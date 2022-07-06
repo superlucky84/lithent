@@ -61,7 +61,8 @@ function processingComponent({ originalVdom, newVdom }) {
       return makeNewVdomTree({ newVdom: item });
     });
   } else if (originalVdom && isSameCustomComponent) {
-    newVdom = newVdom(originalVdom.stateKey);
+    // newVdom = newVdom(originalVdom.stateKey);
+    newVdom = originalVdom.renderer();
     newVdom.children = newVdom.children.map((item, index) => {
       return makeNewVdomTree({
         newVdom: item,

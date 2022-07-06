@@ -1,6 +1,6 @@
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
-import { componentKeyMap, stateKeyRef, stateCallSeq } from '@/hook/useState';
+import { componentKeyMap, stateKeyRef, stateCallSeq } from '@/hook/useData';
 let NEED_DIFF = false;
 
 export function Fragment({ props, children }) {
@@ -48,10 +48,32 @@ function makeCustemNode({ tag, props, children }) {
     stateCallSeq.value = 0;
     stateKeyRef.value = stateKey;
 
-    const customNode = tag({
+    const customNodeRenerer = tag({
       props,
       children,
     });
+    const customNode = customNodeRenerer();
+
+    const renderer = () => {
+      const vdom = customNodeRenerer();
+      vdom.renderer = renderer;
+
+      componentKeyMap[stateKey] = () => {
+        redrawCustomComponent({
+          tag,
+          props,
+          children,
+          prevVDom: vdom,
+          stateKey,
+        });
+      };
+      vdom.tagName = tag.name;
+      vdom.stateKey = stateKey;
+
+      return vdom;
+    };
+
+    customNode.renderer = renderer;
     const prevVDom = customNode;
 
     componentKeyMap[stateKey] = () => {

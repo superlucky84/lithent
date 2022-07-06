@@ -114,7 +114,6 @@ function updateProps(props, element) {
 }
 
 function vDomToDom(vDom) {
-  console.log('VDOM - ', vDom.tagName);
   let element;
   const { type, tag, text, props, children = [] } = vDom;
 

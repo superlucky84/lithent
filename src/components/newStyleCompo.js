@@ -1,7 +1,6 @@
 import { mounted, updated, useData, useRef } from './hook';
 
-export default function NewStyleComponent() {
-  const elementRef = useRef();
+const useJw = elementRef => {
   const data = useData({
     a: 1,
     b: 2,
@@ -15,6 +14,13 @@ export default function NewStyleComponent() {
   const effectHandle = () => {
     console.log(data.a, elementRef);
   };
+
+  return [handle, effectHandle];
+};
+
+export default function NewStyleComponent() {
+  const elementRef = useRef();
+  const [handle, effectHandle] = useJw(elementRef);
 
   const componentMaker = () => {
     mounted(effectHandle);
