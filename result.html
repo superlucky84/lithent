@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      중앙일보 - 지방선거 2022 초간단 정치성향 테스트 | 지방선거 2022 | 중앙일보
+    </title>
+    <meta
+      name="title"
+      content="지방선거 2022 초간단 정치성향 테스트 | 지방선거 2022 | 중앙일보"
+    />
+    <meta
+      name="description"
+      content="지방선거 2022 초간단 정치성향 테스트 | 중앙일보"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <meta property="og:site_name" content="중앙일보" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta
+      property="article:author"
+      content="https://www.facebook.com/joongang"
+    />
+    <meta
+      property="article:publisher"
+      content="https://www.facebook.com/joongang"
+    />
+    <meta property="og:type" content="article" />
+    <meta
+      property="og:title"
+      content="지방선거 2022 초간단 정치성향 테스트 | 지방선거 2022 | 중앙일보"
+    />
+    <meta
+      property="og:description"
+      content="지방선거 2022 초간단 정치성향 테스트 | 중앙일보"
+    />
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="" />
+    <meta property="og:image:kakao" content="" />
+    <meta property="og:image:width" content="610" />
+    <meta property="og:image:height" content="319" />
+    <link
+      rel="shortcut icon"
+      href="https://img.joongang.co.kr/pubimg/favicon/favicon.ico"
+    />
+    <script src="https://digitalspecial.joongang.co.kr/special/common/script/common_ds.js"></script>
+    <script
+      type="text/javascript"
+      src="https://static.joongang.co.kr/js/lib/jquery-3.3.1.min.js"
+    ></script>
+
+    <link
+      rel="canonical"
+      href="https://www.joongang.co.kr/digitalspecial/468"
+    />
+    <script src="https://digitalspecial.joongang.co.kr/_o/static/joongang_15re/scripts/utils/jquery.utils.js"></script>
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+
+    <script src="https://digitalspecial.joongang.co.kr/special/common/script/common.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://static.joins.com/html/ds/2022/myPoliticsTest/css/main.css"
+    />
+    <link
+      href="https://static.joongang.co.kr/css/comment.css"
+      rel="stylesheet"
+    />
+    <!-- 세대 성향 테스트 //-->
+    <script type="text/javascript">
+      $(function () {
+        function checkMobile() {
+          var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+          if (varUA.indexOf('android') > -1) {
+            $('body').addClass('and');
+          } else if (
+            varUA.indexOf('iphone') > -1 ||
+            varUA.indexOf('ipad') > -1 ||
+            varUA.indexOf('ipod') > -1
+          ) {
+            $('body').addClass('ios');
+          } else {
+            $('body').addClass('pc');
+          }
+        }
+        checkMobile();
+      });
+    </script>
+
+    <script src="https://static.joongang.co.kr/js/plugin/digitalspecial.scroll.js"></script>
+    <!--// 세대 성향 테스트 -->
+
+    <!--#include virtual="/_inc/head_gtm3.inc"-->
+    <!--#include virtual="/_inc/head_footer.inc"-->
+  </head>
+  <body class="body_hide">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-55JDM9H"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div id="wrapper">
+      <main id="container" class="container">
+        <section class="content">
+          <!-- intro -->
+          <section id="intro__init" class="intro hide">
+            <div class="intro__inner">
+              <div class="intro-head">
+                <div class="ih__year">ver 5.0</div>
+                <div class="ih__sbj">
+                  <span class="ih__section"
+                    ><i class="logo_local_election2022"
+                      ><span class="visually_hidden">지방선거2022</span></i
+                    ></span
+                  >
+                  <h1 class="ih__title">
+                    <i class="logo_mypoliticstest"
+                      ><span class="visually_hidden"
+                        >나의 정치성향 테스트</span
+                      ></i
+                    >
+                  </h1>
+                </div>
+              </div>
+              <div class="intro-content">
+                <span class="ih__txt"
+                  >소름돋게 맞습니다, 지금 한번 해보세요</span
+                >
+                <span id="total__count__message"></span>
+              </div>
+            </div>
+          </section>
+          <!-- //intro -->
+
+          <div id="intro" class="stop hide">
+            <div class="intro__inner stop__sbj">
+              <strong>워밍업!</strong>
+              테스트 전/후 이용자 정치성향을<br />비교해드립니다. 간단히
+              답해주세요.
+              <!-- question -->
+              <div class="question">
+                <div class="question__head">
+                  <h3 class="question__txt">평소 생각하는 당신의 성향은?</h3>
+                </div>
+                <ul class="select-answer-type1">
+                  <li class="sa__item">
+                    <button
+                      type="button"
+                      data-anum="PG"
+                      data-point=""
+                      class="js-answer sa__btn"
+                    >
+                      <strong>진보</strong>
+                    </button>
+                  </li>
+                  <li class="sa__item">
+                    <button
+                      type="button"
+                      data-anum="PM"
+                      data-point=""
+                      class="js-answer sa__btn"
+                    >
+                      <strong>중도진보</strong>
+                    </button>
+                  </li>
+                  <li class="sa__item">
+                    <button
+                      type="button"
+                      data-anum="MW"
+                      data-point=""
+                      class="js-answer sa__btn"
+                    >
+                      <strong>중도</strong>
+                    </button>
+                  </li>
+                  <li class="sa__item">
+                    <button
+                      type="button"
+                      data-anum="CM"
+                      data-point=""
+                      class="js-answer sa__btn"
+                    >
+                      <strong>중도보수</strong>
+                    </button>
+                  </li>
+                  <li class="sa__item">
+                    <button
+                      type="button"
+                      data-anum="CS"
+                      data-point=""
+                      class="js-answer sa__btn"
+                    >
+                      <strong>보수</strong>
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <!-- //question -->
+            </div>
+          </div>
+
+          <!-- intro1 -->
+          <div id="intro1" class="stop hide">
+            <div class="intro__inner stop__sbj">
+              <img
+                width="120"
+                height="120"
+                src="https://digitalspecial.joongang.co.kr/special/2022/myPoliticsTest/img/intro_img01.png"
+                alt=""
+              />
+              <strong>그럼 지금 시작해볼까요?!</strong><br />
+              평소 생각대로<br />
+              답변해주시면 됩니다<br />
+              정책이슈 영역 10개 질문입니다.
+            </div>
+          </div>
+          <div id="intro2" class="stop hide">
+            <div class="intro__inner stop__sbj">
+              <img
+                width="120"
+                height="120"
+                src="https://digitalspecial.joongang.co.kr/special/2022/myPoliticsTest/img/intro_img02.png"
+                alt=""
+              />
+              <strong>잘 하고 계세요!</strong>
+              태도·가치관 10개 질문입니다.
+            </div>
+          </div>
+          <!-- //intro1 -->
+          <section id="test__section" class="test-section hide"></section>
+          <section id="test__section__temp" class="test-section hide">
+            <header class="test-section-head">
+              <h2 class="test-section__tit">
+                <strong>정책이슈</strong> 총 10문항
+              </h2>
+            </header>
+            <div class="question">
+              <div class="question__head">
+                <strong class="question__tit"></strong>
+                <span class="question__section"></span>
+                <h3 class="question__txt"></h3>
+              </div>
+              <ul class="select-answer-type1">
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="1"
+                    data-point="0"
+                    class="js-answer sa__btn"
+                  >
+                    <strong>매우 찬성</strong>
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="2"
+                    data-point="3.3"
+                    class="js-answer sa__btn"
+                  >
+                    <strong>다소 찬성</strong>
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="3"
+                    data-point="6.7"
+                    class="js-answer sa__btn"
+                  >
+                    <strong>다소 반대</strong>
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="4"
+                    data-point="10"
+                    class="js-answer sa__btn"
+                  >
+                    <strong>매우 반대</strong>
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </section>
+          <!-- intro3 -->
+          <div id="intro3" class="stop hide">
+            <div class="intro__inner stop__sbj">
+              <img
+                width="120"
+                height="120"
+                src="https://digitalspecial.joongang.co.kr/special/2022/myPoliticsTest/img/intro_img03.png"
+                alt=""
+              />
+              <strong>마지막이에요!</strong>
+              간단한 테스트 참여 관련<br />3개 질문입니다.
+            </div>
+          </div>
+          <!-- //intro3 -->
+          <!-- test -->
+
+          <section id="test__section3" class="test-section hide">
+            <header class="test-section-head">
+              <h2 class="test-section__tit">
+                <strong>이용자 참여정보</strong> 총 3문항
+              </h2>
+            </header>
+            <div class="question">
+              <p class="question__stxt">당신의 성별은 어떻게 되십니까?</p>
+              <ul class="select-answer select-answer-type2 gender">
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="M"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    남자
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="F"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    여자
+                  </button>
+                </li>
+              </ul>
+              <p class="question__stxt">당신의 연령대는 어떻게 되십니까?</p>
+              <ul class="select-answer select-answer-type2 age">
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="1"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    만 10대
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="2"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    만 20대
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="3"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    만 30대
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="4"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    만 40대
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="5"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    만 50대
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="6"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    만 60대 이상
+                  </button>
+                </li>
+              </ul>
+              <p class="question__stxt">당신이 사시는 지역은 어디입니까?</p>
+              <ul class="select-answer select-answer-type2 area">
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="1"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    서울
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="2"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    인천/경기
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="3"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    충청
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="4"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    호남/제주
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="5"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    대구/경북
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="6"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    부산/울산/경남
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="7"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    강원
+                  </button>
+                </li>
+                <li class="sa__item">
+                  <button
+                    type="button"
+                    data-anum="8"
+                    data-point=""
+                    class="js-answer sa__btn"
+                  >
+                    국외
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div class="question-foot">
+              <span class="question-foot__txt"
+                >선택한 정보는 서비스 참여자 통계 목적으로 활용됩니다.</span
+              >
+            </div>
+          </section>
+
+          <!-- result -->
+          <section class="result" id="result__section">
+            <header class="result-head" id="result__head__style">
+              <em class="result-head__tit">RESULT</em>
+              <h2 class="result-head__txt">
+                <strong
+                  >당신은 <span id="result__rslt__txt"></span><br />성향을
+                  갖고있네요!</strong
+                >
+                <div>
+                  <span id="result__rslt__x" class="number">2.6</span>
+                  (정책이슈)
+                  <span id="result__rslt__y" class="number">2.7</span>
+                  (태도·가치관)
+                </div>
+              </h2>
+            </header>
+            <!-- 개발 참고
+					자유로운 좌파 : test_color1 
+					자유로운 우파 : test_color3 
+					질서있는 좌파 : test_color2 
+					질서있는 우파 : test_color4 -->
+            <div class="result-content" id="">
+              <!-- chart : 4분면 -->
+              <div class="chain_wrap chart4_wrap">
+                <div class="chart_guide">
+                  <ul>
+                    <li class="test_color2">질서있는 좌파</li>
+                    <li class="test_color4">질서있는 우파</li>
+                    <li class="test_color1">자유로운 좌파</li>
+                    <li class="test_color3">자유로운 우파</li>
+                  </ul>
+                  <div class="chart" id="chart1"></div>
+                  <!-- 정보 -->
+                  <button type="button" class="btn_info">
+                    <i class="ico_info"></i
+                    ><span class="visually_hidden">정보</span>
+                  </button>
+                  <!-- 레이어 - 정보 -->
+                  <div class="layer_popup layer_info hide" tabindex="0">
+                    <!-- hide/show -->
+                    <div class="layer_body">
+                      <p>
+                        본 그래프는 2022년 중앙일보 다차원적 정치이념 조사
+                        결과로 Blundell-Gosschalk 모델 기반으로 온라인 패널을
+                        대상 실시간 진행중입니다. 이번 조사에 참가한 본인,
+                        셀러브니티, 일반참가자의 위치가 어디에 있는지 각 사분면
+                        위에 보여줍니다.
+                      </p>
+                      <p class="date">
+                        평가 방법: 문항 응답에 따른 가중치 합계 / 총 문항 수 =
+                        평균값
+                      </p>
+                    </div>
+                    <button type="button" class="btn_close" title="Close">
+                      <i class="ico_close"></i
+                      ><span class="visually_hidden">닫기</span>
+                    </button>
+                  </div>
+                  <!-- //레이어 - 정보 -->
+                </div>
+                <!-- //정보 -->
+                <!-- 자유로운 좌파 -->
+                <p class="desc__txt hide" id="RESULT__DESC__FL">
+                  <strong class="test_color1">자유로운 좌파</strong>는 정책
+                  선호는 진보적이면서, 삶의 태도는 개인의 선택과 자유를
+                  중시합니다. 버락 오바마(Barack Obama) 전 미국 대통령과 버니
+                  샌더스(Bernie Sanders) 미국 민주당 상원의원이 대표적입니다.<br /><br />
+                  이런 성향을 가진 사람들은 약자를 보호하는 경제 정책과 다자화된
+                  외교 노선을 중시합니다. 또 사회적 편견에 반대하고, 다양한 삶의
+                  방식을 인정하는 경향도 보입니다.
+                </p>
+                <!-- //자유로운 좌파 -->
+                <!-- 자유로운 우파 -->
+                <p class="desc__txt hide" id="RESULT__DESC__FR">
+                  <strong class="test_color3">자유로운 우파</strong>는 정책
+                  선호는 보수적이면서, 삶의 태도는 개인의 선택과 자유를
+                  중시합니다. 에마뉘엘 마크롱(Emmanuel Macron) 프랑스 대통령,
+                  보리스 존슨(Boris Johnson) 영국 총리가 대표적입니다.<br /><br />
+                  이런 성향을 가진 사람들은 경제성장과 안보를 강화하는 정책을
+                  선호합니다. 그러면서 사회적 편견에 반대하고, 다양한 삶의
+                  방식을 인정하는 경향도 보입니다.
+                </p>
+                <!-- //자유로운 우파 -->
+                <!-- 질서있는 좌파 -->
+                <p class="desc__txt hide" id="RESULT__DESC__OL">
+                  <strong class="test_color2">질서있는 좌파</strong>는 정책
+                  선호는 진보적이면서, 삶의 태도는 사회의 질서와 안정을
+                  중시합니다. 앙겔라 메르켈(Angela Merkel) 전 독일 총리와 힐러리
+                  클린턴(Hillary Clinton) 전 미국 국무장관이 대표적입니다.<br /><br />
+                  이런 성향를 가진 사람들은 약자를 보호하는 경제 정책과 다자화된
+                  외교 노선을 중시합니다. 그러면서 사회에 대한 의무를 중요하게
+                  여기고, 현재의 가치와 질서를 잘 지키는 경향을 보입니다.
+                </p>
+                <!-- //질서있는 좌파 -->
+                <!-- 질서있는 우파 -->
+                <p class="desc__txt hide" id="RESULT__DESC__OR">
+                  <strong class="test_color4">질서있는 우파</strong>는 정책
+                  선호는 보수적이면서, 삶의 태도는 사회의 질서와 안정을
+                  중시합니다. 마거릿 대처(Margaret Thatcher) 전 영국 총리와
+                  로널드 레이건(Ronald Reagan) 전 미국 대통령이 대표적입니다.<br /><br />
+                  이런 성향을 가진 사람들은 경제성장과 안보를 강화하는 정책을
+                  선호합니다. 그러면서 사회에 대한 의무를 중요하게 여기고,
+                  현재의 가치와 질서를 잘 지키는 경향을 보입니다.
+                </p>
+                <!-- //질서있는 우파 -->
+                <!-- 정치성향 -->
+                <div class="feature_wrap" id="result__desc__button">
+                  <strong class="result__tit">좀 더 상세히 보시려면</strong>
+                  <ul class="flex">
+                    <li>
+                      <a class="test_color1" data-type="FL" href="#"
+                        >자유로운 좌파</a
+                      >
+                    </li>
+                    <li>
+                      <a class="test_color2" data-type="OL" href="#"
+                        >질서있는 좌파</a
+                      >
+                    </li>
+                    <li>
+                      <a class="test_color3" data-type="FR" href="#"
+                        >자유로운 우파</a
+                      >
+                    </li>
+                    <li>
+                      <a class="test_color4" data-type="OR" href="#"
+                        >질서있는 우파</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+                <!-- //정치성향 -->
+              </div>
+              <!-- //chart : 4분면 -->
+              <div class="chain_wrap">
+                <strong class="result__tit">테스트 전후도 비교해볼까요?</strong>
+                <p id="result__predesc" class="desc__txt"></p>
+                <strong class="result__tit"
+                  ><span id="result__pretype">진보</span>라고 답한 분들의 실제
+                  성향</strong
+                >
+                <!-- chart -->
+                <div class="chart_wrap chart_type">
+                  <div class="chart"></div>
+                </div>
+                <!-- //chart -->
+              </div>
+              <div class="chain_wrap">
+                <strong class="result__tit">내 또래 성향은!</strong>
+                <p id="result__simulardesc" class="desc__txt"></p>
+                <div class="chart_wrap">
+                  <div class="chart chart_all"></div>
+                </div>
+                <dl class="guide_wrap">
+                  <dt class="visually_hidden">성향컬러</dt>
+                  <dd class="test_color1">자유로운 좌파</dd>
+                  <dd class="test_color2">질서있는 좌파</dd>
+                  <dd class="test_color3">자유로운 우파</dd>
+                  <dd class="test_color4">질서있는 우파</dd>
+                </dl>
+              </div>
+              <!-- //chart -->
+              <!-- 결과 더보기 -->
+              <div id="chart__add" class="chart_add hide">
+                <!-- 개발 : show/hide -->
+                <p class="result__tit">성별</p>
+                <!-- chart : circle -->
+                <div class="chart_circle_wrap">
+                  <div class="legend">
+                    <span>남자</span>
+                    <span>여자</span>
+                  </div>
+                  <div class="chart chart_circle_left col_lg6"></div>
+                  <div class="chart chart_circle_right col_lg6"></div>
+                </div>
+                <div id="result__gen__total__txt" class="label"></div>
+                <!-- //chart : circle -->
+                <p class="result__tit">연령대별</p>
+                <!-- chart -->
+                <div class="chart_wrap">
+                  <div class="chart chart_age"></div>
+                </div>
+                <!-- //chart -->
+                <p class="result__tit">지역별</p>
+                <!-- chart -->
+                <div class="chart_wrap">
+                  <div class="chart chart_area"></div>
+                </div>
+                <!-- //chart -->
+              </div>
+              <button
+                id="toggle__total__graph"
+                type="button"
+                class="fm__result"
+              >
+                전체 성별/연령대별/지역별 결과 열기
+                <i class="ico_arrow_down"></i>
+              </button>
+              <!-- //결과 더보기 -->
+            </div>
+            <div class="result-foot">
+              <!-- 내 결과 공유하기 -->
+              <div class="result-content__type">
+                <p class="result__tit text_center">
+                  이제 내 결과를 공유해보세요
+                </p>
+                <div class="flex sns_wrap">
+                  <a
+                    href="javascript:shareResultUrl('KakaoTalk');"
+                    class="kakao"
+                    title="카카오톡 공유"
+                    data-evnt-ctg="event page : 정치성향테스트"
+                    data-evnt-act="click : 공유하기"
+                    data-evnt-lbl="kakao"
+                  ></a>
+                  <a
+                    href="javascript:shareResultUrl('Facebook');"
+                    class="facebook"
+                    title="페이스북 공유"
+                    data-evnt-ctg="event page : 정치성향테스트"
+                    data-evnt-act="click : 공유하기"
+                    data-evnt-lbl="facebook"
+                  ></a>
+                  <a
+                    href="javascript:shareResultUrl('Twitter');"
+                    class="twitter"
+                    title="트위터 공유"
+                    data-evnt-ctg="event page : 정치성향테스트"
+                    data-evnt-act="click : 공유하기"
+                    data-evnt-lbl="twitter"
+                  ></a>
+                  <a
+                    class="urlcopy"
+                    href="javascript:urlCopy();"
+                    data-sns-type="copy"
+                    title="URL 복사"
+                    data-evnt-ctg="event page : 정치성향테스트"
+                    data-evnt-act="click : 공유하기"
+                    data-evnt-lbl="url복사"
+                  ></a>
+                </div>
+              </div>
+              <!-- //내 결과 공유하기 -->
+              <!-- 관련기사 -->
+              <div class="result-content__type">
+                <p class="result__tit">관련기사</p>
+                <ul class="article_list">
+                  <li>
+                    <a href="#"
+                      >한동훈 처분 묻자…박범계 "질문 공정하냐, 진실규명 먼저"</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#"
+                      >이준석 보란듯…고민정 휠체어 출근 "딱 하루인데 두 팔
+                      욱신"</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#"
+                      >우크라군 활약 이유 있었다…"군 일부, 美서 군사교육훈련"</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#"
+                      >1만여명이 무증상 감염…상하이 봉쇄에 이례적 軍 투입, 왜</a
+                    >
+                  </li>
+                </ul>
+              </div>
+              <!-- //관련기사 -->
+              <button
+                type="button"
+                class="fm__again fm__confirm active"
+                data-evnt-ctg="event page : 정치성향테스트"
+                data-evnt-act="click : 테스트 새로하기"
+                onclick="window.location.href='https://www.joongang.co.kr/digitalspecial/468'"
+              >
+                테스트 새로하기
+              </button>
+              <ul class="flex result-link">
+                <li>
+                  <a
+                    href="#"
+                    data-evnt-ctg="event page : 2022지방선거 섹션"
+                    data-evnt-act="move : 2022지방선거 섹션"
+                    target="_blank"
+                    >2022지방선거 섹션</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    data-evnt-ctg="event page : 2022지방선거 FAQ"
+                    data-evnt-act="move : 2022지방선거 FAQ"
+                    target="_blank"
+                    >2022지방선거 FAQ</a
+                  >
+                </li>
+              </ul>
+              <div class="comment_wrap"></div>
+            </div>
+          </section>
+          <!-- //result -->
+        </section>
+      </main>
+      <!-- 레이어 - 후보자의 정치 성향은? - 자유로운 좌파 -->
+      <div id="layer_answer" class="full_popup hide">
+        <div class="layer_popup layer_answer" tabindex="0">
+          <!-- hide/show -->
+          <div class="layer_body">
+            <div class="result-head">
+              <p class="result-head__txt"></p>
+              <em class="result-head__calcul"></em>
+            </div>
+            <div class="result-content__type">
+              <p></p>
+            </div>
+            <!-- //분야별 정치성향 -->
+          </div>
+        </div>
+        <button type="button" class="btn_close" title="Close">
+          <i class="ico_close"></i><span class="visually_hidden">닫기</span>
+        </button>
+      </div>
+      <!-- //레이어 - 후보자의 정치 성향은? -->
+      <div class="fixed-menu">
+        <!-- intro : show 일 경우 -->
+        <div id="intro__sub" class="fm__sub fm__intro hide">
+          <p>
+            <strong>2022년 중앙일보 다차원적 정치이념 조사 </strong>
+            <span
+              >국내외 정치학계의 연구 성과를 반영해 설계되었으며,<br />
+              온라인 패널의 조사 결과를 실시간 집계 중입니다. <br />
+              도움주신 분: 강우창 고려대, 하상응 서강대, 박상경 인천대
+              교수</span
+            >
+          </p>
+          <button
+            type="button"
+            id="intro__start"
+            class="fm__start fm__confirm"
+            data-evnt-ctg="event page : 정치성향테스트"
+            data-evnt-act="click : 시작하기"
+          >
+            START
+          </button>
+        </div>
+        <!-- stop 또는 test-section : show 일 경우 -->
+        <!-- 개발참고 : 모든 버튼들은 기존처럼 다음 버튼 한개에서, active 클래스와 text 변경으로 제어해주시면 됩니다. -->
+        <div id="main-button-area" class="fm__sub fm__test hide">
+          <button id="fm__prev" type="button" class="js-prev fm__prev">
+            <span class="blind">이전</span>
+          </button>
+          <button
+            id="fm__start"
+            type="button"
+            class="js-next fm__confirm fm__next active"
+          >
+            시작하기
+          </button>
+          <button
+            id="fm__next"
+            type="button"
+            class="js-next fm__confirm fm__next hide"
+          >
+            다음
+          </button>
+          <!-- button type="button" class="js-next fm__confirm fm__next">다음</button>
+			<button type="button" class="js-next fm__confirm fm__next active">결과 확인하기</button -->
+        </div>
+      </div>
+    </div>
+    <script>
+      $(function () {
+        // Todo url 값 변경할것 politial.js의 redirectURL도 함께 변경할것
+        shareJS.url = 'https://www.joongang.co.kr/digitalspecial/468';
+        shareJS.text = '중앙일보 - 지방선거 2022 초간단 정치성향 테스트';
+        shareJS.img =
+          'https://digitalspecial.joongang.co.kr/special/2022/myPoliticsTest/img/kakao-share-img2.png';
+        shareJS.imgWidth = 610;
+        shareJS.imgHeight = 319;
+      });
+    </script>
+
+    <!-- 여론조사 -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/variable-pie.js"></script>
+    <!--script src="https://digitalspecial.joongang.co.kr/special/2022/myPoliticsTest_0601/js/chart.js"></script-->
+    <script>
+      // Create the chart
+      function drawDotChart(drawDotData, dotSeriesData, seriesData) {
+        var chart = $('#chart1').highcharts({
+          chart: {
+            type: 'scatter',
+            spacing: [0, 0, 0, 0],
+            margin: [0, 0, 0, 0],
+            /* 처음 진입시 나의 성향 show */
+            events: {
+              load: function () {
+                var point = this.series[1].points[0];
+                // this.tooltip.refresh(point);
+                // this.point.select();
+              },
+            },
+          },
+          credits: { enabled: false },
+          title: {
+            text: null,
+          },
+          subtitle: {
+            text: null,
+          },
+          xAxis: [
+            {
+              title: {
+                align: 'middle',
+                textAlign: 'center',
+                offset: 0,
+                //x: 45,
+                y: 5,
+                enabled: true,
+                //useHTML: true,
+                text: '개인 자유',
+                x: -1,
+                y: -16,
+                style: {
+                  color: '#999',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                },
+              },
+              min: 0,
+              max: 10,
+              tickInterval: 2.5,
+              labels: {
+                enabled: false,
+                y: -5,
+                style: {
+                  color: '#bbb',
+                },
+              },
+              lineWidth: 0,
+              minorGridLineWidth: 0,
+              lineColor: 'transparent',
+              minorTickLength: 0,
+              tickLength: 0,
+              startOnTick: true,
+              endOnTick: true,
+              showLastLabel: true,
+              plotLines: [
+                {
+                  color: '#999',
+                  width: 1,
+                  value: 5,
+                  zIndex: 1,
+                },
+              ],
+              gridLineWidth: 1,
+            },
+            {
+              title: {
+                text: '사회 질서',
+                x: -1,
+                y: 18,
+                style: {
+                  color: '#999',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                },
+              },
+              alignTicks: false,
+              opposite: true,
+            },
+            {
+              title: {
+                text: '10',
+                align: 'low',
+                x: 2,
+                y: 52,
+                style: {
+                  color: '#bbb',
+                  fontSize: '11px',
+                },
+              },
+              lineWidth: 0,
+              alignTicks: false,
+              opposite: true,
+            },
+            {
+              title: {
+                text: '0',
+                align: 'low',
+                x: 2,
+                y: -49,
+                style: {
+                  color: '#bbb',
+                  fontSize: '11px',
+                },
+              },
+              lineWidth: 0,
+            },
+          ],
+          yAxis: [
+            {
+              title: {
+                text: '좌파',
+                align: 'middle',
+                textAlign: 'left',
+                rotation: 0,
+                offset: 0,
+                x: 5,
+                y: -5,
+                enabled: true,
+                style: {
+                  color: '#999',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                },
+              },
+              min: 0,
+              max: 10,
+              tickInterval: 2.5,
+              lineWidth: 1,
+              lineColor: '#eee',
+              labels: {
+                enabled: false,
+                x: 10,
+                style: {
+                  color: '#bbb',
+                },
+              },
+              plotLines: [
+                {
+                  color: '#999',
+                  dashStyle: '',
+                  width: 1,
+                  value: 5,
+                  zIndex: 1,
+                },
+              ],
+              //gridLineWidth: 1
+            },
+            {
+              title: {
+                text: '우파',
+                textAlign: 'right',
+                rotation: 0,
+                x: -15,
+                y: -5,
+                style: {
+                  color: '#999',
+                  fontSize: '11px',
+                  fontWeight: 'bold',
+                },
+              },
+              opposite: true,
+            },
+            {
+              title: {
+                text: '10',
+                align: 'low',
+                rotation: 0,
+                x: -45,
+                y: -3,
+                style: {
+                  color: '#bbb',
+                  fontSize: '11px',
+                },
+              },
+              lineWidth: 0,
+              alignTicks: false,
+              opposite: true,
+            },
+          ],
+          legend: {
+            enabled: false,
+          },
+          plotOptions: {
+            scatter: {
+              marker: {
+                radius: 6,
+                states: {
+                  hover: {
+                    enabled: true,
+                    opacity: 0, // hover시 이미지(marker) 히든
+                  },
+                },
+              },
+              states: {
+                inactive: {
+                  // hover시 나머지 이미지(marker) 보여줌
+                  opacity: 1,
+                },
+                hover: {
+                  halo: {
+                    // hover시 이미지(marker)를 도형(marker)로 변경
+                    size: 6,
+                    opacity: 1,
+                    attributes: {
+                      fill: 'transparent', // 도형(marker)는 투명후 css로 색추가
+                    },
+                  },
+                },
+              },
+              point: {
+                events: {
+                  mouseOut: function (e) {
+                    this.dataLabel.show();
+                  },
+                  mouseOver: function (e) {
+                    this.dataLabel.hide();
+                  },
+                },
+              },
+            },
+          },
+          tooltip: {
+            useHTML: true,
+            formatter: function () {
+              if (this.series.name == '정치인') {
+                return (
+                  '<div class="tooltip"><img width="50" height="50" src="' +
+                  this.point.img +
+                  '" />' +
+                  '<span style="color:' +
+                  this.series.color +
+                  '"><strong>' +
+                  this.point.name +
+                  '</strong>' +
+                  this.point.position +
+                  '</span></div>'
+                );
+              } else return this.series.name;
+            },
+            shadow: false,
+            borderColor: '#dedee5',
+            borderRadius: 0,
+            backgroundColor: '#fff',
+            style: {
+              fontFamily:
+                'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+            },
+            zIndex: 999,
+          },
+          series: [
+            {
+              name: '참여자',
+              color: 'rgba(185, 185, 185, .5)',
+              enableMouseTracking: false,
+              marker: {
+                radius: 1,
+              },
+              data: drawDotData,
+              zIndex: 10,
+              events: {
+                legendItemClick: function () {
+                  return false;
+                },
+              },
+              zIndex: 0,
+            },
+            {
+              name: '나의 성향',
+              color: '#fff',
+              marker: {
+                symbol: 'circle',
+                radius: 7,
+                lineWidth: 6,
+                lineColor: '#4b4d57',
+              },
+              data: [[seriesData.rsltX, seriesData.rsltY]],
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                shape: 'callout',
+                backgroundColor: '#4b4d57',
+                color: '#fff',
+                y: -20,
+                zIndex: 2,
+                style: {
+                  fontWeight: 'bold',
+                  textShadow: 'none',
+                  fontFamily: 'noto sans kr, Roboto, sans-serif',
+                  textOutline: 0,
+                },
+                useHTML: true,
+                formatter: function () {
+                  return '' + this.series.name + '';
+                },
+              },
+              zIndex: 2,
+            },
+          ].concat(dotSeriesData),
+        });
+      }
+
+      var categories = [
+        '서울',
+        '인천·경기',
+        '대전·세종·<br>충청',
+        '광주·전라',
+        '대구·경북',
+        '부산·울산·<br>경남',
+        '강원·제주',
+        '국외',
+      ];
+      var categories_age = [
+        '만 10대',
+        '만 20대',
+        '만 30대',
+        '만 40대',
+        '만 50대',
+        '만 60대<br>이상',
+      ];
+      var data = ['', '', '', '', '', ''];
+
+      function drawTendencyChart(tendencyData) {
+        // 성향
+        var chart = $('.chart_type .chart').highcharts({
+          chart: {
+            type: 'bar',
+            margin: [0, 0, 0, 0],
+            backgroundColor: 'transparent',
+          },
+          credits: { enabled: false },
+          accessibility: {
+            announceNewData: {
+              enabled: true,
+            },
+          },
+          title: {
+            text: null,
+          },
+          xAxis: {
+            title: {
+              align: 'high',
+              textAlign: 'right',
+              style: {
+                fontSize: '12px',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+            },
+            categories: [
+              '자유로운 좌파',
+              '질서있는 좌파',
+              '자유로운 우파',
+              '질서있는 우파',
+            ],
+            lineColor: '#ddd',
+            labels: {
+              x: -21,
+              y: 5,
+              align: 'right',
+              style: {
+                fontSize: '12px',
+                color: '#333',
+                fontWeight: 'bold',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+            },
+          },
+          yAxis: {
+            title: {
+              text: null,
+            },
+            gridLineColor: 'transparent',
+            labels: { enabled: false },
+            max: 100,
+            stackLabels: {
+              x: 0,
+              y: 0,
+              align: '',
+              useHTML: true,
+              formatter: function () {
+                return `총 ${tendencyData[this.x].cnt}`; //개발 : 1번선택한 총 인원수, 2번선택한 총 인원수, 3번선택한 총 인원수 넣어주세요.
+              },
+              enabled: true,
+              shadow: false,
+              style: {
+                textOutline: 0,
+                fontSize: '10px',
+                color: 'black',
+              },
+            },
+          },
+          legend: {
+            enabled: false,
+          },
+          tooltip: {
+            enabled: false,
+          },
+          plotOptions: {
+            series: {
+              stacking: 'normal',
+              borderWidth: 0,
+              pointWidth: 18,
+            },
+          },
+          series: [
+            {
+              data: [
+                {
+                  color: '#52c4b3',
+                  dataLabels: {
+                    enabled: true,
+                    align: 'right',
+                    color: '#52c4b3',
+                    style: {
+                      fontWeight: 'bold',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                    x: 3,
+                    y: 15,
+                    verticalAlign: 'low',
+                    overflow: true,
+                    crop: false,
+                    format: '{point.y:1f}%',
+                  },
+                  y: tendencyData[0].per,
+                },
+                {
+                  color: '#00a8d4',
+                  dataLabels: {
+                    enabled: true,
+                    align: 'right',
+                    color: '#00a8d4',
+                    style: {
+                      fontWeight: 'bold',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                    x: 3,
+                    y: 15,
+                    verticalAlign: 'low',
+                    overflow: true,
+                    crop: false,
+                    format: '{point.y:1f}%',
+                  },
+                  y: tendencyData[1].per,
+                },
+                {
+                  color: '#ff9f4d',
+                  dataLabels: {
+                    enabled: true,
+                    align: 'right',
+                    color: '#ff9f4d',
+                    style: {
+                      fontWeight: 'bold',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                    x: 3,
+                    y: 15,
+                    verticalAlign: 'low',
+                    overflow: true,
+                    crop: false,
+                    format: '{point.y:1f}%',
+                  },
+                  y: tendencyData[2].per,
+                },
+                {
+                  color: '#ff7171',
+                  dataLabels: {
+                    enabled: true,
+                    align: 'right',
+                    color: '#ff7171',
+                    style: {
+                      fontWeight: 'bold',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                    x: 3,
+                    y: 15,
+                    verticalAlign: 'low',
+                    overflow: true,
+                    crop: false,
+                    format: '{point.y:1f}%',
+                  },
+                  y: tendencyData[3].per,
+                },
+              ],
+            },
+          ],
+        });
+      }
+
+      function drawSameChart(samePer, sameCnt, sameCate) {
+        // Create the chart
+        var chart = $('.chart_all').highcharts({
+          chart: {
+            type: 'bar',
+            margin: [0, 0, 0, 0],
+          },
+          credits: { enabled: false },
+          accessibility: {
+            announceNewData: {
+              enabled: true,
+            },
+          },
+          title: {
+            text: null,
+          },
+          xAxis: {
+            title: {
+              align: 'high',
+              textAlign: 'right',
+              style: {
+                fontSize: '12px',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+            },
+            categories: sameCate, //개발 : 내 정보에 맞게 넣어주세요.
+            lineColor: '#ddd',
+            labels: {
+              x: -60,
+              y: 5,
+              align: 'left',
+              style: {
+                fontSize: '12px',
+                color: '#333',
+                fontWeight: 'bold',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+              formatter: function () {
+                return this.value;
+              },
+            },
+          },
+          /*yAxis: {
+	  visible: false,
+  },*/
+          yAxis: {
+            title: {
+              text: null,
+            },
+            gridLineColor: 'transparent',
+            labels: {
+              style: {
+                fontSize: '0',
+                color: '#fff',
+              },
+            },
+            stackLabels: {
+              x: -115,
+              y: 0,
+              align: 'right',
+              useHTML: true,
+              formatter: function () {
+                return (
+                  '<span class="stacklabel">총 ' + sameCnt[this.x] + '</span>'
+                );
+              },
+              enabled: true,
+              shadow: false,
+              style: {
+                textOutline: 0,
+                fontSize: '10px',
+                color: 'white',
+              },
+            },
+          },
+          legend: {
+            enabled: false,
+          },
+          plotOptions: {
+            series: {
+              stacking: 'normal',
+              borderWidth: 0,
+              pointWidth: 18,
+            },
+          },
+          series: [
+            {
+              name: '4번 선택지',
+              data: samePer[3], //개발 : %값 넣어주세요.
+              color: '#ff7171',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#ff7171',
+                align: 'right',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                x: 5,
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '3번 선택지',
+              data: samePer[2], //개발 : %값 넣어주세요.
+              color: '#ff9f4d',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#ff9f4d',
+                align: 'center',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                x: 5,
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '2번 선택지',
+              data: samePer[1], //개발 : %값 넣어주세요.
+              color: '#00a8d4',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#00a8d4',
+                //align: 'right',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '1번 선택지',
+              data: samePer[0], //개발 : %값 넣어주세요.
+              color: '#52c4b3',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                //rotation: -90,
+                color: '#52c4b3',
+                align: 'left',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+          ],
+        });
+      }
+
+      function drawTotalGenChart(genData) {
+        //성별
+        var chart = $('.chart_circle_left').highcharts({
+          chart: {
+            plotBackgroundColor: null,
+            backgroundColor: 'transparent',
+            plotBorderWidth: 0,
+            plotShadow: false,
+            margin: [0, 0, 0, 0],
+          },
+          credits: { enabled: false },
+          title: null,
+          legend: {
+            enabled: false,
+          },
+          tooltip: {
+            enabled: false,
+          },
+          accessibility: {
+            point: {
+              valueSuffix: '%',
+            },
+          },
+          plotOptions: {
+            pie: {
+              /*dataLabels: {
+        enabled: true,
+        distance: -20,
+        style: {
+          fontWeight: 'bold',
+          color: 'white',
+		  fontSize: '12px'
+        },
+		format: '{point.percentage:.0f} %'
+      },*/
+              borderWidth: '0',
+              startAngle: 180,
+              endAngle: 360,
+              center: ['0', '50%'],
+              size: '180%',
+            },
+          },
+          series: [
+            {
+              type: 'pie',
+              name: '남자',
+              innerSize: '44%',
+              enableMouseTracking: false,
+              data: [
+                {
+                  name: '남자4',
+                  y: genData.M.per[3], //개발 : %값 넣어주세요.
+                  z: 100,
+                  color: '#ff7171',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.M.per[3] ? genData.M.per[3] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0, //distance: -35,
+                    y: 10,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+                {
+                  name: '남자3',
+                  y: genData.M.per[2], //개발 : %값 넣어주세요.
+                  z: 100,
+                  color: '#ff9f4d',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.M.per[2] ? genData.M.per[2] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0, //distance: -35,
+                    y: 10,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+                {
+                  name: '남자2',
+                  y: genData.M.per[1], //개발 : %값 넣어주세요.
+                  z: 100,
+                  color: '#00a8d4',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.M.per[1] ? genData.M.per[1] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0,
+                    y: 0,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+                {
+                  name: '남자1',
+                  y: genData.M.per[0], //개발 : %값 넣어주세요.
+                  z: 100,
+                  color: '#52c4b3',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.M.per[0] ? genData.M.per[0] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0,
+                    y: -10,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        });
+
+        var chart = $('.chart_circle_right').highcharts({
+          chart: {
+            plotBackgroundColor: null,
+            backgroundColor: 'transparent',
+            plotBorderWidth: 0,
+            plotShadow: false,
+            margin: [0, 0, 0, 0],
+          },
+          credits: { enabled: false },
+          title: null,
+          legend: {
+            enabled: false,
+          },
+          tooltip: {
+            enabled: false,
+          },
+          accessibility: {
+            point: {
+              valueSuffix: '%',
+            },
+          },
+          plotOptions: {
+            pie: {
+              dataLabels: {
+                enabled: true,
+                distance: 0,
+                style: {
+                  color: 'white',
+                  fontSize: '12px',
+                },
+                format: '{point.percentage:.0f} %',
+              },
+              borderWidth: '0',
+              startAngle: 0,
+              endAngle: 180,
+              center: ['0', '50%'],
+              size: '180%',
+            },
+          },
+          series: [
+            {
+              type: 'pie',
+              name: '여자1',
+              innerSize: '44%',
+              enableMouseTracking: false,
+              data: [
+                {
+                  name: '여자1',
+                  y: genData.F.per[0], //개발 : %값 넣어주세요.
+                  color: '#52c4b3',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.F.per[0] ? genData.F.per[0] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0,
+                    //x: 0,
+                    y: -10,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+                {
+                  name: '여자2',
+                  y: genData.F.per[1], //개발 : %값 넣어주세요.
+                  //z: 100,
+                  color: '#00a8d4',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.F.per[1] ? genData.F.per[1] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0,
+                    y: -10,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+                {
+                  name: '여자3',
+                  y: genData.F.per[2], //개발 : %값 넣어주세요.
+                  //z: 100,
+                  color: '#ff9f4d',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.F.per[2] ? genData.F.per[2] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0,
+                    y: 10,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+                {
+                  name: '여자4',
+                  y: genData.F.per[3], //개발 : %값 넣어주세요.
+                  z: 100,
+                  color: '#ff7171',
+                  dataLabels: {
+                    enabled: true,
+                    format: genData.F.per[3] ? genData.F.per[3] + '%' : '', //개발 : %값 넣어주세요.
+                    distance: 0, //distance: -35,
+                    y: 10,
+                    style: {
+                      color: 'black',
+                      textOutline: 0,
+                      fontSize: '12px',
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        });
+      }
+
+      function drawTotalAgeChart(ageData) {
+        //연령
+        var chart = $('.chart_age').highcharts({
+          chart: {
+            type: 'bar',
+            margin: [0, 0, 0, 0],
+          },
+          credits: { enabled: false },
+          accessibility: {
+            announceNewData: {
+              enabled: true,
+            },
+          },
+          title: {
+            text: null,
+          },
+          xAxis: {
+            title: {
+              align: 'high',
+              textAlign: 'right',
+              style: {
+                fontSize: '12px',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+            },
+            categories: categories_age,
+            lineColor: '#ddd',
+            labels: {
+              x: -60,
+              y: 5,
+              align: 'left',
+              style: {
+                fontSize: '12px',
+                color: '#333',
+                fontWeight: 'bold',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+              formatter: function () {
+                return this.value;
+              },
+            },
+          },
+          yAxis: {
+            title: {
+              text: null,
+            },
+            gridLineColor: 'transparent',
+            labels: {
+              style: {
+                fontSize: '0',
+                color: '#fff',
+              },
+            },
+            stackLabels: {
+              x: -115,
+              y: 0,
+              align: 'right',
+              useHTML: true,
+              formatter: function () {
+                return (
+                  '<span class="stacklabel">총 ' +
+                  ageData[0][this.x + 1].cnt +
+                  '</span>'
+                ); //개발 : 1번선택한 총 인원수, 2번선택한 총 인원수, 3번선택한 총 인원수 넣어주세요.
+              },
+              enabled: true,
+              style: {
+                textOutline: 0,
+                fontSize: '10px',
+                color: 'white',
+              },
+            },
+          },
+          legend: {
+            enabled: false,
+          },
+          plotOptions: {
+            series: {
+              stacking: 'normal',
+              borderWidth: 0,
+              pointWidth: 18,
+            },
+          },
+          series: [
+            {
+              name: '4번 선택지',
+              data: ageData[1][3], //개발 : %값 넣어주세요.
+              color: '#ff7171',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#ff7171',
+                align: 'right',
+                //verticalAlign: 'top',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                x: 5,
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '3번 선택지',
+              data: ageData[1][2], //개발 : %값 넣어주세요.
+              color: '#ff9f4d',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#ff9f4d',
+                align: 'center',
+                //verticalAlign: 'top',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                x: 5,
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '2번 선택지',
+              data: ageData[1][1], //개발 : %값 넣어주세요.
+              color: '#00a8d4',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#00a8d4',
+                //align: 'right',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '1번 선택지',
+              data: ageData[1][0], //개발 : %값 넣어주세요.
+              color: '#52c4b3',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                //rotation: -90,
+                color: '#52c4b3',
+                align: 'left',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+          ],
+        });
+      }
+
+      function drawTotalLocChart(locData) {
+        //지역
+        var chart = $('.chart_area').highcharts({
+          chart: {
+            type: 'bar',
+            margin: [0, 0, 0, 0],
+          },
+          credits: { enabled: false },
+          accessibility: {
+            announceNewData: {
+              enabled: true,
+            },
+          },
+          title: {
+            text: null,
+          },
+          xAxis: {
+            title: {
+              align: 'high',
+              textAlign: 'right',
+              style: {
+                fontSize: '12px',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+            },
+            categories: categories,
+            lineColor: '#ddd',
+            labels: {
+              x: -60,
+              y: 5,
+              align: 'left',
+              style: {
+                fontSize: '12px',
+                color: '#333',
+                fontWeight: 'bold',
+                fontFamily:
+                  'Noto Sans KR,Atheme_uniquele SD Gothic Neo,Malgun Gothic,맑은 고딕,Dotum,돋움,Arial,sans-serif',
+              },
+              formatter: function () {
+                return this.value;
+              },
+            },
+          },
+          yAxis: {
+            title: {
+              text: null,
+            },
+            labels: {
+              style: {
+                fontSize: '0',
+                color: '#fff',
+              },
+            },
+            gridLineColor: 'transparent',
+            stackLabels: {
+              x: -115,
+              y: 0,
+              align: 'right',
+              useHTML: true,
+              formatter: function () {
+                return (
+                  '<span class="stacklabel">총 ' +
+                  locData[0][this.x + 1].cnt +
+                  '</span>'
+                ); //개발 : 1번선택한 총 인원수, 2번선택한 총 인원수, 3번선택한 총 인원수 넣어주세요.
+              },
+              enabled: true,
+              style: {
+                fontSize: '10px',
+                color: 'white',
+                textOutline: 0,
+              },
+            },
+          },
+          legend: {
+            enabled: false,
+          },
+          plotOptions: {
+            series: {
+              stacking: 'normal',
+              borderWidth: 0,
+              pointWidth: 18,
+            },
+          },
+          series: [
+            {
+              name: '4번 선택지',
+              data: locData[1][3],
+              color: '#ff7171',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#ff7171',
+                align: 'right',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                x: 5,
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '3번 선택지',
+              data: locData[1][2],
+              color: '#ff9f4d',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#ff9f4d',
+                align: 'center',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                x: 5,
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '2번 선택지',
+              data: locData[1][1],
+              color: '#00a8d4',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                color: '#00a8d4',
+                //align: 'right',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+            {
+              name: '1번 선택지',
+              data: locData[1][0],
+              color: '#52c4b3',
+              enableMouseTracking: false,
+              dataLabels: {
+                enabled: true,
+                //rotation: -90,
+                color: '#52c4b3',
+                align: 'left',
+                formatter: function () {
+                  return this.y ? this.y + '%' : '';
+                },
+                y: 20, // 10 pixels down from the top
+                style: {
+                  textOutline: 0,
+                  fontSize: '12px',
+                },
+              },
+            },
+          ],
+        });
+      }
+    </script>
+    <script src="https://digitalspecial.joongang.co.kr/special/2022/myPoliticsTest_0601/js/localElectionPoliticsModule.js?ver=71"></script>
+
+    <script>
+      $(function () {
+        $('#wrapper').off('click', '.urlcopy');
+        $('#wrapper .layer_body').on('click', '.urlcopy', function () {
+          urlCopy(shareJS.url);
+        });
+
+        $('.layer_popup.layer_share [data-sns-type="ktalk"]').attr(
+          'data-evnt-ctg',
+          'event page : 지방선거 2022 초간단 정치성향 테스트'
+        );
+        $('.layer_popup.layer_share [data-sns-type="ktalk"]').attr(
+          'data-evnt-act',
+          'click : 공유하기'
+        );
+        $('.layer_popup.layer_share [data-sns-type="ktalk"]').attr(
+          'data-evnt-lbl',
+          'kakao'
+        );
+
+        $('.layer_popup.layer_share [data-sns-type="face"]').attr(
+          'data-evnt-ctg',
+          'event page : 지방선거 2022 초간단 정치성향 테스트'
+        );
+        $('.layer_popup.layer_share [data-sns-type="face"]').attr(
+          'data-evnt-act',
+          'click : 공유하기'
+        );
+        $('.layer_popup.layer_share [data-sns-type="face"]').attr(
+          'data-evnt-lbl',
+          'facebook'
+        );
+
+        $('.layer_popup.layer_share [data-sns-type="twt"]').attr(
+          'data-evnt-ctg',
+          'event page : 지방선거 2022 초간단 정치성향 테스트'
+        );
+        $('.layer_popup.layer_share [data-sns-type="twt"]').attr(
+          'data-evnt-act',
+          'click : 공유하기'
+        );
+        $('.layer_popup.layer_share [data-sns-type="twt"]').attr(
+          'data-evnt-lbl',
+          'twitter'
+        );
+
+        $('.layer_popup.layer_share [data-sns-type="copy"]').attr(
+          'data-evnt-ctg',
+          'event page : 지방선거 2022 초간단 정치성향 테스트'
+        );
+        $('.layer_popup.layer_share [data-sns-type="copy"]').attr(
+          'data-evnt-act',
+          'click : 공유하기'
+        );
+        $('.layer_popup.layer_share [data-sns-type="copy"]').attr(
+          'data-evnt-lbl',
+          'url복사'
+        );
+
+        $('.logo').attr(
+          'data-evnt-ctg',
+          'event page : 지방선거 2022 초간단 정치성향 테스트'
+        );
+        $('.logo').attr('data-evnt-act', 'click : 로고');
+
+        $('.j_logo').attr(
+          'data-evnt-ctg',
+          'event page : 지방선거 2022 초간단 정치성향 테스트'
+        );
+        $('.j_logo').attr('data-evnt-act', 'click : 로고');
+
+        var contentWrap = $('.content')[0];
+        contentWrap.addEventListener('touchstart', function () {
+          window.scrollBy(0, 2);
+        });
+      });
+    </script>
+
+    <script>
+      //레이어 - 정보
+      $('.btn_info').on('click', function (e) {
+        e.preventDefault();
+        var $self = $(this);
+        var obj = '.layer_info';
+        $(obj).toggleClass('show hide').focus();
+        $(obj)
+          .find('.btn_close')
+          .click(function () {
+            $(obj).toggleClass('show hide');
+            $self.focus();
+            $(this).off('click');
+          });
+      });
+    </script>
+    <script>
+      $(function () {
+        var localElementResult = window.localElectionPoliticsModule.result(
+          {
+            ajax: $.ajax,
+            survKey: '4',
+            survSeq: '266',
+            resultData: {},
+            host: 'https://stg-api.joongang.co.kr/moka_api',
+            getUserIds: function () {
+              return {
+                surv_cid: window.getCookie ? getCookie('_ga') : '',
+                surv_useq: window.getMemberInfo ? getMemberInfo().seq : '',
+              };
+            },
+          },
+          {
+            drawDotChart: drawDotChart,
+            drawTendencyChart: drawTendencyChart,
+            drawSameChart: drawSameChart,
+            drawTotalGenChart: drawTotalGenChart,
+            drawTotalAgeChart: drawTotalAgeChart,
+            drawTotalLocChart: drawTotalLocChart,
+          }
+        );
+      });
+    </script>
+    <script
+      type="text/javascript"
+      src="https://static.joongang.co.kr/js/comment.js"
+    ></script>
+    <script type="text/javascript">
+      $(function () {
+        window.comment.init({
+          target: '.comment_wrap', //기본 영역 삽입 위치
+          popupTarget: 'body', //더보기 영역 삽입 위치
+          domain: 'joongang.co.kr', //도메인 구분 값
+          section: 'digitalspecial', //섹션 구분 값
+          contentId: '467', //콘텐트 고유 아이디
+          defaultCount: 3, //댓글 기본 영역에 보여줄 개수
+          autoLoad: false, //더보기 리스트의 자동 갱신 여부
+        });
+      });
+    </script>
+  </body>
+</html>
