@@ -4,27 +4,26 @@ import {
   redrawActionMap,
   initUpdateHookState,
   initMountHookState,
-} from '@/hook';
-
-let NEED_DIFF = false;
+  needDiff,
+} from '@/util';
 
 export function Fragment({ props, children }) {
   return { type: 'fragment', props, children };
 }
 
 export function h(tag, props, ...children) {
-  const nodePointer = { current: null };
+  const nodePointer = { value: null };
   const newProps = props || {};
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
 
-  nodePointer.current = node;
+  nodePointer.value = node;
 
   return node;
 }
 
 function reRenderCustomComponent({ tag, props, children, originalVdom }) {
-  NEED_DIFF = true;
+  needDiff.value = true;
 
   const newVdom = makeVdomResolver({ tag, props, children });
   const newVdomTree = makeNewVdomTree({ originalVdom, newVdom });
@@ -35,7 +34,7 @@ function reRenderCustomComponent({ tag, props, children, originalVdom }) {
 
   vDomUpdate(newVdomTree);
 
-  NEED_DIFF = false;
+  needDiff.value = false;
 }
 
 function makeVdomResolver({ tag, props, children }) {
@@ -128,7 +127,7 @@ function makeNode({ tag, props, children }) {
   } else if (isCustemComponent) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 
-    return NEED_DIFF ? componetMakeResolver : componetMakeResolver();
+    return needDiff.value ? componetMakeResolver : componetMakeResolver();
   }
 
   return { type: 'element', tag, props, children };
@@ -138,8 +137,8 @@ function remakeChildren(nodePointer, children) {
   return children.map(item => {
     const childItem = makeChildrenItem({ item });
 
-    childItem.getParent = () => nodePointer.current;
-    childItem.getBrothers = () => nodePointer.current.children;
+    childItem.getParent = () => nodePointer.value;
+    childItem.getBrothers = () => nodePointer.value.children;
 
     return childItem;
   });
@@ -149,10 +148,10 @@ function makeChildrenItem({ item }) {
   if (!item) {
     return { type: null };
   } else if (Array.isArray(item)) {
-    const nodePointer = { current: null };
+    const nodePointer = { value: null };
     const children = remakeChildren(nodePointer, item);
     const node = { type: 'loop', children };
-    nodePointer.current = node;
+    nodePointer.value = node;
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {

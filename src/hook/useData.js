@@ -1,4 +1,4 @@
-import { dataStore, stateKeyRef, dataCallSeq, redrawActionMap } from '@/hook';
+import { dataStore, stateKeyRef, dataCallSeq, redrawActionMap } from '@/util';
 
 export default function useData(initValue) {
   const sKey = stateKeyRef.value;

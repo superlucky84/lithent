@@ -2,6 +2,7 @@
  * Common
  */
 export const stateKeyRef = { value: null };
+export const needDiff = { value: null };
 
 /**
  * Data
