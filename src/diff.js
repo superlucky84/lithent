@@ -21,6 +21,20 @@
  * * * * (NONE). 오리지날이 있고 같은 타입이며 props나 data가 같으면 (방치 후 children 재귀 체크) (Todo)
  */
 
+import {
+  checkFragment,
+  checkTagElement,
+  checkLoopElement,
+  checkTextElement,
+  checkEmptyElement,
+  checkSameCustomComponent,
+  checkSameFragment,
+  checkSameTagElement,
+  checkSameLoopElement,
+  checkSameTextElement,
+  checkCustemComponent,
+} from '@/util';
+
 export default function makeNewVdomTree({ originalVdom, newVdom }) {
   const isComponent = checkCustemComponent(newVdom);
   const isFragment = checkFragment(newVdom);
@@ -205,51 +219,4 @@ function processingFragment({ originalVdom, newVdom }) {
   }
 
   return newVdom;
-}
-
-function checkCustemComponent(vDom) {
-  return typeof vDom === 'function';
-}
-
-function checkFragment(vDom) {
-  return vDom.type === 'fragment';
-}
-
-function checkTagElement(vDom) {
-  return vDom.type === 'element';
-}
-
-function checkLoopElement(vDom) {
-  return vDom.type === 'loop';
-}
-
-function checkTextElement(vDom) {
-  return vDom.type === 'text';
-}
-
-function checkEmptyElement(vDom) {
-  return !vDom.type;
-}
-
-function checkSameCustomComponent({ originalVdom, newVdom }) {
-  return newVdom.tagName === originalVdom?.tagName;
-}
-
-function checkSameFragment({ originalVdom, newVdom }) {
-  return (
-    originalVdom.type === 'fragment' &&
-    originalVdom.children.length === newVdom.children.length
-  );
-}
-
-function checkSameTagElement({ originalVdom, newVdom }) {
-  return originalVdom?.type === 'element' && originalVdom?.tag === newVdom.tag;
-}
-
-function checkSameLoopElement({ originalVdom, newVdom }) {
-  return originalVdom?.type === newVdom.type;
-}
-
-function checkSameTextElement({ originalVdom, newVdom }) {
-  return originalVdom?.text === newVdom.text;
 }
