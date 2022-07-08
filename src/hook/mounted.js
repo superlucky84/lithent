@@ -4,6 +4,10 @@ export default function mounted(effectAction) {
   const currentSubSeq = mountedCallSeq.value;
   const stateKey = stateKeyRef.value;
 
+  if (!mountedQueue.value[stateKey]) {
+    mountedQueue.value[stateKey] = {};
+  }
+
   mountedQueue.value[stateKey][currentSubSeq] = effectAction;
   mountedCallSeq.value += 1;
 }

@@ -43,9 +43,7 @@ export default function CustomElement({ props, children }) {
         <button onClick={handle}>vava{data.k}aa</button>
         <button onClick={handle2}>{data2.k}-vava</button>
         <button onClick={handle3}>{data3.k}-vava</button>
-        {data.k % 2 === 0 ? <span>j</span> : null}
-        <Custom2 k={data.k} />
-        <Custom2 k={data.k + 1} />
+        {data.k % 2 === 0 ? <Custom2 k={data.k} /> : null}
         <div>
           <div>data.k: {data.k}</div>
           <div>data.j: {data.j}</div>

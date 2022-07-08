@@ -63,7 +63,7 @@ function typeDeleteAdd(newVdom) {
   if (newVdom.type === 'text') {
     typeDeleteAddForText(newVdom);
   } else {
-    // console.log('TTTTTTTTTYPE', newVdom.type);
+    console.log('TTTTTTTTTYPE', newVdom.type);
   }
 
   // if (element && newVdom.oldProps) {
@@ -152,6 +152,8 @@ function vDomToDom(vDom) {
   }
 
   vDom.el = element;
+
+  runMountedQueueFromVdom(vDom);
 
   return element;
 }

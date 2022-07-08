@@ -54,11 +54,22 @@ function processingComponent({ originalVdom, newVdom }) {
     originalVdom,
     newVdom,
   });
+  const existOriginalVdom = originalVdom && originalVdom.type;
 
-  if (!originalVdom || !isSameCustomComponent) {
+  if (!existOriginalVdom || !isSameCustomComponent) {
     newVdom = newVdom();
+    if (originalVdom) {
+      newVdom.getParent = originalVdom.getParent;
+      newVdom.getBrothers = originalVdom.getBrothers;
+
+      const brothers = newVdom.getBrothers();
+      const index = brothers.indexOf(originalVdom);
+
+      brothers.splice(index, 1, newVdom);
+    }
     newVdom.children = newVdom.children.map(item => {
-      return makeNewVdomTree({ newVdom: item });
+      const childVdom = makeNewVdomTree({ newVdom: item });
+      return childVdom;
     });
   } else if (originalVdom && isSameCustomComponent) {
     // newVdom = newVdom(originalVdom.stateKey);
@@ -73,7 +84,7 @@ function processingComponent({ originalVdom, newVdom }) {
     newVdom.el = originalVdom.el;
   }
 
-  if (!originalVdom) {
+  if (!existOriginalVdom) {
     newVdom.needRerender = 'ADD';
   } else if (!isSameCustomComponent) {
     newVdom.needRerender = 'DELETE-ADD';
