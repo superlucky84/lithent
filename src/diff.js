@@ -58,21 +58,11 @@ function processingComponent({ originalVdom, newVdom }) {
 
   if (!existOriginalVdom || !isSameCustomComponent) {
     newVdom = newVdom();
-    if (originalVdom) {
-      newVdom.getParent = originalVdom.getParent;
-      newVdom.getBrothers = originalVdom.getBrothers;
-
-      const brothers = newVdom.getBrothers();
-      const index = brothers.indexOf(originalVdom);
-
-      brothers.splice(index, 1, newVdom);
-    }
     newVdom.children = newVdom.children.map(item => {
       const childVdom = makeNewVdomTree({ newVdom: item });
       return childVdom;
     });
   } else if (originalVdom && isSameCustomComponent) {
-    // newVdom = newVdom(originalVdom.stateKey);
     newVdom = originalVdom.reRender();
     newVdom.children = newVdom.children.map((item, index) => {
       return makeNewVdomTree({
@@ -82,6 +72,16 @@ function processingComponent({ originalVdom, newVdom }) {
     });
 
     newVdom.el = originalVdom.el;
+  }
+
+  if (originalVdom) {
+    newVdom.getParent = originalVdom.getParent;
+    newVdom.getBrothers = originalVdom.getBrothers;
+
+    const brothers = newVdom.getBrothers();
+    const index = brothers.indexOf(originalVdom);
+
+    brothers.splice(index, 1, newVdom);
   }
 
   if (!existOriginalVdom) {

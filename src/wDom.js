@@ -2,11 +2,10 @@ import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
 import {
   redrawActionMap,
-  stateKeyRef,
-  dataCallSeq,
-  updatedCallSeq,
-  mountedCallSeq,
+  initUpdateHookState,
+  initMountHookState,
 } from '@/hook';
+
 let NEED_DIFF = false;
 
 export function Fragment({ props, children }) {
@@ -24,21 +23,13 @@ export function h(tag, props, ...children) {
   return node;
 }
 
-function reRenderCustomComponent({ tag, props, children, prevVDom }) {
+function reRenderCustomComponent({ tag, props, children, originalVdom }) {
   NEED_DIFF = true;
 
-  const newVDomRenderer = makeCustemNode({ tag, props, children });
-
-  const newVdomTree = makeNewVdomTree({
-    originalVdom: prevVDom,
-    newVdom: newVDomRenderer,
-  });
-
-  newVdomTree.getBrothers = prevVDom.getBrothers;
-  newVdomTree.getParent = prevVDom.getParent;
-
+  const newVdom = makeCustemNode({ tag, props, children });
+  const newVdomTree = makeNewVdomTree({ originalVdom, newVdom });
   const brothers = newVdomTree.getBrothers();
-  const index = brothers.indexOf(prevVDom);
+  const index = brothers.indexOf(originalVdom);
 
   brothers.splice(index, 1, newVdomTree);
 
@@ -48,35 +39,23 @@ function reRenderCustomComponent({ tag, props, children, prevVDom }) {
 }
 
 function makeCustemNode({ tag, props, children }) {
-  const resolve = stateKey => {
-    if (!stateKey) {
-      stateKey = Symbol(tag.name);
-    }
-    dataCallSeq.value = 0;
-    updatedCallSeq.value = 0;
-    mountedCallSeq.value = 0;
+  const resolve = (stateKey = Symbol(tag.name)) => {
+    initMountHookState(stateKey);
 
-    stateKeyRef.value = stateKey;
-
-    const customNodeRener = tag({ props, children });
-    const customNode = customNodeRener();
-    const reRender = makeReRender({
-      customNodeRener,
+    const componentMaker = tag({ props, children });
+    const customNode = makeCustomNode({
+      componentMaker,
       stateKey,
       tag,
       props,
       children,
     });
 
-    customNode.reRender = reRender;
-    const prevVDom = customNode;
+    const originalVdom = customNode;
 
     redrawActionMap[stateKey] = () => {
-      reRenderCustomComponent({ tag, props, children, prevVDom, stateKey });
+      reRenderCustomComponent({ tag, props, children, originalVdom, stateKey });
     };
-
-    customNode.tagName = tag.name;
-    customNode.stateKey = stateKey;
 
     return customNode;
   };
@@ -86,19 +65,35 @@ function makeCustemNode({ tag, props, children }) {
   return resolve;
 }
 
-function makeReRender({ customNodeRener, stateKey, tag, props, children }) {
-  const reRender = () => {
-    updatedCallSeq.value = 0;
-    stateKeyRef.value = stateKey;
+function makeCustomNode({ componentMaker, stateKey, tag, props, children }) {
+  const customNode = componentMaker();
+  const reRender = makeReRender({
+    componentMaker,
+    stateKey,
+    tag,
+    props,
+    children,
+  });
 
-    const vdom = customNodeRener();
+  customNode.reRender = reRender;
+  customNode.tagName = tag.name;
+  customNode.stateKey = stateKey;
+
+  return customNode;
+}
+
+function makeReRender({ componentMaker, stateKey, tag, props, children }) {
+  const reRender = () => {
+    initUpdateHookState(stateKey);
+
+    const vdom = componentMaker();
 
     redrawActionMap[stateKey] = () => {
       reRenderCustomComponent({
         tag,
         props,
         children,
-        prevVDom: vdom,
+        originalVdom: vdom,
         stateKey,
       });
     };
