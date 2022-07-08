@@ -2,18 +2,22 @@ import { h, Fragment } from '../jsx';
 import useData from '@/hook/useData';
 import Custom2 from './Custom2';
 
-export default function CustomElement({ props, children }) {
-  console.log('re');
-
-  const [data, setData] = useData({ k: 7 });
-  const [data2, setData2] = useData({ k: 7 });
+const useJw = () => {
+  const data = useData({ k: 7 });
+  const data2 = useData({ k: 1 });
 
   const handle = () => {
-    setData({ k: data.k + 1 });
+    data.k += 1;
   };
   const handle2 = () => {
-    setData2({ k: data2.k + 1 });
+    data2.k += 1;
   };
+
+  return { data, data2, handle, handle2 };
+};
+
+export default function CustomElement({ props, children }) {
+  const { data, data2, handle, handle2 } = useJw();
 
   const componentMaker = () => {
     return (
@@ -25,7 +29,10 @@ export default function CustomElement({ props, children }) {
         <Custom2 k={data.k + 1} />
         <div>
           <div>{data.k}</div>
+          <div>{data2.k}</div>
         </div>
+        <br />
+        <br />
       </div>
     );
   };

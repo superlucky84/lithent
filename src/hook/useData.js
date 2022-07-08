@@ -23,16 +23,22 @@ function makeData({ initValue, stateKey, stateCallSeq, render }) {
 
   if (!value[stateKey] || !value[stateKey][currentSubSeq]) {
     value[stateKey] ??= {};
-    value[stateKey][currentSubSeq] = initValue;
+    value[stateKey][currentSubSeq] = makeProxyData(initValue, render);
   }
 
-  const setData = newValue => {
-    const originalObject = value[stateKey][currentSubSeq];
-    Object.entries(newValue).forEach(([key, value]) => {
-      originalObject[key] = value;
-    });
-    render();
-  };
+  return value[stateKey][currentSubSeq];
+}
 
-  return [value[stateKey][currentSubSeq], setData];
+function makeProxyData(initValue, render) {
+  return new Proxy(initValue, {
+    get(target, prop) {
+      return target[prop];
+    },
+    set(target, prop, value) {
+      target[prop] = value;
+      render();
+
+      return true;
+    },
+  });
 }
