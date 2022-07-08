@@ -1,5 +1,6 @@
 import { h, Fragment } from '../jsx';
 import useData from '@/hook/useData';
+// import updated from '@/hook/updated';
 import Custom2 from './Custom2';
 
 const useJw = () => {
@@ -25,7 +26,17 @@ export default function CustomElement({ props, children }) {
     data3.k += 1;
   };
 
+  const handleUpdatedDataK = () => {
+    console.log('updated k');
+  };
+  const handleUpdatedData2K = () => {
+    console.log('updated 2k');
+  };
+
   const componentMaker = () => {
+    // updated(handleUpdatedDataK, [data.k]);
+    // updated(handleUpdatedData2K, [data2.k]);
+
     return (
       <div class={`aa${data.k}`}>
         <button onClick={handle}>vava{data.k}aa</button>

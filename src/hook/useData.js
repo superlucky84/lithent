@@ -1,8 +1,4 @@
-export const stateCallSeq = { value: null };
-export const stateKeyRef = { value: null };
-export const componentKeyMap = {};
-
-const value = {};
+import { dataStore, stateKeyRef, stateCallSeq, redrawActionMap } from '@/hook';
 
 export default function useData(initValue) {
   const sKey = stateKeyRef.value;
@@ -10,7 +6,7 @@ export default function useData(initValue) {
     initValue,
     stateCallSeq: stateCallSeq.value,
     stateKey: sKey,
-    render: () => componentKeyMap[sKey](),
+    render: () => redrawActionMap[sKey](),
   });
 
   stateCallSeq.value += 1;
@@ -21,12 +17,12 @@ export default function useData(initValue) {
 function makeData({ initValue, stateKey, stateCallSeq, render }) {
   const currentSubSeq = stateCallSeq;
 
-  if (!value[stateKey] || !value[stateKey][currentSubSeq]) {
-    value[stateKey] ??= {};
-    value[stateKey][currentSubSeq] = makeProxyData(initValue, render);
+  if (!dataStore.value[stateKey] || !dataStore.value[stateKey][currentSubSeq]) {
+    dataStore.value[stateKey] ??= {};
+    dataStore.value[stateKey][currentSubSeq] = makeProxyData(initValue, render);
   }
 
-  return value[stateKey][currentSubSeq];
+  return dataStore.value[stateKey][currentSubSeq];
 }
 
 function makeProxyData(initValue, render) {
