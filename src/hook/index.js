@@ -16,3 +16,9 @@ export const redrawActionMap = {};
 export const updatedCallSeq = { value: null };
 export const updatedStore = { value: {} };
 export const updatedQueue = { value: {} };
+
+/**
+ * mounted
+ */
+export const mountedCallSeq = { value: null };
+export const mountedQueue = { value: {} };

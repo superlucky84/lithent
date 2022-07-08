@@ -1,4 +1,5 @@
-import { updatedQueue } from '@/hook';
+import { runMountedQueueFromVdom } from '@/hook/mounted';
+import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
 export function render(vDom, wrapElement) {
   wrapElement.appendChild(vDomToDom(vDom));
@@ -49,6 +50,8 @@ function typeAdd(newVdom) {
   const parentEl = nextEl.parentNode;
 
   parentEl.insertBefore(newElement, nextEl);
+
+  runMountedQueueFromVdom(newVdom);
 }
 
 function typeDeleteAdd(newVdom) {
@@ -75,6 +78,8 @@ function typeDeleteAdd(newVdom) {
   // console.log(newVdom.el);
 
   // parentDiv.replaceChild(newVdom.el, newElement);
+
+  runMountedQueueFromVdom(newVdom);
 }
 
 function typeDeleteAddForText(newVdom) {
@@ -96,14 +101,7 @@ function typeUpdate(newVdom) {
     vDomUpdate(childItem);
   });
 
-  const queue = updatedQueue.value[newVdom.stateKey];
-  if (newVdom.tagName && queue) {
-    updatedQueue.value[newVdom.stateKey] = {};
-
-    Object.values(queue).forEach(effect => {
-      effect();
-    });
-  }
+  runUpdatedQueueFromVdom(newVdom);
 }
 
 function removeEvent(oldProps, element) {

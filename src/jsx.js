@@ -5,6 +5,7 @@ import {
   stateKeyRef,
   dataCallSeq,
   updatedCallSeq,
+  mountedCallSeq,
 } from '@/hook';
 let NEED_DIFF = false;
 
@@ -52,6 +53,7 @@ function makeCustemNode({ tag, props, children }) {
     }
     dataCallSeq.value = 0;
     updatedCallSeq.value = 0;
+    mountedCallSeq.value = 0;
 
     stateKeyRef.value = stateKey;
 

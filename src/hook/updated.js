@@ -32,6 +32,18 @@ export default function updated(effectAction, dependencies) {
   updatedCallSeq.value += 1;
 }
 
+export function runUpdatedQueueFromVdom(newVdom) {
+  const queue = updatedQueue.value[newVdom.stateKey];
+  if (newVdom.tagName && queue) {
+    updatedQueue.value[newVdom.stateKey] = {};
+
+    Object.values(queue).forEach(effect => {
+      effect();
+    });
+  }
+}
+
 function checkNeedPushQueue(originalDefs, newDefs) {
   return originalDefs.some((def, index) => def !== newDefs[index]);
 }
+
