@@ -23,7 +23,7 @@ export function h(tag, props, ...children) {
   return node;
 }
 
-function redrawCustomComponent({ tag, props, children, prevVDom }) {
+function reRenderCustomComponent({ tag, props, children, prevVDom }) {
   NEED_DIFF = true;
 
   const newVDomRenderer = makeCustemNode({ tag, props, children });
@@ -57,38 +57,21 @@ function makeCustemNode({ tag, props, children }) {
 
     stateKeyRef.value = stateKey;
 
-    const customNodeRenerer = tag({
+    const customNodeRener = tag({ props, children });
+    const customNode = customNodeRener();
+    const reRender = makeReRender({
+      customNodeRener,
+      stateKey,
+      tag,
       props,
       children,
     });
-    const customNode = customNodeRenerer();
 
-    const renderer = () => {
-      updatedCallSeq.value = 0;
-      stateKeyRef.value = stateKey;
-      const vdom = customNodeRenerer();
-      vdom.renderer = renderer;
-
-      redrawActionMap[stateKey] = () => {
-        redrawCustomComponent({
-          tag,
-          props,
-          children,
-          prevVDom: vdom,
-          stateKey,
-        });
-      };
-      vdom.tagName = tag.name;
-      vdom.stateKey = stateKey;
-
-      return vdom;
-    };
-
-    customNode.renderer = renderer;
+    customNode.reRender = reRender;
     const prevVDom = customNode;
 
     redrawActionMap[stateKey] = () => {
-      redrawCustomComponent({ tag, props, children, prevVDom, stateKey });
+      reRenderCustomComponent({ tag, props, children, prevVDom, stateKey });
     };
 
     customNode.tagName = tag.name;
@@ -100,6 +83,33 @@ function makeCustemNode({ tag, props, children }) {
   resolve.tagName = tag.name;
 
   return resolve;
+}
+
+function makeReRender({ customNodeRener, stateKey, tag, props, children }) {
+  const reRender = () => {
+    updatedCallSeq.value = 0;
+    stateKeyRef.value = stateKey;
+
+    const vdom = customNodeRener();
+
+    redrawActionMap[stateKey] = () => {
+      reRenderCustomComponent({
+        tag,
+        props,
+        children,
+        prevVDom: vdom,
+        stateKey,
+      });
+    };
+
+    vdom.reRender = reRender;
+    vdom.tagName = tag.name;
+    vdom.stateKey = stateKey;
+
+    return vdom;
+  };
+
+  return reRender;
 }
 
 function makeNode({ tag, props, children }) {

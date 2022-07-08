@@ -73,7 +73,7 @@ function processingComponent({ originalVdom, newVdom }) {
     });
   } else if (originalVdom && isSameCustomComponent) {
     // newVdom = newVdom(originalVdom.stateKey);
-    newVdom = originalVdom.renderer();
+    newVdom = originalVdom.reRender();
     newVdom.children = newVdom.children.map((item, index) => {
       return makeNewVdomTree({
         newVdom: item,
