@@ -34,6 +34,7 @@ import {
   checkSameTextElement,
   checkCustemComponent,
 } from '@/util';
+import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
 export default function makeNewVdomTree({ originalVdom, newVdom }) {
   const isComponent = checkCustemComponent(newVdom);
@@ -155,6 +156,7 @@ function processingNullElement({ originalVdom, newVdom }) {
   newVdom.needRerender = 'DELETE';
 
   if (originalVdom?.el) {
+    runUnmountQueueFromVdom(originalVdom);
     newVdom.el = originalVdom.el;
   }
 

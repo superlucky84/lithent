@@ -25,6 +25,12 @@ export const mountedCallSeq = { value: null };
 export const mountedQueue = { value: {} };
 
 /**
+ * UnMount
+ */
+export const unmountCallSeq = { value: null };
+export const unmountQueue = { value: {} };
+
+/**
  * Update init state
  */
 export function initUpdateHookState(stateKey) {
@@ -38,10 +44,14 @@ export function initUpdateHookState(stateKey) {
 export function initMountHookState(stateKey) {
   dataCallSeq.value = 0;
   mountedCallSeq.value = 0;
+  unmountCallSeq.value = 0;
   updatedCallSeq.value = 0;
   stateKeyRef.value = stateKey;
 }
 
+/**
+ * Predicator
+ */
 export function checkCustemComponent(vDom) {
   return typeof vDom === 'function';
 }
