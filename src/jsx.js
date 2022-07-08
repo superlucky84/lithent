@@ -1,6 +1,11 @@
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
-import { redrawActionMap, stateKeyRef, stateCallSeq } from '@/hook';
+import {
+  redrawActionMap,
+  stateKeyRef,
+  dataCallSeq,
+  updatedCallSeq,
+} from '@/hook';
 let NEED_DIFF = false;
 
 export function Fragment({ props, children }) {
@@ -45,7 +50,9 @@ function makeCustemNode({ tag, props, children }) {
     if (!stateKey) {
       stateKey = Symbol(tag.name);
     }
-    stateCallSeq.value = 0;
+    dataCallSeq.value = 0;
+    updatedCallSeq.value = 0;
+
     stateKeyRef.value = stateKey;
 
     const customNodeRenerer = tag({
@@ -55,6 +62,8 @@ function makeCustemNode({ tag, props, children }) {
     const customNode = customNodeRenerer();
 
     const renderer = () => {
+      updatedCallSeq.value = 0;
+      stateKeyRef.value = stateKey;
       const vdom = customNodeRenerer();
       vdom.renderer = renderer;
 

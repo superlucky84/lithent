@@ -1,6 +1,6 @@
 import { h, Fragment } from '../jsx';
 import useData from '@/hook/useData';
-// import updated from '@/hook/updated';
+import updated from '@/hook/updated';
 import Custom2 from './Custom2';
 
 const useJw = () => {
@@ -27,15 +27,16 @@ export default function CustomElement({ props, children }) {
   };
 
   const handleUpdatedDataK = () => {
-    console.log('updated k');
+    console.log('updated k', data);
+    data3.k += 10;
   };
   const handleUpdatedData2K = () => {
-    console.log('updated 2k');
+    console.log('updated 2k', data2);
   };
 
   const componentMaker = () => {
-    // updated(handleUpdatedDataK, [data.k]);
-    // updated(handleUpdatedData2K, [data2.k]);
+    updated(handleUpdatedDataK, [data.k]);
+    updated(handleUpdatedData2K, [data2.k]);
 
     return (
       <div class={`aa${data.k}`}>
@@ -59,22 +60,3 @@ export default function CustomElement({ props, children }) {
 
   return componentMaker;
 }
-
-/*
-h("div", {}, 
-  h("span", {}, j, "-vava"), 
-  h("span", {}, w, "-vava"), 
-  j % 2 === 0 ? h("div", null, "1111") : null, 
-  h(Custom2, {}),
-  h(Custom2, {}),
-  h("div", null, 
-    h("div", null, j),
-    h("div", null, w)));
-
-
-function k(n) {
-  console.log('k', n);
-}
-
-k(7, k(1), k(2, k(4), k(5), k(6)), k(3));
-*/

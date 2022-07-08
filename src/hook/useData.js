@@ -1,21 +1,21 @@
-import { dataStore, stateKeyRef, stateCallSeq, redrawActionMap } from '@/hook';
+import { dataStore, stateKeyRef, dataCallSeq, redrawActionMap } from '@/hook';
 
 export default function useData(initValue) {
   const sKey = stateKeyRef.value;
   const state = makeData({
     initValue,
-    stateCallSeq: stateCallSeq.value,
+    dataCallSeq: dataCallSeq.value,
     stateKey: sKey,
     render: () => redrawActionMap[sKey](),
   });
 
-  stateCallSeq.value += 1;
+  dataCallSeq.value += 1;
 
   return state;
 }
 
-function makeData({ initValue, stateKey, stateCallSeq, render }) {
-  const currentSubSeq = stateCallSeq;
+function makeData({ initValue, stateKey, dataCallSeq, render }) {
+  const currentSubSeq = dataCallSeq;
 
   if (!dataStore.value[stateKey] || !dataStore.value[stateKey][currentSubSeq]) {
     dataStore.value[stateKey] ??= {};

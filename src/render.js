@@ -1,3 +1,5 @@
+import { updatedQueue } from '@/hook';
+
 export function render(vDom, wrapElement) {
   wrapElement.appendChild(vDomToDom(vDom));
 }
@@ -93,6 +95,15 @@ function typeUpdate(newVdom) {
   newVdom.children.forEach(childItem => {
     vDomUpdate(childItem);
   });
+
+  const queue = updatedQueue.value[newVdom.stateKey];
+  if (newVdom.tagName && queue) {
+    updatedQueue.value[newVdom.stateKey] = {};
+
+    Object.values(queue).forEach(effect => {
+      effect();
+    });
+  }
 }
 
 function removeEvent(oldProps, element) {
