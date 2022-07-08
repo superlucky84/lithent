@@ -1,4 +1,4 @@
-import { h, Fragment } from '../jsx';
+import { h, Fragment } from '@/wDom';
 import useData from '@/hook/useData';
 import updated from '@/hook/updated';
 import Custom2 from './Custom2';

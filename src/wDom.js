@@ -12,6 +12,7 @@ let NEED_DIFF = false;
 export function Fragment({ props, children }) {
   return { type: 'fragment', props, children };
 }
+
 export function h(tag, props, ...children) {
   const nodePointer = { current: null };
   const newProps = props || {};

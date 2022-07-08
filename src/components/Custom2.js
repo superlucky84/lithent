@@ -1,4 +1,4 @@
-import { h, Fragment } from '../jsx';
+import { h, Fragment } from '../wDom';
 import mounted from '@/hook/mounted';
 
 export default function Custom2({ props, children }) {

@@ -1,7 +1,7 @@
-import { h, Fragment } from './jsx';
-import { render } from './render';
-import CustomElement from './components/CustomElement';
-import Custom2 from './components/Custom2';
+import { h, Fragment } from '@/wDom';
+import { render } from '@/render';
+import CustomElement from '@/components/CustomElement';
+import Custom2 from '@/components/Custom2';
 
 const n = '3';
 
