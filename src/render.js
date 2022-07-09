@@ -105,13 +105,13 @@ function typeUpdate(newVdom) {
 }
 
 function removeEvent(oldProps, element) {
-  if (oldProps.onClick) {
+  if (oldProps?.onClick) {
     element.removeEventListener('click', oldProps.onClick);
   }
 }
 
 function updateProps(props, element) {
-  Object.entries(props).forEach(([dataKey, dataValue]) => {
+  Object.entries(props || []).forEach(([dataKey, dataValue]) => {
     if (dataKey === 'style') {
       addStyle(vDom, element);
     } else if (dataKey === 'ref') {

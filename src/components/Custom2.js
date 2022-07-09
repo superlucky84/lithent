@@ -18,7 +18,7 @@ export default function Custom2({ props, children }) {
       <div class="custom2">
         {props.k}-0--------------
         <button onClick={() => props.hadleRef.value.handle3()}>handle3</button>
-        <article>{children}</article>
+        <article>0{children}0</article>
       </div>
     );
   };

@@ -111,18 +111,29 @@ function processingComponent({ originalVdom, newVdom }) {
 }
 
 /**
- * 루프형은 우선 무조건 새로 만듬
+ * 루프형은 일단 태그 엘리먼트와 동일하게 동작하도록 함
  * 추후 키값 있을때는 원본 엘리먼트를 유지하도록 개선 예정
  */
 function processingLoopElement({ originalVdom, newVdom }) {
   const isSameLoopElement = checkSameLoopElement({ originalVdom, newVdom });
+  const existOriginalVdom = originalVdom && originalVdom.type;
 
-  // Todo: 일단 항상 다시 돔에 반영
-  newVdom.children = newVdom.children.map(item => {
-    return makeNewVdomTree({ newVdom: item });
-  });
+  if (!existOriginalVdom || !isSameLoopElement) {
+    newVdom.children = newVdom.children.map(item => {
+      return makeNewVdomTree({ newVdom: item });
+    });
+  } else if (existOriginalVdom && isSameLoopElement) {
+    newVdom.children = newVdom.children.map((item, index) => {
+      return makeNewVdomTree({
+        newVdom: item,
+        originalVdom: originalVdom.children[index],
+      });
+    });
 
-  if (!originalVdom) {
+    newVdom.el = originalVdom.el;
+  }
+
+  if (!existOriginalVdom) {
     newVdom.needRerender = 'ADD';
   } else if (!isSameLoopElement) {
     newVdom.needRerender = 'DELETE-ADD';
