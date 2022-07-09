@@ -114,6 +114,8 @@ function updateProps(props, element) {
   Object.entries(props).forEach(([dataKey, dataValue]) => {
     if (dataKey === 'style') {
       addStyle(vDom, element);
+    } else if (dataKey === 'ref') {
+      dataValue.value = element;
     } else if (dataKey === 'onClick') {
       element.addEventListener('click', dataValue);
     } else {

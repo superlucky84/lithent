@@ -1,6 +1,7 @@
 import { h, Fragment } from '@/wDom';
 import useData from '@/hook/useData';
 import updated from '@/hook/updated';
+import makeRef from '@/hook/ref';
 import Custom2 from './Custom2';
 
 const useJw = () => {
@@ -21,12 +22,14 @@ const useJw = () => {
 export default function CustomElement({ props, children }) {
   const { data, data2, handle, handle2 } = useJw();
   const data3 = useData({ k: 1 });
-
   const handle3 = () => {
     data3.k += 1;
   };
+  const hadleRef = makeRef({ handle3 });
+  const domRef = makeRef(null);
 
   const handleUpdatedDataK = () => {
+    console.log('domRef', domRef);
     console.log('updated k', data);
     data3.k += 10;
   };
@@ -43,8 +46,8 @@ export default function CustomElement({ props, children }) {
         <button onClick={handle}>vava{data.k}aa</button>
         <button onClick={handle2}>{data2.k}-vava</button>
         <button onClick={handle3}>{data3.k}-vava</button>
-        {data.k % 2 === 0 ? <Custom2 k={data.k} /> : null}
-        <div>
+        {data.k % 2 === 0 ? <Custom2 k={data.k} hadleRef={hadleRef} /> : null}
+        <div ref={domRef}>
           <div>data.k: {data.k}</div>
           <div>data.j: {data.j}</div>
           <div>data2.k: {data2.k}</div>

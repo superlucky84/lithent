@@ -4,6 +4,7 @@ import unmount from '@/hook/unmount';
 
 export default function Custom2({ props, children }) {
   const handleMounted = () => {
+    console.log('hr', props.hadleRef);
     console.log('CUSTOM2 MOUNTED');
   };
   const handleUnmount = () => {
@@ -16,6 +17,7 @@ export default function Custom2({ props, children }) {
     return (
       <div class="custom2">
         {props.k}-0--------------
+        <button onClick={() => props.hadleRef.value.handle3()}>handle3</button>
         <article>{children}</article>
       </div>
     );
