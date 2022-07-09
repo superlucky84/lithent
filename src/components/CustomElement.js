@@ -1,12 +1,10 @@
 import { h, Fragment } from '@/wDom';
-import useData from '@/hook/useData';
-import updated from '@/hook/updated';
-import makeRef from '@/hook/ref';
+import { makeRef, updated, makeData } from '@/hook';
 import Custom2 from './Custom2';
 
 const useJw = () => {
-  const data = useData({ k: 7, j: 1 });
-  const data2 = useData({ k: 1 });
+  const data = makeData({ k: 7, j: 1 });
+  const data2 = makeData({ k: 1 });
 
   const handle = () => {
     data.k += 1;
@@ -21,7 +19,7 @@ const useJw = () => {
 
 export default function CustomElement({ props, children }) {
   const { data, data2, handle, handle2 } = useJw();
-  const data3 = useData({ k: 1 });
+  const data3 = makeData({ k: 1 });
   const handle3 = () => {
     data3.k += 1;
   };
