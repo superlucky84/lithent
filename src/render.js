@@ -106,6 +106,7 @@ function typeUpdate(newVdom) {
 
 function removeEvent(oldProps, element) {
   if (oldProps?.onClick) {
+    console.log('remove', element);
     element.removeEventListener('click', oldProps.onClick);
   }
 }
@@ -117,6 +118,7 @@ function updateProps(props, element) {
     } else if (dataKey === 'ref') {
       dataValue.value = element;
     } else if (dataKey === 'onClick') {
+      console.log('add', element);
       element.addEventListener('click', dataValue);
     } else {
       element.setAttribute(dataKey, dataValue);

@@ -21,6 +21,7 @@ export default function CustomElement({ props, children }) {
   const { data, data2, handle, handle2 } = useJw();
   const data3 = makeData({ k: 1 });
   const handle3 = () => {
+    console.log('action handle 3');
     data3.k += 1;
   };
   const hadleRef = makeRef({ handle3 });

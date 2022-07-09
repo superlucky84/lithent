@@ -12,6 +12,13 @@ export const dataStore = { value: {} };
 export const redrawActionMap = {};
 
 /**
+ * DataStore
+ */
+export const dataStoreCallSeq = { value: null };
+export const dataStoreStore = { value: {} };
+export const dataStoreRenderQueue = { value: {} };
+
+/**
  * Updated
  */
 export const updatedCallSeq = { value: null };
