@@ -24,7 +24,7 @@ export default function CustomElement({ props, children }) {
     console.log('action handle 3');
     data3.k += 1;
   };
-  const hadleRef = makeRef({ handle3 });
+  // const hadleRef = makeRef({ handle3 });
   const domRef = makeRef(null);
 
   const handleUpdatedDataK = () => {
@@ -46,7 +46,7 @@ export default function CustomElement({ props, children }) {
         <button onClick={handle2}>{data2.k}-vava</button>
         <button onClick={handle3}>{data3.k}-vava</button>
         {data.k % 2 === 1 ? (
-          <Custom2 k={data.k} handle3={handle3}>
+          <Custom2 k={data.k} data={data} handle3={handle3}>
             <span>1</span>
             <span>2</span>
             <span>3</span>

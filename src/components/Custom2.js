@@ -22,16 +22,7 @@ export default function Custom2({ props, children }) {
     return (
       <div class="custom2">
         {props.k}-0--------------{data7.m}
-        <button
-          onClick={() => {
-            console.log('call3-');
-            // props.hadleRef.value.handle3();
-            props.handle3();
-            // data7.m += 1;
-          }}
-        >
-          handle3
-        </button>
+        <button onClick={() => props.handle3()}>handle3</button>
         <button
           onClick={() => {
             console.log('ddd');

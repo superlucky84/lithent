@@ -27,7 +27,9 @@ function reRenderCustomComponent({ tag, props, children, originalVdom }) {
 
   const newVdom = makeVdomResolver({ tag, props, children });
   const newVdomTree = makeNewVdomTree({ originalVdom, newVdom });
-  const brothers = newVdomTree.getBrothers();
+  newVdomTree.getParent = originalVdom.getParent;
+
+  const brothers = originalVdom.getParent().children;
   const index = brothers.indexOf(originalVdom);
 
   brothers.splice(index, 1, newVdomTree);
@@ -138,7 +140,6 @@ function remakeChildren(nodePointer, children) {
     const childItem = makeChildrenItem({ item });
 
     childItem.getParent = () => nodePointer.value;
-    childItem.getBrothers = () => nodePointer.value.children;
 
     return childItem;
   });

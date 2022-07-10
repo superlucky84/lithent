@@ -80,23 +80,16 @@ function processingComponent({ originalVdom, newVdom }) {
   } else if (originalVdom && isSameCustomComponent) {
     newVdom = originalVdom.reRender();
     newVdom.children = newVdom.children.map((item, index) => {
-      return makeNewVdomTree({
+      const childItem = makeNewVdomTree({
         newVdom: item,
         originalVdom: originalVdom.children[index],
       });
+      childItem.getParent = () => newVdom;
+
+      return childItem;
     });
 
     newVdom.el = originalVdom.el;
-  }
-
-  if (originalVdom) {
-    newVdom.getParent = originalVdom.getParent;
-    newVdom.getBrothers = originalVdom.getBrothers;
-
-    const brothers = newVdom.getBrothers();
-    const index = brothers.indexOf(originalVdom);
-
-    brothers.splice(index, 1, newVdom);
   }
 
   if (!existOriginalVdom) {

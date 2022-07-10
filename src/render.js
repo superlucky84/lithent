@@ -41,7 +41,7 @@ function typeDelete(newVdom) {
 
 function typeAdd(newVdom) {
   const newElement = vDomToDom(newVdom);
-  const brothers = newVdom.getBrothers();
+  const brothers = newVdom.getParent().children;
 
   const index = brothers.indexOf(newVdom);
   const nextIndex = index + 1;
@@ -91,8 +91,8 @@ function typeUpdate(newVdom) {
   const element = newVdom.el;
 
   if (element) {
-    // removeEvent(newVdom.oldProps, element);
-    // updateProps(newVdom.props, element);
+    removeEvent(newVdom.oldProps, element, newVdom.props);
+    updateProps(newVdom.props, element);
 
     delete newVdom.oldProps;
   }
@@ -104,9 +104,13 @@ function typeUpdate(newVdom) {
   runUpdatedQueueFromVdom(newVdom);
 }
 
-function removeEvent(oldProps, element) {
+function removeEvent(oldProps, element, newprops) {
   if (oldProps?.onClick) {
+    console.log('000');
     console.log('remove', element);
+    console.log('old', oldProps.onClick);
+    console.log('new', newprops.onClick);
+    console.log(oldProps.onClick === newprops.onClick);
     element.removeEventListener('click', oldProps.onClick);
   }
 }
@@ -118,7 +122,6 @@ function updateProps(props, element) {
     } else if (dataKey === 'ref') {
       dataValue.value = element;
     } else if (dataKey === 'onClick') {
-      console.log('add', element);
       element.addEventListener('click', dataValue);
     } else {
       element.setAttribute(dataKey, dataValue);

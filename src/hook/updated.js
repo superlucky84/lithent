@@ -9,8 +9,6 @@ export default function updated(effectAction, dependencies) {
   const currentSubSeq = updatedCallSeq.value;
   const stateKey = stateKeyRef.value;
 
-  console.log(stateKey, dependencies);
-
   // 업데이티드 훅이 실행되면 스토어에 저장해놓음
   // 스토어에 처음 등록되는 훅이라면 마운트라고 판단
   if (
