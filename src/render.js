@@ -91,8 +91,8 @@ function typeUpdate(newVdom) {
   const element = newVdom.el;
 
   if (element) {
-    removeEvent(newVdom.oldProps, element);
-    updateProps(newVdom.props, element);
+    // removeEvent(newVdom.oldProps, element);
+    // updateProps(newVdom.props, element);
 
     delete newVdom.oldProps;
   }
