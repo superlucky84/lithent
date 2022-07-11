@@ -126,7 +126,6 @@ function updateProps(props, element) {
     } else if (dataKey === 'onClick') {
       element.addEventListener('click', dataValue);
     } else if (dataKey === 'onInput') {
-      console.log('k');
       element.addEventListener('input', dataValue);
     } else {
       element.setAttribute(dataKey, dataValue);

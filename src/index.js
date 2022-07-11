@@ -1,8 +1,6 @@
 import { h, Fragment } from '@/wDom';
-import { makeData } from '@/hook';
 import { render } from '@/render';
 import CustomElement from '@/components/CustomElement';
-import Custom2 from '@/components/Custom2';
 import { makeDataStore } from '@/hook';
 
 makeDataStore('globalData', { item: 'jjj' });
@@ -20,6 +18,6 @@ const vDom = (
   </Fragment>
 );
 
-console.log('VDOM = ', vDom);
+window.vDom = vDom;
 
 render(vDom, document.getElementById('root'));

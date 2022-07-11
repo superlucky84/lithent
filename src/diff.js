@@ -65,39 +65,18 @@ export default function makeNewVdomTree({ originalVdom, newVdom }) {
 }
 
 function processingComponent({ originalVdom, newVdom }) {
-  const isSameCustomComponent = checkSameCustomComponent({
-    originalVdom,
-    newVdom,
-  });
+  const isSameType = checkSameCustomComponent({ originalVdom, newVdom });
   const existOriginalVdom = originalVdom && originalVdom.type;
 
-  if (!existOriginalVdom || !isSameCustomComponent) {
-    newVdom = newVdom();
-    newVdom.children = newVdom.children.map(item => {
-      const childVdom = makeNewVdomTree({ newVdom: item });
-      return childVdom;
-    });
-  } else if (originalVdom && isSameCustomComponent) {
-    newVdom = originalVdom.reRender();
-    newVdom.children = newVdom.children.map((item, index) => {
-      const childItem = makeNewVdomTree({
-        newVdom: item,
-        originalVdom: originalVdom.children[index],
-      });
-      childItem.getParent = () => newVdom;
-
-      return childItem;
-    });
-
-    newVdom.el = originalVdom.el;
-  }
+  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
 
   if (!existOriginalVdom) {
     newVdom.needRerender = 'ADD';
-  } else if (!isSameCustomComponent) {
+  } else if (!isSameType) {
     newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameCustomComponent) {
+  } else if (isSameType) {
     newVdom.needRerender = 'UPDATE';
+    newVdom.el = originalVdom.el;
   }
 
   return newVdom;
@@ -108,30 +87,18 @@ function processingComponent({ originalVdom, newVdom }) {
  * 추후 키값 있을때는 원본 엘리먼트를 유지하도록 개선 예정
  */
 function processingLoopElement({ originalVdom, newVdom }) {
-  const isSameLoopElement = checkSameLoopElement({ originalVdom, newVdom });
+  const isSameType = checkSameLoopElement({ originalVdom, newVdom });
   const existOriginalVdom = originalVdom && originalVdom.type;
 
-  if (!existOriginalVdom || !isSameLoopElement) {
-    newVdom.children = newVdom.children.map(item => {
-      return makeNewVdomTree({ newVdom: item });
-    });
-  } else if (existOriginalVdom && isSameLoopElement) {
-    newVdom.children = newVdom.children.map((item, index) => {
-      return makeNewVdomTree({
-        newVdom: item,
-        originalVdom: originalVdom.children[index],
-      });
-    });
-
-    newVdom.el = originalVdom.el;
-  }
+  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
 
   if (!existOriginalVdom) {
     newVdom.needRerender = 'ADD';
-  } else if (!isSameLoopElement) {
+  } else if (!isSameType) {
     newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameLoopElement) {
+  } else if (isSameType) {
     newVdom.needRerender = 'UPDATE';
+    newVdom.el = originalVdom.el;
   }
 
   return newVdom;
@@ -168,61 +135,86 @@ function processingNullElement({ originalVdom, newVdom }) {
 }
 
 function processingTagElement({ originalVdom, newVdom }) {
-  const isSameTagElement = checkSameTagElement({ originalVdom, newVdom });
+  const isSameType = checkSameTagElement({ originalVdom, newVdom });
   const existOriginalVdom = originalVdom && originalVdom.type;
 
-  if (!existOriginalVdom || !isSameTagElement) {
-    newVdom.children = newVdom.children.map(item => {
-      return makeNewVdomTree({ newVdom: item });
-    });
-  } else if (existOriginalVdom && isSameTagElement) {
-    newVdom.children = newVdom.children.map((item, index) => {
-      return makeNewVdomTree({
-        newVdom: item,
-        originalVdom: originalVdom.children[index],
-      });
-    });
-
-    newVdom.el = originalVdom.el;
-  }
+  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
 
   if (!existOriginalVdom) {
     newVdom.needRerender = 'ADD';
-  } else if (!isSameTagElement) {
+  } else if (!isSameType) {
     newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameTagElement) {
+  } else if (isSameType) {
     newVdom.needRerender = 'UPDATE';
+    newVdom.el = originalVdom.el;
   }
 
   return newVdom;
 }
 
 function processingFragment({ originalVdom, newVdom }) {
-  const isSameFragment = checkSameFragment({ originalVdom, newVdom });
+  const isSameType = checkSameFragment({ originalVdom, newVdom });
+
+  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
 
   if (!originalVdom) {
     newVdom.needRerender = 'ADD';
-  } else if (!isSameFragment) {
+  } else if (!isSameType) {
     newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameFragment) {
+  } else if (isSameType) {
     newVdom.needRerender = 'UPDATE';
-  }
-
-  if (!originalVdom || !isSameFragment) {
-    newVdom.children = newVdom.children.map(item => {
-      return makeNewVdomTree({ newVdom: item });
-    });
-  } else if (originalVdom && isSameFragment) {
-    newVdom.children = newVdom.children = newVdom.children.map(
-      (item, index) => {
-        return makeNewVdomTree({
-          newVdom: item,
-          originalVdom: originalVdom.children[index],
-        });
-      }
-    );
     newVdom.el = originalVdom.el;
   }
 
   return newVdom;
+}
+
+function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
+  const remakeVdom = generalize({ newVdom, originalVdom, isSameType });
+
+  remakeVdom.children = remakeChildrenForDiff({
+    isSameType,
+    newVdom: remakeVdom,
+    originalVdom,
+  });
+
+  return remakeVdom;
+}
+
+function generalize({ newVdom, originalVdom, isSameType }) {
+  if (typeof newVdom === 'function') {
+    return isSameType ? originalVdom.reRender() : newVdom();
+  }
+
+  return newVdom;
+}
+
+function remakeChildrenForDiff({ isSameType, newVdom, originalVdom }) {
+  if (isSameType) {
+    return remakeChildrenForUpdate(newVdom, originalVdom);
+  }
+
+  return remakeChildrenForAdd(newVdom);
+}
+
+function remakeChildrenForAdd(newVdom) {
+  return newVdom.children.map(item => {
+    const childItem = makeNewVdomTree({ newVdom: item });
+    childItem.getParent = () => newVdom;
+
+    return childItem;
+  });
+}
+
+function remakeChildrenForUpdate(newVdom, originalVdom) {
+  return newVdom.children.map((item, index) => {
+    const childItem = makeNewVdomTree({
+      newVdom: item,
+      originalVdom: originalVdom.children[index],
+    });
+
+    childItem.getParent = () => newVdom;
+
+    return childItem;
+  });
 }
