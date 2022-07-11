@@ -106,11 +106,6 @@ function typeUpdate(newVdom) {
 
 function removeEvent(oldProps, element, newprops) {
   if (oldProps?.onClick) {
-    console.log('000');
-    console.log('remove', element);
-    console.log('old', oldProps.onClick);
-    console.log('new', newprops.onClick);
-    console.log(oldProps.onClick === newprops.onClick);
     element.removeEventListener('click', oldProps.onClick);
   }
 }

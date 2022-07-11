@@ -25,7 +25,6 @@ export default function Custom2({ props, children }) {
         <button onClick={() => props.handle3()}>handle3</button>
         <button
           onClick={() => {
-            console.log('ddd');
             globalData.item = 'kkk';
           }}
         >

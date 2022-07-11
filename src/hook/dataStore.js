@@ -31,7 +31,6 @@ export function makeDataStore(storeKey, initValue) {
 }
 
 function makeProxyData(storeKey, initValue) {
-  console.log('ppp');
   return new Proxy(initValue, {
     get(target, prop) {
       return target[prop];
@@ -40,7 +39,6 @@ function makeProxyData(storeKey, initValue) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue.value[storeKey];
-      console.log('k');
 
       dataStoreQueue.reverse().forEach(render => {
         render();
