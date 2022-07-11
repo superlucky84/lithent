@@ -97,6 +97,10 @@ function typeUpdate(newVdom) {
     delete newVdom.oldProps;
   }
 
+  if (newVdom.tag === 'input') {
+    element.value = newVdom.props.value;
+  }
+
   newVdom.children.forEach(childItem => {
     vDomUpdate(childItem);
   });
@@ -108,6 +112,9 @@ function removeEvent(oldProps, element, newprops) {
   if (oldProps?.onClick) {
     element.removeEventListener('click', oldProps.onClick);
   }
+  if (oldProps?.onInput) {
+    element.removeEventListener('input', oldProps.onInput);
+  }
 }
 
 function updateProps(props, element) {
@@ -118,6 +125,9 @@ function updateProps(props, element) {
       dataValue.value = element;
     } else if (dataKey === 'onClick') {
       element.addEventListener('click', dataValue);
+    } else if (dataKey === 'onInput') {
+      console.log('k');
+      element.addEventListener('input', dataValue);
     } else {
       element.setAttribute(dataKey, dataValue);
     }

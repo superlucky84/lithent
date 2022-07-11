@@ -4,6 +4,7 @@ import { mounted, unmount, updated, useDataStore, makeData } from '@/hook';
 export default function Custom2({ props, children }) {
   const globalData = useDataStore('globalData');
   const data7 = makeData({ m: 1 });
+  const data = makeData({ v: 1 });
   const handleMounted = () => {
     console.log('hr', props.hadleRef);
     console.log('CUSTOM2 MOUNTED');
@@ -14,6 +15,10 @@ export default function Custom2({ props, children }) {
   const handleUpdated = () => {
     console.log('CUSTOM2 UPDATED --');
   };
+  const handleInputChane = event => {
+    data.v = event.target.value;
+  };
+
   const componentMaker = () => {
     mounted(handleMounted);
     unmount(handleUnmount);
@@ -21,11 +26,12 @@ export default function Custom2({ props, children }) {
 
     return (
       <div class="custom2">
-        {props.k}-0--------------{data7.m}
+        {props.k}-0--------------{globalData.item}
+        <input type="text" value={data.v} onInput={handleInputChane} />
         <button onClick={() => props.handle3()}>handle3</button>
         <button
           onClick={() => {
-            globalData.item = 'kkk';
+            globalData.item = globalData.item === 'kkk' ? 'jjj' : 'kkk';
           }}
         >
           handle4
