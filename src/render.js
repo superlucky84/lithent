@@ -60,11 +60,7 @@ function typeDeleteAdd(newVdom) {
   // const parentVdom = newVdom.getParent();
   // const parentDiv = parentVdom.el;
   // const newElement = vDomToDom(newVdom);
-  if (newVdom.type === 'text') {
-    typeDeleteAddForText(newVdom);
-  } else {
-    console.log('TTTTTTTTTYPE', newVdom.type);
-  }
+  console.log('TTTTTTTTTYPE', newVdom.type);
 
   // if (element && newVdom.oldProps) {
   // removeEvent(newVdom.oldProps, element);
@@ -82,13 +78,19 @@ function typeDeleteAdd(newVdom) {
   runMountedQueueFromVdom(newVdom);
 }
 
-function typeDeleteAddForText(newVdom) {
+function updateText(newVdom) {
   const element = newVdom.el;
   element.nodeValue = newVdom.text;
 }
 
 function typeUpdate(newVdom) {
   const element = newVdom.el;
+
+  if (newVdom.type === 'text') {
+    updateText(newVdom);
+
+    return;
+  }
 
   if (element) {
     removeEvent(newVdom.oldProps, element, newVdom.props);

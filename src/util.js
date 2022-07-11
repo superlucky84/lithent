@@ -103,5 +103,5 @@ export function checkSameLoopElement({ originalVdom, newVdom }) {
 }
 
 export function checkSameTextElement({ originalVdom, newVdom }) {
-  return originalVdom?.text === newVdom.text;
+  return originalVdom?.type === newVdom.type;
 }

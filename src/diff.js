@@ -66,20 +66,8 @@ export default function makeNewVdomTree({ originalVdom, newVdom }) {
 
 function processingComponent({ originalVdom, newVdom }) {
   const isSameType = checkSameCustomComponent({ originalVdom, newVdom });
-  const existOriginalVdom = originalVdom && originalVdom.type;
 
-  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
-
-  if (!existOriginalVdom) {
-    newVdom.needRerender = 'ADD';
-  } else if (!isSameType) {
-    newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameType) {
-    newVdom.needRerender = 'UPDATE';
-    newVdom.el = originalVdom.el;
-  }
-
-  return newVdom;
+  return remakeNewVdom({ newVdom, originalVdom, isSameType });
 }
 
 /**
@@ -88,39 +76,14 @@ function processingComponent({ originalVdom, newVdom }) {
  */
 function processingLoopElement({ originalVdom, newVdom }) {
   const isSameType = checkSameLoopElement({ originalVdom, newVdom });
-  const existOriginalVdom = originalVdom && originalVdom.type;
 
-  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
-
-  if (!existOriginalVdom) {
-    newVdom.needRerender = 'ADD';
-  } else if (!isSameType) {
-    newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameType) {
-    newVdom.needRerender = 'UPDATE';
-    newVdom.el = originalVdom.el;
-  }
-
-  return newVdom;
+  return remakeNewVdom({ newVdom, originalVdom, isSameType });
 }
 
-// renrender ok1
 function processingTextElement({ originalVdom, newVdom }) {
-  const isSameTextElement = checkSameTextElement({ originalVdom, newVdom });
+  const isSameType = checkSameTextElement({ originalVdom, newVdom });
 
-  if (!originalVdom) {
-    newVdom.needRerender = 'ADD';
-  } else if (isSameTextElement) {
-    newVdom.needRerender = 'NONE';
-  } else {
-    newVdom.needRerender = 'DELETE-ADD';
-  }
-
-  if (originalVdom?.el) {
-    newVdom.el = originalVdom.el;
-  }
-
-  return newVdom;
+  return remakeNewVdom({ newVdom, originalVdom, isSameType });
 }
 
 function processingNullElement({ originalVdom, newVdom }) {
@@ -136,49 +99,50 @@ function processingNullElement({ originalVdom, newVdom }) {
 
 function processingTagElement({ originalVdom, newVdom }) {
   const isSameType = checkSameTagElement({ originalVdom, newVdom });
-  const existOriginalVdom = originalVdom && originalVdom.type;
 
-  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
-
-  if (!existOriginalVdom) {
-    newVdom.needRerender = 'ADD';
-  } else if (!isSameType) {
-    newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameType) {
-    newVdom.needRerender = 'UPDATE';
-    newVdom.el = originalVdom.el;
-  }
-
-  return newVdom;
+  return remakeNewVdom({ newVdom, originalVdom, isSameType });
 }
 
 function processingFragment({ originalVdom, newVdom }) {
   const isSameType = checkSameFragment({ originalVdom, newVdom });
 
-  newVdom = remakeNewVdom({ newVdom, originalVdom, isSameType });
-
-  if (!originalVdom) {
-    newVdom.needRerender = 'ADD';
-  } else if (!isSameType) {
-    newVdom.needRerender = 'DELETE-ADD';
-  } else if (isSameType) {
-    newVdom.needRerender = 'UPDATE';
-    newVdom.el = originalVdom.el;
-  }
-
-  return newVdom;
+  return remakeNewVdom({ newVdom, originalVdom, isSameType });
 }
 
 function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
+  const existOriginalVdom = originalVdom && originalVdom.type;
   const remakeVdom = generalize({ newVdom, originalVdom, isSameType });
 
-  remakeVdom.children = remakeChildrenForDiff({
+  if (remakeVdom.children) {
+    remakeVdom.children = remakeChildrenForDiff({
+      isSameType,
+      newVdom: remakeVdom,
+      originalVdom,
+    });
+  }
+
+  const needRerender = addReRenderTypeProperty({
+    existOriginalVdom,
     isSameType,
-    newVdom: remakeVdom,
-    originalVdom,
   });
 
+  remakeVdom.needRerender = needRerender;
+
+  if (needRerender === 'UPDATE') {
+    remakeVdom.el = originalVdom.el;
+  }
+
   return remakeVdom;
+}
+
+function addReRenderTypeProperty({ existOriginalVdom, isSameType }) {
+  if (!existOriginalVdom) {
+    return 'ADD';
+  } else if (isSameType) {
+    return 'UPDATE';
+  }
+
+  return 'DELETE-ADD';
 }
 
 function generalize({ newVdom, originalVdom, isSameType }) {
