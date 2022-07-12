@@ -8,7 +8,7 @@ const promiseTest = () => {
   });
 };
 
-export default function init() {
+export default function storeInit() {
   makeDataStore('globalData', {
     item: 'jjj',
     value: 0,
