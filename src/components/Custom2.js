@@ -36,7 +36,7 @@ export default function Custom2({ props, children }) {
   const componentMaker = () => {
     mounted(handleMounted);
     unmount(handleUnmount);
-    updated(handleUpdated);
+    updated(handleUpdated, [globalData.value]);
 
     return (
       <div class="custom2">
