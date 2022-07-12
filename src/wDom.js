@@ -5,6 +5,7 @@ import {
   initUpdateHookState,
   initMountHookState,
   needDiff,
+  isExisty,
 } from '@/util';
 
 export function Fragment({ props, children }) {
@@ -146,7 +147,7 @@ function remakeChildren(nodePointer, children) {
 }
 
 function makeChildrenItem({ item }) {
-  if (!item) {
+  if (!isExisty(item)) {
     return { type: null };
   } else if (Array.isArray(item)) {
     const nodePointer = { value: null };

@@ -105,3 +105,7 @@ export function checkSameLoopElement({ originalVdom, newVdom }) {
 export function checkSameTextElement({ originalVdom, newVdom }) {
   return originalVdom?.type === newVdom.type;
 }
+
+export function isExisty(value) {
+  return value !== null && value !== undefined;
+}

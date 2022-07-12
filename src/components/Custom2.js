@@ -19,9 +19,11 @@ export default function Custom2({ props, children }) {
   const handleMounted = async () => {
     console.log('CUSTOM2 MOUNTED');
 
+    /*
     const resolveValue = await promiseTest();
     console.log(resolveValue);
     data.v = resolveValue;
+    */
   };
   const handleUnmount = () => {
     console.log('CUSTOM2 UNMOUNT');
