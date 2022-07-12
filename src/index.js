@@ -1,11 +1,9 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
 import CustomElement from '@/components/CustomElement';
-import { makeDataStore } from '@/hook';
+import storeInit from '@/store';
 
-makeDataStore('globalData', { item: 'jjj' });
-
-const n = '3';
+storeInit();
 
 const vDom = (
   <Fragment>

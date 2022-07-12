@@ -24,16 +24,26 @@ export function useDataStore(storeKey) {
 
 export function makeDataStore(storeKey, initValue) {
   if (!dataStoreStore.value[storeKey]) {
-    dataStoreStore.value[storeKey] = makeProxyData(storeKey, initValue);
+    dataStoreStore.value[storeKey] = makeProxyData({
+      storeKey,
+      initValue,
+    });
   }
 
   return dataStoreStore.value[storeKey];
 }
 
-function makeProxyData(storeKey, initValue) {
-  return new Proxy(initValue, {
+function makeProxyData({ storeKey, initValue }) {
+  const proxy = new Proxy(initValue, {
     get(target, prop) {
-      return target[prop];
+      const value = target[prop];
+
+      if (typeof value === 'function') {
+        return function (...args) {
+          value.call(proxy, ...args);
+        };
+      }
+      return value;
     },
     set(target, prop, value) {
       target[prop] = value;
@@ -47,4 +57,23 @@ function makeProxyData(storeKey, initValue) {
       return true;
     },
   });
+
+  return new Proxy(
+    {},
+    {
+      get(target, prop) {
+        const methodValue = proxy[prop];
+
+        if (typeof methodValue === 'function') {
+          return function (...args) {
+            methodValue(...args);
+          };
+        }
+        return proxy[prop];
+      },
+      set() {
+        return false;
+      },
+    }
+  );
 }

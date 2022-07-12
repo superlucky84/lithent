@@ -5,14 +5,28 @@ export default function Custom2({ props, children }) {
   const globalData = useDataStore('globalData');
   const data7 = makeData({ m: 1 });
   const data = makeData({ v: 1 });
-  const handleMounted = () => {
-    console.log('hr', props.hadleRef);
+  const promiseTest = () => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve(999);
+      }, 3000);
+    });
+  };
+  const gdataUpdate = () => {
+    console.log('gdataUpdate');
+    globalData.increase();
+  };
+  const handleMounted = async () => {
     console.log('CUSTOM2 MOUNTED');
+
+    const resolveValue = await promiseTest();
+    console.log(resolveValue);
+    data.v = resolveValue;
   };
   const handleUnmount = () => {
     console.log('CUSTOM2 UNMOUNT');
   };
-  const handleUpdated = () => {
+  const handleUpdated = async () => {
     console.log('CUSTOM2 UPDATED --');
   };
   const handleInputChane = event => {
@@ -26,16 +40,11 @@ export default function Custom2({ props, children }) {
 
     return (
       <div class="custom2">
-        {props.k}-0--------------{globalData.item}
+        {props.k}-0--------------{globalData.item}-{globalData.value}
         <input type="text" value={data.v} onInput={handleInputChane} />
         <button onClick={() => props.handle3()}>handle3</button>
-        <button
-          onClick={() => {
-            globalData.item = globalData.item === 'kkk' ? 'jjj' : 'kkk';
-          }}
-        >
-          handle4
-        </button>
+        <button onClick={gdataUpdate}>gdataupdate</button>
+        <button onClick={globalData.toggleItem}>handle4</button>
         <article>0{children}0</article>
       </div>
     );
