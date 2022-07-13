@@ -2,7 +2,7 @@ import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
 export function render(vDom, wrapElement) {
-  wrapElement.appendChild(vDomToDom(vDom));
+  wrapElement.appendChild(vDomToDom(vDom, true));
 }
 
 export function vDomUpdate(newVdomTree) {
@@ -40,16 +40,21 @@ function typeDelete(newVdom) {
 }
 
 function typeAdd(newVdom) {
-  const newElement = vDomToDom(newVdom);
-  const brothers = newVdom.getParent().children;
+  const newElement = vDomToDom(newVdom, true);
+  const parentVdom = newVdom.getParent();
+  const brothers = parentVdom.children;
+  const parentEl = parentVdom.el;
 
   const index = brothers.indexOf(newVdom);
   const nextIndex = index + 1;
 
-  const nextEl = brothers[nextIndex].el;
-  const parentEl = nextEl.parentNode;
+  if (brothers[nextIndex]) {
+    const nextEl = brothers[nextIndex].el;
 
-  parentEl.insertBefore(newElement, nextEl);
+    parentEl.insertBefore(newElement, nextEl);
+  } else {
+    parentEl.appendChild(newElement);
+  }
 
   runMountedQueueFromVdom(newVdom);
 }
@@ -58,7 +63,7 @@ function typeDeleteAdd(newVdom) {
   const parentVdom = newVdom.getParent();
   const parentElement = parentVdom.el;
   const orignalElement = newVdom.el;
-  const newElement = vDomToDom(newVdom);
+  const newElement = vDomToDom(newVdom, true);
 
   if (orignalElement && newVdom.oldProps) {
     removeEvent(newVdom.oldProps, orignalElement);
@@ -121,13 +126,13 @@ function updateProps(props, element) {
       element.addEventListener('click', dataValue);
     } else if (dataKey === 'onInput') {
       element.addEventListener('input', dataValue);
-    } else {
+    } else if (typeof dataValue === 'number' || typeof dataValue === 'string') {
       element.setAttribute(dataKey, dataValue);
     }
   });
 }
 
-function vDomToDom(vDom) {
+function vDomToDom(vDom, init) {
   let element;
   const { type, tag, text, props, children = [] } = vDom;
 
@@ -139,21 +144,22 @@ function vDomToDom(vDom) {
     element = document.createTextNode(text);
   }
 
-  const elementChildren = children.reduce((acc, childItem) => {
-    if (childItem.type) {
-      const a = vDomToDom(childItem);
-      acc.appendChild(a);
-    }
+  if (init) {
+    const elementChildren = children.reduce((acc, childItem) => {
+      if (childItem.type) {
+        acc.appendChild(vDomToDom(childItem, init));
+      }
 
-    return acc;
-  }, new DocumentFragment());
+      return acc;
+    }, new DocumentFragment());
+
+    if (elementChildren.hasChildNodes()) {
+      element.appendChild(elementChildren);
+    }
+  }
 
   if (props) {
     updateProps(props, element);
-  }
-
-  if (elementChildren.hasChildNodes()) {
-    element.appendChild(elementChildren);
   }
 
   vDom.el = element;

@@ -5,6 +5,11 @@ export const stateKeyRef = { value: null };
 export const needDiff = { value: null };
 
 /**
+ * Router
+ */
+export const routerParams = { value: {} };
+
+/**
  * Data
  */
 export const dataCallSeq = { value: null };
@@ -89,8 +94,8 @@ export function checkSameCustomComponent({ originalVdom, newVdom }) {
 
 export function checkSameFragment({ originalVdom, newVdom }) {
   return (
-    originalVdom.type === 'fragment' &&
-    originalVdom.children.length === newVdom.children.length
+    originalVdom?.type === 'fragment' &&
+    originalVdom?.children?.length === newVdom.children.length
   );
 }
 
