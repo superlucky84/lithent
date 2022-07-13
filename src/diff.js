@@ -128,7 +128,7 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
 
   remakeVdom.needRerender = needRerender;
 
-  if (needRerender === 'UPDATE') {
+  if (['UPDATE', 'DELETE-ADD'].includes(needRerender)) {
     remakeVdom.el = originalVdom.el;
   }
 
