@@ -77,6 +77,7 @@ function makeCustomNode({ componentMaker, stateKey, tag, props, children }) {
     children,
   });
 
+  customNode.props = props;
   customNode.reRender = reRender;
   customNode.tagName = tag.name;
   customNode.stateKey = stateKey;
