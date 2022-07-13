@@ -54,6 +54,7 @@ function typeAdd(newVdom) {
   runMountedQueueFromVdom(newVdom);
 }
 
+// Todo 구현필요
 function typeDeleteAdd(newVdom) {
   // console.log('DELTE-ADD', newVdom.type);
 
@@ -93,6 +94,7 @@ function typeUpdate(newVdom) {
   }
 
   if (element) {
+    // Todo 이벤트 처리 추상화 및 일괄 수정 필요
     removeEvent(newVdom.oldProps, element, newVdom.props);
     updateProps(newVdom.props, element);
 
