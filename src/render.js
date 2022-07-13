@@ -54,27 +54,17 @@ function typeAdd(newVdom) {
   runMountedQueueFromVdom(newVdom);
 }
 
-// Todo 구현필요
 function typeDeleteAdd(newVdom) {
-  // console.log('DELTE-ADD', newVdom.type);
+  const parentVdom = newVdom.getParent();
+  const parentElement = parentVdom.el;
+  const orignalElement = newVdom.el;
+  const newElement = vDomToDom(newVdom);
 
-  // const parentVdom = newVdom.getParent();
-  // const parentDiv = parentVdom.el;
-  // const newElement = vDomToDom(newVdom);
-  console.log('TTTTTTTTTYPE', newVdom.type);
+  if (orignalElement && newVdom.oldProps) {
+    removeEvent(newVdom.oldProps, orignalElement);
+  }
 
-  // if (element && newVdom.oldProps) {
-  // removeEvent(newVdom.oldProps, element);
-  // }
-  // console.log('parentEL - ', parentVdom.el);
-
-  // console.log('1111', newVdom.getParent());
-  // console.log('ELEMENT - ', newVdom);
-
-  // console.log('-------------------------');
-  // console.log(newVdom.el);
-
-  // parentDiv.replaceChild(newVdom.el, newElement);
+  parentElement.replaceChild(newElement, orignalElement);
 
   runMountedQueueFromVdom(newVdom);
 }

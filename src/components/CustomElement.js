@@ -8,7 +8,7 @@ const useJw = () => {
 
   const handle = () => {
     data.k += 1;
-    data.j += 1;
+    // data.j += 1;
   };
   const handle2 = () => {
     data2.k += 1;
@@ -45,6 +45,7 @@ export default function CustomElement({ props, children }) {
         <button onClick={handle}>vava{data.k}aa</button>
         <button onClick={handle2}>{data2.k}-vava</button>
         <button onClick={handle3}>{data3.k}-vava</button>
+        {data.k % 2 === 0 ? <span>m</span> : 'jinwoo'}
         {data.k % 2 === 1 ? (
           <Custom2 k={data.k} data={data} handle3={handle3}>
             <span>1</span>
