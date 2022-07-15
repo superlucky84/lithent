@@ -13,11 +13,10 @@ export function Router({ props: { path, element }, children }) {
   const handleHashChange = () => {
     const injectPath = window.location.hash.replace(/^[#\/]*/, '');
     let targetPath = findPath(injectPath);
+
     if (!targetPath) {
       targetPath = findDynamicPath(injectPath);
     }
-
-    console.log('HASHCANGE ---- ', targetPath.props.path);
 
     data.targetPath = targetPath.props.path;
   };
