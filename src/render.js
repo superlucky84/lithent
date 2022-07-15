@@ -3,6 +3,12 @@ import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
 export function render(vDom, wrapElement) {
+  vDom.isRoot = true;
+
+  if (vDom.type === 'fragment') {
+    vDom.el = wrapElement;
+  }
+
   const kk = vDomToDom(vDom, true);
 
   wrapElement.appendChild(kk);
@@ -154,8 +160,9 @@ function updateProps(props, element) {
 function vDomToDom(vDom, init) {
   let element;
   const { type, tag, text, props, children = [] } = vDom;
+  const isVirtualType = type === 'fragment' || type === 'loop';
 
-  if (type === 'fragment' || type === 'loop') {
+  if (isVirtualType) {
     element = new DocumentFragment();
   } else if (type === 'element') {
     element = document.createElement(tag);
@@ -165,7 +172,6 @@ function vDomToDom(vDom, init) {
 
   if (init) {
     const elementChildren = children.reduce((acc, childItem) => {
-      console.log(childItem.type);
       if (childItem.type) {
         acc.appendChild(vDomToDom(childItem, init));
       }
@@ -174,7 +180,6 @@ function vDomToDom(vDom, init) {
     }, new DocumentFragment());
 
     if (elementChildren.hasChildNodes()) {
-      console.log('ELEMENT', element);
       element.appendChild(elementChildren);
     }
   }
@@ -183,7 +188,11 @@ function vDomToDom(vDom, init) {
     updateProps(props, element);
   }
 
-  vDom.el = element;
+  if (isVirtualType) {
+    vDom.el = findRealParentElement(vDom);
+  } else {
+    vDom.el = element;
+  }
 
   runMountedQueueFromVdom(vDom);
 
@@ -195,4 +204,13 @@ function addStyle(vDom, element) {
   Object.entries(style).forEach(([styleKey, dataValue]) => {
     element.style[styleKey] = dataValue;
   });
+}
+
+function findRealParentElement(vDom) {
+  const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
+  if (!isVirtualType || vDom.isRoot) {
+    return vDom.el;
+  }
+
+  return findRealParentElement(vDom.getParent());
 }
