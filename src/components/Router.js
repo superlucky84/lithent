@@ -3,7 +3,7 @@ import { makeData, mounted } from '@/hook';
 import { addParams } from '@/hook/params';
 
 export function Router({ props: { path, element }, children }) {
-  const data = makeData({ targetComponent: <div /> });
+  const data = makeData({ targetPath: '' });
   const findPath = injectPath =>
     children.find(item => item.props.path === injectPath);
 
@@ -13,13 +13,12 @@ export function Router({ props: { path, element }, children }) {
   const handleHashChange = () => {
     const injectPath = window.location.hash.replace(/^[#\/]*/, '');
     let targetPath = findPath(injectPath);
+
     if (!targetPath) {
       targetPath = findDynamicPath(injectPath);
     }
 
-    console.log(targetPath.props.element);
-
-    data.targetComponent = targetPath.props.element;
+    data.targetPath = targetPath.props.path;
   };
 
   window.addEventListener('hashchange', handleHashChange);
@@ -27,7 +26,13 @@ export function Router({ props: { path, element }, children }) {
   const makeComponent = () => {
     mounted(handleHashChange);
 
-    return data.targetComponent;
+    return (
+      <Fragment>
+        {children.map(({ props: { element, path } }) => {
+          return data.targetPath === path ? element : null;
+        })}
+      </Fragment>
+    );
   };
 
   return makeComponent;

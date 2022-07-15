@@ -1,8 +1,17 @@
+import { isExisty } from '@/util';
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
 export function render(vDom, wrapElement) {
-  wrapElement.appendChild(vDomToDom(vDom, true));
+  vDom.isRoot = true;
+
+  const kk = vDomToDom(vDom, true);
+
+  if (vDom.type === 'fragment') {
+    vDom.el = wrapElement;
+  }
+
+  wrapElement.appendChild(kk);
 }
 
 export function vDomUpdate(newVdomTree) {
@@ -42,21 +51,53 @@ function typeDelete(newVdom) {
 function typeAdd(newVdom) {
   const newElement = vDomToDom(newVdom, true);
   const parentVdom = newVdom.getParent();
-  const brothers = parentVdom.children;
-  const parentEl = parentVdom.el;
+  const parentEl = findRealParentElement(parentVdom);
+  const nextEl = startFindNextBrotherElement(newVdom, parentVdom);
 
-  const index = brothers.indexOf(newVdom);
-  const nextIndex = index + 1;
-
-  if (brothers[nextIndex]) {
-    const nextEl = brothers[nextIndex].el;
-
+  if (nextEl) {
     parentEl.insertBefore(newElement, nextEl);
   } else {
     parentEl.appendChild(newElement);
   }
 
   runMountedQueueFromVdom(newVdom);
+}
+
+function startFindNextBrotherElement(vDom, parentVdom) {
+  const brothers = parentVdom.children;
+  const index = brothers.indexOf(vDom);
+  const nextIndex = index + 1;
+  const candidiateBrothers = brothers.slice(nextIndex);
+
+  const finedNextEl = findChildFragmentNextElement(candidiateBrothers);
+
+  if (finedNextEl) {
+    return finedNextEl;
+  }
+
+  if (parentVdom.type === 'fragment' || parentVdom.type === 'loop') {
+    return startFindNextBrotherElement(parentVdom, parentVdom.getParent());
+  }
+
+  return false;
+}
+
+function findChildFragmentNextElement(candidiateBrothers) {
+  return candidiateBrothers.reduce((targetEl, bItem) => {
+    const type = bItem?.type;
+    const el = bItem?.el;
+    const isFragment = type === 'fragment' || type === 'loop';
+
+    if (targetEl) {
+      return targetEl;
+    } else if (isFragment) {
+      return findChildFragmentNextElement(bItem.children);
+    } else if (el && el.nodeType !== 11) {
+      return el;
+    }
+
+    return targetEl;
+  }, null);
 }
 
 function typeDeleteAdd(newVdom) {
@@ -135,8 +176,9 @@ function updateProps(props, element) {
 function vDomToDom(vDom, init) {
   let element;
   const { type, tag, text, props, children = [] } = vDom;
+  const isVirtualType = type === 'fragment' || type === 'loop';
 
-  if (type === 'fragment' || type === 'loop') {
+  if (isVirtualType) {
     element = new DocumentFragment();
   } else if (type === 'element') {
     element = document.createElement(tag);
@@ -174,4 +216,14 @@ function addStyle(vDom, element) {
   Object.entries(style).forEach(([styleKey, dataValue]) => {
     element.style[styleKey] = dataValue;
   });
+}
+
+function findRealParentElement(vDom) {
+  const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
+
+  if (!isVirtualType || vDom.isRoot) {
+    return vDom.el;
+  }
+
+  return findRealParentElement(vDom.getParent());
 }

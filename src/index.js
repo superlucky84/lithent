@@ -5,6 +5,7 @@ import { Router, RouterItem } from '@/components/Router';
 import Main from '@/components/Main';
 import Sub from '@/components/Sub';
 import Sub2 from '@/components/Sub2';
+import NestedFragment from '@/components/NestedFragment';
 import storeInit from '@/store';
 
 storeInit();
@@ -22,6 +23,7 @@ const vDom = (
 );
 */
 
+/*
 const vDom = (
   <Fragment>
     <Router>
@@ -31,6 +33,9 @@ const vDom = (
     </Router>
   </Fragment>
 );
+*/
+
+const vDom = <NestedFragment />;
 
 window.vDom = vDom;
 

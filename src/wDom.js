@@ -30,10 +30,14 @@ function reRenderCustomComponent({ tag, props, children, originalVdom }) {
   const newVdomTree = makeNewVdomTree({ originalVdom, newVdom });
   newVdomTree.getParent = originalVdom.getParent;
 
-  const brothers = originalVdom.getParent().children;
-  const index = brothers.indexOf(originalVdom);
+  if (!originalVdom.isRoot) {
+    const brothers = originalVdom.getParent().children;
+    const index = brothers.indexOf(originalVdom);
 
-  brothers.splice(index, 1, newVdomTree);
+    brothers.splice(index, 1, newVdomTree);
+  } else {
+    newVdomTree.isRoot = true;
+  }
 
   vDomUpdate(newVdomTree);
 
@@ -148,7 +152,7 @@ function remakeChildren(nodePointer, children) {
 }
 
 function makeChildrenItem({ item }) {
-  if (!isExisty(item)) {
+  if (!isExisty(item) || item === false) {
     return { type: null };
   } else if (Array.isArray(item)) {
     const nodePointer = { value: null };
