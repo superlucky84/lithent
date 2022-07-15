@@ -11,7 +11,8 @@ export function Router({ props: { path, element }, children }) {
     children.find(item => /^:/.test(item.props.path));
 
   const handleHashChange = () => {
-    const injectPath = window.location.hash.replace(/^[#\/]*/, '');
+    const injectPath =
+      window.location.hash.replace(/^[#\/]*/, '') || children[0].props.path;
     let targetPath = findPath(injectPath);
 
     if (!targetPath) {
@@ -38,6 +39,6 @@ export function Router({ props: { path, element }, children }) {
   return makeComponent;
 }
 
-export function RouterItem({ props, children }) {
-  return () => <div />;
+export function RouterItem() {
+  return () => <Fragment />;
 }
