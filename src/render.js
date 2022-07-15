@@ -2,14 +2,13 @@ import { isExisty } from '@/util';
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
+let gWrapElement;
+
 export function render(vDom, wrapElement) {
   vDom.isRoot = true;
+  gWrapElement = wrapElement;
 
   const kk = vDomToDom(vDom, true);
-
-  if (vDom.type === 'fragment') {
-    vDom.el = wrapElement;
-  }
 
   wrapElement.appendChild(kk);
 }
@@ -75,7 +74,10 @@ function startFindNextBrotherElement(vDom, parentVdom) {
     return finedNextEl;
   }
 
-  if (parentVdom.type === 'fragment' || parentVdom.type === 'loop') {
+  if (
+    !parentVdom.isRoot &&
+    (parentVdom.type === 'fragment' || parentVdom.type === 'loop')
+  ) {
     return startFindNextBrotherElement(parentVdom, parentVdom.getParent());
   }
 
@@ -220,6 +222,10 @@ function addStyle(vDom, element) {
 
 function findRealParentElement(vDom) {
   const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
+
+  if (vDom.isRoot) {
+    return gWrapElement;
+  }
 
   if (!isVirtualType || vDom.isRoot) {
     return vDom.el;
