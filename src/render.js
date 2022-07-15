@@ -1,8 +1,11 @@
+import { isExisty } from '@/util';
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
 export function render(vDom, wrapElement) {
-  wrapElement.appendChild(vDomToDom(vDom, true));
+  const kk = vDomToDom(vDom, true);
+
+  wrapElement.appendChild(kk);
 }
 
 export function vDomUpdate(newVdomTree) {
@@ -46,17 +49,33 @@ function typeAdd(newVdom) {
   const parentEl = parentVdom.el;
 
   const index = brothers.indexOf(newVdom);
-  const nextIndex = index + 1;
+  const nextEl = findNextBrotherElement(brothers, index + 1);
+  console.log('PARENT - ', parentVdom, parentEl);
+  console.log('ADDELEMENT - ', newElement, nextEl);
 
-  if (brothers[nextIndex]) {
-    const nextEl = brothers[nextIndex].el;
-
+  if (nextEl) {
     parentEl.insertBefore(newElement, nextEl);
   } else {
     parentEl.appendChild(newElement);
   }
 
   runMountedQueueFromVdom(newVdom);
+}
+
+function findNextBrotherElement(brothers, curIndex) {
+  const brother = brothers[curIndex];
+
+  if (!brother) {
+    return false;
+  }
+
+  if (brother.el) {
+    return brother.el;
+  }
+
+  const nextCurIndex = curIndex + 1;
+
+  return findNextBrotherElement(brothers, nextCurIndex);
 }
 
 function typeDeleteAdd(newVdom) {
@@ -146,6 +165,7 @@ function vDomToDom(vDom, init) {
 
   if (init) {
     const elementChildren = children.reduce((acc, childItem) => {
+      console.log(childItem.type);
       if (childItem.type) {
         acc.appendChild(vDomToDom(childItem, init));
       }
@@ -154,6 +174,7 @@ function vDomToDom(vDom, init) {
     }, new DocumentFragment());
 
     if (elementChildren.hasChildNodes()) {
+      console.log('ELEMENT', element);
       element.appendChild(elementChildren);
     }
   }
