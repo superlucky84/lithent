@@ -5,10 +5,10 @@ import { addParams } from '@/hook/params';
 export function Router({ props: { path, element }, children }) {
   const data = makeData({ targetPath: '' });
   const findPath = injectPath =>
-    children.find(item => item.props.path === injectPath);
+    children.find(item => item.componentProps.path === injectPath);
 
   const findDynamicPath = () =>
-    children.find(item => /^:/.test(item.props.path));
+    children.find(item => /^:/.test(item.componentProps.path));
 
   const handleHashChange = () => {
     const injectPath =
@@ -17,9 +17,11 @@ export function Router({ props: { path, element }, children }) {
 
     if (!targetPath) {
       targetPath = findDynamicPath(injectPath);
+
+      addParams(targetPath.componentProps.path.replace(/^:/, ''), injectPath);
     }
 
-    data.targetPath = targetPath.props.path;
+    data.targetPath = targetPath.componentProps.path;
   };
 
   window.addEventListener('hashchange', handleHashChange);
@@ -29,7 +31,7 @@ export function Router({ props: { path, element }, children }) {
 
     return (
       <Fragment>
-        {children.map(({ props: { element, path } }) => {
+        {children.map(({ componentProps: { element, path } }) => {
           return data.targetPath === path ? element : null;
         })}
       </Fragment>
@@ -40,5 +42,5 @@ export function Router({ props: { path, element }, children }) {
 }
 
 export function RouterItem() {
-  return () => <Fragment />;
+  return () => <div />;
 }

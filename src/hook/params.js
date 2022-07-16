@@ -1,7 +1,7 @@
 import { routerParams } from '@/util';
 
-export default function useParams(key) {
-  return routerParams.value[key];
+export default function useParams() {
+  return routerParams.value;
 }
 
 export function addParams(key, value) {

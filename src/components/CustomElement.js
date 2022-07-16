@@ -41,8 +41,8 @@ export default function CustomElement({ props, children }) {
     updated(handleUpdatedData2K, [data2.k]);
 
     return (
-      <div class={`aa${data.k}`}>
-        <button onClick={handle}>vava{data.k}aa</button>
+      <div class={`aaaaaaaaa${data.k}`}>
+        <button onClick={handle}>!vava{data.k}aa</button>
         <button onClick={handle2}>{data2.k}-vava</button>
         <button onClick={handle3}>{data3.k}-vava</button>
         {data.k % 2 === 0 ? <span>m</span> : 'jinwoo'}
