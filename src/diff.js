@@ -33,6 +33,7 @@ import {
   checkSameLoopElement,
   checkSameTextElement,
   checkCustemComponent,
+  isExisty,
 } from '@/util';
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
@@ -171,6 +172,10 @@ function remakeChildrenForAdd(newVdom) {
 }
 
 function remakeChildrenForUpdate(newVdom, originalVdom) {
+  if (newVdom.type === 'loop' && isExisty(getKey(newVdom.children[0]))) {
+    return remakeChildrenForLoopUpdate(newVdom, originalVdom);
+  }
+
   return newVdom.children.map((item, index) => {
     const childItem = makeNewVdomTree({
       newVdom: item,
@@ -181,4 +186,42 @@ function remakeChildrenForUpdate(newVdom, originalVdom) {
 
     return childItem;
   });
+}
+
+function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
+  const originalChildren = [...originalVdom.children];
+  const newChildren = [...newVdom.children];
+  const resultChildren = newChildren.map(item => {
+    const key = getKey(item);
+    const findOrignal = originalChildren.find(
+      orignalChildItem => getKey(orignalChildItem) === key
+    );
+
+    const childItem = makeNewVdomTree({
+      newVdom: item,
+      originalVdom: findOrignal,
+    });
+
+    delete childItem.el;
+
+    childItem.getParent = () => newVdom;
+    childItem.needRerender = 'ADD';
+
+    return childItem;
+  });
+
+  originalChildren.map(remainItem => {
+    const el = remainItem.el;
+
+    if (el) {
+      const parent = el.parentNode;
+      parent.removeChild(el);
+    }
+  });
+
+  return resultChildren;
+}
+
+function getKey(target) {
+  return target?.componentProps?.key ?? target.props.key;
 }
