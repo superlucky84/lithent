@@ -159,6 +159,10 @@ function removeEvent(oldProps, element, newprops) {
 
 function updateProps(props, element) {
   Object.entries(props || []).forEach(([dataKey, dataValue]) => {
+    if (dataKey === 'key') {
+      return;
+    }
+
     if (dataKey === 'style') {
       addStyle(dataValue, element);
     } else if (dataKey === 'ref') {

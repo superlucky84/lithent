@@ -68,6 +68,7 @@ function makeVdomResolver({ tag, props, children }) {
   };
 
   resolve.tagName = tag.name;
+  resolve.props = props;
 
   return resolve;
 }
