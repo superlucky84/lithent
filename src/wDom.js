@@ -17,6 +17,7 @@ export function h(tag, props, ...children) {
   const newProps = props || {};
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
+  // console.log(newProps, node);
 
   nodePointer.value = node;
 
@@ -81,7 +82,7 @@ function makeCustomNode({ componentMaker, stateKey, tag, props, children }) {
     children,
   });
 
-  customNode.props = props;
+  customNode.componentProps = props;
   customNode.reRender = reRender;
   customNode.tagName = tag.name;
   customNode.stateKey = stateKey;
@@ -118,6 +119,7 @@ function vdomMaker({
     });
   };
 
+  vdom.componentProps = props;
   vdom.reRender = reRender;
   vdom.tagName = tag.name;
   vdom.stateKey = stateKey;

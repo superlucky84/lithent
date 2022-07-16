@@ -8,9 +8,7 @@ export function render(vDom, wrapElement) {
   vDom.isRoot = true;
   gWrapElement = wrapElement;
 
-  const kk = vDomToDom(vDom, true);
-
-  wrapElement.appendChild(kk);
+  wrapElement.appendChild(vDomToDom(vDom, true));
 }
 
 export function vDomUpdate(newVdomTree) {
@@ -162,7 +160,7 @@ function removeEvent(oldProps, element, newprops) {
 function updateProps(props, element) {
   Object.entries(props || []).forEach(([dataKey, dataValue]) => {
     if (dataKey === 'style') {
-      addStyle(vDom, element);
+      addStyle(dataValue, element);
     } else if (dataKey === 'ref') {
       dataValue.value = element;
     } else if (dataKey === 'onClick') {
@@ -213,8 +211,7 @@ function vDomToDom(vDom, init) {
   return element;
 }
 
-function addStyle(vDom, element) {
-  const { style = {} } = vDom.props;
+function addStyle(style, element) {
   Object.entries(style).forEach(([styleKey, dataValue]) => {
     element.style[styleKey] = dataValue;
   });
