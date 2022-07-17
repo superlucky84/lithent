@@ -86,14 +86,7 @@ function processingTextElement({ originalVdom, newVdom }) {
 }
 
 function processingNullElement({ originalVdom, newVdom }) {
-  newVdom.needRerender = 'DELETE';
-
-  if (originalVdom?.el) {
-    runUnmountQueueFromVdom(originalVdom);
-    newVdom.el = originalVdom.el;
-  }
-
-  return newVdom;
+  return remakeNewVdom({ newVdom, originalVdom });
 }
 
 function processingTagElement({ originalVdom, newVdom }) {
@@ -121,7 +114,7 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
 
   const needRerender = addReRenderTypeProperty({
     originalVdom,
-    newVdom,
+    newVdom: remakeVdom,
     isSameType,
   });
 
@@ -131,15 +124,22 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
     remakeVdom.el = originalVdom.el;
   }
 
+  if (['DELETE', 'REPLACE'].includes(needRerender)) {
+    runUnmountQueueFromVdom(originalVdom);
+  }
+
   return remakeVdom;
 }
 
 function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
   const existOriginalVdom = originalVdom && originalVdom.type;
+  const isEmptyElement = checkEmptyElement(newVdom);
   const isSameText =
     newVdom.type === 'text' && isSameType && newVdom.text === originalVdom.text;
 
-  if (isSameText) {
+  if (isEmptyElement) {
+    return 'DELETE';
+  } else if (isSameText) {
     return 'NONE';
   } else if (!existOriginalVdom) {
     return 'ADD';
