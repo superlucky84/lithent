@@ -13,9 +13,9 @@
  *
  *
  * * 돔 반영 필요 상태
- * * * ADD, DELETE, DELETE-ADD, UPDATE, NONE
+ * * * ADD, DELETE, REPLACE, UPDATE, NONE
  * * * * (ADD). 오리지날이 없으면 추가되는 돔이므로 (추가, children들까지 재귀돌면서 전부 추가)
- * * * * (DELETE-ADD). 오리지날이 있고 같은 엘리먼트타입이 아닌 경우 기존 (삭제 후 추가,  children들까지 재귀돌면서 전부 추가)
+ * * * * (REPLACE). 오리지날이 있고 같은 엘리먼트타입이 아닌 경우 기존 (삭제 후 추가,  children들까지 재귀돌면서 전부 추가)
  * * * * (DELETE). 오리지날이 있고 새로운 엘리먼트 타입은 null타입일 경우 (삭제)
  * * * * (UPDATE). 오리지날이 있고 같은 타입이며 props나 data가 변경되었으면 (돔 속성이나 에트리뷰트만 변경 후 children 재귀 체크)
  * * * * (NONE). 오리지날이 있고 같은 타입이며 props나 data가 같으면 (방치 후 children 재귀 체크) (Todo)
@@ -129,7 +129,7 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
 
   remakeVdom.needRerender = needRerender;
 
-  if (['UPDATE', 'DELETE-ADD'].includes(needRerender)) {
+  if (['UPDATE', 'REPLACE'].includes(needRerender)) {
     remakeVdom.el = originalVdom.el;
   }
 
@@ -143,7 +143,7 @@ function addReRenderTypeProperty({ existOriginalVdom, isSameType }) {
     return 'UPDATE';
   }
 
-  return 'DELETE-ADD';
+  return 'REPLACE';
 }
 
 function generalize({ newVdom, originalVdom, isSameType }) {
@@ -191,6 +191,7 @@ function remakeChildrenForUpdate(newVdom, originalVdom) {
 function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
   const originalChildren = [...originalVdom.children];
   const newChildren = [...newVdom.children];
+
   const resultChildren = newChildren.map(item => {
     const key = getKey(item);
     const findOrignal = originalChildren.find(
@@ -202,10 +203,15 @@ function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
       originalVdom: findOrignal,
     });
 
-    delete childItem.el;
+    originalChildren.splice(originalChildren.indexOf(findOrignal), 1);
+
+    if (childItem.needRerender === 'REPLACE') {
+      childItem.needRerender = 'DELETE-REMAKE-ADD';
+    } else if (childItem.needRerender === 'UPDATE') {
+      childItem.needRerender = 'DELETE-ORIGINAL-ADD';
+    }
 
     childItem.getParent = () => newVdom;
-    childItem.needRerender = 'ADD';
 
     return childItem;
   });

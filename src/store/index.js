@@ -20,4 +20,8 @@ export default function storeInit() {
       this.value += value;
     },
   });
+
+  makeDataStore('example', {
+    title: '나만의 커스텀 프레임웍 제작기!!',
+  });
 }

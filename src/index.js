@@ -7,6 +7,7 @@ import Sub from '@/components/Sub';
 import Sub2 from '@/components/Sub2';
 import NestedFragment from '@/components/NestedFragment';
 import LoopTest from '@/components/LoopTest';
+import Presentation from '@/components/Presentation';
 import storeInit from '@/store';
 
 storeInit();
@@ -39,6 +40,7 @@ const vDom = (
 // const vDom = <NestedFragment />;
 
 const vDom = <LoopTest />;
+// const vDom = <Presentation />;
 
 window.vDom = vDom;
 
