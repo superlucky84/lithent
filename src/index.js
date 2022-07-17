@@ -12,7 +12,6 @@ import storeInit from '@/store';
 
 storeInit();
 
-/*
 const vDom = (
   <Fragment>
     <CustomElement vava={7} />
@@ -23,7 +22,6 @@ const vDom = (
     </Fragment>
   </Fragment>
 );
-*/
 
 /*
 const vDom = (
@@ -39,7 +37,7 @@ const vDom = (
 
 // const vDom = <NestedFragment />;
 
-const vDom = <LoopTest />;
+// const vDom = <LoopTest />;
 // const vDom = <Presentation />;
 
 window.vDom = vDom;
