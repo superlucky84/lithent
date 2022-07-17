@@ -111,7 +111,6 @@ function processingFragment({ originalVdom, newVdom }) {
 }
 
 function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
-  const existOriginalVdom = originalVdom && originalVdom.type;
   const remakeVdom = generalize({ newVdom, originalVdom, isSameType });
 
   if (remakeVdom.children) {
@@ -123,21 +122,28 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
   }
 
   const needRerender = addReRenderTypeProperty({
-    existOriginalVdom,
+    originalVdom,
+    newVdom,
     isSameType,
   });
 
   remakeVdom.needRerender = needRerender;
 
-  if (['UPDATE', 'REPLACE'].includes(needRerender)) {
+  if (needRerender !== 'ADD') {
     remakeVdom.el = originalVdom.el;
   }
 
   return remakeVdom;
 }
 
-function addReRenderTypeProperty({ existOriginalVdom, isSameType }) {
-  if (!existOriginalVdom) {
+function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
+  const existOriginalVdom = originalVdom && originalVdom.type;
+  const isSameText =
+    newVdom.type === 'text' && isSameType && newVdom.text === originalVdom.text;
+
+  if (isSameText) {
+    return 'NONE';
+  } else if (!existOriginalVdom) {
     return 'ADD';
   } else if (isSameType) {
     return 'UPDATE';
