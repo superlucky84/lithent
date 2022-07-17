@@ -35,6 +35,11 @@ import {
   checkSameLoopElement,
   checkSameTextElement,
   checkCustemComponent,
+  dataStoreRenderQueue,
+  dataStoreStore,
+  updatedQueue,
+  updatedStore,
+  redrawActionMap,
   isExisty,
 } from '@/util';
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
@@ -126,6 +131,8 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
 
   if (['DELETE', 'REPLACE'].includes(needRerender)) {
     runUnmountQueueFromVdom(originalVdom);
+
+    delete redrawActionMap[originalVdom.stateKey];
   }
 
   return remakeVdom;

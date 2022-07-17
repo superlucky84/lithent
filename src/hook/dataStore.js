@@ -17,7 +17,7 @@ export function useDataStore(storeKey) {
   const dataStoreQueue = dataStoreRenderQueue.value;
 
   dataStoreQueue[storeKey] ??= [];
-  dataStoreQueue[storeKey].push(() => redrawActionMap[stateKey]());
+  dataStoreQueue[storeKey].push(() => redrawActionMap[stateKey]);
 
   return dataValue || {};
 }
@@ -49,9 +49,19 @@ function makeProxyData({ storeKey, initValue }) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue.value[storeKey];
+      const deleteTargets = [];
 
-      dataStoreQueue.reverse().forEach(render => {
-        render();
+      dataStoreQueue.forEach((makeRender, index) => {
+        const render = makeRender();
+        if (render) {
+          render();
+        } else {
+          deleteTargets.push(makeRender);
+        }
+      });
+
+      deleteTargets.forEach(deleteTarget => {
+        dataStoreQueue.splice(dataStoreQueue.indexOf(deleteTarget), 1);
       });
 
       return true;
