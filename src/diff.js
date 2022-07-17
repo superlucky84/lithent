@@ -24,86 +24,24 @@
  */
 
 import {
-  checkFragment,
-  checkTagElement,
-  checkLoopElement,
-  checkTextElement,
   checkEmptyElement,
-  checkSameCustomComponent,
-  checkSameFragment,
-  checkSameTagElement,
-  checkSameLoopElement,
-  checkSameTextElement,
-  checkCustemComponent,
-  dataStoreRenderQueue,
-  dataStoreStore,
-  updatedQueue,
-  updatedStore,
+  checkSameVdomWithOriginal,
   redrawActionMap,
   isExisty,
+  getVdomType,
 } from '@/util';
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
 export default function makeNewVdomTree({ originalVdom, newVdom }) {
-  const isComponent = checkCustemComponent(newVdom);
-  const isFragment = checkFragment(newVdom);
-  const isTagElement = checkTagElement(newVdom);
-  const isLoopElement = checkLoopElement(newVdom);
-  const isTextElement = checkTextElement(newVdom);
-  const isEmptyElement = checkEmptyElement(newVdom);
-  let resultVdom;
+  const type = getVdomType(newVdom);
 
-  if (isComponent) {
-    resultVdom = processingComponent({ originalVdom, newVdom });
-  } else if (isFragment) {
-    resultVdom = processingFragment({ originalVdom, newVdom });
-  } else if (isTagElement) {
-    resultVdom = processingTagElement({ originalVdom, newVdom });
-  } else if (isLoopElement) {
-    resultVdom = processingLoopElement({ originalVdom, newVdom });
-  } else if (isTextElement) {
-    resultVdom = processingTextElement({ originalVdom, newVdom });
-  } else if (isEmptyElement) {
-    resultVdom = processingNullElement({ originalVdom, newVdom });
+  if (!type) {
+    throw new Error('Unknown type vdom');
   }
 
-  resultVdom.oldProps = originalVdom?.props;
+  const isSameType = checkSameVdomWithOriginal[type]({ originalVdom, newVdom });
 
-  return resultVdom;
-}
-
-function processingComponent({ originalVdom, newVdom }) {
-  const isSameType = checkSameCustomComponent({ originalVdom, newVdom });
-
-  return remakeNewVdom({ newVdom, originalVdom, isSameType });
-}
-
-function processingLoopElement({ originalVdom, newVdom }) {
-  const isSameType = checkSameLoopElement({ originalVdom, newVdom });
-
-  return remakeNewVdom({ newVdom, originalVdom, isSameType });
-}
-
-function processingTextElement({ originalVdom, newVdom }) {
-  const isSameType = checkSameTextElement({ originalVdom, newVdom });
-
-  return remakeNewVdom({ newVdom, originalVdom, isSameType });
-}
-
-function processingNullElement({ originalVdom, newVdom }) {
-  return remakeNewVdom({ newVdom, originalVdom });
-}
-
-function processingTagElement({ originalVdom, newVdom }) {
-  const isSameType = checkSameTagElement({ originalVdom, newVdom });
-
-  return remakeNewVdom({ newVdom, originalVdom, isSameType });
-}
-
-function processingFragment({ originalVdom, newVdom }) {
-  const isSameType = checkSameFragment({ originalVdom, newVdom });
-
-  return remakeNewVdom({ newVdom, originalVdom, isSameType });
+  return remakeNewVdom({ originalVdom, newVdom, isSameType });
 }
 
 function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
@@ -134,6 +72,8 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
 
     delete redrawActionMap[originalVdom.stateKey];
   }
+
+  remakeVdom.oldProps = originalVdom?.props;
 
   return remakeVdom;
 }
