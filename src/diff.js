@@ -18,6 +18,8 @@
  * * * * (REPLACE). 오리지날이 있고 같은 엘리먼트타입이 아닌 경우 기존 (삭제 후 추가,  children들까지 재귀돌면서 전부 추가)
  * * * * (DELETE). 오리지날이 있고 새로운 엘리먼트 타입은 null타입일 경우 (삭제)
  * * * * (UPDATE). 오리지날이 있고 같은 타입이며 props나 data가 변경되었으면 (돔 속성이나 에트리뷰트만 변경 후 children 재귀 체크)
+ * * * * (DELETE-REMAKE-ADD). 기존엘리먼트 삭제후 새로운 dom을 만들어 추가 (다시 만들어서 삽입정렬)
+ * * * * (DELETE-ORIGINAL-ADD). 기존엘리먼트 삭제후 기존 dom을 다시 추가 (삽입정렬)
  * * * * (NONE). 오리지날이 있고 같은 타입이며 props나 data가 같으면 (방치 후 children 재귀 체크) (Todo)
  */
 
@@ -33,6 +35,11 @@ import {
   checkSameLoopElement,
   checkSameTextElement,
   checkCustemComponent,
+  dataStoreRenderQueue,
+  dataStoreStore,
+  updatedQueue,
+  updatedStore,
+  redrawActionMap,
   isExisty,
 } from '@/util';
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
@@ -71,10 +78,6 @@ function processingComponent({ originalVdom, newVdom }) {
   return remakeNewVdom({ newVdom, originalVdom, isSameType });
 }
 
-/**
- * 루프형은 일단 태그 엘리먼트와 동일하게 동작하도록 함
- * 추후 키값 있을때는 원본 엘리먼트를 유지하도록 개선 예정
- */
 function processingLoopElement({ originalVdom, newVdom }) {
   const isSameType = checkSameLoopElement({ originalVdom, newVdom });
 
@@ -88,14 +91,7 @@ function processingTextElement({ originalVdom, newVdom }) {
 }
 
 function processingNullElement({ originalVdom, newVdom }) {
-  newVdom.needRerender = 'DELETE';
-
-  if (originalVdom?.el) {
-    runUnmountQueueFromVdom(originalVdom);
-    newVdom.el = originalVdom.el;
-  }
-
-  return newVdom;
+  return remakeNewVdom({ newVdom, originalVdom });
 }
 
 function processingTagElement({ originalVdom, newVdom }) {
@@ -123,7 +119,7 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
 
   const needRerender = addReRenderTypeProperty({
     originalVdom,
-    newVdom,
+    newVdom: remakeVdom,
     isSameType,
   });
 
@@ -133,15 +129,24 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
     remakeVdom.el = originalVdom.el;
   }
 
+  if (['DELETE', 'REPLACE'].includes(needRerender)) {
+    runUnmountQueueFromVdom(originalVdom);
+
+    delete redrawActionMap[originalVdom.stateKey];
+  }
+
   return remakeVdom;
 }
 
 function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
   const existOriginalVdom = originalVdom && originalVdom.type;
+  const isEmptyElement = checkEmptyElement(newVdom);
   const isSameText =
     newVdom.type === 'text' && isSameType && newVdom.text === originalVdom.text;
 
-  if (isSameText) {
+  if (isEmptyElement) {
+    return 'DELETE';
+  } else if (isSameText) {
     return 'NONE';
   } else if (!existOriginalVdom) {
     return 'ADD';

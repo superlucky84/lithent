@@ -36,9 +36,11 @@ export default function Custom2({ props, children }) {
   };
 
   const componentMaker = () => {
-    mounted(handleMounted);
-    unmount(handleUnmount);
+    // mounted(handleMounted);
+    // unmount(handleUnmount);
     updated(handleUpdated, [globalData.value]);
+
+    console.log('CUSTOM2 RENDER');
 
     return (
       <div class="custom2">
