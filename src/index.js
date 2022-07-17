@@ -39,8 +39,8 @@ const vDom = (
 
 // const vDom = <NestedFragment />;
 
-// const vDom = <LoopTest />;
-const vDom = <Presentation />;
+const vDom = <LoopTest />;
+// const vDom = <Presentation />;
 
 window.vDom = vDom;
 

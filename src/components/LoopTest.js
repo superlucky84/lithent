@@ -13,8 +13,8 @@ export default function NestedFragment({ props, children }) {
   });
   const handle = () => {
     data.list = [
-      { key: 2, value: '이이' },
       { key: 3, value: '삼삼' },
+      { key: 2, value: '이이' },
     ];
   };
 
@@ -23,7 +23,7 @@ export default function NestedFragment({ props, children }) {
       <Fragment>
         <button onClick={handle}>handle</button>
         {data.list.map(item => (
-          <CustomElement key={item.key} />
+          <div key={item.key}>{item.value}</div>
         ))}
       </Fragment>
     );

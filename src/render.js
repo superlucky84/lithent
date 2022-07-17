@@ -17,19 +17,25 @@ export function vDomUpdate(newVdomTree) {
   // console.log('NEWVDOMTREE - ', newVdomTree);
   // console.log('NEEDRERENDER - ', needRerender);
 
-  // ADD, DELETE, DELETE-ADD, UPDATE, NONE
+  // ADD, DELETE, REPLACE, UPDATE, NONE
   switch (needRerender) {
     case 'ADD':
       typeAdd(newVdomTree);
       break;
-    case 'DELETE':
+    case 'DELETE': // ORIGINAL_EL
       typeDelete(newVdomTree);
       break;
-    case 'DELETE-ADD':
-      typeDeleteAdd(newVdomTree);
+    case 'REPLACE': // ORIGINAL_EL
+      typeReplace(newVdomTree);
       break;
-    case 'UPDATE':
+    case 'UPDATE': // ORIGINAL_EL
       typeUpdate(newVdomTree);
+      break;
+    case 'DELETE-REMAKE-ADD':
+      typeDeleteRemakeAdd(newVdomTree);
+      break;
+    case 'DELETE-ORIGINAL-ADD':
+      typeDeleteOriginalAdd(newVdomTree);
       break;
     case 'NONE':
       break;
@@ -45,8 +51,20 @@ function typeDelete(newVdom) {
   }
 }
 
-function typeAdd(newVdom) {
-  const newElement = vDomToDom(newVdom, true);
+function typeDeleteRemakeAdd(newVdom) {
+  typeDelete(newVdom);
+  typeAdd(newVdom);
+}
+
+function typeDeleteOriginalAdd(newVdom) {
+  typeDelete(newVdom);
+  typeAdd(newVdom, newVdom.el);
+}
+
+function typeAdd(newVdom, newElement) {
+  if (!newElement) {
+    newElement = vDomToDom(newVdom, true);
+  }
   const parentVdom = newVdom.getParent();
   const parentEl = findRealParentElement(parentVdom);
   const nextEl = startFindNextBrotherElement(newVdom, parentVdom);
@@ -100,7 +118,7 @@ function findChildFragmentNextElement(candidiateBrothers) {
   }, null);
 }
 
-function typeDeleteAdd(newVdom) {
+function typeReplace(newVdom) {
   const parentVdom = newVdom.getParent();
   const parentElement = parentVdom.el;
   const orignalElement = newVdom.el;
@@ -228,7 +246,7 @@ function findRealParentElement(vDom) {
     return gWrapElement;
   }
 
-  if (!isVirtualType || vDom.isRoot) {
+  if (!isVirtualType) {
     return vDom.el;
   }
 
