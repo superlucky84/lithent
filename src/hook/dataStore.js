@@ -49,18 +49,18 @@ function makeProxyData({ storeKey, initValue }) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue.value[storeKey];
-      const deleteTargets = [];
+      const trashTargets = [];
 
       dataStoreQueue.forEach((makeRender, index) => {
         const render = makeRender();
         if (render) {
           render();
         } else {
-          deleteTargets.push(makeRender);
+          trashTargets.push(makeRender);
         }
       });
 
-      deleteTargets.forEach(deleteTarget => {
+      trashTargets.forEach(deleteTarget => {
         dataStoreQueue.splice(dataStoreQueue.indexOf(deleteTarget), 1);
       });
 
