@@ -5,8 +5,9 @@ import {
   initUpdateHookState,
   initMountHookState,
   needDiff,
-  isExisty,
 } from '@/util/util';
+
+import { isExisty } from '@/util/predicator';
 
 export function Fragment({ props, children }) {
   return { type: 'fragment', props, children };
