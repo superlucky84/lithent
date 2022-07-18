@@ -1,4 +1,4 @@
-import { stateKeyRef, unmountCallSeq, unmountQueue } from '@/util';
+import { stateKeyRef, unmountCallSeq, unmountQueue } from '@/util/util';
 
 export default function unmount(effectAction) {
   const currentSubSeq = unmountCallSeq.value;

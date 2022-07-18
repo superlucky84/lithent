@@ -1,4 +1,4 @@
-import { isExisty } from '@/util';
+import { isExisty } from '@/util/util';
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 

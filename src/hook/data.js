@@ -1,4 +1,9 @@
-import { dataStore, stateKeyRef, dataCallSeq, redrawActionMap } from '@/util';
+import {
+  dataStore,
+  stateKeyRef,
+  dataCallSeq,
+  redrawActionMap,
+} from '@/util/util';
 
 export default function useData(initValue) {
   const sKey = stateKeyRef.value;

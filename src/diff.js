@@ -29,7 +29,7 @@ import {
   redrawActionMap,
   isExisty,
   getVdomType,
-} from '@/util';
+} from '@/util/util';
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
 export default function makeNewVdomTree({ originalVdom, newVdom }) {

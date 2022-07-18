@@ -6,7 +6,7 @@ import {
   initMountHookState,
   needDiff,
   isExisty,
-} from '@/util';
+} from '@/util/util';
 
 export function Fragment({ props, children }) {
   return { type: 'fragment', props, children };

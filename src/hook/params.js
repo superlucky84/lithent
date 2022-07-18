@@ -1,4 +1,4 @@
-import { routerParams } from '@/util';
+import { routerParams } from '@/util/util';
 
 export default function useParams() {
   return routerParams.value;

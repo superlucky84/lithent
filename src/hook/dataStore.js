@@ -4,7 +4,7 @@ import {
   dataStoreStore,
   dataStoreRenderQueue,
   redrawActionMap,
-} from '@/util';
+} from '@/util/util';
 
 export function useDataStore(storeKey) {
   const stateKey = stateKeyRef.value;
@@ -49,18 +49,18 @@ function makeProxyData({ storeKey, initValue }) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue.value[storeKey];
-      const trashTargets = [];
+      const trashCollections = [];
 
       dataStoreQueue.forEach((makeRender, index) => {
         const render = makeRender();
         if (render) {
           render();
         } else {
-          trashTargets.push(makeRender);
+          trashCollections.push(makeRender);
         }
       });
 
-      trashTargets.forEach(deleteTarget => {
+      trashCollections.forEach(deleteTarget => {
         dataStoreQueue.splice(dataStoreQueue.indexOf(deleteTarget), 1);
       });
 
