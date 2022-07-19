@@ -1,5 +1,5 @@
 import { h, Fragment } from '../wDom';
-import { makeData, mounted } from '@/hook';
+import { makeData, mounted, unmount } from '@/hook';
 import { addParams } from '@/hook/params';
 
 export function Router({ props: { path, element }, children }) {
@@ -24,10 +24,15 @@ export function Router({ props: { path, element }, children }) {
     data.targetPath = targetPath.componentProps.path;
   };
 
+  const removeEvent = () => {
+    window.removeEventListener('hashchange', handleHashChange);
+  };
+
   window.addEventListener('hashchange', handleHashChange);
 
   const makeComponent = () => {
     mounted(handleHashChange);
+    unmount(removeEvent);
 
     return (
       <Fragment>
