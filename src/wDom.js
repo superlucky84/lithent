@@ -1,12 +1,12 @@
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
-import { redrawActionMap, needDiff } from '@/util/universalRef';
+import { redrawActionMap, needDiff } from '@/helper/universalRef';
 import {
   initUpdateHookState,
   initMountHookState,
-} from '@/util/universalRefHelper';
+} from '@/helper/universalRefHelper';
 
-import { isExisty } from '@/util/predicator';
+import { isExisty } from '@/helper/predicator';
 
 export function Fragment({ props, children }) {
   return { type: 'fragment', props, children };

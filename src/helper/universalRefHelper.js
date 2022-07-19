@@ -4,7 +4,7 @@ import {
   unmountCallSeq,
   dataCallSeq,
   mountedCallSeq,
-} from '@/util/universalRef';
+} from '@/helper/universalRef';
 
 /**
  * Update init state

@@ -3,7 +3,7 @@ import {
   updatedCallSeq,
   updatedQueue,
   updatedStore,
-} from '@/util/universalRef';
+} from '@/helper/universalRef';
 
 export default function updated(effectAction, dependencies) {
   const currentSubSeq = updatedCallSeq.value;

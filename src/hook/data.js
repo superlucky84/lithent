@@ -3,7 +3,7 @@ import {
   stateKeyRef,
   dataCallSeq,
   redrawActionMap,
-} from '@/util/universalRef';
+} from '@/helper/universalRef';
 
 export default function useData(initValue) {
   const sKey = stateKeyRef.value;
