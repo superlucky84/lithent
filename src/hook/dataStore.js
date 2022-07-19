@@ -1,10 +1,9 @@
 import {
   stateKeyRef,
-  dataStoreCallSeq,
   dataStoreStore,
   dataStoreRenderQueue,
   redrawActionMap,
-} from '@/util/util';
+} from '@/util/universalRef';
 
 export function useDataStore(storeKey) {
   const stateKey = stateKeyRef.value;

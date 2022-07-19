@@ -1,4 +1,4 @@
-import { stateKeyRef, mountedCallSeq, mountedQueue } from '@/util/util';
+import { stateKeyRef, mountedCallSeq, mountedQueue } from '@/util/universalRef';
 
 export default function mounted(effectAction) {
   const currentSubSeq = mountedCallSeq.value;

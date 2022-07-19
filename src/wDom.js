@@ -1,11 +1,10 @@
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
+import { redrawActionMap, needDiff } from '@/util/universalRef';
 import {
-  redrawActionMap,
   initUpdateHookState,
   initMountHookState,
-  needDiff,
-} from '@/util/util';
+} from '@/util/universalRefHelper';
 
 import { isExisty } from '@/util/predicator';
 

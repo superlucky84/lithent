@@ -23,7 +23,7 @@
  * * * * (NONE). 오리지날이 있고 같은 타입이며 props나 data가 같으면 (방치 후 children 재귀 체크) (Todo)
  */
 
-import { redrawActionMap } from '@/util/util';
+import { redrawActionMap } from '@/util/universalRef';
 import {
   checkEmptyElement,
   checkSameVdomWithOriginal,

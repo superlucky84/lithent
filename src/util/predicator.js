@@ -19,8 +19,6 @@ export function getVdomType(vDom) {
   } else if (isEmptyElement) {
     return 'empty';
   }
-
-  return false;
 }
 
 export const checkSameVdomWithOriginal = {
