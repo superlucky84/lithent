@@ -126,11 +126,6 @@ function typeReplace(newVdom) {
   runMountedQueueFromVdom(newVdom);
 }
 
-function updateText(newVdom) {
-  const element = newVdom.el;
-  element.nodeValue = newVdom.text;
-}
-
 function typeUpdate(newVdom) {
   const element = newVdom.el;
 
@@ -157,6 +152,11 @@ function typeUpdate(newVdom) {
   });
 
   runUpdatedQueueFromVdom(newVdom);
+}
+
+function updateText(newVdom) {
+  const element = newVdom.el;
+  element.nodeValue = newVdom.text;
 }
 
 function removeEvent(oldProps, element, newprops) {
