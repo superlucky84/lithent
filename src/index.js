@@ -25,6 +25,7 @@ const vDom = (
 );
 */
 
+/*
 const vDom = (
   <Fragment>
     <Router>
@@ -34,10 +35,11 @@ const vDom = (
     </Router>
   </Fragment>
 );
+*/
 
 // const vDom = <NestedFragment />;
 
-// const vDom = <LoopTest />;
+const vDom = <LoopTest />;
 // const vDom = <Presentation />;
 
 window.vDom = vDom;

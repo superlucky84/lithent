@@ -82,6 +82,10 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
 function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
   const existOriginalVdom = originalVdom && originalVdom.type;
   const isEmptyElement = checkEmptyElement(newVdom);
+  const isRoot = !newVdom.getParent;
+  const parentType = !isRoot && newVdom.getParent().type;
+  const key = getKey(newVdom);
+  const isKeyCheckedVdom = parentType === 'loop' && isExisty(key);
   const isSameText =
     newVdom.type === 'text' && isSameType && newVdom.text === originalVdom.text;
 
@@ -92,10 +96,10 @@ function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
   } else if (!existOriginalVdom) {
     return 'ADD';
   } else if (isSameType) {
-    return 'UPDATE';
+    return isKeyCheckedVdom ? 'DELETE-ORIGINAL-ADD' : 'UPDATE';
   }
 
-  return 'REPLACE';
+  return isKeyCheckedVdom ? 'DELETE-REMAKE-ADD' : 'REPLACE';
 }
 
 function generalize({ newVdom, originalVdom, isSameType }) {
@@ -124,7 +128,6 @@ function remakeChildrenForAdd(newVdom) {
 }
 
 function remakeChildrenForUpdate(newVdom, originalVdom) {
-  console.log('CHILDREN = ', newVdom.children);
   if (newVdom.type === 'loop' && isExisty(getKey(newVdom.children[0]))) {
     return remakeChildrenForLoopUpdate(newVdom, originalVdom);
   }
@@ -142,35 +145,13 @@ function remakeChildrenForUpdate(newVdom, originalVdom) {
 }
 
 function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
-  const originalChildren = [...originalVdom.children];
-  const newChildren = [...newVdom.children];
+  const { remakedChildren, unUsedChildren } = diffLoopChildren(
+    newVdom,
+    originalVdom
+  );
 
-  const resultChildren = newChildren.map(item => {
-    const key = getKey(item);
-    const findOrignal = originalChildren.find(
-      orignalChildItem => getKey(orignalChildItem) === key
-    );
-
-    const childItem = makeNewVdomTree({
-      newVdom: item,
-      originalVdom: findOrignal,
-    });
-
-    originalChildren.splice(originalChildren.indexOf(findOrignal), 1);
-
-    if (childItem.needRerender === 'REPLACE') {
-      childItem.needRerender = 'DELETE-REMAKE-ADD';
-    } else if (childItem.needRerender === 'UPDATE') {
-      childItem.needRerender = 'DELETE-ORIGINAL-ADD';
-    }
-
-    childItem.getParent = () => newVdom;
-
-    return childItem;
-  });
-
-  originalChildren.map(remainItem => {
-    const el = remainItem.el;
+  unUsedChildren.map(unusedItem => {
+    const el = unusedItem.el;
 
     if (el) {
       const parent = el.parentNode;
@@ -178,7 +159,35 @@ function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
     }
   });
 
-  return resultChildren;
+  return remakedChildren;
+}
+
+function diffLoopChildren(newVdom, originalVdom) {
+  const newChildren = [...newVdom.children];
+  const originalChildren = [...originalVdom.children];
+
+  const remakedChildren = newChildren.map(item => {
+    const key = getKey(item);
+    const originalItem = originalChildren.find(
+      orignalChildItem => getKey(orignalChildItem) === key
+    );
+
+    const childItem = makeNewVdomTree({
+      newVdom: item,
+      originalVdom: originalItem,
+    });
+
+    originalChildren.splice(originalChildren.indexOf(originalItem), 1);
+
+    childItem.getParent = () => newVdom;
+
+    return childItem;
+  });
+
+  return {
+    remakedChildren,
+    unUsedChildren: originalChildren,
+  };
 }
 
 function getKey(target) {

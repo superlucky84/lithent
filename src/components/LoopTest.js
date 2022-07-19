@@ -2,7 +2,7 @@ import { h, Fragment } from '@/wDom';
 import { makeRef, updated, makeData } from '@/hook';
 import CustomElement from '@/components/CustomElement';
 
-export default function NestedFragment({ props, children }) {
+export default function LoopTest({ props, children }) {
   const data = makeData({
     list: [
       { key: 1, value: '일' },
