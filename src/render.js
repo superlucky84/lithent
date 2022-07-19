@@ -159,7 +159,7 @@ function updateText(newVdom) {
   element.nodeValue = newVdom.text;
 }
 
-function removeEvent(oldProps, element, newprops) {
+function removeEvent(oldProps, element) {
   if (oldProps?.onClick) {
     element.removeEventListener('click', oldProps.onClick);
   }
@@ -201,6 +201,17 @@ function vDomToDom(vDom, init) {
     element = document.createTextNode(text);
   }
 
+  vDomChildrenToDom(children, element, init);
+  updateProps(props, element);
+
+  vDom.el = element;
+
+  runMountedQueueFromVdom(vDom);
+
+  return element;
+}
+
+function vDomChildrenToDom(children, parentElement, init) {
   if (init) {
     const elementChildren = children.reduce((acc, childItem) => {
       if (childItem.type) {
@@ -211,19 +222,9 @@ function vDomToDom(vDom, init) {
     }, new DocumentFragment());
 
     if (elementChildren.hasChildNodes()) {
-      element.appendChild(elementChildren);
+      parentElement.appendChild(elementChildren);
     }
   }
-
-  if (props) {
-    updateProps(props, element);
-  }
-
-  vDom.el = element;
-
-  runMountedQueueFromVdom(vDom);
-
-  return element;
 }
 
 function addStyle(style, element) {

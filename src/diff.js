@@ -167,11 +167,7 @@ function diffLoopChildren(newVdom, originalVdom) {
   const originalChildren = [...originalVdom.children];
 
   const remakedChildren = newChildren.map(item => {
-    const key = getKey(item);
-    const originalItem = originalChildren.find(
-      orignalChildItem => getKey(orignalChildItem) === key
-    );
-
+    const originalItem = findSameKeyOriginalItem(item, originalChildren);
     const childItem = makeNewVdomTree({
       newVdom: item,
       originalVdom: originalItem,
@@ -188,6 +184,14 @@ function diffLoopChildren(newVdom, originalVdom) {
     remakedChildren,
     unUsedChildren: originalChildren,
   };
+}
+
+function findSameKeyOriginalItem(item, originalChildren) {
+  const key = getKey(item);
+
+  return originalChildren.find(
+    orignalChildItem => getKey(orignalChildItem) === key
+  );
 }
 
 function getKey(target) {
