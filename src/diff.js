@@ -8,7 +8,7 @@
  * 4. loop타입의 자식들은 같은 키값을 가졌는지로 동일한지 판단하며 키값이 없을경우 fragment타입처럼 취급한다.
  */
 
-import { redrawActionMap } from '@/helper/universalRef';
+import { componentRef } from '@/helper/universalRef';
 import {
   checkEmptyElement,
   checkSameVdomWithOriginal,
@@ -56,7 +56,7 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
   if (['DELETE', 'REPLACE'].includes(needRerender)) {
     runUnmountQueueFromVdom(originalVdom);
 
-    delete redrawActionMap[originalVdom.stateKey];
+    delete componentRef[originalVdom.stateKey];
   }
 
   remakeVdom.oldProps = originalVdom?.props;

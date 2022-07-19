@@ -1,6 +1,6 @@
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
-import { redrawActionMap, needDiffRef } from '@/helper/universalRef';
+import { setRedrawAction, needDiffRef } from '@/helper/universalRef';
 import {
   initUpdateHookState,
   initMountHookState,
@@ -61,9 +61,9 @@ function makeVdomResolver({ tag, props, children }) {
 
     const originalVdom = customNode;
 
-    redrawActionMap[stateKey] = () => {
+    setRedrawAction(stateKey, () => {
       reRenderCustomComponent({ tag, props, children, originalVdom, stateKey });
-    };
+    });
 
     return customNode;
   };
@@ -111,7 +111,7 @@ function vdomMaker({
 
   const vdom = componentMaker();
 
-  redrawActionMap[stateKey] = () => {
+  setRedrawAction(stateKey, () => {
     reRenderCustomComponent({
       tag,
       props,
@@ -119,7 +119,7 @@ function vdomMaker({
       originalVdom: vdom,
       stateKey,
     });
-  };
+  });
 
   vdom.componentProps = props;
   vdom.reRender = reRender;

@@ -4,39 +4,53 @@
 export const stateKeyRef = { value: null };
 export const needDiffRef = { value: null };
 
-/**
- * Router
- */
-export const routerParams = { value: {} };
+// componentRef[stateKey].redrawAction
+// componentRef[stateKey].dataStore
+// componentRef[stateKey].dataStoreQueue
+// componentRef[stateKey].updatedStore
+// componentRef[stateKey].updatedQueue
+// componentRef[stateKey].mountedQueue
+// componentRef[stateKey].unmountQueue
+export const componentRef = {};
 
 /**
  * Data
  */
 export const dataCallSeq = { value: null };
-export const dataStore = { value: {} };
-export const redrawActionMap = {};
 
 /**
  * DataStore
  */
-export const dataStoreStore = { value: {} };
-export const dataStoreRenderQueue = { value: {} };
+export const dataStoreStore = {};
+export const dataStoreRenderQueue = {};
 
 /**
  * Updated
  */
 export const updatedCallSeq = { value: null };
-export const updatedStore = { value: {} };
-export const updatedQueue = { value: {} };
 
 /**
  * Mounted
  */
 export const mountedCallSeq = { value: null };
-export const mountedQueue = { value: {} };
 
 /**
  * UnMount
  */
 export const unmountCallSeq = { value: null };
-export const unmountQueue = { value: {} };
+
+/**
+ * Router
+ */
+export const routerParams = { value: {} };
+
+export function setRedrawAction(stateKey, action) {
+  componentRef[stateKey] ??= {};
+  componentRef[stateKey].redrawAction = action;
+}
+
+export function setDataStore(stateKey, dataCallSeq, data) {
+  componentRef[stateKey] ??= {};
+  componentRef[stateKey].dataStore ??= {};
+  componentRef[stateKey].dataStore[dataCallSeq] = data;
+}
