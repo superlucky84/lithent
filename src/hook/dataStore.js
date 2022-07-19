@@ -2,34 +2,34 @@ import {
   stateKeyRef,
   dataStoreStore,
   dataStoreRenderQueue,
-  redrawActionMap,
+  componentRef,
 } from '@/helper/universalRef';
 
 export function useDataStore(storeKey) {
   const stateKey = stateKeyRef.value;
-  const dataValue = dataStoreStore.value[storeKey];
+  const dataValue = dataStoreStore[storeKey];
 
   if (!dataValue) {
     console.warn('Data store not exist');
   }
 
-  const dataStoreQueue = dataStoreRenderQueue.value;
+  const dataStoreQueue = dataStoreRenderQueue;
 
   dataStoreQueue[storeKey] ??= [];
-  dataStoreQueue[storeKey].push(() => redrawActionMap[stateKey]);
+  dataStoreQueue[storeKey].push(() => componentRef[stateKey]?.redrawAction);
 
   return dataValue || {};
 }
 
 export function makeDataStore(storeKey, initValue) {
-  if (!dataStoreStore.value[storeKey]) {
-    dataStoreStore.value[storeKey] = makeProxyData({
+  if (!dataStoreStore[storeKey]) {
+    dataStoreStore[storeKey] = makeProxyData({
       storeKey,
       initValue,
     });
   }
 
-  return dataStoreStore.value[storeKey];
+  return dataStoreStore[storeKey];
 }
 
 function makeProxyData({ storeKey, initValue }) {
@@ -47,7 +47,7 @@ function makeProxyData({ storeKey, initValue }) {
     set(target, prop, value) {
       target[prop] = value;
 
-      const dataStoreQueue = dataStoreRenderQueue.value[storeKey];
+      const dataStoreQueue = dataStoreRenderQueue[storeKey];
       const trashCollections = [];
 
       dataStoreQueue.forEach((makeRender, index) => {

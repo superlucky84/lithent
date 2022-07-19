@@ -1,6 +1,6 @@
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
-import { redrawActionMap, needDiff } from '@/helper/universalRef';
+import { setRedrawAction, needDiffRef } from '@/helper/universalRef';
 import {
   initUpdateHookState,
   initMountHookState,
@@ -25,7 +25,7 @@ export function h(tag, props, ...children) {
 }
 
 function reRenderCustomComponent({ tag, props, children, originalVdom }) {
-  needDiff.value = true;
+  needDiffRef.value = true;
 
   const newVdom = makeVdomResolver({ tag, props, children });
   const newVdomTree = makeNewVdomTree({ originalVdom, newVdom });
@@ -43,7 +43,7 @@ function reRenderCustomComponent({ tag, props, children, originalVdom }) {
 
   vDomUpdate(newVdomTree);
 
-  needDiff.value = false;
+  needDiffRef.value = false;
 }
 
 function makeVdomResolver({ tag, props, children }) {
@@ -61,9 +61,9 @@ function makeVdomResolver({ tag, props, children }) {
 
     const originalVdom = customNode;
 
-    redrawActionMap[stateKey] = () => {
+    setRedrawAction(stateKey, () => {
       reRenderCustomComponent({ tag, props, children, originalVdom, stateKey });
-    };
+    });
 
     return customNode;
   };
@@ -111,7 +111,7 @@ function vdomMaker({
 
   const vdom = componentMaker();
 
-  redrawActionMap[stateKey] = () => {
+  setRedrawAction(stateKey, () => {
     reRenderCustomComponent({
       tag,
       props,
@@ -119,7 +119,7 @@ function vdomMaker({
       originalVdom: vdom,
       stateKey,
     });
-  };
+  });
 
   vdom.componentProps = props;
   vdom.reRender = reRender;
@@ -139,7 +139,7 @@ function makeNode({ tag, props, children }) {
   } else if (isCustemComponent) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 
-    return needDiff.value ? componetMakeResolver : componetMakeResolver();
+    return needDiffRef.value ? componetMakeResolver : componetMakeResolver();
   }
 
   return { type: 'element', tag, props, children };

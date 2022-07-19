@@ -16,7 +16,7 @@ export default function Custom2({ props, children }) {
     console.log('gdataUpdate');
     globalData.increase();
   };
-  const handleMounted = async () => {
+  const handleMounted = () => {
     console.log('CUSTOM2 MOUNTED');
 
     /*
@@ -36,11 +36,9 @@ export default function Custom2({ props, children }) {
   };
 
   const componentMaker = () => {
-    // mounted(handleMounted);
-    // unmount(handleUnmount);
+    mounted(handleMounted);
+    unmount(handleUnmount);
     updated(handleUpdated, [globalData.value]);
-
-    console.log('CUSTOM2 RENDER');
 
     return (
       <div class="custom2">

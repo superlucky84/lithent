@@ -1,21 +1,27 @@
-import { stateKeyRef, mountedCallSeq, mountedQueue } from '@/helper/universalRef';
+import {
+  stateKeyRef,
+  mountedCallSeq,
+  componentRef,
+} from '@/helper/universalRef';
 
 export default function mounted(effectAction) {
   const currentSubSeq = mountedCallSeq.value;
   const stateKey = stateKeyRef.value;
 
-  if (!mountedQueue.value[stateKey]) {
-    mountedQueue.value[stateKey] = {};
+  if (!componentRef[stateKey]?.mountedQueue) {
+    componentRef[stateKey] ??= {};
+    componentRef[stateKey].mountedQueue ??= {};
   }
 
-  mountedQueue.value[stateKey][currentSubSeq] = effectAction;
+  componentRef[stateKey].mountedQueue[currentSubSeq] = effectAction;
   mountedCallSeq.value += 1;
 }
 
 export function runMountedQueueFromVdom(newVdom) {
-  const queue = mountedQueue.value[newVdom.stateKey];
+  const queue = componentRef[newVdom.stateKey]?.mountedQueue;
+
   if (newVdom.tagName && queue) {
-    mountedQueue.value[newVdom.stateKey] = {};
+    componentRef[newVdom.stateKey].mountedQueue = {};
 
     Object.values(queue).forEach(effect => {
       effect();

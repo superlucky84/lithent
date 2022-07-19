@@ -1,17 +1,18 @@
 import {
   dataStore,
+  componentRef,
   stateKeyRef,
   dataCallSeq,
-  redrawActionMap,
+  setDataStore,
 } from '@/helper/universalRef';
 
 export default function useData(initValue) {
-  const sKey = stateKeyRef.value;
+  const stateKey = stateKeyRef.value;
   const state = makeData({
     initValue,
     dataCallSeq: dataCallSeq.value,
-    stateKey: sKey,
-    render: () => redrawActionMap[sKey](),
+    stateKey,
+    render: () => componentRef[stateKey].redrawAction(),
   });
 
   dataCallSeq.value += 1;
@@ -22,12 +23,14 @@ export default function useData(initValue) {
 function makeData({ initValue, stateKey, dataCallSeq, render }) {
   const currentSubSeq = dataCallSeq;
 
-  if (!dataStore.value[stateKey] || !dataStore.value[stateKey][currentSubSeq]) {
-    dataStore.value[stateKey] ??= {};
-    dataStore.value[stateKey][currentSubSeq] = makeProxyData(initValue, render);
+  if (
+    !componentRef[stateKey]?.dataStore ||
+    !componentRef[stateKey]?.dataStore[currentSubSeq]
+  ) {
+    setDataStore(stateKey, dataCallSeq, makeProxyData(initValue, render));
   }
 
-  return dataStore.value[stateKey][currentSubSeq];
+  return componentRef[stateKey].dataStore[currentSubSeq];
 }
 
 function makeProxyData(initValue, render) {

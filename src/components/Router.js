@@ -2,7 +2,7 @@ import { h, Fragment } from '../wDom';
 import { makeData, mounted, unmount } from '@/hook';
 import { addParams } from '@/hook/params';
 
-export function Router({ props: { path, element }, children }) {
+export function Router({ children }) {
   const data = makeData({ targetPath: '' });
   const findPath = injectPath =>
     children.find(item => item.componentProps.path === injectPath);
@@ -12,7 +12,8 @@ export function Router({ props: { path, element }, children }) {
 
   const handleHashChange = () => {
     const injectPath =
-      window.location.hash.replace(/^[#\/]*/, '') || children[0].props.path;
+      window.location.hash.replace(/^[#\/]*/, '') ||
+      children[0].componentProps.path;
     let targetPath = findPath(injectPath);
 
     if (!targetPath) {

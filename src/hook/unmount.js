@@ -1,21 +1,26 @@
-import { stateKeyRef, unmountCallSeq, unmountQueue } from '@/helper/universalRef';
+import {
+  stateKeyRef,
+  unmountCallSeq,
+  componentRef,
+} from '@/helper/universalRef';
 
 export default function unmount(effectAction) {
   const currentSubSeq = unmountCallSeq.value;
   const stateKey = stateKeyRef.value;
 
-  if (!unmountQueue.value[stateKey]) {
-    unmountQueue.value[stateKey] = {};
-    unmountQueue.value[stateKey][currentSubSeq] = effectAction;
+  if (!componentRef[stateKey]?.unmountQueue) {
+    componentRef[stateKey] ??= {};
+    componentRef[stateKey].unmountQueue ??= {};
+    componentRef[stateKey].unmountQueue[currentSubSeq] = effectAction;
   }
 
   unmountCallSeq.value += 1;
 }
 
 export function runUnmountQueueFromVdom(newVdom) {
-  const queue = unmountQueue.value[newVdom.stateKey];
+  const queue = componentRef[newVdom.stateKey]?.unmountQueue;
   if (newVdom.tagName && queue) {
-    unmountQueue.value[newVdom.stateKey] = {};
+    componentRef[newVdom.stateKey].unmountQueue = {};
 
     Object.values(queue).forEach(effect => {
       effect();
