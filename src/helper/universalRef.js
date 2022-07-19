@@ -2,7 +2,7 @@
  * Common
  */
 export const stateKeyRef = { value: null };
-export const needDiff = { value: null };
+export const needDiffRef = { value: null };
 
 /**
  * Router
