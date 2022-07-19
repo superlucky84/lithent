@@ -12,6 +12,7 @@ import storeInit from '@/store';
 
 storeInit();
 
+/*
 const vDom = (
   <Fragment>
     <CustomElement vava={7} />
@@ -22,8 +23,8 @@ const vDom = (
     </Fragment>
   </Fragment>
 );
+*/
 
-/*
 const vDom = (
   <Fragment>
     <Router>
@@ -33,7 +34,6 @@ const vDom = (
     </Router>
   </Fragment>
 );
-*/
 
 // const vDom = <NestedFragment />;
 

@@ -38,6 +38,7 @@ function reRenderCustomComponent({ tag, props, children, originalVdom }) {
     brothers.splice(index, 1, newVdomTree);
   } else {
     newVdomTree.isRoot = true;
+    newVdomTree.wrapElement = originalVdom.wrapElement;
   }
 
   vDomUpdate(newVdomTree);

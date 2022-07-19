@@ -124,6 +124,7 @@ function remakeChildrenForAdd(newVdom) {
 }
 
 function remakeChildrenForUpdate(newVdom, originalVdom) {
+  console.log('CHILDREN = ', newVdom.children);
   if (newVdom.type === 'loop' && isExisty(getKey(newVdom.children[0]))) {
     return remakeChildrenForLoopUpdate(newVdom, originalVdom);
   }
@@ -181,5 +182,5 @@ function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
 }
 
 function getKey(target) {
-  return target?.componentProps?.key ?? target.props.key;
+  return target?.componentProps?.key ?? target?.props?.key;
 }

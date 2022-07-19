@@ -1,11 +1,9 @@
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
-let gWrapElement;
-
 export function render(vDom, wrapElement) {
   vDom.isRoot = true;
-  gWrapElement = wrapElement;
+  vDom.wrapElement = wrapElement;
 
   wrapElement.appendChild(vDomToDom(vDom, true));
 }
@@ -242,7 +240,7 @@ function findRealParentElement(vDom) {
   const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
 
   if (vDom.isRoot) {
-    return gWrapElement;
+    return vDom.wrapElement;
   }
 
   if (!isVirtualType) {
