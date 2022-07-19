@@ -96,10 +96,10 @@ function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
   } else if (!existOriginalVdom) {
     return 'ADD';
   } else if (isSameType) {
-    return isKeyCheckedVdom ? 'DELETE-ORIGINAL-ADD' : 'UPDATE';
+    return isKeyCheckedVdom ? 'SORTED-UPDATE' : 'UPDATE';
   }
 
-  return isKeyCheckedVdom ? 'DELETE-REMAKE-ADD' : 'REPLACE';
+  return isKeyCheckedVdom ? 'SORTED-REPLACE' : 'REPLACE';
 }
 
 function generalize({ newVdom, originalVdom, isSameType }) {

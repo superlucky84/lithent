@@ -11,28 +11,24 @@ export function render(vDom, wrapElement) {
 export function vDomUpdate(newVdomTree) {
   const { needRerender } = newVdomTree;
 
-  // console.log('NEWVDOMTREE - ', newVdomTree);
-  // console.log('NEEDRERENDER - ', needRerender);
-
-  // ADD, DELETE, REPLACE, UPDATE, NONE
   switch (needRerender) {
     case 'ADD':
       typeAdd(newVdomTree);
       break;
-    case 'DELETE': // ORIGINAL_EL
+    case 'DELETE':
       typeDelete(newVdomTree);
       break;
-    case 'REPLACE': // ORIGINAL_EL
+    case 'REPLACE':
       typeReplace(newVdomTree);
       break;
-    case 'UPDATE': // ORIGINAL_EL
+    case 'UPDATE':
       typeUpdate(newVdomTree);
       break;
-    case 'DELETE-REMAKE-ADD':
-      typeDeleteRemakeAdd(newVdomTree);
+    case 'SORTED-REPLACE':
+      typeSortedReplace(newVdomTree);
       break;
-    case 'DELETE-ORIGINAL-ADD':
-      typeDeleteOriginalAdd(newVdomTree);
+    case 'SORTED-UPDATE':
+      typeSortedUpdate(newVdomTree);
       break;
     case 'NONE':
       break;
@@ -48,12 +44,12 @@ function typeDelete(newVdom) {
   }
 }
 
-function typeDeleteRemakeAdd(newVdom) {
+function typeSortedReplace(newVdom) {
   typeDelete(newVdom);
   typeAdd(newVdom);
 }
 
-function typeDeleteOriginalAdd(newVdom) {
+function typeSortedUpdate(newVdom) {
   typeDelete(newVdom);
   typeAdd(newVdom, newVdom.el);
 }
