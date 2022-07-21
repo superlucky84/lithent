@@ -148,9 +148,9 @@ function typeUpdate(newVdom) {
   }
 
   if (element) {
-    // Todo 이벤트 처리 추상화 및 일괄 수정 필요
-    removeEvent(newVdom.oldProps, element, newVdom.props);
-    updateProps(newVdom.props, element);
+    const { oldProps, props } = newVdom;
+
+    updateProps({ oldProps, props, element });
 
     delete newVdom.oldProps;
   }
@@ -180,23 +180,32 @@ function removeEvent(oldProps, element) {
   }
 }
 
-function updateProps(props, element) {
-  Object.entries(props || []).forEach(([dataKey, dataValue]) => {
-    if (dataKey === 'key') {
-      return;
-    }
+function updateProps({ oldProps, props, element }) {
+  const originalProps = { ...oldProps };
 
-    if (dataKey === 'style') {
-      addStyle(dataValue, element);
+  Object.entries(props || {}).forEach(([dataKey, dataValue]) => {
+    if (dataKey === 'key') {
+      // Do nothing
+    } else if (dataKey === 'style') {
+      updateStyle({ style: dataValue, oldStyle: originalProps.style, element });
     } else if (dataKey === 'ref') {
       dataValue.value = element;
-    } else if (dataKey === 'onClick') {
-      element.addEventListener('click', dataValue);
-    } else if (dataKey === 'onInput') {
-      element.addEventListener('input', dataValue);
+    } else if (dataKey.match(/^on/)) {
+      updateEvent({
+        element,
+        eventKey: dataKey,
+        newEventHandler: dataValue,
+        oldEventHandler: originalProps[dataKey],
+      });
     } else if (typeof dataValue === 'number' || typeof dataValue === 'string') {
       element.setAttribute(dataKey, dataValue);
     }
+
+    delete originalProps[dataKey];
+  });
+
+  Object.keys(originalProps).forEach(dataKey => {
+    element.removeAttribute(dataKey);
   });
 }
 
@@ -214,7 +223,7 @@ function vDomToDom(vDom, init) {
   }
 
   vDomChildrenToDom(children, element, init);
-  updateProps(props, element);
+  updateProps({ props, element });
 
   vDom.el = element;
 
@@ -239,9 +248,25 @@ function vDomChildrenToDom(children, parentElement, init) {
   }
 }
 
-function addStyle(style, element) {
+function updateEvent({ element, eventKey, newEventHandler, oldEventHandler }) {
+  const eventName = eventKey.replace(/^on(.*)/, function (match, p1) {
+    return p1.toLowerCase();
+  });
+
+  element.removeEventListener(eventName, oldEventHandler);
+  element.addEventListener(eventName, newEventHandler);
+}
+
+function updateStyle({ style, oldStyle, element }) {
+  const originalStyle = [...oldStyle];
+
   Object.entries(style).forEach(([styleKey, dataValue]) => {
-    element.style[styleKey] = dataValue;
+    element.style.setProperty(styleKey, dataValue);
+    delete originalStyle[styleKey];
+  });
+
+  Object.entries(originalStyle).forEach(([styleKey, dataValue]) => {
+    element.style.removeProperty(styleKey, dataValue);
   });
 }
 
