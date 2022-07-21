@@ -2,10 +2,10 @@
   "name": "election",
   "version": "0.2.27",
   "description": "",
-  "main": "dist/electionModule.js",
+  "main": "dist/wact.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build --config vite.wact.config.js; vite build --config vite.router.config.js",
     "test": "jest",
     "test:watch": "jest --watch"
   },
