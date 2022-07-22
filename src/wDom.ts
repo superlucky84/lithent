@@ -8,7 +8,7 @@ import {
   needDiffRef,
 } from '@/helper/universalRef';
 
-export function Fragment({ props, children }) {
+export function Fragment(props, children) {
   return { type: 'fragment', props, children };
 }
 
@@ -50,7 +50,7 @@ function makeVdomResolver({ tag, props, children }) {
   const resolve = (stateKey = Symbol(tag.name)) => {
     initMountHookState(stateKey);
 
-    const componentMaker = tag({ props, children });
+    const componentMaker = tag(props, children);
     const customNode = makeCustomNode({
       componentMaker,
       stateKey,
@@ -135,7 +135,7 @@ function makeNode({ tag, props, children }) {
     typeof tag === 'function' && tag.name !== 'Fragment';
 
   if (isFragment) {
-    return Fragment({ props, children });
+    return Fragment(props, children);
   } else if (isCustemComponent) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 

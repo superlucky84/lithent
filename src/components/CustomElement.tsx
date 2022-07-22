@@ -17,7 +17,7 @@ const useJw = () => {
   return { data, data2, handle, handle2 };
 };
 
-export default function CustomElement({ props, children }) {
+export default function CustomElement(props, children) {
   const { data, data2, handle, handle2 } = useJw();
   const data3 = makeData({ k: 1 });
   const handle3 = () => {

@@ -1,7 +1,7 @@
 import { h, Fragment } from '../wDom';
 import { mounted, unmount, updated, useDataStore, makeData } from '@/hook';
 
-export default function Custom2({ props, children }) {
+export default function Custom2(props, children) {
   const globalData = useDataStore('globalData');
   const data7 = makeData({ m: 1 });
   const data = makeData({ v: 1 });
@@ -18,12 +18,6 @@ export default function Custom2({ props, children }) {
   };
   const handleMounted = () => {
     console.log('CUSTOM2 MOUNTED');
-
-    /*
-    const resolveValue = await promiseTest();
-    console.log(resolveValue);
-    data.v = resolveValue;
-    */
   };
   const handleUnmount = () => {
     console.log('CUSTOM2 UNMOUNT');
@@ -31,8 +25,8 @@ export default function Custom2({ props, children }) {
   const handleUpdated = async () => {
     console.log('CUSTOM2 UPDATED --');
   };
-  const handleInputChane = event => {
-    data.v = event.target.value;
+  const handleInputChane = (event: InputEvent) => {
+    data.v = (event.target as HTMLInputElement).value;
   };
 
   const componentMaker = () => {

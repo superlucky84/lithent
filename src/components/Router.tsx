@@ -2,7 +2,7 @@ import { h, Fragment } from '../wDom';
 import { makeData, mounted, unmount } from '@/hook';
 import { addParams } from '@/hook/params';
 
-export function Router({ children }) {
+export function Router(props, children) {
   const data = makeData({ targetPath: '' });
   const findPath = injectPath =>
     children.find(item => item.componentProps.path === injectPath);

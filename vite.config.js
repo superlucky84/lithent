@@ -6,7 +6,7 @@ import eslintPlugin from '@nabla/vite-plugin-eslint';
 export default ({ path, name, fileName }) => {
   return defineConfig({
     plugins: [
-      checker({ typescript: true }),
+      // checker({ typescript: true }),
       eslintPlugin({ eslintOptions: { cache: false } }),
     ],
     resolve: {
