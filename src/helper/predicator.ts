@@ -1,4 +1,8 @@
-export function getVdomType(vDom) {
+import { WDom } from '@/types';
+type WDomType = 'component' | 'fragment' | 'element' | 'loop' | 'text' | 'empty';
+type DiffParam = {originalVdom?: WDom; newVdom: WDom};
+
+export function getVdomType(vDom: WDom): WDomType | undefined {
   const isComponent = checkCustemComponent(vDom);
   const isFragment = checkFragment(vDom);
   const isTagElement = checkTagElement(vDom);
@@ -19,6 +23,8 @@ export function getVdomType(vDom) {
   } else if (isEmptyElement) {
     return 'empty';
   }
+
+  return undefined;
 }
 
 export const checkSameVdomWithOriginal = {
@@ -33,57 +39,57 @@ export const checkSameVdomWithOriginal = {
 /**
  * Predicator
  */
-export function checkCustemComponent(vDom) {
+export function checkCustemComponent(vDom: WDom) {
   return typeof vDom === 'function';
 }
 
-export function checkFragment(vDom) {
+export function checkFragment(vDom: WDom) {
   return vDom.type === 'fragment';
 }
 
-export function checkTagElement(vDom) {
+export function checkTagElement(vDom: WDom) {
   return vDom.type === 'element';
 }
 
-export function checkLoopElement(vDom) {
+export function checkLoopElement(vDom: WDom) {
   return vDom.type === 'loop';
 }
 
-export function checkTextElement(vDom) {
+export function checkTextElement(vDom: WDom) {
   return vDom.type === 'text';
 }
 
-export function checkEmptyElement(vDom) {
+export function checkEmptyElement(vDom: WDom) {
   return !vDom.type;
 }
 
-export function checkSameCustomComponent({ originalVdom, newVdom }) {
+export function checkSameCustomComponent({ originalVdom, newVdom }: DiffParam) {
   return newVdom.tagName === originalVdom?.tagName;
 }
 
-export function checkSameFragment({ originalVdom, newVdom }) {
+export function checkSameFragment({ originalVdom, newVdom }: DiffParam) {
   return (
     originalVdom?.type === 'fragment' &&
     originalVdom?.children?.length === newVdom.children.length
   );
 }
 
-export function checkSameTagElement({ originalVdom, newVdom }) {
+export function checkSameTagElement({ originalVdom, newVdom }: DiffParam) {
   return originalVdom?.type === 'element' && originalVdom?.tag === newVdom.tag;
 }
 
-export function checkSameLoopElement({ originalVdom, newVdom }) {
+export function checkSameLoopElement({ originalVdom, newVdom }: DiffParam) {
   return originalVdom?.type === newVdom.type;
 }
 
-export function checkSameTextElement({ originalVdom, newVdom }) {
+export function checkSameTextElement({ originalVdom, newVdom }: DiffParam) {
   return originalVdom?.type === newVdom.type;
 }
 
-export function checkSameEmptyElement({ originalVdom, newVdom }) {
+export function checkSameEmptyElement({ originalVdom, newVdom }: DiffParam) {
   return originalVdom?.type === newVdom.type;
 }
 
-export function isExisty(value) {
+export function isExisty(value: unknown) {
   return value !== null && value !== undefined;
 }

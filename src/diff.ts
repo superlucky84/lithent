@@ -20,7 +20,7 @@ import {
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
 type DiffPrimaryParam = {
-  originalVdom: WDom;
+  originalVdom?: WDom;
   newVdom: WDom;
   isSameType: boolean;
 };
@@ -29,7 +29,7 @@ export default function makeNewVdomTree({
   originalVdom,
   newVdom,
 }: {
-  originalVdom: WDom;
+  originalVdom?: WDom;
   newVdom: WDom;
 }) {
   const type = getVdomType(newVdom);
@@ -66,14 +66,16 @@ function remakeNewVdom({
 
   remakeVdom.needRerender = needRerender;
 
-  if (needRerender !== 'ADD') {
+  if (needRerender !== 'ADD' && originalVdom) {
     remakeVdom.el = originalVdom.el;
   }
 
   if (['DELETE', 'REPLACE'].includes(needRerender)) {
     runUnmountQueueFromVdom(originalVdom);
 
-    delete componentRef[originalVdom.stateKey];
+    if (originalVdom) {
+      delete componentRef[originalVdom.stateKey];
+    }
   }
 
   remakeVdom.oldProps = originalVdom?.props;
@@ -85,11 +87,7 @@ function addReRenderTypeProperty({
   originalVdom,
   newVdom,
   isSameType,
-}: {
-  originalVdom: WDom;
-  newVdom: WDom;
-  isSameType: boolean;
-}) {
+}: DiffPrimaryParam) {
   const existOriginalVdom = originalVdom && originalVdom.type;
   const isEmptyElement = checkEmptyElement(newVdom);
   const isRoot = !newVdom.getParent;
@@ -97,7 +95,7 @@ function addReRenderTypeProperty({
   const key = getKey(newVdom);
   const isKeyCheckedVdom = parentType === 'loop' && isExisty(key);
   const isSameText =
-    newVdom.type === 'text' && isSameType && newVdom.text === originalVdom.text;
+    newVdom.type === 'text' && isSameType && newVdom.text === originalVdom?.text;
 
   if (isEmptyElement) {
     return 'DELETE';
@@ -114,14 +112,14 @@ function addReRenderTypeProperty({
 
 function generalize({ newVdom, originalVdom, isSameType }: DiffPrimaryParam) {
   if (typeof newVdom === 'function') {
-    return isSameType ? originalVdom.reRender() : newVdom();
+    return isSameType ? originalVdom?.reRender() : newVdom();
   }
 
   return newVdom;
 }
 
 function remakeChildrenForDiff({ isSameType, newVdom, originalVdom }: DiffPrimaryParam) {
-  if (isSameType) {
+  if (isSameType && originalVdom) {
     return remakeChildrenForUpdate(newVdom, originalVdom);
   }
 
@@ -129,7 +127,7 @@ function remakeChildrenForDiff({ isSameType, newVdom, originalVdom }: DiffPrimar
 }
 
 function remakeChildrenForAdd(newVdom: WDom) {
-  return newVdom.children.map(item => {
+  return newVdom.children.map((item: WDom) => {
     const childItem = makeNewVdomTree({ newVdom: item });
     childItem.getParent = () => newVdom;
 
@@ -142,7 +140,7 @@ function remakeChildrenForUpdate(newVdom: WDom, originalVdom: WDom) {
     return remakeChildrenForLoopUpdate(newVdom, originalVdom);
   }
 
-  return newVdom.children.map((item, index) => {
+  return newVdom.children.map((item: WDom, index: number) => {
     const childItem = makeNewVdomTree({
       newVdom: item,
       originalVdom: originalVdom.children[index],
@@ -196,7 +194,7 @@ function diffLoopChildren(newVdom: WDom, originalVdom: WDom) {
   };
 }
 
-function findSameKeyOriginalItem(item, originalChildren) {
+function findSameKeyOriginalItem(item: WDom, originalChildren: WDom[]) {
   const key = getKey(item);
 
   return originalChildren.find(
@@ -204,6 +202,6 @@ function findSameKeyOriginalItem(item, originalChildren) {
   );
 }
 
-function getKey(target) {
+function getKey(target: WDom) {
   return target?.componentProps?.key ?? target?.props?.key;
 }
