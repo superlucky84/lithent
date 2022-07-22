@@ -1,4 +1,4 @@
-import { WDom } from '@/src/type/index.ts';
+import { WDom } from '@/src/types';
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
 import { isExisty } from '@/helper/predicator';
