@@ -1,5 +1,5 @@
-import { WDom } from '@/src/types';
-import makeNewVdomTree from './diff';
+import { WDom } from '@/types';
+import makeNewVdomTree from '@/diff';
 import { vDomUpdate } from './render';
 import { isExisty } from '@/helper/predicator';
 import {
@@ -9,7 +9,7 @@ import {
   needDiffRef,
 } from '@/helper/universalRef';
 
-export function Fragment(children: WDom[]) {
+export function Fragment(...children: WDom[]) {
   return { type: 'fragment', children };
 }
 
@@ -136,7 +136,7 @@ function makeNode({ tag, props, children }) {
     typeof tag === 'function' && tag.name !== 'Fragment';
 
   if (isFragment) {
-    return Fragment(children);
+    return Fragment(...children);
   } else if (isCustemComponent) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 

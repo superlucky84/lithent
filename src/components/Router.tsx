@@ -1,10 +1,11 @@
+import { WDom } from '@/types';
 import { h, Fragment } from '../wDom';
 import { makeData, mounted, unmount } from '@/hook';
 import { addParams } from '@/hook/params';
 
-export function Router(props, children) {
+export function Router(_props: {}, children: WDom[]) {
   const data = makeData({ targetPath: '' });
-  const findPath = injectPath =>
+  const findPath = (injectPath: string) =>
     children.find(item => item.componentProps.path === injectPath);
 
   const findDynamicPath = () =>
@@ -17,12 +18,16 @@ export function Router(props, children) {
     let targetPath = findPath(injectPath);
 
     if (!targetPath) {
-      targetPath = findDynamicPath(injectPath);
+      targetPath = findDynamicPath();
 
-      addParams(targetPath.componentProps.path.replace(/^:/, ''), injectPath);
+      if (targetPath) {
+        addParams(targetPath.componentProps.path.replace(/^:/, ''), injectPath);
+      }
     }
 
-    data.targetPath = targetPath.componentProps.path;
+    if (targetPath) {
+      data.targetPath = targetPath.componentProps.path;
+    }
   };
 
   const removeEvent = () => {

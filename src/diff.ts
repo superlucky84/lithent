@@ -8,6 +8,7 @@
  * 4. loop타입의 자식들은 같은 키값을 가졌는지로 동일한지 판단하며 키값이 없을경우 fragment타입처럼 취급한다.
  */
 
+import { WDom } from '@/types';
 import { componentRef } from '@/helper/universalRef';
 import {
   checkEmptyElement,
@@ -18,7 +19,19 @@ import {
 
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
-export default function makeNewVdomTree({ originalVdom, newVdom }) {
+type DiffPrimaryParam = {
+  originalVdom: WDom;
+  newVdom: WDom;
+  isSameType: boolean;
+};
+
+export default function makeNewVdomTree({
+  originalVdom,
+  newVdom,
+}: {
+  originalVdom: WDom;
+  newVdom: WDom;
+}) {
   const type = getVdomType(newVdom);
 
   if (!type) {
@@ -30,7 +43,11 @@ export default function makeNewVdomTree({ originalVdom, newVdom }) {
   return remakeNewVdom({ originalVdom, newVdom, isSameType });
 }
 
-function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
+function remakeNewVdom({
+  newVdom,
+  originalVdom,
+  isSameType,
+}: DiffPrimaryParam) {
   const remakeVdom = generalize({ newVdom, originalVdom, isSameType });
 
   if (remakeVdom.children) {
@@ -64,7 +81,15 @@ function remakeNewVdom({ newVdom, originalVdom, isSameType }) {
   return remakeVdom;
 }
 
-function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
+function addReRenderTypeProperty({
+  originalVdom,
+  newVdom,
+  isSameType,
+}: {
+  originalVdom: WDom;
+  newVdom: WDom;
+  isSameType: boolean;
+}) {
   const existOriginalVdom = originalVdom && originalVdom.type;
   const isEmptyElement = checkEmptyElement(newVdom);
   const isRoot = !newVdom.getParent;
@@ -87,7 +112,7 @@ function addReRenderTypeProperty({ originalVdom, newVdom, isSameType }) {
   return isKeyCheckedVdom ? 'SORTED-REPLACE' : 'REPLACE';
 }
 
-function generalize({ newVdom, originalVdom, isSameType }) {
+function generalize({ newVdom, originalVdom, isSameType }: DiffPrimaryParam) {
   if (typeof newVdom === 'function') {
     return isSameType ? originalVdom.reRender() : newVdom();
   }
@@ -95,7 +120,7 @@ function generalize({ newVdom, originalVdom, isSameType }) {
   return newVdom;
 }
 
-function remakeChildrenForDiff({ isSameType, newVdom, originalVdom }) {
+function remakeChildrenForDiff({ isSameType, newVdom, originalVdom }: DiffPrimaryParam) {
   if (isSameType) {
     return remakeChildrenForUpdate(newVdom, originalVdom);
   }
@@ -103,7 +128,7 @@ function remakeChildrenForDiff({ isSameType, newVdom, originalVdom }) {
   return remakeChildrenForAdd(newVdom);
 }
 
-function remakeChildrenForAdd(newVdom) {
+function remakeChildrenForAdd(newVdom: WDom) {
   return newVdom.children.map(item => {
     const childItem = makeNewVdomTree({ newVdom: item });
     childItem.getParent = () => newVdom;
@@ -112,7 +137,7 @@ function remakeChildrenForAdd(newVdom) {
   });
 }
 
-function remakeChildrenForUpdate(newVdom, originalVdom) {
+function remakeChildrenForUpdate(newVdom: WDom, originalVdom: WDom) {
   if (newVdom.type === 'loop' && isExisty(getKey(newVdom.children[0]))) {
     return remakeChildrenForLoopUpdate(newVdom, originalVdom);
   }
@@ -129,7 +154,7 @@ function remakeChildrenForUpdate(newVdom, originalVdom) {
   });
 }
 
-function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
+function remakeChildrenForLoopUpdate(newVdom: WDom, originalVdom: WDom) {
   const { remakedChildren, unUsedChildren } = diffLoopChildren(
     newVdom,
     originalVdom
@@ -147,7 +172,7 @@ function remakeChildrenForLoopUpdate(newVdom, originalVdom) {
   return remakedChildren;
 }
 
-function diffLoopChildren(newVdom, originalVdom) {
+function diffLoopChildren(newVdom: WDom, originalVdom: WDom) {
   const newChildren = [...newVdom.children];
   const originalChildren = [...originalVdom.children];
 

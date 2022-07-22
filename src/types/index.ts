@@ -1,1 +1,1 @@
-export type WDom = any;
+export type WDom = {[key: string]: any};

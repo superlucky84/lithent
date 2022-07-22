@@ -1,6 +1,6 @@
-import { h, Fragment } from '../wDom';
+import { h } from '../wDom';
 
-export default function Sub(props, children) {
+export default function Sub() {
   const componentMaker = () => {
     return <div>Sub</div>;
   };

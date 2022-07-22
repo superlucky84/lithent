@@ -1,7 +1,7 @@
-import { h, Fragment } from '../wDom';
+import { h } from '@/wDom';
 import useParams from '@/hook/params';
 
-export default function Sub2(props, children) {
+export default function Sub2() {
   const params = useParams();
   const handle = () => {
     console.log('a', params);

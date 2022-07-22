@@ -1,9 +1,8 @@
 import { h, Fragment } from '@/wDom';
-import { makeRef, updated, makeData } from '@/hook';
-import CustomElement from '@/components/CustomElement';
+import { makeData } from '@/hook';
 
-export default function LoopTest(props, children) {
-  const data = makeData({
+export default function LoopTest() {
+  const data: { list: { key: number; value: string }[] } = makeData({
     list: [
       { key: 1, value: '일' },
       { key: 2, value: '이' },

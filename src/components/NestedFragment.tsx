@@ -1,7 +1,7 @@
 import { h, Fragment } from '@/wDom';
-import { makeRef, updated, makeData } from '@/hook';
+import { makeData } from '@/hook';
 
-export default function NestedFragment(props, children) {
+export default function NestedFragment() {
   const data = makeData({ choiceNode: 7 });
   const handle = () => {
     const randomValue = Math.floor(Math.random() * 10) + 1;
