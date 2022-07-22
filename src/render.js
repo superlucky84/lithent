@@ -184,6 +184,8 @@ function updateProps({ oldProps, props, element }) {
   const originalProps = { ...oldProps };
 
   Object.entries(props || {}).forEach(([dataKey, dataValue]) => {
+    console.log('PROPS - ', props);
+
     if (dataKey === 'key') {
       // Do nothing
     } else if (dataKey === 'style') {
@@ -258,7 +260,7 @@ function updateEvent({ element, eventKey, newEventHandler, oldEventHandler }) {
 }
 
 function updateStyle({ style, oldStyle, element }) {
-  const originalStyle = [...oldStyle];
+  const originalStyle = { ...oldStyle };
 
   Object.entries(style).forEach(([styleKey, dataValue]) => {
     element.style.setProperty(styleKey, dataValue);

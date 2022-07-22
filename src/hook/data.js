@@ -26,7 +26,7 @@ function makeData({ initValue, stateKey, dataCallSeq, render }) {
     !componentRef[stateKey]?.dataStore ||
     !componentRef[stateKey]?.dataStore[currentSubSeq]
   ) {
-    setDataStore(stateKey, dataCallSeq, makeProxyData(initValue, render));
+    setDataStore(stateKey, makeProxyData(initValue, render));
   }
 
   return componentRef[stateKey].dataStore[currentSubSeq];
