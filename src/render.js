@@ -258,7 +258,7 @@ function updateEvent({ element, eventKey, newEventHandler, oldEventHandler }) {
 }
 
 function updateStyle({ style, oldStyle, element }) {
-  const originalStyle = [...oldStyle];
+  const originalStyle = { ...oldStyle };
 
   Object.entries(style).forEach(([styleKey, dataValue]) => {
     element.style.setProperty(styleKey, dataValue);

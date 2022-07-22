@@ -30,27 +30,31 @@ export const dataStoreRenderQueue = {};
 export const updatedCallSeq = { value: null };
 
 /**
- * Mounted
- */
-export const mountedCallSeq = { value: null };
-
-/**
- * UnMount
- */
-export const unmountCallSeq = { value: null };
-
-/**
  * Router
  */
 export const routerParams = { value: {} };
 
+/**
+ * Ref helpers
+ */
 export function setRedrawAction(stateKey, action) {
   componentRef[stateKey] ??= {};
   componentRef[stateKey].redrawAction = action;
 }
 
-export function setDataStore(stateKey, dataCallSeq, data) {
+export function setDataStore(stateKey, data) {
   componentRef[stateKey] ??= {};
-  componentRef[stateKey].dataStore ??= {};
-  componentRef[stateKey].dataStore[dataCallSeq] = data;
+  componentRef[stateKey].dataStore ??= [];
+  componentRef[stateKey].dataStore.push(data);
+}
+
+export function initUpdateHookState(stateKey) {
+  updatedCallSeq.value = 0;
+  stateKeyRef.value = stateKey;
+}
+
+export function initMountHookState(stateKey) {
+  dataCallSeq.value = 0;
+  updatedCallSeq.value = 0;
+  stateKeyRef.value = stateKey;
 }
