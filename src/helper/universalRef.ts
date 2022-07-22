@@ -2,7 +2,7 @@
  * Common
  */
 export const stateKeyRef = { value: null };
-export const needDiffRef = { value: null };
+export const needDiffRef: { value: boolean } = { value: false };
 
 // componentRef[stateKey].redrawAction
 // componentRef[stateKey].dataStore

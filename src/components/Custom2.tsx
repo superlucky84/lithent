@@ -1,7 +1,7 @@
 import { h, Fragment } from '../wDom';
 import { mounted, unmount, updated, useDataStore, makeData } from '@/hook';
 
-export default function Custom2(props, children) {
+export default function Custom2(props: {k: string; data: any, handle3: () => void}, children: any) {
   const globalData = useDataStore('globalData');
   const data7 = makeData({ m: 1 });
   const data = makeData({ v: 1 });

@@ -1,3 +1,4 @@
+import { WDom } from '@/src/type/index.ts';
 import makeNewVdomTree from './diff';
 import { vDomUpdate } from './render';
 import { isExisty } from '@/helper/predicator';
@@ -8,8 +9,8 @@ import {
   needDiffRef,
 } from '@/helper/universalRef';
 
-export function Fragment(props, children) {
-  return { type: 'fragment', props, children };
+export function Fragment(children: WDom[]) {
+  return { type: 'fragment', children };
 }
 
 export function h(tag, props, ...children) {
@@ -135,7 +136,7 @@ function makeNode({ tag, props, children }) {
     typeof tag === 'function' && tag.name !== 'Fragment';
 
   if (isFragment) {
-    return Fragment(props, children);
+    return Fragment(children);
   } else if (isCustemComponent) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 
