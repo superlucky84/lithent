@@ -26,8 +26,8 @@ export const dataCallSeq: { value: number } = { value: 0 };
 /**
  * DataStore
  */
-export const dataStoreStore = {};
-export const dataStoreRenderQueue = {};
+export const dataStoreStore: { [key: string]: { [key: string]: any } } = {};
+export const dataStoreRenderQueue: { [key: string]: (() => any)[] } = {};
 
 /**
  * Updated

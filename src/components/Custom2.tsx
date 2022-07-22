@@ -1,8 +1,9 @@
-import { h } from '../wDom';
+import { GlobalData } from '@/store';
+import { h } from '@/wDom';
 import { mounted, unmount, updated, useDataStore, makeData } from '@/hook';
 
 export default function Custom2(props: {k: string; data: any, handle3: () => void}, children: any) {
-  const globalData = useDataStore('globalData');
+  const globalData = useDataStore('globalData') as GlobalData;
   const data7 = makeData({ m: 1 });
   const data = makeData({ v: 1 });
   const gdataUpdate = () => {

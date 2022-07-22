@@ -1,6 +1,6 @@
-import { h } from '@/wDom';
+import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
-// import CustomElement from '@/components/CustomElement';
+import CustomElement from '@/components/CustomElement';
 // import { Router, RouterItem } from '@/components/Router';
 // import Main from '@/components/Main';
 // import Sub from '@/components/Sub';
@@ -12,7 +12,6 @@ import storeInit from '@/store';
 
 storeInit();
 
-/*
 const vDom = (
   <Fragment>
     <CustomElement vava={7} />
@@ -23,7 +22,6 @@ const vDom = (
     </Fragment>
   </Fragment>
 );
-*/
 /*
 const vDom = (
   <Fragment>
@@ -36,7 +34,7 @@ const vDom = (
 );
  */
 
-const vDom = <NestedFragment />;
+//const vDom = <NestedFragment />;
 
 // const vDom = <LoopTest />;
 // const vDom = <Presentation />;
