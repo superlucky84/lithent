@@ -70,12 +70,9 @@ function remakeNewVdom({
     remakeVdom.el = originalVdom.el;
   }
 
-  if (['DELETE', 'REPLACE'].includes(needRerender)) {
+  if (['DELETE', 'REPLACE'].includes(needRerender) && originalVdom) {
     runUnmountQueueFromVdom(originalVdom);
-
-    if (originalVdom) {
-      delete componentRef[originalVdom.stateKey];
-    }
+    delete componentRef[originalVdom.stateKey];
   }
 
   remakeVdom.oldProps = originalVdom?.props;
@@ -95,7 +92,9 @@ function addReRenderTypeProperty({
   const key = getKey(newVdom);
   const isKeyCheckedVdom = parentType === 'loop' && isExisty(key);
   const isSameText =
-    newVdom.type === 'text' && isSameType && newVdom.text === originalVdom?.text;
+    newVdom.type === 'text' &&
+    isSameType &&
+    newVdom.text === originalVdom?.text;
 
   if (isEmptyElement) {
     return 'DELETE';
@@ -118,7 +117,11 @@ function generalize({ newVdom, originalVdom, isSameType }: DiffPrimaryParam) {
   return newVdom;
 }
 
-function remakeChildrenForDiff({ isSameType, newVdom, originalVdom }: DiffPrimaryParam) {
+function remakeChildrenForDiff({
+  isSameType,
+  newVdom,
+  originalVdom,
+}: DiffPrimaryParam) {
   if (isSameType && originalVdom) {
     return remakeChildrenForUpdate(newVdom, originalVdom);
   }

@@ -37,7 +37,7 @@ export const updatedCallSeq: { value: number } = { value: 0 };
 /**
  * Router
  */
-export const routerParams = { value: {} };
+export const routerParams: { value: { [key: string]: string } } = { value: {} };
 
 /**
  * Ref helpers

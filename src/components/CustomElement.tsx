@@ -40,6 +40,8 @@ export default function CustomElement() {
     updated(handleUpdatedDataK, [data.k]);
     updated(handleUpdatedData2K, [data2.k]);
 
+    console.log('JJ', data.k % 2 === 1);
+
     return (
       <div class={`aaaaaaaaa${data.k}`}>
         <button onClick={handle}>!vava{data.k}aa</button>

@@ -10,17 +10,21 @@
  * 7. (NONE). text타입의 경우 text가 같다면 변경이 필요 없으므로 방치한다. (Todo. 다른 타입의 경우 처리필요)
  */
 
+import { WDom } from '@/types';
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
-export function render(vDom, wrapElement) {
+export function render(vDom: WDom, wrapElement: HTMLElement | null) {
+  if (!wrapElement) {
+    throw Error('WrapELement is null');
+  }
   vDom.isRoot = true;
   vDom.wrapElement = wrapElement;
 
   wrapElement.appendChild(vDomToDom(vDom, true));
 }
 
-export function vDomUpdate(newVdomTree) {
+export function vDomUpdate(newVdomTree: WDom) {
   const { needRerender } = newVdomTree;
 
   switch (needRerender) {
@@ -47,7 +51,7 @@ export function vDomUpdate(newVdomTree) {
   }
 }
 
-function typeDelete(newVdom) {
+function typeDelete(newVdom: WDom) {
   const parent = newVdom?.el?.parentNode;
 
   if (parent) {
@@ -56,20 +60,22 @@ function typeDelete(newVdom) {
   }
 }
 
-function typeSortedReplace(newVdom) {
+function typeSortedReplace(newVdom: WDom) {
   typeDelete(newVdom);
   typeAdd(newVdom);
 }
 
-function typeSortedUpdate(newVdom) {
+function typeSortedUpdate(newVdom: WDom) {
   typeDelete(newVdom);
   typeAdd(newVdom, newVdom.el);
 }
 
-function typeAdd(newVdom, newElement) {
+function typeAdd(newVdom: WDom, newElement?: HTMLElement) {
   if (!newElement) {
     newElement = vDomToDom(newVdom, true);
+    return;
   }
+
   const parentVdom = newVdom.getParent();
   const parentEl = findRealParentElement(parentVdom);
   const nextEl = startFindNextBrotherElement(newVdom, parentVdom);
@@ -83,7 +89,10 @@ function typeAdd(newVdom, newElement) {
   runMountedQueueFromVdom(newVdom);
 }
 
-function startFindNextBrotherElement(vDom, parentVdom) {
+function startFindNextBrotherElement(
+  vDom: WDom,
+  parentVdom: WDom
+): HTMLElement | undefined {
   const brothers = parentVdom.children;
   const index = brothers.indexOf(vDom);
   const nextIndex = index + 1;
@@ -102,28 +111,33 @@ function startFindNextBrotherElement(vDom, parentVdom) {
     return startFindNextBrotherElement(parentVdom, parentVdom.getParent());
   }
 
-  return false;
+  return undefined;
 }
 
-function findChildFragmentNextElement(candidiateBrothers) {
-  return candidiateBrothers.reduce((targetEl, bItem) => {
-    const type = bItem?.type;
-    const el = bItem?.el;
-    const isFragment = type === 'fragment' || type === 'loop';
+function findChildFragmentNextElement(
+  candidiateBrothers: WDom[]
+): HTMLElement | undefined {
+  return candidiateBrothers.reduce(
+    (targetEl: HTMLElement | undefined, bItem: WDom) => {
+      const type = bItem?.type;
+      const el = bItem?.el;
+      const isFragment = type === 'fragment' || type === 'loop';
 
-    if (targetEl) {
+      if (targetEl) {
+        return targetEl;
+      } else if (isFragment) {
+        return findChildFragmentNextElement(bItem.children);
+      } else if (el && el.nodeType !== 11) {
+        return el;
+      }
+
       return targetEl;
-    } else if (isFragment) {
-      return findChildFragmentNextElement(bItem.children);
-    } else if (el && el.nodeType !== 11) {
-      return el;
-    }
-
-    return targetEl;
-  }, null);
+    },
+    undefined
+  );
 }
 
-function typeReplace(newVdom) {
+function typeReplace(newVdom: WDom) {
   const parentVdom = newVdom.getParent();
   const parentElement = parentVdom.el;
   const orignalElement = newVdom.el;
@@ -138,7 +152,7 @@ function typeReplace(newVdom) {
   runMountedQueueFromVdom(newVdom);
 }
 
-function typeUpdate(newVdom) {
+function typeUpdate(newVdom: WDom) {
   const element = newVdom.el;
 
   if (newVdom.type === 'text') {
@@ -159,19 +173,19 @@ function typeUpdate(newVdom) {
     element.value = newVdom.props.value;
   }
 
-  newVdom.children.forEach(childItem => {
+  newVdom.children.forEach((childItem: WDom) => {
     vDomUpdate(childItem);
   });
 
   runUpdatedQueueFromVdom(newVdom);
 }
 
-function updateText(newVdom) {
+function updateText(newVdom: WDom) {
   const element = newVdom.el;
   element.nodeValue = newVdom.text;
 }
 
-function removeEvent(oldProps, element) {
+function removeEvent(oldProps: any, element: HTMLElement) {
   if (oldProps?.onClick) {
     element.removeEventListener('click', oldProps.onClick);
   }
@@ -180,7 +194,15 @@ function removeEvent(oldProps, element) {
   }
 }
 
-function updateProps({ oldProps, props, element }) {
+function updateProps({
+  oldProps,
+  props,
+  element,
+}: {
+  oldProps?: { [key: string]: any };
+  props: { [key: string]: any };
+  element: HTMLElement;
+}) {
   const originalProps = { ...oldProps };
 
   Object.entries(props || {}).forEach(([dataKey, dataValue]) => {
@@ -198,7 +220,7 @@ function updateProps({ oldProps, props, element }) {
         oldEventHandler: originalProps[dataKey],
       });
     } else if (typeof dataValue === 'number' || typeof dataValue === 'string') {
-      element.setAttribute(dataKey, dataValue);
+      element.setAttribute(dataKey, String(dataValue));
     }
 
     delete originalProps[dataKey];
@@ -209,7 +231,7 @@ function updateProps({ oldProps, props, element }) {
   });
 }
 
-function vDomToDom(vDom, init) {
+function vDomToDom(vDom: WDom, init: boolean) {
   let element;
   const { type, tag, text, props, children = [] } = vDom;
   const isVirtualType = type === 'fragment' || type === 'loop';
@@ -232,15 +254,22 @@ function vDomToDom(vDom, init) {
   return element;
 }
 
-function vDomChildrenToDom(children, parentElement, init) {
+function vDomChildrenToDom(
+  children: WDom,
+  parentElement: HTMLElement,
+  init: boolean
+) {
   if (init) {
-    const elementChildren = children.reduce((acc, childItem) => {
-      if (childItem.type) {
-        acc.appendChild(vDomToDom(childItem, init));
-      }
+    const elementChildren = children.reduce(
+      (acc: DocumentFragment, childItem: WDom) => {
+        if (childItem.type) {
+          acc.appendChild(vDomToDom(childItem, init));
+        }
 
-      return acc;
-    }, new DocumentFragment());
+        return acc;
+      },
+      new DocumentFragment()
+    );
 
     if (elementChildren.hasChildNodes()) {
       parentElement.appendChild(elementChildren);
@@ -248,8 +277,18 @@ function vDomChildrenToDom(children, parentElement, init) {
   }
 }
 
-function updateEvent({ element, eventKey, newEventHandler, oldEventHandler }) {
-  const eventName = eventKey.replace(/^on(.*)/, function (match, p1) {
+function updateEvent({
+  element,
+  eventKey,
+  newEventHandler,
+  oldEventHandler,
+}: {
+  element: HTMLElement;
+  eventKey: string;
+  newEventHandler: (e: Event) => void;
+  oldEventHandler: (e: Event) => void;
+}) {
+  const eventName = eventKey.replace(/^on(.*)/, function (_match, p1) {
     return p1.toLowerCase();
   });
 
@@ -257,7 +296,15 @@ function updateEvent({ element, eventKey, newEventHandler, oldEventHandler }) {
   element.addEventListener(eventName, newEventHandler);
 }
 
-function updateStyle({ style, oldStyle, element }) {
+function updateStyle({
+  style,
+  oldStyle,
+  element,
+}: {
+  style: { [key: string]: string };
+  oldStyle: { [key: string]: string };
+  element: HTMLElement;
+}) {
   const originalStyle = { ...oldStyle };
 
   Object.entries(style).forEach(([styleKey, dataValue]) => {
@@ -265,12 +312,12 @@ function updateStyle({ style, oldStyle, element }) {
     delete originalStyle[styleKey];
   });
 
-  Object.entries(originalStyle).forEach(([styleKey, dataValue]) => {
-    element.style.removeProperty(styleKey, dataValue);
+  Object.entries(originalStyle).forEach(([styleKey]) => {
+    element.style.removeProperty(styleKey);
   });
 }
 
-function findRealParentElement(vDom) {
+function findRealParentElement(vDom: WDom): HTMLElement {
   const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
 
   if (vDom.isRoot) {

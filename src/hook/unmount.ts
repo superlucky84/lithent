@@ -1,6 +1,7 @@
+import { WDom } from '@/types';
 import { stateKeyRef, componentRef } from '@/helper/universalRef';
 
-export default function unmount(effectAction) {
+export default function unmount(effectAction: Function) {
   const stateKey = stateKeyRef.value;
 
   if (!componentRef[stateKey]?.unmountQueue) {
@@ -10,12 +11,12 @@ export default function unmount(effectAction) {
   }
 }
 
-export function runUnmountQueueFromVdom(newVdom) {
+export function runUnmountQueueFromVdom(newVdom: WDom) {
   const queue = componentRef[newVdom.stateKey]?.unmountQueue;
   if (newVdom.tagName && queue) {
     componentRef[newVdom.stateKey].unmountQueue = [];
 
-    queue.forEach(effect => {
+    queue.forEach((effect: Function) => {
       effect();
     });
   }
