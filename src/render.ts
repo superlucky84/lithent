@@ -73,17 +73,18 @@ function typeSortedUpdate(newVdom: WDom) {
 function typeAdd(newVdom: WDom, newElement?: HTMLElement) {
   if (!newElement) {
     newElement = vDomToDom(newVdom, true);
-    return;
   }
 
   const parentVdom = newVdom.getParent();
   const parentEl = findRealParentElement(parentVdom);
   const nextEl = startFindNextBrotherElement(newVdom, parentVdom);
 
-  if (nextEl) {
-    parentEl.insertBefore(newElement, nextEl);
-  } else {
-    parentEl.appendChild(newElement);
+  if (newElement) {
+    if (nextEl) {
+      parentEl.insertBefore(newElement, nextEl);
+    } else {
+      parentEl.appendChild(newElement);
+    }
   }
 
   runMountedQueueFromVdom(newVdom);
