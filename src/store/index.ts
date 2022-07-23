@@ -1,6 +1,6 @@
 import { makeDataStore } from '@/hook';
 
-const promiseTest = () => {
+const promiseTest = (): Promise<number> => {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(777);
@@ -8,8 +8,15 @@ const promiseTest = () => {
   });
 };
 
+export interface GlobalData {
+  item: string;
+  value: number;
+  toggleItem: () => void;
+  increase: () => void;
+}
+
 export default function storeInit() {
-  makeDataStore('globalData', {
+  const storeValue: GlobalData = {
     item: 'jjj',
     value: 0,
     toggleItem() {
@@ -19,9 +26,10 @@ export default function storeInit() {
       const value = await promiseTest();
       this.value += value;
     },
-  });
+  };
 
-  makeDataStore('example', {
+  makeDataStore<GlobalData>('globalData', storeValue);
+  makeDataStore<{ title: string }>('example', {
     title: '나만의 커스텀 프레임웍 제작기!!',
   });
 }

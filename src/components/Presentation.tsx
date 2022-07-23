@@ -1,8 +1,7 @@
-import { h, Fragment } from '@/wDom';
-import { makeRef, updated, makeData, useDataStore } from '@/hook';
-import CustomElement from '@/components/CustomElement';
+import { h } from '@/wDom';
+import { useDataStore } from '@/hook';
 
-export default function NestedFragment({ props, children }) {
+export default function NestedFragment() {
   const exampleData = useDataStore('example');
 
   const componentMaker = () => {

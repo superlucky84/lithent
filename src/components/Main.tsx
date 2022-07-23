@@ -1,7 +1,7 @@
 import { h, Fragment } from '../wDom';
 import CustomElement from '@/components/CustomElement';
 
-export default function Main({ props, children }) {
+export default function Main() {
   const componentMaker = () => {
     return (
       <div>

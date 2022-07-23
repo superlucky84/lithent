@@ -1,6 +1,7 @@
+import { WDom } from '@/types';
 import { stateKeyRef, componentRef } from '@/helper/universalRef';
 
-export default function mounted(effectAction) {
+export default function mounted(effectAction: Function) {
   const stateKey = stateKeyRef.value;
 
   if (!componentRef[stateKey]?.mountedQueue) {
@@ -11,13 +12,13 @@ export default function mounted(effectAction) {
   componentRef[stateKey].mountedQueue.push(effectAction);
 }
 
-export function runMountedQueueFromVdom(newVdom) {
+export function runMountedQueueFromVdom(newVdom: WDom) {
   const queue = componentRef[newVdom.stateKey]?.mountedQueue;
 
   if (newVdom.tagName && queue) {
     componentRef[newVdom.stateKey].mountedQueue = [];
 
-    queue.forEach(effect => {
+    queue.forEach((effect: Function) => {
       effect();
     });
   }

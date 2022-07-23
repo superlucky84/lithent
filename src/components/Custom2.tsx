@@ -1,29 +1,20 @@
-import { h, Fragment } from '../wDom';
+import { GlobalData } from '@/store';
+import { h } from '@/wDom';
 import { mounted, unmount, updated, useDataStore, makeData } from '@/hook';
 
-export default function Custom2({ props, children }) {
-  const globalData = useDataStore('globalData');
+export default function Custom2(
+  props: { k: string; data: any; handle3: () => void },
+  children: any
+) {
+  const globalData = useDataStore('globalData') as GlobalData;
   const data7 = makeData({ m: 1 });
   const data = makeData({ v: 1 });
-  const promiseTest = () => {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(999);
-      }, 3000);
-    });
-  };
   const gdataUpdate = () => {
     console.log('gdataUpdate');
     globalData.increase();
   };
   const handleMounted = () => {
     console.log('CUSTOM2 MOUNTED');
-
-    /*
-    const resolveValue = await promiseTest();
-    console.log(resolveValue);
-    data.v = resolveValue;
-    */
   };
   const handleUnmount = () => {
     console.log('CUSTOM2 UNMOUNT');
@@ -31,8 +22,8 @@ export default function Custom2({ props, children }) {
   const handleUpdated = async () => {
     console.log('CUSTOM2 UPDATED --');
   };
-  const handleInputChane = event => {
-    data.v = event.target.value;
+  const handleInputChane = (event: InputEvent) => {
+    data.v = (event.target as HTMLInputElement).value;
   };
 
   const componentMaker = () => {
@@ -42,7 +33,7 @@ export default function Custom2({ props, children }) {
 
     return (
       <div class="custom2">
-        {props.k}-0--------------{globalData.item}-{globalData.value}
+        {props.k}-{data7.m}--------------{globalData.item}-{globalData.value}
         <input type="text" value={data.v} onInput={handleInputChane} />
         <button onClick={() => props.handle3()}>handle3</button>
         <button onClick={gdataUpdate}>gdataupdate</button>

@@ -5,7 +5,9 @@ import {
   setDataStore,
 } from '@/helper/universalRef';
 
-export default function useData(initValue) {
+type InitValue = { [key: string]: unknown };
+
+export default function useData(initValue: InitValue) {
   const stateKey = stateKeyRef.value;
   const state = makeData({
     initValue,
@@ -19,7 +21,17 @@ export default function useData(initValue) {
   return state;
 }
 
-function makeData({ initValue, stateKey, dataCallSeq, render }) {
+function makeData({
+  initValue,
+  stateKey,
+  dataCallSeq,
+  render,
+}: {
+  initValue: InitValue;
+  stateKey: symbol;
+  dataCallSeq: number;
+  render: any;
+}) {
   const currentSubSeq = dataCallSeq;
 
   if (
@@ -32,12 +44,12 @@ function makeData({ initValue, stateKey, dataCallSeq, render }) {
   return componentRef[stateKey].dataStore[currentSubSeq];
 }
 
-function makeProxyData(initValue, render) {
+function makeProxyData(initValue: InitValue, render: any) {
   return new Proxy(initValue, {
-    get(target, prop) {
+    get(target, prop: string) {
       return target[prop];
     },
-    set(target, prop, value) {
+    set(target, prop: string, value) {
       target[prop] = value;
       render();
 

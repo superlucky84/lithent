@@ -1,3 +1,4 @@
+import { checkFunction } from '@/types/predicator';
 import {
   stateKeyRef,
   dataStoreStore,
@@ -5,7 +6,7 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-export function useDataStore(storeKey) {
+export function useDataStore(storeKey: string) {
   const stateKey = stateKeyRef.value;
   const dataValue = dataStoreStore[storeKey];
 
@@ -21,9 +22,9 @@ export function useDataStore(storeKey) {
   return dataValue || {};
 }
 
-export function makeDataStore(storeKey, initValue) {
+export function makeDataStore<T>(storeKey: string, initValue: T) {
   if (!dataStoreStore[storeKey]) {
-    dataStoreStore[storeKey] = makeProxyData({
+    dataStoreStore[storeKey] = makeProxyData<T>({
       storeKey,
       initValue,
     });
@@ -32,25 +33,31 @@ export function makeDataStore(storeKey, initValue) {
   return dataStoreStore[storeKey];
 }
 
-function makeProxyData({ storeKey, initValue }) {
-  const proxy = new Proxy(initValue, {
+function makeProxyData<T extends { [key: string | symbol]: any }>({
+  storeKey,
+  initValue,
+}: {
+  storeKey: string;
+  initValue: T;
+}) {
+  const proxy = new Proxy<T>(initValue, {
     get(target, prop) {
       const value = target[prop];
 
-      if (typeof value === 'function') {
-        return function (...args) {
-          value.call(proxy, ...args);
+      if (checkFunction(value)) {
+        return function (...args: unknown[]) {
+          (value as Function).call(proxy, ...args);
         };
       }
       return value;
     },
-    set(target, prop, value) {
+    set(target, prop: keyof typeof target, value) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue[storeKey];
-      const trashCollections = [];
+      const trashCollections: (() => undefined)[] = [];
 
-      dataStoreQueue.forEach((makeRender, index) => {
+      dataStoreQueue.forEach(makeRender => {
         const render = makeRender();
         if (render) {
           render();
@@ -70,12 +77,12 @@ function makeProxyData({ storeKey, initValue }) {
   return new Proxy(
     {},
     {
-      get(target, prop) {
+      get(_target, prop: string) {
         const methodValue = proxy[prop];
 
-        if (typeof methodValue === 'function') {
-          return function (...args) {
-            methodValue(...args);
+        if (checkFunction(methodValue)) {
+          return function (...args: unknown[]) {
+            (methodValue as Function)(...args);
           };
         }
         return proxy[prop];

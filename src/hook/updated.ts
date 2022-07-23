@@ -1,10 +1,11 @@
+import { WDom } from '@/types';
 import {
   stateKeyRef,
   updatedCallSeq,
   componentRef,
 } from '@/helper/universalRef';
 
-export default function updated(effectAction, dependencies) {
+export default function updated(effectAction: Function, dependencies: unknown[]) {
   const currentSubSeq = updatedCallSeq.value;
   const stateKey = stateKeyRef.value;
 
@@ -29,17 +30,17 @@ export default function updated(effectAction, dependencies) {
   updatedCallSeq.value += 1;
 }
 
-export function runUpdatedQueueFromVdom(newVdom) {
+export function runUpdatedQueueFromVdom(newVdom: WDom) {
   const queue = componentRef[newVdom.stateKey]?.updatedQueue;
   if (newVdom.tagName && queue) {
     componentRef[newVdom.stateKey].updatedQueue = [];
 
-    queue.forEach(effect => {
+    queue.forEach((effect: Function) => {
       effect();
     });
   }
 }
 
-function checkNeedPushQueue(originalDefs, newDefs) {
+function checkNeedPushQueue(originalDefs: unknown[], newDefs: unknown[]) {
   return originalDefs.some((def, index) => def !== newDefs[index]);
 }

@@ -3,5 +3,5 @@ import commonConfigMaker from './vite.config.js';
 export default commonConfigMaker({
   name: 'wact',
   fileName: 'wact',
-  path: 'src/index.js',
+  path: 'src/index.ts',
 });
