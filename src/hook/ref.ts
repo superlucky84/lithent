@@ -1,3 +1,3 @@
-export default function makeRef(initValue) {
+export default function makeRef<T>(initValue: T) {
   return { value: initValue };
 }

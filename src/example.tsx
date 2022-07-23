@@ -5,7 +5,7 @@ import CustomElement from '@/components/CustomElement';
 // import Main from '@/components/Main';
 // import Sub from '@/components/Sub';
 // import Sub2 from '@/components/Sub2';
-import NestedFragment from '@/components/NestedFragment';
+// import NestedFragment from '@/components/NestedFragment';
 // import LoopTest from '@/components/LoopTest';
 // import Presentation from '@/components/Presentation';
 import storeInit from '@/store';

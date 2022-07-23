@@ -22,12 +22,9 @@ export function useDataStore(storeKey: string) {
   return dataValue || {};
 }
 
-export function makeDataStore(
-  storeKey: string,
-  initValue: {[key: string]: unknown},
-) {
+export function makeDataStore<T>(storeKey: string, initValue: T) {
   if (!dataStoreStore[storeKey]) {
-    dataStoreStore[storeKey] = makeProxyData({
+    dataStoreStore[storeKey] = makeProxyData<T>({
       storeKey,
       initValue,
     });
@@ -36,15 +33,15 @@ export function makeDataStore(
   return dataStoreStore[storeKey];
 }
 
-function makeProxyData({
+function makeProxyData<T extends { [key: string | symbol]: any }>({
   storeKey,
   initValue,
 }: {
   storeKey: string;
-  initValue: {[key: string]: unknown};
+  initValue: T;
 }) {
-  const proxy = new Proxy(initValue, {
-    get(target, prop: string) {
+  const proxy = new Proxy<T>(initValue, {
+    get(target, prop) {
       const value = target[prop];
 
       if (checkFunction(value)) {
@@ -54,7 +51,7 @@ function makeProxyData({
       }
       return value;
     },
-    set(target, prop: string, value) {
+    set(target, prop: keyof typeof target, value) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue[storeKey];
