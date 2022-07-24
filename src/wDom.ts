@@ -1,4 +1,4 @@
-import { WDom } from '@/types';
+import { WDom, MiddleStateVDomChildren } from '@/types';
 import makeNewVdomTree from '@/diff';
 import { vDomUpdate } from './render';
 import { isExisty } from '@/helper/predicator';
@@ -13,12 +13,12 @@ export function Fragment(...children: WDom[]) {
   return { type: 'fragment', children };
 }
 
-export function h(tag: any, props: any, ...children: any) {
+export function h(tag: any, props: any, ...children: MiddleStateVDomChildren) {
+  console.log('PROPS - ', props);
   const nodePointer = { value: null };
   const newProps = props || {};
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
-  // console.log(newProps, node);
 
   nodePointer.value = node;
 
