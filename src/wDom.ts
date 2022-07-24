@@ -18,6 +18,8 @@ import {
 } from '@/helper/universalRef';
 import { checkFragment, checkCustemComponent } from '@/helper/predicator';
 
+export type Children = WDom[];
+
 export function Fragment(...children: WDom[]) {
   return { type: 'fragment', children };
 }

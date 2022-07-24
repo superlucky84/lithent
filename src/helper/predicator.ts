@@ -103,3 +103,23 @@ export function isExisty(value: unknown) {
 export function checkFunction(target: unknown): target is Function {
   return typeof target === 'function';
 }
+
+export function checkEventFunction(
+  target: unknown
+): target is (e: Event) => void {
+  return typeof target === 'function';
+}
+
+export function checkStyleData(
+  dataKey: string,
+  dataValue: unknown
+): dataValue is Record<string, string> {
+  return dataKey === 'style' && typeof dataValue === 'object';
+}
+
+export function checkRefData(
+  dataKey: string,
+  dataValue: unknown
+): dataValue is { value: HTMLElement } {
+  return dataKey === 'ref' && typeof dataValue === 'object';
+}

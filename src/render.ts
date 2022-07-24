@@ -10,7 +10,12 @@
  * 7. (NONE). text타입의 경우 text가 같다면 변경이 필요 없으므로 방치한다. (Todo. 다른 타입의 경우 처리필요)
  */
 
-import { WDom } from '@/types';
+import { WDom, Props } from '@/types';
+import {
+  checkStyleData,
+  checkRefData,
+  checkEventFunction,
+} from '@/helper/predicator';
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
 
@@ -186,11 +191,11 @@ function updateText(newVdom: WDom) {
   element.nodeValue = newVdom.text;
 }
 
-function removeEvent(oldProps: any, element: HTMLElement) {
-  if (oldProps?.onClick) {
+function removeEvent(oldProps: Props, element: HTMLElement) {
+  if (checkEventFunction(oldProps?.onClick)) {
     element.removeEventListener('click', oldProps.onClick);
   }
-  if (oldProps?.onInput) {
+  if (checkEventFunction(oldProps?.onInput)) {
     element.removeEventListener('input', oldProps.onInput);
   }
 }
@@ -200,32 +205,40 @@ function updateProps({
   props,
   element,
 }: {
-  oldProps?: { [key: string]: any };
-  props: { [key: string]: any };
+  oldProps?: Props;
+  props: Props;
   element: HTMLElement;
 }) {
   const originalProps = { ...oldProps };
 
-  Object.entries(props || {}).forEach(([dataKey, dataValue]) => {
-    if (dataKey === 'key') {
-      // Do nothing
-    } else if (dataKey === 'style') {
-      updateStyle({ style: dataValue, oldStyle: originalProps.style, element });
-    } else if (dataKey === 'ref') {
-      dataValue.value = element;
-    } else if (dataKey.match(/^on/)) {
-      updateEvent({
-        element,
-        eventKey: dataKey,
-        newEventHandler: dataValue,
-        oldEventHandler: originalProps[dataKey],
-      });
-    } else if (typeof dataValue === 'number' || typeof dataValue === 'string') {
-      element.setAttribute(dataKey, String(dataValue));
-    }
+  Object.entries(props || {}).forEach(
+    ([dataKey, dataValue]: [string, unknown]) => {
+      if (dataKey === 'key') {
+        // Do nothing
+      } else if (checkStyleData(dataKey, dataValue)) {
+        const style = dataValue;
+        const oldStyle = checkStyleData(dataKey, originalProps.style) || {};
 
-    delete originalProps[dataKey];
-  });
+        updateStyle({ style, oldStyle, element });
+      } else if (checkRefData(dataKey, dataValue)) {
+        dataValue.value = element;
+      } else if (dataKey.match(/^on/)) {
+        updateEvent({
+          element,
+          eventKey: dataKey,
+          newEventHandler: dataValue as (e: Event) => void,
+          oldEventHandler: originalProps[dataKey] as (e: Event) => void,
+        });
+      } else if (
+        typeof dataValue === 'number' ||
+        typeof dataValue === 'string'
+      ) {
+        element.setAttribute(dataKey, String(dataValue));
+      }
+
+      delete originalProps[dataKey];
+    }
+  );
 
   Object.keys(originalProps).forEach(dataKey => {
     element.removeAttribute(dataKey);
