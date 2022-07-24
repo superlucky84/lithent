@@ -13,6 +13,9 @@ export default function unmount(effectAction: () => void) {
 }
 
 export function runUnmountQueueFromVdom(newVdom: WDom) {
+  if (!newVdom.stateKey) {
+    return;
+  }
   const queue = componentRef[newVdom.stateKey]?.unmountQueue;
   if (newVdom.tagName && queue) {
     componentRef[newVdom.stateKey].unmountQueue = [];

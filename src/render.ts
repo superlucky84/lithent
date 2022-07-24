@@ -15,9 +15,11 @@ import {
   checkStyleData,
   checkRefData,
   checkEventFunction,
+  isExisty,
 } from '@/helper/predicator';
 import { runMountedQueueFromVdom } from '@/hook/mounted';
 import { runUpdatedQueueFromVdom } from '@/hook/updated';
+import { getParent } from '@/helper';
 
 export function render(vDom: WDom, wrapElement: HTMLElement | null) {
   if (!wrapElement) {
@@ -59,7 +61,7 @@ export function vDomUpdate(newVdomTree: WDom) {
 function typeDelete(newVdom: WDom) {
   const parent = newVdom?.el?.parentNode;
 
-  if (parent) {
+  if (parent && newVdom.el) {
     parent.removeChild(newVdom.el);
     delete newVdom.el;
   }
@@ -75,20 +77,25 @@ function typeSortedUpdate(newVdom: WDom) {
   typeAdd(newVdom, newVdom.el);
 }
 
-function typeAdd(newVdom: WDom, newElement?: HTMLElement) {
+function typeAdd(
+  newVdom: WDom,
+  newElement?: HTMLElement | DocumentFragment | Text
+) {
   if (!newElement) {
     newElement = vDomToDom(newVdom, true);
   }
 
-  const parentVdom = newVdom.getParent();
-  const parentEl = findRealParentElement(parentVdom);
-  const nextEl = startFindNextBrotherElement(newVdom, parentVdom);
+  const parentVdom = getParent(newVdom);
+  if (parentVdom.type) {
+    const parentEl = findRealParentElement(parentVdom);
+    const nextEl = startFindNextBrotherElement(newVdom, parentVdom);
 
-  if (newElement) {
-    if (nextEl) {
-      parentEl.insertBefore(newElement, nextEl);
-    } else {
-      parentEl.appendChild(newElement);
+    if (newElement && parentEl) {
+      if (nextEl) {
+        parentEl.insertBefore(newElement, nextEl);
+      } else {
+        parentEl.appendChild(newElement);
+      }
     }
   }
 
@@ -98,8 +105,8 @@ function typeAdd(newVdom: WDom, newElement?: HTMLElement) {
 function startFindNextBrotherElement(
   vDom: WDom,
   parentVdom: WDom
-): HTMLElement | undefined {
-  const brothers = parentVdom.children;
+): HTMLElement | DocumentFragment | Text | undefined {
+  const brothers = parentVdom.children || [];
   const index = brothers.indexOf(vDom);
   const nextIndex = index + 1;
   const candidiateBrothers = brothers.slice(nextIndex);
@@ -114,7 +121,7 @@ function startFindNextBrotherElement(
     !parentVdom.isRoot &&
     (parentVdom.type === 'fragment' || parentVdom.type === 'loop')
   ) {
-    return startFindNextBrotherElement(parentVdom, parentVdom.getParent());
+    return startFindNextBrotherElement(parentVdom, getParent(parentVdom));
   }
 
   return undefined;
@@ -122,9 +129,12 @@ function startFindNextBrotherElement(
 
 function findChildFragmentNextElement(
   candidiateBrothers: WDom[]
-): HTMLElement | undefined {
+): HTMLElement | DocumentFragment | Text | undefined {
   return candidiateBrothers.reduce(
-    (targetEl: HTMLElement | undefined, bItem: WDom) => {
+    (
+      targetEl: HTMLElement | DocumentFragment | Text | undefined,
+      bItem: WDom
+    ) => {
       const type = bItem?.type;
       const el = bItem?.el;
       const isFragment = type === 'fragment' || type === 'loop';
@@ -132,7 +142,7 @@ function findChildFragmentNextElement(
       if (targetEl) {
         return targetEl;
       } else if (isFragment) {
-        return findChildFragmentNextElement(bItem.children);
+        return findChildFragmentNextElement(bItem.children || []);
       } else if (el && el.nodeType !== 11) {
         return el;
       }
@@ -144,16 +154,21 @@ function findChildFragmentNextElement(
 }
 
 function typeReplace(newVdom: WDom) {
-  const parentVdom = newVdom.getParent();
-  const parentElement = parentVdom.el;
-  const orignalElement = newVdom.el;
-  const newElement = vDomToDom(newVdom, true);
+  const parentVdom = getParent(newVdom);
 
-  if (orignalElement && newVdom.oldProps) {
-    removeEvent(newVdom.oldProps, orignalElement);
+  if (parentVdom.type) {
+    const parentElement = parentVdom.el;
+    const orignalElement = newVdom.el;
+    const newElement = vDomToDom(newVdom, true);
+
+    if (orignalElement && newVdom.oldProps) {
+      removeEvent(newVdom.oldProps, orignalElement);
+    }
+
+    if (parentElement && orignalElement) {
+      parentElement.replaceChild(newElement, orignalElement);
+    }
   }
-
-  parentElement.replaceChild(newElement, orignalElement);
 
   runMountedQueueFromVdom(newVdom);
 }
@@ -173,13 +188,13 @@ function typeUpdate(newVdom: WDom) {
     updateProps({ oldProps, props, element });
 
     delete newVdom.oldProps;
+
+    if (newVdom.tag === 'input') {
+      (element as HTMLInputElement).value = String(newVdom?.props?.value || '');
+    }
   }
 
-  if (newVdom.tag === 'input') {
-    element.value = newVdom.props.value;
-  }
-
-  newVdom.children.forEach((childItem: WDom) => {
+  (newVdom.children || []).forEach((childItem: WDom) => {
     vDomUpdate(childItem);
   });
 
@@ -188,15 +203,23 @@ function typeUpdate(newVdom: WDom) {
 
 function updateText(newVdom: WDom) {
   const element = newVdom.el;
-  element.nodeValue = newVdom.text;
+
+  if (element) {
+    element.nodeValue = String(newVdom.text);
+  }
 }
 
-function removeEvent(oldProps: Props, element: HTMLElement) {
-  if (checkEventFunction(oldProps?.onClick)) {
-    element.removeEventListener('click', oldProps.onClick);
-  }
-  if (checkEventFunction(oldProps?.onInput)) {
-    element.removeEventListener('input', oldProps.onInput);
+function removeEvent(
+  oldProps: Props,
+  element?: HTMLElement | DocumentFragment | Text
+) {
+  if (element) {
+    if (checkEventFunction(oldProps?.onClick)) {
+      element.removeEventListener('click', oldProps.onClick);
+    }
+    if (checkEventFunction(oldProps?.onInput)) {
+      element.removeEventListener('input', oldProps.onInput);
+    }
   }
 }
 
@@ -206,8 +229,8 @@ function updateProps({
   element,
 }: {
   oldProps?: Props;
-  props: Props;
-  element: HTMLElement;
+  props?: Props;
+  element?: HTMLElement | DocumentFragment | Text;
 }) {
   const originalProps = { ...oldProps };
 
@@ -224,7 +247,7 @@ function updateProps({
         dataValue.value = element;
       } else if (dataKey.match(/^on/)) {
         updateEvent({
-          element,
+          element: element as HTMLElement,
           eventKey: dataKey,
           newEventHandler: dataValue as (e: Event) => void,
           oldEventHandler: originalProps[dataKey] as (e: Event) => void,
@@ -233,7 +256,7 @@ function updateProps({
         typeof dataValue === 'number' ||
         typeof dataValue === 'string'
       ) {
-        element.setAttribute(dataKey, String(dataValue));
+        (element as HTMLElement).setAttribute(dataKey, String(dataValue));
       }
 
       delete originalProps[dataKey];
@@ -241,7 +264,7 @@ function updateProps({
   );
 
   Object.keys(originalProps).forEach(dataKey => {
-    element.removeAttribute(dataKey);
+    (element as HTMLElement).removeAttribute(dataKey);
   });
 }
 
@@ -252,10 +275,10 @@ function vDomToDom(vDom: WDom, init: boolean) {
 
   if (isVirtualType) {
     element = new DocumentFragment();
-  } else if (type === 'element') {
+  } else if (type === 'element' && tag) {
     element = document.createElement(tag);
-  } else if (type === 'text') {
-    element = document.createTextNode(text);
+  } else if (type === 'text' && isExisty(text)) {
+    element = document.createTextNode(String(text));
   }
 
   vDomChildrenToDom(children, element, init);
@@ -265,13 +288,13 @@ function vDomToDom(vDom: WDom, init: boolean) {
 
   runMountedQueueFromVdom(vDom);
 
-  return element;
+  return element || document.createElement('div');
 }
 
 function vDomChildrenToDom(
-  children: WDom,
-  parentElement: HTMLElement,
-  init: boolean
+  children: WDom[],
+  parentElement?: HTMLElement | DocumentFragment | Text,
+  init?: boolean
 ) {
   if (init) {
     const elementChildren = children.reduce(
@@ -285,7 +308,7 @@ function vDomChildrenToDom(
       new DocumentFragment()
     );
 
-    if (elementChildren.hasChildNodes()) {
+    if (parentElement && elementChildren.hasChildNodes()) {
       parentElement.appendChild(elementChildren);
     }
   }
@@ -317,21 +340,26 @@ function updateStyle({
 }: {
   style: { [key: string]: string };
   oldStyle: { [key: string]: string };
-  element: HTMLElement;
+  element?: HTMLElement | DocumentFragment | Text;
 }) {
   const originalStyle = { ...oldStyle };
+  const elementStyle = (element as HTMLElement)?.style;
 
-  Object.entries(style).forEach(([styleKey, dataValue]) => {
-    element.style.setProperty(styleKey, dataValue);
-    delete originalStyle[styleKey];
-  });
+  if (elementStyle) {
+    Object.entries(style).forEach(([styleKey, dataValue]) => {
+      elementStyle.setProperty(styleKey, dataValue);
+      delete originalStyle[styleKey];
+    });
 
-  Object.entries(originalStyle).forEach(([styleKey]) => {
-    element.style.removeProperty(styleKey);
-  });
+    Object.entries(originalStyle).forEach(([styleKey]) => {
+      elementStyle.removeProperty(styleKey);
+    });
+  }
 }
 
-function findRealParentElement(vDom: WDom): HTMLElement {
+function findRealParentElement(
+  vDom: WDom
+): HTMLElement | DocumentFragment | Text | undefined {
   const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
 
   if (vDom.isRoot) {
@@ -342,5 +370,7 @@ function findRealParentElement(vDom: WDom): HTMLElement {
     return vDom.el;
   }
 
-  return findRealParentElement(vDom.getParent());
+  const parentVDom = getParent(vDom);
+
+  return findRealParentElement(parentVDom);
 }

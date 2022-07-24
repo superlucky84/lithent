@@ -33,7 +33,7 @@ export default function Custom2(
 
     return (
       <div class="custom2">
-        {props.k}-{data7.m}--------------{globalData.item}-{globalData.value}
+        {props.k}-{data7.m}--------------{globalData.item}-!{globalData.value}
         <input type="text" value={data.v} onInput={handleInputChane} />
         <button onClick={() => props.handle3()}>handle3</button>
         <button onClick={gdataUpdate}>gdataupdate</button>

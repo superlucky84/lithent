@@ -32,6 +32,10 @@ export default function updated(
 }
 
 export function runUpdatedQueueFromVdom(newVdom: WDom) {
+  if (!newVdom.stateKey) {
+    return;
+  }
+
   const queue = componentRef[newVdom.stateKey]?.updatedQueue;
   if (newVdom.tagName && queue) {
     componentRef[newVdom.stateKey].updatedQueue = [];

@@ -32,10 +32,11 @@ export function h(
   props: Props,
   ...children: MiddleStateVDomChildren
 ) {
-  const nodePointer: NodePointer = { value: undefined };
+  const nodePointer: NodePointer = { value: {} };
   const newProps = props || {};
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
+  console.log('NODE', node);
 
   nodePointer.value = node;
 
@@ -59,8 +60,8 @@ function reRenderCustomComponent({
   const newVdomTree = makeNewVdomTree({ originalVdom, newVdom });
   newVdomTree.getParent = originalVdom.getParent;
 
-  if (!originalVdom.isRoot) {
-    const brothers = originalVdom.getParent().children;
+  if (!originalVdom.isRoot && originalVdom.getParent) {
+    const brothers = originalVdom.getParent().children || [];
     const index = brothers.indexOf(originalVdom);
 
     brothers.splice(index, 1, newVdomTree);
@@ -227,7 +228,7 @@ function makeChildrenItem(item: MiddleStateVDom): WDom {
   if (item === null || item === undefined || item === false) {
     return { type: null };
   } else if (Array.isArray(item)) {
-    const nodePointer: NodePointer = { value: undefined };
+    const nodePointer: NodePointer = { value: {} };
     const children = remakeChildren(nodePointer, item);
     const node = { type: 'loop', children };
     nodePointer.value = node;

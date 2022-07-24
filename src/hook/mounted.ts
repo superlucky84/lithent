@@ -16,6 +16,9 @@ export default function mounted(effectAction: () => void) {
 }
 
 export function runMountedQueueFromVdom(newVdom: WDom) {
+  if (!newVdom.stateKey) {
+    return;
+  }
   const queue = componentRef[newVdom.stateKey]?.mountedQueue;
 
   if (newVdom.tagName && queue) {

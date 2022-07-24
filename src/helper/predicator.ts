@@ -84,7 +84,7 @@ export function checkSameCustomComponent({ originalVdom, newVdom }: DiffParam) {
 export function checkSameFragment({ originalVdom, newVdom }: DiffParam) {
   return (
     originalVdom?.type === 'fragment' &&
-    originalVdom?.children?.length === newVdom.children.length
+    originalVdom?.children?.length === newVdom?.children?.length
   );
 }
 
@@ -128,6 +128,6 @@ export function checkStyleData(
 export function checkRefData(
   dataKey: string,
   dataValue: unknown
-): dataValue is { value: HTMLElement } {
+): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } {
   return dataKey === 'ref' && typeof dataValue === 'object';
 }
