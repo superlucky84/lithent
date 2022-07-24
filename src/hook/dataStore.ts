@@ -55,7 +55,7 @@ function makeProxyData<T extends UseDataStoreValue>({
       }
       return value;
     },
-    set(target, prop: keyof typeof target, value) {
+    set(target, prop: keyof T, value) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue[storeKey];
