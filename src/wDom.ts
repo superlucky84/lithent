@@ -36,7 +36,6 @@ export function h(
   const newProps = props || {};
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
-  console.log('NODE', node);
 
   nodePointer.value = node;
 
