@@ -56,7 +56,7 @@ function makeProxyData<T extends UseDataStoreValue>({
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue[storeKey];
-      const trashCollections: (() => undefined)[] = [];
+      const trashCollections: (() => (() => void) | undefined)[] = [];
 
       dataStoreQueue.forEach(makeRender => {
         const render = makeRender();

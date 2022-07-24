@@ -2,7 +2,7 @@ import { h, Fragment } from '@/wDom';
 import { makeData } from '@/hook';
 
 export default function NestedFragment() {
-  const data = makeData({ choiceNode: 7 });
+  const data = makeData<{ choiceNode: number }>({ choiceNode: 7 });
   const handle = () => {
     const randomValue = Math.floor(Math.random() * 10) + 1;
     data.choiceNode = randomValue;

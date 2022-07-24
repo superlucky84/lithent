@@ -4,7 +4,7 @@ import { makeData, mounted, unmount } from '@/hook';
 import { addParams } from '@/hook/params';
 
 export function Router(_props: {}, children: WDom[]) {
-  const data = makeData({ targetPath: '' });
+  const data = makeData<{ targetPath: string }>({ targetPath: '' });
   const findPath = (injectPath: string) =>
     children.find(item => item.componentProps.path === injectPath);
 

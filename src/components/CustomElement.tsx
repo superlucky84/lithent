@@ -3,8 +3,8 @@ import { makeRef, updated, makeData } from '@/hook';
 import Custom2 from './Custom2';
 
 const useJw = () => {
-  const data = makeData({ k: 7, j: 1 });
-  const data2 = makeData({ k: 1 });
+  const data = makeData<{ k: number; j: number }>({ k: 7, j: 1 });
+  const data2 = makeData<{ k: number }>({ k: 1 });
 
   const handle = () => {
     data.k += 1;
@@ -19,7 +19,7 @@ const useJw = () => {
 
 export default function CustomElement() {
   const { data, data2, handle, handle2 } = useJw();
-  const data3 = makeData({ k: 1 });
+  const data3 = makeData<{ k: number }>({ k: 1 });
   const handle3 = () => {
     console.log('action handle 3');
     data3.k += 1;

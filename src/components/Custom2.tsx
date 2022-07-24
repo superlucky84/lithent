@@ -3,12 +3,12 @@ import { h, Children } from '@/wDom';
 import { mounted, unmount, updated, useDataStore, makeData } from '@/hook';
 
 export default function Custom2(
-  props: { k: string; data: any; handle3: () => void },
+  props: { k: number; data: { k: number; j: number }; handle3: () => void },
   children: Children
 ) {
   const globalData = useDataStore<GlobalData>('globalData');
-  const data7 = makeData({ m: 1 });
-  const data = makeData({ v: 1 });
+  const data7 = makeData<{ m: number }>({ m: 1 });
+  const data = makeData<{ v: string }>({ v: '1' });
   const gdataUpdate = () => {
     console.log('gdataUpdate');
     globalData.increase();

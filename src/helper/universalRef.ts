@@ -8,13 +8,13 @@ export const needDiffRef: { value: boolean } = { value: false };
 
 type ComponentRef = {
   [key: symbol]: {
-    redrawAction?: any;
-    dataStore?: any;
-    dataStoreQueue?: any;
-    updatedStore?: any;
-    updatedQueue?: any;
-    mountedQueue?: any;
-    unmountQueue?: any;
+    redrawAction?: () => void;
+    dataStore?: unknown[];
+    // 모든 타입의 변수에 대해 체크해야 하기 때문에 정말 any타입임
+    updatedStore?: any[];
+    updatedQueue?: (() => void)[];
+    mountedQueue?: (() => void)[];
+    unmountQueue?: (() => void)[];
   };
 };
 
@@ -29,7 +29,9 @@ export const dataCallSeq: { value: number } = { value: 0 };
  * DataStore
  */
 export const dataStoreStore: { [key: string]: UseDataStoreValue } = {};
-export const dataStoreRenderQueue: { [key: string]: (() => any)[] } = {};
+export const dataStoreRenderQueue: {
+  [key: string]: (() => (() => void) | undefined)[];
+} = {};
 
 /**
  * Updated
@@ -44,15 +46,15 @@ export const routerParams: { value: { [key: string]: string } } = { value: {} };
 /**
  * Ref helpers
  */
-export function setRedrawAction(stateKey: symbol, action: any) {
+export function setRedrawAction(stateKey: symbol, action: () => void) {
   componentRef[stateKey] ??= {};
   componentRef[stateKey].redrawAction = action;
 }
 
-export function setDataStore(stateKey: symbol, data: any) {
+export function setDataStore(stateKey: symbol, data: unknown) {
   componentRef[stateKey] ??= {};
   componentRef[stateKey].dataStore ??= [];
-  componentRef[stateKey].dataStore.push(data);
+  componentRef[stateKey].dataStore?.push(data);
 }
 
 export function initUpdateHookState(stateKey: symbol) {
