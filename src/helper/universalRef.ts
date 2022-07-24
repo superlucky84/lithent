@@ -1,3 +1,5 @@
+import { UseDataStoreValue } from '@/types';
+
 /**
  * Common
  */
@@ -26,9 +28,7 @@ export const dataCallSeq: { value: number } = { value: 0 };
 /**
  * DataStore
  */
-export const dataStoreStore: {
-  [key: string]: { [key: string | symbol]: any };
-} = {};
+export const dataStoreStore: { [key: string]: UseDataStoreValue } = {};
 export const dataStoreRenderQueue: { [key: string]: (() => any)[] } = {};
 
 /**
