@@ -1,3 +1,4 @@
+import { UseDataStoreValue } from '@/types';
 import { checkFunction } from '@/types/predicator';
 import {
   stateKeyRef,
@@ -6,9 +7,9 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-export function useDataStore(storeKey: string) {
+export function useDataStore<T extends UseDataStoreValue>(storeKey: string) {
   const stateKey = stateKeyRef.value;
-  const dataValue = dataStoreStore[storeKey];
+  const dataValue = dataStoreStore[storeKey] as T;
 
   if (!dataValue) {
     console.warn('Data store not exist');
@@ -19,10 +20,13 @@ export function useDataStore(storeKey: string) {
   dataStoreQueue[storeKey] ??= [];
   dataStoreQueue[storeKey].push(() => componentRef[stateKey]?.redrawAction);
 
-  return dataValue || {};
+  return dataValue;
 }
 
-export function makeDataStore<T>(storeKey: string, initValue: T) {
+export function makeDataStore<T extends UseDataStoreValue>(
+  storeKey: string,
+  initValue: T
+) {
   if (!dataStoreStore[storeKey]) {
     dataStoreStore[storeKey] = makeProxyData<T>({
       storeKey,
@@ -33,7 +37,7 @@ export function makeDataStore<T>(storeKey: string, initValue: T) {
   return dataStoreStore[storeKey];
 }
 
-function makeProxyData<T extends { [key: string | symbol]: any }>({
+function makeProxyData<T extends UseDataStoreValue>({
   storeKey,
   initValue,
 }: {
@@ -51,7 +55,7 @@ function makeProxyData<T extends { [key: string | symbol]: any }>({
       }
       return value;
     },
-    set(target, prop: keyof typeof target, value) {
+    set(target, prop: keyof T, value) {
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue[storeKey];
