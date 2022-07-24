@@ -7,7 +7,7 @@ import {
   MiddleStateVDom,
   NodePointer,
 } from '@/types';
-import { checkFragment, checkCustemComponent } from '@/types/predicator';
+
 import makeNewVdomTree from '@/diff';
 import { vDomUpdate } from './render';
 import {
@@ -16,6 +16,7 @@ import {
   setRedrawAction,
   needDiffRef,
 } from '@/helper/universalRef';
+import { checkFragment, checkCustemComponent } from '@/helper/predicator';
 
 export function Fragment(...children: WDom[]) {
   return { type: 'fragment', children };

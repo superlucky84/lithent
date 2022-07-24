@@ -1,5 +1,5 @@
 import { UseDataStoreValue } from '@/types';
-import { checkFunction } from '@/types/predicator';
+import { checkFunction } from '@/helper/predicator';
 import {
   stateKeyRef,
   dataStoreStore,

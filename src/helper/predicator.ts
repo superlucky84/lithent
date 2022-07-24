@@ -1,6 +1,12 @@
-import { WDom } from '@/types';
-type WDomType = 'component' | 'fragment' | 'element' | 'loop' | 'text' | 'empty';
-type DiffParam = {originalVdom?: WDom; newVdom: WDom};
+import { WDom, TagFunction, FragmentFunction } from '@/types';
+type WDomType =
+  | 'component'
+  | 'fragment'
+  | 'element'
+  | 'loop'
+  | 'text'
+  | 'empty';
+type DiffParam = { originalVdom?: WDom; newVdom: WDom };
 
 export function getVdomType(vDom: WDom): WDomType | undefined {
   const isComponent = checkCustemComponent(vDom);
@@ -39,12 +45,12 @@ export const checkSameVdomWithOriginal = {
 /**
  * Predicator
  */
-export function checkCustemComponent(vDom: WDom) {
-  return typeof vDom === 'function';
+export function checkCustemComponent(target: unknown): target is TagFunction {
+  return typeof target === 'function' && target.name !== 'Fragment';
 }
 
-export function checkFragment(vDom: WDom) {
-  return vDom.type === 'fragment';
+export function checkFragment(target: unknown): target is FragmentFunction {
+  return typeof target === 'function' && target.name === 'Fragment';
 }
 
 export function checkTagElement(vDom: WDom) {
@@ -92,4 +98,8 @@ export function checkSameEmptyElement({ originalVdom, newVdom }: DiffParam) {
 
 export function isExisty(value: unknown) {
   return value !== null && value !== undefined;
+}
+
+export function checkFunction(target: unknown): target is Function {
+  return typeof target === 'function';
 }
