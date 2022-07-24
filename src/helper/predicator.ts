@@ -9,7 +9,7 @@ type WDomType =
 type DiffParam = { originalVdom?: WDom; newVdom: WDom };
 
 export function getVdomType(vDom: WDom): WDomType | undefined {
-  const isComponent = checkCustemComponent(vDom);
+  const isComponent = checkCustemComponentFunction(vDom);
   const isFragment = checkFragment(vDom);
   const isTagElement = checkTagElement(vDom);
   const isLoopElement = checkLoopElement(vDom);
@@ -45,12 +45,20 @@ export const checkSameVdomWithOriginal = {
 /**
  * Predicator
  */
-export function checkCustemComponent(target: unknown): target is TagFunction {
+export function checkCustemComponentFunction(
+  target: unknown
+): target is TagFunction {
   return typeof target === 'function' && target.name !== 'Fragment';
 }
 
-export function checkFragment(target: unknown): target is FragmentFunction {
+export function checkFragmentFunction(
+  target: unknown
+): target is FragmentFunction {
   return typeof target === 'function' && target.name === 'Fragment';
+}
+
+export function checkFragment(vDom: WDom) {
+  return vDom.type === 'fragment';
 }
 
 export function checkTagElement(vDom: WDom) {

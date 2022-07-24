@@ -16,7 +16,10 @@ import {
   setRedrawAction,
   needDiffRef,
 } from '@/helper/universalRef';
-import { checkFragment, checkCustemComponent } from '@/helper/predicator';
+import {
+  checkFragmentFunction,
+  checkCustemComponentFunction,
+} from '@/helper/predicator';
 
 export type Children = WDom[];
 
@@ -196,9 +199,9 @@ function makeNode({
   props: Props;
   children: WDom[];
 }) {
-  if (checkFragment(tag)) {
+  if (checkFragmentFunction(tag)) {
     return Fragment(...children);
-  } else if (checkCustemComponent(tag)) {
+  } else if (checkCustemComponentFunction(tag)) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 
     return needDiffRef.value ? componetMakeResolver : componetMakeResolver();
