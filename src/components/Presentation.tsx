@@ -2,7 +2,7 @@ import { h } from '@/wDom';
 import { useDataStore } from '@/hook';
 
 export default function NestedFragment() {
-  const exampleData = useDataStore('example');
+  const exampleData = useDataStore<{ title: string }>('example');
 
   const componentMaker = () => {
     return (
