@@ -135,7 +135,19 @@ function makeCustomNode({
   return customNode;
 }
 
-function makeReRender({ componentMaker, stateKey, tag, props, children }: any) {
+function makeReRender({
+  componentMaker,
+  stateKey,
+  tag,
+  props,
+  children,
+}: {
+  componentMaker: () => WDom;
+  stateKey: symbol;
+  tag: TagFunction;
+  props: Props;
+  children: WDom[];
+}) {
   const reRender = () =>
     vdomMaker({ componentMaker, stateKey, tag, props, children, reRender });
 
@@ -149,7 +161,14 @@ function vdomMaker({
   props,
   children,
   reRender,
-}: any) {
+}: {
+  componentMaker: () => WDom;
+  stateKey: symbol;
+  tag: TagFunction;
+  props: Props;
+  children: WDom[];
+  reRender: () => WDom;
+}) {
   initUpdateHookState(stateKey);
 
   const vdom = componentMaker();
