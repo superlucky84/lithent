@@ -18,8 +18,6 @@ export type MiddleStateVDom =
 
 export type MiddleStateVDomChildren = MiddleStateVDom[];
 
-// export type WDom = {[key: string]: any};
-
 export interface WDom {
   isRoot?: boolean;
   type?: string | null;
@@ -31,8 +29,8 @@ export interface WDom {
   getParent?: () => WDom;
   text?: string | number;
   stateKey?: symbol;
-  reRender?: any;
-  componentProps?: any;
+  reRender?: () => WDom;
+  componentProps?: Props;
   wrapElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?:

@@ -9,7 +9,7 @@
  */
 
 import { WDom } from '@/types';
-import { getParent } from '@/helper';
+import { getParent, reRender } from '@/helper';
 import { componentRef } from '@/helper/universalRef';
 import {
   checkEmptyElement,
@@ -126,7 +126,7 @@ function generalize({
   isSameType,
 }: DiffPrimaryParam): WDom {
   if (typeof newVdom === 'function') {
-    return isSameType ? originalVdom?.reRender() : newVdom();
+    return isSameType && originalVdom ? reRender(originalVdom) : newVdom();
   }
 
   return newVdom;

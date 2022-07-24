@@ -6,27 +6,30 @@ import { addParams } from '@/hook/params';
 export function Router(_props: {}, children: WDom[]) {
   const data = makeData<{ targetPath: string }>({ targetPath: '' });
   const findPath = (injectPath: string) =>
-    children.find(item => item.componentProps.path === injectPath);
+    children.find(item => item.componentProps?.path === injectPath);
 
   const findDynamicPath = () =>
-    children.find(item => /^:/.test(item.componentProps.path));
+    children.find(item => /^:/.test(String(item?.componentProps?.path || '')));
 
   const handleHashChange = () => {
     const injectPath =
       window.location.hash.replace(/^[#\/]*/, '') ||
-      children[0].componentProps.path;
+      String(children[0]?.componentProps?.path || '');
     let targetPath = findPath(injectPath);
 
     if (!targetPath) {
       targetPath = findDynamicPath();
 
       if (targetPath) {
-        addParams(targetPath.componentProps.path.replace(/^:/, ''), injectPath);
+        addParams(
+          String(targetPath?.componentProps?.path || '').replace(/^:/, ''),
+          injectPath
+        );
       }
     }
 
     if (targetPath) {
-      data.targetPath = targetPath.componentProps.path;
+      data.targetPath = String(targetPath?.componentProps?.path || '');
     }
   };
 
@@ -42,7 +45,10 @@ export function Router(_props: {}, children: WDom[]) {
 
     return (
       <Fragment>
-        {children.map(({ componentProps: { element, path } }) => {
+        {children.map(item => {
+          const path = String(item?.componentProps?.path || '');
+          const element = item?.componentProps?.element;
+
           return data.targetPath === path ? element : null;
         })}
       </Fragment>
