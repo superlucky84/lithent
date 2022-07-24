@@ -1,5 +1,5 @@
 import { UseDataStoreValue } from '@/types';
-import { checkFunction } from '@/types/predicator';
+import { checkFunction } from '@/helper/predicator';
 import {
   stateKeyRef,
   dataStoreStore,
@@ -56,7 +56,7 @@ function makeProxyData<T extends UseDataStoreValue>({
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue[storeKey];
-      const trashCollections: (() => undefined)[] = [];
+      const trashCollections: (() => (() => void) | undefined)[] = [];
 
       dataStoreQueue.forEach(makeRender => {
         const render = makeRender();

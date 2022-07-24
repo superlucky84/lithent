@@ -5,32 +5,37 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-export default function updated(effectAction: Function, dependencies: unknown[]) {
+export default function updated(
+  effectAction: () => void,
+  dependencies: unknown[]
+) {
   const currentSubSeq = updatedCallSeq.value;
   const stateKey = stateKeyRef.value;
+  const updatedStore = componentRef[stateKey]?.updatedStore;
 
-  if (
-    !componentRef[stateKey]?.updatedStore ||
-    !componentRef[stateKey]?.updatedStore[currentSubSeq]
-  ) {
+  if (!updatedStore || !updatedStore[currentSubSeq]) {
     componentRef[stateKey] ??= {};
     componentRef[stateKey].updatedStore ??= [];
     componentRef[stateKey].updatedQueue ??= [];
   } else if (
-    checkNeedPushQueue(
-      componentRef[stateKey].updatedStore[currentSubSeq],
-      dependencies
-    ) ||
+    checkNeedPushQueue(updatedStore[currentSubSeq], dependencies) ||
     !dependencies
   ) {
-    componentRef[stateKey].updatedQueue.push(effectAction);
+    const updateQueue = componentRef[stateKey].updatedQueue;
+    // Toto typescript의 영향으로 엉뚱한 코드가 생겼음 type guard를 이용해 개선 예정
+    (updateQueue || []).push(effectAction);
   }
 
-  componentRef[stateKey].updatedStore[currentSubSeq] = dependencies;
+  // Toto typescript의 영향으로 엉뚱한 코드가 생겼음 type guard를 이용해 개선 예정
+  (updatedStore || [])[currentSubSeq] = dependencies;
   updatedCallSeq.value += 1;
 }
 
 export function runUpdatedQueueFromVdom(newVdom: WDom) {
+  if (!newVdom.stateKey) {
+    return;
+  }
+
   const queue = componentRef[newVdom.stateKey]?.updatedQueue;
   if (newVdom.tagName && queue) {
     componentRef[newVdom.stateKey].updatedQueue = [];

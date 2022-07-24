@@ -1,9 +1,15 @@
-import { WDom } from '@/types';
-type WDomType = 'component' | 'fragment' | 'element' | 'loop' | 'text' | 'empty';
-type DiffParam = {originalVdom?: WDom; newVdom: WDom};
+import { WDom, TagFunction, FragmentFunction } from '@/types';
+type WDomType =
+  | 'component'
+  | 'fragment'
+  | 'element'
+  | 'loop'
+  | 'text'
+  | 'empty';
+type DiffParam = { originalVdom?: WDom; newVdom: WDom };
 
 export function getVdomType(vDom: WDom): WDomType | undefined {
-  const isComponent = checkCustemComponent(vDom);
+  const isComponent = checkCustemComponentFunction(vDom);
   const isFragment = checkFragment(vDom);
   const isTagElement = checkTagElement(vDom);
   const isLoopElement = checkLoopElement(vDom);
@@ -39,8 +45,16 @@ export const checkSameVdomWithOriginal = {
 /**
  * Predicator
  */
-export function checkCustemComponent(vDom: WDom) {
-  return typeof vDom === 'function';
+export function checkCustemComponentFunction(
+  target: unknown
+): target is TagFunction {
+  return typeof target === 'function' && target.name !== 'Fragment';
+}
+
+export function checkFragmentFunction(
+  target: unknown
+): target is FragmentFunction {
+  return typeof target === 'function' && target.name === 'Fragment';
 }
 
 export function checkFragment(vDom: WDom) {
@@ -70,7 +84,7 @@ export function checkSameCustomComponent({ originalVdom, newVdom }: DiffParam) {
 export function checkSameFragment({ originalVdom, newVdom }: DiffParam) {
   return (
     originalVdom?.type === 'fragment' &&
-    originalVdom?.children?.length === newVdom.children.length
+    originalVdom?.children?.length === newVdom?.children?.length
   );
 }
 
@@ -92,4 +106,28 @@ export function checkSameEmptyElement({ originalVdom, newVdom }: DiffParam) {
 
 export function isExisty(value: unknown) {
   return value !== null && value !== undefined;
+}
+
+export function checkFunction(target: unknown): target is Function {
+  return typeof target === 'function';
+}
+
+export function checkEventFunction(
+  target: unknown
+): target is (e: Event) => void {
+  return typeof target === 'function';
+}
+
+export function checkStyleData(
+  dataKey: string,
+  dataValue: unknown
+): dataValue is Record<string, string> {
+  return dataKey === 'style' && typeof dataValue === 'object';
+}
+
+export function checkRefData(
+  dataKey: string,
+  dataValue: unknown
+): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } {
+  return dataKey === 'ref' && typeof dataValue === 'object';
 }

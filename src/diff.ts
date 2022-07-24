@@ -9,6 +9,7 @@
  */
 
 import { WDom } from '@/types';
+import { getParent, reRender } from '@/helper';
 import { componentRef } from '@/helper/universalRef';
 import {
   checkEmptyElement,
@@ -20,6 +21,12 @@ import {
 import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
 type DiffPrimaryParam = {
+  originalVdom?: WDom;
+  newVdom: WDom | ((stateKey?: symbol) => WDom);
+  isSameType: boolean;
+};
+
+type DiffSecondeParam = {
   originalVdom?: WDom;
   newVdom: WDom;
   isSameType: boolean;
@@ -70,7 +77,11 @@ function remakeNewVdom({
     remakeVdom.el = originalVdom.el;
   }
 
-  if (['DELETE', 'REPLACE'].includes(needRerender) && originalVdom) {
+  if (
+    ['DELETE', 'REPLACE'].includes(needRerender) &&
+    originalVdom &&
+    originalVdom.stateKey
+  ) {
     runUnmountQueueFromVdom(originalVdom);
     delete componentRef[originalVdom.stateKey];
   }
@@ -84,11 +95,11 @@ function addReRenderTypeProperty({
   originalVdom,
   newVdom,
   isSameType,
-}: DiffPrimaryParam) {
+}: DiffSecondeParam) {
   const existOriginalVdom = originalVdom && originalVdom.type;
   const isEmptyElement = checkEmptyElement(newVdom);
   const isRoot = !newVdom.getParent;
-  const parentType = !isRoot && newVdom.getParent().type;
+  const parentType = !isRoot && getParent(newVdom).type;
   const key = getKey(newVdom);
   const isKeyCheckedVdom = parentType === 'loop' && isExisty(key);
   const isSameText =
@@ -109,9 +120,13 @@ function addReRenderTypeProperty({
   return isKeyCheckedVdom ? 'SORTED-REPLACE' : 'REPLACE';
 }
 
-function generalize({ newVdom, originalVdom, isSameType }: DiffPrimaryParam) {
+function generalize({
+  newVdom,
+  originalVdom,
+  isSameType,
+}: DiffPrimaryParam): WDom {
   if (typeof newVdom === 'function') {
-    return isSameType ? originalVdom?.reRender() : newVdom();
+    return isSameType && originalVdom ? reRender(originalVdom) : newVdom();
   }
 
   return newVdom;
@@ -121,7 +136,7 @@ function remakeChildrenForDiff({
   isSameType,
   newVdom,
   originalVdom,
-}: DiffPrimaryParam) {
+}: DiffSecondeParam) {
   if (isSameType && originalVdom) {
     return remakeChildrenForUpdate(newVdom, originalVdom);
   }
@@ -130,7 +145,7 @@ function remakeChildrenForDiff({
 }
 
 function remakeChildrenForAdd(newVdom: WDom) {
-  return newVdom.children.map((item: WDom) => {
+  return (newVdom.children || []).map((item: WDom) => {
     const childItem = makeNewVdomTree({ newVdom: item });
     childItem.getParent = () => newVdom;
 
@@ -139,14 +154,17 @@ function remakeChildrenForAdd(newVdom: WDom) {
 }
 
 function remakeChildrenForUpdate(newVdom: WDom, originalVdom: WDom) {
-  if (newVdom.type === 'loop' && isExisty(getKey(newVdom.children[0]))) {
+  if (
+    newVdom.type === 'loop' &&
+    isExisty(getKey((newVdom.children || [])[0]))
+  ) {
     return remakeChildrenForLoopUpdate(newVdom, originalVdom);
   }
 
-  return newVdom.children.map((item: WDom, index: number) => {
+  return (newVdom.children || []).map((item: WDom, index: number) => {
     const childItem = makeNewVdomTree({
       newVdom: item,
-      originalVdom: originalVdom.children[index],
+      originalVdom: (originalVdom.children || [])[index],
     });
 
     childItem.getParent = () => newVdom;
@@ -164,7 +182,7 @@ function remakeChildrenForLoopUpdate(newVdom: WDom, originalVdom: WDom) {
   unUsedChildren.map(unusedItem => {
     const el = unusedItem.el;
 
-    if (el) {
+    if (el && el.parentNode) {
       const parent = el.parentNode;
       parent.removeChild(el);
     }
@@ -174,8 +192,8 @@ function remakeChildrenForLoopUpdate(newVdom: WDom, originalVdom: WDom) {
 }
 
 function diffLoopChildren(newVdom: WDom, originalVdom: WDom) {
-  const newChildren = [...newVdom.children];
-  const originalChildren = [...originalVdom.children];
+  const newChildren = [...(newVdom.children || [])];
+  const originalChildren = [...(originalVdom.children || [])];
 
   const remakedChildren = newChildren.map(item => {
     const originalItem = findSameKeyOriginalItem(item, originalChildren);
@@ -184,7 +202,9 @@ function diffLoopChildren(newVdom: WDom, originalVdom: WDom) {
       originalVdom: originalItem,
     });
 
-    originalChildren.splice(originalChildren.indexOf(originalItem), 1);
+    if (originalItem) {
+      originalChildren.splice(originalChildren.indexOf(originalItem), 1);
+    }
 
     childItem.getParent = () => newVdom;
 

@@ -7,18 +7,18 @@ import {
 
 type InitValue = { [key: string]: unknown };
 
-export default function useData(initValue: InitValue) {
+export default function useData<T>(initValue: InitValue) {
   const stateKey = stateKeyRef.value;
   const state = makeData({
     initValue,
     dataCallSeq: dataCallSeq.value,
     stateKey,
-    render: () => componentRef[stateKey].redrawAction(),
+    render: () => (componentRef[stateKey].redrawAction || (() => {}))(),
   });
 
   dataCallSeq.value += 1;
 
-  return state;
+  return state as T;
 }
 
 function makeData({
@@ -30,21 +30,21 @@ function makeData({
   initValue: InitValue;
   stateKey: symbol;
   dataCallSeq: number;
-  render: any;
+  render: () => void;
 }) {
   const currentSubSeq = dataCallSeq;
+  const dataStore = componentRef[stateKey]?.dataStore;
 
-  if (
-    !componentRef[stateKey]?.dataStore ||
-    !componentRef[stateKey]?.dataStore[currentSubSeq]
-  ) {
+  if (!dataStore || !dataStore[currentSubSeq]) {
     setDataStore(stateKey, makeProxyData(initValue, render));
   }
 
-  return componentRef[stateKey].dataStore[currentSubSeq];
+  const checkedDataStore = componentRef[stateKey]?.dataStore;
+
+  return checkedDataStore && checkedDataStore[currentSubSeq];
 }
 
-function makeProxyData(initValue: InitValue, render: any) {
+function makeProxyData(initValue: InitValue, render: () => void) {
   return new Proxy(initValue, {
     get(target, prop: string) {
       return target[prop];
