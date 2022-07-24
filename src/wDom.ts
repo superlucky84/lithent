@@ -1,7 +1,15 @@
-import { WDom, MiddleStateVDomChildren } from '@/types';
+import {
+  WDom,
+  TagFunction,
+  FragmentFunction,
+  Props,
+  MiddleStateVDomChildren,
+  MiddleStateVDom,
+  NodePointer,
+} from '@/types';
+import { checkFragment, checkCustemComponent } from '@/types/predicator';
 import makeNewVdomTree from '@/diff';
 import { vDomUpdate } from './render';
-import { isExisty } from '@/helper/predicator';
 import {
   initUpdateHookState,
   initMountHookState,
@@ -13,9 +21,12 @@ export function Fragment(...children: WDom[]) {
   return { type: 'fragment', children };
 }
 
-export function h(tag: any, props: any, ...children: MiddleStateVDomChildren) {
-  console.log('PROPS - ', props);
-  const nodePointer = { value: null };
+export function h(
+  tag: TagFunction | FragmentFunction | string,
+  props: Props,
+  ...children: MiddleStateVDomChildren
+) {
+  const nodePointer: NodePointer = { value: undefined };
   const newProps = props || {};
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
@@ -25,7 +36,17 @@ export function h(tag: any, props: any, ...children: MiddleStateVDomChildren) {
   return node;
 }
 
-function reRenderCustomComponent({ tag, props, children, originalVdom }: any) {
+function reRenderCustomComponent({
+  tag,
+  props,
+  children,
+  originalVdom,
+}: {
+  tag: TagFunction;
+  props: Props;
+  children: WDom[];
+  originalVdom: WDom;
+}) {
   needDiffRef.value = true;
 
   const newVdom = makeVdomResolver({ tag, props, children });
@@ -47,7 +68,15 @@ function reRenderCustomComponent({ tag, props, children, originalVdom }: any) {
   needDiffRef.value = false;
 }
 
-function makeVdomResolver({ tag, props, children }: any) {
+function makeVdomResolver({
+  tag,
+  props,
+  children,
+}: {
+  tag: TagFunction;
+  props: Props;
+  children: WDom[];
+}) {
   const resolve = (stateKey = Symbol(tag.name)) => {
     initMountHookState(stateKey);
 
@@ -63,7 +92,7 @@ function makeVdomResolver({ tag, props, children }: any) {
     const originalVdom = customNode;
 
     setRedrawAction(stateKey, () => {
-      reRenderCustomComponent({ tag, props, children, originalVdom, stateKey });
+      reRenderCustomComponent({ tag, props, children, originalVdom });
     });
 
     return customNode;
@@ -81,7 +110,13 @@ function makeCustomNode({
   tag,
   props,
   children,
-}: any) {
+}: {
+  componentMaker: () => WDom;
+  stateKey: symbol;
+  tag: TagFunction;
+  props: Props;
+  children: WDom[];
+}) {
   const customNode = componentMaker();
   const reRender = makeReRender({
     componentMaker,
@@ -119,13 +154,7 @@ function vdomMaker({
   const vdom = componentMaker();
 
   setRedrawAction(stateKey, () => {
-    reRenderCustomComponent({
-      tag,
-      props,
-      children,
-      originalVdom: vdom,
-      stateKey,
-    });
+    reRenderCustomComponent({ tag, props, children, originalVdom: vdom });
   });
 
   vdom.componentProps = props;
@@ -136,14 +165,18 @@ function vdomMaker({
   return vdom;
 }
 
-function makeNode({ tag, props, children }: any) {
-  const isFragment = typeof tag === 'function' && tag.name === 'Fragment';
-  const isCustemComponent =
-    typeof tag === 'function' && tag.name !== 'Fragment';
-
-  if (isFragment) {
+function makeNode({
+  tag,
+  props,
+  children,
+}: {
+  tag: TagFunction | FragmentFunction | string;
+  props: Props;
+  children: WDom[];
+}) {
+  if (checkFragment(tag)) {
     return Fragment(...children);
-  } else if (isCustemComponent) {
+  } else if (checkCustemComponent(tag)) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 
     return needDiffRef.value ? componetMakeResolver : componetMakeResolver();
@@ -152,9 +185,12 @@ function makeNode({ tag, props, children }: any) {
   return { type: 'element', tag, props, children };
 }
 
-function remakeChildren(nodePointer: any, children: any) {
-  return children.map((item: any) => {
-    const childItem = makeChildrenItem({ item });
+function remakeChildren(
+  nodePointer: NodePointer,
+  children: MiddleStateVDomChildren
+): WDom[] {
+  return children.map((item: MiddleStateVDom) => {
+    const childItem = makeChildrenItem(item);
 
     childItem.getParent = () => nodePointer.value;
 
@@ -162,11 +198,11 @@ function remakeChildren(nodePointer: any, children: any) {
   });
 }
 
-function makeChildrenItem({ item }: any) {
-  if (!isExisty(item) || item === false) {
+function makeChildrenItem(item: MiddleStateVDom): WDom {
+  if (item === null || item === undefined || item === false) {
     return { type: null };
   } else if (Array.isArray(item)) {
-    const nodePointer: any = { value: null };
+    const nodePointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodePointer, item);
     const node = { type: 'loop', children };
     nodePointer.value = node;
