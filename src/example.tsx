@@ -15,6 +15,7 @@ storeInit();
 const vDom = (
   <Fragment>
     <CustomElement vava={7} />
+    <CustomElement vava={7} />
     <Fragment>
       <div>3</div>
       <div>3</div>

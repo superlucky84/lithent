@@ -37,8 +37,8 @@ export default function CustomElement() {
   };
 
   const componentMaker = () => {
-    // updated(handleUpdatedDataK, [data.k]);
-    // updated(handleUpdatedData2K, [data2.k]);
+    updated(handleUpdatedDataK, [data.k]);
+    updated(handleUpdatedData2K, [data2.k]);
 
     return (
       <div class={`aaaaaaaaa${data.k}`}>

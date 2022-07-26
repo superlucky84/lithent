@@ -1,16 +1,12 @@
 import { WDom } from '@/types';
-import {
-  stateKeyRef,
-  componentRef,
-  makeUnmountQueueRef,
-} from '@/helper/universalRef';
+import { stateKeyRef, componentRef, makeQueueRef } from '@/helper/universalRef';
 
 export default function unmount(effectAction: () => void) {
   const stateKey = stateKeyRef.value;
   const unmountQueue = componentRef[stateKey].unmountQueue;
 
   if (!unmountQueue) {
-    makeUnmountQueueRef(stateKey).push(effectAction);
+    makeQueueRef(stateKey, 'unmountQueue').push(effectAction);
   }
 }
 

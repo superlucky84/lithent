@@ -6,11 +6,18 @@ import { UseDataStoreValue } from '@/types';
 export const stateKeyRef: { value: symbol } = { value: Symbol('null') };
 export const needDiffRef: { value: boolean } = { value: false };
 
+type ComponentSubKey =
+  | 'redrawAction'
+  | 'dataStore'
+  | 'updatedStore'
+  | 'updatedQueue'
+  | 'mountedQueue'
+  | 'unmountQueue';
+
 type ComponentRef = {
   [key: symbol]: {
     redrawAction?: () => void;
     dataStore?: unknown[];
-    // 모든 타입의 변수에 대해 체크해야 하기 때문에 정말 any타입임
     updatedStore?: any[];
     updatedQueue?: (() => void)[];
     mountedQueue?: (() => void)[];
@@ -46,12 +53,28 @@ export const routerParams: { value: { [key: string]: string } } = { value: {} };
 /**
  * Ref helpers
  */
-
-export function makeUnmountQueueRef(stateKey: symbol): (() => void)[] {
+export function makeQueueRef(
+  stateKey: symbol,
+  name: ComponentSubKey
+): (() => void)[] {
   componentRef[stateKey] ??= {};
-  componentRef[stateKey].unmountQueue ??= [];
 
-  return componentRef[stateKey].unmountQueue as (() => void)[];
+  if (
+    name === 'updatedQueue' ||
+    name === 'mountedQueue' ||
+    name === 'unmountQueue'
+  ) {
+    componentRef[stateKey][name] ??= [];
+  }
+
+  return componentRef[stateKey][name] as (() => void)[];
+}
+
+export function makeUpdatedStore(stateKey: symbol): (() => void)[] {
+  componentRef[stateKey] ??= {};
+  componentRef[stateKey].updatedStore ??= [];
+
+  return componentRef[stateKey].updatedStore as (() => void)[];
 }
 
 export function setRedrawAction(stateKey: symbol, action: () => void) {
