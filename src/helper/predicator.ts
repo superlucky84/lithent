@@ -3,14 +3,9 @@ import {
   TagFunction,
   TagFunctionResolver,
   FragmentFunction,
+  WDomType,
 } from '@/types';
-type WDomType =
-  | 'component'
-  | 'fragment'
-  | 'element'
-  | 'loop'
-  | 'text'
-  | 'empty';
+
 type DiffParam = {
   originalVdom?: WDom;
   newVdom: WDom | TagFunction | TagFunctionResolver;

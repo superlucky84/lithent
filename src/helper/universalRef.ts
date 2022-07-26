@@ -1,36 +1,13 @@
-import { UseDataStoreValue } from '@/types';
+import { UseDataStoreValue, ComponentSubKey, ComponentRef } from '@/types';
 
 /**
  * Common
  */
 export const stateKeyRef: { value: symbol } = { value: Symbol('null') };
 export const needDiffRef: { value: boolean } = { value: false };
-
-type ComponentSubKey =
-  | 'redrawAction'
-  | 'dataStore'
-  | 'updateSubscribeDefList'
-  | 'updateSubscribeList'
-  | 'mountSubscribeList'
-  | 'unmountSubscribeList';
-
-type ComponentRef = {
-  [key: symbol]: {
-    redrawAction?: () => void;
-    dataStore?: unknown[];
-    updateSubscribeDefList?: any[];
-    updateSubscribeList?: (() => void)[];
-    mountSubscribeList?: (() => void)[];
-    unmountSubscribeList?: (() => void)[];
-  };
-};
-
-export const componentRef: ComponentRef = {};
-
-/**
- * Data
- */
 export const dataCallSeq: { value: number } = { value: 0 };
+export const updatedCallSeq: { value: number } = { value: 0 };
+export const componentRef: ComponentRef = {};
 
 /**
  * DataStore
@@ -39,11 +16,6 @@ export const dataStoreStore: { [key: string]: UseDataStoreValue } = {};
 export const dataStoreRenderQueue: {
   [key: string]: (() => (() => void) | undefined)[];
 } = {};
-
-/**
- * Updated
- */
-export const updatedCallSeq: { value: number } = { value: 0 };
 
 /**
  * Router

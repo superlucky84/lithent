@@ -23,6 +23,14 @@ export type MiddleStateVDom =
 
 export type MiddleStateVDomChildren = MiddleStateVDom[];
 
+export type WDomType =
+  | 'component'
+  | 'fragment'
+  | 'element'
+  | 'loop'
+  | 'text'
+  | 'empty';
+
 export interface WDom {
   type: string | null;
   isRoot?: boolean;
@@ -47,3 +55,22 @@ export interface WDom {
     | 'SORTED-UPDATE'
     | 'NONE';
 }
+
+export type ComponentSubKey =
+  | 'redrawAction'
+  | 'dataStore'
+  | 'updateSubscribeDefList'
+  | 'updateSubscribeList'
+  | 'mountSubscribeList'
+  | 'unmountSubscribeList';
+
+export type ComponentRef = {
+  [key: symbol]: {
+    redrawAction?: () => void;
+    dataStore?: unknown[];
+    updateSubscribeDefList?: any[];
+    updateSubscribeList?: (() => void)[];
+    mountSubscribeList?: (() => void)[];
+    unmountSubscribeList?: (() => void)[];
+  };
+};
