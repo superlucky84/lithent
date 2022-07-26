@@ -1,7 +1,13 @@
 import { WDom } from '@/types';
 
 export function getParent(vDom: WDom) {
-  return (vDom.getParent || (() => ({ type: null })))();
+  const parentVDom = vDom.getParent && vDom.getParent();
+
+  if (!parentVDom) {
+    throw Error('Not found parent vDom');
+  }
+
+  return parentVDom;
 }
 
 export function reRender(vDom: WDom) {

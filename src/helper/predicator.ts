@@ -6,9 +6,9 @@ type WDomType =
   | 'loop'
   | 'text'
   | 'empty';
-type DiffParam = { originalVdom?: WDom; newVdom: WDom };
+type DiffParam = { originalVdom?: WDom; newVdom: WDom | (() => WDom) };
 
-export function getVdomType(vDom: WDom): WDomType | undefined {
+export function getVdomType(vDom: WDom | (() => WDom)): WDomType | undefined {
   const isComponent = checkCustemComponentFunction(vDom);
   const isFragment = checkFragment(vDom);
   const isTagElement = checkTagElement(vDom);
@@ -57,51 +57,58 @@ export function checkFragmentFunction(
   return typeof target === 'function' && target.name === 'Fragment';
 }
 
-export function checkFragment(vDom: WDom) {
-  return vDom.type === 'fragment';
+export function checkFragment(vDom: WDom | (() => WDom)) {
+  return typeof vDom !== 'function' && vDom.type === 'fragment';
 }
 
-export function checkTagElement(vDom: WDom) {
-  return vDom.type === 'element';
+export function checkTagElement(vDom: WDom | (() => WDom)) {
+  return typeof vDom !== 'function' && vDom.type === 'element';
 }
 
-export function checkLoopElement(vDom: WDom) {
-  return vDom.type === 'loop';
+export function checkLoopElement(vDom: WDom | (() => WDom)) {
+  return typeof vDom !== 'function' && vDom.type === 'loop';
 }
 
-export function checkTextElement(vDom: WDom) {
-  return vDom.type === 'text';
+export function checkTextElement(vDom: WDom | (() => WDom)) {
+  return typeof vDom !== 'function' && vDom.type === 'text';
 }
 
-export function checkEmptyElement(vDom: WDom) {
-  return !vDom.type;
+export function checkEmptyElement(vDom: WDom | (() => WDom)) {
+  return typeof vDom !== 'function' && !vDom.type;
 }
 
 export function checkSameCustomComponent({ originalVdom, newVdom }: DiffParam) {
+  // Todo need Fix Function type check
+  // @ts-ignore
   return newVdom.tagName === originalVdom?.tagName;
 }
 
 export function checkSameFragment({ originalVdom, newVdom }: DiffParam) {
   return (
+    typeof newVdom !== 'function' &&
     originalVdom?.type === 'fragment' &&
     originalVdom?.children?.length === newVdom?.children?.length
   );
 }
 
 export function checkSameTagElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === 'element' && originalVdom?.tag === newVdom.tag;
+  return (
+    typeof newVdom !== 'function' &&
+    originalVdom?.type === 'element' &&
+    originalVdom?.tag === newVdom.tag
+  );
 }
 
 export function checkSameLoopElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === newVdom.type;
+  return typeof newVdom !== 'function' && originalVdom?.type === newVdom.type;
 }
 
 export function checkSameTextElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === newVdom.type;
+  return typeof newVdom !== 'function' && originalVdom?.type === newVdom.type;
 }
 
 export function checkSameEmptyElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === newVdom.type;
+  return typeof newVdom !== 'function' && originalVdom?.type === newVdom.type;
 }
 
 export function isExisty(value: unknown) {

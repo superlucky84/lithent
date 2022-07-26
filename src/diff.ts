@@ -37,7 +37,7 @@ export default function makeNewVdomTree({
   newVdom,
 }: {
   originalVdom?: WDom;
-  newVdom: WDom;
+  newVdom: WDom | (() => WDom);
 }) {
   const type = getVdomType(newVdom);
 

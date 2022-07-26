@@ -6,7 +6,7 @@ export type TagFunction = (prop: Props, children: WDom[]) => () => WDom;
 
 export type FragmentFunction = (children: WDom[]) => WDom;
 
-export type NodePointer = { value: WDom };
+export type NodePointer = { value: WDom | undefined };
 
 export type MiddleStateVDom =
   | WDom
@@ -19,14 +19,14 @@ export type MiddleStateVDom =
 export type MiddleStateVDomChildren = MiddleStateVDom[];
 
 export interface WDom {
+  type: string | null;
   isRoot?: boolean;
-  type?: string | null;
   tag?: string;
   props?: Props;
   oldProps?: Props;
   tagName?: string;
   children?: WDom[];
-  getParent?: () => WDom;
+  getParent?: () => WDom | undefined;
   text?: string | number;
   stateKey?: symbol;
   reRender?: () => WDom;
