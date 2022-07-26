@@ -166,7 +166,6 @@ function typeReplace(newVdom: WDom) {
     }
 
     if (parentElement && orignalElement) {
-      console.log(parentElement, newElement, orignalElement);
       parentElement.replaceChild(newElement, orignalElement);
     }
   }

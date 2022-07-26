@@ -11,5 +11,11 @@ export function getParent(vDom: WDom) {
 }
 
 export function reRender(vDom: WDom) {
-  return (vDom.reRender || (() => ({ type: null })))();
+  const newVDom = vDom.reRender && vDom.reRender();
+
+  if (!newVDom) {
+    throw Error('Unable reRender');
+  }
+
+  return newVDom;
 }
