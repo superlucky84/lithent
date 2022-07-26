@@ -2,6 +2,7 @@
   "name": "election",
   "version": "0.2.27",
   "description": "",
+  "type": "module",
   "main": "dist/wact.js",
   "scripts": {
     "dev": "vite --config vite.wact.config.js",
