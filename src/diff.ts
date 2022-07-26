@@ -47,8 +47,6 @@ export default function makeNewVdomTree({
   }
   const isSameType = checkSameVdomWithOriginal[type]({ originalVdom, newVdom });
 
-  console.log('NNNNVDOM = ', newVdom);
-
   return remakeNewVdom({ originalVdom, newVdom, isSameType });
 }
 

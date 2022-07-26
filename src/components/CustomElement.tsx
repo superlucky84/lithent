@@ -30,15 +30,15 @@ export default function CustomElement() {
   const handleUpdatedDataK = () => {
     console.log('domRef', domRef);
     console.log('updated k', data);
-    data3.k += 10;
+    // data3.k += 10;
   };
   const handleUpdatedData2K = () => {
     console.log('updated 2k', data2);
   };
 
   const componentMaker = () => {
-    updated(handleUpdatedDataK, [data.k]);
-    updated(handleUpdatedData2K, [data2.k]);
+    // updated(handleUpdatedDataK, [data.k]);
+    // updated(handleUpdatedData2K, [data2.k]);
 
     return (
       <div class={`aaaaaaaaa${data.k}`}>

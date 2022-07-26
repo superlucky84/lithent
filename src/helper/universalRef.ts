@@ -46,6 +46,14 @@ export const routerParams: { value: { [key: string]: string } } = { value: {} };
 /**
  * Ref helpers
  */
+
+export function makeUnmountQueueRef(stateKey: symbol): (() => void)[] {
+  componentRef[stateKey] ??= {};
+  componentRef[stateKey].unmountQueue ??= [];
+
+  return componentRef[stateKey].unmountQueue as (() => void)[];
+}
+
 export function setRedrawAction(stateKey: symbol, action: () => void) {
   componentRef[stateKey] ??= {};
   componentRef[stateKey].redrawAction = action;
