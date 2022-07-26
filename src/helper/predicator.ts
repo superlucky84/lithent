@@ -1,4 +1,9 @@
-import { WDom, TagFunction, FragmentFunction } from '@/types';
+import {
+  WDom,
+  TagFunction,
+  TagFunctionResolver,
+  FragmentFunction,
+} from '@/types';
 type WDomType =
   | 'component'
   | 'fragment'
@@ -6,9 +11,16 @@ type WDomType =
   | 'loop'
   | 'text'
   | 'empty';
-type DiffParam = { originalVdom?: WDom; newVdom: WDom };
+type DiffParam = {
+  originalVdom?: WDom;
+  newVdom: WDom | TagFunction | TagFunctionResolver;
+};
 
-export function getVdomType(vDom: WDom): WDomType | undefined {
+type WDomParam = string | WDom | TagFunction | TagFunctionResolver;
+
+export function getVdomType(
+  vDom: WDom | TagFunction | TagFunctionResolver
+): WDomType | undefined {
   const isComponent = checkCustemComponentFunction(vDom);
   const isFragment = checkFragment(vDom);
   const isTagElement = checkTagElement(vDom);
@@ -46,9 +58,13 @@ export const checkSameVdomWithOriginal = {
  * Predicator
  */
 export function checkCustemComponentFunction(
-  target: unknown
-): target is TagFunction {
-  return typeof target === 'function' && target.name !== 'Fragment';
+  target: WDomParam
+): target is TagFunction | TagFunctionResolver {
+  const isTagTagFunction =
+    typeof target === 'function' && target.name !== 'Fragment';
+  const TagFunctionResolver = typeof target === 'object' && 'resolve' in target;
+
+  return isTagTagFunction || TagFunctionResolver;
 }
 
 export function checkFragmentFunction(
@@ -57,51 +73,62 @@ export function checkFragmentFunction(
   return typeof target === 'function' && target.name === 'Fragment';
 }
 
-export function checkFragment(vDom: WDom) {
-  return vDom.type === 'fragment';
+export function checkPlainWDomType(vDom: WDomParam): vDom is WDom {
+  return typeof vDom === 'object' && !('resolve' in vDom);
 }
 
-export function checkTagElement(vDom: WDom) {
-  return vDom.type === 'element';
+export function checkFragment(vDom: WDomParam) {
+  return checkPlainWDomType(vDom) && vDom.type === 'fragment';
 }
 
-export function checkLoopElement(vDom: WDom) {
-  return vDom.type === 'loop';
+export function checkTagElement(vDom: WDomParam) {
+  return checkPlainWDomType(vDom) && vDom.type === 'element';
 }
 
-export function checkTextElement(vDom: WDom) {
-  return vDom.type === 'text';
+export function checkLoopElement(vDom: WDomParam) {
+  return checkPlainWDomType(vDom) && vDom.type === 'loop';
 }
 
-export function checkEmptyElement(vDom: WDom) {
-  return !vDom.type;
+export function checkTextElement(vDom: WDomParam) {
+  return checkPlainWDomType(vDom) && vDom.type === 'text';
+}
+
+export function checkEmptyElement(vDom: WDomParam) {
+  return checkPlainWDomType(vDom) && !vDom.type;
 }
 
 export function checkSameCustomComponent({ originalVdom, newVdom }: DiffParam) {
+  // Todo need Fix Function type check
+  // @ts-ignore
   return newVdom.tagName === originalVdom?.tagName;
 }
 
 export function checkSameFragment({ originalVdom, newVdom }: DiffParam) {
   return (
+    checkPlainWDomType(newVdom) &&
     originalVdom?.type === 'fragment' &&
     originalVdom?.children?.length === newVdom?.children?.length
   );
 }
 
 export function checkSameTagElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === 'element' && originalVdom?.tag === newVdom.tag;
+  return (
+    checkPlainWDomType(newVdom) &&
+    originalVdom?.type === 'element' &&
+    originalVdom?.tag === newVdom.tag
+  );
 }
 
 export function checkSameLoopElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === newVdom.type;
+  return checkPlainWDomType(newVdom) && originalVdom?.type === newVdom.type;
 }
 
 export function checkSameTextElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === newVdom.type;
+  return checkPlainWDomType(newVdom) && originalVdom?.type === newVdom.type;
 }
 
 export function checkSameEmptyElement({ originalVdom, newVdom }: DiffParam) {
-  return originalVdom?.type === newVdom.type;
+  return checkPlainWDomType(newVdom) && originalVdom?.type === newVdom.type;
 }
 
 export function isExisty(value: unknown) {

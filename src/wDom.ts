@@ -23,7 +23,7 @@ import {
 
 export type Children = WDom[];
 
-export function Fragment(...children: WDom[]) {
+export function Fragment(_props: Props, ...children: WDom[]) {
   return { type: 'fragment', children };
 }
 
@@ -32,12 +32,16 @@ export function h(
   props: Props,
   ...children: MiddleStateVDomChildren
 ) {
-  const nodePointer: NodePointer = { value: {} };
+  const nodePointer: NodePointer = { value: undefined };
   const newProps = props || {};
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
 
-  nodePointer.value = node;
+  // console.log('NODE', node);
+
+  if (!checkCustemComponentFunction(node)) {
+    nodePointer.value = node;
+  }
 
   return node;
 }
@@ -60,7 +64,7 @@ function reRenderCustomComponent({
   newVdomTree.getParent = originalVdom.getParent;
 
   if (!originalVdom.isRoot && originalVdom.getParent) {
-    const brothers = originalVdom.getParent().children || [];
+    const brothers = originalVdom.getParent()?.children || [];
     const index = brothers.indexOf(originalVdom);
 
     brothers.splice(index, 1, newVdomTree);
@@ -104,10 +108,10 @@ function makeVdomResolver({
     return customNode;
   };
 
-  resolve.tagName = tag.name;
-  resolve.props = props;
-
-  return resolve;
+  return {
+    tagName: tag.name,
+    resolve,
+  };
 }
 
 function makeCustomNode({
@@ -200,11 +204,13 @@ function makeNode({
   children: WDom[];
 }) {
   if (checkFragmentFunction(tag)) {
-    return Fragment(...children);
+    return Fragment(props, ...children);
   } else if (checkCustemComponentFunction(tag)) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 
-    return needDiffRef.value ? componetMakeResolver : componetMakeResolver();
+    return needDiffRef.value
+      ? componetMakeResolver
+      : componetMakeResolver.resolve();
   }
 
   return { type: 'element', tag, props, children };
@@ -227,7 +233,7 @@ function makeChildrenItem(item: MiddleStateVDom): WDom {
   if (item === null || item === undefined || item === false) {
     return { type: null };
   } else if (Array.isArray(item)) {
-    const nodePointer: NodePointer = { value: {} };
+    const nodePointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodePointer, item);
     const node = { type: 'loop', children };
     nodePointer.value = node;

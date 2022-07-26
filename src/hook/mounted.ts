@@ -1,25 +1,22 @@
 import { WDom } from '@/types';
-import { stateKeyRef, componentRef } from '@/helper/universalRef';
+import { stateKeyRef, componentRef, makeQueueRef } from '@/helper/universalRef';
 
 export default function mounted(effectAction: () => void) {
   const stateKey = stateKeyRef.value;
-  const mountedQueue = componentRef[stateKey]?.mountedQueue;
+  let mountedQueue = componentRef[stateKey]?.mountedQueue;
 
   if (!mountedQueue) {
-    componentRef[stateKey] ??= {};
-    componentRef[stateKey].mountedQueue ??= [];
+    mountedQueue = makeQueueRef(stateKey, 'mountedQueue');
   }
 
-  const makedMountedQueue = componentRef[stateKey].mountedQueue;
-
-  (makedMountedQueue || []).push(effectAction);
+  mountedQueue.push(effectAction);
 }
 
 export function runMountedQueueFromVdom(newVdom: WDom) {
   if (!newVdom.stateKey) {
     return;
   }
-  const queue = componentRef[newVdom.stateKey]?.mountedQueue;
+  const queue = componentRef[newVdom.stateKey].mountedQueue;
 
   if (newVdom.tagName && queue) {
     componentRef[newVdom.stateKey].mountedQueue = [];
