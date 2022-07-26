@@ -16,15 +16,10 @@ type DiffParam = {
   newVdom: WDom | TagFunction | TagFunctionResolver;
 };
 
-type WDomParam =
-  | string
-  | WDom
-  | (() => WDom)
-  | TagFunction
-  | TagFunctionResolver;
+type WDomParam = string | WDom | TagFunction | TagFunctionResolver;
 
 export function getVdomType(
-  vDom: WDom | (() => WDom) | TagFunction | TagFunctionResolver
+  vDom: WDom | TagFunction | TagFunctionResolver
 ): WDomType | undefined {
   const isComponent = checkCustemComponentFunction(vDom);
   const isFragment = checkFragment(vDom);
