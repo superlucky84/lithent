@@ -81,7 +81,6 @@ function remakeNewVdom({
     originalVdom.stateKey
   ) {
     runUnmountQueueFromVdom(originalVdom);
-    console.log('delete', originalVdom.stateKey);
     delete componentRef[originalVdom.stateKey];
   }
 

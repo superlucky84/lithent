@@ -10,9 +10,6 @@ export default function unmount(effectAction: () => void) {
   const unmountQueue = componentRef[stateKey].unmountQueue;
 
   if (!unmountQueue) {
-    componentRef[stateKey] = {};
-    componentRef[stateKey].unmountQueue = [];
-
     makeUnmountQueueRef(stateKey).push(effectAction);
   }
 }
