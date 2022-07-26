@@ -30,6 +30,7 @@ export default function Custom2(
     mounted(handleMounted);
     unmount(handleUnmount);
     updated(handleUpdated, [globalData.value]);
+    console.log('a');
 
     return (
       <div class="custom2">

@@ -47,8 +47,6 @@ export default function makeNewVdomTree({
   }
   const isSameType = checkSameVdomWithOriginal[type]({ originalVdom, newVdom });
 
-  console.log('NNNNVDOM = ', newVdom);
-
   return remakeNewVdom({ originalVdom, newVdom, isSameType });
 }
 
@@ -83,6 +81,7 @@ function remakeNewVdom({
     originalVdom.stateKey
   ) {
     runUnmountQueueFromVdom(originalVdom);
+    console.log('delete', originalVdom.stateKey);
     delete componentRef[originalVdom.stateKey];
   }
 
