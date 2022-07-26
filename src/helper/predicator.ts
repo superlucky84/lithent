@@ -78,32 +78,28 @@ export function checkFragmentFunction(
   return typeof target === 'function' && target.name === 'Fragment';
 }
 
+export function checkPlainWDomType(vDom: WDomParam): vDom is WDom {
+  return typeof vDom === 'object' && !('resolve' in vDom);
+}
+
 export function checkFragment(vDom: WDomParam) {
-  return (
-    typeof vDom === 'object' && !('resolve' in vDom) && vDom.type === 'fragment'
-  );
+  return checkPlainWDomType(vDom) && vDom.type === 'fragment';
 }
 
 export function checkTagElement(vDom: WDomParam) {
-  return (
-    typeof vDom === 'object' && !('resolve' in vDom) && vDom.type === 'element'
-  );
+  return checkPlainWDomType(vDom) && vDom.type === 'element';
 }
 
 export function checkLoopElement(vDom: WDomParam) {
-  return (
-    typeof vDom === 'object' && !('resolve' in vDom) && vDom.type === 'loop'
-  );
+  return checkPlainWDomType(vDom) && vDom.type === 'loop';
 }
 
 export function checkTextElement(vDom: WDomParam) {
-  return (
-    typeof vDom === 'object' && !('resolve' in vDom) && vDom.type === 'text'
-  );
+  return checkPlainWDomType(vDom) && vDom.type === 'text';
 }
 
 export function checkEmptyElement(vDom: WDomParam) {
-  return typeof vDom === 'object' && !('resolve' in vDom) && !vDom.type;
+  return checkPlainWDomType(vDom) && !vDom.type;
 }
 
 export function checkSameCustomComponent({ originalVdom, newVdom }: DiffParam) {
@@ -114,8 +110,7 @@ export function checkSameCustomComponent({ originalVdom, newVdom }: DiffParam) {
 
 export function checkSameFragment({ originalVdom, newVdom }: DiffParam) {
   return (
-    typeof newVdom !== 'function' &&
-    !('resolve' in newVdom) &&
+    checkPlainWDomType(newVdom) &&
     originalVdom?.type === 'fragment' &&
     originalVdom?.children?.length === newVdom?.children?.length
   );
@@ -123,35 +118,22 @@ export function checkSameFragment({ originalVdom, newVdom }: DiffParam) {
 
 export function checkSameTagElement({ originalVdom, newVdom }: DiffParam) {
   return (
-    typeof newVdom !== 'function' &&
-    !('resolve' in newVdom) &&
+    checkPlainWDomType(newVdom) &&
     originalVdom?.type === 'element' &&
     originalVdom?.tag === newVdom.tag
   );
 }
 
 export function checkSameLoopElement({ originalVdom, newVdom }: DiffParam) {
-  return (
-    typeof newVdom !== 'function' &&
-    !('resolve' in newVdom) &&
-    originalVdom?.type === newVdom.type
-  );
+  return checkPlainWDomType(newVdom) && originalVdom?.type === newVdom.type;
 }
 
 export function checkSameTextElement({ originalVdom, newVdom }: DiffParam) {
-  return (
-    typeof newVdom !== 'function' &&
-    !('resolve' in newVdom) &&
-    originalVdom?.type === newVdom.type
-  );
+  return checkPlainWDomType(newVdom) && originalVdom?.type === newVdom.type;
 }
 
 export function checkSameEmptyElement({ originalVdom, newVdom }: DiffParam) {
-  return (
-    typeof newVdom !== 'function' &&
-    !('resolve' in newVdom) &&
-    originalVdom?.type === newVdom.type
-  );
+  return checkPlainWDomType(newVdom) && originalVdom?.type === newVdom.type;
 }
 
 export function isExisty(value: unknown) {
