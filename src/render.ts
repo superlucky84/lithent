@@ -156,6 +156,8 @@ function findChildFragmentNextElement(
 function typeReplace(newVdom: WDom) {
   const parentVdom = getParent(newVdom);
 
+  console.log('PARENTVDOM = ', parentVdom.type);
+
   if (parentVdom.type) {
     const parentElement = parentVdom.el;
     const orignalElement = newVdom.el;

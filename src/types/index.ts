@@ -4,6 +4,11 @@ export type Props = { [key: string]: unknown };
 
 export type TagFunction = (prop: Props, children: WDom[]) => () => WDom;
 
+export type TagFunctionResolver = {
+  tagName: string;
+  resolve: (stateKey?: symbol) => WDom;
+};
+
 export type FragmentFunction = (children: WDom[]) => WDom;
 
 export type NodePointer = { value: WDom | undefined };

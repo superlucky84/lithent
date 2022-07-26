@@ -37,7 +37,9 @@ export function h(
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
 
-  if (typeof node !== 'function') {
+  // console.log('NODE', node);
+
+  if (!checkCustemComponentFunction(node)) {
     nodePointer.value = node;
   }
 
@@ -106,10 +108,10 @@ function makeVdomResolver({
     return customNode;
   };
 
-  resolve.tagName = tag.name;
-  resolve.props = props;
-
-  return resolve;
+  return {
+    tagName: tag.name,
+    resolve,
+  };
 }
 
 function makeCustomNode({
@@ -206,7 +208,9 @@ function makeNode({
   } else if (checkCustemComponentFunction(tag)) {
     const componetMakeResolver = makeVdomResolver({ tag, props, children });
 
-    return needDiffRef.value ? componetMakeResolver : componetMakeResolver();
+    return needDiffRef.value
+      ? componetMakeResolver
+      : componetMakeResolver.resolve();
   }
 
   return { type: 'element', tag, props, children };

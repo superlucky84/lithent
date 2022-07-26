@@ -8,7 +8,8 @@
  * 4. loop타입의 자식들은 같은 키값을 가졌는지로 동일한지 판단하며 키값이 없을경우 fragment타입처럼 취급한다.
  */
 
-import { WDom } from '@/types';
+import { WDom, TagFunctionResolver } from '@/types';
+import { checkCustemComponentFunction } from '@/helper/predicator';
 import { getParent, reRender } from '@/helper';
 import { componentRef } from '@/helper/universalRef';
 import {
@@ -22,7 +23,7 @@ import { runUnmountQueueFromVdom } from '@/hook/unmount';
 
 type DiffPrimaryParam = {
   originalVdom?: WDom;
-  newVdom: WDom | ((stateKey?: symbol) => WDom);
+  newVdom: WDom | TagFunctionResolver;
   isSameType: boolean;
 };
 
@@ -37,15 +38,16 @@ export default function makeNewVdomTree({
   newVdom,
 }: {
   originalVdom?: WDom;
-  newVdom: WDom | (() => WDom);
+  newVdom: WDom | TagFunctionResolver;
 }) {
   const type = getVdomType(newVdom);
 
   if (!type) {
     throw new Error('Unknown type vdom');
   }
-
   const isSameType = checkSameVdomWithOriginal[type]({ originalVdom, newVdom });
+
+  console.log('NNNNVDOM = ', newVdom);
 
   return remakeNewVdom({ originalVdom, newVdom, isSameType });
 }
@@ -57,13 +59,11 @@ function remakeNewVdom({
 }: DiffPrimaryParam) {
   const remakeVdom = generalize({ newVdom, originalVdom, isSameType });
 
-  if (remakeVdom.children) {
-    remakeVdom.children = remakeChildrenForDiff({
-      isSameType,
-      newVdom: remakeVdom,
-      originalVdom,
-    });
-  }
+  remakeVdom.children = remakeChildrenForDiff({
+    isSameType,
+    newVdom: remakeVdom,
+    originalVdom,
+  });
 
   const needRerender = addReRenderTypeProperty({
     originalVdom,
@@ -125,8 +125,10 @@ function generalize({
   originalVdom,
   isSameType,
 }: DiffPrimaryParam): WDom {
-  if (typeof newVdom === 'function') {
-    return isSameType && originalVdom ? reRender(originalVdom) : newVdom();
+  if (checkCustemComponentFunction(newVdom)) {
+    return isSameType && originalVdom
+      ? reRender(originalVdom)
+      : newVdom.resolve();
   }
 
   return newVdom;
