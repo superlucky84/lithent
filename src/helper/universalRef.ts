@@ -9,19 +9,19 @@ export const needDiffRef: { value: boolean } = { value: false };
 type ComponentSubKey =
   | 'redrawAction'
   | 'dataStore'
-  | 'updatedStore'
-  | 'updatedQueue'
-  | 'mountedQueue'
-  | 'unmountQueue';
+  | 'updateSubscribeDefList'
+  | 'updateSubscribeList'
+  | 'mountSubscribeList'
+  | 'unmountSubscribeList';
 
 type ComponentRef = {
   [key: symbol]: {
     redrawAction?: () => void;
     dataStore?: unknown[];
-    updatedStore?: any[];
-    updatedQueue?: (() => void)[];
-    mountedQueue?: (() => void)[];
-    unmountQueue?: (() => void)[];
+    updateSubscribeDefList?: any[];
+    updateSubscribeList?: (() => void)[];
+    mountSubscribeList?: (() => void)[];
+    unmountSubscribeList?: (() => void)[];
   };
 };
 
@@ -60,9 +60,9 @@ export function makeQueueRef(
   componentRef[stateKey] ??= {};
 
   if (
-    name === 'updatedQueue' ||
-    name === 'mountedQueue' ||
-    name === 'unmountQueue'
+    name === 'updateSubscribeList' ||
+    name === 'mountSubscribeList' ||
+    name === 'unmountSubscribeList'
   ) {
     componentRef[stateKey][name] ??= [];
   }
@@ -72,9 +72,9 @@ export function makeQueueRef(
 
 export function makeUpdatedStore(stateKey: symbol): (() => void)[] {
   componentRef[stateKey] ??= {};
-  componentRef[stateKey].updatedStore ??= [];
+  componentRef[stateKey].updateSubscribeDefList ??= [];
 
-  return componentRef[stateKey].updatedStore as (() => void)[];
+  return componentRef[stateKey].updateSubscribeDefList as (() => void)[];
 }
 
 export function setRedrawAction(stateKey: symbol, action: () => void) {

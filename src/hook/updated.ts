@@ -13,19 +13,19 @@ export default function updated(
 ) {
   const currentSubSeq = updatedCallSeq.value;
   const stateKey = stateKeyRef.value;
-  let updatedStore = componentRef[stateKey]?.updatedStore;
+  let updateSubscribeDefList = componentRef[stateKey]?.updateSubscribeDefList;
 
-  if (!updatedStore || !updatedStore[currentSubSeq]) {
-    updatedStore = makeUpdatedStore(stateKey);
+  if (!updateSubscribeDefList || !updateSubscribeDefList[currentSubSeq]) {
+    updateSubscribeDefList = makeUpdatedStore(stateKey);
   } else if (
-    checkNeedPushQueue(updatedStore[currentSubSeq], dependencies) ||
+    checkNeedPushQueue(updateSubscribeDefList[currentSubSeq], dependencies) ||
     !dependencies
   ) {
-    makeQueueRef(stateKey, 'updatedQueue').push(effectAction);
+    makeQueueRef(stateKey, 'updateSubscribeList').push(effectAction);
   }
 
   // Toto typescript의 영향으로 엉뚱한 코드가 생겼음 type guard를 이용해 개선 예정
-  (updatedStore || [])[currentSubSeq] = dependencies;
+  updateSubscribeDefList[currentSubSeq] = dependencies;
   updatedCallSeq.value += 1;
 }
 
@@ -34,9 +34,9 @@ export function runUpdatedQueueFromVdom(newVdom: WDom) {
     return;
   }
 
-  const queue = componentRef[newVdom.stateKey]?.updatedQueue;
+  const queue = componentRef[newVdom.stateKey]?.updateSubscribeList;
   if (newVdom.tagName && queue) {
-    componentRef[newVdom.stateKey].updatedQueue = [];
+    componentRef[newVdom.stateKey].updateSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();
