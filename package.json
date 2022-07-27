@@ -9,7 +9,9 @@
     "node": ">=16.16.0"
   },
   "scripts": {
-    "clean": "pnpm -r exec rm -rf node_modules && rm -rf node_modules"
+    "clean": "pnpm clean:dist && pnpm clean:module",
+    "clean:dist": "pnpm -r exec rm -rf dist",
+    "clean:module": "pnpm -r exec rm -rf node_modules && rm -rf node_modules"
   },
   "author": "",
   "license": "ISC",
