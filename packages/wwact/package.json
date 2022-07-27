@@ -1,0 +1,22 @@
+{
+  "name": "wwact",
+  "version": "0.0.1",
+  "description": "wwact",
+  "main": "./dist/wwact.umd.cjs",
+  "module": "./dist/wwact.js",
+  "exports": {
+    ".": {
+      "import": "./dist/wwact.js",
+      "require": "./dist/wwact.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "esm": "babel --extensions .ts,.tsx --config-file ./babel.config.json --out-dir esm ./src",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "author": "superlucky84",
+  "license": "MIT"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@wwact/router",
+  "version": "0.2.27",
+  "description": "@wact/router",
+  "main": "./dist/Router.umd.cjs",
+  "module": "./dist/Router.js",
+  "exports": {
+    ".": {
+      "import": "./dist/Router.js",
+      "require": "./dist/Router.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "wwact": "workspace:*"
+  },
+  "author": "superlucky84",
+  "license": "MIT"
+}
