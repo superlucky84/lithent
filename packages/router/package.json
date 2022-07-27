@@ -1,8 +1,9 @@
 {
   "name": "@wwact/router",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "@wact/router",
   "main": "./dist/Router.umd.cjs",
+  "type": "module",
   "module": "./dist/Router.js",
   "exports": {
     ".": {

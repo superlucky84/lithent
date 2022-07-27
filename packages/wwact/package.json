@@ -1,7 +1,8 @@
 {
   "name": "wwact",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "wwact",
+  "type": "module",
   "main": "./dist/wwact.umd.cjs",
   "module": "./dist/wwact.js",
   "exports": {
