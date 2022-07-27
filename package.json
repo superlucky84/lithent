@@ -1,8 +1,7 @@
 {
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "name": "election",
-  "version": "0.2.27",
+  "version": "0.0.1",
   "description": "",
   "type": "module",
   "engines": {
