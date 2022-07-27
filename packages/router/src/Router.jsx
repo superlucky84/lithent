@@ -1,11 +1,10 @@
-import { WDom } from '@/types';
-import { h, Fragment } from '../wDom';
-import { makeData, mounted, unmount } from '@/hook';
+import { h, Fragment } from '@wact/act';
+import { makeData, mounted, unmount } from '@wact/act';
 import { addParams } from '@/hook/params';
 
-export function Router(_props: {}, children: WDom[]) {
+export function Router(_props, children) {
   const data = makeData<{ targetPath: string }>({ targetPath: '' });
-  const findPath = (injectPath: string) =>
+  const findPath = (injectPath) =>
     children.find(item => item.componentProps?.path === injectPath);
 
   const findDynamicPath = () =>

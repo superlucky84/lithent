@@ -2,13 +2,17 @@
   "name": "@wact/router",
   "version": "0.2.27",
   "description": "@wact/router",
-  "main": "./dist/router.umd.cjs",
-  "module": "./dist/router.js",
+  "main": "./dist/Router.umd.cjs",
+  "module": "./dist/Router.js",
   "exports": {
     ".": {
-      "import": "./dist/router.js",
-      "require": "./dist/router.umd.cjs"
+      "import": "./dist/Router.js",
+      "require": "./dist/Router.umd.cjs"
     }
+  },
+  "scripts": {
+    "dev": "vite --config vite.router.config.js",
+    "build": "vite build --config vite.router.config.js"
   },
   "dependencies": {
     "@wact/act": "workspace:*"
