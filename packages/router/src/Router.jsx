@@ -1,5 +1,5 @@
-import { h, Fragment } from '@wact/act';
-import { makeData, mounted, unmount } from '@wact/act';
+import { h, Fragment } from 'wwact';
+import { makeData, mounted, unmount } from 'wwact';
 import { addParams } from '@/hook/params';
 
 export function Router(_props, children) {

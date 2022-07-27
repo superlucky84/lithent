@@ -42,14 +42,14 @@ importers:
       vite: 3.0.3
       vite-plugin-checker: 0.4.9_vite@3.0.3
 
-  packages/act:
-    specifiers: {}
-
   packages/router:
     specifiers:
-      '@wact/act': workspace:*
+      wwact: workspace:*
     dependencies:
-      '@wact/act': link:../act
+      wwact: link:../wwact
+
+  packages/wwact:
+    specifiers: {}
 
 packages:
 

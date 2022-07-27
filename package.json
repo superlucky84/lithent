@@ -5,7 +5,6 @@
   "version": "0.2.27",
   "description": "",
   "type": "module",
-  "main": "dist/wact.js",
   "engines": {
     "node": ">=16.16.0"
   },

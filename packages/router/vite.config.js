@@ -2,28 +2,26 @@ import { resolve } from "path";
 import { defineConfig } from "vite";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
 
-export default ({ path, name, fileName }) => {
-  return defineConfig({
-    plugins: [eslintPlugin({ eslintOptions: { cache: false } })],
-    resolve: {
-      alias: {
-        "@": resolve(__dirname, "./src"),
-      },
+export default defineConfig({
+  plugins: [eslintPlugin({ eslintOptions: { cache: false } })],
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "./src"),
     },
-    build: {
-      emptyOutDir: false,
-      lib: {
-        entry: resolve(__dirname, path),
-        name,
-        fileName,
-      },
-      rollupOptions: {
-        external: ["@wact/act"],
-      },
+  },
+  build: {
+    emptyOutDir: false,
+    lib: {
+      entry: resolve(__dirname, 'src/Router.jsx'),
+      name: 'Router',
+      fileName: 'Router',
     },
-    esbuild: {
-      jsxFactory: "h",
-      jsxFragment: "Fragment",
+    rollupOptions: {
+      external: ["wwact"],
     },
-  });
-};
+  },
+  esbuild: {
+    jsxFactory: "h",
+    jsxFragment: "Fragment",
+  },
+});
