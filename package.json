@@ -3,7 +3,6 @@
   "packageManager": "pnpm@7.6.0",
   "version": "0.0.2",
   "description": "",
-  "type": "module",
   "engines": {
     "node": ">=16.16.0"
   },

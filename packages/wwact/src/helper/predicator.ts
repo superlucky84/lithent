@@ -11,7 +11,12 @@ type DiffParam = {
   newVdom: WDom | TagFunction | TagFunctionResolver;
 };
 
-type WDomParam = string | WDom | TagFunction | TagFunctionResolver;
+type WDomParam =
+  | string
+  | WDom
+  | TagFunction
+  | TagFunctionResolver
+  | FragmentFunction;
 
 export function getVdomType(
   vDom: WDom | TagFunction | TagFunctionResolver
@@ -55,8 +60,7 @@ export const checkSameVdomWithOriginal = {
 export function checkCustemComponentFunction(
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver {
-  const isTagTagFunction =
-    typeof target === 'function' && target.name !== 'Fragment';
+  const isTagTagFunction = typeof target === 'function' && !('isF' in target);
   const TagFunctionResolver = typeof target === 'object' && 'resolve' in target;
 
   return isTagTagFunction || TagFunctionResolver;
@@ -65,7 +69,7 @@ export function checkCustemComponentFunction(
 export function checkFragmentFunction(
   target: unknown
 ): target is FragmentFunction {
-  return typeof target === 'function' && target.name === 'Fragment';
+  return typeof target === 'function' && 'isF' in target;
 }
 
 export function checkPlainWDomType(vDom: WDomParam): vDom is WDom {

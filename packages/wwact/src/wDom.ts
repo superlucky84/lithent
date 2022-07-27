@@ -26,6 +26,7 @@ export type Children = WDom[];
 export function Fragment(_props: Props, ...children: WDom[]) {
   return { type: 'fragment', children };
 }
+Fragment.isF = true;
 
 export function h(
   tag: TagFunction | FragmentFunction | string,

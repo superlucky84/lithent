@@ -1,4 +1,5 @@
 import { h, Fragment } from '@/wDom';
+import { render } from '@/render';
 import {
   mounted,
   updated,
@@ -12,6 +13,7 @@ import {
 export {
   h,
   Fragment,
+  render,
   mounted,
   updated,
   unmount,

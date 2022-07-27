@@ -9,7 +9,7 @@ export type TagFunctionResolver = {
   resolve: (stateKey?: symbol) => WDom;
 };
 
-export type FragmentFunction = (children: WDom[]) => WDom;
+export type FragmentFunction = (props: Props, children: WDom[]) => WDom & {isF: boolean};
 
 export type NodePointer = { value: WDom | undefined };
 
