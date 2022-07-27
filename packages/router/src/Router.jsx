@@ -3,8 +3,8 @@ import { makeData, mounted, unmount } from 'wwact';
 import { addParams } from '@/hook/params';
 
 export function Router(_props, children) {
-  const data = makeData<{ targetPath: string }>({ targetPath: '' });
-  const findPath = (injectPath) =>
+  const data = makeData({ targetPath: '' });
+  const findPath = injectPath =>
     children.find(item => item.componentProps?.path === injectPath);
 
   const findDynamicPath = () =>

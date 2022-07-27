@@ -1,6 +1,6 @@
 {
   "name": "wwact",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "wwact",
   "type": "module",
   "main": "./dist/wwact.umd.cjs",
@@ -19,5 +19,6 @@
     "test:watch": "jest --watch"
   },
   "author": "superlucky84",
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/wwact"
 }

@@ -1,4 +1,4 @@
-import { h } from '@/wDom';
+import { h } from 'wwact';
 import useParams from '@/hook/params';
 
 export default function Sub2() {

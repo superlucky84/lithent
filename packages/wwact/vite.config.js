@@ -15,6 +15,7 @@ export default defineConfig({
   },
   build: {
     emptyOutDir: false,
+    sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'wwact',

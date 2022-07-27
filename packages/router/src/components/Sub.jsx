@@ -1,4 +1,4 @@
-import { h } from '../wDom';
+import { h } from 'wwact';
 
 export default function Sub() {
   const componentMaker = () => {

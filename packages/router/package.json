@@ -1,6 +1,6 @@
 {
   "name": "@wwact/router",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "@wact/router",
   "main": "./dist/Router.umd.cjs",
   "type": "module",
@@ -19,5 +19,6 @@
     "wwact": "workspace:*"
   },
   "author": "superlucky84",
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/router"
 }
