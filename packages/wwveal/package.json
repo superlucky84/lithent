@@ -17,6 +17,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "sass": "^1.54.0",
     "wwact": "workspace:*"
   },
   "author": "superlucky84",
