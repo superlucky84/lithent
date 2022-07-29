@@ -1,5 +1,6 @@
 import { h, makeData, makeRef, mounted } from 'wwact';
 import { wwveal, slides } from '@/wwveal.module.scss';
+import Navi from '@/navi';
 
 export default function Wwveal() {
   let { data, slidesElementRef, handleMounted, changeCursor } = useNavi();
@@ -12,54 +13,36 @@ export default function Wwveal() {
         <div class={slides} ref={slidesElementRef}>
           <section>
             <h1>나만의 커스텀 프레임웍 제작기</h1>
-            <h2>Wwact</h2>
+            <h2>Wwact(짝퉁 React)</h2>
+          </section>
+          <section>
+            <h1>목차</h1>
+            <ul>
+              <li>1. Wwact 구현이유</li>
+              <li>2. Wwact의 장점</li>
+              <li>3. JSX 와 VDOM</li>
+              <li>4. useState 분석과 프로토타이핑</li>
+              <li>5. Diff 알고리즘</li>
+              <li>6. Render 알고리즘</li>
+              <li>7. fragment와 loop</li>
+            </ul>
           </section>
           <section>
             <section>
-              <h1>목차</h1>
+              <h2>Wwact 구현이유</h2>
               <ul>
                 <li>1. Wwact 구현이유</li>
-                <li>2. Wwact의 장점</li>
-                <li>3. JSX 와 VDOM</li>
-                <li>4. Diff 알고리즘</li>
-                <li>5. Render 알고리즘</li>
-                <li>6. Router 컴포넌트 구현 방법</li>
               </ul>
-            </section>
-            <section>
-              <ul>
-                <li>7. Wwact 구현이유</li>
-                <li>8. Wwact의 장점</li>
-                <li>9. JSX 와 VDOM</li>
-                <li>10. Diff 알고리즘</li>
-                <li>11. Render 알고리즘</li>
-                <li>12. Router 컴포넌트 구현 방법</li>
-              </ul>
-            </section>
-          </section>
-          <section>
-            <section>
-              <h1>이유1</h1>
             </section>
             <section>
               <h1>이유2</h1>
             </section>
           </section>
         </div>
-        <nav>
-          {data.existSubContents && (
-            <div>
-              <div onClick={() => changeCursor('up')}>up</div>
-            </div>
-          )}
-          <div>
-            <div onClick={() => changeCursor('prev')}>prev</div>
-            {data.existSubContents && (
-              <div onClick={() => changeCursor('down')}>down</div>
-            )}
-            <div onClick={() => changeCursor('next')}>next</div>
-          </div>
-        </nav>
+        <Navi
+          existSubContents={data.existSubContents}
+          changeCursor={changeCursor}
+        />
       </div>
     );
   };
@@ -114,6 +97,10 @@ function useNavi() {
 
     window.addEventListener('keydown', e => {
       const keyToEventMap = {
+        j: 'down',
+        k: 'up',
+        h: 'prev',
+        l: 'next',
         ArrowRight: 'next',
         ArrowLeft: 'prev',
         ArrowUp: 'up',

@@ -9,6 +9,7 @@ export default function Custom2(
   const globalData = useDataStore<GlobalData>('globalData');
   const data7 = makeData<{ m: number }>({ m: 1 });
   const data = makeData<{ v: string }>({ v: '1' });
+
   const gdataUpdate = () => {
     console.log('gdataUpdate');
     globalData.increase();
