@@ -76,6 +76,7 @@ function useNavi() {
   let slideSubElementList = [];
 
   let translateX = 0;
+  let translateY = 0;
 
   const handleMounted = () => {
     slidesElement = slidesElementRef.value;
@@ -84,11 +85,26 @@ function useNavi() {
 
     // Todo nexttick 구현
     Promise.resolve().then(() => {
-      moveStepNumber();
+      moveStepNumberHorizontal();
+      moveStepNumberVertical();
     });
   };
 
-  const moveStepNumber = () => {
+  const updateSubStep = sublist => {
+    slideSubElementList = sublist;
+    slideSubLength = slideSubElementList.length;
+  };
+
+  const moveStepNumberVertical = () => {
+    const element = slideSubElementList[stepVertical];
+    const { top } = element.getBoundingClientRect();
+
+    translateY -= top;
+
+    slidesElement.style.transform = `translate3d(${translateX}px, ${translateY}px, 0)`;
+  };
+
+  const moveStepNumberHorizontal = () => {
     const element = slideElementList[stepHorizontal];
     const { left } = element.getBoundingClientRect();
 
@@ -100,9 +116,12 @@ function useNavi() {
     );
 
     if (hasSection) {
+      updateSubStep(Array.from(element.children));
       data.existSubContents = true;
       element.style.justifyContent = 'start';
     } else {
+      updateSubStep([]);
+      translateY = 0;
       data.existSubContents = false;
     }
   };
@@ -117,20 +136,20 @@ function useNavi() {
       stepHorizontal -= 1;
     }
 
-    moveStepNumber();
+    moveStepNumberHorizontal();
   };
 
   const moveStepVertical = type => {
-    const allowDown = type === 'down' && stepVertical + 1 < slideLength;
+    const allowDown = type === 'down' && stepVertical + 1 < slideSubLength;
     const allowUp = type === 'up' && stepVertical - 1 >= 0;
 
     if (allowDown) {
-      stepHorizontal += 1;
+      stepVertical += 1;
     } else if (allowUp) {
-      stepHorizontal -= 1;
+      stepVertical -= 1;
     }
 
-    moveStepNumber();
+    moveStepNumberVertical();
   };
 
   const handleUp = () => {
