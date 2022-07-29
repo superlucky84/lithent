@@ -2,37 +2,40 @@ import { h, makeData, makeRef, mounted } from 'wwact';
 import { wwveal, slides } from '@/wwveal.module.scss';
 
 export default function Wwveal() {
-  let {
-    data,
-    slidesElementRef,
-    handleMounted,
-    handlePrev,
-    handleNext,
-    handleUp,
-    handleDown,
-  } = useNavi();
+  let { data, slidesElementRef, handleMounted, changeCursor } = useNavi();
 
   const componentMaker = () => {
     mounted(handleMounted);
 
     return (
-      <div class={wwveal}>
+      <div class={wwveal} style={{ color: data.color }}>
         <div class={slides} ref={slidesElementRef}>
           <section>
             <h1>나만의 커스텀 프레임웍 제작기</h1>
             <h2>Wwact</h2>
-            <h3>짝퉁 React</h3>
           </section>
           <section>
-            <h1>목차</h1>
-            <ol>
-              <li>Wwact 구현이유</li>
-              <li>Wwact의 장점</li>
-              <li>JSX 와 VDOM</li>
-              <li>Diff 알고리즘</li>
-              <li>Render 알고리즘</li>
-              <li>Router 컴포넌트 구현 방법</li>
-            </ol>
+            <section>
+              <h1>목차</h1>
+              <ul>
+                <li>1. Wwact 구현이유</li>
+                <li>2. Wwact의 장점</li>
+                <li>3. JSX 와 VDOM</li>
+                <li>4. Diff 알고리즘</li>
+                <li>5. Render 알고리즘</li>
+                <li>6. Router 컴포넌트 구현 방법</li>
+              </ul>
+            </section>
+            <section>
+              <ul>
+                <li>7. Wwact 구현이유</li>
+                <li>8. Wwact의 장점</li>
+                <li>9. JSX 와 VDOM</li>
+                <li>10. Diff 알고리즘</li>
+                <li>11. Render 알고리즘</li>
+                <li>12. Router 컴포넌트 구현 방법</li>
+              </ul>
+            </section>
           </section>
           <section>
             <section>
@@ -46,13 +49,15 @@ export default function Wwveal() {
         <nav>
           {data.existSubContents && (
             <div>
-              <div onClick={handleUp}>up</div>
+              <div onClick={() => changeCursor('up')}>up</div>
             </div>
           )}
           <div>
-            <div onClick={handlePrev}>prev</div>
-            {data.existSubContents && <div onClick={handleDown}>down</div>}
-            <div onClick={handleNext}>next</div>
+            <div onClick={() => changeCursor('prev')}>prev</div>
+            {data.existSubContents && (
+              <div onClick={() => changeCursor('down')}>down</div>
+            )}
+            <div onClick={() => changeCursor('next')}>next</div>
           </div>
         </nav>
       </div>
@@ -64,84 +69,121 @@ export default function Wwveal() {
 
 function useNavi() {
   const slidesElementRef = makeRef(null);
-  const data = makeData({ existSubContents: false });
+  const data = makeData({ existSubContents: false, color: 'white' });
+  let dimensions = {};
 
-  let stepHorizontal = 2;
+  let stepHorizontal = 0;
   let stepVertical = 0;
   let slidesElement = null;
-  let slideLength = 0;
-  let slideElementList = [];
+  let resizeTimer = null;
 
-  let slideSubLength = 0;
-  let slideSubElementList = [];
+  const calculateDimensions = () => {
+    const res = {};
+    const slideElementList = Array.from(slidesElementRef.value.children);
 
-  let translateX = 0;
-  let translateY = 0;
+    slidesElement.style.transitionDuration = '0ms';
+    const origStepHorizontal = stepHorizontal;
+    const origStepVertical = stepVertical;
+
+    stepHorizontal = 0;
+    stepVertical = 0;
+    move();
+
+    slideElementList.forEach((element, index) => {
+      const children = Array.from(element.children);
+      const hasSection = children.some(item => item.tagName === 'SECTION');
+
+      if (hasSection) {
+        children.forEach((childItem, childIndex) => {
+          res[`${index}-${childIndex}`] = childItem.getBoundingClientRect();
+        });
+      } else {
+        res[`${index}-${0}`] = element.getBoundingClientRect();
+      }
+    });
+
+    dimensions = res;
+
+    stepHorizontal = origStepHorizontal;
+    stepVertical = origStepVertical;
+    move();
+  };
 
   const handleMounted = () => {
     slidesElement = slidesElementRef.value;
-    slideElementList = Array.from(slidesElementRef.value.children);
-    slideLength = slideElementList.length;
+
+    window.addEventListener('keydown', e => {
+      const keyToEventMap = {
+        ArrowRight: 'next',
+        ArrowLeft: 'prev',
+        ArrowUp: 'up',
+        ArrowDown: 'down',
+      };
+
+      if (keyToEventMap[e.key]) {
+        changeCursor(keyToEventMap[e.key]);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (data.color === 'white') {
+        data.color = 'black';
+      }
+
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        calculateDimensions();
+        data.color = 'white';
+      }, 300);
+    });
 
     // Todo nexttick 구현
     Promise.resolve().then(() => {
-      moveStepNumberHorizontal();
-      moveStepNumberVertical();
+      calculateDimensions();
     });
   };
 
-  const updateSubStep = sublist => {
-    slideSubElementList = sublist;
-    slideSubLength = slideSubElementList.length;
-  };
+  const move = () => {
+    const dimension = dimensions[`${stepHorizontal}-${stepVertical}`];
 
-  const moveStepNumberVertical = () => {
-    const element = slideSubElementList[stepVertical];
-    const { top } = element.getBoundingClientRect();
-
-    translateY -= top;
-
-    slidesElement.style.transform = `translate3d(${translateX}px, ${translateY}px, 0)`;
-  };
-
-  const moveStepNumberHorizontal = () => {
-    const element = slideElementList[stepHorizontal];
-    const { left } = element.getBoundingClientRect();
-
-    translateX -= left;
-    slidesElement.style.transform = `translate3d(${translateX}px, 0, 0)`;
-
-    const hasSection = Array.from(element.children).some(
-      item => item.tagName === 'SECTION'
-    );
-
-    if (hasSection) {
-      updateSubStep(Array.from(element.children));
-      data.existSubContents = true;
-      element.style.justifyContent = 'start';
-    } else {
-      updateSubStep([]);
-      translateY = 0;
-      data.existSubContents = false;
+    if (dimension) {
+      slidesElement.style.transform = `translate3d(${dimension.left * -1}px, ${
+        dimension.top * -1
+      }px, 0)`;
     }
   };
 
   const moveStepHolizontal = type => {
-    const allowNext = type === 'next' && stepHorizontal + 1 < slideLength;
-    const allowPrev = type === 'prev' && stepHorizontal - 1 >= 0;
+    const nextDimension = dimensions[`${stepHorizontal + 1}-0`];
+    const prevDimension = dimensions[`${stepHorizontal - 1}-0`];
+    const allowNext = type === 'next' && nextDimension;
+    const allowPrev = type === 'prev' && prevDimension;
 
     if (allowNext) {
       stepHorizontal += 1;
+      stepVertical = 0;
     } else if (allowPrev) {
       stepHorizontal -= 1;
+      stepVertical = 0;
     }
 
-    moveStepNumberHorizontal();
+    const hasSection = dimensions[`${stepHorizontal}-1`];
+
+    if (hasSection) {
+      data.existSubContents = true;
+    } else {
+      data.existSubContents = false;
+    }
+
+    move();
   };
 
   const moveStepVertical = type => {
-    const allowDown = type === 'down' && stepVertical + 1 < slideSubLength;
-    const allowUp = type === 'up' && stepVertical - 1 >= 0;
+    const downDimension = dimensions[`${stepHorizontal}-${stepVertical + 1}`];
+    const upDimension = dimensions[`${stepHorizontal}-${stepVertical - 1}`];
+
+    const allowDown = type === 'down' && downDimension;
+    const allowUp = type === 'up' && upDimension;
 
     if (allowDown) {
       stepVertical += 1;
@@ -149,23 +191,17 @@ function useNavi() {
       stepVertical -= 1;
     }
 
-    moveStepNumberVertical();
+    move();
   };
 
-  const handleUp = () => {
-    moveStepVertical('up');
-  };
+  const changeCursor = type => {
+    slidesElement.style.transitionDuration = '700ms';
 
-  const handleDown = () => {
-    moveStepVertical('down');
-  };
-
-  const handlePrev = () => {
-    moveStepHolizontal('prev');
-  };
-
-  const handleNext = () => {
-    moveStepHolizontal('next');
+    if (['up', 'down'].includes(type)) {
+      moveStepVertical(type);
+    } else if (['prev', 'next'].includes(type)) {
+      moveStepHolizontal(type);
+    }
   };
 
   return {
@@ -173,13 +209,7 @@ function useNavi() {
     slidesElementRef,
     stepHorizontal,
     slidesElement,
-    slideLength,
-    slideElementList,
-    translateX,
     handleMounted,
-    handlePrev,
-    handleNext,
-    handleUp,
-    handleDown,
+    changeCursor,
   };
 }

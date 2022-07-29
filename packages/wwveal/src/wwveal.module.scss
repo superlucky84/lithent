@@ -5,6 +5,7 @@ body {
 }
 
 .wwveal {
+  background-color: black;
   width: 100%;
   height: 100%;
   color: white;
@@ -17,7 +18,7 @@ body {
     white-space: nowrap;
     transform: translate3d(0, 0, 0);
     transition-timing-function: ease;
-    transition-duration: 900ms;
+    transition-duration: 300ms;
 
     > section {
       flex: 0 0 100%;
@@ -32,6 +33,7 @@ body {
       > section {
         display: flex;
         flex: 0 0 100%;
+        flex-direction: column;
         background-color: black;
         justify-content: center;
         align-items: center;
@@ -63,32 +65,32 @@ body {
   }
 
   h1 {
-    font-size: 70px;
+    font-size: 5.5vw;
     margin: 70px 0;
   }
 
   h2 {
-    font-size: 60px;
+    font-size: 5vw;
     margin: 33px 0;
   }
 
   h3 {
-    font-size: 40px;
+    font-size: 4vw;
     margin: 20px 0;
   }
 
   h4 {
-    font-size: 30px;
+    font-size: 3vw;
     margin: 20px 0;
   }
 
   p {
-    font-size: 30px;
+    font-size: 4vw;
   }
 
   ul,
   ol {
-    font-size: 38px;
+    font-size: 3vw;
     margin: left;
     > li {
       margin-bottom: 7px;
