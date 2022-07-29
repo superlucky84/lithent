@@ -2,8 +2,15 @@ import { h, makeData, makeRef, mounted } from 'wwact';
 import { wwveal, slides } from '@/wwveal.module.scss';
 
 export default function Wwveal() {
-  let { data, slidesElementRef, handleMounted, handlePrev, handleNext } =
-    useNavi();
+  let {
+    data,
+    slidesElementRef,
+    handleMounted,
+    handlePrev,
+    handleNext,
+    handleUp,
+    handleDown,
+  } = useNavi();
 
   const componentMaker = () => {
     mounted(handleMounted);
@@ -13,28 +20,38 @@ export default function Wwveal() {
         <div class={slides} ref={slidesElementRef}>
           <section>
             <h1>나만의 커스텀 프레임웍 제작기</h1>
-            <h2>WWACT</h2>
+            <h2>Wwact</h2>
+            <h3>짝퉁 React</h3>
           </section>
           <section>
             <h1>목차</h1>
             <ol>
-              <li>wwact 구현이유</li>
+              <li>Wwact 구현이유</li>
+              <li>Wwact의 장점</li>
               <li>JSX 와 VDOM</li>
+              <li>Diff 알고리즘</li>
+              <li>Render 알고리즘</li>
+              <li>Router 컴포넌트 구현 방법</li>
             </ol>
           </section>
           <section>
-            <h1>이유</h1>
+            <section>
+              <h1>이유1</h1>
+            </section>
+            <section>
+              <h1>이유2</h1>
+            </section>
           </section>
         </div>
         <nav>
           {data.existSubContents && (
             <div>
-              <div onClick={handlePrev}>up</div>
+              <div onClick={handleUp}>up</div>
             </div>
           )}
           <div>
             <div onClick={handlePrev}>prev</div>
-            {data.existSubContents && <div onClick={handlePrev}>down</div>}
+            {data.existSubContents && <div onClick={handleDown}>down</div>}
             <div onClick={handleNext}>next</div>
           </div>
         </nav>
@@ -49,10 +66,15 @@ function useNavi() {
   const slidesElementRef = makeRef(null);
   const data = makeData({ existSubContents: false });
 
-  let step = 0;
+  let stepHorizontal = 2;
+  let stepVertical = 0;
   let slidesElement = null;
   let slideLength = 0;
   let slideElementList = [];
+
+  let slideSubLength = 0;
+  let slideSubElementList = [];
+
   let translateX = 0;
 
   const handleMounted = () => {
@@ -67,44 +89,70 @@ function useNavi() {
   };
 
   const moveStepNumber = () => {
-    const element = slideElementList[step];
+    const element = slideElementList[stepHorizontal];
     const { left } = element.getBoundingClientRect();
 
     translateX -= left;
     slidesElement.style.transform = `translate3d(${translateX}px, 0, 0)`;
 
-    if (step === 1) {
+    const hasSection = Array.from(element.children).some(
+      item => item.tagName === 'SECTION'
+    );
+
+    if (hasSection) {
       data.existSubContents = true;
+      element.style.justifyContent = 'start';
     } else {
       data.existSubContents = false;
     }
   };
 
-  const moveStep = type => {
-    const allowNext = type === 'next' && step + 1 < slideLength;
-    const allowPrev = type === 'prev' && step - 1 >= 0;
+  const moveStepHolizontal = type => {
+    const allowNext = type === 'next' && stepHorizontal + 1 < slideLength;
+    const allowPrev = type === 'prev' && stepHorizontal - 1 >= 0;
 
     if (allowNext) {
-      step += 1;
+      stepHorizontal += 1;
     } else if (allowPrev) {
-      step -= 1;
+      stepHorizontal -= 1;
     }
 
     moveStepNumber();
   };
 
+  const moveStepVertical = type => {
+    const allowDown = type === 'down' && stepVertical + 1 < slideLength;
+    const allowUp = type === 'up' && stepVertical - 1 >= 0;
+
+    if (allowDown) {
+      stepHorizontal += 1;
+    } else if (allowUp) {
+      stepHorizontal -= 1;
+    }
+
+    moveStepNumber();
+  };
+
+  const handleUp = () => {
+    moveStepVertical('up');
+  };
+
+  const handleDown = () => {
+    moveStepVertical('down');
+  };
+
   const handlePrev = () => {
-    moveStep('prev');
+    moveStepHolizontal('prev');
   };
 
   const handleNext = () => {
-    moveStep('next');
+    moveStepHolizontal('next');
   };
 
   return {
     data,
     slidesElementRef,
-    step,
+    stepHorizontal,
     slidesElement,
     slideLength,
     slideElementList,
@@ -112,5 +160,7 @@ function useNavi() {
     handleMounted,
     handlePrev,
     handleNext,
+    handleUp,
+    handleDown,
   };
 }

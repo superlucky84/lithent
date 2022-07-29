@@ -29,30 +29,14 @@ body {
       align-items: center;
       height: 100%;
       width: 100%;
-
-      > h1 {
-        font-size: 70px;
-      }
-
-      > h2 {
-        font-size: 60px;
-      }
-
-      > h3 {
-        font-size: 50px;
-      }
-
-      > p {
-        font-size: 30px;
-      }
-
-      > ul,
-      ol {
-        font-size: 38px;
-        margin: left;
-        > li {
-          margin-bottom: 7px;
-        }
+      > section {
+        display: flex;
+        flex: 0 0 100%;
+        background-color: black;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
       }
     }
   }
@@ -75,6 +59,39 @@ body {
       > div {
         cursor: pointer;
       }
+    }
+  }
+
+  h1 {
+    font-size: 70px;
+    margin: 70px 0;
+  }
+
+  h2 {
+    font-size: 60px;
+    margin: 33px 0;
+  }
+
+  h3 {
+    font-size: 40px;
+    margin: 20px 0;
+  }
+
+  h4 {
+    font-size: 30px;
+    margin: 20px 0;
+  }
+
+  p {
+    font-size: 30px;
+  }
+
+  ul,
+  ol {
+    font-size: 38px;
+    margin: left;
+    > li {
+      margin-bottom: 7px;
     }
   }
 }
