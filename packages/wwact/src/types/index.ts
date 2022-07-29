@@ -2,14 +2,17 @@ export type UseDataStoreValue = { [key: string | symbol]: unknown };
 
 export type Props = { [key: string]: unknown };
 
-export type TagFunction = (prop: Props, children: WDom[]) => () => WDom;
+export type TagFunction = (prop: Props, children: WDom[]) => WDom;
 
 export type TagFunctionResolver = {
   tagName: string;
   resolve: (stateKey?: symbol) => WDom;
 };
 
-export type FragmentFunction = (props: Props, children: WDom[]) => WDom & {isF: boolean};
+export type FragmentFunction = (
+  props: Props,
+  children: WDom[]
+) => WDom & { isF: boolean };
 
 export type NodePointer = { value: WDom | undefined };
 

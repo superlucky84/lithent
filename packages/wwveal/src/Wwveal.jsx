@@ -5,49 +5,45 @@ import Navi from '@/navi';
 export default function Wwveal() {
   let { data, slidesElementRef, handleMounted, changeCursor } = useNavi();
 
-  const componentMaker = () => {
-    mounted(handleMounted);
+  mounted(handleMounted);
 
-    return (
-      <div class={wwveal} style={{ color: data.color }}>
-        <div class={slides} ref={slidesElementRef}>
+  return (
+    <div class={wwveal} style={{ color: data.color }}>
+      <div class={slides} ref={slidesElementRef}>
+        <section>
+          <h1>나만의 커스텀 프레임웍 제작기</h1>
+          <h2>Wwact(짝퉁 React)</h2>
+        </section>
+        <section>
+          <h1>목차</h1>
+          <ul>
+            <li>1. Wwact 구현이유</li>
+            <li>2. Wwact의 장점</li>
+            <li>3. JSX 와 VDOM</li>
+            <li>4. useState 분석과 프로토타이핑</li>
+            <li>5. Diff 알고리즘</li>
+            <li>6. Render 알고리즘</li>
+            <li>7. fragment와 loop</li>
+          </ul>
+        </section>
+        <section>
           <section>
-            <h1>나만의 커스텀 프레임웍 제작기</h1>
-            <h2>Wwact(짝퉁 React)</h2>
-          </section>
-          <section>
-            <h1>목차</h1>
+            <h2>Wwact 구현이유</h2>
             <ul>
               <li>1. Wwact 구현이유</li>
-              <li>2. Wwact의 장점</li>
-              <li>3. JSX 와 VDOM</li>
-              <li>4. useState 분석과 프로토타이핑</li>
-              <li>5. Diff 알고리즘</li>
-              <li>6. Render 알고리즘</li>
-              <li>7. fragment와 loop</li>
             </ul>
           </section>
           <section>
-            <section>
-              <h2>Wwact 구현이유</h2>
-              <ul>
-                <li>1. Wwact 구현이유</li>
-              </ul>
-            </section>
-            <section>
-              <h1>이유2</h1>
-            </section>
+            <h1>이유2</h1>
           </section>
-        </div>
-        <Navi
-          existSubContents={data.existSubContents}
-          changeCursor={changeCursor}
-        />
+        </section>
       </div>
-    );
-  };
-
-  return componentMaker;
+      <Navi
+        existSubContents={data.existSubContents}
+        changeCursor={changeCursor}
+      />
+    </div>
+  );
 }
 
 function useNavi() {

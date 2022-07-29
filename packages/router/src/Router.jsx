@@ -38,23 +38,19 @@ export function Router(_props, children) {
 
   window.addEventListener('hashchange', handleHashChange);
 
-  const makeComponent = () => {
-    mounted(handleHashChange);
-    unmount(removeEvent);
+  mounted(handleHashChange);
+  unmount(removeEvent);
 
-    return (
-      <Fragment>
-        {children.map(item => {
-          const path = String(item?.componentProps?.path || '');
-          const element = item?.componentProps?.element;
+  return (
+    <Fragment>
+      {children.map(item => {
+        const path = String(item?.componentProps?.path || '');
+        const element = item?.componentProps?.element;
 
-          return data.targetPath === path ? element : null;
-        })}
-      </Fragment>
-    );
-  };
-
-  return makeComponent;
+        return data.targetPath === path ? element : null;
+      })}
+    </Fragment>
+  );
 }
 
 export function RouterItem() {

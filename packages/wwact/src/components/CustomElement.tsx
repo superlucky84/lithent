@@ -36,34 +36,30 @@ export default function CustomElement() {
     console.log('updated 2k', data2);
   };
 
-  const componentMaker = () => {
-    updated(handleUpdatedDataK, [data.k]);
-    updated(handleUpdatedData2K, [data2.k]);
+  updated(handleUpdatedDataK, [data.k]);
+  updated(handleUpdatedData2K, [data2.k]);
 
-    return (
-      <div class={`aaaaaaaaa${data.k}`}>
-        <button onClick={handle}>!vava{data.k}aa</button>
-        <button onClick={handle2}>{data2.k}-vava</button>
-        <button onClick={handle3}>{data3.k}-vava</button>
-        {data.k % 2 === 0 ? <span>m</span> : 'jinwoo'}
-        {data.k % 2 === 1 ? (
-          <Custom2 k={data.k} data={data} handle3={handle3}>
-            <span>1</span>
-            <span>2</span>
-            <span>3</span>
-          </Custom2>
-        ) : null}
-        <div ref={domRef}>
-          <div>data.k: {data.k}</div>
-          <div>data.j: {data.j}</div>
-          <div>data2.k: {data2.k}</div>
-          <div>data3.k: {data3.k}</div>
-        </div>
-        <br />
-        <br />
+  return (
+    <div class={`aaaaaaaaa${data.k}`}>
+      <button onClick={handle}>!vava{data.k}aa</button>
+      <button onClick={handle2}>{data2.k}-vava</button>
+      <button onClick={handle3}>{data3.k}-vava</button>
+      {data.k % 2 === 0 ? <span>m</span> : 'jinwoo'}
+      {data.k % 2 === 1 ? (
+        <Custom2 k={data.k} data={data} handle3={handle3}>
+          <span>1</span>
+          <span>2</span>
+          <span>3</span>
+        </Custom2>
+      ) : null}
+      <div ref={domRef}>
+        <div>data.k: {data.k}</div>
+        <div>data.j: {data.j}</div>
+        <div>data2.k: {data2.k}</div>
+        <div>data3.k: {data3.k}</div>
       </div>
-    );
-  };
-
-  return componentMaker;
+      <br />
+      <br />
+    </div>
+  );
 }
