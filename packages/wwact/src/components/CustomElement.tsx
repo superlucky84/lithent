@@ -20,16 +20,16 @@ const useJw = () => {
 export default function CustomElement() {
   const { data, data2, handle, handle2 } = useJw();
   const data3 = makeData<{ k: number }>({ k: 1 });
+  const hadleRef = makeRef<string>('3');
   const handle3 = () => {
-    console.log('action handle 3');
+    hadleRef.value = '7';
     data3.k += 1;
   };
-  // const hadleRef = makeRef({ handle3 });
   const domRef = makeRef(null);
 
   const handleUpdatedDataK = () => {
     console.log('domRef', domRef);
-    console.log('updated k', data);
+    console.log('updated k', data, hadleRef);
     // data3.k += 10;
   };
   const handleUpdatedData2K = () => {
