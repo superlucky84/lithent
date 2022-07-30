@@ -4,6 +4,10 @@ body {
   height: 100%;
 }
 
+section {
+  white-space: normal;
+}
+
 .wwveal {
   background-color: black;
   width: 100%;
@@ -29,7 +33,7 @@ body {
       justify-content: center;
       align-items: center;
       height: 100%;
-      width: 100%;
+      width: 79%;
       > section {
         display: flex;
         flex: 0 0 100%;
@@ -64,14 +68,18 @@ body {
     }
   }
 
+  br {
+    height: 0.1vw;
+  }
+
   h1 {
     font-size: 5.5vw;
-    margin: 70px 0;
+    margin: 0.3em 0;
   }
 
   h2 {
     font-size: 5vw;
-    margin: 33px 0;
+    margin: 0.3em 0;
   }
 
   h3 {
@@ -86,6 +94,11 @@ body {
 
   p {
     font-size: 2.5vw;
+    margin: 0;
+    margin-bottom: 3.3vh;
+    line-height: 1.5;
+    text-align: left;
+    width: 73%;
   }
 
   ul,
@@ -93,7 +106,7 @@ body {
     font-size: 3vw;
     margin: left;
     > li {
-      margin-bottom: 7px;
+      margin-bottom: 0.1em;
     }
   }
 }
