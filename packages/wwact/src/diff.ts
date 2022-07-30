@@ -10,7 +10,7 @@
 
 import { WDom, TagFunctionResolver } from '@/types';
 import { checkCustemComponentFunction } from '@/helper/predicator';
-import { getParent } from '@/helper';
+import { getParent, reRender } from '@/helper';
 import { componentRef } from '@/helper/universalRef';
 import {
   checkEmptyElement,
@@ -125,7 +125,7 @@ function generalize({
 }: DiffPrimaryParam): WDom {
   if (checkCustemComponentFunction(newVdom)) {
     return isSameType && originalVdom
-      ? newVdom.resolve(originalVdom.stateKey) // ? reRender(originalVdom)
+      ? reRender(originalVdom)
       : newVdom.resolve();
   }
 

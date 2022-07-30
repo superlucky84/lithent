@@ -91,7 +91,7 @@ function makeVdomResolver({
   const resolve = (stateKey = Symbol(tag.name)) => {
     initMountHookState(stateKey);
 
-    const componentMaker = () => tag(props, children);
+    const componentMaker = tag(props, children);
     const customNode = makeCustomNode({
       componentMaker,
       stateKey,
