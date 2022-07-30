@@ -6,7 +6,6 @@ import { UseDataStoreValue, ComponentSubKey, ComponentRef } from '@/types';
 export const stateKeyRef: { value: symbol } = { value: Symbol('null') };
 export const needDiffRef: { value: boolean } = { value: false };
 export const dataCallSeq: { value: number } = { value: 0 };
-export const refCallSeq: { value: number } = { value: 0 };
 export const updatedCallSeq: { value: number } = { value: 0 };
 export const componentRef: ComponentRef = {};
 
@@ -61,22 +60,13 @@ export function setDataStore(stateKey: symbol, data: unknown) {
   componentRef[stateKey].dataStore?.push(data);
 }
 
-export function setRefStore(stateKey: symbol, data: unknown) {
-  componentRef[stateKey] ??= {};
-  componentRef[stateKey].refStore ??= [];
-  componentRef[stateKey].refStore?.push(data);
-}
-
 export function initUpdateHookState(stateKey: symbol) {
-  dataCallSeq.value = 0;
   updatedCallSeq.value = 0;
-  refCallSeq.value = 0;
   stateKeyRef.value = stateKey;
 }
 
 export function initMountHookState(stateKey: symbol) {
   dataCallSeq.value = 0;
   updatedCallSeq.value = 0;
-  refCallSeq.value = 0;
   stateKeyRef.value = stateKey;
 }

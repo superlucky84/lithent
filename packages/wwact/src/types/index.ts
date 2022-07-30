@@ -2,10 +2,12 @@ export type UseDataStoreValue = { [key: string | symbol]: unknown };
 
 export type Props = { [key: string]: unknown };
 
-export type TagFunction = (prop: Props, children: WDom[]) => WDom;
+export type TagFunction = (prop: Props, children: WDom[]) => () => WDom;
 
 export type TagFunctionResolver = {
   tagName: string;
+  props: Props;
+  children: WDom[];
   resolve: (stateKey?: symbol) => WDom;
 };
 
@@ -47,6 +49,7 @@ export interface WDom {
   stateKey?: symbol;
   reRender?: () => WDom;
   componentProps?: Props;
+  componentChildren?: WDom[];
   wrapElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?:
@@ -62,7 +65,6 @@ export interface WDom {
 export type ComponentSubKey =
   | 'redrawAction'
   | 'dataStore'
-  | 'refStore'
   | 'updateSubscribeDefList'
   | 'updateSubscribeList'
   | 'mountSubscribeList'
@@ -72,7 +74,6 @@ export type ComponentRef = {
   [key: symbol]: {
     redrawAction?: () => void;
     dataStore?: unknown[];
-    refStore?: unknown[];
     updateSubscribeDefList?: any[];
     updateSubscribeList?: (() => void)[];
     mountSubscribeList?: (() => void)[];

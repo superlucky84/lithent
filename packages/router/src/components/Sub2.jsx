@@ -7,9 +7,12 @@ export default function Sub2() {
     console.log('a', params);
   };
 
-  return (
-    <div style={{ color: 'red' }} onClick={handle}>
-      Sub222
-    </div>
-  );
+  const componentMaker = () => {
+    return (
+      <div style={{ color: 'red' }} onClick={handle}>
+        Sub222
+      </div>
+    );
+  };
+  return componentMaker;
 }

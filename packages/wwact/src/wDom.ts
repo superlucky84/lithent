@@ -91,7 +91,7 @@ function makeVdomResolver({
   const resolve = (stateKey = Symbol(tag.name)) => {
     initMountHookState(stateKey);
 
-    const componentMaker = () => tag(props, children);
+    const componentMaker = tag(props, children);
     const customNode = makeCustomNode({
       componentMaker,
       stateKey,
@@ -111,6 +111,8 @@ function makeVdomResolver({
 
   return {
     tagName: tag.name,
+    props,
+    children,
     resolve,
   };
 }
@@ -138,6 +140,7 @@ function makeCustomNode({
   });
 
   customNode.componentProps = props;
+  customNode.componentChildren = children;
   customNode.reRender = reRender;
   customNode.tagName = tag.name;
   customNode.stateKey = stateKey;
@@ -188,6 +191,7 @@ function vdomMaker({
   });
 
   vdom.componentProps = props;
+  vdom.componentChildren = children;
   vdom.reRender = reRender;
   vdom.tagName = tag.name;
   vdom.stateKey = stateKey;
