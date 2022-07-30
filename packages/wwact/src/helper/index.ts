@@ -14,9 +14,6 @@ export function reRender(vDom: WDom, infoVdom: TagFunctionResolver) {
   const { componentProps: props, componentChildren: children } = vDom;
   const { props: infoProps, children: infoChidren } = infoVdom;
 
-  console.log('vDom', vDom);
-  console.log('infoVdom', infoVdom);
-
   if (props) {
     updateProps(props, infoProps);
   }

@@ -65,7 +65,6 @@ export interface WDom {
 export type ComponentSubKey =
   | 'redrawAction'
   | 'dataStore'
-  | 'refStore'
   | 'updateSubscribeDefList'
   | 'updateSubscribeList'
   | 'mountSubscribeList'
@@ -75,7 +74,6 @@ export type ComponentRef = {
   [key: symbol]: {
     redrawAction?: () => void;
     dataStore?: unknown[];
-    refStore?: unknown[];
     updateSubscribeDefList?: any[];
     updateSubscribeList?: (() => void)[];
     mountSubscribeList?: (() => void)[];
