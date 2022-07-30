@@ -1,4 +1,4 @@
-import { WDom } from '@/types';
+import { WDom, TagFunctionResolver, Props } from '@/types';
 
 export function getParent(vDom: WDom) {
   const parentVDom = vDom.getParent && vDom.getParent();
@@ -10,7 +10,21 @@ export function getParent(vDom: WDom) {
   return parentVDom;
 }
 
-export function reRender(vDom: WDom) {
+export function reRender(vDom: WDom, infoVdom: TagFunctionResolver) {
+  const { componentProps: props, componentChildren: children } = vDom;
+  const { props: infoProps, children: infoChidren } = infoVdom;
+
+  console.log('vDom', vDom);
+  console.log('infoVdom', infoVdom);
+
+  if (props) {
+    updateProps(props, infoProps);
+  }
+
+  if (children) {
+    updateChildren(children, infoChidren);
+  }
+
   const newVDom = vDom.reRender && vDom.reRender();
 
   if (!newVDom) {
@@ -18,4 +32,34 @@ export function reRender(vDom: WDom) {
   }
 
   return newVDom;
+}
+
+function updateProps(props: Props, infoProps: Props) {
+  if (infoProps !== props) {
+    if (props) {
+      Object.keys(props).forEach(key => {
+        delete props[key];
+      });
+    }
+
+    if (props) {
+      Object.entries(infoProps || {}).forEach(([key, value]) => {
+        props[key] = value;
+      });
+    }
+  }
+}
+
+function updateChildren(children: WDom[], infoChidren: WDom[]) {
+  if (infoChidren !== children) {
+    if (children) {
+      children.splice(0, children.length);
+    }
+
+    if (infoChidren && children) {
+      infoChidren.forEach(childrenItem => {
+        children.push(childrenItem);
+      });
+    }
+  }
 }

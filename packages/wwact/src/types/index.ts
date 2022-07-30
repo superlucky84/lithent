@@ -6,6 +6,8 @@ export type TagFunction = (prop: Props, children: WDom[]) => () => WDom;
 
 export type TagFunctionResolver = {
   tagName: string;
+  props: Props;
+  children: WDom[];
   resolve: (stateKey?: symbol) => WDom;
 };
 
@@ -47,6 +49,7 @@ export interface WDom {
   stateKey?: symbol;
   reRender?: () => WDom;
   componentProps?: Props;
+  componentChildren?: WDom[];
   wrapElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?:

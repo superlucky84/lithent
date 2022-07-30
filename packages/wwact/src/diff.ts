@@ -125,7 +125,7 @@ function generalize({
 }: DiffPrimaryParam): WDom {
   if (checkCustemComponentFunction(newVdom)) {
     return isSameType && originalVdom
-      ? reRender(originalVdom)
+      ? reRender(originalVdom, newVdom)
       : newVdom.resolve();
   }
 
