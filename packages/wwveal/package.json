@@ -17,6 +17,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "highlight.js": "^11.6.0",
     "sass": "^1.54.0",
     "wwact": "workspace:*"
   },

@@ -53,9 +53,11 @@ importers:
 
   packages/wwveal:
     specifiers:
+      highlight.js: ^11.6.0
       sass: ^1.54.0
       wwact: workspace:*
     dependencies:
+      highlight.js: 11.6.0
       sass: 1.54.0
       wwact: link:../wwact
 
@@ -2487,6 +2489,11 @@ packages:
     dependencies:
       function-bind: 1.1.1
     dev: true
+
+  /highlight.js/11.6.0:
+    resolution: {integrity: sha512-ig1eqDzJaB0pqEvlPVIpSSyMaO92bH1N2rJpLMN/nX396wTpDA4Eq0uK+7I/2XG17pFaaKE0kjV/XPeGt7Evjw==}
+    engines: {node: '>=12.0.0'}
+    dev: false
 
   /html-encoding-sniffer/2.0.1:
     resolution: {integrity: sha512-D5JbOMBIR/TVZkubHT+OyT2705QvogUW4IBn6nHd756OwieSF9aDYFj4dv6HHEVGYbHaLETa3WggZYWWMyy3ZQ==}

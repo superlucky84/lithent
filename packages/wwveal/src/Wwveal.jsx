@@ -1,6 +1,16 @@
 import { h, makeData, makeRef, mounted } from 'wwact';
-import { wwveal, slides } from '@/wwveal.module.scss';
+import { wwveal, slides, code as codeClass } from '@/wwveal.module.scss';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 import Navi from '@/navi';
+
+function code(originalString) {
+  const matchs = originalString[0].match(/\n\s*/, '');
+  const targetString = matchs[0];
+  const tReg = new RegExp(targetString, 'g');
+
+  return originalString[0].replace(targetString, '').replace(tReg, '\n');
+}
 
 export default function Wwveal() {
   let { data, slidesElementRef, handleMounted, changeCursor } = useNavi();
@@ -142,8 +152,15 @@ export default function Wwveal() {
             <section>
               <h2>Diff 알고리즘 #1</h2>
               <h3>변경 이벤트가 발생한 tree상의 변경점 찾기</h3>
-              <p />
-              <p>a</p>
+              <pre class={codeClass}>
+                <code class="language-javascript hljs">{code`
+                  var a = 3;
+                  var b = 'k';
+                  function name() {
+                    console.log('k');
+                  }
+                `}</code>
+              </pre>
             </section>
             <section>
               <h2>Diff 알고리즘 #2</h2>
@@ -315,6 +332,8 @@ function useNavi() {
     Promise.resolve().then(() => {
       calculateDimensions();
       updateExistSubContents();
+      // const codes = slidesElement.querySelectorAll('code');
+      hljs.highlightAll();
     });
   };
 
