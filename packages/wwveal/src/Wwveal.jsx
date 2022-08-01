@@ -101,7 +101,6 @@ export default function Wwveal() {
               <h2>JSX 와 가상돔 #1</h2>
               <h3>JSX는 "함수 실행기"다</h3>
               <pre class={codeClass}>
-                // eslint-disable-start
                 {/*eslint-disable */}
                 <code class="language-javascript hljs">{code`
                   const componentMaker = () => {
@@ -124,7 +123,6 @@ export default function Wwveal() {
               <h2>JSX 와 가상돔 #2</h2>
               <h3>JSX는 "함수 실행기"다</h3>
               <pre class={codeClass}>
-                // eslint-disable-start
                 {/*eslint-disable */}
                 <code class="language-javascript hljs">{code`
                   const componentMaker = () => {
@@ -145,7 +143,6 @@ export default function Wwveal() {
               <h2>JSX 와 가상돔 #3</h2>
               <h3>함수가 실행되면 가상돔이 만들어진다</h3>
               <pre class={codeClass}>
-                // eslint-disable-start
                 {/*eslint-disable */}
                 <code class="language-javascript hljs">{code`
                   props: {class: 'aaaaaaaaa7'}
@@ -163,14 +160,41 @@ export default function Wwveal() {
             <section>
               <h2>JSX & VDOM #3</h2>
               <h3>가상돔은 dom의 상태를 표현하는 객체트리다</h3>
-              <p />
-              <p>a</p>
+              <pre class={codeClass}>
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  props: {class: 'aaaaaaaaa7'}
+                  children: Array(4)
+                    0: {type: 'element', tag: 'button', props: {…}, children: Array(3), getParent: ƒ, …}
+                    1: {type: 'text', text: 'jinwoo', el: text, getParent: ƒ}
+                    2: {type: 'element', tag: 'div', props: {…}, children: Array(12), componentProps: {…}, …}
+                    3: {type: 'element', tag: 'br', props: {…}, children: Array(0), getParent: ƒ, …}
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
             </section>
             <section>
               <h2>JSX & VDOM #4</h2>
               <h3>가상돔을 이용해 실제 html을 그릴 수 있다</h3>
-              <p />
-              <p>a</p>
+              <pre class={codeClass}>
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  function vDomToDom(vDom) {
+                    const element = document.createElement(vdom.tag);
+                    const elementChildren = children.reduce(
+                      (acc: DocumentFragment, childItem: WDom) => {
+                        if (childItem.type) {
+                          acc.appendChild(vDomToDom(childItem, init));
+                        }
+                        return acc;
+                      }, new DocumentFragment()
+                    );
+                    element.appendChild(elementChildren);
+                    return element;
+                  }
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
             </section>
           </section>
           <section>
