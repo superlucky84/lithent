@@ -29,7 +29,7 @@ export default function Wwveal() {
             <h2>목차</h2>
             <ol>
               <li>Wwact 구현계기</li>
-              <li>Wwact 자랑</li>
+              <li>Wwact 장점</li>
               <li>JSX 와 가상돔</li>
               <li>useState 분석</li>
               <li>Diff 알고리즘</li>
@@ -62,7 +62,7 @@ export default function Wwveal() {
           </section>
           <section>
             <section>
-              <h2>Wwact 자랑 #1</h2>
+              <h2>Wwact 장점 #1</h2>
               <h3>useMemo, useCallback을 안써도 됨</h3>
               <p />
               <p>
@@ -78,7 +78,7 @@ export default function Wwveal() {
               <p>디펜던시 배열을 매번 신경쓰지 않고 코딩 가능</p>
             </section>
             <section>
-              <h2>Wwact 자랑 #2</h2>
+              <h2>Wwact 장점 #2</h2>
               <h3>updated와 mounted의 명확한 분리</h3>
               <p />
               <p>
@@ -87,7 +87,7 @@ export default function Wwveal() {
               </p>
             </section>
             <section>
-              <h2>Wwact 자랑 #3</h2>
+              <h2>Wwact 장점 #3</h2>
               <h3>가볍고 쉬움</h3>
               <p />
               <p>
@@ -100,13 +100,64 @@ export default function Wwveal() {
             <section>
               <h2>JSX 와 가상돔 #1</h2>
               <h3>JSX는 "함수 실행기"다</h3>
-              <p />
-              <p>a</p>
+              <pre class={codeClass}>
+                // eslint-disable-start
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  const componentMaker = () => {
+                    return (
+                      <div class={\`aaaaaaaaa\${data.k}\`}>
+                        <button onClick={handle}>!vava{data.k}aa</button>
+                        {data.k % 2 === 0 ? <span>m</span> : 'jinwoo'}
+                        <Custom2 k={data.k} data={data} handle3={handle3}>
+                          <span>1</span>
+                        </Custom2>
+                        <br />
+                      </div>
+                    );
+                  };
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
             </section>
             <section>
               <h2>JSX 와 가상돔 #2</h2>
+              <h3>JSX는 "함수 실행기"다</h3>
+              <pre class={codeClass}>
+                // eslint-disable-start
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  const componentMaker = () => {
+                    h("div", { class: \`aaaaaaaaa\${data.k}\` },
+                      h("button", { onClick: handle }, "!vava", data.k, "aa"),
+                      data.k % 2 === 0 ? h("span", null, "m") : 'jinwoo',
+                      h(Custom2, { k: data.k, data: data, handle3: handle3 },
+                        h("span", null, "1"),
+                      ),
+                      h("br", null),
+                    );
+                  };
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
+            </section>
+            <section>
+              <h2>JSX 와 가상돔 #3</h2>
               <h3>함수가 실행되면 가상돔이 만들어진다</h3>
-              <p />
+              <pre class={codeClass}>
+                // eslint-disable-start
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  props: {class: 'aaaaaaaaa7'}
+                  children: Array(4)
+                    0: {type: 'element', tag: 'button', props: {…}, children: Array(3), getParent: ƒ, …}
+                    1: {type: 'text', text: 'jinwoo', el: text, getParent: ƒ}
+                    2: {type: 'element', tag: 'div', props: {…}, children: Array(12), componentProps: {…}, …}
+                    3: {type: 'element', tag: 'br', props: {…}, children: Array(0), getParent: ƒ, …}
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
+
               <p>a</p>
             </section>
             <section>
