@@ -10,7 +10,7 @@ section {
 
 pre.code {
   width: 73%;
-  font-size: 2vw;
+  font-size: 2.7vw;
 }
 
 .wwveal {
@@ -60,7 +60,7 @@ pre.code {
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 13%;
+    width: 17%;
     height: 10%;
 
     > div {
@@ -69,6 +69,7 @@ pre.code {
       justify-content: space-evenly;
       > div {
         cursor: pointer;
+        padding-left: 7px;
       }
     }
   }

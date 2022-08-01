@@ -13,7 +13,7 @@ function code(originalString) {
 }
 
 export default function Wwveal() {
-  let { data, slidesElementRef, handleMounted, changeCursor } = useNavi();
+  let { data, slidesElementRef, handleMounted, changeCursor, step } = useNavi();
 
   const componentMaker = () => {
     mounted(handleMounted);
@@ -246,6 +246,7 @@ export default function Wwveal() {
         <Navi
           existSubContents={data.existSubContents}
           changeCursor={changeCursor}
+          step={step}
         />
       </div>
     );
@@ -257,10 +258,12 @@ export default function Wwveal() {
 function useNavi() {
   const slidesElementRef = makeRef(null);
   const data = makeData({ existSubContents: false, color: 'white' });
+  const step = makeData({
+    stepHorizontal: 6,
+    stepVertical: 0,
+  });
   let dimensions = {};
 
-  let stepHorizontal = 6;
-  let stepVertical = 0;
   let slidesElement = null;
   let resizeTimer = null;
 
@@ -269,11 +272,11 @@ function useNavi() {
     const slideElementList = Array.from(slidesElementRef.value.children);
 
     slidesElement.style.transitionDuration = '0ms';
-    const origStepHorizontal = stepHorizontal;
-    const origStepVertical = stepVertical;
+    const origStepHorizontal = step.stepHorizontal;
+    const origStepVertical = step.stepVertical;
 
-    stepHorizontal = 0;
-    stepVertical = 0;
+    step.stepHorizontal = 0;
+    step.stepVertical = 0;
     move();
 
     slideElementList.forEach((element, index) => {
@@ -291,8 +294,8 @@ function useNavi() {
 
     dimensions = res;
 
-    stepHorizontal = origStepHorizontal;
-    stepVertical = origStepVertical;
+    step.stepHorizontal = origStepHorizontal;
+    step.stepVertical = origStepVertical;
     move();
   };
 
@@ -338,7 +341,7 @@ function useNavi() {
   };
 
   const move = () => {
-    const dimension = dimensions[`${stepHorizontal}-${stepVertical}`];
+    const dimension = dimensions[`${step.stepHorizontal}-${step.stepVertical}`];
 
     if (dimension) {
       slidesElement.style.transform = `translate3d(${dimension.left * -1}px, ${
@@ -348,7 +351,7 @@ function useNavi() {
   };
 
   const updateExistSubContents = () => {
-    const hasSection = dimensions[`${stepHorizontal}-1`];
+    const hasSection = dimensions[`${step.stepHorizontal}-1`];
 
     if (hasSection) {
       data.existSubContents = true;
@@ -358,17 +361,17 @@ function useNavi() {
   };
 
   const moveStepHolizontal = type => {
-    const nextDimension = dimensions[`${stepHorizontal + 1}-0`];
-    const prevDimension = dimensions[`${stepHorizontal - 1}-0`];
+    const nextDimension = dimensions[`${step.stepHorizontal + 1}-0`];
+    const prevDimension = dimensions[`${step.stepHorizontal - 1}-0`];
     const allowNext = type === 'next' && nextDimension;
     const allowPrev = type === 'prev' && prevDimension;
 
     if (allowNext) {
-      stepHorizontal += 1;
-      stepVertical = 0;
+      step.stepHorizontal += 1;
+      step.stepVertical = 0;
     } else if (allowPrev) {
-      stepHorizontal -= 1;
-      stepVertical = 0;
+      step.stepHorizontal -= 1;
+      step.stepVertical = 0;
     }
 
     updateExistSubContents();
@@ -377,16 +380,18 @@ function useNavi() {
   };
 
   const moveStepVertical = type => {
-    const downDimension = dimensions[`${stepHorizontal}-${stepVertical + 1}`];
-    const upDimension = dimensions[`${stepHorizontal}-${stepVertical - 1}`];
+    const downDimension =
+      dimensions[`${step.stepHorizontal}-${step.stepVertical + 1}`];
+    const upDimension =
+      dimensions[`${step.stepHorizontal}-${step.stepVertical - 1}`];
 
     const allowDown = type === 'down' && downDimension;
     const allowUp = type === 'up' && upDimension;
 
     if (allowDown) {
-      stepVertical += 1;
+      step.stepVertical += 1;
     } else if (allowUp) {
-      stepVertical -= 1;
+      step.stepVertical -= 1;
     }
 
     move();
@@ -405,9 +410,9 @@ function useNavi() {
   return {
     data,
     slidesElementRef,
-    stepHorizontal,
     slidesElement,
     handleMounted,
     changeCursor,
+    step,
   };
 }
