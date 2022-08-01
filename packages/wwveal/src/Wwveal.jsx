@@ -26,7 +26,7 @@ export default function Wwveal() {
             <h2>Wwact(짝퉁 React)</h2>
           </section>
           <section>
-            <h2>목차</h2>
+            <h3>목차</h3>
             <ol>
               <li>Wwact 구현계기</li>
               <li>Wwact 장점</li>
@@ -41,7 +41,9 @@ export default function Wwveal() {
           </section>
           <section>
             <section>
-              <h2>Wwact 구현계기 #1</h2>
+              <h1>Wwact 구현계기</h1>
+            </section>
+            <section>
               <h3>React 파악 욕구</h3>
               <p />
               <p>
@@ -51,7 +53,6 @@ export default function Wwveal() {
               </p>
             </section>
             <section>
-              <h2>Wwact 구현계기 #2</h2>
               <h3>개인프로젝트에 사용</h3>
               <p />
               <ul>
@@ -62,7 +63,9 @@ export default function Wwveal() {
           </section>
           <section>
             <section>
-              <h2>Wwact 장점 #1</h2>
+              <h1>Wwact 장점</h1>
+            </section>
+            <section>
               <h3>useMemo, useCallback을 안써도 됨</h3>
               <p />
               <p>
@@ -78,7 +81,6 @@ export default function Wwveal() {
               <p>디펜던시 배열을 매번 신경쓰지 않고 코딩 가능</p>
             </section>
             <section>
-              <h2>Wwact 장점 #2</h2>
               <h3>updated와 mounted의 명확한 분리</h3>
               <p />
               <p>
@@ -87,7 +89,6 @@ export default function Wwveal() {
               </p>
             </section>
             <section>
-              <h2>Wwact 장점 #3</h2>
               <h3>가볍고 쉬움</h3>
               <p />
               <p>
@@ -98,8 +99,10 @@ export default function Wwveal() {
           </section>
           <section>
             <section>
-              <h2>JSX 와 가상돔 #1</h2>
-              <h3>JSX는 "함수 실행기"다</h3>
+              <h1>JSX 와 가상돔</h1>
+            </section>
+            <section>
+              <h3>JSX는 "함수 실행기"다 #1</h3>
               <pre class={codeClass}>
                 {/*eslint-disable */}
                 <code class="language-javascript hljs">{code`
@@ -120,8 +123,7 @@ export default function Wwveal() {
               </pre>
             </section>
             <section>
-              <h2>JSX 와 가상돔 #2</h2>
-              <h3>JSX는 "함수 실행기"다</h3>
+              <h3>JSX는 "함수 실행기"다 #2</h3>
               <pre class={codeClass}>
                 {/*eslint-disable */}
                 <code class="language-javascript hljs">{code`
@@ -140,25 +142,7 @@ export default function Wwveal() {
               </pre>
             </section>
             <section>
-              <h2>JSX 와 가상돔 #3</h2>
               <h3>함수가 실행되면 가상돔이 만들어진다</h3>
-              <pre class={codeClass}>
-                {/*eslint-disable */}
-                <code class="language-javascript hljs">{code`
-                  props: {class: 'aaaaaaaaa7'}
-                  children: Array(4)
-                    0: {type: 'element', tag: 'button', props: {…}, children: Array(3), getParent: ƒ, …}
-                    1: {type: 'text', text: 'jinwoo', el: text, getParent: ƒ}
-                    2: {type: 'element', tag: 'div', props: {…}, children: Array(12), componentProps: {…}, …}
-                    3: {type: 'element', tag: 'br', props: {…}, children: Array(0), getParent: ƒ, …}
-                `}</code>
-                {/*eslint-enable */}
-              </pre>
-
-              <p>a</p>
-            </section>
-            <section>
-              <h2>JSX & VDOM #3</h2>
               <h3>가상돔은 dom의 상태를 표현하는 객체트리다</h3>
               <pre class={codeClass}>
                 {/*eslint-disable */}
@@ -174,7 +158,6 @@ export default function Wwveal() {
               </pre>
             </section>
             <section>
-              <h2>JSX & VDOM #4</h2>
               <h3>가상돔을 이용해 실제 html을 그릴 수 있다</h3>
               <pre class={codeClass}>
                 {/*eslint-disable */}
@@ -199,122 +182,269 @@ export default function Wwveal() {
           </section>
           <section>
             <section>
-              <h2>useState 분석 #1</h2>
+              <h1>useState 분석</h1>
+              <h4>마운트 될때 initValue가 세팅된다</h4>
+              <h4>업데이트 될때는 클로저에 세팅된 값을 찾아온다</h4>
+            </section>
+            <section>
               <h3>useState는 클로저를 이용하여 구현되었다</h3>
-              <p />
-              <p>a</p>
+              <ul>
+                <li>마운트 될때 initValue가 세팅된다</li>
+                <li>업데이트 될때는 클로저에 세팅된 값을 찾아온다</li>
+              </ul>
             </section>
             <section>
-              <h2>useState 분석 #2</h2>
-              <h3>컴포넌트 함수 내에서 useState가 여러번 실행될 때</h3>
-              <p />
-              <p>a</p>
-            </section>
-            <section>
-              <h2>useState 분석 #3</h2>
-              <h3>생성된 컴포넌트별로 상태를 기억하는 방법</h3>
-              <p />
-              <p>a</p>
-            </section>
-            <section>
-              <h2>useState 분석 #4</h2>
-              <h3>Hook 인터페이스 따라하기</h3>
-              <p />
-              <p>a</p>
-            </section>
-          </section>
-          <section>
-            <section>
-              <h2>Diff 알고리즘 #1</h2>
-              <h3>변경 이벤트가 발생한 tree상의 변경점 찾기</h3>
+              <h4>한 컴포넌트에 여러개의 useState가 사용될 경우 처리 안됨</h4>
               <pre class={codeClass}>
+                {/*eslint-disable */}
                 <code class="language-javascript hljs">{code`
-                  var a = 3;
-                  var b = 'k';
-                  function name() {
-                    console.log('k');
+                  const useState = initValue => {
+                    if (!value) {
+                      value = initValue;
+                    }
+
+                    const setData = newValue => {
+                      value = newValue;
+                    };
+
+                    return [value, setData];
+                  };
+
+                  export default function CustomElement(props = {}, children) {
+                    let vdom;
+                    const [v, setV] = useState(props.vava);
+                    ...
                   }
                 `}</code>
+                {/*eslint-enable */}
               </pre>
             </section>
             <section>
-              <h2>Diff 알고리즘 #2</h2>
+              <h4>컴포넌트 함수 내에서 useState가 여러번 실행될 때</h4>
+              <h5>useState가 실행되는 순서가 항상 같음을 이용</h5>
+              <pre class={codeClass}>
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  const value = {};
+                  let stateCallSeq = 0;
+
+                  const useState = (initValue, vdomKey) => {
+                    const currentSubSeq = stateCallSeq;
+
+                    if (!value[currentSubSeq]) {
+                      value[currentSubSeq] ??= [];
+                      value[currentSubSeq] = initValue;
+                    }
+
+                    const setData = newValue => {
+                      value[currentSubSeq] = newValue;
+                    };
+
+                    stateCallSeq += 1;
+
+                    return [value[currentSubSeq], setData];
+                  };
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
+            </section>
+            <section>
+              <h4>하나의 컴포넌트가 여러 곳에서 사용될때 처리</h4>
+              <pre class={codeClass}>
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  const useState = (initValue, vdomKey) => {
+                    if (!value[vdomKey] || !value[vdomKey][currentSubSeq]) {
+                      value[vdomKey] ??= {};
+                      value[vdomKey][currentSubSeq] ??= {};
+                      value[vdomKey][currentSubSeq] = initValue;
+                    }
+
+                    const setData = newValue => {
+                      value[vdomKey][currentSubSeq] = newValue;
+                    };
+
+                    stateCallSeq += 1;
+
+                    return [value[vdomKey][currentSubSeq], setData];
+                  };
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
+            </section>
+            <section>
+              <h3>Hook 인터페이스 따라하기 (개선 전)</h3>
+              <ul>
+                <li>
+                  <a href="https://github.com/superlucky84/jwVDomPrototype/blob/1aa1af064a3a524050fc1f8954b3fed3f376ab87/src/jsx.js#L59">
+                    useState구현
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/superlucky84/jwVDomPrototype/blob/1aa1af064a3a524050fc1f8954b3fed3f376ab87/src/components/CustomElement.js#L3">
+                    useState사용
+                  </a>
+                </li>
+              </ul>
+            </section>
+            <section>
+              <h3>Hook 인터페이스 따라하기 (개선 후)</h3>
+              <ul>
+                <li>
+                  <a href="https://github.com/superlucky84/jwVDomPrototype/blob/master/src/components/CustomElement.js">
+                    useState사용
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/superlucky84/jwVDomPrototype/blob/master/src/hook/useState.js">
+                    useState구현 - 1
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/superlucky84/jwVDomPrototype/blob/master/src/jsx.js#L43">
+                    useState구현 - 2
+                  </a>
+                </li>
+              </ul>
+            </section>
+          </section>
+          <section>
+            <section>
+              <h1>Diff 알고리즘</h1>
+            </section>
+            <section>
               <h3>비교 알고리즘 컨셉</h3>
+              <h5>
+                <a href="https://ko.reactjs.org/docs/reconciliation.html">
+                  https://ko.reactjs.org/docs/reconciliation.html
+                </a>
+              </h5>
               <p />
-              <p>a</p>
+              <p>
+                동일한 컴포넌트 함수는 항상 동일한 개수의 자식을 생성하므로 항상
+                같은 레벨에서 비교 가능하다.
+              </p>
+              <p>
+                서로 다른 컴포넌트 함수는 전혀 다른 트리를 생성하므로 하위
+                트리는 전혀 다른 구조의 트리 구조를 작으므로 그냥 교체해버리면
+                된다.
+              </p>
             </section>
             <section>
-              <h2>Diff 알고리즘 #3</h2>
-              <h3>비교 알고리즘 구상</h3>
-              <p />
-              <p>a</p>
+              <h3>비교 알고리즘 컨셉</h3>
+              <img src="https://miro.medium.com/max/1400/1*JVIONc4gA_iCxmBycD3A3Q.png" />
             </section>
             <section>
-              <h2>Diff 알고리즘 #4</h2>
-              <h3>Component 키 상속하기</h3>
-              <p />
-              <p>a</p>
+              <h3>가상돔 생성 지연 시키기</h3>
+              <h4>
+                <a href="https://github.com/superlucky84/jwVDomPrototype/blob/master/src/jsx.js#L43">
+                  예제코드
+                </a>
+              </h4>
+              <p></p>
+              <p>
+                컴포넌트 트리를 비교하면서 타입이 같을 경우 componentKey를
+                유지시켜 줘야 하기 때문에 컴포넌트 함수가 바로 가상돔을 만들지
+                못하게 지연시킴
+              </p>
             </section>
             <section>
-              <h2>Diff 알고리즘 #5</h2>
-              <h3>상속없이 오리지날 활용하기</h3>
-              <p />
-              <p>a</p>
+              <h2>Component 키 상속하기</h2>
+              <p></p>
+              <h4>
+                <a href="https://github.com/superlucky84/jwVDomPrototype/blob/master/src/jsx.js#L43">
+                  오리지널 키값을 전달받아, 컴포넌트 함수 자체를 새로 실행하기
+                </a>
+              </h4>
+            </section>
+            <section>
+              <h2>상속없이 오리지날 활용하기</h2>
+              <p></p>
+              <h4>
+                <a href="https://github.com/superlucky84/wwact/blob/master/packages/wwact/src/components/Custom2.tsx">
+                  오리지날 가상돔이 가지고 있는 makeComponent 함수 부분만
+                  실행하기
+                </a>
+              </h4>
             </section>
           </section>
           <section>
             <section>
-              <h2>Render 알고리즘 #1</h2>
+              <h1>Render 알고리즘</h1>
+            </section>
+            <section>
               <h3>처음 한번 html그리기</h3>
-              <p />
-              <p>a</p>
+              <pre class={codeClass}>
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  function vDomToDom(vDom) {
+                    const element = document.createElement(vdom.tag);
+                    const elementChildren = children.reduce(
+                      (acc: DocumentFragment, childItem: WDom) => {
+                        if (childItem.type) {
+                          acc.appendChild(vDomToDom(childItem, init));
+                        }
+                        return acc;
+                      }, new DocumentFragment()
+                    );
+                    element.appendChild(elementChildren);
+                    return element;
+                  }
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
             </section>
             <section>
-              <h2>Render 알고리즘 #2</h2>
-              <h3>dom 변경 타입 정하기</h3>
-              <p />
-              <p>a</p>
-            </section>
-            <section>
-              <h2>Render 알고리즘 #3</h2>
-              <h3>html 업데이트 하기</h3>
-              <p />
-              <p>a</p>
+              <h3>tree 업데이트시 변경 타입 정하기</h3>
+              <pre class={codeClass}>
+                {/*eslint-disable */}
+                <code class="language-javascript hljs">{code`
+                  /**
+                   * Rerender시 실제 dom에 반영해줘야 하는 상태
+                   *
+                   * 1. (ADD). 가상돔 비교시 오리지날이 없으면 새로 추가되는 dom으로 판단한다.
+                   * 2. (REPLACE). 오리지날이 있고 같은 엘리먼트타입이 아닌 경우 해당 위치의 태그 자체를 교체해준다.
+                   * 3. (UPDATE). 오리지날이 있고 같은 타입이면 dom의 속성만 변경해 주며, 텍스트 노드일 경우는 텍스트를 교체해준다.
+                   * 4. (DELETE). 오리지날이 있고 새로운 엘리먼트 타입은 null타입일 경우 dom을 삭제한다.
+                   * 5. (SORTED-REPLACE). loop의 경우 REPLACE라도 키값에 의해 순서가 변경될 수 있으므로 새로운 dom을 단순히 기존 위치에 교체하지 않고 새로 삼입하여 정렬한다.
+                   * 6. (SORTED-UPDATE). loop의 경우 UPDATE라도 키값에 의해 순서가 변경될수 있으므로 재 삽입하여 정렬한다.
+                   * 7. (NONE). text타입의 경우 text가 같다면 변경이 필요 없으므로 방치한다. (Todo. 다른 타입의 경우 처리필요)
+                   */
+                `}</code>
+                {/*eslint-enable */}
+              </pre>
             </section>
           </section>
           <section>
             <section>
-              <h2>fragment와 loop #1</h2>
-              <h3>fragment의 이해</h3>
-              <p />
-              <p>a</p>
+              <h1>fragment와 loop</h1>
             </section>
             <section>
-              <h2>fragment와 loop #2</h2>
-              <h3>loop의 이해</h3>
-              <p />
-              <p>a</p>
-            </section>
-            <section>
-              <h2>fragment와 loop #3</h2>
-              <h3>중첩된 가상타입 내에서 요소의 위치 찾기</h3>
-              <p />
-              <p>a</p>
+              <h2>중첩된 가상타입 내에서 요소의 위치 찾기</h2>
+              <h4>
+                <a href="https://github.com/superlucky84/wwact/blob/master/packages/wwact/src/components/NestedFragment.tsx">
+                  리얼 dom 업데이트시 부모와 자식 가상돔을 전부 다 탐색해야 함
+                </a>
+              </h4>
             </section>
           </section>
           <section>
             <section>
               <h2>Store 구현</h2>
-              <h3>변경지점 기억시키기</h3>
-              <p />
-              <p>a</p>
+              <h4>
+                <a href="https://github.com/superlucky84/wwact/blob/master/packages/wwact/src/hook/dataStore.ts">
+                  프록시를 활용
+                </a>
+              </h4>
+              <p>
+                훅을 사용하는 컴포넌트의 rerender 함수실행을 리스트에 넣어놓고,
+                스토어 변경이 있을때마다 리스트에 넣어놓은 함수를 실행시킴
+              </p>
             </section>
           </section>
           <section>
             <section>
               <h2>Router 구현</h2>
-              <p />
-              <p>a</p>
             </section>
           </section>
         </div>
@@ -334,7 +464,7 @@ function useNavi() {
   const slidesElementRef = makeRef(null);
   const data = makeData({ existSubContents: false, color: 'white' });
   const step = makeData({
-    stepHorizontal: 6,
+    stepHorizontal: 7,
     stepVertical: 0,
   });
   let dimensions = {};
