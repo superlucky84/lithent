@@ -88,13 +88,13 @@ function makeVdomResolver({
   props: Props;
   children: WDom[];
 }) {
-  const resolve = (stateKey = Symbol(tag.name)) => {
-    initMountHookState(stateKey);
+  const resolve = (componentKey = Symbol(tag.name)) => {
+    initMountHookState(componentKey);
 
     const componentMaker = tag(props, children);
     const customNode = makeCustomNode({
       componentMaker,
-      stateKey,
+      componentKey,
       tag,
       props,
       children,
@@ -102,7 +102,7 @@ function makeVdomResolver({
 
     const originalVdom = customNode;
 
-    setRedrawAction(stateKey, () => {
+    setRedrawAction(componentKey, () => {
       reRenderCustomComponent({ tag, props, children, originalVdom });
     });
 
@@ -119,13 +119,13 @@ function makeVdomResolver({
 
 function makeCustomNode({
   componentMaker,
-  stateKey,
+  componentKey,
   tag,
   props,
   children,
 }: {
   componentMaker: () => WDom;
-  stateKey: symbol;
+  componentKey: symbol;
   tag: TagFunction;
   props: Props;
   children: WDom[];
@@ -133,7 +133,7 @@ function makeCustomNode({
   const customNode = componentMaker();
   const reRender = makeReRender({
     componentMaker,
-    stateKey,
+    componentKey,
     tag,
     props,
     children,
@@ -143,50 +143,50 @@ function makeCustomNode({
   customNode.componentChildren = children;
   customNode.reRender = reRender;
   customNode.tagName = tag.name;
-  customNode.stateKey = stateKey;
+  customNode.componentKey = componentKey;
 
   return customNode;
 }
 
 function makeReRender({
   componentMaker,
-  stateKey,
+  componentKey,
   tag,
   props,
   children,
 }: {
   componentMaker: () => WDom;
-  stateKey: symbol;
+  componentKey: symbol;
   tag: TagFunction;
   props: Props;
   children: WDom[];
 }) {
   const reRender = () =>
-    vdomMaker({ componentMaker, stateKey, tag, props, children, reRender });
+    vdomMaker({ componentMaker, componentKey, tag, props, children, reRender });
 
   return reRender;
 }
 
 function vdomMaker({
   componentMaker,
-  stateKey,
+  componentKey,
   tag,
   props,
   children,
   reRender,
 }: {
   componentMaker: () => WDom;
-  stateKey: symbol;
+  componentKey: symbol;
   tag: TagFunction;
   props: Props;
   children: WDom[];
   reRender: () => WDom;
 }) {
-  initUpdateHookState(stateKey);
+  initUpdateHookState(componentKey);
 
   const vdom = componentMaker();
 
-  setRedrawAction(stateKey, () => {
+  setRedrawAction(componentKey, () => {
     reRenderCustomComponent({ tag, props, children, originalVdom: vdom });
   });
 
@@ -194,7 +194,7 @@ function vdomMaker({
   vdom.componentChildren = children;
   vdom.reRender = reRender;
   vdom.tagName = tag.name;
-  vdom.stateKey = stateKey;
+  vdom.componentKey = componentKey;
 
   return vdom;
 }

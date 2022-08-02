@@ -1,22 +1,22 @@
 import { WDom } from '@/types';
-import { stateKeyRef, componentRef, makeQueueRef } from '@/helper/universalRef';
+import { componentKeyRef, componentRef, makeQueueRef } from '@/helper/universalRef';
 
 export default function unmount(effectAction: () => void) {
-  const stateKey = stateKeyRef.value;
-  const unmountSubscribeList = componentRef[stateKey].unmountSubscribeList;
+  const componentKey = componentKeyRef.value;
+  const unmountSubscribeList = componentRef[componentKey].unmountSubscribeList;
 
   if (!unmountSubscribeList) {
-    makeQueueRef(stateKey, 'unmountSubscribeList').push(effectAction);
+    makeQueueRef(componentKey, 'unmountSubscribeList').push(effectAction);
   }
 }
 
 export function runUnmountQueueFromVdom(newVdom: WDom) {
-  if (!newVdom.stateKey) {
+  if (!newVdom.componentKey) {
     return;
   }
-  const queue = componentRef[newVdom.stateKey]?.unmountSubscribeList;
+  const queue = componentRef[newVdom.componentKey]?.unmountSubscribeList;
   if (newVdom.tagName && queue) {
-    componentRef[newVdom.stateKey].unmountSubscribeList = [];
+    componentRef[newVdom.componentKey].unmountSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

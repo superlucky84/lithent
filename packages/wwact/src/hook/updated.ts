@@ -1,6 +1,6 @@
 import { WDom } from '@/types';
 import {
-  stateKeyRef,
+  componentKeyRef,
   updatedCallSeq,
   makeQueueRef,
   makeUpdatedStore,
@@ -12,16 +12,17 @@ export default function updated(
   dependencies: unknown[]
 ) {
   const currentSubSeq = updatedCallSeq.value;
-  const stateKey = stateKeyRef.value;
-  let updateSubscribeDefList = componentRef[stateKey]?.updateSubscribeDefList;
+  const componentKey = componentKeyRef.value;
+  let updateSubscribeDefList =
+    componentRef[componentKey]?.updateSubscribeDefList;
 
   if (!updateSubscribeDefList || !updateSubscribeDefList[currentSubSeq]) {
-    updateSubscribeDefList = makeUpdatedStore(stateKey);
+    updateSubscribeDefList = makeUpdatedStore(componentKey);
   } else if (
     checkNeedPushQueue(updateSubscribeDefList[currentSubSeq], dependencies) ||
     !dependencies
   ) {
-    makeQueueRef(stateKey, 'updateSubscribeList').push(effectAction);
+    makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
   }
 
   // Toto typescript의 영향으로 엉뚱한 코드가 생겼음 type guard를 이용해 개선 예정
@@ -30,13 +31,13 @@ export default function updated(
 }
 
 export function runUpdatedQueueFromVdom(newVdom: WDom) {
-  if (!newVdom.stateKey) {
+  if (!newVdom.componentKey) {
     return;
   }
 
-  const queue = componentRef[newVdom.stateKey]?.updateSubscribeList;
+  const queue = componentRef[newVdom.componentKey]?.updateSubscribeList;
   if (newVdom.tagName && queue) {
-    componentRef[newVdom.stateKey].updateSubscribeList = [];
+    componentRef[newVdom.componentKey].updateSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

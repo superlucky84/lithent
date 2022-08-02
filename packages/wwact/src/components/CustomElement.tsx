@@ -30,7 +30,7 @@ export default function CustomElement() {
   const handleUpdatedDataK = () => {
     console.log('domRef', domRef);
     console.log('updated k', data, hadleRef);
-    // data3.k += 10;
+    data3.k += 10;
   };
   const handleUpdatedData2K = () => {
     console.log('updated 2k', data2);
@@ -46,11 +46,13 @@ export default function CustomElement() {
         <button onClick={handle2}>{data2.k}-vava</button>
         <button onClick={handle3}>{data3.k}-vava</button>
         {data.k % 2 === 0 ? <span>m</span> : 'jinwoo'}
-        <Custom2 k={data.k} data={data} handle3={handle3}>
-          <span>1</span>
-          <span>2</span>
-          <span>3</span>
-        </Custom2>
+        {data.k % 2 === 1 && (
+          <Custom2 k={data.k} data={data} handle3={handle3}>
+            <span>1</span>
+            <span>2</span>
+            <span>3</span>
+          </Custom2>
+        )}
         <div ref={domRef}>
           <div>data.k: {data.k}</div>
           <div>data.j: {data.j}</div>

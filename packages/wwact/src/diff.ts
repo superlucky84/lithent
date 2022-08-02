@@ -78,10 +78,10 @@ function remakeNewVdom({
   if (
     ['DELETE', 'REPLACE'].includes(needRerender) &&
     originalVdom &&
-    originalVdom.stateKey
+    originalVdom.componentKey
   ) {
     runUnmountQueueFromVdom(originalVdom);
-    delete componentRef[originalVdom.stateKey];
+    delete componentRef[originalVdom.componentKey];
   }
 
   remakeVdom.oldProps = originalVdom?.props;

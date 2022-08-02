@@ -1,11 +1,11 @@
 import { UseDataStoreValue } from '@/types';
-import { componentRef, stateKeyRef } from '@/helper/universalRef';
+import { componentRef, componentKeyRef } from '@/helper/universalRef';
 
 export default function useData<T extends {}>(initValue: T) {
-  const stateKey = stateKeyRef.value;
+  const componentKey = componentKeyRef.value;
   const state = makeData<T>({
     initValue,
-    render: () => (componentRef[stateKey].redrawAction || (() => {}))(),
+    render: () => (componentRef[componentKey].redrawAction || (() => {}))(),
   });
 
   return state;
