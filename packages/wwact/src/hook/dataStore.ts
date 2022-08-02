@@ -1,14 +1,14 @@
 import { UseDataStoreValue } from '@/types';
 import { checkFunction } from '@/helper/predicator';
 import {
-  stateKeyRef,
+  componentKeyRef,
   dataStoreStore,
   dataStoreRenderQueue,
   componentRef,
 } from '@/helper/universalRef';
 
 export function useDataStore<T extends {}>(storeKey: string) {
-  const stateKey = stateKeyRef.value;
+  const componentKey = componentKeyRef.value;
   const dataValue = dataStoreStore[storeKey] as T;
 
   if (!dataValue) {
@@ -18,7 +18,7 @@ export function useDataStore<T extends {}>(storeKey: string) {
   const dataStoreQueue = dataStoreRenderQueue;
 
   dataStoreQueue[storeKey] ??= [];
-  dataStoreQueue[storeKey].push(() => componentRef[stateKey]?.redrawAction);
+  dataStoreQueue[storeKey].push(() => componentRef[componentKey]?.redrawAction);
 
   return dataValue;
 }

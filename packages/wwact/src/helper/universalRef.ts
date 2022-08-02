@@ -3,9 +3,8 @@ import { UseDataStoreValue, ComponentSubKey, ComponentRef } from '@/types';
 /**
  * Common
  */
-export const stateKeyRef: { value: symbol } = { value: Symbol('null') };
+export const componentKeyRef: { value: symbol } = { value: Symbol('null') };
 export const needDiffRef: { value: boolean } = { value: false };
-export const dataCallSeq: { value: number } = { value: 0 };
 export const updatedCallSeq: { value: number } = { value: 0 };
 export const componentRef: ComponentRef = {};
 
@@ -26,47 +25,40 @@ export const routerParams: { value: { [key: string]: string } } = { value: {} };
  * Ref helpers
  */
 export function makeQueueRef(
-  stateKey: symbol,
+  componentKey: symbol,
   name: ComponentSubKey
 ): (() => void)[] {
-  componentRef[stateKey] ??= {};
+  componentRef[componentKey] ??= {};
 
   if (
     name === 'updateSubscribeList' ||
     name === 'mountSubscribeList' ||
     name === 'unmountSubscribeList'
   ) {
-    componentRef[stateKey][name] ??= [];
+    componentRef[componentKey][name] ??= [];
   }
 
-  return componentRef[stateKey][name] as (() => void)[];
+  return componentRef[componentKey][name] as (() => void)[];
 }
 
-export function makeUpdatedStore(stateKey: symbol): (() => void)[] {
-  componentRef[stateKey] ??= {};
-  componentRef[stateKey].updateSubscribeDefList ??= [];
+export function makeUpdatedStore(componentKey: symbol): (() => void)[] {
+  componentRef[componentKey] ??= {};
+  componentRef[componentKey].updateSubscribeDefList ??= [];
 
-  return componentRef[stateKey].updateSubscribeDefList as (() => void)[];
+  return componentRef[componentKey].updateSubscribeDefList as (() => void)[];
 }
 
-export function setRedrawAction(stateKey: symbol, action: () => void) {
-  componentRef[stateKey] ??= {};
-  componentRef[stateKey].redrawAction = action;
+export function setRedrawAction(componentKey: symbol, action: () => void) {
+  componentRef[componentKey] ??= {};
+  componentRef[componentKey].redrawAction = action;
 }
 
-export function setDataStore(stateKey: symbol, data: unknown) {
-  componentRef[stateKey] ??= {};
-  componentRef[stateKey].dataStore ??= [];
-  componentRef[stateKey].dataStore?.push(data);
-}
-
-export function initUpdateHookState(stateKey: symbol) {
+export function initUpdateHookState(componentKey: symbol) {
   updatedCallSeq.value = 0;
-  stateKeyRef.value = stateKey;
+  componentKeyRef.value = componentKey;
 }
 
-export function initMountHookState(stateKey: symbol) {
-  dataCallSeq.value = 0;
+export function initMountHookState(componentKey: symbol) {
   updatedCallSeq.value = 0;
-  stateKeyRef.value = stateKey;
+  componentKeyRef.value = componentKey;
 }

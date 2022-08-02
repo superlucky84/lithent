@@ -8,7 +8,7 @@ export type TagFunctionResolver = {
   tagName: string;
   props: Props;
   children: WDom[];
-  resolve: (stateKey?: symbol) => WDom;
+  resolve: (componentKey?: symbol) => WDom;
 };
 
 export type FragmentFunction = (
@@ -46,7 +46,7 @@ export interface WDom {
   children?: WDom[];
   getParent?: () => WDom | undefined;
   text?: string | number;
-  stateKey?: symbol;
+  componentKey?: symbol;
   reRender?: () => WDom;
   componentProps?: Props;
   componentChildren?: WDom[];
@@ -64,7 +64,6 @@ export interface WDom {
 
 export type ComponentSubKey =
   | 'redrawAction'
-  | 'dataStore'
   | 'updateSubscribeDefList'
   | 'updateSubscribeList'
   | 'mountSubscribeList'
@@ -73,7 +72,6 @@ export type ComponentSubKey =
 export type ComponentRef = {
   [key: symbol]: {
     redrawAction?: () => void;
-    dataStore?: unknown[];
     updateSubscribeDefList?: any[];
     updateSubscribeList?: (() => void)[];
     mountSubscribeList?: (() => void)[];

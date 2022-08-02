@@ -10,9 +10,9 @@
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf node_modules && rm -rf node_modules",
-    "wwact": "pnpm --filter wwact dev",
-    "wwveal": "pnpm --filter wwveal dev",
-    "router": "pnpm --filter router dev"
+    "dev:wwact": "pnpm --filter wwact dev",
+    "dev:wwveal": "pnpm --filter wwveal dev",
+    "dev:router": "pnpm --filter router dev"
   },
   "author": "",
   "license": "ISC",
