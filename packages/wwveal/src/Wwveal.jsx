@@ -52,7 +52,7 @@ function useNavi() {
   const slidesElementRef = makeRef(null);
   const data = makeData({ existSubContents: false, color: 'white' });
   const step = makeData({
-    stepHorizontal: 7,
+    stepHorizontal: 0,
     stepVertical: 0,
   });
   let dimensions = {};
