@@ -99,7 +99,8 @@ function makeVdomResolver({
   props: Props;
   children: WDom[];
 }) {
-  const resolve = (componentKey = Symbol(tag.name)) => {
+  const tagName = tag.name;
+  const resolve = (componentKey = Symbol(tagName)) => {
     initMountHookState(componentKey);
 
     const componentMaker = tag(props, children);
@@ -120,12 +121,7 @@ function makeVdomResolver({
     return customNode;
   };
 
-  return {
-    tagName: tag.name,
-    props,
-    children,
-    resolve,
-  };
+  return { tagName, props, children, resolve };
 }
 
 function makeCustomNode(vdomInfo: VDomInfoParam) {
