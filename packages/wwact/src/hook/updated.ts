@@ -25,7 +25,6 @@ export default function updated(
     makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
   }
 
-  // Toto typescript의 영향으로 엉뚱한 코드가 생겼음 type guard를 이용해 개선 예정
   updateSubscribeDefList[currentSubSeq] = dependencies;
   updatedCallSeq.value += 1;
 }

@@ -1,5 +1,9 @@
 import { WDom } from '@/types';
-import { componentKeyRef, componentRef, makeQueueRef } from '@/helper/universalRef';
+import {
+  componentKeyRef,
+  componentRef,
+  makeQueueRef,
+} from '@/helper/universalRef';
 
 export default function unmount(effectAction: () => void) {
   const componentKey = componentKeyRef.value;
