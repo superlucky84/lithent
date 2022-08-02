@@ -1,55 +1,35 @@
-import {
-  componentRef,
-  stateKeyRef,
-  dataCallSeq,
-  setDataStore,
-} from '@/helper/universalRef';
+import { UseDataStoreValue } from '@/types';
+import { componentRef, stateKeyRef } from '@/helper/universalRef';
 
-type InitValue = { [key: string]: unknown };
-
-export default function useData<T>(initValue: InitValue) {
+export default function useData<T extends {}>(initValue: T) {
   const stateKey = stateKeyRef.value;
-  const state = makeData({
+  const state = makeData<T>({
     initValue,
-    dataCallSeq: dataCallSeq.value,
-    stateKey,
     render: () => (componentRef[stateKey].redrawAction || (() => {}))(),
   });
 
-  dataCallSeq.value += 1;
-
-  return state as T;
+  return state;
 }
 
-function makeData({
+function makeData<T extends {}>({
   initValue,
-  stateKey,
-  dataCallSeq,
   render,
 }: {
-  initValue: InitValue;
-  stateKey: symbol;
-  dataCallSeq: number;
+  initValue: T;
   render: () => void;
 }) {
-  const currentSubSeq = dataCallSeq;
-  const dataStore = componentRef[stateKey]?.dataStore;
-
-  if (!dataStore || !dataStore[currentSubSeq]) {
-    setDataStore(stateKey, makeProxyData(initValue, render));
-  }
-
-  const checkedDataStore = componentRef[stateKey]?.dataStore;
-
-  return checkedDataStore && checkedDataStore[currentSubSeq];
+  return makeProxyData<T>(initValue, render);
 }
 
-function makeProxyData(initValue: InitValue, render: () => void) {
+function makeProxyData<T extends UseDataStoreValue>(
+  initValue: T,
+  render: () => void
+) {
   return new Proxy(initValue, {
-    get(target, prop: string) {
+    get(target: T, prop: string) {
       return target[prop];
     },
-    set(target, prop: string, value) {
+    set(target, prop: keyof T, value) {
       target[prop] = value;
       render();
 
