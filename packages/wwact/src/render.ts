@@ -112,15 +112,13 @@ function startFindNextBrotherElement(
   const candidiateBrothers = brothers.slice(nextIndex);
 
   const finedNextEl = findChildFragmentNextElement(candidiateBrothers);
+  const parentType = parentWDom.type || '';
 
   if (finedNextEl) {
     return finedNextEl;
   }
 
-  if (
-    !parentWDom.isRoot &&
-    (parentWDom.type === 'fragment' || parentWDom.type === 'loop')
-  ) {
+  if (!parentWDom.isRoot && ['fragment', 'loop'].includes(parentType)) {
     return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
   }
 
@@ -155,17 +153,17 @@ function findChildFragmentNextElement(
 
 function typeReplace(newWDom: WDom) {
   const parentWDom = getParent(newWDom);
+  const orignalElement = newWDom.el;
 
-  if (parentWDom.type) {
+  if (parentWDom.type && orignalElement) {
     const parentElement = parentWDom.el;
-    const orignalElement = newWDom.el;
     const newElement = wDomToDom(newWDom, true);
 
-    if (orignalElement && newWDom.oldProps) {
+    if (newWDom.oldProps) {
       removeEvent(newWDom.oldProps, orignalElement);
     }
 
-    if (parentElement && orignalElement) {
+    if (parentElement) {
       parentElement.replaceChild(newElement, orignalElement);
     }
   }
