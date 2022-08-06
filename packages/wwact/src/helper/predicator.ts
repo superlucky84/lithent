@@ -1,3 +1,4 @@
+import { Fragment } from '@/wDom';
 import {
   WDom,
   TagFunction,
@@ -60,7 +61,8 @@ export const checkSameVdomWithOriginal = {
 export function checkCustemComponentFunction(
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver {
-  const isTagTagFunction = typeof target === 'function' && !('isF' in target);
+  const isTagTagFunction =
+    typeof target === 'function' && target.prototype.constructor !== Fragment;
   const TagFunctionResolver = typeof target === 'object' && 'resolve' in target;
 
   return isTagTagFunction || TagFunctionResolver;
@@ -69,7 +71,9 @@ export function checkCustemComponentFunction(
 export function checkFragmentFunction(
   target: unknown
 ): target is FragmentFunction {
-  return typeof target === 'function' && 'isF' in target;
+  return (
+    typeof target === 'function' && target.prototype.constructor === Fragment
+  );
 }
 
 export function checkPlainWDomType(vDom: WDomParam): vDom is WDom {
