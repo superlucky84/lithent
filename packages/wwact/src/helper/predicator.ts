@@ -22,24 +22,17 @@ type WDomParam =
 export function getWDomType(
   wDom: WDom | TagFunction | TagFunctionResolver
 ): WDomType | undefined {
-  const isComponent = checkCustemComponentFunction(wDom);
-  const isFragment = checkFragment(wDom);
-  const isTagElement = checkTagElement(wDom);
-  const isLoopElement = checkLoopElement(wDom);
-  const isTextElement = checkTextElement(wDom);
-  const isEmptyElement = checkEmptyElement(wDom);
-
-  if (isComponent) {
+  if (checkCustemComponentFunction(wDom)) {
     return 'component';
-  } else if (isFragment) {
+  } else if (checkPlainType(wDom, 'fragment')) {
     return 'fragment';
-  } else if (isTagElement) {
+  } else if (checkPlainType(wDom, 'element')) {
     return 'element';
-  } else if (isLoopElement) {
+  } else if (checkPlainType(wDom, 'loop')) {
     return 'loop';
-  } else if (isTextElement) {
+  } else if (checkPlainType(wDom, 'text')) {
     return 'text';
-  } else if (isEmptyElement) {
+  } else if (checkEmptyElement(wDom)) {
     return 'empty';
   }
 
@@ -48,11 +41,11 @@ export function getWDomType(
 
 export const checkSameWDomWithOriginal = {
   component: checkSameCustomComponent,
-  loop: checkSameLoopElement,
-  text: checkSameTextElement,
+  loop: checkNormalTypeElement,
+  text: checkNormalTypeElement,
   element: checkSameTagElement,
   fragment: checkSameFragment,
-  empty: checkSameEmptyElement,
+  empty: checkNormalTypeElement,
 };
 
 /**
@@ -80,20 +73,8 @@ export function checkPlainWDomType(wDom: WDomParam): wDom is WDom {
   return typeof wDom === 'object' && !('resolve' in wDom);
 }
 
-export function checkFragment(wDom: WDomParam) {
-  return checkPlainWDomType(wDom) && wDom.type === 'fragment';
-}
-
-export function checkTagElement(wDom: WDomParam) {
-  return checkPlainWDomType(wDom) && wDom.type === 'element';
-}
-
-export function checkLoopElement(wDom: WDomParam) {
-  return checkPlainWDomType(wDom) && wDom.type === 'loop';
-}
-
-export function checkTextElement(wDom: WDomParam) {
-  return checkPlainWDomType(wDom) && wDom.type === 'text';
+export function checkPlainType(wDom: WDomParam, typeName: string) {
+  return checkPlainWDomType(wDom) && wDom.type === typeName;
 }
 
 export function checkEmptyElement(wDom: WDomParam) {
@@ -122,15 +103,7 @@ export function checkSameTagElement({ originalWDom, newWDom }: DiffParam) {
   );
 }
 
-export function checkSameLoopElement({ originalWDom, newWDom }: DiffParam) {
-  return checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
-}
-
-export function checkSameTextElement({ originalWDom, newWDom }: DiffParam) {
-  return checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
-}
-
-export function checkSameEmptyElement({ originalWDom, newWDom }: DiffParam) {
+export function checkNormalTypeElement({ originalWDom, newWDom }: DiffParam) {
   return checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
 }
 
