@@ -19,6 +19,11 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ['wwact'],
+      output: {
+        globals: {
+          wwact: 'wwact',
+        },
+      },
     },
   },
   esbuild: {
