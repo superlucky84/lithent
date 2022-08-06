@@ -18,15 +18,15 @@ export type FragmentFunction = (
 
 export type NodePointer = { value: WDom | undefined };
 
-export type MiddleStateVDom =
+export type MiddleStateWDom =
   | WDom
   | number
   | string
   | false
   | null
-  | MiddleStateVDomChildren;
+  | MiddleStateWDomChildren;
 
-export type MiddleStateVDomChildren = MiddleStateVDom[];
+export type MiddleStateWDomChildren = MiddleStateWDom[];
 
 export type WDomType =
   | 'component'

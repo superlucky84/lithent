@@ -3,13 +3,13 @@ import {
   TagFunction,
   FragmentFunction,
   Props,
-  MiddleStateVDomChildren,
-  MiddleStateVDom,
+  MiddleStateWDomChildren,
+  MiddleStateWDom,
   NodePointer,
 } from '@/types';
 
-import makeNewVdomTree from '@/diff';
-import { vDomUpdate } from './render';
+import makeNewWDomTree from '@/diff';
+import { wDomUpdate } from './render';
 import {
   initUpdateHookState,
   initMountHookState,
@@ -23,14 +23,14 @@ import {
 
 export type Children = WDom[];
 
-type VDomInfoParam = {
+type WDomInfoParam = {
   componentMaker: () => WDom;
   componentKey: symbol;
   tag: TagFunction;
   props: Props;
   children: WDom[];
 };
-type VDomInfoWithRenderParam = VDomInfoParam & {
+type WDomInfoWithRenderParam = WDomInfoParam & {
   reRender: () => WDom;
 };
 
@@ -42,7 +42,7 @@ Fragment.isF = true;
 export function h(
   tag: TagFunction | FragmentFunction | string,
   props: Props,
-  ...children: MiddleStateVDomChildren
+  ...children: MiddleStateWDomChildren
 ) {
   const nodePointer: NodePointer = { value: undefined };
   const newProps = props || {};
@@ -62,35 +62,35 @@ function reRenderCustomComponent({
   tag,
   props,
   children,
-  originalVdom,
+  originalWDom,
 }: {
   tag: TagFunction;
   props: Props;
   children: WDom[];
-  originalVdom: WDom;
+  originalWDom: WDom;
 }) {
   needDiffRef.value = true;
 
-  const newVdom = makeVdomResolver({ tag, props, children });
-  const newVdomTree = makeNewVdomTree({ originalVdom, newVdom });
-  newVdomTree.getParent = originalVdom.getParent;
+  const newWDom = makeWDomResolver({ tag, props, children });
+  const newWDomTree = makeNewWDomTree({ originalWDom, newWDom });
+  newWDomTree.getParent = originalWDom.getParent;
 
-  if (!originalVdom.isRoot && originalVdom.getParent) {
-    const brothers = originalVdom.getParent()?.children || [];
-    const index = brothers.indexOf(originalVdom);
+  if (!originalWDom.isRoot && originalWDom.getParent) {
+    const brothers = originalWDom.getParent()?.children || [];
+    const index = brothers.indexOf(originalWDom);
 
-    brothers.splice(index, 1, newVdomTree);
+    brothers.splice(index, 1, newWDomTree);
   } else {
-    newVdomTree.isRoot = true;
-    newVdomTree.wrapElement = originalVdom.wrapElement;
+    newWDomTree.isRoot = true;
+    newWDomTree.wrapElement = originalWDom.wrapElement;
   }
 
-  vDomUpdate(newVdomTree);
+  wDomUpdate(newWDomTree);
 
   needDiffRef.value = false;
 }
 
-function makeVdomResolver({
+function makeWDomResolver({
   tag,
   props,
   children,
@@ -112,10 +112,10 @@ function makeVdomResolver({
       children,
     });
 
-    const originalVdom = customNode;
+    const originalWDom = customNode;
 
     setRedrawAction(componentKey, () => {
-      reRenderCustomComponent({ tag, props, children, originalVdom });
+      reRenderCustomComponent({ tag, props, children, originalWDom });
     });
 
     return customNode;
@@ -124,45 +124,45 @@ function makeVdomResolver({
   return { tagName, props, children, resolve };
 }
 
-function makeCustomNode(vdomInfo: VDomInfoParam) {
-  const { componentMaker } = vdomInfo;
+function makeCustomNode(wDomInfo: WDomInfoParam) {
+  const { componentMaker } = wDomInfo;
   const customNode = componentMaker();
-  const reRender = makeReRender(vdomInfo);
+  const reRender = makeReRender(wDomInfo);
 
-  addComponentProps(customNode, { ...vdomInfo, reRender });
+  addComponentProps(customNode, { ...wDomInfo, reRender });
 
   return customNode;
 }
 
-function makeReRender(vdomInfo: VDomInfoParam) {
-  const reRender = () => vdomMaker({ ...vdomInfo, reRender });
+function makeReRender(wDomInfo: WDomInfoParam) {
+  const reRender = () => wDomMaker({ ...wDomInfo, reRender });
 
   return reRender;
 }
 
-function vdomMaker(vdomInfo: VDomInfoWithRenderParam) {
-  const { componentMaker, componentKey, tag, props, children } = vdomInfo;
+function wDomMaker(wDomInfo: WDomInfoWithRenderParam) {
+  const { componentMaker, componentKey, tag, props, children } = wDomInfo;
 
   initUpdateHookState(componentKey);
 
-  const originalVdom = componentMaker();
+  const originalWDom = componentMaker();
 
   setRedrawAction(componentKey, () => {
-    reRenderCustomComponent({ tag, props, children, originalVdom });
+    reRenderCustomComponent({ tag, props, children, originalWDom });
   });
 
-  addComponentProps(originalVdom, vdomInfo);
+  addComponentProps(originalWDom, wDomInfo);
 
-  return originalVdom;
+  return originalWDom;
 }
 
-function addComponentProps(vDom: WDom, info: VDomInfoWithRenderParam) {
+function addComponentProps(wDom: WDom, info: WDomInfoWithRenderParam) {
   const { componentKey, tag, props, children, reRender } = info;
-  vDom.componentProps = props;
-  vDom.componentChildren = children;
-  vDom.tagName = tag.name;
-  vDom.componentKey = componentKey;
-  vDom.reRender = reRender;
+  wDom.componentProps = props;
+  wDom.componentChildren = children;
+  wDom.tagName = tag.name;
+  wDom.componentKey = componentKey;
+  wDom.reRender = reRender;
 }
 
 function makeNode({
@@ -177,7 +177,7 @@ function makeNode({
   if (checkFragmentFunction(tag)) {
     return Fragment(props, ...children);
   } else if (checkCustemComponentFunction(tag)) {
-    const componetMakeResolver = makeVdomResolver({ tag, props, children });
+    const componetMakeResolver = makeWDomResolver({ tag, props, children });
 
     return needDiffRef.value
       ? componetMakeResolver
@@ -189,9 +189,9 @@ function makeNode({
 
 function remakeChildren(
   nodePointer: NodePointer,
-  children: MiddleStateVDomChildren
+  children: MiddleStateWDomChildren
 ): WDom[] {
-  return children.map((item: MiddleStateVDom) => {
+  return children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
 
     childItem.getParent = () => nodePointer.value;
@@ -200,7 +200,7 @@ function remakeChildren(
   });
 }
 
-function makeChildrenItem(item: MiddleStateVDom): WDom {
+function makeChildrenItem(item: MiddleStateWDom): WDom {
   if (item === null || item === undefined || item === false) {
     return { type: null };
   } else if (Array.isArray(item)) {

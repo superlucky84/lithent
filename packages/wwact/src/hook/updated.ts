@@ -29,14 +29,14 @@ export default function updated(
   updatedCallSeq.value += 1;
 }
 
-export function runUpdatedQueueFromVdom(newVdom: WDom) {
-  if (!newVdom.componentKey) {
+export function runUpdatedQueueFromWDom(newWDom: WDom) {
+  if (!newWDom.componentKey) {
     return;
   }
 
-  const queue = componentRef[newVdom.componentKey]?.updateSubscribeList;
-  if (newVdom.tagName && queue) {
-    componentRef[newVdom.componentKey].updateSubscribeList = [];
+  const queue = componentRef[newWDom.componentKey]?.updateSubscribeList;
+  if (newWDom.tagName && queue) {
+    componentRef[newWDom.componentKey].updateSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

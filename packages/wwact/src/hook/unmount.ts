@@ -14,13 +14,13 @@ export default function unmount(effectAction: () => void) {
   }
 }
 
-export function runUnmountQueueFromVdom(newVdom: WDom) {
-  if (!newVdom.componentKey) {
+export function runUnmountQueueFromWDom(newWDom: WDom) {
+  if (!newWDom.componentKey) {
     return;
   }
-  const queue = componentRef[newVdom.componentKey]?.unmountSubscribeList;
-  if (newVdom.tagName && queue) {
-    componentRef[newVdom.componentKey].unmountSubscribeList = [];
+  const queue = componentRef[newWDom.componentKey]?.unmountSubscribeList;
+  if (newWDom.tagName && queue) {
+    componentRef[newWDom.componentKey].unmountSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

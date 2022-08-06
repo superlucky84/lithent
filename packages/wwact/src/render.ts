@@ -17,78 +17,78 @@ import {
   checkEventFunction,
   isExisty,
 } from '@/helper/predicator';
-import { runMountedQueueFromVdom } from '@/hook/mounted';
-import { runUpdatedQueueFromVdom } from '@/hook/updated';
+import { runMountedQueueFromWDom } from '@/hook/mounted';
+import { runUpdatedQueueFromWDom } from '@/hook/updated';
 import { getParent } from '@/helper';
 
-export function render(vDom: WDom, wrapElement: HTMLElement | null) {
+export function render(wDom: WDom, wrapElement: HTMLElement | null) {
   if (!wrapElement) {
     throw Error('WrapELement is null');
   }
-  vDom.isRoot = true;
-  vDom.wrapElement = wrapElement;
+  wDom.isRoot = true;
+  wDom.wrapElement = wrapElement;
 
-  wrapElement.appendChild(vDomToDom(vDom, true));
+  wrapElement.appendChild(wDomToDom(wDom, true));
 }
 
-export function vDomUpdate(newVdomTree: WDom) {
-  const { needRerender } = newVdomTree;
+export function wDomUpdate(newWDomTree: WDom) {
+  const { needRerender } = newWDomTree;
 
   switch (needRerender) {
     case 'ADD':
-      typeAdd(newVdomTree);
+      typeAdd(newWDomTree);
       break;
     case 'DELETE':
-      typeDelete(newVdomTree);
+      typeDelete(newWDomTree);
       break;
     case 'REPLACE':
-      typeReplace(newVdomTree);
+      typeReplace(newWDomTree);
       break;
     case 'UPDATE':
-      typeUpdate(newVdomTree);
+      typeUpdate(newWDomTree);
       break;
     case 'SORTED-REPLACE':
-      typeSortedReplace(newVdomTree);
+      typeSortedReplace(newWDomTree);
       break;
     case 'SORTED-UPDATE':
-      typeSortedUpdate(newVdomTree);
+      typeSortedUpdate(newWDomTree);
       break;
     case 'NONE':
       break;
   }
 }
 
-function typeDelete(newVdom: WDom) {
-  const parent = newVdom?.el?.parentNode;
+function typeDelete(newWDom: WDom) {
+  const parent = newWDom?.el?.parentNode;
 
-  if (parent && newVdom.el) {
-    parent.removeChild(newVdom.el);
-    delete newVdom.el;
+  if (parent && newWDom.el) {
+    parent.removeChild(newWDom.el);
+    delete newWDom.el;
   }
 }
 
-function typeSortedReplace(newVdom: WDom) {
-  typeDelete(newVdom);
-  typeAdd(newVdom);
+function typeSortedReplace(newWDom: WDom) {
+  typeDelete(newWDom);
+  typeAdd(newWDom);
 }
 
-function typeSortedUpdate(newVdom: WDom) {
-  typeDelete(newVdom);
-  typeAdd(newVdom, newVdom.el);
+function typeSortedUpdate(newWDom: WDom) {
+  typeDelete(newWDom);
+  typeAdd(newWDom, newWDom.el);
 }
 
 function typeAdd(
-  newVdom: WDom,
+  newWDom: WDom,
   newElement?: HTMLElement | DocumentFragment | Text
 ) {
   if (!newElement) {
-    newElement = vDomToDom(newVdom, true);
+    newElement = wDomToDom(newWDom, true);
   }
 
-  const parentVdom = getParent(newVdom);
-  if (parentVdom.type) {
-    const parentEl = findRealParentElement(parentVdom);
-    const nextEl = startFindNextBrotherElement(newVdom, parentVdom);
+  const parentWDom = getParent(newWDom);
+  if (parentWDom.type) {
+    const parentEl = findRealParentElement(parentWDom);
+    const nextEl = startFindNextBrotherElement(newWDom, parentWDom);
 
     if (newElement && parentEl) {
       if (nextEl) {
@@ -99,15 +99,15 @@ function typeAdd(
     }
   }
 
-  runMountedQueueFromVdom(newVdom);
+  runMountedQueueFromWDom(newWDom);
 }
 
 function startFindNextBrotherElement(
-  vDom: WDom,
-  parentVdom: WDom
+  wDom: WDom,
+  parentWDom: WDom
 ): HTMLElement | DocumentFragment | Text | undefined {
-  const brothers = parentVdom.children || [];
-  const index = brothers.indexOf(vDom);
+  const brothers = parentWDom.children || [];
+  const index = brothers.indexOf(wDom);
   const nextIndex = index + 1;
   const candidiateBrothers = brothers.slice(nextIndex);
 
@@ -118,10 +118,10 @@ function startFindNextBrotherElement(
   }
 
   if (
-    !parentVdom.isRoot &&
-    (parentVdom.type === 'fragment' || parentVdom.type === 'loop')
+    !parentWDom.isRoot &&
+    (parentWDom.type === 'fragment' || parentWDom.type === 'loop')
   ) {
-    return startFindNextBrotherElement(parentVdom, getParent(parentVdom));
+    return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
   }
 
   return undefined;
@@ -153,16 +153,16 @@ function findChildFragmentNextElement(
   );
 }
 
-function typeReplace(newVdom: WDom) {
-  const parentVdom = getParent(newVdom);
+function typeReplace(newWDom: WDom) {
+  const parentWDom = getParent(newWDom);
 
-  if (parentVdom.type) {
-    const parentElement = parentVdom.el;
-    const orignalElement = newVdom.el;
-    const newElement = vDomToDom(newVdom, true);
+  if (parentWDom.type) {
+    const parentElement = parentWDom.el;
+    const orignalElement = newWDom.el;
+    const newElement = wDomToDom(newWDom, true);
 
-    if (orignalElement && newVdom.oldProps) {
-      removeEvent(newVdom.oldProps, orignalElement);
+    if (orignalElement && newWDom.oldProps) {
+      removeEvent(newWDom.oldProps, orignalElement);
     }
 
     if (parentElement && orignalElement) {
@@ -170,42 +170,42 @@ function typeReplace(newVdom: WDom) {
     }
   }
 
-  runMountedQueueFromVdom(newVdom);
+  runMountedQueueFromWDom(newWDom);
 }
 
-function typeUpdate(newVdom: WDom) {
-  const element = newVdom.el;
+function typeUpdate(newWDom: WDom) {
+  const element = newWDom.el;
 
-  if (newVdom.type === 'text') {
-    updateText(newVdom);
+  if (newWDom.type === 'text') {
+    updateText(newWDom);
 
     return;
   }
 
   if (element) {
-    const { oldProps, props } = newVdom;
+    const { oldProps, props } = newWDom;
 
     updateProps({ oldProps, props, element });
 
-    delete newVdom.oldProps;
+    delete newWDom.oldProps;
 
-    if (newVdom.tag === 'input') {
-      (element as HTMLInputElement).value = String(newVdom?.props?.value || '');
+    if (newWDom.tag === 'input') {
+      (element as HTMLInputElement).value = String(newWDom?.props?.value || '');
     }
   }
 
-  (newVdom.children || []).forEach((childItem: WDom) => {
-    vDomUpdate(childItem);
+  (newWDom.children || []).forEach((childItem: WDom) => {
+    wDomUpdate(childItem);
   });
 
-  runUpdatedQueueFromVdom(newVdom);
+  runUpdatedQueueFromWDom(newWDom);
 }
 
-function updateText(newVdom: WDom) {
-  const element = newVdom.el;
+function updateText(newWDom: WDom) {
+  const element = newWDom.el;
 
   if (element) {
-    element.nodeValue = String(newVdom.text);
+    element.nodeValue = String(newWDom.text);
   }
 }
 
@@ -268,9 +268,9 @@ function updateProps({
   });
 }
 
-function vDomToDom(vDom: WDom, init: boolean) {
+function wDomToDom(wDom: WDom, init: boolean) {
   let element;
-  const { type, tag, text, props, children = [] } = vDom;
+  const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = type === 'fragment' || type === 'loop';
 
   if (isVirtualType) {
@@ -281,17 +281,17 @@ function vDomToDom(vDom: WDom, init: boolean) {
     element = document.createTextNode(String(text));
   }
 
-  vDomChildrenToDom(children, element, init);
+  wDomChildrenToDom(children, element, init);
   updateProps({ props, element });
 
-  vDom.el = element;
+  wDom.el = element;
 
-  runMountedQueueFromVdom(vDom);
+  runMountedQueueFromWDom(wDom);
 
   return element || document.createElement('div');
 }
 
-function vDomChildrenToDom(
+function wDomChildrenToDom(
   children: WDom[],
   parentElement?: HTMLElement | DocumentFragment | Text,
   init?: boolean
@@ -300,7 +300,7 @@ function vDomChildrenToDom(
     const elementChildren = children.reduce(
       (acc: DocumentFragment, childItem: WDom) => {
         if (childItem.type) {
-          acc.appendChild(vDomToDom(childItem, init));
+          acc.appendChild(wDomToDom(childItem, init));
         }
 
         return acc;

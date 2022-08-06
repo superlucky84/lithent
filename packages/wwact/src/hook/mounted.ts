@@ -16,14 +16,14 @@ export default function mounted(effectAction: () => void) {
   mountSubscribeList.push(effectAction);
 }
 
-export function runMountedQueueFromVdom(newVdom: WDom) {
-  if (!newVdom.componentKey) {
+export function runMountedQueueFromWDom(newWDom: WDom) {
+  if (!newWDom.componentKey) {
     return;
   }
-  const queue = componentRef[newVdom.componentKey].mountSubscribeList;
+  const queue = componentRef[newWDom.componentKey].mountSubscribeList;
 
-  if (newVdom.tagName && queue) {
-    componentRef[newVdom.componentKey].mountSubscribeList = [];
+  if (newWDom.tagName && queue) {
+    componentRef[newWDom.componentKey].mountSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();
