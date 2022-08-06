@@ -5,17 +5,8 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
 import Navi from '@/navi';
 
-export function code(originalString) {
-  const matchs = originalString.match(/\n\s*/, '');
-  const targetString = matchs[0];
-  const tReg = new RegExp(targetString, 'g');
-
-  return originalString.replace(targetString, '').replace(tReg, '\n');
-}
-
 export function RenderCode({ codeString }) {
   const componentMaker = () => {
-    console.log(code(codeString));
     return (
       <pre class={codeClass}>
         <code class="language-javascript hljs">{code(codeString)}</code>
@@ -25,7 +16,7 @@ export function RenderCode({ codeString }) {
   return componentMaker;
 }
 
-export default function Wwveal(_props, children) {
+export function Wwveal(_props, children) {
   let { data, slidesElementRef, handleMounted, changeCursor, step } = useNavi();
 
   const componentMaker = () => {
@@ -46,6 +37,14 @@ export default function Wwveal(_props, children) {
   };
 
   return componentMaker;
+}
+
+function code(originalString) {
+  const matchs = originalString.match(/\n\s*/, '');
+  const targetString = matchs[0];
+  const tReg = new RegExp(targetString, 'g');
+
+  return originalString.replace(targetString, '').replace(tReg, '\n');
 }
 
 function useNavi() {

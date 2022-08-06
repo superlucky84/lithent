@@ -1,5 +1,5 @@
 import { h, render } from 'wwact';
-import Wwveal, { RenderCode } from '@/Wwveal';
+import { Wwveal, RenderCode } from '@/Wwveal';
 
 const vDom = (
   <Wwveal>
