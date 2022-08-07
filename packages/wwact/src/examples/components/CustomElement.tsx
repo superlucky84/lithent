@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { makeRef, updated, makeData } from '@/hook';
+import { makeRef, updated, makeData } from '@/index';
 import Custom2 from './Custom2';
 
 const useJw = () => {

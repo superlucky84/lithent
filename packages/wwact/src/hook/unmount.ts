@@ -15,12 +15,15 @@ export default function unmount(effectAction: () => void) {
 }
 
 export function runUnmountQueueFromWDom(newWDom: WDom) {
-  if (!newWDom.componentKey) {
+  const { componentKey } = newWDom;
+
+  if (!componentKey) {
     return;
   }
-  const queue = componentRef[newWDom.componentKey]?.unmountSubscribeList;
+
+  const queue = componentRef[componentKey]?.unmountSubscribeList;
   if (newWDom.tagName && queue) {
-    componentRef[newWDom.componentKey].unmountSubscribeList = [];
+    componentRef[componentKey].unmountSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

@@ -82,9 +82,7 @@ export function checkEmptyElement(wDom: WDomParam) {
 }
 
 export function checkSameCustomComponent({ originalWDom, newWDom }: DiffParam) {
-  // Todo need Fix Function type check
-  // @ts-ignore
-  return newWDom.tagName === originalWDom?.tagName;
+  return 'tagName' in newWDom && newWDom.tagName === originalWDom?.tagName;
 }
 
 export function checkSameFragment({ originalWDom, newWDom }: DiffParam) {
@@ -112,12 +110,6 @@ export function isExisty(value: unknown) {
 }
 
 export function checkFunction(target: unknown): target is Function {
-  return typeof target === 'function';
-}
-
-export function checkEventFunction(
-  target: unknown
-): target is (e: Event) => void {
   return typeof target === 'function';
 }
 

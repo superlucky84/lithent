@@ -183,8 +183,7 @@ function remakeChildrenForLoopUpdate(newWDom: WDom, originalWDom: WDom) {
     const el = unusedItem.el;
 
     if (el && el.parentNode) {
-      const parent = el.parentNode;
-      parent.removeChild(el);
+      el.parentNode.removeChild(el);
     }
   });
 

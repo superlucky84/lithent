@@ -32,28 +32,22 @@ export function reRender(vDom: WDom, infoVdom: TagFunctionResolver) {
 }
 
 function updateProps(props: Props, infoProps: Props) {
-  if (infoProps !== props) {
-    if (props) {
-      Object.keys(props).forEach(key => {
-        delete props[key];
-      });
-    }
+  if (props && infoProps !== props) {
+    Object.keys(props).forEach(key => {
+      delete props[key];
+    });
 
-    if (props) {
-      Object.entries(infoProps || {}).forEach(([key, value]) => {
-        props[key] = value;
-      });
-    }
+    Object.entries(infoProps || {}).forEach(([key, value]) => {
+      props[key] = value;
+    });
   }
 }
 
 function updateChildren(children: WDom[], infoChidren: WDom[]) {
-  if (infoChidren !== children) {
-    if (children) {
-      children.splice(0, children.length);
-    }
+  if (children && infoChidren !== children) {
+    children.splice(0, children.length);
 
-    if (infoChidren && children) {
+    if (infoChidren) {
       infoChidren.forEach(childrenItem => {
         children.push(childrenItem);
       });

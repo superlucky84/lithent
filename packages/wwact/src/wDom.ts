@@ -49,8 +49,6 @@ export function h(
   const newChildren = remakeChildren(nodePointer, children);
   const node = makeNode({ tag, props: newProps, children: newChildren });
 
-  // console.log('NODE', node);
-
   if (!checkCustemComponentFunction(node)) {
     nodePointer.value = node;
   }
@@ -73,16 +71,18 @@ function reRenderCustomComponent({
 
   const newWDom = makeWDomResolver({ tag, props, children });
   const newWDomTree = makeNewWDomTree({ originalWDom, newWDom });
-  newWDomTree.getParent = originalWDom.getParent;
+  const { isRoot, getParent, wrapElement } = originalWDom;
 
-  if (!originalWDom.isRoot && originalWDom.getParent) {
-    const brothers = originalWDom.getParent()?.children || [];
+  newWDomTree.getParent = getParent;
+
+  if (!isRoot && getParent) {
+    const brothers = getParent()?.children || [];
     const index = brothers.indexOf(originalWDom);
 
     brothers.splice(index, 1, newWDomTree);
   } else {
     newWDomTree.isRoot = true;
-    newWDomTree.wrapElement = originalWDom.wrapElement;
+    newWDomTree.wrapElement = wrapElement;
   }
 
   wDomUpdate(newWDomTree);
@@ -158,11 +158,14 @@ function wDomMaker(wDomInfo: WDomInfoWithRenderParam) {
 
 function addComponentProps(wDom: WDom, info: WDomInfoWithRenderParam) {
   const { componentKey, tag, props, children, reRender } = info;
-  wDom.componentProps = props;
-  wDom.componentChildren = children;
-  wDom.tagName = tag.name;
-  wDom.componentKey = componentKey;
-  wDom.reRender = reRender;
+
+  Object.assign(wDom, {
+    componentProps: props,
+    componentChildren: children,
+    tagName: tag.name,
+    componentKey,
+    reRender,
+  });
 }
 
 function makeNode({

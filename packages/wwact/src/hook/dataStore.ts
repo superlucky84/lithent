@@ -86,6 +86,7 @@ function makeProxyData<T extends UseDataStoreValue>({
             (methodValue as Function)(...args);
           };
         }
+
         return proxy[prop];
       },
       set() {

@@ -1,4 +1,4 @@
-import { makeDataStore } from '@/hook';
+import { makeDataStore } from '@/hook/dataStore';
 
 const promiseTest = (): Promise<number> => {
   return new Promise(resolve => {

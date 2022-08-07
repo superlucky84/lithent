@@ -1,5 +1,5 @@
 import { h, Fragment } from '@/wDom';
-import { makeData } from '@/hook';
+import { makeData } from '@/index';
 
 export default function NestedFragment() {
   const data = makeData<{ choiceNode: number }>({ choiceNode: 7 });

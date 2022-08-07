@@ -11,12 +11,7 @@
  */
 
 import { WDom, Props } from '@/types';
-import {
-  checkStyleData,
-  checkRefData,
-  checkEventFunction,
-  isExisty,
-} from '@/helper/predicator';
+import { checkStyleData, checkRefData, isExisty } from '@/helper/predicator';
 import { runMountedQueueFromWDom } from '@/hook/mounted';
 import { runUpdatedQueueFromWDom } from '@/hook/updated';
 import { getParent } from '@/helper';
@@ -60,6 +55,10 @@ export function wDomUpdate(newWDomTree: WDom) {
 
 function typeDelete(newWDom: WDom) {
   const parent = newWDom?.el?.parentNode;
+
+  if (newWDom.oldProps && newWDom.el) {
+    removeEvent(newWDom.oldProps, newWDom.el);
+  }
 
   if (parent && newWDom.el) {
     parent.removeChild(newWDom.el);
@@ -171,6 +170,21 @@ function typeReplace(newWDom: WDom) {
   runMountedQueueFromWDom(newWDom);
 }
 
+function removeEvent(
+  oldProps: Props,
+  element?: HTMLElement | DocumentFragment | Text
+) {
+  if (element) {
+    Object.entries(oldProps || {}).forEach(
+      ([dataKey, dataValue]: [string, unknown]) => {
+        if (dataKey.match(/^on/)) {
+          element.removeEventListener(dataKey, dataValue as (e: Event) => void);
+        }
+      }
+    );
+  }
+}
+
 function typeUpdate(newWDom: WDom) {
   const element = newWDom.el;
 
@@ -204,20 +218,6 @@ function updateText(newWDom: WDom) {
 
   if (element) {
     element.nodeValue = String(newWDom.text);
-  }
-}
-
-function removeEvent(
-  oldProps: Props,
-  element?: HTMLElement | DocumentFragment | Text
-) {
-  if (element) {
-    if (checkEventFunction(oldProps?.onClick)) {
-      element.removeEventListener('click', oldProps.onClick);
-    }
-    if (checkEventFunction(oldProps?.onInput)) {
-      element.removeEventListener('input', oldProps.onInput);
-    }
   }
 }
 

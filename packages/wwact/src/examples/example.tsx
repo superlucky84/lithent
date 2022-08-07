@@ -1,9 +1,9 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
-import CustomElement from '@/components/CustomElement';
-// import NestedFragment from '@/components/NestedFragment';
-// import LoopTest from '@/components/LoopTest';
-// import Presentation from '@/components/Presentation';
+import CustomElement from '@/examples/components/CustomElement';
+// import NestedFragment from '@/examples/components/NestedFragment';
+// import LoopTest from '@/examples/components/LoopTest';
+// import Presentation from '@/examples/components/Presentation';
 import storeInit from '@/store';
 
 storeInit();

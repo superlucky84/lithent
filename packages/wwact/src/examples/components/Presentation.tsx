@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { useDataStore } from '@/hook';
+import { useDataStore } from '@/index';
 
 export default function NestedFragment() {
   const exampleData = useDataStore<{ title: string }>('example');

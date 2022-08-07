@@ -30,13 +30,14 @@ export default function updated(
 }
 
 export function runUpdatedQueueFromWDom(newWDom: WDom) {
-  if (!newWDom.componentKey) {
+  const { componentKey } = newWDom;
+  if (!componentKey) {
     return;
   }
 
-  const queue = componentRef[newWDom.componentKey]?.updateSubscribeList;
+  const queue = componentRef[componentKey]?.updateSubscribeList;
   if (newWDom.tagName && queue) {
-    componentRef[newWDom.componentKey].updateSubscribeList = [];
+    componentRef[componentKey].updateSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

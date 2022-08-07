@@ -1,6 +1,6 @@
 import { GlobalData } from '@/store';
 import { h, Children } from '@/wDom';
-import { mounted, unmount, updated, useDataStore, makeData } from '@/hook';
+import { mounted, unmount, updated, useDataStore, makeData } from '@/index';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
