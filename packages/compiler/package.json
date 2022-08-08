@@ -1,0 +1,27 @@
+{
+  "name": "@wwact/compiler",
+  "private": true,
+  "version": "0.0.1",
+  "description": "@wwact/compiler",
+  "type": "module",
+  "main": "./dist/compiler.umd.cjs",
+  "module": "./dist/compiler.js",
+  "exports": {
+    ".": {
+      "import": "./dist/compiler.js",
+      "require": "./dist/compiler.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "highlight.js": "^11.6.0",
+    "sass": "^1.54.0",
+    "wwact": "workspace:*"
+  },
+  "author": "superlucky84",
+  "license": "MIT",
+  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/compiler"
+}
