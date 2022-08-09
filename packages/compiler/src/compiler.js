@@ -1,7 +1,7 @@
 const j = `
 <div class={\`aaaaaaaaa$\{data.k\}\`} jj = "2" />
 <div class={\`aaaaaaaaa$\{data.k\}\`} jj = "2">
-  <button onClick={handle}>!vava{data.k}aa</button>
+  <button w-if={true} onClick={handle}> !vava{data.k}aa</button>
   <button onClick={handle2}>{data2.k}-vava</button>
   <button onClick={handle3}>{data3.k}-vava</button>
   <div ref={domRef}>
@@ -13,49 +13,91 @@ const j = `
   <br />
   <br />
 </div>
-`;
+`.trim();
 
-const templateArr = j.split('');
+console.log(j);
 
-console.log(templateArr);
+const jLength = j.length;
 
-function* makeFinder(templateArr) {
-  const target = [...templateArr];
-  while (target.length > 0) {
-    const item = target.shift();
+const result = {
+  children: [],
+};
+const sa = {
+  start: 0,
+  end: 0,
+  code: j,
+};
 
-    yield item;
+function isExisty(value) {
+  return value !== undefined && value !== null;
+}
+
+function search(targetString) {
+  let acc = '';
+  let finded = false;
+
+  for (sa.end = sa.start; sa.end < sa.code.length; sa.end += 1) {
+    if (sa.code[sa.end] === targetString) {
+      finded = true;
+      sa.start = sa.end;
+      break;
+    }
+
+    acc += sa.code[sa.end];
+  }
+
+  return [finded, acc.trim()];
+}
+
+const tagStack = [];
+
+function find(parent) {
+  const [finded, acc1] = search('<');
+  if (finded) {
+    const innerValue = acc1.replace(/>/, '');
+    if (innerValue) {
+      const item = {
+        text: innerValue,
+        parent,
+      };
+      parent.children.push(item);
+    }
+    sa.start += 1;
+
+    const [finded, acc] = search('>');
+    if (finded) {
+      const children = [];
+      const [tagName] = acc.split(' ');
+
+      if (!/^\//.test(tagName)) {
+        const hasChildren = !/\/$/.test(acc);
+        const item = {
+          tagName,
+          s: acc,
+          hasChildren,
+          children,
+          parent,
+        };
+        tagStack.push(tagName);
+
+        parent.children.push(item);
+
+        return hasChildren ? item : parent;
+      } else {
+        return parent.parent;
+      }
+    }
   }
 }
 
-function search(regex) {
-  let i;
-  let find = false;
-  let acc = '';
-  do {
-    i = va.next();
-    acc = acc + i.value;
-    if (regex.test(i.value)) {
-      find = true;
-    }
-  } while (!i.done && !find);
+function makeTree(parentArr = { children: [] }) {
+  const returnArr = find(parentArr);
+  if (returnArr) {
+    return makeTree(returnArr);
+  }
 
-  return acc;
+  return parentArr;
 }
+const result2 = makeTree();
 
-function findTag() {
-  search(/</);
-  const tagName = search(/ /).trim();
-  const etc = search(/\/?>/).replace(/>$/, '').trim();
-  const hasChildren = !/\/$/.test(etc);
-  console.log(tagName, etc, hasChildren);
-}
-
-const va = makeFinder(templateArr);
-
-findTag();
-findTag();
-findTag();
-findTag();
-findTag();
-findTag();
+console.log(result2);
