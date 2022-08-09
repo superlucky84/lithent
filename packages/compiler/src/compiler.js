@@ -16,6 +16,7 @@ const j = `
 `;
 
 const templateArr = j.split('');
+const va = makeFinder(templateArr);
 
 console.log(templateArr);
 
@@ -43,19 +44,45 @@ function search(regex) {
   return acc;
 }
 
-function findTag() {
-  search(/</);
-  const tagName = search(/ /).trim();
-  const etc = search(/\/?>/).replace(/>$/, '').trim();
-  const hasChildren = !/\/$/.test(etc);
-  console.log(tagName, etc, hasChildren);
+function findTag(parentArr) {
+  const s = search(/[^\n\r]/).trim();
+  if (s === '<') {
+    const tagName = search(/ /).trim();
+    const etc = search(/\/?>/).replace(/>$/, '').trim();
+    const hasChildren = !/\/$/.test(etc);
+    const children = [];
+    console.log('ISTAG', tagName, etc, hasChildren);
+
+    const item = {
+      tagName,
+      hasChildren,
+      children,
+      etc,
+    };
+
+    console.log(parentArr);
+    parentArr.push(item);
+
+    const newParentArr = hasChildren ? children : parentArr;
+
+    return newParentArr;
+  } else {
+    const text = search(/[ |{]/).trim();
+
+    console.log('ISNOTTAG', s + text);
+
+    return parentArr;
+  }
 }
 
-const va = makeFinder(templateArr);
+const root = [];
+let tempParentArr = [];
 
-findTag();
-findTag();
-findTag();
-findTag();
-findTag();
-findTag();
+tempParentArr = findTag(root);
+tempParentArr = findTag(tempParentArr);
+tempParentArr = findTag(tempParentArr);
+tempParentArr = findTag(tempParentArr);
+tempParentArr = findTag(tempParentArr);
+tempParentArr = findTag(tempParentArr);
+
+console.log('RESULT = ', root);
