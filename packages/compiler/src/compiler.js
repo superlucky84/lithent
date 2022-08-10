@@ -1,7 +1,10 @@
-const j = `
-<div class={\`aaaaaaaaa$\{data.k\}\`} jj = "2" />
-<div class={\`aaaaaaaaa$\{data.k\}\`} jj = "2">
-  <button w-if={true} onClick={handle}> !vava{data.k}aa</button>
+import step1 from '@/step1';
+
+const code = `
+<div
+  class   =   {\`aaaaaaaaa$\{data.k\}\`}
+        jj  =  "2" kk={3}>
+  <button w-if={true} onClick={handle}>{ssv} !vava{data.k}a {data.j}a  asdlg  asdg</button>
   <button onClick={handle2}>{data2.k}-vava</button>
   <button onClick={handle3}>{data3.k}-vava</button>
   <div ref={domRef}>
@@ -15,89 +18,99 @@ const j = `
 </div>
 `.trim();
 
-console.log(j);
+console.log(code);
 
-const jLength = j.length;
-
-const result = {
-  children: [],
-};
-const sa = {
-  start: 0,
-  end: 0,
-  code: j,
-};
-
-function isExisty(value) {
-  return value !== undefined && value !== null;
+function makeCursor(code) {
+  return { start: 0, end: 0, code };
 }
 
-function search(targetString) {
+const stepIns = new step1(makeCursor(code));
+const step1Result = stepIns.run();
+
+console.log(step1Result);
+
+function search(cursor, targetString) {
   let acc = '';
   let finded = false;
 
-  for (sa.end = sa.start; sa.end < sa.code.length; sa.end += 1) {
-    if (sa.code[sa.end] === targetString) {
+  for (
+    cursor.end = cursor.start;
+    cursor.end < cursor.code.length;
+    cursor.end += 1
+  ) {
+    if (cursor.code[cursor.end] === targetString) {
       finded = true;
-      sa.start = sa.end;
+      cursor.start = cursor.end;
       break;
     }
 
-    acc += sa.code[sa.end];
+    acc += cursor.code[cursor.end];
   }
 
   return [finded, acc.trim()];
 }
 
-const tagStack = [];
+function textToArr(target) {
+  let newTarget = target.replace(/\n|\r/g, ' ');
+  const cursor = makeCursor(newTarget);
 
-function find(parent) {
-  const [finded, acc1] = search('<');
-  if (finded) {
-    const innerValue = acc1.replace(/>/, '');
-    if (innerValue) {
-      const item = {
-        text: innerValue,
-        parent,
-      };
-      parent.children.push(item);
-    }
-    sa.start += 1;
+  function parse(acc) {
+    const startTick = search(cursor, '{');
+    if (startTick[0]) {
+      acc.push(startTick[1]);
 
-    const [finded, acc] = search('>');
-    if (finded) {
-      const children = [];
-      const [tagName] = acc.split(' ');
-
-      if (!/^\//.test(tagName)) {
-        const hasChildren = !/\/$/.test(acc);
-        const item = {
-          tagName,
-          s: acc,
-          hasChildren,
-          children,
-          parent,
-        };
-        tagStack.push(tagName);
-
-        parent.children.push(item);
-
-        return hasChildren ? item : parent;
-      } else {
-        return parent.parent;
+      const endTick = search(cursor, '}');
+      if (endTick[0]) {
+        endTick[1] += '}';
       }
+
+      acc.push(endTick[1]);
+      cursor.start += 1;
+      return parse(acc);
     }
-  }
-}
 
-function makeTree(parentArr = { children: [] }) {
-  const returnArr = find(parentArr);
-  if (returnArr) {
-    return makeTree(returnArr);
+    acc.push(startTick[1]);
+
+    return acc;
   }
 
-  return parentArr;
-}
-const result2 = makeTree();
+  const arr = parse([]).filter(item => item);
+  const result = arr.reduce((acc, item) => {
+    if (/^{.*}$/.test(item)) {
+      acc += item.replace(/^{|}$/g, '') + ', ';
+    } else {
+      acc += `'${item}', `;
+    }
 
-console.log(result2);
+    return acc;
+  }, '');
+
+  return `[ ${result.replace(/, $/, '')} ]`;
+}
+// ['{ssv}', '!vava', '{data.k}', 'a', '{data.j}', 'a  asdlg  asdg']
+// !vava{data.k}aa
+// ['!vava', data.k, 'aa']
+
+function propsToObjectString(target) {
+  let newTarget = target.replace(/\n|\r/g, '');
+  newTarget = newTarget.replace(/=\s*/g, '=');
+  newTarget = newTarget.replace(/\s*=/g, '=');
+  newTarget = newTarget.replace(/\s{2,}/g, ' ');
+  const [, ...propsArr] = newTarget.split(' ');
+
+  // console.log(propsArr);
+  // console.log(propsArr.join(',').replace(/=/g, ': '));
+
+  const result = propsArr.reduce((acc, item) => {
+    const [key, value] = item.split('=');
+    acc.push(`${key}: ${value.replace(/^{|}$/g, '')}`);
+
+    return acc;
+  }, []);
+
+  return `{ ${result.join(', ')} }`;
+}
+
+// propsToObjectString(step1Result.children[0].s);
+console.log(propsToObjectString(step1Result.children[0].children[0].s));
+console.log(textToArr(step1Result.children[0].children[0].children[0].text));
