@@ -47,7 +47,7 @@ function search(cursor, targetString) {
     acc += cursor.code[cursor.end];
   }
 
-  return [finded, acc.trim()];
+  return [finded, acc];
 }
 
 function textToArr(target) {
@@ -62,10 +62,10 @@ function textToArr(target) {
       const endTick = search(cursor, '}');
       if (endTick[0]) {
         endTick[1] += '}';
+        cursor.start += 1;
       }
 
       acc.push(endTick[1]);
-      cursor.start += 1;
       return parse(acc);
     }
 
@@ -75,6 +75,7 @@ function textToArr(target) {
   }
 
   const arr = parse([]).filter(item => item);
+  console.log(arr);
   const result = arr.reduce((acc, item) => {
     if (/^{.*}$/.test(item)) {
       acc += item.replace(/^{|}$/g, '') + ', ';
