@@ -75,7 +75,6 @@ function textToArr(target) {
   }
 
   const arr = parse([]).filter(item => item);
-  console.log(arr);
   const result = arr.reduce((acc, item) => {
     if (/^{.*}$/.test(item)) {
       acc += item.replace(/^{|}$/g, '') + ', ';
@@ -113,5 +112,5 @@ function propsToObjectString(target) {
 }
 
 // propsToObjectString(step1Result.children[0].s);
-console.log(propsToObjectString(step1Result.children[0].children[0].s));
-console.log(textToArr(step1Result.children[0].children[0].children[0].text));
+// console.log(propsToObjectString(step1Result.children[0].children[0].s));
+// console.log(textToArr(step1Result.children[0].children[0].children[0].text));
