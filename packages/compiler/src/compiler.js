@@ -10,6 +10,7 @@ const code = `
   <button onClick={handle}>{ssv} !vava{data.k}a {data.j}a  asdlg  asdg</button>
   <button onClick={handle2}>{data2.k}-vava</button>
   <button onClick={handle3}>{data3.k}-vava</button>
+  <Custom />
   <div ref={domRef}>
     <div>data.k: {data.k}</div>
     <div>data.j: {data.j}</div>
@@ -23,11 +24,14 @@ const code = `
 
 console.log(code);
 
-const stepIns = new step1(makeCursor(code));
-const step1Result = stepIns.run();
+export function parse(code) {
+  const stepIns = new step1(makeCursor(code));
+  const step1Result = stepIns.run();
+  console.log(step1Result);
+  const addedProps = step2(step1Result);
+  const result = step3(addedProps).replace(/,\s*/, '');
 
-const addedProps = step2(step1Result);
-console.log(addedProps);
-const result = step3(addedProps).replace(/,\s*/, '');
+  return result;
+}
 
-console.log(result);
+console.log(parse(code));

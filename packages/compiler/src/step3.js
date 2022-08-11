@@ -1,7 +1,10 @@
 export default function makeFuctions(node) {
   let result = '';
   if (node.tagName) {
-    result += `h('${node.tagName}', ${node.props}`;
+    const isCustom = /^[A-Z]/.test(node.tagName);
+    const tagName = isCustom ? node.tagName : `'${node.tagName}'`;
+
+    result += `h(${tagName}, ${node.props}`;
 
     (node.children || []).forEach(childItem => {
       result += `, ${makeFuctions(childItem)}`;
