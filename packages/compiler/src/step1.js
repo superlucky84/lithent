@@ -49,7 +49,8 @@ export default class step1 {
       const [finded, acc] = this.search('>');
       if (finded) {
         const children = [];
-        const [tagName] = acc.split(' ');
+        let [tagName] = acc.split(' ');
+        tagName = tagName.replace(/\n|\r/g, '');
 
         if (!/^\//.test(tagName)) {
           const hasChildren = !/\/$/.test(acc);
