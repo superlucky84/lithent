@@ -2,8 +2,9 @@ import { makeCursor } from '@/util';
 
 export default function traverse(node) {
   if (node.tagName) {
-    const props = propsToObjectString(node.s);
+    const [props, ifValue] = propsToObjectString(node.s);
     node.props = props;
+    node.ifValue = ifValue;
   } else if (node.text) {
     const textArr = textToArr(node.text);
     node.textArr = textArr;
@@ -76,6 +77,7 @@ function textToArr(target) {
 }
 
 function propsToObjectString(target) {
+  let ifValue = '';
   let newTarget = target.replace(/\n|\r/g, '');
   newTarget = newTarget.replace(/=\s*/g, '=');
   newTarget = newTarget.replace(/\s*=/g, '=');
@@ -87,12 +89,19 @@ function propsToObjectString(target) {
 
   const result = propsArr.reduce((acc, item) => {
     const [key, value] = item.split('=');
+    console.log(key);
     if (key.replace('/', '')) {
-      acc.push(`${key}: ${(value || "''").replace(/^{|}$/g, '')}`);
+      const newValue = (value || "''").replace(/^{|}$/g, '');
+
+      if (key === 'w-if') {
+        ifValue = `(newValue) && `;
+      } else {
+        acc.push(`${key}: ${newValue}`);
+      }
     }
 
     return acc;
   }, []);
 
-  return result.length ? `{ ${result.join(', ')} }` : null;
+  return [result.length ? `{ ${result.join(', ')} }` : null, ifValue];
 }
