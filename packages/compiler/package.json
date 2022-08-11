@@ -5,10 +5,10 @@
   "description": "@wwact/compiler",
   "type": "module",
   "main": "./dist/compiler.umd.cjs",
-  "module": "./dist/compiler.js",
+  "module": "./src/compiler.js",
   "exports": {
     ".": {
-      "import": "./dist/compiler.js",
+      "import": "./src/compiler.js",
       "require": "./dist/compiler.umd.cjs"
     }
   },
