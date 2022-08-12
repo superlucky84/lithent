@@ -21,16 +21,35 @@ export default function traverse(node) {
 function search(cursor, targetString) {
   let acc = '';
   let finded = false;
+  const { ignoreStr, ignoreChk } = cursor;
 
   for (
     cursor.end = cursor.start;
     cursor.end < cursor.code.length;
     cursor.end += 1
   ) {
-    if (cursor.code[cursor.end] === targetString) {
+    const currentString = cursor.code[cursor.end];
+    const matchString = currentString === targetString;
+    const isIgnore = ignoreChk.length > 0;
+
+    if (matchString && !isIgnore) {
       finded = true;
       cursor.start = cursor.end;
       break;
+    }
+
+    const isIgnoreString = ignoreStr.includes(currentString);
+    if (isIgnoreString) {
+      if (ignoreChk[ignoreChk.length - 1] === '"' && currentString === '"') {
+        ignoreChk.pop();
+      } else if (
+        ignoreChk[ignoreChk.length - 1] === '{' &&
+        currentString === '}'
+      ) {
+        ignoreChk.pop();
+      } else {
+        ignoreChk.push(currentString);
+      }
     }
 
     acc += cursor.code[cursor.end];
@@ -84,10 +103,22 @@ function propsToObjectString(target) {
   newTarget = newTarget.replace(/=\s*/g, '=');
   newTarget = newTarget.replace(/\s*=/g, '=');
   newTarget = newTarget.replace(/\s{2,}/g, ' ');
-  const [, ...propsArr] = newTarget.split(' ');
 
-  // console.log(propsArr);
-  // console.log(propsArr.join(',').replace(/=/g, ': '));
+  const cursor = makeCursor(newTarget, ['"', '{', '}']);
+  const finder = (res = []) => {
+    let [finded, findedItem] = search(cursor, ' ');
+    if (finded) {
+      res.push(findedItem);
+      cursor.start += 1;
+
+      return finder(res);
+    }
+    res.push(findedItem);
+
+    return res;
+  };
+
+  const [, ...propsArr] = finder();
 
   const result = propsArr.reduce((acc, item) => {
     const [key, value] = item.split('=');
@@ -97,7 +128,12 @@ function propsToObjectString(target) {
       if (key === 'w-if') {
         ifValue = `(${newValue}) && `;
       } else if (key === 'w-for') {
-        forValue = `(${newValue}).map(${newValue}Item, index) => `;
+        let [listItem, list] = newValue.split(' in ');
+        if (!list) {
+          list = listItem;
+          listItem = `${list}Item`;
+        }
+        forValue = `(${list}).map(${listItem}, index) => `;
       } else {
         acc.push(`${key}: ${newValue}`);
       }

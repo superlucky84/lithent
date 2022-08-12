@@ -1,3 +1,3 @@
-export function makeCursor(code) {
-  return { start: 0, end: 0, code };
+export function makeCursor(code, ignoreStr = [], ignoreChk = []) {
+  return { ignoreStr, ignoreChk, start: 0, end: 0, code };
 }
