@@ -2,9 +2,12 @@ import { makeCursor } from '@/util';
 
 export default function traverse(node) {
   if (node.tagName) {
-    const [props, ifValue, forValue] = propsToObjectString(node.s);
+    const [props, ifValue, forValue, elseIfValue, elseValue] =
+      propsToObjectString(node.s);
     node.props = props;
     node.ifValue = ifValue;
+    node.elseIfValue = elseIfValue;
+    node.elseValue = elseValue;
     node.forValue = forValue;
   } else if (node.text) {
     const textArr = textToArr(node.text);
@@ -99,6 +102,8 @@ function textToArr(target) {
 function propsToObjectString(target) {
   let ifValue = '';
   let forValue = '';
+  let elseIfValue = '';
+  let elseValue = '';
   let newTarget = target.replace(/\n|\r/g, '');
   newTarget = newTarget.replace(/=\s*/g, '=');
   newTarget = newTarget.replace(/\s*=/g, '=');
@@ -126,7 +131,11 @@ function propsToObjectString(target) {
       const newValue = (value || "''").replace(/^{|}$/g, '');
 
       if (key === 'w-if') {
-        ifValue = `(${newValue}) && `;
+        ifValue = `((${newValue}) && `;
+      } else if (key === 'w-else-if') {
+        elseIfValue = `((${newValue}) && `;
+      } else if (key === 'w-else') {
+        elseValue = `((${newValue}) && `;
       } else if (key === 'w-for') {
         let [listItem, list] = newValue.split(' in ');
         if (!list) {
@@ -142,5 +151,11 @@ function propsToObjectString(target) {
     return acc;
   }, []);
 
-  return [result.length ? `{ ${result.join(', ')} }` : null, ifValue, forValue];
+  return [
+    result.length ? `{ ${result.join(', ')} }` : null,
+    ifValue,
+    forValue,
+    elseIfValue,
+    elseValue,
+  ];
 }
