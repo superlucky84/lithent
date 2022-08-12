@@ -26,7 +26,7 @@ const code = `
 console.log(code);
 
 export function parse(code) {
-  const stepIns = new step1(makeCursor(code));
+  const stepIns = new step1(makeCursor(code, ['"', '{', '}']));
   const step1Result = stepIns.run();
   const addedProps = step2(step1Result);
   console.log(addedProps);

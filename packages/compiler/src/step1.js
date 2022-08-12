@@ -15,16 +15,35 @@ export default class step1 {
   search(targetString) {
     let acc = '';
     let finded = false;
+    const { ignoreStr, ignoreChk } = this.sa;
 
     for (
       this.sa.end = this.sa.start;
       this.sa.end < this.sa.code.length;
       this.sa.end += 1
     ) {
-      if (this.sa.code[this.sa.end] === targetString) {
+      const currentString = this.sa.code[this.sa.end];
+      const matchString = currentString === targetString;
+      const isIgnore = ignoreChk.length > 0;
+
+      if (matchString && !isIgnore) {
         finded = true;
         this.sa.start = this.sa.end;
         break;
+      }
+
+      const isIgnoreString = ignoreStr.includes(currentString);
+      if (isIgnoreString) {
+        if (ignoreChk[ignoreChk.length - 1] === '"' && currentString === '"') {
+          ignoreChk.pop();
+        } else if (
+          ignoreChk[ignoreChk.length - 1] === '{' &&
+          currentString === '}'
+        ) {
+          ignoreChk.pop();
+        } else {
+          ignoreChk.push(currentString);
+        }
       }
 
       acc += this.sa.code[this.sa.end];
