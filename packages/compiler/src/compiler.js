@@ -7,7 +7,8 @@ import step3 from '@/step3';
 const code = `
 <div
   class   =   {\`aaaaaaaaa$\{data.k\}\`} jj  =  "2" kk={3}>
-  <Custom w-if={true} jj="kk" />
+  <span w-for={list}>vsvs</span>
+  <Custom w-for={list} w-if={true} jj="kk" />
   <button onClick={handle}>{ssv} !vava{data.k}a {data.j}a  asdlg  asdg</button>
   <button onClick={handle2}>{data2.k}-vava</button>
   <button onClick={handle3}>{data3.k}-vava</button>

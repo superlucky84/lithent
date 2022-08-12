@@ -2,9 +2,10 @@ import { makeCursor } from '@/util';
 
 export default function traverse(node) {
   if (node.tagName) {
-    const [props, ifValue] = propsToObjectString(node.s);
+    const [props, ifValue, forValue] = propsToObjectString(node.s);
     node.props = props;
     node.ifValue = ifValue;
+    node.forValue = forValue;
   } else if (node.text) {
     const textArr = textToArr(node.text);
     node.textArr = textArr;
@@ -78,6 +79,7 @@ function textToArr(target) {
 
 function propsToObjectString(target) {
   let ifValue = '';
+  let forValue = '';
   let newTarget = target.replace(/\n|\r/g, '');
   newTarget = newTarget.replace(/=\s*/g, '=');
   newTarget = newTarget.replace(/\s*=/g, '=');
@@ -89,12 +91,13 @@ function propsToObjectString(target) {
 
   const result = propsArr.reduce((acc, item) => {
     const [key, value] = item.split('=');
-    console.log(key);
     if (key.replace('/', '')) {
       const newValue = (value || "''").replace(/^{|}$/g, '');
 
       if (key === 'w-if') {
-        ifValue = `(newValue) && `;
+        ifValue = `(${newValue}) && `;
+      } else if (key === 'w-for') {
+        forValue = `(${newValue}).map(${newValue}Item, index) => `;
       } else {
         acc.push(`${key}: ${newValue}`);
       }
@@ -103,5 +106,5 @@ function propsToObjectString(target) {
     return acc;
   }, []);
 
-  return [result.length ? `{ ${result.join(', ')} }` : null, ifValue];
+  return [result.length ? `{ ${result.join(', ')} }` : null, ifValue, forValue];
 }

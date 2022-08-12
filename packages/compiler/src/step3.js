@@ -4,7 +4,7 @@ export default function makeFuctions(node) {
     const isCustom = /^[A-Z]/.test(node.tagName);
     const tagName = isCustom ? node.tagName : `'${node.tagName}'`;
 
-    result += `${node.ifValue}h(${tagName}, ${node.props}`;
+    result += `${node.ifValue}${node.forValue}h(${tagName}, ${node.props}`;
 
     (node.children || []).forEach(childItem => {
       result += `, ${makeFuctions(childItem)}`;
