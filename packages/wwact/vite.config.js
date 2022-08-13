@@ -22,8 +22,4 @@ export default defineConfig({
       fileName: 'wwact',
     },
   },
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
-  },
 });
