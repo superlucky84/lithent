@@ -4,6 +4,16 @@ import step1 from '@/step1';
 import step2 from '@/step2';
 import step3 from '@/step3';
 
+export function parse(code) {
+  const stepIns = new step1(makeCursor(code, ['"', '{', '}']));
+  const step1Result = stepIns.run();
+  const addedProps = step2(step1Result);
+  const result = step3(addedProps).replace(/,\s*/, 'return ') + ';';
+
+  return result;
+}
+
+/*
 const code = `
 <div
   class   =   {\`aaaaaaaaa$\{data.k\}\`} jj  =  "2" kk={3}>
@@ -28,15 +38,5 @@ const code = `
 `.trim();
 
 console.log(code);
-
-export function parse(code) {
-  const stepIns = new step1(makeCursor(code, ['"', '{', '}']));
-  const step1Result = stepIns.run();
-  const addedProps = step2(step1Result);
-  console.log(addedProps);
-  const result = step3(addedProps).replace(/,\s*/, '');
-
-  return result;
-}
-
 console.log(parse(code));
+*/
