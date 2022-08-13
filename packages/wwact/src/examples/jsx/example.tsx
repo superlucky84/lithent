@@ -1,6 +1,6 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
-import CustomElement from '@/examples/components/CustomElement';
+import CustomElement from '@/examples/jsx/components/CustomElement';
 // import NestedFragment from '@/examples/components/NestedFragment';
 // import LoopTest from '@/examples/components/LoopTest';
 // import Presentation from '@/examples/components/Presentation';

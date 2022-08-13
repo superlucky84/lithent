@@ -1,0 +1,25 @@
+{
+  "name": "@wwact/vite-plugin-wwx",
+  "private": true,
+  "version": "0.0.1",
+  "description": "@wwact/vite-plugin-wwx",
+  "type": "module",
+  "main": "./dist/wwxVitePlugin.umd.cjs",
+  "module": "./dist/wwxVitePlugin.js",
+  "exports": {
+    ".": {
+      "import": "./dist/wwxVitePlugin.js",
+      "require": "./dist/wwxVitePlugin.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@wwact/compiler": "workspace:*"
+  },
+  "author": "superlucky84",
+  "license": "MIT",
+  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/vitePlugin"
+}

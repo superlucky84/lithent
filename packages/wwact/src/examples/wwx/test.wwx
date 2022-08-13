@@ -1,0 +1,13 @@
+import { h, Fragment } from '@/wDom';
+
+const makeVDom = () => {
+  <template>
+    <Fragment>
+      <div>3</div>
+      <div>7</div>
+    </Fragment>
+  </template>
+};
+const vDom = makeVDom();
+
+export default vDom;

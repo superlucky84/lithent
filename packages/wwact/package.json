@@ -18,7 +18,15 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
+  "devDependencies": {
+    "@wwact/vite-plugin-wwx": "workspace:*"
+  },
   "author": "superlucky84",
   "license": "MIT",
-  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/wwact"
+  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/wwact",
+  "dependencies": {
+    "@rollup/pluginutils": "^4.2.1",
+    "require-relative": "^0.8.7",
+    "vite-plugin-inspect": "^0.6.0"
+  }
 }
