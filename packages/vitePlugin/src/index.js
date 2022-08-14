@@ -9,8 +9,8 @@ export default function myPlugin() {
     transform(src, id) {
       if (fileRegex.test(id)) {
 
-        const code = src.replace(/<template>((.|[\/S\/s])*)<\/template>/ms, (_m, p1) => {
-          return parse(p1);
+        const code = src.replace(/<template>((.|[\/S\/s])*)<\/template>/ms, (_m, template) => {
+          return parse(template);
         });
 
         return {

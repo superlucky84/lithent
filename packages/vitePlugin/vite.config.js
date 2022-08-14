@@ -17,8 +17,5 @@ export default defineConfig({
       name: 'wwxVitePlugin',
       fileName: 'wwxVitePlugin',
     },
-  },
-  server: {
-    open: '/wwxExample.html'
   }
 });
