@@ -47,7 +47,12 @@ export default function CustomElement() {
         <button onClick={handle3}>{data3.k}-vava</button>
         <span w-if={data.k % 2 === 0}>m</span>
         <span w-else>jinwoo</span>
-        <Custom2 w-if={data.k % 2 === 1} k={data.k} data={data} handle3={handle3}>
+        <Custom2
+          w-if={data.k % 2 === 1}
+          k={data.k}
+          data={data}
+          handle3={handle3}
+        >
           <span>1</span>
           <span>2</span>
           <span>3</span>
@@ -61,7 +66,7 @@ export default function CustomElement() {
         <br />
         <br />
       </div>
-    </template>
+    </template>;
   };
 
   return componentMaker;

@@ -1,10 +1,7 @@
 import { h } from '@/wDom';
 import { mounted, unmount, updated, useDataStore, makeData } from '@/index';
 
-export default function Custom2(
-  props,
-  children,
-) {
+export default function Custom2(props, children) {
   const globalData = useDataStore('globalData');
   const data7 = makeData({ m: 1 });
   const data = makeData({ v: '1' });
@@ -22,7 +19,7 @@ export default function Custom2(
   const handleUpdated = async () => {
     console.log('CUSTOM2 UPDATED --');
   };
-  const handleInputChane = (event) => {
+  const handleInputChane = event => {
     data.v = event.target.value;
   };
 
@@ -39,7 +36,7 @@ export default function Custom2(
         <button onClick={globalData.toggleItem}>handle4</button>
         <article>0{children}0</article>
       </div>
-    </template>
+    </template>;
   };
 
   return componentMaker;
