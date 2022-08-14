@@ -126,7 +126,9 @@ function propsToObjectString(target) {
   const [, ...propsArr] = finder();
 
   const result = propsArr.reduce((acc, item) => {
-    const [key, value] = item.split('=');
+    const [key, ...values] = item.split('=');
+    const value = values.join('=');
+
     if (key.replace('/', '')) {
       const newValue = (value || "''").replace(/^{|}$/g, '');
 
@@ -135,7 +137,7 @@ function propsToObjectString(target) {
       } else if (key === 'w-else-if') {
         elseIfValue = `((${newValue}) && `;
       } else if (key === 'w-else') {
-        elseValue = `((${newValue}) && `;
+        elseValue = `(`;
       } else if (key === 'w-for') {
         let [listItem, list] = newValue.split(' in ');
         if (!list) {

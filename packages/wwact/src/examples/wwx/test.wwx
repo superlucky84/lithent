@@ -1,0 +1,21 @@
+import { h, Fragment } from '@/wDom';
+import CustomElement from '@/examples/wwx/components/CustomElement.wwx';
+import storeInit from '@/store';
+
+storeInit();
+
+const makeVDom = () => {
+  <template>
+    <Fragment>
+      <CustomElement vava={7} />
+      <CustomElement vava={7} />
+      <Fragment>
+        <div>3</div>
+        <div>3</div>
+      </Fragment>
+    </Fragment>
+  </template>
+};
+const vDom = makeVDom();
+
+export default vDom;

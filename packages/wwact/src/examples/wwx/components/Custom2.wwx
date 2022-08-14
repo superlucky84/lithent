@@ -1,0 +1,46 @@
+import { h } from '@/wDom';
+import { mounted, unmount, updated, useDataStore, makeData } from '@/index';
+
+export default function Custom2(
+  props,
+  children,
+) {
+  const globalData = useDataStore('globalData');
+  const data7 = makeData({ m: 1 });
+  const data = makeData({ v: '1' });
+
+  const gdataUpdate = () => {
+    console.log('gdataUpdate');
+    globalData.increase();
+  };
+  const handleMounted = () => {
+    console.log('CUSTOM2 MOUNTED');
+  };
+  const handleUnmount = () => {
+    console.log('CUSTOM2 UNMOUNT');
+  };
+  const handleUpdated = async () => {
+    console.log('CUSTOM2 UPDATED --');
+  };
+  const handleInputChane = (event) => {
+    data.v = event.target.value;
+  };
+
+  const componentMaker = () => {
+    mounted(handleMounted);
+    unmount(handleUnmount);
+    updated(handleUpdated, [globalData.value]);
+
+    <template>
+      <div class="custom2">
+        {props.k}-{data7.m}--------------{globalData.item}-!{globalData.value}
+        <input type="text" value={data.v} onInput={handleInputChane} />
+        <button onClick={gdataUpdate}>gdataupdate</button>
+        <button onClick={globalData.toggleItem}>handle4</button>
+        <article>0{children}0</article>
+      </div>
+    </template>
+  };
+
+  return componentMaker;
+}
