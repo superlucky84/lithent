@@ -19,9 +19,12 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/examples/wwx/example.wwx'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'wwact',
       fileName: 'wwact',
     },
+  },
+  server: {
+    open: '/html/wwxExample.html',
   },
 });

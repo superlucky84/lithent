@@ -17,10 +17,7 @@ export function parse(code) {
 const code = `
 <div
   class   =   {\`aaaaaaaaa$\{data.k\}\`} jj  =  "2" kk={3}>
-  <span w-if={a}>a</span>
-  <span w-else-if={b}>b</span>
-  <span w-else-if={c}>c</span>
-  <span w-else>s</span>
+  <span w-if={a === 0}>a</span>
 
   <Custom w-for={list} w-if={true} jj="kk" />
   <button onClick={handle}>{ssv} !vava{data.k}a {data.j}a  asdlg  asdg</button>
