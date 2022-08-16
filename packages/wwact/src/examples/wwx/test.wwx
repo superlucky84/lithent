@@ -1,6 +1,6 @@
 import { h, Fragment } from '@/wDom';
 import CustomElement from '@/examples/wwx/components/CustomElement.wwx';
-import storeInit from '@/store';
+import storeInit from '@/examples/wwx/store';
 
 storeInit();
 

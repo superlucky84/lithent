@@ -1,7 +1,7 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
 import test from '@/examples/wwx/test.wwx';
-import storeInit from '@/store';
+import storeInit from '@/examples/wwx/store';
 
 storeInit();
 

@@ -1,4 +1,4 @@
-import { GlobalData } from '@/store';
+import { GlobalData } from '@/examples/jsx/store';
 import { h, Children } from '@/wDom';
 import { mounted, unmount, updated, useDataStore, makeData } from '@/index';
 
