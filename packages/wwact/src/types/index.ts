@@ -6,6 +6,7 @@ export type TagFunction = (prop: Props, children: WDom[]) => () => WDom;
 
 export type TagFunctionResolver = {
   tagName: string;
+  constructor: Function;
   props: Props;
   children: WDom[];
   resolve: (componentKey?: symbol) => WDom;
@@ -43,6 +44,7 @@ export interface WDom {
   props?: Props;
   oldProps?: Props;
   tagName?: string;
+  constructor?: Function;
   children?: WDom[];
   getParent?: () => WDom | undefined;
   text?: string | number;

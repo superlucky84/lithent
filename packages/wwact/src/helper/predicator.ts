@@ -82,7 +82,10 @@ export function checkEmptyElement(wDom: WDomParam) {
 }
 
 export function checkSameCustomComponent({ originalWDom, newWDom }: DiffParam) {
-  return 'tagName' in newWDom && newWDom.tagName === originalWDom?.tagName;
+  return (
+    'constructor' in newWDom &&
+    newWDom.constructor === originalWDom?.constructor
+  );
 }
 
 export function checkSameFragment({ originalWDom, newWDom }: DiffParam) {

@@ -99,6 +99,7 @@ function makeWDomResolver({
   children: WDom[];
 }) {
   const tagName = tag.name;
+  const constructor = tag;
   const resolve = (componentKey = Symbol(tagName)) => {
     initMountHookState(componentKey);
 
@@ -120,7 +121,7 @@ function makeWDomResolver({
     return customNode;
   };
 
-  return { tagName, props, children, resolve };
+  return { tagName, constructor, props, children, resolve };
 }
 
 function makeCustomNode(wDomInfo: WDomInfoParam) {
@@ -161,6 +162,7 @@ function addComponentProps(wDom: WDom, info: WDomInfoWithRenderParam) {
   Object.assign(wDom, {
     componentProps: props,
     componentChildren: children,
+    constructor: tag,
     tagName: tag.name,
     componentKey,
     reRender,
