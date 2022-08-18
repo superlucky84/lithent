@@ -43,14 +43,7 @@ importers:
       vite-plugin-checker: 0.4.9_vite@3.0.3
 
   packages/compiler:
-    specifiers:
-      highlight.js: ^11.6.0
-      sass: ^1.54.0
-      wwact: workspace:*
-    dependencies:
-      highlight.js: 11.6.0
-      sass: 1.54.0
-      wwact: link:../wwact
+    specifiers: {}
 
   packages/router:
     specifiers:
@@ -67,7 +60,7 @@ importers:
   packages/wwact:
     specifiers:
       '@wwact/vite-plugin-wwx': workspace:*
-    dependencies:
+    devDependencies:
       '@wwact/vite-plugin-wwx': link:../vitePlugin
 
   packages/wwveal:

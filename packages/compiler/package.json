@@ -1,6 +1,5 @@
 {
   "name": "@wwact/compiler",
-  "private": true,
   "version": "0.0.1",
   "description": "@wwact/compiler",
   "type": "module",
@@ -15,11 +14,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build"
-  },
-  "dependencies": {
-    "highlight.js": "^11.6.0",
-    "sass": "^1.54.0",
-    "wwact": "workspace:*"
   },
   "author": "superlucky84",
   "license": "MIT",

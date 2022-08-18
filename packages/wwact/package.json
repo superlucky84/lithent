@@ -23,8 +23,5 @@
   },
   "author": "superlucky84",
   "license": "MIT",
-  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/wwact",
-  "dependencies": {
-    "@wwact/vite-plugin-wwx": "workspace:*"
-  }
+  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/wwact"
 }
