@@ -1,5 +1,5 @@
 import { h, Fragment } from 'wwact';
-import { makeData, mounted, unmount } from 'wwact';
+import { makeData, effect, unmount } from 'wwact';
 import { addParams } from '@/hook/params';
 
 export function Router(_props, children) {
@@ -33,15 +33,16 @@ export function Router(_props, children) {
   };
 
   const removeEvent = () => {
+    console.log('unmount');
     window.removeEventListener('hashchange', handleHashChange);
   };
 
   window.addEventListener('hashchange', handleHashChange);
 
-  const componentMaker = () => {
-    mounted(handleHashChange);
-    unmount(removeEvent);
+  effect(handleHashChange);
+  unmount(removeEvent);
 
+  const componentMaker = () => {
     return (
       <Fragment>
         {children.map(item => {

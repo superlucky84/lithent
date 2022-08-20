@@ -21,6 +21,7 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
   if (!componentKey) {
     return;
   }
+  console.log('COMPONENTREF - ', componentRef, newWDom);
   const queue = componentRef[componentKey].mountSubscribeList;
   componentKeyRef.value = componentKey;
 

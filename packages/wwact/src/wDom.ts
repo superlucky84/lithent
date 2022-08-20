@@ -113,6 +113,7 @@ function makeWDomResolver({
     });
 
     const originalWDom = customNode;
+    console.log('b');
 
     setRedrawAction(componentKey, () => {
       reRenderCustomComponent({ tag, props, children, originalWDom });
@@ -141,6 +142,7 @@ function makeReRender(wDomInfo: WDomInfoParam) {
 }
 
 function wDomMaker(wDomInfo: WDomInfoWithRenderParam) {
+  console.log('a');
   const { componentMaker, componentKey, tag, props, children } = wDomInfo;
 
   initUpdateHookState(componentKey);

@@ -81,6 +81,7 @@ function remakeNewWDom({
     originalWDom.componentKey
   ) {
     runUnmountQueueFromWDom(originalWDom);
+    console.log('RUN UNMOUNT', remakeWDom, originalWDom);
     delete componentRef[originalWDom.componentKey];
   }
 

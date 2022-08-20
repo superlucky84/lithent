@@ -14,7 +14,7 @@ const makeVDom = () => {
         <div>3</div>
       </Fragment>
     </Fragment>
-  </template>
+  </template>;
 };
 const vDom = makeVDom();
 
