@@ -74,7 +74,7 @@ export type ComponentSubKey =
 export type ComponentRef = {
   [key: symbol]: {
     redrawAction?: () => void;
-    updateSubscribeDefList?: any[];
+    updateSubscribeDefList?: WeakMap<() => void, unknown[]>;
     updateSubscribeList?: (() => void)[];
     mountSubscribeList?: (() => void)[];
     unmountSubscribeList?: (() => void)[];

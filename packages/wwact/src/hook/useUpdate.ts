@@ -1,7 +1,6 @@
 import { WDom } from '@/types';
 import {
   componentKeyRef,
-  updatedCallSeq,
   makeQueueRef,
   makeUpdatedStore,
   componentRef,
@@ -9,24 +8,31 @@ import {
 
 export default function updated(
   effectAction: () => void,
-  dependencies: unknown[]
-) {
-  const currentSubSeq = updatedCallSeq.value;
+  dependencies: unknown[] = []
+): boolean {
   const componentKey = componentKeyRef.value;
-  let updateSubscribeDefList =
-    componentRef[componentKey]?.updateSubscribeDefList;
+  let isUpdated = true;
 
-  if (!updateSubscribeDefList || !updateSubscribeDefList[currentSubSeq]) {
+  let updateSubscribeDefList = componentRef[componentKey]
+    ?.updateSubscribeDefList as WeakMap<() => void, unknown[]>;
+
+  if (!updateSubscribeDefList || !updateSubscribeDefList.get(effectAction)) {
     updateSubscribeDefList = makeUpdatedStore(componentKey);
+  } else if (!dependencies.length) {
+    isUpdated = false;
   } else if (
-    checkNeedPushQueue(updateSubscribeDefList[currentSubSeq], dependencies) ||
-    !dependencies
+    checkNeedPushQueue(
+      updateSubscribeDefList.get(effectAction) || [],
+      dependencies
+    )
   ) {
-    makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
+    isUpdated = false;
   }
 
-  updateSubscribeDefList[currentSubSeq] = dependencies;
-  updatedCallSeq.value += 1;
+  makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
+  updateSubscribeDefList.set(effectAction, dependencies);
+
+  return !isUpdated;
 }
 
 export function runUpdatedQueueFromWDom(newWDom: WDom) {
@@ -34,6 +40,7 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
   if (!componentKey) {
     return;
   }
+  componentKeyRef.value = componentKey;
 
   const queue = componentRef[componentKey]?.updateSubscribeList;
   if (newWDom.tagName && queue) {

@@ -41,11 +41,19 @@ export function makeQueueRef(
   return componentRef[componentKey][name] as (() => void)[];
 }
 
-export function makeUpdatedStore(componentKey: symbol): (() => void)[] {
+export function makeUpdatedStore(
+  componentKey: symbol
+): WeakMap<() => void, unknown[]> {
   componentRef[componentKey] ??= {};
-  componentRef[componentKey].updateSubscribeDefList ??= [];
+  componentRef[componentKey].updateSubscribeDefList ??= new WeakMap<
+    () => void,
+    unknown[]
+  >();
 
-  return componentRef[componentKey].updateSubscribeDefList as (() => void)[];
+  return componentRef[componentKey].updateSubscribeDefList as WeakMap<
+    () => void,
+    unknown[]
+  >;
 }
 
 export function setRedrawAction(componentKey: symbol, action: () => void) {
