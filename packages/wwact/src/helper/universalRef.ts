@@ -5,7 +5,6 @@ import { UseDataStoreValue, ComponentSubKey, ComponentRef } from '@/types';
  */
 export const componentKeyRef: { value: symbol } = { value: Symbol('null') };
 export const needDiffRef: { value: boolean } = { value: false };
-export const updatedCallSeq: { value: number } = { value: 0 };
 export const componentRef: ComponentRef = {};
 
 /**
@@ -62,11 +61,9 @@ export function setRedrawAction(componentKey: symbol, action: () => void) {
 }
 
 export function initUpdateHookState(componentKey: symbol) {
-  updatedCallSeq.value = 0;
   componentKeyRef.value = componentKey;
 }
 
 export function initMountHookState(componentKey: symbol) {
-  updatedCallSeq.value = 0;
   componentKeyRef.value = componentKey;
 }
