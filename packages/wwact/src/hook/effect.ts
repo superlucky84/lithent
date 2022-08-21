@@ -17,14 +17,14 @@ export default function mounted(effectAction: () => void) {
 }
 
 export function runMountedQueueFromWDom(newWDom: WDom) {
-  const { componentKey, tagName } = newWDom;
+  const { componentKey } = newWDom;
   if (!componentKey) {
     return;
   }
   const queue = componentRef.get(componentKey)!.mountSubscribeList;
   componentKeyRef.value = componentKey;
 
-  if (tagName && queue) {
+  if (queue) {
     componentRef.get(componentKey)!.mountSubscribeList = [];
 
     queue.forEach((effect: Function) => {

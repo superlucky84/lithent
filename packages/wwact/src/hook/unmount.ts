@@ -23,7 +23,8 @@ export function runUnmountQueueFromWDom(newWDom: WDom) {
   }
 
   const queue = componentRef.get(componentKey)?.unmountSubscribeList;
-  if (newWDom.tagName && queue) {
+
+  if (queue) {
     componentRef.get(componentKey)!.unmountSubscribeList = [];
 
     queue.forEach((effect: Function) => {
