@@ -5,7 +5,8 @@ export default function useData<T extends {}>(initValue: T) {
   const componentKey = componentKeyRef.value;
   const state = makeData<T>({
     initValue,
-    render: () => (componentRef[componentKey].redrawAction || (() => {}))(),
+    render: () =>
+      (componentRef.get(componentKey)!.redrawAction || (() => {}))(),
   });
 
   return state;

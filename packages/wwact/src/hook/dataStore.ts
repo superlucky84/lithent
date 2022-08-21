@@ -18,7 +18,9 @@ export function useDataStore<T extends {}>(storeKey: string) {
   const dataStoreQueue = dataStoreRenderQueue;
 
   dataStoreQueue[storeKey] ??= [];
-  dataStoreQueue[storeKey].push(() => componentRef[componentKey]?.redrawAction);
+  dataStoreQueue[storeKey].push(
+    () => componentRef.get(componentKey)?.redrawAction
+  );
 
   return dataValue;
 }

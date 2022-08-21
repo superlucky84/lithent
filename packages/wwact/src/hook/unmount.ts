@@ -7,7 +7,8 @@ import {
 
 export default function unmount(effectAction: () => void) {
   const componentKey = componentKeyRef.value;
-  const unmountSubscribeList = componentRef[componentKey].unmountSubscribeList;
+  const unmountSubscribeList =
+    componentRef.get(componentKey)!.unmountSubscribeList;
 
   if (!unmountSubscribeList) {
     makeQueueRef(componentKey, 'unmountSubscribeList').push(effectAction);
@@ -21,9 +22,9 @@ export function runUnmountQueueFromWDom(newWDom: WDom) {
     return;
   }
 
-  const queue = componentRef[componentKey]?.unmountSubscribeList;
+  const queue = componentRef.get(componentKey)?.unmountSubscribeList;
   if (newWDom.tagName && queue) {
-    componentRef[componentKey].unmountSubscribeList = [];
+    componentRef.get(componentKey)!.unmountSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

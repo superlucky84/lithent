@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { mounted, unmount, updated, useDataStore, makeData } from '@/index';
+import { effect, unmount, useUpdate, useDataStore, makeData } from '@/index';
 
 export default function Custom2(props, children) {
   const globalData = useDataStore('globalData');
@@ -17,16 +17,18 @@ export default function Custom2(props, children) {
     console.log('CUSTOM2 UNMOUNT');
   };
   const handleUpdated = async () => {
-    console.log('CUSTOM2 UPDATED --');
+    if (useUpdate(handleUpdated, [globalData.value])) {
+      console.log('CUSTOM2 UPDATED --');
+    }
   };
   const handleInputChane = event => {
     data.v = event.target.value;
   };
 
   const componentMaker = () => {
-    mounted(handleMounted);
+    effect(handleMounted);
     unmount(handleUnmount);
-    updated(handleUpdated, [globalData.value]);
+    effect(handleUpdated);
 
     <template>
       <div class="custom2">

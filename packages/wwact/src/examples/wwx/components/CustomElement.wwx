@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { makeRef, updated, makeData } from '@/index';
+import { makeRef, useUpdate, makeData, effect } from '@/index';
 import Custom2 from './Custom2.wwx';
 
 const useJw = () => {
@@ -28,17 +28,21 @@ export default function CustomElement() {
   const domRef = makeRef(null);
 
   const handleUpdatedDataK = () => {
-    console.log('domRef', domRef);
-    console.log('updated k', data, hadleRef);
-    data3.k += 10;
+    if (useUpdate(handleUpdatedDataK, [data.k])) {
+      console.log('domRef', domRef);
+      console.log('updated k', data, hadleRef);
+      data3.k += 10;
+    }
   };
   const handleUpdatedData2K = () => {
-    console.log('updated 2k', data2);
+    if (useUpdate(handleUpdatedData2K, [data2.k])) {
+      console.log('updated 2k', data2);
+    }
   };
 
   const componentMaker = () => {
-    updated(handleUpdatedDataK, [data.k]);
-    updated(handleUpdatedData2K, [data2.k]);
+    effect(handleUpdatedDataK);
+    effect(handleUpdatedData2K);
 
     <template>
       <div class={`aaaaaaaaa${data.k}`}>

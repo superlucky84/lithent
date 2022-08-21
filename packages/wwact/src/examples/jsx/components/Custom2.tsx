@@ -1,6 +1,6 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, Children } from '@/wDom';
-import { mounted, unmount, updated, useDataStore, makeData } from '@/index';
+import { effect, unmount, useUpdate, useDataStore, makeData } from '@/index';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
@@ -21,16 +21,18 @@ export default function Custom2(
     console.log('CUSTOM2 UNMOUNT');
   };
   const handleUpdated = async () => {
-    console.log('CUSTOM2 UPDATED --');
+    if (useUpdate(handleUpdated, [globalData.value])) {
+      console.log('CUSTOM2 UPDATED --');
+    }
   };
   const handleInputChane = (event: InputEvent) => {
     data.v = (event.target as HTMLInputElement).value;
   };
 
   const componentMaker = () => {
-    mounted(handleMounted);
+    effect(handleMounted);
     unmount(handleUnmount);
-    updated(handleUpdated, [globalData.value]);
+    effect(handleUpdated);
 
     return (
       <div class="custom2">

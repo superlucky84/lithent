@@ -25,7 +25,7 @@ export type Children = WDom[];
 
 type WDomInfoParam = {
   componentMaker: () => WDom;
-  componentKey: symbol;
+  componentKey: Props;
   tag: TagFunction;
   props: Props;
   children: WDom[];
@@ -100,7 +100,11 @@ function makeWDomResolver({
 }) {
   const tagName = tag.name;
   const constructor = tag;
-  const resolve = (componentKey = Symbol(tagName)) => {
+  const resolve = (componentKey?: Props) => {
+    if (!componentKey) {
+      componentKey = props;
+    }
+
     initMountHookState(componentKey);
 
     const componentMaker = tag(props, children);

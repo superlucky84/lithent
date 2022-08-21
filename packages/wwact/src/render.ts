@@ -12,8 +12,8 @@
 
 import { WDom, Props } from '@/types';
 import { checkStyleData, checkRefData, isExisty } from '@/helper/predicator';
-import { runMountedQueueFromWDom } from '@/hook/mounted';
-import { runUpdatedQueueFromWDom } from '@/hook/updated';
+import { runMountedQueueFromWDom } from '@/hook/effect';
+import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/helper';
 
 export function render(wDom: WDom, wrapElement: HTMLElement | null) {
