@@ -7,7 +7,7 @@ import {
 
 export default function mounted(effectAction: () => void) {
   const componentKey = componentKeyRef.value;
-  let mountSubscribeList = componentRef[componentKey]?.mountSubscribeList;
+  let mountSubscribeList = componentRef.get(componentKey)?.mountSubscribeList;
 
   if (!mountSubscribeList) {
     mountSubscribeList = makeQueueRef(componentKey, 'mountSubscribeList');
@@ -21,11 +21,11 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
   if (!componentKey) {
     return;
   }
-  const queue = componentRef[componentKey].mountSubscribeList;
+  const queue = componentRef.get(componentKey)!.mountSubscribeList;
   componentKeyRef.value = componentKey;
 
   if (tagName && queue) {
-    componentRef[componentKey].mountSubscribeList = [];
+    componentRef.get(componentKey)!.mountSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

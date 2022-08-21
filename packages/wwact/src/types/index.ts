@@ -9,7 +9,7 @@ export type TagFunctionResolver = {
   constructor: Function;
   props: Props;
   children: WDom[];
-  resolve: (componentKey?: symbol) => WDom;
+  resolve: (componentKey?: Props) => WDom;
 };
 
 export type FragmentFunction = (
@@ -48,7 +48,7 @@ export interface WDom {
   children?: WDom[];
   getParent?: () => WDom | undefined;
   text?: string | number;
-  componentKey?: symbol;
+  componentKey?: Props;
   reRender?: () => WDom;
   componentProps?: Props;
   componentChildren?: WDom[];
@@ -71,12 +71,13 @@ export type ComponentSubKey =
   | 'mountSubscribeList'
   | 'unmountSubscribeList';
 
-export type ComponentRef = {
-  [key: symbol]: {
+export type ComponentRef = WeakMap<
+  Props,
+  {
     redrawAction?: () => void;
     updateSubscribeDefList?: WeakMap<() => void, unknown[]>;
     updateSubscribeList?: (() => void)[];
     mountSubscribeList?: (() => void)[];
     unmountSubscribeList?: (() => void)[];
-  };
-};
+  }
+>;

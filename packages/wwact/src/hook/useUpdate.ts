@@ -13,7 +13,7 @@ export default function updated(
   const componentKey = componentKeyRef.value;
   let isUpdated = true;
 
-  let updateSubscribeDefList = componentRef[componentKey]
+  let updateSubscribeDefList = componentRef.get(componentKey)
     ?.updateSubscribeDefList as WeakMap<() => void, unknown[]>;
 
   if (!updateSubscribeDefList || !updateSubscribeDefList.get(effectAction)) {
@@ -42,9 +42,9 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
   }
   componentKeyRef.value = componentKey;
 
-  const queue = componentRef[componentKey]?.updateSubscribeList;
+  const queue = componentRef.get(componentKey)?.updateSubscribeList;
   if (newWDom.tagName && queue) {
-    componentRef[componentKey].updateSubscribeList = [];
+    componentRef.get(componentKey)!.updateSubscribeList = [];
 
     queue.forEach((effect: Function) => {
       effect();

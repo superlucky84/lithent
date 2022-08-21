@@ -11,7 +11,6 @@
 import { WDom, TagFunctionResolver } from '@/types';
 import { checkCustemComponentFunction } from '@/helper/predicator';
 import { getParent, reRender } from '@/helper';
-import { componentRef } from '@/helper/universalRef';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
@@ -81,7 +80,6 @@ function remakeNewWDom({
     originalWDom.componentKey
   ) {
     runUnmountQueueFromWDom(originalWDom);
-    delete componentRef[originalWDom.componentKey];
   }
 
   remakeWDom.oldProps = originalWDom?.props;

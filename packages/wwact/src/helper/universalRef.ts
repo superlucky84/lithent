@@ -1,11 +1,16 @@
-import { UseDataStoreValue, ComponentSubKey, ComponentRef } from '@/types';
+import {
+  UseDataStoreValue,
+  ComponentSubKey,
+  ComponentRef,
+  Props,
+} from '@/types';
 
 /**
  * Common
  */
-export const componentKeyRef: { value: symbol } = { value: Symbol('null') };
+export const componentKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
-export const componentRef: ComponentRef = {};
+export const componentRef: ComponentRef = new WeakMap();
 
 /**
  * DataStore
@@ -24,46 +29,54 @@ export const routerParams: { value: { [key: string]: string } } = { value: {} };
  * Ref helpers
  */
 export function makeQueueRef(
-  componentKey: symbol,
+  componentKey: Props,
   name: ComponentSubKey
 ): (() => void)[] {
-  componentRef[componentKey] ??= {};
+  if (!componentRef.get(componentKey)) {
+    componentRef.set(componentKey, {});
+  }
 
   if (
     name === 'updateSubscribeList' ||
     name === 'mountSubscribeList' ||
     name === 'unmountSubscribeList'
   ) {
-    componentRef[componentKey][name] ??= [];
+    componentRef.get(componentKey)![name] ??= [];
   }
 
-  return componentRef[componentKey][name] as (() => void)[];
+  return componentRef.get(componentKey)![name] as (() => void)[];
 }
 
 export function makeUpdatedStore(
-  componentKey: symbol
+  componentKey: Props
 ): WeakMap<() => void, unknown[]> {
-  componentRef[componentKey] ??= {};
-  componentRef[componentKey].updateSubscribeDefList ??= new WeakMap<
+  if (!componentRef.get(componentKey)) {
+    componentRef.set(componentKey, {});
+  }
+
+  componentRef.get(componentKey)!.updateSubscribeDefList ??= new WeakMap<
     () => void,
     unknown[]
   >();
 
-  return componentRef[componentKey].updateSubscribeDefList as WeakMap<
+  return componentRef.get(componentKey)!.updateSubscribeDefList as WeakMap<
     () => void,
     unknown[]
   >;
 }
 
-export function setRedrawAction(componentKey: symbol, action: () => void) {
-  componentRef[componentKey] ??= {};
-  componentRef[componentKey].redrawAction = action;
+export function setRedrawAction(componentKey: Props, action: () => void) {
+  if (!componentRef.get(componentKey)) {
+    componentRef.set(componentKey, {});
+  }
+
+  componentRef.get(componentKey)!.redrawAction = action;
 }
 
-export function initUpdateHookState(componentKey: symbol) {
+export function initUpdateHookState(componentKey: Props) {
   componentKeyRef.value = componentKey;
 }
 
-export function initMountHookState(componentKey: symbol) {
+export function initMountHookState(componentKey: Props) {
   componentKeyRef.value = componentKey;
 }
