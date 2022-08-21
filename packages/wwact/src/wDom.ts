@@ -100,11 +100,7 @@ function makeWDomResolver({
 }) {
   const tagName = tag.name;
   const constructor = tag;
-  const resolve = (componentKey?: Props) => {
-    if (!componentKey) {
-      componentKey = props;
-    }
-
+  const resolve = (componentKey = props) => {
     initMountHookState(componentKey);
 
     const componentMaker = tag(props, children);
