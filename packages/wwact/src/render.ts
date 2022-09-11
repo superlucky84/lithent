@@ -11,7 +11,12 @@
  */
 
 import { WDom, Props } from '@/types';
-import { checkStyleData, checkRefData, isExisty } from '@/helper/predicator';
+import {
+  checkStyleData,
+  checkRefData,
+  checkNormalAttribute,
+  isExisty,
+} from '@/helper/predicator';
 import { runMountedQueueFromWDom } from '@/hook/effect';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/helper';
@@ -250,10 +255,7 @@ function updateProps({
           newEventHandler: dataValue as (e: Event) => void,
           oldEventHandler: originalProps[dataKey] as (e: Event) => void,
         });
-      } else if (
-        typeof dataValue === 'number' ||
-        typeof dataValue === 'string'
-      ) {
+      } else if (checkNormalAttribute(dataValue)) {
         (element as HTMLElement).setAttribute(dataKey, String(dataValue));
       }
 
@@ -336,8 +338,8 @@ function updateStyle({
   oldStyle,
   element,
 }: {
-  style: { [key: string]: string };
-  oldStyle: { [key: string]: string };
+  style: Record<string, string>;
+  oldStyle: Record<string, string>;
   element?: HTMLElement | DocumentFragment | Text;
 }) {
   const originalStyle = { ...oldStyle };

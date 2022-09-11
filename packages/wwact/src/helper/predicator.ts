@@ -129,3 +129,9 @@ export function checkRefData(
 ): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } {
   return dataKey === 'ref' && typeof dataValue === 'object';
 }
+
+export function checkNormalAttribute(
+  dataValue: unknown
+): dataValue is number | string {
+  return typeof dataValue === 'number' || typeof dataValue === 'string';
+}
