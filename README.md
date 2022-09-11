@@ -16,7 +16,7 @@ pnpm install
 
 ## Running the development environment
 ```bash
-pnpm run dev:wwact
+pnpm dev:wwact
 ```
 
 ---
