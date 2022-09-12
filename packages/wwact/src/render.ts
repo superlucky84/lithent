@@ -15,7 +15,7 @@ import {
   checkStyleData,
   checkRefData,
   checkNormalAttribute,
-  isExisty,
+  checkExisty,
 } from '@/helper/predicator';
 import { runMountedQueueFromWDom } from '@/hook/effect';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
@@ -137,9 +137,9 @@ function findChildFragmentNextElement(
       targetEl: HTMLElement | DocumentFragment | Text | undefined,
       bItem: WDom
     ) => {
-      const type = bItem?.type;
-      const el = bItem?.el;
-      const isFragment = type === 'fragment' || type === 'loop';
+      const type = bItem.type;
+      const el = bItem.el;
+      const isFragment = type && ['fragment', 'loop'].includes(type);
 
       if (targetEl) {
         return targetEl;
@@ -277,7 +277,7 @@ function wDomToDom(wDom: WDom, init: boolean) {
     element = new DocumentFragment();
   } else if (type === 'element' && tag) {
     element = document.createElement(tag);
-  } else if (type === 'text' && isExisty(text)) {
+  } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
   }
 

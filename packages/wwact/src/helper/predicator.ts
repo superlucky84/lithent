@@ -108,7 +108,7 @@ export function checkNormalTypeElement({ originalWDom, newWDom }: DiffParam) {
   return checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
 }
 
-export function isExisty(value: unknown) {
+export function checkExisty(value: unknown) {
   return value !== null && value !== undefined;
 }
 

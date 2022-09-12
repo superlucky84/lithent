@@ -15,7 +15,7 @@ import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
-  isExisty,
+  checkExisty,
 } from '@/helper/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
@@ -97,7 +97,7 @@ function addReRenderTypeProperty({
   const isRoot = !newWDom.getParent;
   const parentType = !isRoot && getParent(newWDom).type;
   const key = getKey(newWDom);
-  const isKeyCheckedWDom = parentType === 'loop' && isExisty(key);
+  const isKeyCheckedWDom = parentType === 'loop' && checkExisty(key);
   const isSameText =
     newWDom.type === 'text' &&
     isSameType &&
@@ -154,7 +154,7 @@ function remakeChildrenForAdd(newWDom: WDom) {
 function remakeChildrenForUpdate(newWDom: WDom, originalWDom: WDom) {
   if (
     newWDom.type === 'loop' &&
-    isExisty(getKey((newWDom.children || [])[0]))
+    checkExisty(getKey((newWDom.children || [])[0]))
   ) {
     return remakeChildrenForLoopUpdate(newWDom, originalWDom);
   }
