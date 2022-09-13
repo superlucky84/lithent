@@ -9,7 +9,7 @@ import {
 } from '@/types';
 
 import makeNewWDomTree from '@/diff';
-import { wDomUpdate } from './render';
+import { wDomUpdate } from '@/render';
 import {
   initUpdateHookState,
   initMountHookState,
