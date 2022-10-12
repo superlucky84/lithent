@@ -14,6 +14,11 @@ npm install -g pnpm
 pnpm install
 ```
 
+## project build
+```bash
+pnpm build:all
+```
+
 ## Running the development environment
 ```bash
 pnpm dev:wwact
