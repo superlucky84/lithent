@@ -329,8 +329,15 @@ function updateEvent({
     return p1.toLowerCase();
   });
 
-  element.removeEventListener(eventName, oldEventHandler);
-  element.addEventListener(eventName, newEventHandler);
+  if (oldEventHandler !== newEventHandler) {
+    if (oldEventHandler) {
+      element.removeEventListener(eventName, oldEventHandler);
+    }
+
+    if (newEventHandler) {
+      element.addEventListener(eventName, newEventHandler);
+    }
+  }
 }
 
 function updateStyle({
