@@ -5,6 +5,7 @@
     "module": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "moduleResolution": "Node",
+    "declaration": true,
     "allowJs": false,
     "strict": true,
     "sourceMap": true,

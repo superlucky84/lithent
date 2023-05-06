@@ -11,6 +11,7 @@
       "require": "./dist/wwact.umd.cjs"
     }
   },
+  "types": "./types/index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
