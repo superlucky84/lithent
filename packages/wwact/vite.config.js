@@ -29,6 +29,6 @@ export default defineConfig({
     },
   },
   server: {
-    open: '/html/wwxExample.html',
+    open: '/html/jsxExample.html',
   },
 });

@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { effect, unmount, useUpdate, useDataStore, makeData } from '@/index';
+import { effect, unmount, useDataStore, makeData } from '@/index';
 
 export default function Custom2(props, children) {
   const globalData = useDataStore('globalData');
@@ -17,9 +17,7 @@ export default function Custom2(props, children) {
     console.log('CUSTOM2 UNMOUNT');
   };
   const handleUpdated = async () => {
-    if (useUpdate(handleUpdated, [globalData.value])) {
-      console.log('CUSTOM2 UPDATED --');
-    }
+    console.log('CUSTOM2 UPDATED --');
   };
   const handleInputChane = event => {
     data.v = event.target.value;
@@ -28,12 +26,13 @@ export default function Custom2(props, children) {
   const componentMaker = () => {
     effect(handleMounted);
     unmount(handleUnmount);
-    effect(handleUpdated);
+    effect(handleUpdated, [globalData.value]);
 
     <template>
       <div class="custom2">
-        {props.k}-{data7.m}--------------{globalData.item}-!{globalData.value}
+        {props.k}--{data7.m}--------------{globalData.item}-!{globalData.value}
         <input type="text" value={data.v} onInput={handleInputChane} />
+        <span>7</span>
         <button onClick={gdataUpdate}>gdataupdate</button>
         <button onClick={globalData.toggleItem}>handle4</button>
         <article>0{children}0</article>

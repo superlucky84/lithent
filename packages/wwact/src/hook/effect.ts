@@ -4,16 +4,24 @@ import {
   componentRef,
   makeQueueRef,
 } from '@/helper/universalRef';
+import useUpdate from '@/hook/useUpdate';
 
-export default function mounted(effectAction: () => void) {
-  const componentKey = componentKeyRef.value;
-  let mountSubscribeList = componentRef.get(componentKey)?.mountSubscribeList;
+export default function mounted(
+  effectAction: () => void,
+  dependencies: unknown[] = []
+) {
+  if (!dependencies.length) {
+    const componentKey = componentKeyRef.value;
+    let mountSubscribeList = componentRef.get(componentKey)?.mountSubscribeList;
 
-  if (!mountSubscribeList) {
-    mountSubscribeList = makeQueueRef(componentKey, 'mountSubscribeList');
+    if (!mountSubscribeList) {
+      mountSubscribeList = makeQueueRef(componentKey, 'mountSubscribeList');
+    }
+
+    mountSubscribeList.push(effectAction);
+  } else {
+    useUpdate(effectAction, dependencies);
   }
-
-  mountSubscribeList.push(effectAction);
 }
 
 export function runMountedQueueFromWDom(newWDom: WDom) {

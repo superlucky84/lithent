@@ -9,30 +9,24 @@ import {
 export default function updated(
   effectAction: () => void,
   dependencies: unknown[] = []
-): boolean {
+) {
   const componentKey = componentKeyRef.value;
-  let isUpdated = true;
 
   let updateSubscribeDefList = componentRef.get(componentKey)
     ?.updateSubscribeDefList as WeakMap<() => void, unknown[]>;
 
   if (!updateSubscribeDefList || !updateSubscribeDefList.get(effectAction)) {
     updateSubscribeDefList = makeUpdatedStore(componentKey);
-  } else if (!dependencies.length) {
-    isUpdated = false;
   } else if (
     checkNeedPushQueue(
       updateSubscribeDefList.get(effectAction) || [],
       dependencies
     )
   ) {
-    isUpdated = false;
+    makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
   }
 
-  makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
   updateSubscribeDefList.set(effectAction, dependencies);
-
-  return !isUpdated;
 }
 
 export function runUpdatedQueueFromWDom(newWDom: WDom) {
