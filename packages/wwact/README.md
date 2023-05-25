@@ -42,7 +42,7 @@ import {
   makeRef,
   effect,
   unmount,
-} from '@/index';
+} from 'wwact';
 
 function CustomComponent({ parentValue }: { parentValue: number }) {
   // Create a responsive object. If this value changes, retry the render.
