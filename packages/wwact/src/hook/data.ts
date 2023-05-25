@@ -32,7 +32,7 @@ function makeProxyData<T extends UseDataStoreValue>(
     },
     set(target, prop: keyof T, value) {
       target[prop] = value;
-      render();
+      setTimeout(render);
 
       return true;
     },

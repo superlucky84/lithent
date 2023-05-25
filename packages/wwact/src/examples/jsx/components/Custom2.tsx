@@ -23,6 +23,7 @@ export default function Custom2(
   const handleUpdated = async () => {
     console.log('CUSTOM2 UPDATED --');
   };
+
   const handleInputChane = (event: InputEvent) => {
     data.v = (event.target as HTMLInputElement).value;
   };

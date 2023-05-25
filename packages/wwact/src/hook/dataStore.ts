@@ -63,7 +63,7 @@ function makeProxyData<T extends UseDataStoreValue>({
       dataStoreQueue.forEach(makeRender => {
         const render = makeRender();
         if (render) {
-          render();
+          setTimeout(render);
         } else {
           trashCollections.push(makeRender);
         }

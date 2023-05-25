@@ -1,3 +1,38 @@
+
+# Basic Usage
+
+A simpler style of library inspired by Reactjs.
+
+The idea of wwact is to keep the value associated with a `component` as a closure.
+
+There aren't as many rules as in React, you just need to know how closures work in JSX and JavaScript.
+
+## Install
+
+```bash
+pnpm add wwact
+```
+
+## Using JSX
+
+Please include the JSX option in the build tool you use.
+
+```js
+// vite.config.js
+
+export default defineConfig({
+  ...
+  esbuild: {
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
+  },
+  ...
+});
+```
+
+## Example
+
+```jsx
 // example.jsx
 import {
   h,
@@ -71,3 +106,4 @@ const Root = (
 );
 
 render(Root, document.getElementById('root'));
+```
