@@ -33,7 +33,7 @@ export default defineConfig({
 ## Example
 
 ```jsx
-// example.jsx
+// example.tsx
 import {
   h,
   Fragment,
@@ -42,7 +42,7 @@ import {
   makeRef,
   effect,
   unmount,
-} from 'wwact';
+} from '@/index';
 
 function CustomComponent({ parentValue }: { parentValue: number }) {
   // Create a responsive object. If this value changes, retry the render.
@@ -86,13 +86,10 @@ function CustomComponent({ parentValue }: { parentValue: number }) {
     return (
       <Fragment>
         {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
-        <input
-          type="text"
-          value={`${state.text}-${state.count + privateValue}`}
-          onInput={handleInputChane}
-        />
+        <input type="text" value={state.text} onInput={handleInputChane} />
         <div ref={domRef}>count: {state.count}</div>
         <div>privateValue: {privateValue}</div>
+        <div>sum: {state.count + privateValue}</div>
         <button onClick={increase}>Increase</button>
       </Fragment>
     );
