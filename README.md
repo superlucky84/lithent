@@ -2,7 +2,7 @@
 
 Wwact is a virtual implementation library that behaves similarly to React.
 
-[production motive](https://github.com/superlucky84/wwact/blob/master/docs/MOTIBATION.md)
+[production motive](https://medium.com/p/d14ba89373d3)
 
 A simpler style of library inspired by Reactjs.
 

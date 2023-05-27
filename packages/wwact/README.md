@@ -1,6 +1,10 @@
 
 # Basic Usage
 
+Wwact is a virtual implementation library that behaves similarly to React.
+
+[production motive](https://medium.com/p/d14ba89373d3)
+
 A simpler style of library inspired by Reactjs.
 
 The idea of wwact is to keep the value associated with a `component` as a closure.
@@ -104,3 +108,52 @@ const Root = (
 
 render(Root, document.getElementById('root'));
 ```
+
+# Develop
+
+## pnpm install (this project was created using pnpm.)
+```bash
+npm install -g pnpm
+```
+
+## project install
+```bash
+pnpm install
+```
+
+## project build
+```bash
+pnpm build:all
+```
+
+## Running the development environment
+```bash
+pnpm dev:wwact
+```
+
+---
+
+# Packages
+
+## wwact
+
+Main module
+
+## router
+
+Hash routing extension
+
+## compiler
+
+Converter for using template syntax(.wwx)
+
+Can be used using `jsx` without using `wwx`
+
+## vitePlugin
+
+A plugin to connect the template syntax (wwx) and the transpiler to the vite build tool
+
+## wwveal
+
+Presentation tool made with wwact
+
