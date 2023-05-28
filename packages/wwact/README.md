@@ -48,6 +48,8 @@ import {
   WDom,
 } from 'wwact';
 
+
+// When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property.
 // childen is passed as the second argument.
 function CustomComponent(props: { parentValue: number }, children: WDom[]) {
   // Create a responsive object. If this value changes, retry the render.
