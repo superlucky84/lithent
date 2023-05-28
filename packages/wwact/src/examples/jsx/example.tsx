@@ -7,11 +7,11 @@ import {
   makeRef,
   effect,
   unmount,
+  WDom,
 } from '@/index';
-import { Children } from '@/wDom';
 
 // childen is passed as the second argument.
-function CustomComponent(props: { parentValue: number }, children: Children) {
+function CustomComponent(props: { parentValue: number }, children: WDom[]) {
   // Create a responsive object. If this value changes, retry the render.
   // Like React, you can also create and use custom hooks
   const state = makeData<{ count: number; text: string }>({

@@ -8,6 +8,7 @@
   "module": "./dist/Wwveal.js",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/Wwveal.js",
       "require": "./dist/Wwveal.umd.cjs"
     }

@@ -1,4 +1,3 @@
-
 # Basic Usage
 
 Wwact is a virtual implementation library that behaves similarly to React.
@@ -46,9 +45,11 @@ import {
   makeRef,
   effect,
   unmount,
+  WDom,
 } from 'wwact';
 
-function CustomComponent({ parentValue }: { parentValue: number }) {
+// childen is passed as the second argument.
+function CustomComponent(props: { parentValue: number }, children: WDom[]) {
   // Create a responsive object. If this value changes, retry the render.
   // Like React, you can also create and use custom hooks
   const state = makeData<{ count: number; text: string }>({
@@ -57,7 +58,7 @@ function CustomComponent({ parentValue }: { parentValue: number }) {
   });
 
   // Even if you don't use a ref, the private value is always maintained as a regular variable.
-  let privateValue = parentValue;
+  let privateValue = props.parentValue;
 
   // Ref is only used to reference the DOM.
   const domRef = makeRef(null);
@@ -93,7 +94,10 @@ function CustomComponent({ parentValue }: { parentValue: number }) {
         <input type="text" value={state.text} onInput={handleInputChane} />
         <div ref={domRef}>count: {state.count}</div>
         <div>privateValue: {privateValue}</div>
+        {/* When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property. */}
+        <div>parentalue: {props.parentValue}</div>
         <div>sum: {state.count + privateValue}</div>
+        {children}
         <button onClick={increase}>Increase</button>
       </Fragment>
     );
@@ -102,7 +106,9 @@ function CustomComponent({ parentValue }: { parentValue: number }) {
 
 const Root = (
   <div>
-    <CustomComponent parentValue={7} />
+    <CustomComponent parentValue={7}>
+      <div>slot</div>
+    </CustomComponent>
   </div>
 );
 
