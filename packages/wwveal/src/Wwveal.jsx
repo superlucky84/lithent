@@ -1,4 +1,4 @@
-import { h, makeData, makeRef, effect } from 'wwact';
+import { h, makeData, makeRef, mounted } from 'wwact';
 import { wwveal, slides } from '@/wwveal.module.scss';
 import { code as codeClass } from '@/wwveal.module.scss';
 import hljs from 'highlight.js';
@@ -19,9 +19,9 @@ export function RenderCode({ codeString }) {
 export function Wwveal(_props, children) {
   let { data, slidesElementRef, handleMounted, changeCursor, step } = useNavi();
 
-  effect(handleMounted);
-
   const componentMaker = () => {
+    mounted(handleMounted);
+
     return (
       <div class={wwveal} style={{ color: data.color }}>
         <div class={slides} ref={slidesElementRef}>

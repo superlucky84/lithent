@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { makeRef, effect, makeData } from '@/index';
+import { makeRef, updated, makeData } from '@/index';
 import Custom2 from './Custom2';
 
 const useJw = () => {
@@ -37,8 +37,8 @@ export default function CustomElement() {
   };
 
   const componentMaker = () => {
-    effect(handleUpdatedDataK, [data.k]);
-    effect(handleUpdatedData2K, [data2.k]);
+    updated(handleUpdatedDataK, [data.k]);
+    updated(handleUpdatedData2K, [data2.k]);
 
     return (
       <div class={`aaaaaaaaa${data.k}`}>

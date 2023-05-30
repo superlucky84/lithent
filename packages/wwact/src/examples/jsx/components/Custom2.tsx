@@ -1,6 +1,6 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, Children } from '@/wDom';
-import { effect, unmount, useDataStore, makeData } from '@/index';
+import { mounted, updated, unmount, useDataStore, makeData } from '@/index';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
@@ -29,9 +29,9 @@ export default function Custom2(
   };
 
   const componentMaker = () => {
-    effect(handleMounted);
+    mounted(handleMounted);
     unmount(handleUnmount);
-    effect(handleUpdated, [globalData.value]);
+    updated(handleUpdated, [globalData.value]);
 
     return (
       <div class="custom2">

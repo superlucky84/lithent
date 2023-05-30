@@ -5,7 +5,8 @@ import {
   render,
   makeData,
   makeRef,
-  effect,
+  mounted,
+  updated,
   unmount,
   WDom,
 } from '@/index';
@@ -45,8 +46,8 @@ function ChildComponent(props: { parentValue: number }, children: WDom[]) {
   // To take advantage of closures, we've wrapped the function in two layers.
   return () => {
     // This is where you'll need to specify an action to run the effect or unmount the hook.
-    effect(handleMounted); // Only Mounted
-    effect(handleUpdated, [privateValue]); // Only Defs Updated
+    mounted(handleMounted); // Only Mounted
+    updated(handleUpdated, [privateValue]); // Only Defs Updated
     unmount(handleUnmount); // Only Unmounted
 
     // The second return contains only JSX tags.

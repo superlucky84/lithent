@@ -1,10 +1,10 @@
 import { h, Fragment } from './wDom';
 import { render } from './render';
-import effect from './hook/effect';
-import useUpdate from './hook/useUpdate';
+import mounted from './hook/mounted';
+import updated from './hook/useUpdate';
 import unmount from './hook/unmount';
 import makeData from './hook/data';
 import { makeDataStore, useDataStore } from './hook/dataStore';
 import makeRef from './hook/ref';
 export type { WDom, TagFunction, FragmentFunction, Props, MiddleStateWDomChildren, MiddleStateWDom, NodePointer, } from './types';
-export { h, Fragment, render, effect, useUpdate, unmount, makeData, makeDataStore, useDataStore, makeRef, };
+export { h, Fragment, render, mounted, updated, unmount, makeData, makeDataStore, useDataStore, makeRef, };

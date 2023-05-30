@@ -4,7 +4,7 @@ import {
   componentRef,
   makeQueueRef,
 } from '@/helper/universalRef';
-import useUpdate from '@/hook/useUpdate';
+import updated from '@/hook/useUpdate';
 
 export default function mounted(
   effectAction: () => void,
@@ -20,7 +20,7 @@ export default function mounted(
 
     mountSubscribeList.push(effectAction);
   } else {
-    useUpdate(effectAction, dependencies);
+    updated(effectAction, dependencies);
   }
 }
 

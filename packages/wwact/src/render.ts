@@ -17,7 +17,7 @@ import {
   checkNormalAttribute,
   checkExisty,
 } from '@/helper/predicator';
-import { runMountedQueueFromWDom } from '@/hook/effect';
+import { runMountedQueueFromWDom } from '@/hook/mounted';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/helper';
 

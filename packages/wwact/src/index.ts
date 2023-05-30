@@ -1,7 +1,7 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
-import effect from '@/hook/effect';
-import useUpdate from '@/hook/useUpdate';
+import mounted from '@/hook/mounted';
+import updated from '@/hook/useUpdate';
 import unmount from '@/hook/unmount';
 import makeData from '@/hook/data';
 import { makeDataStore, useDataStore } from '@/hook/dataStore';
@@ -21,8 +21,8 @@ export {
   h,
   Fragment,
   render,
-  effect,
-  useUpdate,
+  mounted,
+  updated,
   unmount,
   makeData,
   makeDataStore,
