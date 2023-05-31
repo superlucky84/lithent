@@ -6,35 +6,45 @@ type Param<A, B, C> = {
   children: WDom[];
 };
 
-export default function wwact<A, B, C>({
+export default function make<A, B, C>({
   signal,
   makePrivates,
-  callbacks,
+  makeCallbacks,
   makeComponent,
 }: {
   signal: A;
   makePrivates: (info: Omit<Param<A, B, C>, 'children' | 'values'>) => B;
-  callbacks?: {
-    mountedCallback?: (info: Param<A, B, C>) => () => void;
-    updatedCallback?: (info: Param<A, B, C>) => () => void;
-    unmountCallback?: (info: Param<A, B, C>) => () => void;
+  makeCallbacks?: (info: Param<A, B, C>) => {
+    mountedCallback: () => void;
+    updatedCallback: () => [() => void, unknown[]];
+    unmountCallback: () => void;
   };
   makeComponent: (info: Param<A, B, C>) => WDom;
 }) {
-  return (props: C, children: WDom[]) => {
+  return function (props: C, children: WDom[]) {
     const state = makeData<A>(signal);
     const values = makePrivates({ state, props });
     const info = { state, props, values, children };
+    const { mountedCallback, updatedCallback, unmountCallback } = makeCallbacks
+      ? makeCallbacks(info)
+      : {
+          mountedCallback: null,
+          updatedCallback: () => [],
+          unmountCallback: null,
+        };
+
+    const [uEffect] = updatedCallback();
 
     return () => {
-      if (callbacks?.mountedCallback) {
-        mounted(callbacks.mountedCallback(info));
+      if (mountedCallback) {
+        mounted(mountedCallback);
       }
-      if (callbacks?.updatedCallback) {
-        updated(callbacks.updatedCallback(info));
+      if (unmountCallback) {
+        unmount(unmountCallback);
       }
-      if (callbacks?.unmountCallback) {
-        unmount(callbacks.unmountCallback(info));
+      if (updatedCallback) {
+        const [, callbackDefs] = updatedCallback();
+        updated(uEffect, callbackDefs);
       }
 
       return makeComponent(info);
