@@ -55,7 +55,7 @@ export function checkCustemComponentFunction(
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver {
   const isTagTagFunction =
-    typeof target === 'function' && target.prototype.constructor !== Fragment;
+    typeof target === 'function' && !checkFragmentFunction(target);
   const TagFunctionResolver = typeof target === 'object' && 'resolve' in target;
 
   return isTagTagFunction || TagFunctionResolver;
@@ -64,9 +64,7 @@ export function checkCustemComponentFunction(
 export function checkFragmentFunction(
   target: unknown
 ): target is FragmentFunction {
-  return (
-    typeof target === 'function' && target.prototype.constructor === Fragment
-  );
+  return typeof target === 'function' && target === Fragment;
 }
 
 export function checkPlainWDomType(wDom: WDomParam): wDom is WDom {
@@ -82,10 +80,7 @@ export function checkEmptyElement(wDom: WDomParam) {
 }
 
 export function checkSameCustomComponent({ originalWDom, newWDom }: DiffParam) {
-  return (
-    'constructor' in newWDom &&
-    newWDom.constructor === originalWDom?.constructor
-  );
+  return newWDom.constructor === originalWDom?.constructor;
 }
 
 export function checkSameFragment({ originalWDom, newWDom }: DiffParam) {
