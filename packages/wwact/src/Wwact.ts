@@ -6,7 +6,7 @@ type Param<A, B, C> = {
   children: WDom[];
 };
 
-export default function make<A, B, C>({
+export default function make<A extends {}, B, C>({
   signal,
   makePrivates,
   makeCallbacks,
