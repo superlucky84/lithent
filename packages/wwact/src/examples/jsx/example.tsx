@@ -12,7 +12,7 @@ import {
 } from '@/index';
 
 // childen is passed as the second argument.
-function ChildComponent(props: { parentValue: number }, children: WDom[]) {
+const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
   // Like React, you can also create and use custom hooks
   const state = makeData<{ count: number; text: string }>({
@@ -65,7 +65,7 @@ function ChildComponent(props: { parentValue: number }, children: WDom[]) {
       </Fragment>
     );
   };
-}
+};
 
 function Root() {
   const parentState = makeData<{ count: number }>({ count: 7 });

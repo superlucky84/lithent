@@ -37,7 +37,7 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
   componentKeyRef.value = componentKey;
 
   const queue = componentRef.get(componentKey)?.updateSubscribeList;
-  if (newWDom.tagName && queue) {
+  if (newWDom.constructor && queue) {
     componentRef.get(componentKey)!.updateSubscribeList = [];
 
     queue.forEach((effect: Function) => {
