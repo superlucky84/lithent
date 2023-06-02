@@ -1,8 +1,9 @@
-import { h, Fragment, make, makeRef, render } from '@/index';
+import { h, Fragment, make, makeRef, render, makeData } from '@/index';
 
-type Singal = { count: number; text: string };
+type Signal = { count: number; text: string };
 type Member = {
   privateValue: number;
+  mixinData: { value: number };
   domRef: { value: HTMLElement | null };
   increase: () => void;
   decrease: () => void;
@@ -10,7 +11,7 @@ type Member = {
 };
 type Props = { parentValue: number };
 
-const Component = make<Singal, Member, Props>({
+const Component = make<Signal, Member, Props>({
   signal: {
     count: 1,
     text: 'text',
@@ -18,8 +19,10 @@ const Component = make<Singal, Member, Props>({
   member({ signal, member }) {
     return {
       privateValue: 7,
+      mixinData: { value: 0 },
       domRef: makeRef<HTMLElement | null>(null),
       increase() {
+        member.mixinData.value += 1;
         signal.count += 1;
         member.privateValue += 1;
       },
@@ -34,7 +37,8 @@ const Component = make<Singal, Member, Props>({
   callback(info) {
     return {
       mount() {
-        console.log('MOUNT');
+        info.member.mixinData = makeData({ value: 3 });
+        console.log('MOUNT', info.member.mixinData);
       },
       update() {
         console.log('UPDATE');
@@ -53,7 +57,14 @@ const Component = make<Singal, Member, Props>({
   template({
     signal: { text, count },
     props: { parentValue },
-    member: { privateValue, handleInputChange, domRef, increase, decrease },
+    member: {
+      mixinData,
+      privateValue,
+      handleInputChange,
+      domRef,
+      increase,
+      decrease,
+    },
     children,
   }) {
     return (
@@ -62,6 +73,7 @@ const Component = make<Singal, Member, Props>({
         <div ref={domRef}>count: {count}</div>
         <div>privateValue: {privateValue}</div>
         <div>parentalue: {parentValue}</div>
+        <div>{mixinData?.value}</div>
         <div>sum: {count + privateValue + parentValue}</div>
         {children}
         <div>
@@ -73,7 +85,4 @@ const Component = make<Singal, Member, Props>({
   },
 });
 
-render(
-  <Component parentValue={7}>childText</Component>,
-  document.getElementById('root')
-);
+render(<Component parentValue={9} />, document.getElementById('root'));
