@@ -6,43 +6,57 @@ type Param<A, B, C> = {
   children: WDom[];
 };
 
-export default function make<A extends {}, B, C>({
+type Callbacks = {
+  mountedCallback?: () => void;
+  updatedCallback?: () => [() => void, unknown[]];
+  unmountCallback?: () => void;
+  mountCallback?: () => void;
+  updateCallback?: () => void;
+};
+
+export default function make<A extends {}, B extends {}, C>({
   signal,
   makePrivates,
   makeCallbacks,
   makeComponent,
 }: {
   signal: A;
-  makePrivates: (info: Omit<Param<A, B, C>, 'children' | 'values'>) => B;
-  makeCallbacks?: (info: Param<A, B, C>) => {
-    mountedCallback: () => void;
-    updatedCallback: () => [() => void, unknown[]];
-    unmountCallback: () => void;
-  };
+  makePrivates: (info: Omit<Param<A, B, C>, 'children'>) => B;
+  makeCallbacks?: (info: Param<A, B, C>) => Callbacks;
   makeComponent: (info: Param<A, B, C>) => WDom;
 }) {
   return function (props: C, children: WDom[]) {
+    let updateCount = 0;
     const state = makeData<A>(signal);
-    const values = makePrivates({ state, props });
-    const info = { state, props, values, children };
-    const { mountedCallback, updatedCallback, unmountCallback } = makeCallbacks
-      ? makeCallbacks(info)
-      : {
-          mountedCallback: null,
-          updatedCallback: () => [],
-          unmountCallback: null,
-        };
+    const values = {} as B;
+    Object.assign(values, makePrivates({ state, props, values }));
 
+    const info = { state, props, values, children };
+    const callbacks = makeCallbacks ? makeCallbacks(info) : {};
+    const {
+      mountedCallback = null,
+      updatedCallback = () => [],
+      unmountCallback = null,
+      mountCallback = () => {},
+      updateCallback = () => {},
+    } = callbacks as Required<Callbacks>;
     const [uEffect] = updatedCallback();
 
+    mountCallback();
+
     return () => {
+      if (updateCount) {
+        updateCallback();
+      }
+      updateCount += 1;
+
       if (mountedCallback) {
         mounted(mountedCallback);
       }
       if (unmountCallback) {
         unmount(unmountCallback);
       }
-      if (updatedCallback) {
+      if (uEffect && updatedCallback) {
         const [, callbackDefs] = updatedCallback();
         updated(uEffect, callbackDefs);
       }

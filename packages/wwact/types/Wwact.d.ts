@@ -5,9 +5,9 @@ type Param<A, B, C> = {
     values: B;
     children: WDom[];
 };
-export default function make<A extends {}, B, C>({ signal, makePrivates, makeCallbacks, makeComponent, }: {
+export default function make<A extends {}, B extends {}, C>({ signal, makePrivates, makeCallbacks, makeComponent, }: {
     signal: A;
-    makePrivates: (info: Omit<Param<A, B, C>, 'children' | 'values'>) => B;
+    makePrivates: (info: Omit<Param<A, B, C>, 'children'>) => B;
     makeCallbacks?: (info: Param<A, B, C>) => {
         mountedCallback: () => void;
         updatedCallback: () => [() => void, unknown[]];

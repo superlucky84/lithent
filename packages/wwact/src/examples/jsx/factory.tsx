@@ -15,13 +15,13 @@ const Component = make<State, Private, Props>({
     count: 1,
     text: 'text',
   },
-  makePrivates({ state }) {
-    const value = {
+  makePrivates({ state, values }) {
+    return {
       privateValue: 7,
       domRef: makeRef<HTMLElement | null>(null),
       increase() {
         state.count += 1;
-        value.privateValue += 1;
+        values.privateValue += 1;
       },
       decrease() {
         state.count -= 1;
@@ -30,7 +30,6 @@ const Component = make<State, Private, Props>({
         state.text = (event.target as HTMLInputElement).value;
       },
     };
-    return value;
   },
   makeCallbacks(info) {
     return {
@@ -42,6 +41,12 @@ const Component = make<State, Private, Props>({
       },
       unmountCallback() {
         console.log('UNMOUNT', info);
+      },
+      updateCallback() {
+        console.log('UPDATE');
+      },
+      mountCallback() {
+        console.log('MOUNT');
       },
     };
   },
