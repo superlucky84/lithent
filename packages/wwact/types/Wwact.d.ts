@@ -1,18 +1,18 @@
 import { WDom } from './index';
-type Param<A, B, C> = {
-    state: A;
-    props: C;
-    values: B;
+type Param<Signal, Member, Props> = {
+    signal: Signal;
+    props: Props;
+    member: Member;
     children: WDom[];
 };
-export default function make<A extends {}, B extends {}, C>({ signal, makePrivates, makeCallbacks, makeComponent, }: {
-    signal: A;
-    makePrivates: (info: Omit<Param<A, B, C>, 'children'>) => B;
-    makeCallbacks?: (info: Param<A, B, C>) => {
-        mountedCallback: () => void;
-        updatedCallback: () => [() => void, unknown[]];
-        unmountCallback: () => void;
-    };
-    makeComponent: (info: Param<A, B, C>) => WDom;
-}): (props: C, children: WDom[]) => () => WDom;
+type Callbacks = {
+    mount?: () => void;
+    update?: () => void;
+};
+export default function make<Signal extends {}, Member extends {}, Props>({ signal: signalData, member: makeMember, callback: makeCallback, template, }: {
+    signal?: Signal;
+    member?: (info: Omit<Param<Signal, Member, Props>, 'children'>) => Member;
+    callback?: (info: Param<Signal, Member, Props>) => Callbacks;
+    template: (info: Param<Signal, Member, Props>) => WDom;
+}): (props: Props, children: WDom[]) => () => WDom;
 export {};

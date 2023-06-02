@@ -30,7 +30,9 @@ export declare const routerParams: {
  * Ref helpers
  */
 export declare function makeQueueRef(componentKey: Props, name: ComponentSubKey): (() => void)[];
-export declare function makeUpdatedStore(componentKey: Props): WeakMap<() => void, unknown[]>;
+export declare function makeUpdatedStore(componentKey: Props): [{
+    value: number;
+}, unknown[][]];
 export declare function setRedrawAction(componentKey: Props, action: () => void): void;
 export declare function initUpdateHookState(componentKey: Props): void;
 export declare function initMountHookState(componentKey: Props): void;
