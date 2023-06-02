@@ -1,4 +1,4 @@
-import { h, makeData, makeRef, mounted } from 'wwact';
+import { h, makeSignal, makeRef, mounted } from 'wwact';
 import { wwveal, slides } from '@/wwveal.module.scss';
 import { code as codeClass } from '@/wwveal.module.scss';
 import hljs from 'highlight.js';
@@ -49,8 +49,8 @@ function code(originalString) {
 
 function useNavi() {
   const slidesElementRef = makeRef(null);
-  const data = makeData({ existSubContents: false, color: 'white' });
-  const step = makeData({
+  const data = makeSignal({ existSubContents: false, color: 'white' });
+  const step = makeSignal({
     stepHorizontal: 0,
     stepVertical: 0,
   });

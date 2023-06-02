@@ -4,7 +4,7 @@ import { render } from '@/render';
 import mounted from '@/hook/mounted';
 import updated from '@/hook/useUpdate';
 import unmount from '@/hook/unmount';
-import makeData from '@/hook/data';
+import makeSignal from '@/hook/signal';
 import { makeDataStore, useDataStore } from '@/hook/dataStore';
 import makeRef from '@/hook/ref';
 
@@ -25,7 +25,7 @@ export {
   mounted,
   updated,
   unmount,
-  makeData,
+  makeSignal,
   makeDataStore,
   useDataStore,
   makeRef,

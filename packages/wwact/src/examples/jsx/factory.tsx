@@ -4,7 +4,7 @@ import {
   make,
   makeRef,
   render,
-  makeData,
+  makeSignal,
   mounted,
   updated,
   unmount,
@@ -50,7 +50,7 @@ const Component = make<Signal, Member, Props>({
   callback(info) {
     return {
       mount() {
-        info.member.mixinData = makeData({ value: 3 });
+        info.member.mixinData = makeSignal({ value: 3 });
         mounted(() => console.log('MOUNTED'));
         unmount(() => console.log('UNMOUNT'));
 

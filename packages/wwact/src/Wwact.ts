@@ -1,4 +1,4 @@
-import { makeData, WDom } from '@/index';
+import { makeSignal, WDom } from '@/index';
 type Param<Signal, Member, Props> = {
   signal: Signal;
   props: Props;
@@ -23,7 +23,7 @@ export default function make<Signal extends {}, Member extends {}, Props>({
   template: (info: Param<Signal, Member, Props>) => WDom;
 }) {
   return function (props: Props, children: WDom[]) {
-    const signal = signalData ? makeData<Signal>(signalData) : ({} as Signal);
+    const signal = signalData ? makeSignal<Signal>(signalData) : ({} as Signal);
 
     const member = {} as Member;
     if (makeMember) {

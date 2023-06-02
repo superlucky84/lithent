@@ -1,10 +1,10 @@
 import { h } from '@/wDom';
-import { mounted, updated, unmount, useDataStore, makeData } from '@/index';
+import { mounted, updated, unmount, useDataStore, makeSignal } from '@/index';
 
 export default function Custom2(props, children) {
   const globalData = useDataStore('globalData');
-  const data7 = makeData({ m: 1 });
-  const data = makeData({ v: '1' });
+  const data7 = makeSignal({ m: 1 });
+  const data = makeSignal({ v: '1' });
 
   const gdataUpdate = () => {
     console.log('gdataUpdate');

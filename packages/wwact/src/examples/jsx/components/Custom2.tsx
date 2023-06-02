@@ -1,14 +1,14 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, Children } from '@/wDom';
-import { mounted, updated, unmount, useDataStore, makeData } from '@/index';
+import { mounted, updated, unmount, useDataStore, makeSignal } from '@/index';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
   children: Children
 ) {
   const globalData = useDataStore<GlobalData>('globalData');
-  const data7 = makeData<{ m: number }>({ m: 1 });
-  const data = makeData<{ v: string }>({ v: '1' });
+  const data7 = makeSignal<{ m: number }>({ m: 1 });
+  const data = makeSignal<{ v: string }>({ v: '1' });
 
   const gdataUpdate = () => {
     console.log('gdataUpdate');

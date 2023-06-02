@@ -3,7 +3,7 @@ import {
   h,
   Fragment,
   render,
-  makeData,
+  makeSignal,
   makeRef,
   mounted,
   updated,
@@ -15,7 +15,7 @@ import {
 const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
   // Like React, you can also create and use custom hooks
-  const state = makeData<{ count: number; text: string }>({
+  const state = makeSignal<{ count: number; text: string }>({
     count: 1,
     text: 'text',
   });
@@ -68,7 +68,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
 };
 
 function Root() {
-  const parentState = makeData<{ count: number }>({ count: 7 });
+  const parentState = makeSignal<{ count: number }>({ count: 7 });
 
   const increaseParent = () => {
     parentState.count += 1;

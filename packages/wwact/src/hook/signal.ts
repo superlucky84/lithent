@@ -1,9 +1,9 @@
 import { UseDataStoreValue } from '@/types';
 import { componentRef, componentKeyRef } from '@/helper/universalRef';
 
-export default function useData<T extends {}>(initValue: T) {
+export default function useSignal<T extends {}>(initValue: T) {
   const componentKey = componentKeyRef.value;
-  const state = makeData<T>({
+  const state = makeSignal<T>({
     initValue,
     render: () =>
       (componentRef.get(componentKey)!.redrawAction || (() => {}))(),
@@ -12,7 +12,7 @@ export default function useData<T extends {}>(initValue: T) {
   return state;
 }
 
-function makeData<T extends {}>({
+function makeSignal<T extends {}>({
   initValue,
   render,
 }: {
