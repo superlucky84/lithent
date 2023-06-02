@@ -1,4 +1,4 @@
-import { makeData, mounted, updated, unmount, WDom } from '@/index';
+import { makeData, WDom } from '@/index';
 type Param<Signal, Member, Props> = {
   signal: Signal;
   props: Props;
@@ -7,9 +7,6 @@ type Param<Signal, Member, Props> = {
 };
 
 type Callbacks = {
-  mounted?: () => void;
-  updated?: () => [() => void, unknown[]];
-  unmount?: () => void;
   mount?: () => void;
   update?: () => void;
 };
@@ -26,7 +23,6 @@ export default function make<Signal extends {}, Member extends {}, Props>({
   template: (info: Param<Signal, Member, Props>) => WDom;
 }) {
   return function (props: Props, children: WDom[]) {
-    let updateCount = 0;
     const signal = signalData ? makeData<Signal>(signalData) : ({} as Signal);
 
     const member = {} as Member;
@@ -36,33 +32,13 @@ export default function make<Signal extends {}, Member extends {}, Props>({
 
     const info = { signal, props, member, children };
     const callbacks = makeCallback ? makeCallback(info) : {};
-    const {
-      mounted: mountedCallback = null,
-      updated: updatedCallback = () => [],
-      unmount: unmountCallback = null,
-      mount: mountCallback = () => {},
-      update: updateCallback = () => {},
-    } = callbacks as Required<Callbacks>;
-    const [uEffect] = updatedCallback();
+    const { mount = () => {}, update = () => {} } =
+      callbacks as Required<Callbacks>;
 
-    mountCallback();
+    mount();
 
     return () => {
-      if (updateCount) {
-        updateCallback();
-      }
-      updateCount += 1;
-
-      if (mountedCallback) {
-        mounted(mountedCallback);
-      }
-      if (unmountCallback) {
-        unmount(unmountCallback);
-      }
-      if (uEffect && updatedCallback) {
-        const [, callbackDefs] = updatedCallback();
-        updated(uEffect, callbackDefs);
-      }
+      update();
 
       return template(info);
     };

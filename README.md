@@ -36,57 +36,83 @@ export default defineConfig({
 ## Example (Using the make function)
 ```jsx
 // factory.tsx
-import { h, Fragment, make, makeRef, render } from 'wwact';
+import {
+  h,
+  Fragment,
+  make,
+  makeRef,
+  render,
+  makeData,
+  mounted,
+  updated,
+  unmount,
+} from 'wwact';
 
-type State = { count: number; text: string };
-type Private = {
+type Signal = { count: number; text: string };
+type Member = {
   privateValue: number;
+  mixinData: { value: number };
   domRef: { value: HTMLElement | null };
   increase: () => void;
+  increaseMixin: () => void;
   decrease: () => void;
   handleInputChange: (event: InputEvent) => void;
 };
 type Props = { parentValue: number };
 
-const Component = make<State, Private, Props>({
+const Component = make<Signal, Member, Props>({
   signal: {
     count: 1,
     text: 'text',
   },
-  makePrivates({ state }) {
-    const value = {
+  member({ signal, member }) {
+    return {
       privateValue: 7,
+      mixinData: { value: 0 },
       domRef: makeRef<HTMLElement | null>(null),
       increase() {
-        state.count += 1;
-        value.privateValue += 1;
+        signal.count += 1;
+        member.privateValue += 1;
+      },
+      increaseMixin() {
+        member.mixinData.value += 1;
       },
       decrease() {
-        state.count -= 1;
+        signal.count -= 1;
       },
       handleInputChange(event: InputEvent) {
-        state.text = (event.target as HTMLInputElement).value;
+        signal.text = (event.target as HTMLInputElement).value;
       },
     };
-    return value;
   },
-  makeCallbacks(info) {
+  callback(info) {
     return {
-      mountedCallback() {
-        console.log('MOUNTED', info);
+      mount() {
+        info.member.mixinData = makeData({ value: 3 });
+        mounted(() => console.log('MOUNTED'));
+        unmount(() => console.log('UNMOUNT'));
+
+        console.log('MOUNT', info.member.mixinData);
       },
-      updatedCallback() {
-        return [() => console.log('UPDATED'), [info.values.privateValue]];
-      },
-      unmountCallback() {
-        console.log('UNMOUNT', info);
+      update() {
+        updated(() => console.log('UPDATED'), [info.member.privateValue]);
+
+        console.log('UPDATE');
       },
     };
   },
-  makeComponent({
-    state: { text, count },
+  template({
+    signal: { text, count },
     props: { parentValue },
-    values: { privateValue, handleInputChange, domRef, increase, decrease },
+    member: {
+      mixinData,
+      privateValue,
+      handleInputChange,
+      domRef,
+      increase,
+      increaseMixin,
+      decrease,
+    },
     children,
   }) {
     return (
@@ -95,9 +121,11 @@ const Component = make<State, Private, Props>({
         <div ref={domRef}>count: {count}</div>
         <div>privateValue: {privateValue}</div>
         <div>parentalue: {parentValue}</div>
+        <div>{mixinData?.value}</div>
         <div>sum: {count + privateValue + parentValue}</div>
         {children}
         <div>
+          <button onClick={increaseMixin}>increaseMixin</button>
           <button onClick={increase}>Increase</button>
           <button onClick={decrease}>Decrease</button>
         </div>
@@ -106,10 +134,7 @@ const Component = make<State, Private, Props>({
   },
 });
 
-render(
-  <Component parentValue={7}>childText</Component>,
-  document.getElementById('root')
-);
+render(<Component parentValue={9} />, document.getElementById('root'));
 ```
 
 ## Example (Use the primitive)

@@ -49,20 +49,19 @@ export function makeQueueRef(
 
 export function makeUpdatedStore(
   componentKey: Props
-): WeakMap<() => void, unknown[]> {
+): [{ value: number }, unknown[][]] {
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
+  componentRef.get(componentKey)!.updateSubscribeDefList ??= [];
+  componentRef.get(componentKey)!.updateSubscribeSequence ??= { value: 0 };
 
-  componentRef.get(componentKey)!.updateSubscribeDefList ??= new WeakMap<
-    () => void,
-    unknown[]
-  >();
-
-  return componentRef.get(componentKey)!.updateSubscribeDefList as WeakMap<
-    () => void,
-    unknown[]
-  >;
+  return [
+    componentRef.get(componentKey)!.updateSubscribeSequence as {
+      value: number;
+    },
+    componentRef.get(componentKey)!.updateSubscribeDefList as unknown[][],
+  ];
 }
 
 export function setRedrawAction(componentKey: Props, action: () => void) {

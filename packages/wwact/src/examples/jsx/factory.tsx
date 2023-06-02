@@ -1,4 +1,14 @@
-import { h, Fragment, make, makeRef, render, makeData } from '@/index';
+import {
+  h,
+  Fragment,
+  make,
+  makeRef,
+  render,
+  makeData,
+  mounted,
+  updated,
+  unmount,
+} from '@/index';
 
 type Signal = { count: number; text: string };
 type Member = {
@@ -6,6 +16,7 @@ type Member = {
   mixinData: { value: number };
   domRef: { value: HTMLElement | null };
   increase: () => void;
+  increaseMixin: () => void;
   decrease: () => void;
   handleInputChange: (event: InputEvent) => void;
 };
@@ -22,9 +33,11 @@ const Component = make<Signal, Member, Props>({
       mixinData: { value: 0 },
       domRef: makeRef<HTMLElement | null>(null),
       increase() {
-        member.mixinData.value += 1;
         signal.count += 1;
         member.privateValue += 1;
+      },
+      increaseMixin() {
+        member.mixinData.value += 1;
       },
       decrease() {
         signal.count -= 1;
@@ -38,19 +51,15 @@ const Component = make<Signal, Member, Props>({
     return {
       mount() {
         info.member.mixinData = makeData({ value: 3 });
+        mounted(() => console.log('MOUNTED'));
+        unmount(() => console.log('UNMOUNT'));
+
         console.log('MOUNT', info.member.mixinData);
       },
       update() {
+        updated(() => console.log('UPDATED'), [info.member.privateValue]);
+
         console.log('UPDATE');
-      },
-      mounted() {
-        console.log('MOUNTED', info);
-      },
-      updated() {
-        return [() => console.log('UPDATED'), [info.member.privateValue]];
-      },
-      unmount() {
-        console.log('UNMOUNT', info);
       },
     };
   },
@@ -63,6 +72,7 @@ const Component = make<Signal, Member, Props>({
       handleInputChange,
       domRef,
       increase,
+      increaseMixin,
       decrease,
     },
     children,
@@ -77,6 +87,7 @@ const Component = make<Signal, Member, Props>({
         <div>sum: {count + privateValue + parentValue}</div>
         {children}
         <div>
+          <button onClick={increaseMixin}>increaseMixin</button>
           <button onClick={increase}>Increase</button>
           <button onClick={decrease}>Decrease</button>
         </div>
