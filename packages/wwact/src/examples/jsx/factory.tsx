@@ -15,45 +15,45 @@ const Component = make<State, Private, Props>({
     count: 1,
     text: 'text',
   },
-  makePrivates({ state, values }) {
+  member({ signal, member }) {
     return {
       privateValue: 7,
       domRef: makeRef<HTMLElement | null>(null),
       increase() {
-        state.count += 1;
-        values.privateValue += 1;
+        signal.count += 1;
+        member.privateValue += 1;
       },
       decrease() {
-        state.count -= 1;
+        signal.count -= 1;
       },
       handleInputChange(event: InputEvent) {
-        state.text = (event.target as HTMLInputElement).value;
+        signal.text = (event.target as HTMLInputElement).value;
       },
     };
   },
-  makeCallbacks(info) {
+  callback(info) {
     return {
-      mountedCallback() {
-        console.log('MOUNTED', info);
-      },
-      updatedCallback() {
-        return [() => console.log('UPDATED'), [info.values.privateValue]];
-      },
-      unmountCallback() {
-        console.log('UNMOUNT', info);
-      },
-      updateCallback() {
-        console.log('UPDATE');
-      },
-      mountCallback() {
+      mount() {
         console.log('MOUNT');
       },
+      update() {
+        console.log('UPDATE');
+      },
+      mounted() {
+        console.log('MOUNTED', info);
+      },
+      updated() {
+        return [() => console.log('UPDATED'), [info.member.privateValue]];
+      },
+      unmount() {
+        console.log('UNMOUNT', info);
+      },
     };
   },
-  makeComponent({
-    state: { text, count },
+  template({
+    signal: { text, count },
     props: { parentValue },
-    values: { privateValue, handleInputChange, domRef, increase, decrease },
+    member: { privateValue, handleInputChange, domRef, increase, decrease },
     children,
   }) {
     return (

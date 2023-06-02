@@ -1,44 +1,44 @@
 import { makeData, mounted, updated, unmount, WDom } from '@/index';
 type Param<A, B, C> = {
-  state: A;
+  signal: A;
   props: C;
-  values: B;
+  member: B;
   children: WDom[];
 };
 
 type Callbacks = {
-  mountedCallback?: () => void;
-  updatedCallback?: () => [() => void, unknown[]];
-  unmountCallback?: () => void;
-  mountCallback?: () => void;
-  updateCallback?: () => void;
+  mounted?: () => void;
+  updated?: () => [() => void, unknown[]];
+  unmount?: () => void;
+  mount?: () => void;
+  update?: () => void;
 };
 
 export default function make<A extends {}, B extends {}, C>({
-  signal,
-  makePrivates,
-  makeCallbacks,
-  makeComponent,
+  signal: signalData,
+  member: makeMember,
+  callback: makeCallback,
+  template,
 }: {
   signal: A;
-  makePrivates: (info: Omit<Param<A, B, C>, 'children'>) => B;
-  makeCallbacks?: (info: Param<A, B, C>) => Callbacks;
-  makeComponent: (info: Param<A, B, C>) => WDom;
+  member: (info: Omit<Param<A, B, C>, 'children'>) => B;
+  callback?: (info: Param<A, B, C>) => Callbacks;
+  template: (info: Param<A, B, C>) => WDom;
 }) {
   return function (props: C, children: WDom[]) {
     let updateCount = 0;
-    const state = makeData<A>(signal);
-    const values = {} as B;
-    Object.assign(values, makePrivates({ state, props, values }));
+    const signal = makeData<A>(signalData);
+    const member = {} as B;
+    Object.assign(member, makeMember({ signal, props, member }));
 
-    const info = { state, props, values, children };
-    const callbacks = makeCallbacks ? makeCallbacks(info) : {};
+    const info = { signal, props, member, children };
+    const callbacks = makeCallback ? makeCallback(info) : {};
     const {
-      mountedCallback = null,
-      updatedCallback = () => [],
-      unmountCallback = null,
-      mountCallback = () => {},
-      updateCallback = () => {},
+      mounted: mountedCallback = null,
+      updated: updatedCallback = () => [],
+      unmount: unmountCallback = null,
+      mount: mountCallback = () => {},
+      update: updateCallback = () => {},
     } = callbacks as Required<Callbacks>;
     const [uEffect] = updatedCallback();
 
@@ -61,7 +61,7 @@ export default function make<A extends {}, B extends {}, C>({
         updated(uEffect, callbackDefs);
       }
 
-      return makeComponent(info);
+      return template(info);
     };
   };
 }
