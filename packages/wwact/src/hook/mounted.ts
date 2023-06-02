@@ -30,6 +30,9 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
     return;
   }
   const queue = componentRef.get(componentKey)!.mountSubscribeList;
+  if (componentRef.get(componentKey)!.updateSubscribeSequence) {
+    componentRef.get(componentKey)!.updateSubscribeSequence!.value = 0;
+  }
   componentKeyRef.value = componentKey;
 
   if (queue) {

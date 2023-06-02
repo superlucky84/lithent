@@ -13,20 +13,28 @@ export default function updated(
   const componentKey = componentKeyRef.value;
 
   let updateSubscribeDefList = componentRef.get(componentKey)
-    ?.updateSubscribeDefList as WeakMap<() => void, unknown[]>;
+    ?.updateSubscribeDefList as unknown[][];
 
-  if (!updateSubscribeDefList || !updateSubscribeDefList.get(effectAction)) {
-    updateSubscribeDefList = makeUpdatedStore(componentKey);
+  let updateSubscribeSequence = componentRef.get(componentKey)
+    ?.updateSubscribeSequence as { value: number };
+
+  if (
+    !updateSubscribeDefList ||
+    !updateSubscribeDefList[updateSubscribeSequence.value]
+  ) {
+    [updateSubscribeSequence, updateSubscribeDefList] =
+      makeUpdatedStore(componentKey);
   } else if (
     checkNeedPushQueue(
-      updateSubscribeDefList.get(effectAction) || [],
+      updateSubscribeDefList[updateSubscribeSequence.value] || [],
       dependencies
     )
   ) {
     makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
   }
 
-  updateSubscribeDefList.set(effectAction, dependencies);
+  updateSubscribeDefList[updateSubscribeSequence.value] = dependencies;
+  updateSubscribeSequence.value += 1;
 }
 
 export function runUpdatedQueueFromWDom(newWDom: WDom) {
@@ -37,6 +45,9 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
   componentKeyRef.value = componentKey;
 
   const queue = componentRef.get(componentKey)?.updateSubscribeList;
+  if (componentRef.get(componentKey)!.updateSubscribeSequence) {
+    componentRef.get(componentKey)!.updateSubscribeSequence!.value = 0;
+  }
   if (newWDom.constructor && queue) {
     componentRef.get(componentKey)!.updateSubscribeList = [];
 

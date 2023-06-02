@@ -75,7 +75,8 @@ export type ComponentRef = WeakMap<
   Props,
   {
     redrawAction?: () => void;
-    updateSubscribeDefList?: WeakMap<() => void, unknown[]>;
+    updateSubscribeSequence?: { value: number };
+    updateSubscribeDefList?: unknown[][];
     updateSubscribeList?: (() => void)[];
     mountSubscribeList?: (() => void)[];
     unmountSubscribeList?: (() => void)[];
