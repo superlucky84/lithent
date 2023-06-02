@@ -1,8 +1,8 @@
 import { makeData, mounted, updated, unmount, WDom } from '@/index';
-type Param<A, B, C> = {
-  signal: A;
-  props: C;
-  member: B;
+type Param<Signal, Member, Props> = {
+  signal: Signal;
+  props: Props;
+  member: Member;
   children: WDom[];
 };
 
@@ -14,21 +14,21 @@ type Callbacks = {
   update?: () => void;
 };
 
-export default function make<A extends {}, B extends {}, C>({
+export default function make<Signal extends {}, Member extends {}, Props>({
   signal: signalData,
   member: makeMember,
   callback: makeCallback,
   template,
 }: {
-  signal: A;
-  member: (info: Omit<Param<A, B, C>, 'children'>) => B;
-  callback?: (info: Param<A, B, C>) => Callbacks;
-  template: (info: Param<A, B, C>) => WDom;
+  signal: Signal;
+  member: (info: Omit<Param<Signal, Member, Props>, 'children'>) => Member;
+  callback?: (info: Param<Signal, Member, Props>) => Callbacks;
+  template: (info: Param<Signal, Member, Props>) => WDom;
 }) {
-  return function (props: C, children: WDom[]) {
+  return function (props: Props, children: WDom[]) {
     let updateCount = 0;
-    const signal = makeData<A>(signalData);
-    const member = {} as B;
+    const signal = makeData<Signal>(signalData);
+    const member = {} as Member;
     Object.assign(member, makeMember({ signal, props, member }));
 
     const info = { signal, props, member, children };

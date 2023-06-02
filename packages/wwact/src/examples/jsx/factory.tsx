@@ -1,7 +1,7 @@
 import { h, Fragment, make, makeRef, render } from '@/index';
 
-type State = { count: number; text: string };
-type Private = {
+type Singal = { count: number; text: string };
+type Member = {
   privateValue: number;
   domRef: { value: HTMLElement | null };
   increase: () => void;
@@ -10,7 +10,7 @@ type Private = {
 };
 type Props = { parentValue: number };
 
-const Component = make<State, Private, Props>({
+const Component = make<Singal, Member, Props>({
   signal: {
     count: 1,
     text: 'text',
