@@ -23,11 +23,11 @@ export default function Custom2(props, children) {
     data.v = event.target.value;
   };
 
-  const componentMaker = () => {
-    mounted(handleMounted);
-    unmount(handleUnmount);
-    updated(handleUpdated, [globalData.value]);
+  mounted(handleMounted);
+  unmount(handleUnmount);
+  updated(handleUpdated, () => [globalData.value]);
 
+  return () => {
     <template>
       <div class="custom2">
         {props.k}--{data7.m}--------------{globalData.item}-!{globalData.value}
@@ -39,6 +39,4 @@ export default function Custom2(props, children) {
       </div>
     </template>;
   };
-
-  return componentMaker;
 }

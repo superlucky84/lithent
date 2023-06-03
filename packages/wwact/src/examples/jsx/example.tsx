@@ -43,28 +43,24 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
     console.log('UPDATED');
   };
 
-  // To take advantage of closures, we've wrapped the function in two layers.
-  return () => {
-    // This is where you'll need to specify an action to run the effect or unmount the hook.
-    mounted(handleMounted); // Only Mounted
-    updated(handleUpdated, [privateValue]); // Only Defs Updated
-    unmount(handleUnmount); // Only Unmounted
+  mounted(handleMounted); // Only Mounted
+  unmount(handleUnmount); // Only Unmounted
+  updated(handleUpdated, () => [privateValue]); // Only Defs Updated
 
-    // The second return contains only JSX tags.
-    return (
-      <Fragment>
-        {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
-        <input type="text" value={state.text} onInput={handleInputChane} />
-        <div ref={domRef}>count: {state.count}</div>
-        <div>privateValue: {privateValue}</div>
-        {/* When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property. */}
-        <div>parentalue: {props.parentValue}</div>
-        <div>sum: {state.count + privateValue + props.parentValue}</div>
-        {children}
-        <button onClick={increase}>Increase</button>
-      </Fragment>
-    );
-  };
+  // To take advantage of closures, we've wrapped the function in two layers.
+  return () => (
+    <Fragment>
+      {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
+      <input type="text" value={state.text} onInput={handleInputChane} />
+      <div ref={domRef}>count: {state.count}</div>
+      <div>privateValue: {privateValue}</div>
+      {/* When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property. */}
+      <div>parentalue: {props.parentValue}</div>
+      <div>sum: {state.count + privateValue + props.parentValue}</div>
+      {children}
+      <button onClick={increase}>Increase</button>
+    </Fragment>
+  );
 };
 
 function Root() {

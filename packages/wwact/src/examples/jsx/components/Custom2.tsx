@@ -28,11 +28,11 @@ export default function Custom2(
     data.v = (event.target as HTMLInputElement).value;
   };
 
-  const componentMaker = () => {
-    mounted(handleMounted);
-    unmount(handleUnmount);
-    updated(handleUpdated, [globalData.value]);
+  mounted(handleMounted);
+  unmount(handleUnmount);
+  updated(handleUpdated, () => [globalData.value]);
 
+  const componentMaker = () => {
     return (
       <div class="custom2">
         {props.k}-{data7.m}--------------{globalData.item}-!{globalData.value}

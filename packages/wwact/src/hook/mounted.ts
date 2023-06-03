@@ -8,7 +8,7 @@ import updated from '@/hook/useUpdate';
 
 export default function mounted(
   effectAction: () => void,
-  dependencies: unknown[] = []
+  dependencies: () => any[] = () => []
 ) {
   if (!dependencies.length) {
     const componentKey = componentKeyRef.value;

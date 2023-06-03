@@ -36,10 +36,10 @@ export default function CustomElement() {
     console.log('updated 2k', data2);
   };
 
-  const componentMaker = () => {
-    updated(handleUpdatedDataK, [data.k]);
-    updated(handleUpdatedData2K, [data2.k]);
+  updated(handleUpdatedDataK, () => [data.k]);
+  updated(handleUpdatedData2K, () => [data2.k]);
 
+  const componentMaker = () => {
     return (
       <div class={`aaaaaaaaa${data.k}`}>
         <button onClick={handle}>!vava{data.k}aa</button>

@@ -16,6 +16,7 @@ import {
   setRedrawAction,
   needDiffRef,
 } from '@/helper/universalRef';
+import { runUpdateCallback } from '@/hook/updated';
 import {
   checkFragmentFunction,
   checkCustemComponentFunction,
@@ -144,6 +145,7 @@ function wDomMaker(wDomInfo: WDomInfoWithRenderParam) {
   const { componentMaker, componentKey, tag, props, children } = wDomInfo;
 
   initUpdateHookState(componentKey);
+  runUpdateCallback();
 
   const originalWDom = componentMaker();
 

@@ -66,6 +66,7 @@ export interface WDom {
 
 export type ComponentSubKey =
   | 'redrawAction'
+  | 'updateReservedList'
   | 'updateSubscribeDefList'
   | 'updateSubscribeList'
   | 'mountSubscribeList'
@@ -75,6 +76,7 @@ export type ComponentRef = WeakMap<
   Props,
   {
     redrawAction?: () => void;
+    updateReservedList?: (() => void)[];
     updateSubscribeSequence?: { value: number };
     updateSubscribeDefList?: unknown[][];
     updateSubscribeList?: (() => void)[];
@@ -82,3 +84,11 @@ export type ComponentRef = WeakMap<
     unmountSubscribeList?: (() => void)[];
   }
 >;
+
+export type Param<Signal, Member, Props> = {
+  signal: Signal;
+  props: Props;
+  member: Member;
+  children: WDom[];
+};
+export type Callbacks = { mount?: () => void };

@@ -1,15 +1,5 @@
 import { makeSignal, WDom } from '@/index';
-type Param<Signal, Member, Props> = {
-  signal: Signal;
-  props: Props;
-  member: Member;
-  children: WDom[];
-};
-
-type Callbacks = {
-  mount?: () => void;
-  update?: () => void;
-};
+import { Param, Callbacks } from '@/types';
 
 export default function make<Signal extends {}, Member extends {}, Props>({
   signal: signalData,
@@ -24,23 +14,18 @@ export default function make<Signal extends {}, Member extends {}, Props>({
 }) {
   return function (props: Props, children: WDom[]) {
     const signal = signalData ? makeSignal<Signal>(signalData) : ({} as Signal);
-
     const member = {} as Member;
+
     if (makeMember) {
       Object.assign(member, makeMember({ signal, props, member }));
     }
 
     const info = { signal, props, member, children };
     const callbacks = makeCallback ? makeCallback(info) : {};
-    const { mount = () => {}, update = () => {} } =
-      callbacks as Required<Callbacks>;
+    const { mount = () => {} } = callbacks as Required<Callbacks>;
 
     mount();
 
-    return () => {
-      update();
-
-      return template(info);
-    };
+    return () => template(info);
   };
 }

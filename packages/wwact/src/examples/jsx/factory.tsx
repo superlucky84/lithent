@@ -53,12 +53,13 @@ const Component = make<Signal, Member, Props>({
         info.member.mixinData = makeSignal({ value: 3 });
         mounted(() => console.log('MOUNTED'));
         unmount(() => console.log('UNMOUNT'));
-
+        updated(
+          () => console.log('UPDATED'),
+          () => [info.member.privateValue]
+        );
         console.log('MOUNT', info.member.mixinData);
       },
       update() {
-        updated(() => console.log('UPDATED'), [info.member.privateValue]);
-
         console.log('UPDATE');
       },
     };
