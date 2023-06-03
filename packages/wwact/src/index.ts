@@ -11,11 +11,15 @@ import makeRef from '@/hook/ref';
 export type {
   WDom,
   TagFunction,
+  TagFunctionResolver,
   FragmentFunction,
+  ComponentSubKey,
+  ComponentRef,
   Props,
   MiddleStateWDomChildren,
   MiddleStateWDom,
   NodePointer,
+  Param,
 } from '@/types';
 
 export {

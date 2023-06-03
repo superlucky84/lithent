@@ -42,11 +42,11 @@ import {
   make,
   makeRef,
   render,
-  makeData,
+  makeSignal,
   mounted,
   updated,
   unmount,
-} from 'wwact';
+} from '@/index';
 
 type Signal = { count: number; text: string };
 type Member = {
@@ -85,21 +85,32 @@ const Component = make<Signal, Member, Props>({
       },
     };
   },
-  callback(info) {
-    return {
-      mount() {
-        info.member.mixinData = makeData({ value: 3 });
-        mounted(() => console.log('MOUNTED'));
-        unmount(() => console.log('UNMOUNT'));
+  mount(info) {
+    const { member } = info;
+    const { privateValue } = member;
 
-        console.log('MOUNT', info.member.mixinData);
-      },
-      update() {
-        updated(() => console.log('UPDATED'), [info.member.privateValue]);
+    info.member.mixinData = makeSignal({ value: 3 });
 
-        console.log('UPDATE');
-      },
-    };
+    mounted(() => console.log('MOUNTED'));
+    unmount(() => console.log('UNMOUNT'));
+
+    // Working
+    updated(
+      () => console.log('UPDATED'),
+      () => [info.member.privateValue] // (using a closure to update a value)
+    );
+    updated(
+      () => console.log('UPDATED2'),
+      () => [member.privateValue]
+    );
+
+    // Not working
+    // The `callback` doesn't work because the `privateValue` is closed with a non-reference value.
+    updated(
+      () => console.log('UPDATED3'),
+      () => [privateValue]
+    );
+    console.log('MOUNT', info.member.mixinData);
   },
   template({
     signal: { text, count },
@@ -140,24 +151,24 @@ render(<Component parentValue={9} />, document.getElementById('root'));
 ## Example (Use the primitive)
 
 ```jsx
-// example.tsx
+// example.jsx
 import {
   h,
   Fragment,
   render,
-  makeData,
+  makeSignal,
   makeRef,
   mounted,
   updated,
   unmount,
   WDom,
-} from 'wwact';
+} from '@/index';
 
+// This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
 // childen is passed as the second argument.
-function ChildComponent(props: { parentValue: number }, children: WDom[]) {
+const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
-  // Like React, you can also create and use custom hooks
-  const state = makeData<{ count: number; text: string }>({
+  const state = makeSignal<{ count: number; text: string }>({
     count: 1,
     text: 'text',
   });
@@ -185,32 +196,28 @@ function ChildComponent(props: { parentValue: number }, children: WDom[]) {
     console.log('UPDATED');
   };
 
-  // To take advantage of closures, we've wrapped the function in two layers.
-  return () => {
-    // This is where you'll need to specify an action to run the effect or unmount the hook.
-    mounted(handleMounted); // Only Mounted
-    updated(handleUpdated, [privateValue]); // Only Defs Updated
-    unmount(handleUnmount); // Only Unmounted
+  mounted(handleMounted); // Only Mounted
+  unmount(handleUnmount); // Only Unmounted
+  updated(handleUpdated, () => [privateValue]); // Only Defs Updated (using a closure to update a value)
 
-    // The second return contains only JSX tags.
-    return (
-      <Fragment>
-        {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
-        <input type="text" value={state.text} onInput={handleInputChane} />
-        <div ref={domRef}>count: {state.count}</div>
-        <div>privateValue: {privateValue}</div>
-        {/* When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property. */}
-        <div>parentalue: {props.parentValue}</div>
-        <div>sum: {state.count + privateValue + props.parentValue}</div>
-        {children}
-        <button onClick={increase}>Increase</button>
-      </Fragment>
-    );
-  };
-}
+  // Wrap in a function and return (using a closure to hold the value)
+  return () => (
+    <Fragment>
+      {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
+      <input type="text" value={state.text} onInput={handleInputChane} />
+      <div ref={domRef}>count: {state.count}</div>
+      <div>privateValue: {privateValue}</div>
+      {/* When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property. */}
+      <div>parentalue: {props.parentValue}</div>
+      <div>sum: {state.count + privateValue + props.parentValue}</div>
+      {children}
+      <button onClick={increase}>Increase</button>
+    </Fragment>
+  );
+};
 
 function Root() {
-  const parentState = makeData<{ count: number }>({ count: 7 });
+  const parentState = makeSignal<{ count: number }>({ count: 7 });
 
   const increaseParent = () => {
     parentState.count += 1;

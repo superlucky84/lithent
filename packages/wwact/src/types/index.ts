@@ -91,4 +91,3 @@ export type Param<Signal, Member, Props> = {
   member: Member;
   children: WDom[];
 };
-export type Callbacks = { mount?: () => void };

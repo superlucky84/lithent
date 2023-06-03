@@ -47,22 +47,32 @@ const Component = make<Signal, Member, Props>({
       },
     };
   },
-  callback(info) {
-    return {
-      mount() {
-        info.member.mixinData = makeSignal({ value: 3 });
-        mounted(() => console.log('MOUNTED'));
-        unmount(() => console.log('UNMOUNT'));
-        updated(
-          () => console.log('UPDATED'),
-          () => [info.member.privateValue]
-        );
-        console.log('MOUNT', info.member.mixinData);
-      },
-      update() {
-        console.log('UPDATE');
-      },
-    };
+  mount(info) {
+    const { member } = info;
+    const { privateValue } = member;
+
+    info.member.mixinData = makeSignal({ value: 3 });
+
+    mounted(() => console.log('MOUNTED'));
+    unmount(() => console.log('UNMOUNT'));
+
+    // Working
+    updated(
+      () => console.log('UPDATED'),
+      () => [info.member.privateValue] // (using a closure to update a value)
+    );
+    updated(
+      () => console.log('UPDATED2'),
+      () => [member.privateValue]
+    );
+
+    // Not working
+    // The `callback` doesn't work because the `privateValue` is closed with a non-reference value.
+    updated(
+      () => console.log('UPDATED3'),
+      () => [privateValue]
+    );
+    console.log('MOUNT', info.member.mixinData);
   },
   template({
     signal: { text, count },

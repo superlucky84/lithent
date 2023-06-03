@@ -40,9 +40,10 @@ export interface WDom {
     el?: HTMLElement | DocumentFragment | Text;
     needRerender?: 'ADD' | 'DELETE' | 'REPLACE' | 'UPDATE' | 'SORTED-REPLACE' | 'SORTED-UPDATE' | 'NONE';
 }
-export type ComponentSubKey = 'redrawAction' | 'updateSubscribeDefList' | 'updateSubscribeList' | 'mountSubscribeList' | 'unmountSubscribeList';
+export type ComponentSubKey = 'redrawAction' | 'updateReservedList' | 'updateSubscribeDefList' | 'updateSubscribeList' | 'mountSubscribeList' | 'unmountSubscribeList';
 export type ComponentRef = WeakMap<Props, {
     redrawAction?: () => void;
+    updateReservedList?: (() => void)[];
     updateSubscribeSequence?: {
         value: number;
     };
@@ -51,3 +52,9 @@ export type ComponentRef = WeakMap<Props, {
     mountSubscribeList?: (() => void)[];
     unmountSubscribeList?: (() => void)[];
 }>;
+export type Param<Signal, Member, Props> = {
+    signal: Signal;
+    props: Props;
+    member: Member;
+    children: WDom[];
+};

@@ -11,10 +11,10 @@ import {
   WDom,
 } from '@/index';
 
+// This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
 // childen is passed as the second argument.
 const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
-  // Like React, you can also create and use custom hooks
   const state = makeSignal<{ count: number; text: string }>({
     count: 1,
     text: 'text',
@@ -45,9 +45,9 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
 
   mounted(handleMounted); // Only Mounted
   unmount(handleUnmount); // Only Unmounted
-  updated(handleUpdated, () => [privateValue]); // Only Defs Updated
+  updated(handleUpdated, () => [privateValue]); // Only Defs Updated (using a closure to update a value)
 
-  // To take advantage of closures, we've wrapped the function in two layers.
+  // Wrap in a function and return (using a closure to hold the value)
   return () => (
     <Fragment>
       {/* Note that the event is onInput (we use the native event name to avoid confusion). */}

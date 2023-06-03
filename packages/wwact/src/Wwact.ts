@@ -1,15 +1,15 @@
 import { makeSignal, WDom } from '@/index';
-import { Param, Callbacks } from '@/types';
+import { Param } from '@/types';
 
 export default function make<Signal extends {}, Member extends {}, Props>({
   signal: signalData,
   member: makeMember,
-  callback: makeCallback,
+  mount: makeCallback,
   template,
 }: {
   signal?: Signal;
   member?: (info: Omit<Param<Signal, Member, Props>, 'children'>) => Member;
-  callback?: (info: Param<Signal, Member, Props>) => Callbacks;
+  mount?: (info: Param<Signal, Member, Props>) => void;
   template: (info: Param<Signal, Member, Props>) => WDom;
 }) {
   return function (props: Props, children: WDom[]) {
@@ -21,10 +21,7 @@ export default function make<Signal extends {}, Member extends {}, Props>({
     }
 
     const info = { signal, props, member, children };
-    const callbacks = makeCallback ? makeCallback(info) : {};
-    const { mount = () => {} } = callbacks as Required<Callbacks>;
-
-    mount();
+    makeCallback ? makeCallback(info) : {};
 
     return () => template(info);
   };
