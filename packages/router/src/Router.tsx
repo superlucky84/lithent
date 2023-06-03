@@ -1,10 +1,10 @@
-import { h, Fragment } from 'wwact';
+import { h, Fragment, WDom, Props } from 'wwact';
 import { makeSignal, mounted, unmount } from 'wwact';
 import { addParams } from '@/hook/params';
 
-export function Router(_props, children) {
+export function Router(_props: Props, children: WDom[]) {
   const data = makeSignal({ targetPath: '' });
-  const findPath = injectPath =>
+  const findPath = (injectPath: string) =>
     children.find(item => item.componentProps?.path === injectPath);
 
   const findDynamicPath = () =>
@@ -42,19 +42,16 @@ export function Router(_props, children) {
   mounted(handleHashChange);
   unmount(removeEvent);
 
-  const componentMaker = () => {
-    return (
-      <Fragment>
-        {children.map(item => {
-          const path = String(item?.componentProps?.path || '');
-          const element = item?.componentProps?.element;
+  return () => (
+    <Fragment>
+      {children.map(item => {
+        const path = String(item?.componentProps?.path || '');
+        const element = item?.componentProps?.element;
 
-          return data.targetPath === path ? element : null;
-        })}
-      </Fragment>
-    );
-  };
-  return componentMaker;
+        return data.targetPath === path ? element : null;
+      })}
+    </Fragment>
+  );
 }
 
 export function RouterItem() {

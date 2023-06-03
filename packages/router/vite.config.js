@@ -1,9 +1,17 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import checker from 'vite-plugin-checker';
 import eslintPlugin from '@nabla/vite-plugin-eslint';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig({
-  plugins: [eslintPlugin({ eslintOptions: { cache: false } })],
+  plugins: [
+    checker({ typescript: true }),
+    eslintPlugin({ eslintOptions: { cache: false } }),
+    dts({
+      outputDir: ['dist', 'types'],
+    }),
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -13,7 +21,7 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/Router.jsx'),
+      entry: resolve(__dirname, 'src/Router.tsx'),
       name: 'Router',
       fileName: 'Router',
     },
@@ -25,9 +33,5 @@ export default defineConfig({
         },
       },
     },
-  },
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
   },
 });

@@ -91,3 +91,9 @@ export type Param<Signal, Member, Props> = {
   member: Member;
   children: WDom[];
 };
+
+declare namespace JSX {
+  interface IntrinsicElements {
+    [name: string]: any;
+  }
+}

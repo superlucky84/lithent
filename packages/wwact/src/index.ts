@@ -22,6 +22,14 @@ export type {
   Param,
 } from '@/types';
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      [name: string]: any;
+    }
+  }
+}
+
 export {
   h,
   Fragment,

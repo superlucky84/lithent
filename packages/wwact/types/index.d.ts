@@ -8,4 +8,11 @@ import makeSignal from './hook/signal';
 import { makeDataStore, useDataStore } from './hook/dataStore';
 import makeRef from './hook/ref';
 export type { WDom, TagFunction, TagFunctionResolver, FragmentFunction, ComponentSubKey, ComponentRef, Props, MiddleStateWDomChildren, MiddleStateWDom, NodePointer, Param, } from './types';
+declare global {
+    namespace JSX {
+        interface IntrinsicElements {
+            [name: string]: any;
+        }
+    }
+}
 export { h, Fragment, render, mounted, updated, unmount, makeSignal, makeDataStore, useDataStore, makeRef, make, };
