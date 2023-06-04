@@ -9,6 +9,16 @@ export declare const needDiffRef: {
     value: boolean;
 };
 export declare const componentRef: ComponentRef;
+export declare const redrawQueue: {
+    value: {
+        componentKey: Props;
+        nodeChildKey: Props[];
+        exec: () => void;
+    }[];
+};
+export declare const redrawQueueTimeout: {
+    value: null | number;
+};
 /**
  * DataStore
  */
@@ -33,6 +43,10 @@ export declare function makeQueueRef(componentKey: Props, name: ComponentSubKey)
 export declare function makeUpdatedStore(componentKey: Props): [{
     value: number;
 }, unknown[][]];
-export declare function setRedrawAction(componentKey: Props, action: () => void): void;
+export declare function setRedrawAction({ componentKey, nodeChildKey, exec, }: {
+    componentKey: Props;
+    nodeChildKey: Props[];
+    exec: () => void;
+}): void;
 export declare function initUpdateHookState(componentKey: Props): void;
 export declare function initMountHookState(componentKey: Props): void;

@@ -122,10 +122,11 @@ function makeWDomResolver({
 
     const originalWDom = customNode;
 
-    console.log(originalWDom);
-
-    setRedrawAction(componentKey, () => {
-      reRenderCustomComponent({ tag, props, children, originalWDom });
+    setRedrawAction({
+      componentKey,
+      nodeChildKey: originalWDom.nodeChildKey || ([] as Props[]),
+      exec: () =>
+        reRenderCustomComponent({ tag, props, children, originalWDom }),
     });
 
     return customNode;
@@ -158,8 +159,10 @@ function wDomMaker(wDomInfo: WDomInfoWithRenderParam) {
 
   const originalWDom = componentMaker();
 
-  setRedrawAction(componentKey, () => {
-    reRenderCustomComponent({ tag, props, children, originalWDom });
+  setRedrawAction({
+    componentKey,
+    nodeChildKey: originalWDom.nodeChildKey || ([] as Props[]),
+    exec: () => reRenderCustomComponent({ tag, props, children, originalWDom }),
   });
 
   addComponentProps(originalWDom, wDomInfo);

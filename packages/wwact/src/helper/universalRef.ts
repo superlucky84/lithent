@@ -5,13 +5,21 @@ import {
   Props,
 } from '@/types';
 
+type redrawQueueList = {
+  componentKey: Props;
+  nodeChildKey: Props[];
+  exec: () => void;
+}[];
+
 /**
  * Common
  */
 export const componentKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentRef: ComponentRef = new WeakMap();
-export const redrawQueue: { value: (() => void)[] } = { value: [] };
+export const redrawQueue: {
+  value: { componentKey: Props; nodeChildKey: Props[]; exec: () => void }[];
+} = { value: [] };
 export const redrawQueueTimeout: { value: null | number } = { value: null };
 
 /**
@@ -66,13 +74,25 @@ export function makeUpdatedStore(
   ];
 }
 
-export function setRedrawAction(componentKey: Props, action: () => void) {
+export function setRedrawAction({
+  componentKey,
+  nodeChildKey,
+  exec,
+}: {
+  componentKey: Props;
+  nodeChildKey: Props[];
+  exec: () => void;
+}) {
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
 
   componentRef.get(componentKey)!.redrawAction = () => {
-    redrawQueue.value.push(action);
+    redrawQueue.value.push({
+      componentKey,
+      nodeChildKey,
+      exec,
+    });
     if (!redrawQueueTimeout.value) {
       redrawQueueTimeout.value = setTimeout(execRedrawQueue);
     }
@@ -88,15 +108,36 @@ export function initMountHookState(componentKey: Props) {
 }
 
 function execRedrawQueue() {
-  redrawQueue.value = redrawQueue.value.filter(
-    (item, index) => redrawQueue.value.indexOf(item) === index
-  );
+  let childItemList: Props[] = [];
 
-  while (redrawQueue.value.length) {
-    const action = redrawQueue.value.shift();
+  redrawQueue.value.forEach(item => {
+    childItemList = childItemList.concat(item.nodeChildKey);
+  });
+
+  const addedKey: Props[] = [];
+  const result = redrawQueue.value.reduce((acc, item) => {
+    const { componentKey } = item;
+
+    if (
+      childItemList.includes(componentKey) ||
+      addedKey.includes(componentKey)
+    ) {
+      return acc;
+    }
+
+    addedKey.push(componentKey);
+    acc.push(item);
+
+    return acc;
+  }, [] as redrawQueueList);
+
+  while (result.length) {
+    const action = result.shift();
     if (action) {
-      action();
+      action.exec();
     }
   }
+
+  redrawQueue.value = [];
   redrawQueueTimeout.value = null;
 }
