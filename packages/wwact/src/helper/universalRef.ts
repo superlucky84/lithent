@@ -11,6 +11,8 @@ import {
 export const componentKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentRef: ComponentRef = new WeakMap();
+export const redrawQueue: { value: (() => void)[] } = { value: [] };
+export const redrawQueueTimeout: { value: null | number } = { value: null };
 
 /**
  * DataStore
@@ -69,7 +71,12 @@ export function setRedrawAction(componentKey: Props, action: () => void) {
     componentRef.set(componentKey, {});
   }
 
-  componentRef.get(componentKey)!.redrawAction = action;
+  componentRef.get(componentKey)!.redrawAction = () => {
+    redrawQueue.value.push(action);
+    if (!redrawQueueTimeout.value) {
+      redrawQueueTimeout.value = setTimeout(execRedrawQueue);
+    }
+  };
 }
 
 export function initUpdateHookState(componentKey: Props) {
@@ -78,4 +85,18 @@ export function initUpdateHookState(componentKey: Props) {
 
 export function initMountHookState(componentKey: Props) {
   componentKeyRef.value = componentKey;
+}
+
+function execRedrawQueue() {
+  redrawQueue.value = redrawQueue.value.filter(
+    (item, index) => redrawQueue.value.indexOf(item) === index
+  );
+
+  while (redrawQueue.value.length) {
+    const action = redrawQueue.value.shift();
+    if (action) {
+      action();
+    }
+  }
+  redrawQueueTimeout.value = null;
 }
