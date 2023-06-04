@@ -144,6 +144,10 @@ function remakeChildrenForDiff({
 function remakeChildrenForAdd(newWDom: WDom) {
   return (newWDom.children || []).map((item: WDom) => {
     const childItem = makeNewWDomTree({ newWDom: item });
+
+    if (childItem.componentKey && newWDom.nodeChildKey) {
+      newWDom.nodeChildKey.push(childItem.componentKey);
+    }
     childItem.getParent = () => newWDom;
 
     return childItem;
@@ -164,6 +168,9 @@ function remakeChildrenForUpdate(newWDom: WDom, originalWDom: WDom) {
       originalWDom: (originalWDom.children || [])[index],
     });
 
+    if (childItem.componentKey && newWDom.nodeChildKey) {
+      newWDom.nodeChildKey.push(childItem.componentKey);
+    }
     childItem.getParent = () => newWDom;
 
     return childItem;
@@ -202,6 +209,9 @@ function diffLoopChildren(newWDom: WDom, originalWDom: WDom) {
       originalChildren.splice(originalChildren.indexOf(originalItem), 1);
     }
 
+    if (childItem.componentKey && newWDom.nodeChildKey) {
+      newWDom.nodeChildKey.push(childItem.componentKey);
+    }
     childItem.getParent = () => newWDom;
 
     return childItem;

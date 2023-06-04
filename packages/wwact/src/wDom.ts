@@ -6,6 +6,7 @@ import {
   MiddleStateWDomChildren,
   MiddleStateWDom,
   NodePointer,
+  NodeChildKey,
 } from '@/types';
 
 import makeNewWDomTree from '@/diff';
@@ -44,13 +45,19 @@ export function h(
   props: Props,
   ...children: MiddleStateWDomChildren
 ) {
-  const nodePointer: NodePointer = { value: undefined };
+  const nodeParentPointer: NodePointer = { value: undefined };
+  const nodeChildKey: NodeChildKey = { value: [] };
   const newProps = props || {};
-  const newChildren = remakeChildren(nodePointer, children);
-  const node = makeNode({ tag, props: newProps, children: newChildren });
+  const newChildren = remakeChildren(nodeParentPointer, nodeChildKey, children);
+  const node = makeNode({
+    tag,
+    props: newProps,
+    nodeChildKey,
+    children: newChildren,
+  });
 
   if (!checkCustemComponentFunction(node)) {
-    nodePointer.value = node;
+    nodeParentPointer.value = node;
   }
 
   return node;
@@ -115,6 +122,8 @@ function makeWDomResolver({
 
     const originalWDom = customNode;
 
+    console.log(originalWDom);
+
     setRedrawAction(componentKey, () => {
       reRenderCustomComponent({ tag, props, children, originalWDom });
     });
@@ -174,10 +183,12 @@ function addComponentProps(wDom: WDom, info: WDomInfoWithRenderParam) {
 function makeNode({
   tag,
   props,
+  nodeChildKey,
   children,
 }: {
   tag: TagFunction | FragmentFunction | string;
   props: Props;
+  nodeChildKey: NodeChildKey;
   children: WDom[];
 }) {
   if (checkFragmentFunction(tag)) {
@@ -190,17 +201,27 @@ function makeNode({
       : componetMakeResolver.resolve();
   }
 
-  return { type: 'element', tag, props, children };
+  return {
+    type: 'element',
+    tag,
+    props,
+    nodeChildKey: nodeChildKey.value,
+    children,
+  };
 }
 
 function remakeChildren(
-  nodePointer: NodePointer,
+  nodeParentPointer: NodePointer,
+  nodeChildKey: NodeChildKey,
   children: MiddleStateWDomChildren
 ): WDom[] {
   return children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
 
-    childItem.getParent = () => nodePointer.value;
+    childItem.getParent = () => nodeParentPointer.value;
+    if (childItem.componentKey) {
+      nodeChildKey.value.push(childItem.componentKey);
+    }
 
     return childItem;
   });
@@ -210,10 +231,15 @@ function makeChildrenItem(item: MiddleStateWDom): WDom {
   if (item === null || item === undefined || item === false) {
     return { type: null };
   } else if (Array.isArray(item)) {
-    const nodePointer: NodePointer = { value: undefined };
-    const children = remakeChildren(nodePointer, item);
-    const node = { type: 'loop', children };
-    nodePointer.value = node;
+    const nodeParentPointer: NodePointer = { value: undefined };
+    const nodeChildKey: NodeChildKey = { value: [] };
+    const children = remakeChildren(nodeParentPointer, nodeChildKey, item);
+    const node = {
+      type: 'loop',
+      nodeChildKey: nodeChildKey.value,
+      children,
+    };
+    nodeParentPointer.value = node;
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {

@@ -19,6 +19,8 @@ export type FragmentFunction = (
 
 export type NodePointer = { value: WDom | undefined };
 
+export type NodeChildKey = { value: Props[] };
+
 export type MiddleStateWDom =
   | WDom
   | number
@@ -47,6 +49,7 @@ export interface WDom {
   constructor?: Function;
   children?: WDom[];
   getParent?: () => WDom | undefined;
+  nodeChildKey?: Props[];
   text?: string | number;
   componentKey?: Props;
   reRender?: () => WDom;
