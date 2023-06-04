@@ -369,7 +369,7 @@ function findRealParentElement(
 ): HTMLElement | DocumentFragment | Text | undefined {
   const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
 
-  if (vDom.isRoot) {
+  if (vDom.isRoot && vDom.type === 'fragment') {
     return vDom.wrapElement;
   }
 
