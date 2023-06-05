@@ -1,10 +1,10 @@
 import { h } from '@/wDom';
-import { makeRef, updated, makeSignal } from '@/index';
+import { makeRef, updated, updater } from '@/index';
 import Custom2 from './Custom2';
 
 const useJw = () => {
-  const data = makeSignal<{ k: number; j: number }>({ k: 7, j: 1 });
-  const data2 = makeSignal<{ k: number }>({ k: 1 });
+  const data = updater<{ k: number; j: number }>({ k: 7, j: 1 });
+  const data2 = updater<{ k: number }>({ k: 1 });
 
   const handle = () => {
     data.k += 1;
@@ -19,7 +19,7 @@ const useJw = () => {
 
 export default function CustomElement() {
   const { data, data2, handle, handle2 } = useJw();
-  const data3 = makeSignal<{ k: number }>({ k: 1 });
+  const data3 = updater<{ k: number }>({ k: 1 });
   const hadleRef = makeRef<string>('3');
   const handle3 = () => {
     hadleRef.value = '7';

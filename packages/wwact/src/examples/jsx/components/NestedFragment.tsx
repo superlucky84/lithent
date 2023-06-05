@@ -1,8 +1,8 @@
 import { h, Fragment } from '@/wDom';
-import { makeSignal } from '@/index';
+import { updater } from '@/index';
 
 export default function NestedFragment() {
-  const data = makeSignal<{ choiceNode: number }>({ choiceNode: 7 });
+  const data = updater<{ choiceNode: number }>({ choiceNode: 7 });
   const handle = () => {
     const randomValue = Math.floor(Math.random() * 10) + 1;
     data.choiceNode = randomValue;

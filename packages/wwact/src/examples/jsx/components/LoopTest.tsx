@@ -1,8 +1,8 @@
 import { h, Fragment } from '@/wDom';
-import { makeSignal } from '@/index';
+import { updater } from '@/index';
 
 export default function LoopTest() {
-  const data: { list: { key: number; value: string }[] } = makeSignal({
+  const data: { list: { key: number; value: string }[] } = updater({
     list: [
       { key: 1, value: '일' },
       { key: 2, value: '이' },

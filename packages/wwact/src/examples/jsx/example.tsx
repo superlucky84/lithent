@@ -3,7 +3,7 @@ import {
   h,
   Fragment,
   render,
-  makeSignal,
+  updater,
   makeRef,
   mounted,
   updated,
@@ -15,7 +15,7 @@ import {
 // childen is passed as the second argument.
 const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
-  const state = makeSignal<{ count: number; text: string }>({
+  const state = updater<{ count: number; text: string }>({
     count: 1,
     text: 'text',
   });
@@ -64,7 +64,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
 };
 
 function Root() {
-  const parentState = makeSignal<{ count: number }>({ count: 7 });
+  const parentState = updater<{ count: number }>({ count: 7 });
 
   const increaseParent = () => {
     parentState.count += 1;
