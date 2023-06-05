@@ -42,18 +42,17 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
   if (componentKey) {
     const component = componentRef.get(componentKey);
     const queue = component?.updateSubscribeList;
+    const sequence = component!.updateSubscribeSequence;
 
     componentKeyRef.value = componentKey;
 
-    if (component!.updateSubscribeSequence) {
-      component!.updateSubscribeSequence!.value = 0;
+    if (sequence) {
+      sequence.value = 0;
     }
+
     if (newWDom.constructor && queue) {
       component.updateSubscribeList = [];
-
-      queue.forEach((effect: Function) => {
-        effect();
-      });
+      queue.forEach((effect: Function) => effect());
     }
   }
 }
