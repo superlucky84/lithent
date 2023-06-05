@@ -131,13 +131,13 @@ function execRedrawQueue() {
     return acc;
   }, [] as redrawQueueList);
 
+  redrawQueue.value = [];
+  redrawQueueTimeout.value = null;
+
   while (result.length) {
     const action = result.shift();
     if (action) {
       action.exec();
     }
   }
-
-  redrawQueue.value = [];
-  redrawQueueTimeout.value = null;
 }

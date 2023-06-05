@@ -25,6 +25,8 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
     const queue = component.mountSubscribeList;
     const sequence = component.updateSubscribeSequence;
 
+    componentKeyRef.value = componentKey;
+
     if (sequence) {
       sequence.value = 0;
     }

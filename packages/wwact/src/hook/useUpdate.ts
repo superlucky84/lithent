@@ -11,12 +11,13 @@ export default function useUpdated(
   dependencies: () => any[] = () => []
 ) {
   const componentKey = componentKeyRef.value;
+  const component = componentRef.get(componentKey);
 
-  let updateSubscribeDefList = componentRef.get(componentKey)
-    ?.updateSubscribeDefList as unknown[][];
+  let updateSubscribeDefList = component?.updateSubscribeDefList as unknown[][];
 
-  let updateSubscribeSequence = componentRef.get(componentKey)
-    ?.updateSubscribeSequence as { value: number };
+  let updateSubscribeSequence = component?.updateSubscribeSequence as {
+    value: number;
+  };
 
   if (
     !updateSubscribeDefList ||
@@ -38,21 +39,22 @@ export default function useUpdated(
 
 export function runUpdatedQueueFromWDom(newWDom: WDom) {
   const { componentKey } = newWDom;
-  if (!componentKey) {
-    return;
-  }
-  componentKeyRef.value = componentKey;
+  if (componentKey) {
+    const component = componentRef.get(componentKey);
+    const queue = component?.updateSubscribeList;
 
-  const queue = componentRef.get(componentKey)?.updateSubscribeList;
-  if (componentRef.get(componentKey)!.updateSubscribeSequence) {
-    componentRef.get(componentKey)!.updateSubscribeSequence!.value = 0;
-  }
-  if (newWDom.constructor && queue) {
-    componentRef.get(componentKey)!.updateSubscribeList = [];
+    componentKeyRef.value = componentKey;
 
-    queue.forEach((effect: Function) => {
-      effect();
-    });
+    if (component!.updateSubscribeSequence) {
+      component!.updateSubscribeSequence!.value = 0;
+    }
+    if (newWDom.constructor && queue) {
+      component.updateSubscribeList = [];
+
+      queue.forEach((effect: Function) => {
+        effect();
+      });
+    }
   }
 }
 
