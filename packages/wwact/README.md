@@ -162,7 +162,7 @@ import {
   updated,
   unmount,
   WDom,
-} from '@/index';
+} from 'wwact';
 
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
 // childen is passed as the second argument.
