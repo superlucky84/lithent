@@ -85,7 +85,7 @@ const Component = make<Updater, Member, Props>({
       },
     };
   },
-  mount(info) {
+  mounter(info) {
     const { member } = info;
     const { privateValue } = member;
 
