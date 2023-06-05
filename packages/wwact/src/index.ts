@@ -5,7 +5,7 @@ import mounted from '@/hook/mounted';
 import unmount from '@/hook/unmount';
 import updated from '@/hook/updated';
 import updater from '@/hook/updater';
-import { makeDataStore, useDataStore } from '@/hook/dataStore';
+import { makeSharedUpdater, sharedUpdater } from '@/hook/sharedUpdater';
 import makeRef from '@/hook/ref';
 
 export type {
@@ -18,6 +18,7 @@ export type {
   Props,
   MiddleStateWDomChildren,
   MiddleStateWDom,
+  UseDataStoreValue,
   NodePointer,
   Param,
 } from '@/types';
@@ -38,8 +39,8 @@ export {
   updated,
   unmount,
   updater,
-  makeDataStore,
-  useDataStore,
+  makeSharedUpdater,
+  sharedUpdater,
   makeRef,
   make,
 };

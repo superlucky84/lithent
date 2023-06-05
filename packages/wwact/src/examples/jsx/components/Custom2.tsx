@@ -1,12 +1,12 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, Children } from '@/wDom';
-import { mounted, updated, unmount, useDataStore, updater } from '@/index';
+import { mounted, updated, unmount, sharedUpdater, updater } from '@/index';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
   children: Children
 ) {
-  const globalData = useDataStore<GlobalData>('globalData');
+  const globalData = sharedUpdater<GlobalData>('globalData');
   const data7 = updater<{ m: number }>({ m: 1 });
   const data = updater<{ v: string }>({ v: '1' });
 

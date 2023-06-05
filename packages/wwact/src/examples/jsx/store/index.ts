@@ -1,4 +1,4 @@
-import { makeDataStore } from '@/hook/dataStore';
+import { makeSharedUpdater } from '@/hook/sharedUpdater';
 
 const promiseTest = (): Promise<number> => {
   return new Promise(resolve => {
@@ -28,8 +28,8 @@ export default function storeInit() {
     },
   };
 
-  makeDataStore<GlobalData>('globalData', storeValue);
-  makeDataStore<{ title: string }>('example', {
+  makeSharedUpdater<GlobalData>('globalData', storeValue);
+  makeSharedUpdater<{ title: string }>('example', {
     title: '나만의 커스텀 프레임웍 제작기!!',
   });
 }

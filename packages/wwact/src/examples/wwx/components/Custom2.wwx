@@ -1,8 +1,8 @@
 import { h } from '@/wDom';
-import { mounted, updated, unmount, useDataStore, updater } from '@/index';
+import { mounted, updated, unmount, sharedUpdater, updater } from '@/index';
 
 export default function Custom2(props, children) {
-  const globalData = useDataStore('globalData');
+  const globalData = sharedUpdater('globalData');
   const data7 = updater({ m: 1 });
   const data = updater({ v: '1' });
 

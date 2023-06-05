@@ -7,7 +7,7 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-export function useDataStore<T extends {}>(storeKey: string) {
+export function sharedUpdater<T extends {}>(storeKey: string) {
   const componentKey = componentKeyRef.value;
   const dataValue = dataStoreStore[storeKey] as T;
 
@@ -25,7 +25,10 @@ export function useDataStore<T extends {}>(storeKey: string) {
   return dataValue;
 }
 
-export function makeDataStore<T extends {}>(storeKey: string, initValue: T) {
+export function makeSharedUpdater<T extends {}>(
+  storeKey: string,
+  initValue: T
+) {
   if (!dataStoreStore[storeKey]) {
     dataStoreStore[storeKey] = makeProxyData<T>({
       storeKey,
