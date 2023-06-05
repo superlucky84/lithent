@@ -3,13 +3,12 @@ import { componentRef, componentKeyRef } from '@/helper/universalRef';
 
 export default function useUpdater<T extends {}>(initValue: T) {
   const componentKey = componentKeyRef.value;
-  const state = updater<T>({
+
+  return updater<T>({
     initValue,
     render: () =>
       (componentRef.get(componentKey)!.redrawAction || (() => {}))(),
   });
-
-  return state;
 }
 
 function updater<T extends UseDataStoreValue>({
