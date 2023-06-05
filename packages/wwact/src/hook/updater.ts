@@ -3,29 +3,21 @@ import { componentRef, componentKeyRef } from '@/helper/universalRef';
 
 export default function useUpdater<T extends {}>(initValue: T) {
   const componentKey = componentKeyRef.value;
-  const state = updater<T>({
+
+  return updater<T>({
     initValue,
     render: () =>
       (componentRef.get(componentKey)!.redrawAction || (() => {}))(),
   });
-
-  return state;
 }
 
-function updater<T extends {}>({
+function updater<T extends UseDataStoreValue>({
   initValue,
   render,
 }: {
   initValue: T;
   render: () => void;
 }) {
-  return makeProxyData<T>(initValue, render);
-}
-
-function makeProxyData<T extends UseDataStoreValue>(
-  initValue: T,
-  render: () => void
-) {
   return new Proxy(initValue, {
     get(target: T, prop: string) {
       return target[prop];

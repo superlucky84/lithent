@@ -12,7 +12,7 @@ export function sharedUpdater<T extends {}>(storeKey: string) {
   const dataValue = dataStoreStore[storeKey] as T;
 
   if (!dataValue) {
-    console.warn('Data store not exist');
+    console.error('Data store not exist');
   }
 
   const dataStoreQueue = dataStoreRenderQueue;
@@ -30,10 +30,7 @@ export function makeSharedUpdater<T extends {}>(
   initValue: T
 ) {
   if (!dataStoreStore[storeKey]) {
-    dataStoreStore[storeKey] = makeProxyData<T>({
-      storeKey,
-      initValue,
-    });
+    dataStoreStore[storeKey] = makeProxyData<T>({ storeKey, initValue });
   }
 
   return dataStoreStore[storeKey];
