@@ -5,9 +5,9 @@ import mounted from './hook/mounted';
 import unmount from './hook/unmount';
 import updated from './hook/updated';
 import updater from './hook/updater';
-import { makeDataStore, useDataStore } from './hook/dataStore';
+import { makeSharedUpdater, sharedUpdater } from './hook/sharedUpdater';
 import makeRef from './hook/ref';
-export type { WDom, TagFunction, TagFunctionResolver, FragmentFunction, ComponentSubKey, ComponentRef, Props, MiddleStateWDomChildren, MiddleStateWDom, NodePointer, Param, } from './types';
+export type { WDom, TagFunction, TagFunctionResolver, FragmentFunction, ComponentSubKey, ComponentRef, Props, MiddleStateWDomChildren, MiddleStateWDom, UseDataStoreValue, NodePointer, Param, } from './types';
 declare global {
     namespace JSX {
         interface IntrinsicElements {
@@ -15,4 +15,4 @@ declare global {
         }
     }
 }
-export { h, Fragment, render, mounted, updated, unmount, updater, makeDataStore, useDataStore, makeRef, make, };
+export { h, Fragment, render, mounted, updated, unmount, updater, makeSharedUpdater, sharedUpdater, makeRef, make, };
