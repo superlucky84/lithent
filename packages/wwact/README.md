@@ -42,13 +42,13 @@ import {
   make,
   makeRef,
   render,
-  makeSignal,
+  updater,
   mounted,
   updated,
   unmount,
-} from '@/index';
+} from 'wwact';
 
-type Signal = { count: number; text: string };
+type Updater = { count: number; text: string };
 type Member = {
   privateValue: number;
   mixinData: { value: number };
@@ -60,28 +60,28 @@ type Member = {
 };
 type Props = { parentValue: number };
 
-const Component = make<Signal, Member, Props>({
-  signal: {
+const Component = make<Updater, Member, Props>({
+  updater: {
     count: 1,
     text: 'text',
   },
-  member({ signal, member }) {
+  member({ updater, member }) {
     return {
       privateValue: 7,
       mixinData: { value: 0 },
       domRef: makeRef<HTMLElement | null>(null),
       increase() {
-        signal.count += 1;
+        updater.count += 1;
         member.privateValue += 1;
       },
       increaseMixin() {
         member.mixinData.value += 1;
       },
       decrease() {
-        signal.count -= 1;
+        updater.count -= 1;
       },
       handleInputChange(event: InputEvent) {
-        signal.text = (event.target as HTMLInputElement).value;
+        updater.text = (event.target as HTMLInputElement).value;
       },
     };
   },
@@ -89,7 +89,7 @@ const Component = make<Signal, Member, Props>({
     const { member } = info;
     const { privateValue } = member;
 
-    info.member.mixinData = makeSignal({ value: 3 });
+    info.member.mixinData = updater({ value: 3 });
 
     mounted(() => console.log('MOUNTED'));
     unmount(() => console.log('UNMOUNT'));
@@ -113,7 +113,7 @@ const Component = make<Signal, Member, Props>({
     console.log('MOUNT', info.member.mixinData);
   },
   template({
-    signal: { text, count },
+    updater: { text, count },
     props: { parentValue },
     member: {
       mixinData,
@@ -156,7 +156,7 @@ import {
   h,
   Fragment,
   render,
-  makeSignal,
+  updater,
   makeRef,
   mounted,
   updated,
@@ -168,7 +168,7 @@ import {
 // childen is passed as the second argument.
 const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
-  const state = makeSignal<{ count: number; text: string }>({
+  const state = updater<{ count: number; text: string }>({
     count: 1,
     text: 'text',
   });
@@ -217,7 +217,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
 };
 
 function Root() {
-  const parentState = makeSignal<{ count: number }>({ count: 7 });
+  const parentState = updater<{ count: number }>({ count: 7 });
 
   const increaseParent = () => {
     parentState.count += 1;
