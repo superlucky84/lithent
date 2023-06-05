@@ -12,20 +12,13 @@ export default function useUpdater<T extends {}>(initValue: T) {
   return state;
 }
 
-function updater<T extends {}>({
+function updater<T extends UseDataStoreValue>({
   initValue,
   render,
 }: {
   initValue: T;
   render: () => void;
 }) {
-  return makeProxyData<T>(initValue, render);
-}
-
-function makeProxyData<T extends UseDataStoreValue>(
-  initValue: T,
-  render: () => void
-) {
   return new Proxy(initValue, {
     get(target: T, prop: string) {
       return target[prop];
