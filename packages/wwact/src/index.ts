@@ -2,8 +2,7 @@ import { h, Fragment } from '@/wDom';
 import make from '@/Wwact';
 import { render } from '@/render';
 import mounted from '@/hook/mounted';
-import unmount from '@/hook/unmount';
-import updated from '@/hook/updated';
+import update from '@/hook/update';
 import updater from '@/hook/updater';
 import { makeSharedUpdater, sharedUpdater } from '@/hook/sharedUpdater';
 import makeRef from '@/hook/ref';
@@ -36,8 +35,7 @@ export {
   Fragment,
   render,
   mounted,
-  updated,
-  unmount,
+  update,
   updater,
   makeSharedUpdater,
   sharedUpdater,

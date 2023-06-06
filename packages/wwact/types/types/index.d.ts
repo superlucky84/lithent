@@ -56,8 +56,7 @@ export type ComponentRef = WeakMap<Props, {
     mountSubscribeList?: (() => void)[];
     unmountSubscribeList?: (() => void)[];
 }>;
-export type Param<Updater, Member, Props> = {
-    updater: Updater;
+export type Param<Props, Member> = {
     props: Props;
     member: Member;
     children: WDom[];

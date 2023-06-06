@@ -2,28 +2,33 @@ import { updater as updaterHook, WDom } from '@/index';
 import { Param } from '@/types';
 
 export default function make<Updater extends {}, Member extends {}, Props>({
-  updater: updaterData,
+  updater: makeUpdater,
   member: makeMember,
-  mounter: makeCallback,
+  mounter: makeMounter,
   template,
 }: {
-  updater?: Updater;
+  updater?: (
+    info: Omit<Param<Updater, Member, Props>, 'children' | 'updater' | 'member'>
+  ) => Updater;
   member?: (info: Omit<Param<Updater, Member, Props>, 'children'>) => Member;
   mounter?: (info: Param<Updater, Member, Props>) => void;
   template: (info: Param<Updater, Member, Props>) => WDom;
 }) {
   return function (props: Props, children: WDom[]) {
-    const updater = updaterData
-      ? updaterHook<Updater>(updaterData)
-      : ({} as Updater);
     const member = {} as Member;
-
-    if (makeMember) {
-      Object.assign(member, makeMember({ updater, props, member }));
-    }
+    const updater = makeUpdater
+      ? updaterHook(makeUpdater({ props }))
+      : ({} as Updater);
 
     const info = { updater, props, member, children };
-    makeCallback ? makeCallback(info) : {};
+
+    if (makeMember) {
+      Object.assign(member, makeMember(info));
+    }
+
+    if (makeMounter) {
+      makeMounter(info);
+    }
 
     return () => template(info);
   };

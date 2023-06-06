@@ -5,6 +5,8 @@ import {
   makeQueueRef,
 } from '@/helper/universalRef';
 
+import unmount from '@/hook/unmount';
+
 export default function mounted(effectAction: () => void) {
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
@@ -34,7 +36,12 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
     if (queue) {
       component.mountSubscribeList = [];
 
-      queue.forEach((effect: Function) => effect());
+      queue.forEach((effect: Function) => {
+        const callback = effect();
+        if (callback) {
+          unmount(callback);
+        }
+      });
     }
   }
 }

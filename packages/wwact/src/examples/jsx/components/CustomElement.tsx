@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { makeRef, updated, updater } from '@/index';
+import { makeRef, update, updater } from '@/index';
 import Custom2 from './Custom2';
 
 const useJw = () => {
@@ -27,17 +27,17 @@ export default function CustomElement() {
   };
   const domRef = makeRef(null);
 
-  const handleUpdatedDataK = () => {
+  const handleUpdatedDataK = () => () => {
     console.log('domRef', domRef);
     console.log('updated k', data, hadleRef);
     data3.k += 10;
   };
-  const handleUpdatedData2K = () => {
+  const handleUpdatedData2K = () => () => {
     console.log('updated 2k', data2);
   };
 
-  updated(handleUpdatedDataK, () => [data.k]);
-  updated(handleUpdatedData2K, () => [data2.k]);
+  update(handleUpdatedDataK, () => [data.k]);
+  update(handleUpdatedData2K, () => [data2.k]);
 
   const componentMaker = () => {
     return (

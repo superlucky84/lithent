@@ -1,5 +1,5 @@
 import { h, Fragment, WDom, Props } from 'wwact';
-import { updater, mounted, unmount } from 'wwact';
+import { updater, mounted } from 'wwact';
 import { addParams } from '@/hook/params';
 
 export function Router(_props: Props, children: WDom[]) {
@@ -39,8 +39,11 @@ export function Router(_props: Props, children: WDom[]) {
 
   window.addEventListener('hashchange', handleHashChange);
 
-  mounted(handleHashChange);
-  unmount(removeEvent);
+  mounted(() => {
+    handleHashChange();
+
+    return removeEvent;
+  });
 
   return () => (
     <Fragment>
