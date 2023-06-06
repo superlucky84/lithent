@@ -84,6 +84,7 @@ const Component = make<Updater, Member, Props>({
     // Working
     update(
       () => {
+        console.log('UPDATE');
         return () => console.log('UPDATED');
       },
       () => [info.member.privateValue] // (using a closure to update a value)
