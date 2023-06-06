@@ -1,13 +1,4 @@
-import {
-  h,
-  Fragment,
-  make,
-  makeRef,
-  render,
-  mounted,
-  update,
-  unmount,
-} from '@/index';
+import { h, Fragment, make, makeRef, render, mounted, update } from '@/index';
 
 type Updater = { count: number; text: string };
 type Member = {
@@ -47,8 +38,10 @@ const Component = make<Updater, Member, Props>({
     const { member } = info;
     const { privateValue } = member;
 
-    mounted(() => console.log('MOUNTED'));
-    unmount(() => console.log('UNMOUNT'));
+    mounted(() => {
+      console.log('MOUNTED');
+      return () => console.log('UNMOUNT');
+    });
 
     // Working
     update(
