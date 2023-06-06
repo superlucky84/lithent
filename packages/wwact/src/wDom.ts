@@ -17,7 +17,7 @@ import {
   setRedrawAction,
   needDiffRef,
 } from '@/helper/universalRef';
-import { runUpdateCallback } from '@/hook/updated';
+import { runUpdateCallback } from '@/hook/update';
 import {
   checkFragmentFunction,
   checkCustemComponentFunction,
