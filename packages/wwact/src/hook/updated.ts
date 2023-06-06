@@ -7,7 +7,7 @@ import {
 import useUpdated from '@/hook/useUpdate';
 
 export default function updated(
-  effectAction: () => void,
+  effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) {
   const componentKey = componentKeyRef.value;

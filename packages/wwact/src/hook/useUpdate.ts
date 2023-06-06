@@ -7,7 +7,7 @@ import {
 } from '@/helper/universalRef';
 
 export default function useUpdated(
-  effectAction: () => void,
+  effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) {
   const componentKey = componentKeyRef.value;
@@ -31,7 +31,10 @@ export default function useUpdated(
       dependencies()
     )
   ) {
-    makeQueueRef(componentKey, 'updateSubscribeList').push(effectAction);
+    const callback = effectAction();
+    if (callback) {
+      makeQueueRef(componentKey, 'updateSubscribeList').push(callback);
+    }
   }
   updateSubscribeDefList[updateSubscribeSequence.value] = dependencies();
   updateSubscribeSequence.value += 1;

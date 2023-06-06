@@ -47,11 +47,16 @@ const Component = make<Props, Member>(
 
     // Working
     updated(
-      () => console.log('UPDATED'),
+      () => {
+        console.log('UPDATE');
+        return () => {
+          console.log('UPDATED');
+        };
+      },
       () => [member.privateValue] // (using a closure to update a value)
     );
     updated(
-      () => console.log('UPDATED2'),
+      () => async () => console.log('UPDATED2'),
       () => [member.privateValue]
     );
 

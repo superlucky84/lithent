@@ -20,7 +20,7 @@ export default function Custom2(
   const handleUnmount = () => {
     console.log('CUSTOM2 UNMOUNT');
   };
-  const handleUpdated = async () => {
+  const handleUpdated = () => {
     console.log('CUSTOM2 UPDATED --');
   };
 
