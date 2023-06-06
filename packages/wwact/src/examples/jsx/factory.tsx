@@ -10,48 +10,37 @@ import {
   unmount,
 } from '@/index';
 
-type Updater = { count: number; text: string };
 type Member = {
-  privateValue: number;
-  mixinData: { value: number };
-  domRef: { value: HTMLElement | null };
-  increase: () => void;
-  increaseMixin: () => void;
+  doer: { count: number; text: string };
   decrease: () => void;
-  handleInputChange: (event: InputEvent) => void;
+  increase: () => void;
+  changeText: (event: InputEvent) => void;
+  privateValue: number;
+  domRef: { value: HTMLElement | null };
 };
 type Props = { parentValue: number };
 
-const Component = make<Updater, Member, Props>({
-  updater: {
-    count: 1,
-    text: 'text',
-  },
-  member({ updater, member }) {
-    return {
-      privateValue: 7,
-      mixinData: { value: 0 },
-      domRef: makeRef<HTMLElement | null>(null),
-      increase() {
-        updater.count += 1;
-        member.privateValue += 1;
-      },
-      increaseMixin() {
-        member.mixinData.value += 1;
-      },
-      decrease() {
-        updater.count -= 1;
-      },
-      handleInputChange(event: InputEvent) {
-        updater.text = (event.target as HTMLInputElement).value;
-      },
-    };
-  },
-  mounter(info) {
-    const { member } = info;
-    const { privateValue } = member;
+const Component = make<Props, Member>(
+  ({ props, member }) => {
+    let privateValue = props.parentValue;
+    const domRef = makeRef(null);
+    const doer = updater({
+      count: 1,
+      text: 'text',
+    });
 
-    info.member.mixinData = updater({ value: 3 });
+    const increase = () => {
+      doer.count += 1;
+      member.privateValue += 1;
+    };
+
+    const decrease = () => {
+      doer.count -= 1;
+    };
+
+    const changeText = (event: InputEvent) => {
+      doer.text = (event.target as HTMLInputElement).value;
+    };
 
     mounted(() => console.log('MOUNTED'));
     unmount(() => console.log('UNMOUNT'));
@@ -59,7 +48,7 @@ const Component = make<Updater, Member, Props>({
     // Working
     updated(
       () => console.log('UPDATED'),
-      () => [info.member.privateValue] // (using a closure to update a value)
+      () => [member.privateValue] // (using a closure to update a value)
     );
     updated(
       () => console.log('UPDATED2'),
@@ -72,39 +61,38 @@ const Component = make<Updater, Member, Props>({
       () => console.log('UPDATED3'),
       () => [privateValue]
     );
-    console.log('MOUNT', info.member.mixinData);
+
+    return { doer, increase, decrease, changeText, privateValue, domRef };
   },
-  template({
-    updater: { text, count },
+  ({
     props: { parentValue },
     member: {
-      mixinData,
+      doer: { text, count },
       privateValue,
-      handleInputChange,
       domRef,
       increase,
-      increaseMixin,
       decrease,
+      changeText,
     },
     children,
-  }) {
+  }) => {
+    const sum = count + privateValue + parentValue;
+
     return (
       <Fragment>
-        <input type="text" value={text} onInput={handleInputChange} />
+        <input type="text" value={text} onInput={changeText} />
         <div ref={domRef}>count: {count}</div>
         <div>privateValue: {privateValue}</div>
         <div>parentalue: {parentValue}</div>
-        <div>{mixinData?.value}</div>
-        <div>sum: {count + privateValue + parentValue}</div>
+        <div>sum: {sum}</div>
         {children}
         <div>
-          <button onClick={increaseMixin}>increaseMixin</button>
           <button onClick={increase}>Increase</button>
           <button onClick={decrease}>Decrease</button>
         </div>
       </Fragment>
     );
-  },
-});
+  }
+);
 
 render(<Component parentValue={9} />, document.getElementById('root'));

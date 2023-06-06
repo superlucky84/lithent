@@ -88,8 +88,7 @@ export type ComponentRef = WeakMap<
   }
 >;
 
-export type Param<Updater, Member, Props> = {
-  updater: Updater;
+export type Param<Props, Member> = {
   props: Props;
   member: Member;
   children: WDom[];
