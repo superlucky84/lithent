@@ -7,7 +7,6 @@ import {
   updater,
   mounted,
   updated,
-  unmount,
 } from '@/index';
 
 type Member = {
@@ -42,8 +41,12 @@ const Component = make<Props, Member>(
       doer.text = (event.target as HTMLInputElement).value;
     };
 
-    mounted(() => console.log('MOUNTED'));
-    unmount(() => console.log('UNMOUNT'));
+    mounted(() => {
+      console.log('MOUNTED');
+      return () => {
+        console.log('UNMOUNTED');
+      };
+    });
 
     // Working
     updated(
