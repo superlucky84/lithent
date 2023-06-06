@@ -93,9 +93,7 @@ export function setRedrawAction({
       nodeChildKey,
       exec,
     });
-    console.log('77', redrawQueueTimeout.value);
     if (!redrawQueueTimeout.value) {
-      console.log('88');
       redrawQueueTimeout.value = setTimeout(execRedrawQueue);
     }
   };
@@ -136,7 +134,6 @@ function execRedrawQueue() {
   redrawQueue.value = [];
   redrawQueueTimeout.value = null;
 
-  console.log('9', result);
   while (result.length) {
     const action = result.shift();
     if (action) {

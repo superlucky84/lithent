@@ -31,7 +31,6 @@ export default function useUpdated(
       dependencies()
     )
   ) {
-    console.log('action');
     const callback = effectAction();
     if (callback) {
       makeQueueRef(componentKey, 'updateSubscribeList').push(callback);
