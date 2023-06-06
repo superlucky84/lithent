@@ -6,7 +6,7 @@ import {
   updater,
   makeRef,
   mounted,
-  updated,
+  update,
   unmount,
   WDom,
 } from '@/index';
@@ -39,13 +39,13 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   const handleUnmount = () => {
     console.log('UNMOUNT');
   };
-  const handleUpdated = () => {
+  const handleUpdated = () => () => {
     console.log('UPDATED');
   };
 
   mounted(handleMounted); // Only Mounted
   unmount(handleUnmount); // Only Unmounted
-  updated(handleUpdated, () => [privateValue]); // Only Defs Updated (using a closure to update a value)
+  update(handleUpdated, () => [privateValue]); // Only Defs Updated (using a closure to update a value)
 
   // Wrap in a function and return (using a closure to hold the value)
   return () => (

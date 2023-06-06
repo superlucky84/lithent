@@ -1,5 +1,5 @@
 import { h } from '@/wDom';
-import { mounted, updated, unmount, sharedUpdater, updater } from '@/index';
+import { mounted, update, sharedUpdater, updater } from '@/index';
 
 export default function Custom2(props, children) {
   const globalData = sharedUpdater('globalData');
@@ -24,7 +24,7 @@ export default function Custom2(props, children) {
   };
 
   mounted(handleMounted);
-  updated(handleUpdated, () => [globalData.value]);
+  update(handleUpdated, () => [globalData.value]);
 
   return () => {
     <template>

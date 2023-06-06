@@ -31,6 +31,7 @@ export default function useUpdated(
       dependencies()
     )
   ) {
+    console.log('action');
     const callback = effectAction();
     if (callback) {
       makeQueueRef(componentKey, 'updateSubscribeList').push(callback);
@@ -61,5 +62,8 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
 }
 
 function checkNeedPushQueue(originalDefs: unknown[], newDefs: unknown[]) {
+  if (!originalDefs.length && !originalDefs.length) {
+    return true;
+  }
   return originalDefs.some((def, index) => def !== newDefs[index]);
 }

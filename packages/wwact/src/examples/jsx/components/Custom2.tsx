@@ -1,6 +1,6 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, Children } from '@/wDom';
-import { mounted, updated, unmount, sharedUpdater, updater } from '@/index';
+import { mounted, update, unmount, sharedUpdater, updater } from '@/index';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
@@ -20,7 +20,7 @@ export default function Custom2(
   const handleUnmount = () => {
     console.log('CUSTOM2 UNMOUNT');
   };
-  const handleUpdated = () => {
+  const handleUpdated = () => () => {
     console.log('CUSTOM2 UPDATED --');
   };
 
@@ -30,7 +30,7 @@ export default function Custom2(
 
   mounted(handleMounted);
   unmount(handleUnmount);
-  updated(handleUpdated, () => [globalData.value]);
+  update(handleUpdated, () => [globalData.value]);
 
   const componentMaker = () => {
     return (

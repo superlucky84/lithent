@@ -4,95 +4,84 @@ import {
   make,
   makeRef,
   render,
-  updater,
   mounted,
-  updated,
+  update,
+  unmount,
 } from '@/index';
 
+type Updater = { count: number; text: string };
 type Member = {
-  doer: { count: number; text: string };
-  decrease: () => void;
-  increase: () => void;
-  changeText: (event: InputEvent) => void;
   privateValue: number;
   domRef: { value: HTMLElement | null };
+  increase: () => void;
+  decrease: () => void;
+  handleInputChange: (event: InputEvent) => void;
 };
 type Props = { parentValue: number };
 
-const Component = make<Props, Member>(
-  ({ props, member }) => {
-    let privateValue = props.parentValue;
-    const domRef = makeRef(null);
-    const doer = updater({
-      count: 1,
+const Component = make<Updater, Member, Props>({
+  updater({ props }) {
+    return {
+      count: props.parentValue,
       text: 'text',
-    });
-
-    const increase = () => {
-      doer.count += 1;
-      member.privateValue += 1;
     };
-
-    const decrease = () => {
-      doer.count -= 1;
+  },
+  member({ updater, member }) {
+    return {
+      privateValue: 7,
+      mixinData: { value: 0 },
+      domRef: makeRef<HTMLElement | null>(null),
+      increase() {
+        updater.count += 1;
+        member.privateValue += 1;
+      },
+      decrease() {
+        updater.count -= 1;
+      },
+      handleInputChange(event: InputEvent) {
+        updater.text = (event.target as HTMLInputElement).value;
+      },
     };
+  },
+  mounter(info) {
+    const { member } = info;
+    const { privateValue } = member;
 
-    const changeText = (event: InputEvent) => {
-      doer.text = (event.target as HTMLInputElement).value;
-    };
-
-    mounted(() => {
-      console.log('MOUNTED');
-      return () => {
-        console.log('UNMOUNTED');
-      };
-    });
+    mounted(() => console.log('MOUNTED'));
+    unmount(() => console.log('UNMOUNT'));
 
     // Working
-    updated(
+    update(
       () => {
-        console.log('UPDATE');
-        return () => {
-          console.log('UPDATED');
-        };
+        return () => console.log('UPDATED');
       },
-      () => [member.privateValue] // (using a closure to update a value)
+      () => [info.member.privateValue] // (using a closure to update a value)
     );
-    updated(
-      () => async () => console.log('UPDATED2'),
+    update(
+      () => () => console.log('UPDATED2'),
       () => [member.privateValue]
     );
 
     // Not working
     // The `callback` doesn't work because the `privateValue` is closed with a non-reference value.
-    updated(
+    update(
       () => console.log('UPDATED3'),
       () => [privateValue]
     );
-
-    return { doer, increase, decrease, changeText, privateValue, domRef };
   },
-  ({
+  template({
+    updater: { text, count },
     props: { parentValue },
-    member: {
-      doer: { text, count },
-      privateValue,
-      domRef,
-      increase,
-      decrease,
-      changeText,
-    },
+    member: { privateValue, handleInputChange, domRef, increase, decrease },
     children,
-  }) => {
-    const sum = count + privateValue + parentValue;
-
+  }) {
     return (
       <Fragment>
-        <input type="text" value={text} onInput={changeText} />
+        <input type="text" value={text} onInput={handleInputChange} />
         <div ref={domRef}>count: {count}</div>
         <div>privateValue: {privateValue}</div>
         <div>parentalue: {parentValue}</div>
-        <div>sum: {sum}</div>
+        <div>sum: {count + privateValue + parentValue}</div>
         {children}
         <div>
           <button onClick={increase}>Increase</button>
@@ -100,7 +89,7 @@ const Component = make<Props, Member>(
         </div>
       </Fragment>
     );
-  }
-);
+  },
+});
 
 render(<Component parentValue={9} />, document.getElementById('root'));

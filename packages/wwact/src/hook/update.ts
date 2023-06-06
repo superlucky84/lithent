@@ -6,7 +6,7 @@ import {
 
 import useUpdated from '@/hook/useUpdate';
 
-export default function updated(
+export default function update(
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) {
