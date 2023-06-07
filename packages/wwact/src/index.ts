@@ -1,5 +1,4 @@
 import { h, Fragment } from '@/wDom';
-import make from '@/Wwact';
 import { render } from '@/render';
 import mounted from '@/hook/mounted';
 import update from '@/hook/update';
@@ -40,5 +39,4 @@ export {
   makeSharedUpdater,
   sharedUpdater,
   makeRef,
-  make,
 };
