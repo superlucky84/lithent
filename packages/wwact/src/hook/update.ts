@@ -34,9 +34,7 @@ export function runUpdateCallback() {
   const updateReservedList = componentRef.get(componentKey)?.updateReservedList;
 
   if (updateReservedList && updateReservedList.length) {
-    updateReservedList.forEach(callback => {
-      callback();
-    });
+    updateReservedList.forEach(callback => callback());
   }
 
   redrawQueue.value = [];

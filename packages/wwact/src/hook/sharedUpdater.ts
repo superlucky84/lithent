@@ -69,9 +69,9 @@ function makeProxyData<T extends UseDataStoreValue>({
         }
       });
 
-      trashCollections.forEach(deleteTarget => {
-        dataStoreQueue.splice(dataStoreQueue.indexOf(deleteTarget), 1);
-      });
+      trashCollections.forEach(deleteTarget =>
+        dataStoreQueue.splice(dataStoreQueue.indexOf(deleteTarget), 1)
+      );
 
       return true;
     },

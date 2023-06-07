@@ -210,9 +210,7 @@ function typeUpdate(newWDom: WDom) {
     }
   }
 
-  (newWDom.children || []).forEach((childItem: WDom) => {
-    wDomUpdate(childItem);
-  });
+  (newWDom.children || []).forEach((childItem: WDom) => wDomUpdate(childItem));
 
   runUpdatedQueueFromWDom(newWDom);
 }
@@ -262,9 +260,9 @@ function updateProps({
     }
   );
 
-  Object.keys(originalProps).forEach(dataKey => {
-    (element as HTMLElement).removeAttribute(dataKey);
-  });
+  Object.keys(originalProps).forEach(dataKey =>
+    (element as HTMLElement).removeAttribute(dataKey)
+  );
 }
 
 function wDomToDom(wDom: WDom, init: boolean) {
@@ -357,9 +355,9 @@ function updateStyle({
       delete originalStyle[styleKey];
     });
 
-    Object.entries(originalStyle).forEach(([styleKey]) => {
-      elementStyle.removeProperty(styleKey);
-    });
+    Object.entries(originalStyle).forEach(([styleKey]) =>
+      elementStyle.removeProperty(styleKey)
+    );
   }
 }
 

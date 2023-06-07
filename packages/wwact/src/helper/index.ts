@@ -48,9 +48,7 @@ function updateChildren(children: WDom[], infoChidren: WDom[]) {
     children.splice(0, children.length);
 
     if (infoChidren) {
-      infoChidren.forEach(childrenItem => {
-        children.push(childrenItem);
-      });
+      infoChidren.forEach(childrenItem => children.push(childrenItem));
     }
   }
 }

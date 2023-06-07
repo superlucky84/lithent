@@ -110,9 +110,9 @@ export function initMountHookState(componentKey: Props) {
 function execRedrawQueue() {
   let childItemList: Props[] = [];
 
-  redrawQueue.value.forEach(item => {
-    childItemList = childItemList.concat(item.nodeChildKey);
-  });
+  redrawQueue.value.forEach(
+    item => (childItemList = childItemList.concat(item.nodeChildKey))
+  );
 
   const addedKey: Props[] = [];
   const result = redrawQueue.value.reduce((acc, item) => {
