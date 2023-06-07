@@ -21,14 +21,25 @@ import { runMountedQueueFromWDom } from '@/hook/mounted';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/helper';
 
-export function render(wDom: WDom, wrapElement: HTMLElement | null) {
+export function render(
+  wDom: WDom,
+  wrapElement: HTMLElement | null,
+  afterElement?: HTMLElement | null
+) {
   if (!wrapElement) {
     throw Error('WrapELement is null');
   }
   wDom.isRoot = true;
   wDom.wrapElement = wrapElement;
 
-  wrapElement.appendChild(wDomToDom(wDom, true));
+  const Dom = wDomToDom(wDom, true);
+
+  if (afterElement) {
+    console.log(wrapElement, afterElement, Dom);
+    wrapElement.insertBefore(Dom, afterElement);
+  } else {
+    wrapElement.appendChild(Dom);
+  }
 }
 
 export function wDomUpdate(newWDomTree: WDom) {
