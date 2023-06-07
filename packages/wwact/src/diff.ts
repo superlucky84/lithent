@@ -31,13 +31,13 @@ type DiffSecondeParam = {
   isSameType: boolean;
 };
 
-export default function makeNewWDomTree({
+const makeNewWDomTree = ({
   originalWDom,
   newWDom,
 }: {
   originalWDom?: WDom;
   newWDom: WDom | TagFunctionResolver;
-}) {
+}) => {
   const type = getWDomType(newWDom);
 
   if (!type) {
@@ -46,13 +46,14 @@ export default function makeNewWDomTree({
   const isSameType = checkSameWDomWithOriginal[type]({ originalWDom, newWDom });
 
   return remakeNewWDom({ originalWDom, newWDom, isSameType });
-}
+};
+export default makeNewWDomTree;
 
-function remakeNewWDom({
+const remakeNewWDom = ({
   newWDom,
   originalWDom,
   isSameType,
-}: DiffPrimaryParam) {
+}: DiffPrimaryParam) => {
   const remakeWDom = generalize({ newWDom, originalWDom, isSameType });
 
   remakeWDom.children = remakeChildrenForDiff({
@@ -84,13 +85,13 @@ function remakeNewWDom({
   remakeWDom.oldProps = originalWDom?.props;
 
   return remakeWDom;
-}
+};
 
-function addReRenderTypeProperty({
+const addReRenderTypeProperty = ({
   originalWDom,
   newWDom,
   isSameType,
-}: DiffSecondeParam) {
+}: DiffSecondeParam) => {
   const existOriginalWDom = originalWDom && originalWDom.type;
   const isEmptyElement = checkEmptyElement(newWDom);
   const isRoot = !newWDom.getParent;
@@ -113,13 +114,13 @@ function addReRenderTypeProperty({
   }
 
   return isKeyCheckedWDom ? 'S_REPLACE' : 'REPLACE';
-}
+};
 
-function generalize({
+const generalize = ({
   newWDom,
   originalWDom,
   isSameType,
-}: DiffPrimaryParam): WDom {
+}: DiffPrimaryParam): WDom => {
   if (checkCustemComponentFunction(newWDom)) {
     return isSameType && originalWDom
       ? reRender(originalWDom, newWDom)
@@ -127,21 +128,21 @@ function generalize({
   }
 
   return newWDom;
-}
+};
 
-function remakeChildrenForDiff({
+const remakeChildrenForDiff = ({
   isSameType,
   newWDom,
   originalWDom,
-}: DiffSecondeParam) {
+}: DiffSecondeParam) => {
   if (isSameType && originalWDom) {
     return remakeChildrenForUpdate(newWDom, originalWDom);
   }
 
   return remakeChildrenForAdd(newWDom);
-}
+};
 
-function remakeChildrenForAdd(newWDom: WDom) {
+const remakeChildrenForAdd = (newWDom: WDom) => {
   return (newWDom.children || []).map((item: WDom) => {
     const childItem = makeNewWDomTree({ newWDom: item });
 
@@ -152,9 +153,9 @@ function remakeChildrenForAdd(newWDom: WDom) {
 
     return childItem;
   });
-}
+};
 
-function remakeChildrenForUpdate(newWDom: WDom, originalWDom: WDom) {
+const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
   if (
     newWDom.type === 'loop' &&
     checkExisty(getKey((newWDom.children || [])[0]))
@@ -175,9 +176,9 @@ function remakeChildrenForUpdate(newWDom: WDom, originalWDom: WDom) {
 
     return childItem;
   });
-}
+};
 
-function remakeChildrenForLoopUpdate(newWDom: WDom, originalWDom: WDom) {
+const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
   const { remakedChildren, unUsedChildren } = diffLoopChildren(
     newWDom,
     originalWDom
@@ -192,9 +193,9 @@ function remakeChildrenForLoopUpdate(newWDom: WDom, originalWDom: WDom) {
   });
 
   return remakedChildren;
-}
+};
 
-function diffLoopChildren(newWDom: WDom, originalWDom: WDom) {
+const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
   const newChildren = [...(newWDom.children || [])];
   const originalChildren = [...(originalWDom.children || [])];
 
@@ -221,16 +222,15 @@ function diffLoopChildren(newWDom: WDom, originalWDom: WDom) {
     remakedChildren,
     unUsedChildren: originalChildren,
   };
-}
+};
 
-function findSameKeyOriginalItem(item: WDom, originalChildren: WDom[]) {
+const findSameKeyOriginalItem = (item: WDom, originalChildren: WDom[]) => {
   const key = getKey(item);
 
   return originalChildren.find(
     orignalChildItem => getKey(orignalChildItem) === key
   );
-}
+};
 
-function getKey(target: WDom) {
-  return target?.componentProps?.key ?? target?.props?.key;
-}
+const getKey = (target: WDom) =>
+  target?.componentProps?.key ?? target?.props?.key;

@@ -1,11 +1,11 @@
 import update from '@/hook/update';
 import mounted from '@/hook/mounted';
 
-export default function effect(
+const effect = (
   forward: () => (() => void) | void,
   backward: () => (() => void) | void,
   dependencies: () => any[] = () => []
-) {
+) => {
   mounted(() => {
     forward();
 
@@ -17,4 +17,5 @@ export default function effect(
 
     return forward;
   }, dependencies);
-}
+};
+export default effect;

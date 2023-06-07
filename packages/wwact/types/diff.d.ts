@@ -8,7 +8,8 @@
  * 4. loop타입의 자식들은 같은 키값을 가졌는지로 동일한지 판단하며 키값이 없을경우 fragment타입처럼 취급한다.
  */
 import { WDom, TagFunctionResolver } from './types';
-export default function makeNewWDomTree({ originalWDom, newWDom, }: {
-    originalWDom?: WDom;
+declare const makeNewWDomTree: ({ originalWDom, newWDom, }: {
+    originalWDom?: WDom | undefined;
     newWDom: WDom | TagFunctionResolver;
-}): WDom;
+}) => WDom;
+export default makeNewWDomTree;

@@ -7,7 +7,7 @@ import {
 
 import unmount from '@/hook/unmount';
 
-export default function mounted(effectAction: () => void) {
+const mounted = (effectAction: () => void) => {
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
   let mounts = component?.mounts;
@@ -17,9 +17,10 @@ export default function mounted(effectAction: () => void) {
   }
 
   mounts.push(effectAction);
-}
+};
+export default mounted;
 
-export function runMountedQueueFromWDom(newWDom: WDom) {
+export const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;
 
   if (componentKey) {
@@ -44,4 +45,4 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
       });
     }
   }
-}
+};

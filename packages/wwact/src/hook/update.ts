@@ -8,10 +8,10 @@ import {
 
 import useUpdated from '@/hook/useUpdate';
 
-export default function update(
+const update = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
-) {
+) => {
   const componentKey = componentKeyRef.value;
 
   let updateReqs = componentRef.get(componentKey)?.updateReqs as (() => void)[];
@@ -26,7 +26,9 @@ export default function update(
   });
 
   useUpdated(effectAction, dependencies);
-}
+};
+
+export default update;
 
 export function runUpdateCallback() {
   const componentKey = componentKeyRef.value;

@@ -10,5 +10,5 @@
  * 7. (NONE). text타입의 경우 text가 같다면 변경이 필요 없으므로 방치한다. (Todo. 다른 타입의 경우 처리필요)
  */
 import { WDom } from './types';
-export declare function render(wDom: WDom, wrapElement: HTMLElement | null, afterElement?: HTMLElement | null): void;
-export declare function wDomUpdate(newWDomTree: WDom): void;
+export declare const render: (wDom: WDom, wrapElement: HTMLElement | null, afterElement?: HTMLElement | null) => void;
+export declare const wDomUpdate: (newWDomTree: WDom) => void;

@@ -4,7 +4,7 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-export default function state<T>(value: T): [() => T, (setValue: T) => void] {
+const state = <T>(value: T): [() => T, (setValue: T) => void] => {
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
   const render = () =>
@@ -35,4 +35,6 @@ export default function state<T>(value: T): [() => T, (setValue: T) => void] {
   stateSeq.value += 1;
 
   return [getValue, setValue];
-}
+};
+
+export default state;

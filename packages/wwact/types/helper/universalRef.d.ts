@@ -39,17 +39,17 @@ export declare const routerParams: {
 /**
  * Ref helpers
  */
-export declare function makeQueueRef(componentKey: Props, name: ComponentSubKey): (() => void)[];
-export declare function makeUpdatedStore(componentKey: Props): [{
+export declare const makeQueueRef: (componentKey: Props, name: ComponentSubKey) => (() => void)[];
+export declare const makeUpdatedStore: (componentKey: Props) => [{
     value: number;
 }, unknown[][]];
-export declare function makeStateStore<T>(componentKey: Props): [{
+export declare const makeStateStore: <T>(componentKey: Props) => [{
     value: number;
 }, T[]];
-export declare function setRedrawAction({ componentKey, nodeChildKey, exec, }: {
+export declare const setRedrawAction: ({ componentKey, nodeChildKey, exec, }: {
     componentKey: Props;
     nodeChildKey: Props[];
     exec: () => void;
-}): void;
-export declare function initUpdateHookState(componentKey: Props): void;
-export declare function initMountHookState(componentKey: Props): void;
+}) => void;
+export declare const initUpdateHookState: (componentKey: Props) => Props;
+export declare const initMountHookState: (componentKey: Props) => Props;

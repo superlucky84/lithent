@@ -5,16 +5,18 @@ import {
   makeQueueRef,
 } from '@/helper/universalRef';
 
-export default function unmount(effectAction: () => void) {
+const unmount = (effectAction: () => void) => {
   const componentKey = componentKeyRef.value;
   const unmounts = componentRef.get(componentKey)!.unmounts;
 
   if (!unmounts) {
     makeQueueRef(componentKey, 'unmounts').push(effectAction);
   }
-}
+};
 
-export function runUnmountQueueFromWDom(newWDom: WDom) {
+export default unmount;
+
+export const runUnmountQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;
 
   if (!componentKey) {
@@ -28,4 +30,4 @@ export function runUnmountQueueFromWDom(newWDom: WDom) {
 
     queue.forEach((effect: Function) => effect());
   }
-}
+};

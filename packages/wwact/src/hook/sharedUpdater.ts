@@ -7,7 +7,7 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-export function sharedUpdater<T extends {}>(storeKey: string) {
+export const sharedUpdater = <T extends {}>(storeKey: string) => {
   const componentKey = componentKeyRef.value;
   const dataValue = dataStoreStore[storeKey] as T;
 
@@ -23,32 +23,32 @@ export function sharedUpdater<T extends {}>(storeKey: string) {
   );
 
   return dataValue;
-}
+};
 
-export function makeSharedUpdater<T extends {}>(
+export const makeSharedUpdater = <T extends {}>(
   storeKey: string,
   initValue: T
-) {
+) => {
   if (!dataStoreStore[storeKey]) {
     dataStoreStore[storeKey] = makeProxyData<T>({ storeKey, initValue });
   }
 
   return dataStoreStore[storeKey];
-}
+};
 
-function makeProxyData<T extends UseDataStoreValue>({
+const makeProxyData = <T extends UseDataStoreValue>({
   storeKey,
   initValue,
 }: {
   storeKey: string;
   initValue: T;
-}) {
+}) => {
   const proxy = new Proxy<T>(initValue, {
     get(target, prop) {
       const value = target[prop];
 
       if (checkFunction(value)) {
-        return function (...args: unknown[]) {
+        return (...args: unknown[]) => {
           (value as Function).call(proxy, ...args);
         };
       }
@@ -84,9 +84,7 @@ function makeProxyData<T extends UseDataStoreValue>({
         const methodValue = proxy[prop];
 
         if (checkFunction(methodValue)) {
-          return function (...args: unknown[]) {
-            (methodValue as Function)(...args);
-          };
+          return (...args: unknown[]) => (methodValue as Function)(...args);
         }
 
         return proxy[prop];
@@ -96,4 +94,4 @@ function makeProxyData<T extends UseDataStoreValue>({
       },
     }
   );
-}
+};

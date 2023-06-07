@@ -21,11 +21,11 @@ import { runMountedQueueFromWDom } from '@/hook/mounted';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/helper';
 
-export function render(
+export const render = (
   wDom: WDom,
   wrapElement: HTMLElement | null,
   afterElement?: HTMLElement | null
-) {
+) => {
   if (!wrapElement) {
     throw Error('WrapELement is null');
   }
@@ -40,24 +40,25 @@ export function render(
   } else {
     wrapElement.appendChild(Dom);
   }
-}
+};
 
-export function wDomUpdate(newWDomTree: WDom) {
+export const wDomUpdate = (newWDomTree: WDom) => {
   const { needRerender } = newWDomTree;
 
   if (needRerender && needRerender !== 'NONE') {
-    ({
+    const exec = {
       ADD: typeAdd,
       DELETE: typeDelete,
       REPLACE: typeReplace,
       UPDATE: typeUpdate,
       S_REPLACE: typeSortedReplace,
       S_UPDATE: typeSortedUpdate,
-    })[needRerender](newWDomTree);
+    }[needRerender];
+    exec(newWDomTree);
   }
-}
+};
 
-function typeDelete(newWDom: WDom) {
+const typeDelete = (newWDom: WDom) => {
   const parent = newWDom?.el?.parentNode;
 
   if (newWDom.oldProps && newWDom.el) {
@@ -68,22 +69,22 @@ function typeDelete(newWDom: WDom) {
     parent.removeChild(newWDom.el);
     delete newWDom.el;
   }
-}
+};
 
-function typeSortedReplace(newWDom: WDom) {
+const typeSortedReplace = (newWDom: WDom) => {
   typeDelete(newWDom);
   typeAdd(newWDom);
-}
+};
 
-function typeSortedUpdate(newWDom: WDom) {
+const typeSortedUpdate = (newWDom: WDom) => {
   typeDelete(newWDom);
   typeAdd(newWDom, newWDom.el);
-}
+};
 
-function typeAdd(
+const typeAdd = (
   newWDom: WDom,
   newElement?: HTMLElement | DocumentFragment | Text
-) {
+) => {
   if (!newElement) {
     newElement = wDomToDom(newWDom, true);
   }
@@ -103,12 +104,12 @@ function typeAdd(
   }
 
   runMountedQueueFromWDom(newWDom);
-}
+};
 
-function startFindNextBrotherElement(
+const startFindNextBrotherElement = (
   wDom: WDom,
   parentWDom: WDom
-): HTMLElement | DocumentFragment | Text | undefined {
+): HTMLElement | DocumentFragment | Text | undefined => {
   const brothers = parentWDom.children || [];
   const index = brothers.indexOf(wDom);
   const nextIndex = index + 1;
@@ -126,12 +127,12 @@ function startFindNextBrotherElement(
   }
 
   return undefined;
-}
+};
 
-function findChildFragmentNextElement(
+const findChildFragmentNextElement = (
   candidiateBrothers: WDom[]
-): HTMLElement | DocumentFragment | Text | undefined {
-  return candidiateBrothers.reduce(
+): HTMLElement | DocumentFragment | Text | undefined =>
+  candidiateBrothers.reduce(
     (
       targetEl: HTMLElement | DocumentFragment | Text | undefined,
       bItem: WDom
@@ -152,9 +153,8 @@ function findChildFragmentNextElement(
     },
     undefined
   );
-}
 
-function typeReplace(newWDom: WDom) {
+const typeReplace = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
   const orignalElement = newWDom.el;
 
@@ -172,12 +172,12 @@ function typeReplace(newWDom: WDom) {
   }
 
   runMountedQueueFromWDom(newWDom);
-}
+};
 
-function removeEvent(
+const removeEvent = (
   oldProps: Props,
   element?: HTMLElement | DocumentFragment | Text
-) {
+) => {
   if (element) {
     Object.entries(oldProps || {}).forEach(
       ([dataKey, dataValue]: [string, unknown]) => {
@@ -187,9 +187,9 @@ function removeEvent(
       }
     );
   }
-}
+};
 
-function typeUpdate(newWDom: WDom) {
+const typeUpdate = (newWDom: WDom) => {
   const element = newWDom.el;
 
   if (newWDom.type === 'text') {
@@ -213,17 +213,17 @@ function typeUpdate(newWDom: WDom) {
   (newWDom.children || []).forEach((childItem: WDom) => wDomUpdate(childItem));
 
   runUpdatedQueueFromWDom(newWDom);
-}
+};
 
-function updateText(newWDom: WDom) {
+const updateText = (newWDom: WDom) => {
   const element = newWDom.el;
 
   if (element) {
     element.nodeValue = String(newWDom.text);
   }
-}
+};
 
-function updateProps({
+const updateProps = ({
   oldProps,
   props,
   element,
@@ -231,7 +231,7 @@ function updateProps({
   oldProps?: Props;
   props?: Props;
   element?: HTMLElement | DocumentFragment | Text;
-}) {
+}) => {
   const originalProps = { ...oldProps };
 
   Object.entries(props || {}).forEach(
@@ -263,9 +263,9 @@ function updateProps({
   Object.keys(originalProps).forEach(dataKey =>
     (element as HTMLElement).removeAttribute(dataKey)
   );
-}
+};
 
-function wDomToDom(wDom: WDom, init: boolean) {
+const wDomToDom = (wDom: WDom, init: boolean) => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = type === 'fragment' || type === 'loop';
@@ -286,13 +286,13 @@ function wDomToDom(wDom: WDom, init: boolean) {
   runMountedQueueFromWDom(wDom);
 
   return element || document.createElement('div');
-}
+};
 
-function wDomChildrenToDom(
+const wDomChildrenToDom = (
   children: WDom[],
   parentElement?: HTMLElement | DocumentFragment | Text,
   init?: boolean
-) {
+) => {
   if (init) {
     const elementChildren = children.reduce(
       (acc: DocumentFragment, childItem: WDom) => {
@@ -309,9 +309,9 @@ function wDomChildrenToDom(
       parentElement.appendChild(elementChildren);
     }
   }
-}
+};
 
-function updateEvent({
+const updateEvent = ({
   element,
   eventKey,
   newEventHandler,
@@ -321,10 +321,10 @@ function updateEvent({
   eventKey: string;
   newEventHandler: (e: Event) => void;
   oldEventHandler: (e: Event) => void;
-}) {
-  const eventName = eventKey.replace(/^on(.*)/, function (_match, p1) {
-    return p1.toLowerCase();
-  });
+}) => {
+  const eventName = eventKey.replace(/^on(.*)/, (_match, p1) =>
+    p1.toLowerCase()
+  );
 
   if (oldEventHandler !== newEventHandler) {
     if (oldEventHandler) {
@@ -335,9 +335,9 @@ function updateEvent({
       element.addEventListener(eventName, newEventHandler);
     }
   }
-}
+};
 
-function updateStyle({
+const updateStyle = ({
   style,
   oldStyle,
   element,
@@ -345,7 +345,7 @@ function updateStyle({
   style: Record<string, string>;
   oldStyle: Record<string, string>;
   element?: HTMLElement | DocumentFragment | Text;
-}) {
+}) => {
   const originalStyle = { ...oldStyle };
   const elementStyle = (element as HTMLElement)?.style;
 
@@ -359,11 +359,11 @@ function updateStyle({
       elementStyle.removeProperty(styleKey)
     );
   }
-}
+};
 
-function findRealParentElement(
+const findRealParentElement = (
   vDom: WDom
-): HTMLElement | DocumentFragment | Text | undefined {
+): HTMLElement | DocumentFragment | Text | undefined => {
   const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
 
   if (vDom.isRoot && vDom.type === 'fragment') {
@@ -377,4 +377,4 @@ function findRealParentElement(
   const parentVDom = getParent(vDom);
 
   return findRealParentElement(parentVDom);
-}
+};

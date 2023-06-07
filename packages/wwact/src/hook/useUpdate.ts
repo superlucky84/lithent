@@ -6,10 +6,10 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-export default function useUpdated(
+const useUpdated = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
-) {
+) => {
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
 
@@ -34,9 +34,11 @@ export default function useUpdated(
   }
   updateDefs[updateSubscribeSequence.value] = dependencies();
   updateSubscribeSequence.value += 1;
-}
+};
 
-export function runUpdatedQueueFromWDom(newWDom: WDom) {
+export default useUpdated;
+
+export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;
   if (componentKey) {
     const component = componentRef.get(componentKey);
@@ -54,11 +56,11 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
       queue.forEach((effect: Function) => effect());
     }
   }
-}
+};
 
-function checkNeedPushQueue(originalDefs: unknown[], newDefs: unknown[]) {
+const checkNeedPushQueue = (originalDefs: unknown[], newDefs: unknown[]) => {
   if (!originalDefs.length && !originalDefs.length) {
     return true;
   }
   return originalDefs.some((def, index) => def !== newDefs[index]);
-}
+};

@@ -1,3 +1,2 @@
-export default function makeRef<T>(initValue: T) {
-  return { value: initValue };
-}
+const makeRef = <T>(initValue: T) => ({ value: initValue });
+export default makeRef;

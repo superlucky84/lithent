@@ -19,9 +19,80 @@ type WDomParam =
   | TagFunctionResolver
   | FragmentFunction;
 
-export function getWDomType(
+/**
+ * Predicator
+ */
+export const checkCustemComponentFunction = (
+  target: WDomParam
+): target is TagFunction | TagFunctionResolver => {
+  const isTagTagFunction =
+    typeof target === 'function' && !checkFragmentFunction(target);
+  const TagFunctionResolver = typeof target === 'object' && 'resolve' in target;
+
+  return isTagTagFunction || TagFunctionResolver;
+};
+
+export const checkFragmentFunction = (
+  target: unknown
+): target is FragmentFunction => {
+  return typeof target === 'function' && target === Fragment;
+};
+
+export const checkPlainWDomType = (wDom: WDomParam): wDom is WDom => {
+  return typeof wDom === 'object' && !('resolve' in wDom);
+};
+
+export const checkPlainType = (wDom: WDomParam, typeName: string) => {
+  return checkPlainWDomType(wDom) && wDom.type === typeName;
+};
+
+export const checkEmptyElement = (wDom: WDomParam) =>
+  checkPlainWDomType(wDom) && !wDom.type;
+
+export const checkSameCustomComponent = ({
+  originalWDom,
+  newWDom,
+}: DiffParam) => newWDom.constructor === originalWDom?.constructor;
+
+export const checkSameFragment = ({ originalWDom, newWDom }: DiffParam) =>
+  checkPlainWDomType(newWDom) &&
+  originalWDom?.type === 'fragment' &&
+  originalWDom?.children?.length === newWDom?.children?.length;
+
+export const checkSameTagElement = ({ originalWDom, newWDom }: DiffParam) =>
+  checkPlainWDomType(newWDom) &&
+  originalWDom?.type === 'element' &&
+  originalWDom?.tag === newWDom.tag;
+
+export const checkNormalTypeElement = ({ originalWDom, newWDom }: DiffParam) =>
+  checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
+
+export const checkExisty = (value: unknown) =>
+  value !== null && value !== undefined;
+
+export const checkFunction = (target: unknown): target is Function =>
+  typeof target === 'function';
+
+export const checkStyleData = (
+  dataKey: string,
+  dataValue: unknown
+): dataValue is Record<string, string> =>
+  dataKey === 'style' && typeof dataValue === 'object';
+
+export const checkRefData = (
+  dataKey: string,
+  dataValue: unknown
+): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } =>
+  dataKey === 'ref' && typeof dataValue === 'object';
+
+export const checkNormalAttribute = (
+  dataValue: unknown
+): dataValue is number | string =>
+  typeof dataValue === 'number' || typeof dataValue === 'string';
+
+export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver
-): WDomType | undefined {
+): WDomType | undefined => {
   if (checkCustemComponentFunction(wDom)) {
     return 'component';
   } else if (checkPlainType(wDom, 'fragment')) {
@@ -37,7 +108,7 @@ export function getWDomType(
   }
 
   return undefined;
-}
+};
 
 export const checkSameWDomWithOriginal = {
   component: checkSameCustomComponent,
@@ -47,86 +118,3 @@ export const checkSameWDomWithOriginal = {
   fragment: checkSameFragment,
   empty: checkNormalTypeElement,
 };
-
-/**
- * Predicator
- */
-export function checkCustemComponentFunction(
-  target: WDomParam
-): target is TagFunction | TagFunctionResolver {
-  const isTagTagFunction =
-    typeof target === 'function' && !checkFragmentFunction(target);
-  const TagFunctionResolver = typeof target === 'object' && 'resolve' in target;
-
-  return isTagTagFunction || TagFunctionResolver;
-}
-
-export function checkFragmentFunction(
-  target: unknown
-): target is FragmentFunction {
-  return typeof target === 'function' && target === Fragment;
-}
-
-export function checkPlainWDomType(wDom: WDomParam): wDom is WDom {
-  return typeof wDom === 'object' && !('resolve' in wDom);
-}
-
-export function checkPlainType(wDom: WDomParam, typeName: string) {
-  return checkPlainWDomType(wDom) && wDom.type === typeName;
-}
-
-export function checkEmptyElement(wDom: WDomParam) {
-  return checkPlainWDomType(wDom) && !wDom.type;
-}
-
-export function checkSameCustomComponent({ originalWDom, newWDom }: DiffParam) {
-  return newWDom.constructor === originalWDom?.constructor;
-}
-
-export function checkSameFragment({ originalWDom, newWDom }: DiffParam) {
-  return (
-    checkPlainWDomType(newWDom) &&
-    originalWDom?.type === 'fragment' &&
-    originalWDom?.children?.length === newWDom?.children?.length
-  );
-}
-
-export function checkSameTagElement({ originalWDom, newWDom }: DiffParam) {
-  return (
-    checkPlainWDomType(newWDom) &&
-    originalWDom?.type === 'element' &&
-    originalWDom?.tag === newWDom.tag
-  );
-}
-
-export function checkNormalTypeElement({ originalWDom, newWDom }: DiffParam) {
-  return checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
-}
-
-export function checkExisty(value: unknown) {
-  return value !== null && value !== undefined;
-}
-
-export function checkFunction(target: unknown): target is Function {
-  return typeof target === 'function';
-}
-
-export function checkStyleData(
-  dataKey: string,
-  dataValue: unknown
-): dataValue is Record<string, string> {
-  return dataKey === 'style' && typeof dataValue === 'object';
-}
-
-export function checkRefData(
-  dataKey: string,
-  dataValue: unknown
-): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } {
-  return dataKey === 'ref' && typeof dataValue === 'object';
-}
-
-export function checkNormalAttribute(
-  dataValue: unknown
-): dataValue is number | string {
-  return typeof dataValue === 'number' || typeof dataValue === 'string';
-}

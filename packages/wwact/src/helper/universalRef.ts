@@ -38,10 +38,10 @@ export const routerParams: { value: { [key: string]: string } } = { value: {} };
 /**
  * Ref helpers
  */
-export function makeQueueRef(
+export const makeQueueRef = (
   componentKey: Props,
   name: ComponentSubKey
-): (() => void)[] {
+): (() => void)[] => {
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
@@ -51,11 +51,11 @@ export function makeQueueRef(
   }
 
   return componentRef.get(componentKey)![name] as (() => void)[];
-}
+};
 
-export function makeUpdatedStore(
+export const makeUpdatedStore = (
   componentKey: Props
-): [{ value: number }, unknown[][]] {
+): [{ value: number }, unknown[][]] => {
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
@@ -68,11 +68,11 @@ export function makeUpdatedStore(
     },
     componentRef.get(componentKey)!.updateDefs as unknown[][],
   ];
-}
+};
 
-export function makeStateStore<T>(
+export const makeStateStore = <T>(
   componentKey: Props
-): [{ value: number }, T[]] {
+): [{ value: number }, T[]] => {
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
@@ -85,9 +85,9 @@ export function makeStateStore<T>(
     },
     componentRef.get(componentKey)!.stateVal as T[],
   ];
-}
+};
 
-export function setRedrawAction({
+export const setRedrawAction = ({
   componentKey,
   nodeChildKey,
   exec,
@@ -95,7 +95,7 @@ export function setRedrawAction({
   componentKey: Props;
   nodeChildKey: Props[];
   exec: () => void;
-}) {
+}) => {
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
@@ -110,17 +110,15 @@ export function setRedrawAction({
       redrawQueueTimeout.value = setTimeout(execRedrawQueue);
     }
   };
-}
+};
 
-export function initUpdateHookState(componentKey: Props) {
-  componentKeyRef.value = componentKey;
-}
+export const initUpdateHookState = (componentKey: Props) =>
+  (componentKeyRef.value = componentKey);
 
-export function initMountHookState(componentKey: Props) {
-  componentKeyRef.value = componentKey;
-}
+export const initMountHookState = (componentKey: Props) =>
+  (componentKeyRef.value = componentKey);
 
-function execRedrawQueue() {
+const execRedrawQueue = () => {
   let childItemList: Props[] = [];
 
   redrawQueue.value.forEach(
@@ -150,4 +148,4 @@ function execRedrawQueue() {
       action.exec();
     }
   }
-}
+};

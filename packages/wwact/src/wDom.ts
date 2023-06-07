@@ -36,15 +36,16 @@ type WDomInfoWithRenderParam = WDomInfoParam & {
   reRender: () => WDom;
 };
 
-export function Fragment(_props: Props, ...children: WDom[]) {
-  return { type: 'fragment', children };
-}
+export const Fragment = (_props: Props, ...children: WDom[]) => ({
+  type: 'fragment',
+  children,
+});
 
-export function h(
+export const h = (
   tag: TagFunction | FragmentFunction | string,
   props: Props,
   ...children: MiddleStateWDomChildren
-) {
+) => {
   const nodeParentPointer: NodePointer = { value: undefined };
   const nodeChildKey: NodeChildKey = { value: [] };
   const newProps = props || {};
@@ -61,9 +62,9 @@ export function h(
   }
 
   return node;
-}
+};
 
-function reRenderCustomComponent({
+const reRenderCustomComponent = ({
   tag,
   props,
   children,
@@ -73,7 +74,7 @@ function reRenderCustomComponent({
   props: Props;
   children: WDom[];
   originalWDom: WDom;
-}) {
+}) => {
   needDiffRef.value = true;
 
   const newWDom = makeWDomResolver({ tag, props, children });
@@ -95,9 +96,9 @@ function reRenderCustomComponent({
   wDomUpdate(newWDomTree);
 
   needDiffRef.value = false;
-}
+};
 
-function makeWDomResolver({
+const makeWDomResolver = ({
   tag,
   props,
   children,
@@ -105,7 +106,7 @@ function makeWDomResolver({
   tag: TagFunction;
   props: Props;
   children: WDom[];
-}) {
+}) => {
   const tagName = tag.name;
   const constructor = tag;
   const resolve = (componentKey = props) => {
@@ -133,9 +134,9 @@ function makeWDomResolver({
   };
 
   return { tagName, constructor, props, children, resolve };
-}
+};
 
-function makeCustomNode(wDomInfo: WDomInfoParam) {
+const makeCustomNode = (wDomInfo: WDomInfoParam) => {
   const { componentMaker } = wDomInfo;
   const customNode = componentMaker();
   const reRender = makeReRender(wDomInfo);
@@ -143,15 +144,15 @@ function makeCustomNode(wDomInfo: WDomInfoParam) {
   addComponentProps(customNode, { ...wDomInfo, reRender });
 
   return customNode;
-}
+};
 
-function makeReRender(wDomInfo: WDomInfoParam) {
+const makeReRender = (wDomInfo: WDomInfoParam) => {
   const reRender = () => wDomMaker({ ...wDomInfo, reRender });
 
   return reRender;
-}
+};
 
-function wDomMaker(wDomInfo: WDomInfoWithRenderParam) {
+const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   const { componentMaker, componentKey, tag, props, children } = wDomInfo;
 
   initUpdateHookState(componentKey);
@@ -168,9 +169,9 @@ function wDomMaker(wDomInfo: WDomInfoWithRenderParam) {
   addComponentProps(originalWDom, wDomInfo);
 
   return originalWDom;
-}
+};
 
-function addComponentProps(wDom: WDom, info: WDomInfoWithRenderParam) {
+const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
   const { componentKey, tag, props, children, reRender } = info;
 
   Object.assign(wDom, {
@@ -181,9 +182,9 @@ function addComponentProps(wDom: WDom, info: WDomInfoWithRenderParam) {
     componentKey,
     reRender,
   });
-}
+};
 
-function makeNode({
+const makeNode = ({
   tag,
   props,
   nodeChildKey,
@@ -193,7 +194,7 @@ function makeNode({
   props: Props;
   nodeChildKey: NodeChildKey;
   children: WDom[];
-}) {
+}) => {
   if (checkFragmentFunction(tag)) {
     return Fragment(props, ...children);
   } else if (checkCustemComponentFunction(tag)) {
@@ -211,14 +212,14 @@ function makeNode({
     nodeChildKey: nodeChildKey.value,
     children,
   };
-}
+};
 
-function remakeChildren(
+const remakeChildren = (
   nodeParentPointer: NodePointer,
   nodeChildKey: NodeChildKey,
   children: MiddleStateWDomChildren
-): WDom[] {
-  return children.map((item: MiddleStateWDom) => {
+): WDom[] =>
+  children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
 
     childItem.getParent = () => nodeParentPointer.value;
@@ -228,9 +229,8 @@ function remakeChildren(
 
     return childItem;
   });
-}
 
-function makeChildrenItem(item: MiddleStateWDom): WDom {
+const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {
     return { type: null };
   } else if (Array.isArray(item)) {
@@ -250,4 +250,4 @@ function makeChildrenItem(item: MiddleStateWDom): WDom {
   }
 
   return item;
-}
+};
