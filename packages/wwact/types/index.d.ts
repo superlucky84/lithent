@@ -4,8 +4,6 @@ import state from './hook/state';
 import effect from './hook/effect';
 import mounted from './hook/mounted';
 import update from './hook/update';
-import makeUpdater from './hook/makeUpdater';
-import { makeSharedUpdater, sharedUpdater } from './hook/sharedUpdater';
 import makeRef from './hook/ref';
 export type { WDom, TagFunction, TagFunctionResolver, FragmentFunction, ComponentSubKey, ComponentRef, Props, MiddleStateWDomChildren, MiddleStateWDom, UseDataStoreValue, NodePointer, Param, } from './types';
 declare global {
@@ -15,4 +13,4 @@ declare global {
         }
     }
 }
-export { h, Fragment, render, makeUpdater, state, mounted, update, effect, makeRef, sharedUpdater, makeSharedUpdater, };
+export { h, Fragment, render, state, mounted, update, effect, makeRef };

@@ -26,15 +26,16 @@ const state = <T>(value: T): [() => T, (setValue: T) => void] => {
   stateVal[stateSeq.value] = result;
 
   const seqence = stateSeq.value;
-  const getValue = () => stateVal[seqence];
-  const setValue = (value: T) => {
-    stateVal[seqence] = value;
-    render();
-  };
 
   stateSeq.value += 1;
 
-  return [getValue, setValue];
+  return [
+    () => stateVal[seqence],
+    (value: T) => {
+      stateVal[seqence] = value;
+      render();
+    },
+  ];
 };
 
 export default state;

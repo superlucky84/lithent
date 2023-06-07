@@ -1,18 +1,16 @@
 // example.jsx
-import { h, Fragment, render, makeUpdater } from '@/index';
+import { h, Fragment, render, state } from '@/index';
 
 function Root() {
-  const parentState = makeUpdater<{ showFive: boolean; showSix: boolean }>({
-    showFive: true,
-    showSix: true,
-  });
+  const [getShowFive, setShowFive] = state<boolean>(true);
+  const [getShowSix, setShowSix] = state<boolean>(true);
 
   const toggleFive = () => {
-    parentState.showFive = !parentState.showFive;
+    setShowFive(!getShowFive());
   };
 
   const toggleSix = () => {
-    parentState.showSix = !parentState.showSix;
+    setShowSix(!getShowSix());
   };
 
   return () => (
@@ -21,8 +19,8 @@ function Root() {
         4 <button onClick={toggleFive}>ShowFive</button>
         <button onClick={toggleSix}>ShowSix</button>
       </li>
-      {parentState.showFive ? <li>5</li> : null}
-      {parentState.showSix ? <li>6</li> : null}
+      {getShowFive() ? <li>5</li> : null}
+      {getShowSix() ? <li>6</li> : null}
       <li>7</li>
     </Fragment>
   );

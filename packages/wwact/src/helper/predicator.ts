@@ -24,13 +24,9 @@ type WDomParam =
  */
 export const checkCustemComponentFunction = (
   target: WDomParam
-): target is TagFunction | TagFunctionResolver => {
-  const isTagTagFunction =
-    typeof target === 'function' && !checkFragmentFunction(target);
-  const TagFunctionResolver = typeof target === 'object' && 'resolve' in target;
-
-  return isTagTagFunction || TagFunctionResolver;
-};
+): target is TagFunction | TagFunctionResolver =>
+  (typeof target === 'function' && !checkFragmentFunction(target)) ||
+  (typeof target === 'object' && 'resolve' in target);
 
 export const checkFragmentFunction = (
   target: unknown
@@ -40,9 +36,8 @@ export const checkFragmentFunction = (
 export const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
   typeof wDom === 'object' && !('resolve' in wDom);
 
-export const checkPlainType = (wDom: WDomParam, typeName: string) => {
-  return checkPlainWDomType(wDom) && wDom.type === typeName;
-};
+export const checkPlainType = (wDom: WDomParam, typeName: string) =>
+  checkPlainWDomType(wDom) && wDom.type === typeName;
 
 export const checkEmptyElement = (wDom: WDomParam) =>
   checkPlainWDomType(wDom) && !wDom.type;
@@ -91,21 +86,23 @@ export const checkNormalAttribute = (
 export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver
 ): WDomType | undefined => {
+  let result: WDomType | undefined;
+
   if (checkCustemComponentFunction(wDom)) {
-    return 'component';
+    result = 'component';
   } else if (checkPlainType(wDom, 'fragment')) {
-    return 'fragment';
+    result = 'fragment';
   } else if (checkPlainType(wDom, 'element')) {
-    return 'element';
+    result = 'element';
   } else if (checkPlainType(wDom, 'loop')) {
-    return 'loop';
+    result = 'loop';
   } else if (checkPlainType(wDom, 'text')) {
-    return 'text';
+    result = 'text';
   } else if (checkEmptyElement(wDom)) {
-    return 'empty';
+    result = 'empty';
   }
 
-  return undefined;
+  return result;
 };
 
 export const checkSameWDomWithOriginal = {

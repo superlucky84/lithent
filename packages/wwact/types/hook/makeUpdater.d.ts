@@ -1,1 +1,2 @@
-export default function makeUpdater<T extends {}>(initValue: T): T;
+declare const makeUpdater: <T extends {}>(initValue: T) => T;
+export default makeUpdater;

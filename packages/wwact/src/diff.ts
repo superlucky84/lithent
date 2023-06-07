@@ -142,8 +142,8 @@ const remakeChildrenForDiff = ({
   return remakeChildrenForAdd(newWDom);
 };
 
-const remakeChildrenForAdd = (newWDom: WDom) => {
-  return (newWDom.children || []).map((item: WDom) => {
+const remakeChildrenForAdd = (newWDom: WDom) =>
+  (newWDom.children || []).map((item: WDom) => {
     const childItem = makeNewWDomTree({ newWDom: item });
 
     if (childItem.componentKey && newWDom.nodeChildKey) {
@@ -153,7 +153,6 @@ const remakeChildrenForAdd = (newWDom: WDom) => {
 
     return childItem;
   });
-};
 
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
   if (

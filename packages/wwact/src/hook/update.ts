@@ -30,7 +30,7 @@ const update = (
 
 export default update;
 
-export function runUpdateCallback() {
+export const runUpdateCallback = () => {
   const componentKey = componentKeyRef.value;
   const updateReqs = componentRef.get(componentKey)?.updateReqs;
 
@@ -40,4 +40,4 @@ export function runUpdateCallback() {
 
   redrawQueue.value = [];
   redrawQueueTimeout.value = null;
-}
+};

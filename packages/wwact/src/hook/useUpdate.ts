@@ -55,9 +55,7 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
   }
 };
 
-const checkNeedPushQueue = (originalDefs: unknown[], newDefs: unknown[]) => {
-  if (!originalDefs.length && !originalDefs.length) {
-    return true;
-  }
-  return originalDefs.some((def, index) => def !== newDefs[index]);
-};
+const checkNeedPushQueue = (originalDefs: unknown[], newDefs: unknown[]) =>
+  !originalDefs.length && !originalDefs.length
+    ? true
+    : originalDefs.some((def, index) => def !== newDefs[index]);

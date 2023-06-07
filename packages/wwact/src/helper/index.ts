@@ -33,13 +33,11 @@ export const reRender = (vDom: WDom, infoVdom: TagFunctionResolver) => {
 
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
-    Object.keys(props).forEach(key => {
-      delete props[key];
-    });
+    Object.keys(props).forEach(key => delete props[key]);
 
-    Object.entries(infoProps || {}).forEach(([key, value]) => {
-      props[key] = value;
-    });
+    Object.entries(infoProps || {}).forEach(
+      ([key, value]) => (props[key] = value)
+    );
   }
 };
 
