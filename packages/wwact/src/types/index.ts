@@ -62,8 +62,8 @@ export interface WDom {
     | 'DELETE'
     | 'REPLACE'
     | 'UPDATE'
-    | 'SORTED-REPLACE'
-    | 'SORTED-UPDATE'
+    | 'S_REPLACE'
+    | 'S_UPDATE'
     | 'NONE';
 }
 

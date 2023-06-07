@@ -51,8 +51,8 @@ export function wDomUpdate(newWDomTree: WDom) {
       DELETE: typeDelete,
       REPLACE: typeReplace,
       UPDATE: typeUpdate,
-      'SORTED-REPLACE': typeSortedReplace,
-      'SORTED-UPDATE': typeSortedUpdate,
+      S_REPLACE: typeSortedReplace,
+      S_UPDATE: typeSortedUpdate,
     })[needRerender](newWDomTree);
   }
 }

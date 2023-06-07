@@ -109,10 +109,10 @@ function addReRenderTypeProperty({
   } else if (!existOriginalWDom) {
     return 'ADD';
   } else if (isSameType) {
-    return isKeyCheckedWDom ? 'SORTED-UPDATE' : 'UPDATE';
+    return isKeyCheckedWDom ? 'S_UPDATE' : 'UPDATE';
   }
 
-  return isKeyCheckedWDom ? 'SORTED-REPLACE' : 'REPLACE';
+  return isKeyCheckedWDom ? 'S_REPLACE' : 'REPLACE';
 }
 
 function generalize({
