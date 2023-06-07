@@ -45,27 +45,15 @@ export function render(
 export function wDomUpdate(newWDomTree: WDom) {
   const { needRerender } = newWDomTree;
 
-  switch (needRerender) {
-    case 'ADD':
-      typeAdd(newWDomTree);
-      break;
-    case 'DELETE':
-      typeDelete(newWDomTree);
-      break;
-    case 'REPLACE':
-      typeReplace(newWDomTree);
-      break;
-    case 'UPDATE':
-      typeUpdate(newWDomTree);
-      break;
-    case 'SORTED-REPLACE':
-      typeSortedReplace(newWDomTree);
-      break;
-    case 'SORTED-UPDATE':
-      typeSortedUpdate(newWDomTree);
-      break;
-    case 'NONE':
-      break;
+  if (needRerender && needRerender !== 'NONE') {
+    ({
+      ADD: typeAdd,
+      DELETE: typeDelete,
+      REPLACE: typeReplace,
+      UPDATE: typeUpdate,
+      'SORTED-REPLACE': typeSortedReplace,
+      'SORTED-UPDATE': typeSortedUpdate,
+    })[needRerender](newWDomTree);
   }
 }
 
