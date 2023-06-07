@@ -44,7 +44,7 @@ export interface WDom {
     el?: HTMLElement | DocumentFragment | Text;
     needRerender?: 'ADD' | 'DELETE' | 'REPLACE' | 'UPDATE' | 'S_REPLACE' | 'S_UPDATE' | 'NONE';
 }
-export type ComponentSubKey = 'redrawAction' | 'updateReqs' | 'updateDefs' | 'updateCallbacks' | 'stateVal' | 'stateSeq' | 'mountSubscribeList' | 'unmountSubscribeList';
+export type ComponentSubKey = 'redrawAction' | 'updateReqs' | 'updateDefs' | 'updateCallbacks' | 'stateVal' | 'stateSeq' | 'mounts' | 'unmounts';
 export type ComponentRef = WeakMap<Props, {
     redrawAction?: () => void;
     updateReqs?: (() => void)[];
@@ -57,8 +57,8 @@ export type ComponentRef = WeakMap<Props, {
         value: number;
     };
     stateVal?: unknown[];
-    mountSubscribeList?: (() => void)[];
-    unmountSubscribeList?: (() => void)[];
+    mounts?: (() => void)[];
+    unmounts?: (() => void)[];
 }>;
 export type Param<Updater, Member, Props> = {
     updater: Updater;

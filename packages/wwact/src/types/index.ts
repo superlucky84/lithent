@@ -74,8 +74,8 @@ export type ComponentSubKey =
   | 'updateCallbacks'
   | 'stateVal'
   | 'stateSeq'
-  | 'mountSubscribeList'
-  | 'unmountSubscribeList';
+  | 'mounts'
+  | 'unmounts';
 
 export type ComponentRef = WeakMap<
   Props,
@@ -87,8 +87,8 @@ export type ComponentRef = WeakMap<
     updateCallbacks?: (() => void)[];
     stateSeq?: { value: number };
     stateVal?: unknown[];
-    mountSubscribeList?: (() => void)[];
-    unmountSubscribeList?: (() => void)[];
+    mounts?: (() => void)[];
+    unmounts?: (() => void)[];
   }
 >;
 

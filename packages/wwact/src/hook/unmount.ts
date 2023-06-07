@@ -7,11 +7,10 @@ import {
 
 export default function unmount(effectAction: () => void) {
   const componentKey = componentKeyRef.value;
-  const unmountSubscribeList =
-    componentRef.get(componentKey)!.unmountSubscribeList;
+  const unmounts = componentRef.get(componentKey)!.unmounts;
 
-  if (!unmountSubscribeList) {
-    makeQueueRef(componentKey, 'unmountSubscribeList').push(effectAction);
+  if (!unmounts) {
+    makeQueueRef(componentKey, 'unmounts').push(effectAction);
   }
 }
 
@@ -22,10 +21,10 @@ export function runUnmountQueueFromWDom(newWDom: WDom) {
     return;
   }
 
-  const queue = componentRef.get(componentKey)?.unmountSubscribeList;
+  const queue = componentRef.get(componentKey)?.unmounts;
 
   if (queue) {
-    componentRef.get(componentKey)!.unmountSubscribeList = [];
+    componentRef.get(componentKey)!.unmounts = [];
 
     queue.forEach((effect: Function) => effect());
   }

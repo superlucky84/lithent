@@ -10,13 +10,13 @@ import unmount from '@/hook/unmount';
 export default function mounted(effectAction: () => void) {
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
-  let mountSubscribeList = component?.mountSubscribeList;
+  let mounts = component?.mounts;
 
-  if (!mountSubscribeList) {
-    mountSubscribeList = makeQueueRef(componentKey, 'mountSubscribeList');
+  if (!mounts) {
+    mounts = makeQueueRef(componentKey, 'mounts');
   }
 
-  mountSubscribeList.push(effectAction);
+  mounts.push(effectAction);
 }
 
 export function runMountedQueueFromWDom(newWDom: WDom) {
@@ -24,7 +24,7 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
 
   if (componentKey) {
     const component = componentRef.get(componentKey) || {};
-    const queue = component.mountSubscribeList;
+    const queue = component.mounts;
     const sequence = component.updateSubscribeSequence;
 
     componentKeyRef.value = componentKey;
@@ -34,7 +34,7 @@ export function runMountedQueueFromWDom(newWDom: WDom) {
     }
 
     if (queue) {
-      component.mountSubscribeList = [];
+      component.mounts = [];
 
       queue.forEach((effect: Function) => {
         const callback = effect();

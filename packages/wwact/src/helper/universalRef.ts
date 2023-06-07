@@ -46,11 +46,7 @@ export function makeQueueRef(
     componentRef.set(componentKey, {});
   }
 
-  if (
-    name === 'updateCallbacks' ||
-    name === 'mountSubscribeList' ||
-    name === 'unmountSubscribeList'
-  ) {
+  if (name === 'updateCallbacks' || name === 'mounts' || name === 'unmounts') {
     componentRef.get(componentKey)![name] ??= [];
   }
 
