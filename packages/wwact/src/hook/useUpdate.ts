@@ -15,25 +15,22 @@ const useUpdated = (
 
   let updateDefs = component?.updateDefs as unknown[][];
 
-  let updateSubscribeSequence = component?.updateSubscribeSequence as {
+  let updateSeq = component?.updateSeq as {
     value: number;
   };
 
-  if (!updateDefs || !updateDefs[updateSubscribeSequence.value]) {
-    [updateSubscribeSequence, updateDefs] = makeUpdatedStore(componentKey);
+  if (!updateDefs || !updateDefs[updateSeq.value]) {
+    [updateSeq, updateDefs] = makeUpdatedStore(componentKey);
   } else if (
-    checkNeedPushQueue(
-      updateDefs[updateSubscribeSequence.value] || [],
-      dependencies()
-    )
+    checkNeedPushQueue(updateDefs[updateSeq.value] || [], dependencies())
   ) {
     const callback = effectAction();
     if (callback) {
       makeQueueRef(componentKey, 'updateCallbacks').push(callback);
     }
   }
-  updateDefs[updateSubscribeSequence.value] = dependencies();
-  updateSubscribeSequence.value += 1;
+  updateDefs[updateSeq.value] = dependencies();
+  updateSeq.value += 1;
 };
 
 export default useUpdated;
@@ -43,7 +40,7 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
   if (componentKey) {
     const component = componentRef.get(componentKey);
     const queue = component?.updateCallbacks;
-    const sequence = component!.updateSubscribeSequence;
+    const sequence = component!.updateSeq;
 
     componentKeyRef.value = componentKey;
 

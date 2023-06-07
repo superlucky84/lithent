@@ -70,12 +70,12 @@ const remakeNewWDom = ({
 
   remakeWDom.needRerender = needRerender;
 
-  if (needRerender !== 'ADD' && originalWDom) {
+  if (needRerender !== 'A' && originalWDom) {
     remakeWDom.el = originalWDom.el;
   }
 
   if (
-    ['DELETE', 'REPLACE'].includes(needRerender) &&
+    ['D', 'R'].includes(needRerender) &&
     originalWDom &&
     originalWDom.componentKey
   ) {
@@ -104,16 +104,16 @@ const addReRenderTypeProperty = ({
     newWDom.text === originalWDom?.text;
 
   if (isEmptyElement) {
-    return 'DELETE';
+    return 'D';
   } else if (isSameText) {
-    return 'NONE';
+    return 'N';
   } else if (!existOriginalWDom) {
-    return 'ADD';
+    return 'A';
   } else if (isSameType) {
-    return isKeyCheckedWDom ? 'S_UPDATE' : 'UPDATE';
+    return isKeyCheckedWDom ? 'SU' : 'U';
   }
 
-  return isKeyCheckedWDom ? 'S_REPLACE' : 'REPLACE';
+  return isKeyCheckedWDom ? 'SR' : 'R';
 };
 
 const generalize = ({

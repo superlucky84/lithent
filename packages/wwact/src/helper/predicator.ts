@@ -34,13 +34,11 @@ export const checkCustemComponentFunction = (
 
 export const checkFragmentFunction = (
   target: unknown
-): target is FragmentFunction => {
-  return typeof target === 'function' && target === Fragment;
-};
+): target is FragmentFunction =>
+  typeof target === 'function' && target === Fragment;
 
-export const checkPlainWDomType = (wDom: WDomParam): wDom is WDom => {
-  return typeof wDom === 'object' && !('resolve' in wDom);
-};
+export const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
+  typeof wDom === 'object' && !('resolve' in wDom);
 
 export const checkPlainType = (wDom: WDomParam, typeName: string) => {
   return checkPlainWDomType(wDom) && wDom.type === typeName;

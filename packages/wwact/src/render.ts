@@ -45,14 +45,14 @@ export const render = (
 export const wDomUpdate = (newWDomTree: WDom) => {
   const { needRerender } = newWDomTree;
 
-  if (needRerender && needRerender !== 'NONE') {
+  if (needRerender && needRerender !== 'N') {
     const exec = {
-      ADD: typeAdd,
-      DELETE: typeDelete,
-      REPLACE: typeReplace,
-      UPDATE: typeUpdate,
-      S_REPLACE: typeSortedReplace,
-      S_UPDATE: typeSortedUpdate,
+      A: typeAdd,
+      D: typeDelete,
+      R: typeReplace,
+      U: typeUpdate,
+      SR: typeSortedReplace,
+      SU: typeSortedUpdate,
     }[needRerender];
     exec(newWDomTree);
   }

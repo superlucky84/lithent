@@ -60,10 +60,10 @@ export const makeUpdatedStore = (
     componentRef.set(componentKey, {});
   }
   componentRef.get(componentKey)!.updateDefs ??= [];
-  componentRef.get(componentKey)!.updateSubscribeSequence ??= { value: 0 };
+  componentRef.get(componentKey)!.updateSeq ??= { value: 0 };
 
   return [
-    componentRef.get(componentKey)!.updateSubscribeSequence as {
+    componentRef.get(componentKey)!.updateSeq as {
       value: number;
     },
     componentRef.get(componentKey)!.updateDefs as unknown[][],

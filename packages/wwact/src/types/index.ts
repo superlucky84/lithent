@@ -58,18 +58,19 @@ export interface WDom {
   wrapElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?:
-    | 'ADD'
-    | 'DELETE'
-    | 'REPLACE'
-    | 'UPDATE'
-    | 'S_REPLACE'
-    | 'S_UPDATE'
-    | 'NONE';
+    | 'A' // ADD
+    | 'D' // DELETE
+    | 'R' // REPLACE
+    | 'U' // UPDATE
+    | 'SR' // S_REPLACE
+    | 'SU' // S_UPDATE
+    | 'N'; // NONE
 }
 
 export type ComponentSubKey =
   | 'redrawAction'
   | 'updateReqs'
+  | 'updateSeq'
   | 'updateDefs'
   | 'updateCallbacks'
   | 'stateVal'
@@ -82,7 +83,7 @@ export type ComponentRef = WeakMap<
   {
     redrawAction?: () => void;
     updateReqs?: (() => void)[];
-    updateSubscribeSequence?: { value: number };
+    updateSeq?: { value: number };
     updateDefs?: unknown[][];
     updateCallbacks?: (() => void)[];
     stateSeq?: { value: number };

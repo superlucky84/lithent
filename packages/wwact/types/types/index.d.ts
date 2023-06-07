@@ -42,13 +42,13 @@ export interface WDom {
     componentChildren?: WDom[];
     wrapElement?: HTMLElement;
     el?: HTMLElement | DocumentFragment | Text;
-    needRerender?: 'ADD' | 'DELETE' | 'REPLACE' | 'UPDATE' | 'S_REPLACE' | 'S_UPDATE' | 'NONE';
+    needRerender?: 'A' | 'D' | 'R' | 'U' | 'SR' | 'SU' | 'N';
 }
-export type ComponentSubKey = 'redrawAction' | 'updateReqs' | 'updateDefs' | 'updateCallbacks' | 'stateVal' | 'stateSeq' | 'mounts' | 'unmounts';
+export type ComponentSubKey = 'redrawAction' | 'updateReqs' | 'updateSeq' | 'updateDefs' | 'updateCallbacks' | 'stateVal' | 'stateSeq' | 'mounts' | 'unmounts';
 export type ComponentRef = WeakMap<Props, {
     redrawAction?: () => void;
     updateReqs?: (() => void)[];
-    updateSubscribeSequence?: {
+    updateSeq?: {
         value: number;
     };
     updateDefs?: unknown[][];
