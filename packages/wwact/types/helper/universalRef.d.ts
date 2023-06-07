@@ -43,6 +43,9 @@ export declare function makeQueueRef(componentKey: Props, name: ComponentSubKey)
 export declare function makeUpdatedStore(componentKey: Props): [{
     value: number;
 }, unknown[][]];
+export declare function makeStateStore<T>(componentKey: Props): [{
+    value: number;
+}, T[]];
 export declare function setRedrawAction({ componentKey, nodeChildKey, exec, }: {
     componentKey: Props;
     nodeChildKey: Props[];
