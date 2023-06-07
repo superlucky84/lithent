@@ -42,7 +42,6 @@ import {
   Fragment,
   render,
   state,
-  makeUpdater,
   makeRef,
   mounted,
   update,
@@ -59,7 +58,6 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   const [getText, setText] = state<string>('text');
   const getParentValue = () => props.parentValue;
   const parentValue = props.parentValue;
-  const updater = makeUpdater({ value: 3 });
 
   // Even if you don't use a ref, the private value is always maintained as a regular variable.
   let notRefValue = props.parentValue;
@@ -109,7 +107,6 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
       <div>parentValue: {props.parentValue} (working)</div>
       <div>parentValue: {getParentValue()} (working)</div>
       <div>parentValue: {parentValue} (not working)</div>
-      <div>updater: {updater.value} (use makeUpdater)</div>
       <div>sum: {getCount() + notRefValue + props.parentValue}</div>
       {/* It doesn't pull it out from under the reference, it uses the value directly, so you can just use it. */}
       <div>notRefValue: {notRefValue}</div>
