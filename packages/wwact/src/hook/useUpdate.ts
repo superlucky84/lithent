@@ -13,30 +13,26 @@ export default function useUpdated(
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
 
-  let updateSubscribeDefList = component?.updateSubscribeDefList as unknown[][];
+  let updateDefs = component?.updateDefs as unknown[][];
 
   let updateSubscribeSequence = component?.updateSubscribeSequence as {
     value: number;
   };
 
-  if (
-    !updateSubscribeDefList ||
-    !updateSubscribeDefList[updateSubscribeSequence.value]
-  ) {
-    [updateSubscribeSequence, updateSubscribeDefList] =
-      makeUpdatedStore(componentKey);
+  if (!updateDefs || !updateDefs[updateSubscribeSequence.value]) {
+    [updateSubscribeSequence, updateDefs] = makeUpdatedStore(componentKey);
   } else if (
     checkNeedPushQueue(
-      updateSubscribeDefList[updateSubscribeSequence.value] || [],
+      updateDefs[updateSubscribeSequence.value] || [],
       dependencies()
     )
   ) {
     const callback = effectAction();
     if (callback) {
-      makeQueueRef(componentKey, 'updateSubscribeList').push(callback);
+      makeQueueRef(componentKey, 'updateCallbacks').push(callback);
     }
   }
-  updateSubscribeDefList[updateSubscribeSequence.value] = dependencies();
+  updateDefs[updateSubscribeSequence.value] = dependencies();
   updateSubscribeSequence.value += 1;
 }
 
@@ -44,7 +40,7 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
   const { componentKey } = newWDom;
   if (componentKey) {
     const component = componentRef.get(componentKey);
-    const queue = component?.updateSubscribeList;
+    const queue = component?.updateCallbacks;
     const sequence = component!.updateSubscribeSequence;
 
     componentKeyRef.value = componentKey;
@@ -54,7 +50,7 @@ export function runUpdatedQueueFromWDom(newWDom: WDom) {
     }
 
     if (newWDom.constructor && queue) {
-      component.updateSubscribeList = [];
+      component.updateCallbacks = [];
       queue.forEach((effect: Function) => effect());
     }
   }

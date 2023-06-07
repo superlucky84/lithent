@@ -11,32 +11,28 @@ export default function state<T>(value: T): [() => T, (setValue: T) => void] {
     (componentRef.get(componentKey)!.redrawAction || (() => {}))();
 
   let result = value;
-  let stateSubscribeDefList = component?.stateSubscribeDefList as T[];
-  let stateSubscribeSequence = component?.stateSubscribeSequence as {
+  let stateVal = component?.stateVal as T[];
+  let stateSeq = component?.stateSeq as {
     value: number;
   };
 
-  if (
-    !stateSubscribeDefList ||
-    !stateSubscribeDefList[stateSubscribeSequence.value]
-  ) {
-    [stateSubscribeSequence, stateSubscribeDefList] =
-      makeStateStore<T>(componentKey);
+  if (!stateVal || !stateVal[stateSeq.value]) {
+    [stateSeq, stateVal] = makeStateStore<T>(componentKey);
     result = value;
   } else {
-    result = stateSubscribeDefList[stateSubscribeSequence.value];
+    result = stateVal[stateSeq.value];
   }
 
-  stateSubscribeDefList[stateSubscribeSequence.value] = result;
+  stateVal[stateSeq.value] = result;
 
-  const seqence = stateSubscribeSequence.value;
-  const getValue = () => stateSubscribeDefList[seqence];
+  const seqence = stateSeq.value;
+  const getValue = () => stateVal[seqence];
   const setValue = (value: T) => {
-    stateSubscribeDefList[seqence] = value;
+    stateVal[seqence] = value;
     render();
   };
 
-  stateSubscribeSequence.value += 1;
+  stateSeq.value += 1;
 
   return [getValue, setValue];
 }

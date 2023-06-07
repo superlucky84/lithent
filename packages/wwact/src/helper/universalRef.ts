@@ -47,7 +47,7 @@ export function makeQueueRef(
   }
 
   if (
-    name === 'updateSubscribeList' ||
+    name === 'updateCallbacks' ||
     name === 'mountSubscribeList' ||
     name === 'unmountSubscribeList'
   ) {
@@ -63,14 +63,14 @@ export function makeUpdatedStore(
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
-  componentRef.get(componentKey)!.updateSubscribeDefList ??= [];
+  componentRef.get(componentKey)!.updateDefs ??= [];
   componentRef.get(componentKey)!.updateSubscribeSequence ??= { value: 0 };
 
   return [
     componentRef.get(componentKey)!.updateSubscribeSequence as {
       value: number;
     },
-    componentRef.get(componentKey)!.updateSubscribeDefList as unknown[][],
+    componentRef.get(componentKey)!.updateDefs as unknown[][],
   ];
 }
 
@@ -80,14 +80,14 @@ export function makeStateStore<T>(
   if (!componentRef.get(componentKey)) {
     componentRef.set(componentKey, {});
   }
-  componentRef.get(componentKey)!.stateSubscribeDefList ??= [];
-  componentRef.get(componentKey)!.stateSubscribeSequence ??= { value: 0 };
+  componentRef.get(componentKey)!.stateVal ??= [];
+  componentRef.get(componentKey)!.stateSeq ??= { value: 0 };
 
   return [
-    componentRef.get(componentKey)!.stateSubscribeSequence as {
+    componentRef.get(componentKey)!.stateSeq as {
       value: number;
     },
-    componentRef.get(componentKey)!.stateSubscribeDefList as T[],
+    componentRef.get(componentKey)!.stateVal as T[],
   ];
 }
 

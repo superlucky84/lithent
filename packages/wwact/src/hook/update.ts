@@ -14,15 +14,14 @@ export default function update(
 ) {
   const componentKey = componentKeyRef.value;
 
-  let updateReservedList = componentRef.get(componentKey)
-    ?.updateReservedList as (() => void)[];
-  if (!updateReservedList) {
+  let updateReqs = componentRef.get(componentKey)?.updateReqs as (() => void)[];
+  if (!updateReqs) {
     makeUpdatedStore(componentKey);
-    updateReservedList = [];
-    componentRef.get(componentKey)!.updateReservedList ??= updateReservedList;
+    updateReqs = [];
+    componentRef.get(componentKey)!.updateReqs ??= updateReqs;
   }
 
-  updateReservedList.push(() => {
+  updateReqs.push(() => {
     useUpdated(effectAction, dependencies);
   });
 
@@ -31,10 +30,10 @@ export default function update(
 
 export function runUpdateCallback() {
   const componentKey = componentKeyRef.value;
-  const updateReservedList = componentRef.get(componentKey)?.updateReservedList;
+  const updateReqs = componentRef.get(componentKey)?.updateReqs;
 
-  if (updateReservedList && updateReservedList.length) {
-    updateReservedList.forEach(callback => callback());
+  if (updateReqs && updateReqs.length) {
+    updateReqs.forEach(callback => callback());
   }
 
   redrawQueue.value = [];
