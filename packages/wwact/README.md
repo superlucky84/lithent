@@ -13,10 +13,7 @@ There aren't as many rules as in React, you just need to know how closures work 
 ## Install
 
 ```bash
-git clone https://github.com/superlucky84/wwact.git
-
-cd wwact
-
+```bash
 pnpm add wwact
 ```
 
@@ -142,12 +139,17 @@ render(<Root />, document.getElementById('root'));
 # Develop
 
 ## pnpm install (this project was created using pnpm.)
+
 ```bash
 npm install -g pnpm
 ```
 
 ## project install
 ```bash
+git clone https://github.com/superlucky84/wwact.git
+
+cd wwact
+
 pnpm install
 ```
 
