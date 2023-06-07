@@ -2,6 +2,8 @@ import {
   componentKeyRef,
   componentRef,
   makeUpdatedStore,
+  redrawQueue,
+  redrawQueueTimeout,
 } from '@/helper/universalRef';
 
 import useUpdated from '@/hook/useUpdate';
@@ -36,4 +38,7 @@ export function runUpdateCallback() {
       callback();
     });
   }
+
+  redrawQueue.value = [];
+  redrawQueueTimeout.value = null;
 }
