@@ -1,8 +1,8 @@
 import { h, Fragment } from '@/wDom';
-import { updater } from '@/index';
+import { makeUpdater } from '@/index';
 
 export default function LoopTest() {
-  const data: { list: { key: number; value: string }[] } = updater({
+  const data: { list: { key: number; value: string }[] } = makeUpdater({
     list: [
       { key: 1, value: '일' },
       { key: 2, value: '이' },

@@ -1,7 +1,7 @@
 import { UseDataStoreValue } from '@/types';
 import { componentRef, componentKeyRef } from '@/helper/universalRef';
 
-export default function useUpdater<T extends {}>(initValue: T) {
+export default function makeUpdater<T extends {}>(initValue: T) {
   const componentKey = componentKeyRef.value;
 
   return updater<T>({

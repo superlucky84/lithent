@@ -3,7 +3,7 @@ import { render } from '@/render';
 import effect from '@/hook/effect';
 import mounted from '@/hook/mounted';
 import update from '@/hook/update';
-import updater from '@/hook/updater';
+import makeUpdater from '@/hook/makeUpdater';
 import { makeSharedUpdater, sharedUpdater } from '@/hook/sharedUpdater';
 import makeRef from '@/hook/ref';
 
@@ -34,11 +34,11 @@ export {
   h,
   Fragment,
   render,
+  makeUpdater,
   mounted,
   update,
-  updater,
-  makeSharedUpdater,
-  sharedUpdater,
-  makeRef,
   effect,
+  makeRef,
+  sharedUpdater,
+  makeSharedUpdater,
 };

@@ -1,9 +1,9 @@
 import { h, Fragment, WDom, Props } from 'wwact';
-import { updater, mounted } from 'wwact';
+import { makeUpdater, mounted } from 'wwact';
 import { addParams } from '@/hook/params';
 
 export function Router(_props: Props, children: WDom[]) {
-  const data = updater({ targetPath: '' });
+  const data = makeUpdater({ targetPath: '' });
   const findPath = (injectPath: string) =>
     children.find(item => item.componentProps?.path === injectPath);
 

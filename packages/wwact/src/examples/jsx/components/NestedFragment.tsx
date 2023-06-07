@@ -1,8 +1,8 @@
 import { h, Fragment } from '@/wDom';
-import { updater } from '@/index';
+import { makeUpdater } from '@/index';
 
 export default function NestedFragment() {
-  const data = updater<{ choiceNode: number }>({ choiceNode: 7 });
+  const data = makeUpdater<{ choiceNode: number }>({ choiceNode: 7 });
   const handle = () => {
     const randomValue = Math.floor(Math.random() * 10) + 1;
     data.choiceNode = randomValue;

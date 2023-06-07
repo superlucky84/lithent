@@ -3,7 +3,7 @@ import {
   h,
   Fragment,
   render,
-  updater,
+  makeUpdater,
   makeRef,
   mounted,
   update,
@@ -15,7 +15,7 @@ import {
 // childen is passed as the second argument.
 const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
-  const state = updater<{ count: number; text: string; list: {}[] }>({
+  const state = makeUpdater<{ count: number; text: string; list: {}[] }>({
     count: 1,
     text: 'text',
     list: [],
@@ -73,7 +73,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
 };
 
 function Root() {
-  const parentState = updater<{ count: number }>({ count: 7 });
+  const parentState = makeUpdater<{ count: number }>({ count: 7 });
 
   const increaseParent = () => {
     parentState.count += 1;

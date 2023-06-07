@@ -1,10 +1,10 @@
 import { h } from '@/wDom';
-import { makeRef, updater, update } from '@/index';
+import { makeRef, makeUpdater, update } from '@/index';
 import Custom2 from './Custom2.wwx';
 
 const useJw = () => {
-  const data = updater({ k: 7, j: 1 });
-  const data2 = updater({ k: 1 });
+  const data = makeUpdater({ k: 7, j: 1 });
+  const data2 = makeUpdater({ k: 1 });
 
   const handle = () => {
     data.k += 1;
@@ -19,7 +19,7 @@ const useJw = () => {
 
 export default function CustomElement() {
   const { data, data2, handle, handle2 } = useJw();
-  const data3 = updater({ k: 1 });
+  const data3 = makeUpdater({ k: 1 });
   const hadleRef = makeRef('3');
   const handle3 = () => {
     hadleRef.value = '7';

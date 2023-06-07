@@ -1,8 +1,8 @@
 // example.jsx
-import { h, Fragment, render, updater } from '@/index';
+import { h, Fragment, render, makeUpdater } from '@/index';
 
 function Root() {
-  const parentState = updater<{ showFive: boolean; showSix: boolean }>({
+  const parentState = makeUpdater<{ showFive: boolean; showSix: boolean }>({
     showFive: true,
     showSix: true,
   });

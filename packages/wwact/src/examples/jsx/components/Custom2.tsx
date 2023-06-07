@@ -1,14 +1,14 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, Children } from '@/wDom';
-import { mounted, update, sharedUpdater, updater } from '@/index';
+import { mounted, update, sharedUpdater, makeUpdater } from '@/index';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
   children: Children
 ) {
   const globalData = sharedUpdater<GlobalData>('globalData');
-  const data7 = updater<{ m: number }>({ m: 1 });
-  const data = updater<{ v: string }>({ v: '1' });
+  const data7 = makeUpdater<{ m: number }>({ m: 1 });
+  const data = makeUpdater<{ v: string }>({ v: '1' });
 
   const gdataUpdate = () => {
     console.log('gdataUpdate');

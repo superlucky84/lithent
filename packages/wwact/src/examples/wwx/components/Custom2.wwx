@@ -1,10 +1,10 @@
 import { h } from '@/wDom';
-import { mounted, update, sharedUpdater, updater } from '@/index';
+import { mounted, update, sharedUpdater, makeUpdater } from '@/index';
 
 export default function Custom2(props, children) {
   const globalData = sharedUpdater('globalData');
-  const data7 = updater({ m: 1 });
-  const data = updater({ v: '1' });
+  const data7 = makeUpdater({ m: 1 });
+  const data = makeUpdater({ v: '1' });
 
   const gdataUpdate = () => {
     console.log('gdataUpdate');
