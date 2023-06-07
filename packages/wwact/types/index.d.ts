@@ -1,5 +1,6 @@
 import { h, Fragment } from './wDom';
 import { render } from './render';
+import effect from './hook/effect';
 import mounted from './hook/mounted';
 import update from './hook/update';
 import updater from './hook/updater';
@@ -13,4 +14,4 @@ declare global {
         }
     }
 }
-export { h, Fragment, render, mounted, update, updater, makeSharedUpdater, sharedUpdater, makeRef, };
+export { h, Fragment, render, mounted, update, updater, makeSharedUpdater, sharedUpdater, makeRef, effect, };
