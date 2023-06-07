@@ -74,6 +74,23 @@ export function makeUpdatedStore(
   ];
 }
 
+export function makeStateStore<T>(
+  componentKey: Props
+): [{ value: number }, T[]] {
+  if (!componentRef.get(componentKey)) {
+    componentRef.set(componentKey, {});
+  }
+  componentRef.get(componentKey)!.stateSubscribeDefList ??= [];
+  componentRef.get(componentKey)!.stateSubscribeSequence ??= { value: 0 };
+
+  return [
+    componentRef.get(componentKey)!.stateSubscribeSequence as {
+      value: number;
+    },
+    componentRef.get(componentKey)!.stateSubscribeDefList as T[],
+  ];
+}
+
 export function setRedrawAction({
   componentKey,
   nodeChildKey,

@@ -72,6 +72,8 @@ export type ComponentSubKey =
   | 'updateReservedList'
   | 'updateSubscribeDefList'
   | 'updateSubscribeList'
+  | 'stateSubscribeDefList'
+  | 'stateSubscribeSequence'
   | 'mountSubscribeList'
   | 'unmountSubscribeList';
 
@@ -82,6 +84,8 @@ export type ComponentRef = WeakMap<
     updateReservedList?: (() => void)[];
     updateSubscribeSequence?: { value: number };
     updateSubscribeDefList?: unknown[][];
+    stateSubscribeSequence?: { value: number };
+    stateSubscribeDefList?: unknown[];
     updateSubscribeList?: (() => void)[];
     mountSubscribeList?: (() => void)[];
     unmountSubscribeList?: (() => void)[];

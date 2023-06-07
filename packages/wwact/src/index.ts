@@ -1,5 +1,6 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
+import state from '@/hook/state';
 import effect from '@/hook/effect';
 import mounted from '@/hook/mounted';
 import update from '@/hook/update';
@@ -35,6 +36,7 @@ export {
   Fragment,
   render,
   makeUpdater,
+  state,
   mounted,
   update,
   effect,
