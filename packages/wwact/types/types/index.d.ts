@@ -42,7 +42,7 @@ export interface WDom {
     componentChildren?: WDom[];
     wrapElement?: HTMLElement;
     el?: HTMLElement | DocumentFragment | Text;
-    needRerender?: 'ADD' | 'DELETE' | 'REPLACE' | 'UPDATE' | 'SORTED-REPLACE' | 'SORTED-UPDATE' | 'NONE';
+    needRerender?: 'ADD' | 'DELETE' | 'REPLACE' | 'UPDATE' | 'S_REPLACE' | 'S_UPDATE' | 'NONE';
 }
 export type ComponentSubKey = 'redrawAction' | 'updateReservedList' | 'updateSubscribeDefList' | 'updateSubscribeList' | 'mountSubscribeList' | 'unmountSubscribeList';
 export type ComponentRef = WeakMap<Props, {
