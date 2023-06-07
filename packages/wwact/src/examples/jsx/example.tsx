@@ -7,6 +7,7 @@ import {
   makeRef,
   mounted,
   update,
+  effect,
   WDom,
 } from '@/index';
 
@@ -14,9 +15,10 @@ import {
 // childen is passed as the second argument.
 const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // Create a responsive object. If this value changes, retry the render.
-  const state = updater<{ count: number; text: string }>({
+  const state = updater<{ count: number; text: string; list: {}[] }>({
     count: 1,
     text: 'text',
+    list: [],
   });
 
   // Even if you don't use a ref, the private value is always maintained as a regular variable.
@@ -32,6 +34,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   const handleInputChane = (event: InputEvent) => {
     state.text = (event.target as HTMLInputElement).value;
   };
+
   const handleMounted = () => {
     console.log('MOUNTED', domRef);
 
@@ -44,7 +47,14 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   };
 
   mounted(handleMounted); // Only Mounted
-  update(handleUpdated, () => [privateValue]); // Only Defs Updated (using a closure to update a value)
+  update(handleUpdated, () => []); // Only Defs Updated (using a closure to update a value)
+
+  // Behaves like `react`'s `useEffect`
+  effect(
+    () => console.log('INJECT'),
+    () => console.log('CLEAN_UP'),
+    () => [state.count]
+  );
 
   // Wrap in a function and return (using a closure to hold the value)
   return () => (

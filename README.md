@@ -89,6 +89,13 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   mounted(handleMounted); // Only Mounted
   update(handleUpdated, () => [privateValue]); // Only Defs Updated (using a closure to update a value)
 
+  // Behaves like `react`'s `useEffect`
+  effect(
+    () => console.log('INJECT'),
+    () => console.log('CLEAN_UP'),
+    () => [state.count]
+  );
+
   // Wrap in a function and return (using a closure to hold the value)
   return () => (
     <Fragment>
