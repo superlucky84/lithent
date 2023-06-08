@@ -1,4 +1,9 @@
-import { UseDataStoreValue, ComponentRef, Props } from '@/types';
+import {
+  UseDataStoreValue,
+  ComponentRef,
+  ComponentSubKey,
+  Props,
+} from '@/types';
 
 type redrawQueueList = {
   componentKey: Props;
@@ -31,21 +36,26 @@ export const dataStoreRenderQueue: {
 export const routerParams: { value: { [key: string]: string } } = { value: {} };
 
 export const componentRender = (componentKey: Props) => () =>
-  componentRef.get(componentKey)?.redrawAction();
+  componentRef.get(componentKey)?.up();
 
 export const setComponetRef = (componentKey: Props) => {
   componentRef.set(componentKey, {
-    redrawAction: () => {},
-    updateReqs: [],
-    updateSeq: { value: 0 },
-    updateDefs: [],
-    updateCallbacks: [],
-    stateSeq: { value: 0 },
-    stateVal: [],
+    up: () => {},
+    upR: [],
+    upS: { value: 0 },
+    upD: [],
+    upCB: [],
     mounts: [],
     unmounts: [],
   });
 };
+
+export const getComponentKey = () => componentKeyRef.value;
+
+export const getComponentSubInfo = (
+  componentKey: Props,
+  subKey: ComponentSubKey
+) => componentRef.get(componentKey)![subKey];
 
 export const setRedrawAction = ({
   componentKey,
@@ -56,7 +66,7 @@ export const setRedrawAction = ({
   nodeChildKey: Props[];
   exec: () => void;
 }) => {
-  componentRef.get(componentKey)!.redrawAction = () => {
+  componentRef.get(componentKey)!.up = () => {
     redrawQueue.value.push({
       componentKey,
       nodeChildKey,

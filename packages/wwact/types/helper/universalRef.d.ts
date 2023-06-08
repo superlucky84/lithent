@@ -1,4 +1,4 @@
-import { UseDataStoreValue, ComponentRef, Props } from '../types';
+import { UseDataStoreValue, ComponentRef, ComponentSubKey, Props } from '../types';
 /**
  * Common
  */
@@ -38,6 +38,10 @@ export declare const routerParams: {
 };
 export declare const componentRender: (componentKey: Props) => () => void | undefined;
 export declare const setComponetRef: (componentKey: Props) => void;
+export declare const getComponentKey: () => Props;
+export declare const getComponentSubInfo: (componentKey: Props, subKey: ComponentSubKey) => (() => void) | (() => void)[] | {
+    value: number;
+} | unknown[][] | (() => void)[] | (() => void)[] | (() => void)[];
 export declare const setRedrawAction: ({ componentKey, nodeChildKey, exec, }: {
     componentKey: Props;
     nodeChildKey: Props[];

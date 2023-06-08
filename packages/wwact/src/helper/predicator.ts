@@ -89,27 +89,27 @@ export const getWDomType = (
   let result: WDomType | undefined;
 
   if (checkCustemComponentFunction(wDom)) {
-    result = 'component';
+    result = 'c';
   } else if (checkPlainType(wDom, 'fragment')) {
-    result = 'fragment';
+    result = 'f';
   } else if (checkPlainType(wDom, 'element')) {
-    result = 'element';
+    result = 'e';
   } else if (checkPlainType(wDom, 'loop')) {
-    result = 'loop';
+    result = 'l';
   } else if (checkPlainType(wDom, 'text')) {
-    result = 'text';
+    result = 't';
   } else if (checkEmptyElement(wDom)) {
-    result = 'empty';
+    result = 'et';
   }
 
   return result;
 };
 
 export const checkSameWDomWithOriginal = {
-  component: checkSameCustomComponent,
-  loop: checkNormalTypeElement,
-  text: checkNormalTypeElement,
-  element: checkSameTagElement,
-  fragment: checkSameFragment,
-  empty: checkNormalTypeElement,
+  c: checkSameCustomComponent,
+  l: checkNormalTypeElement,
+  t: checkNormalTypeElement,
+  e: checkSameTagElement,
+  f: checkSameFragment,
+  et: checkNormalTypeElement,
 };

@@ -1,24 +1,27 @@
 import { WDom } from '@/types';
-import { componentKeyRef, componentRef } from '@/helper/universalRef';
+import {
+  componentKeyRef,
+  componentRef,
+  getComponentKey,
+} from '@/helper/universalRef';
 
 export const useUpdated = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) => {
-  const componentKey = componentKeyRef.value;
-  const component = componentRef.get(componentKey);
-  const { updateDefs, updateSeq } = component!;
-  const def = updateDefs[updateSeq.value];
+  const component = componentRef.get(getComponentKey());
+  const { upD, upS } = component!;
+  const def = upD[upS.value];
 
   if (def && checkNeedPushQueue(def, dependencies())) {
     const callback = effectAction();
     if (callback) {
-      component!.updateCallbacks.push(callback);
+      component!.upCB.push(callback);
     }
   }
 
-  updateDefs[updateSeq.value] = dependencies();
-  updateSeq.value += 1;
+  upD[upS.value] = dependencies();
+  upS.value += 1;
 };
 
 export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
@@ -26,8 +29,8 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
 
   if (componentKey) {
     const component = componentRef.get(componentKey);
-    const queue = component?.updateCallbacks;
-    const sequence = component?.updateSeq;
+    const queue = component?.upCB;
+    const sequence = component?.upS;
 
     componentKeyRef.value = componentKey;
 
@@ -36,7 +39,7 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
     }
 
     if (newWDom.constructor && queue) {
-      component.updateCallbacks = [];
+      component.upCB = [];
       queue.forEach((effect: Function) => effect());
     }
   }

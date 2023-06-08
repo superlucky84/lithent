@@ -23,7 +23,7 @@ export type NodeChildKey = {
 };
 export type MiddleStateWDom = WDom | number | string | false | null | MiddleStateWDomChildren;
 export type MiddleStateWDomChildren = MiddleStateWDom[];
-export type WDomType = 'component' | 'fragment' | 'element' | 'loop' | 'text' | 'empty';
+export type WDomType = 'c' | 'f' | 'e' | 'l' | 't' | 'et';
 export interface WDom {
     type: string | null;
     isRoot?: boolean;
@@ -45,19 +45,15 @@ export interface WDom {
     needRerender?: RenderType;
 }
 export type RenderType = 'A' | 'D' | 'R' | 'U' | 'SR' | 'SU' | 'N';
-export type ComponentSubKey = 'redrawAction' | 'updateReqs' | 'updateSeq' | 'updateDefs' | 'updateCallbacks' | 'stateVal' | 'stateSeq' | 'mounts' | 'unmounts';
+export type ComponentSubKey = 'up' | 'upR' | 'upS' | 'upD' | 'upCB' | 'mounts' | 'unmounts';
 export type ComponentRef = WeakMap<Props, {
-    redrawAction: () => void;
-    updateReqs: (() => void)[];
-    updateSeq: {
+    up: () => void;
+    upR: (() => void)[];
+    upS: {
         value: number;
     };
-    updateDefs: unknown[][];
-    updateCallbacks: (() => void)[];
-    stateSeq: {
-        value: number;
-    };
-    stateVal: unknown[];
+    upD: unknown[][];
+    upCB: (() => void)[];
     mounts: (() => void)[];
     unmounts: (() => void)[];
 }>;

@@ -25,11 +25,11 @@ export declare const checkRefData: (dataKey: string, dataValue: unknown) => data
 export declare const checkNormalAttribute: (dataValue: unknown) => dataValue is string | number;
 export declare const getWDomType: (wDom: WDom | TagFunction | TagFunctionResolver) => WDomType | undefined;
 export declare const checkSameWDomWithOriginal: {
-    component: ({ originalWDom, newWDom, }: DiffParam) => boolean;
-    loop: ({ originalWDom, newWDom }: DiffParam) => boolean;
-    text: ({ originalWDom, newWDom }: DiffParam) => boolean;
-    element: ({ originalWDom, newWDom }: DiffParam) => boolean;
-    fragment: ({ originalWDom, newWDom }: DiffParam) => boolean;
-    empty: ({ originalWDom, newWDom }: DiffParam) => boolean;
+    c: ({ originalWDom, newWDom, }: DiffParam) => boolean;
+    l: ({ originalWDom, newWDom }: DiffParam) => boolean;
+    t: ({ originalWDom, newWDom }: DiffParam) => boolean;
+    e: ({ originalWDom, newWDom }: DiffParam) => boolean;
+    f: ({ originalWDom, newWDom }: DiffParam) => boolean;
+    et: ({ originalWDom, newWDom }: DiffParam) => boolean;
 };
 export {};

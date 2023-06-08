@@ -1,11 +1,14 @@
 import { WDom } from '@/types';
-import { componentKeyRef, componentRef } from '@/helper/universalRef';
+import {
+  componentKeyRef,
+  componentRef,
+  getComponentKey,
+} from '@/helper/universalRef';
 
 import { unmount } from '@/hook/unmount';
 
 export const mounted = (effectAction: () => void) => {
-  const componentKey = componentKeyRef.value;
-  const mounts = componentRef.get(componentKey)!.mounts;
+  const mounts = componentRef.get(getComponentKey())!.mounts;
 
   mounts.push(effectAction);
 };
@@ -16,7 +19,7 @@ export const runMountedQueueFromWDom = (newWDom: WDom) => {
   if (componentKey) {
     const component = componentRef.get(componentKey);
     const queue = component?.mounts;
-    const sequence = component?.updateSeq;
+    const sequence = component?.upS;
 
     componentKeyRef.value = componentKey;
 

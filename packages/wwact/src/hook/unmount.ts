@@ -1,9 +1,8 @@
 import { WDom } from '@/types';
-import { componentKeyRef, componentRef } from '@/helper/universalRef';
+import { componentRef, getComponentKey } from '@/helper/universalRef';
 
 export const unmount = (effectAction: () => void) => {
-  const componentKey = componentKeyRef.value;
-  componentRef.get(componentKey)!.unmounts.push(effectAction);
+  componentRef.get(getComponentKey())!.unmounts.push(effectAction);
 };
 
 export const runUnmountQueueFromWDom = (newWDom: WDom) => {
