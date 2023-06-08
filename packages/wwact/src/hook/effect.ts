@@ -1,7 +1,7 @@
-import update from '@/hook/update';
-import mounted from '@/hook/mounted';
+import { update } from '@/hook/update';
+import { mounted } from '@/hook/mounted';
 
-const effect = (
+export const effect = (
   forward: () => (() => void) | void,
   backward: () => (() => void) | void,
   dependencies: () => any[] = () => []
@@ -18,4 +18,3 @@ const effect = (
     return forward;
   }, dependencies);
 };
-export default effect;

@@ -6,7 +6,7 @@ import {
   componentRef,
 } from '@/helper/universalRef';
 
-const useUpdated = (
+export const useUpdated = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) => {
@@ -32,8 +32,6 @@ const useUpdated = (
   updateDefs[updateSeq.value] = dependencies();
   updateSeq.value += 1;
 };
-
-export default useUpdated;
 
 export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;

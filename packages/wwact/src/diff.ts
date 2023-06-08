@@ -7,7 +7,7 @@
  * 3. fragment타입의 경우에는 children의 갯수까지 같아야지 같은 타입이라고 판단한다.
  * 4. loop타입의 자식들은 같은 키값을 가졌는지로 동일한지 판단하며 키값이 없을경우 fragment타입처럼 취급한다.
  */
-import { WDom, TagFunctionResolver } from '@/types';
+import { WDom, TagFunctionResolver, RenderType } from '@/types';
 import { checkCustemComponentFunction } from '@/helper/predicator';
 import { getParent, reRender } from '@/helper';
 import {
@@ -75,6 +75,7 @@ const remakeNewWDom = ({
   }
 
   if (
+    needRerender &&
     ['D', 'R'].includes(needRerender) &&
     originalWDom &&
     originalWDom.componentKey
@@ -91,7 +92,7 @@ const addReRenderTypeProperty = ({
   originalWDom,
   newWDom,
   isSameType,
-}: DiffSecondeParam) => {
+}: DiffSecondeParam): RenderType | undefined => {
   const existOriginalWDom = originalWDom && originalWDom.type;
   const isEmptyElement = checkEmptyElement(newWDom);
   const isRoot = !newWDom.getParent;
@@ -103,17 +104,20 @@ const addReRenderTypeProperty = ({
     isSameType &&
     newWDom.text === originalWDom?.text;
 
+  let result: RenderType | undefined;
   if (isEmptyElement) {
-    return 'D';
+    result = 'D';
   } else if (isSameText) {
-    return 'N';
+    result = 'N';
   } else if (!existOriginalWDom) {
-    return 'A';
+    result = 'A';
   } else if (isSameType) {
-    return isKeyCheckedWDom ? 'SU' : 'U';
+    result = isKeyCheckedWDom ? 'SU' : 'U';
+  } else {
+    result = isKeyCheckedWDom ? 'SR' : 'R';
   }
 
-  return isKeyCheckedWDom ? 'SR' : 'R';
+  return result;
 };
 
 const generalize = ({

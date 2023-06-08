@@ -5,9 +5,9 @@ import {
   makeQueueRef,
 } from '@/helper/universalRef';
 
-import unmount from '@/hook/unmount';
+import { unmount } from '@/hook/unmount';
 
-const mounted = (effectAction: () => void) => {
+export const mounted = (effectAction: () => void) => {
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
   let mounts = component?.mounts;
@@ -18,7 +18,6 @@ const mounted = (effectAction: () => void) => {
 
   mounts.push(effectAction);
 };
-export default mounted;
 
 export const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;

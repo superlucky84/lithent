@@ -42,8 +42,9 @@ export interface WDom {
     componentChildren?: WDom[];
     wrapElement?: HTMLElement;
     el?: HTMLElement | DocumentFragment | Text;
-    needRerender?: 'A' | 'D' | 'R' | 'U' | 'SR' | 'SU' | 'N';
+    needRerender?: RenderType;
 }
+export type RenderType = 'A' | 'D' | 'R' | 'U' | 'SR' | 'SU' | 'N';
 export type ComponentSubKey = 'redrawAction' | 'updateReqs' | 'updateSeq' | 'updateDefs' | 'updateCallbacks' | 'stateVal' | 'stateSeq' | 'mounts' | 'unmounts';
 export type ComponentRef = WeakMap<Props, {
     redrawAction: () => void;

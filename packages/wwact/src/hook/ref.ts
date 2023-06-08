@@ -1,2 +1,1 @@
-const makeRef = <T>(initValue: T) => ({ value: initValue });
-export default makeRef;
+export const makeRef = <T>(initValue: T) => ({ value: initValue });

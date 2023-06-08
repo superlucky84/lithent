@@ -57,15 +57,17 @@ export interface WDom {
   componentChildren?: WDom[];
   wrapElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;
-  needRerender?:
-    | 'A' // ADD
-    | 'D' // DELETE
-    | 'R' // REPLACE
-    | 'U' // UPDATE
-    | 'SR' // S_REPLACE
-    | 'SU' // S_UPDATE
-    | 'N'; // NONE
+  needRerender?: RenderType;
 }
+
+export type RenderType =
+  | 'A' // ADD
+  | 'D' // DELETE
+  | 'R' // REPLACE
+  | 'U' // UPDATE
+  | 'SR' // S_REPLACE
+  | 'SU' // S_UPDATE
+  | 'N'; // NONE
 
 export type ComponentSubKey =
   | 'redrawAction'

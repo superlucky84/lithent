@@ -6,9 +6,9 @@ import {
   redrawQueueTimeout,
 } from '@/helper/universalRef';
 
-import useUpdated from '@/hook/useUpdate';
+import { useUpdated } from '@/hook/useUpdate';
 
-const update = (
+export const update = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) => {
@@ -27,8 +27,6 @@ const update = (
 
   useUpdated(effectAction, dependencies);
 };
-
-export default update;
 
 export const runUpdateCallback = () => {
   const componentKey = componentKeyRef.value;

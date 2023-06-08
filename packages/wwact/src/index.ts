@@ -1,10 +1,10 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
 import { state } from '@/hook/state';
-import effect from '@/hook/effect';
-import mounted from '@/hook/mounted';
-import update from '@/hook/update';
-import makeRef from '@/hook/ref';
+import { effect } from '@/hook/effect';
+import { mounted } from '@/hook/mounted';
+import { update } from '@/hook/update';
+import { makeRef } from '@/hook/ref';
 
 export type {
   WDom,
