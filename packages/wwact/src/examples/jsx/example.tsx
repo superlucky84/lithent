@@ -77,7 +77,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   );
 };
 
-function Root() {
+const Root = () => {
   const [getParentNumber, setParentNumber] = state<number>(7);
 
   const increaseParent = () => {
@@ -98,6 +98,9 @@ function Root() {
       </div>
     </Fragment>
   );
-}
+};
+const root = <Root />;
 
-render(<Root />, document.getElementById('root'));
+console.log(root);
+
+render(root, document.getElementById('root'));

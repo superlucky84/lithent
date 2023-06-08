@@ -3,6 +3,7 @@ import {
   ComponentRef,
   ComponentSubKey,
   Props,
+  NodeChildKey,
 } from '@/types';
 
 type redrawQueueList = {
@@ -21,6 +22,13 @@ export const redrawQueue: {
   value: { componentKey: Props; nodeChildKey: Props[]; exec: () => void }[];
 } = { value: [] };
 export const redrawQueueTimeout: { value: null | number } = { value: null };
+export const nodeChildKeyList: { value: NodeChildKey[] } = { value: [] };
+
+export const pushNodeChildKey = (key: Props) => {
+  nodeChildKeyList.value.forEach(item => {
+    item.value.push(key);
+  });
+};
 
 /**
  * DataStore
