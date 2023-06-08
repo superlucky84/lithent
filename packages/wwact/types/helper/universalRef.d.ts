@@ -1,4 +1,4 @@
-import { UseDataStoreValue, ComponentSubKey, ComponentRef, Props } from '../types';
+import { UseDataStoreValue, ComponentRef, Props } from '../types';
 /**
  * Common
  */
@@ -36,16 +36,6 @@ export declare const routerParams: {
         [key: string]: string;
     };
 };
-/**
- * Ref helpers
- */
-export declare const makeQueueRef: (componentKey: Props, name: ComponentSubKey) => (() => void)[];
-export declare const makeUpdatedStore: (componentKey: Props) => [{
-    value: number;
-}, unknown[][]];
-export declare const makeStateStore: <T>(componentKey: Props) => [{
-    value: number;
-}, T[]];
 export declare const componentRender: (componentKey: Props) => () => void | undefined;
 export declare const setComponetRef: (componentKey: Props) => void;
 export declare const setRedrawAction: ({ componentKey, nodeChildKey, exec, }: {

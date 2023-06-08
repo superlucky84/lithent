@@ -1,7 +1,6 @@
 import {
   componentKeyRef,
   componentRef,
-  makeUpdatedStore,
   redrawQueue,
   redrawQueueTimeout,
 } from '@/helper/universalRef';
@@ -13,13 +12,7 @@ export const update = (
   dependencies: () => any[] = () => []
 ) => {
   const componentKey = componentKeyRef.value;
-
-  let updateReqs = componentRef.get(componentKey)?.updateReqs as (() => void)[];
-  if (!updateReqs) {
-    makeUpdatedStore(componentKey);
-    updateReqs = [];
-    componentRef.get(componentKey)!.updateReqs ??= updateReqs;
-  }
+  const updateReqs = componentRef.get(componentKey)!.updateReqs;
 
   updateReqs.push(() => {
     useUpdated(effectAction, dependencies);

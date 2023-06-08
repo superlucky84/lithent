@@ -1,10 +1,5 @@
 import { WDom } from '@/types';
-import {
-  componentKeyRef,
-  makeQueueRef,
-  makeUpdatedStore,
-  componentRef,
-} from '@/helper/universalRef';
+import { componentKeyRef, componentRef } from '@/helper/universalRef';
 
 export const useUpdated = (
   effectAction: () => (() => void) | void,
@@ -13,20 +8,13 @@ export const useUpdated = (
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
 
-  let updateDefs = component?.updateDefs as unknown[][];
+  let updateDefs = component!.updateDefs;
+  let updateSeq = component!.updateSeq;
 
-  let updateSeq = component?.updateSeq as {
-    value: number;
-  };
-
-  if (!updateDefs || !updateDefs[updateSeq.value]) {
-    [updateSeq, updateDefs] = makeUpdatedStore(componentKey);
-  } else if (
-    checkNeedPushQueue(updateDefs[updateSeq.value] || [], dependencies())
-  ) {
+  if (checkNeedPushQueue(updateDefs[updateSeq.value] || [], dependencies())) {
     const callback = effectAction();
     if (callback) {
-      makeQueueRef(componentKey, 'updateCallbacks').push(callback);
+      component!.updateCallbacks.push(callback);
     }
   }
   updateDefs[updateSeq.value] = dependencies();

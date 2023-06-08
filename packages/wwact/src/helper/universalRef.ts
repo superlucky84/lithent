@@ -1,9 +1,4 @@
-import {
-  UseDataStoreValue,
-  ComponentSubKey,
-  ComponentRef,
-  Props,
-} from '@/types';
+import { UseDataStoreValue, ComponentRef, Props } from '@/types';
 
 type redrawQueueList = {
   componentKey: Props;
@@ -34,48 +29,6 @@ export const dataStoreRenderQueue: {
  * Router
  */
 export const routerParams: { value: { [key: string]: string } } = { value: {} };
-
-/**
- * Ref helpers
- */
-export const makeQueueRef = (
-  componentKey: Props,
-  name: ComponentSubKey
-): (() => void)[] => {
-  if (name === 'updateCallbacks' || name === 'mounts' || name === 'unmounts') {
-    componentRef.get(componentKey)![name] ??= [];
-  }
-
-  return componentRef.get(componentKey)![name] as (() => void)[];
-};
-
-export const makeUpdatedStore = (
-  componentKey: Props
-): [{ value: number }, unknown[][]] => {
-  componentRef.get(componentKey)!.updateDefs ??= [];
-  componentRef.get(componentKey)!.updateSeq ??= { value: 0 };
-
-  return [
-    componentRef.get(componentKey)!.updateSeq as {
-      value: number;
-    },
-    componentRef.get(componentKey)!.updateDefs as unknown[][],
-  ];
-};
-
-export const makeStateStore = <T>(
-  componentKey: Props
-): [{ value: number }, T[]] => {
-  componentRef.get(componentKey)!.stateVal ??= [];
-  componentRef.get(componentKey)!.stateSeq ??= { value: 0 };
-
-  return [
-    componentRef.get(componentKey)!.stateSeq as {
-      value: number;
-    },
-    componentRef.get(componentKey)!.stateVal as T[],
-  ];
-};
 
 export const componentRender = (componentKey: Props) => () =>
   componentRef.get(componentKey)?.redrawAction();
