@@ -1,4 +1,4 @@
-import { UseDataStoreValue, ComponentRef, ComponentSubKey, Props } from '../types';
+import { UseDataStoreValue, ComponentRef, ComponentSubKey, Props, NodeChildKey } from '../types';
 /**
  * Common
  */
@@ -19,6 +19,11 @@ export declare const redrawQueue: {
 export declare const redrawQueueTimeout: {
     value: null | number;
 };
+export declare const nodeChildKeyList: {
+    value: NodeChildKey[];
+};
+export declare const pushNodeChildKey: (key: Props) => void;
+export declare const cleanNodeChildKey: () => never[];
 /**
  * DataStore
  */
@@ -44,7 +49,9 @@ export declare const getComponentSubInfo: (componentKey: Props, subKey: Componen
 } | unknown[][] | (() => void)[] | (() => void)[] | (() => void)[];
 export declare const setRedrawAction: ({ componentKey, nodeChildKey, exec, }: {
     componentKey: Props;
-    nodeChildKey: Props[];
+    nodeChildKey: {
+        value: Props[];
+    };
     exec: () => void;
 }) => void;
 export declare const initUpdateHookState: (componentKey: Props) => Props;

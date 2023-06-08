@@ -16,6 +16,9 @@ import {
   initMountHookState,
   setRedrawAction,
   needDiffRef,
+  pushNodeChildKey,
+  nodeChildKeyList,
+  cleanNodeChildKey,
 } from '@/helper/universalRef';
 import { runUpdateCallback } from '@/hook/update';
 import {
@@ -31,6 +34,7 @@ type WDomInfoParam = {
   tag: TagFunction;
   props: Props;
   children: WDom[];
+  nodeChildKey: { value: Props[] };
 };
 type WDomInfoWithRenderParam = WDomInfoParam & {
   reRender: () => WDom;
@@ -47,13 +51,11 @@ export const h = (
   ...children: MiddleStateWDomChildren
 ) => {
   const nodeParentPointer: NodePointer = { value: undefined };
-  const nodeChildKey: NodeChildKey = { value: [] };
   const newProps = props || {};
-  const newChildren = remakeChildren(nodeParentPointer, nodeChildKey, children);
+  const newChildren = remakeChildren(nodeParentPointer, children);
   const node = makeNode({
     tag,
     props: newProps,
-    nodeChildKey,
     children: newChildren,
   });
 
@@ -76,6 +78,7 @@ const reRenderCustomComponent = ({
   originalWDom: WDom;
 }) => {
   needDiffRef.value = true;
+  cleanNodeChildKey();
 
   const newWDom = makeWDomResolver({ tag, props, children });
   const newWDomTree = makeNewWDomTree({ originalWDom, newWDom });
@@ -109,23 +112,32 @@ const makeWDomResolver = ({
 }) => {
   const tagName = tag.name;
   const constructor = tag;
+  // 리졸브는 컴포넌트를 새로 만든다.
   const resolve = (componentKey = props) => {
     initMountHookState(componentKey);
 
+    const nodeChildKey: NodeChildKey = { value: [] };
+    // 먼저 부모들에게 키를 넣는다.
+    pushNodeChildKey(componentKey);
+    // 나 자신도 구독을 등록한다.
+    nodeChildKeyList.value.push(nodeChildKey);
+
     const componentMaker = tag(props, children);
+
     const customNode = makeCustomNode({
       componentMaker,
       componentKey,
       tag,
       props,
       children,
+      nodeChildKey,
     });
 
     const originalWDom = customNode;
 
     setRedrawAction({
       componentKey,
-      nodeChildKey: originalWDom.nodeChildKey || ([] as Props[]),
+      nodeChildKey,
       exec: () =>
         reRenderCustomComponent({ tag, props, children, originalWDom }),
     });
@@ -158,11 +170,20 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   initUpdateHookState(componentKey);
   runUpdateCallback();
 
+  // 옛날꺼는 버리고 여기에 새로운 NodeChildKey
+  const nodeChildKey: NodeChildKey = { value: [] };
+  // 먼저 부모들에게 키를 넣는다.
+  pushNodeChildKey(componentKey);
+  // 나 자신도 구독을 등록한다.
+  nodeChildKeyList.value.push(nodeChildKey);
+
   const originalWDom = componentMaker();
+
+  wDomInfo.nodeChildKey = nodeChildKey;
 
   setRedrawAction({
     componentKey,
-    nodeChildKey: originalWDom.nodeChildKey || ([] as Props[]),
+    nodeChildKey,
     exec: () => reRenderCustomComponent({ tag, props, children, originalWDom }),
   });
 
@@ -172,7 +193,7 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
 };
 
 const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
-  const { componentKey, tag, props, children, reRender } = info;
+  const { componentKey, tag, props, children, reRender, nodeChildKey } = info;
 
   Object.assign(wDom, {
     componentProps: props,
@@ -180,6 +201,7 @@ const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
     constructor: tag,
     tagName: tag.name,
     componentKey,
+    nodeChildKey,
     reRender,
   });
 };
@@ -187,12 +209,10 @@ const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
 const makeNode = ({
   tag,
   props,
-  nodeChildKey,
   children,
 }: {
   tag: TagFunction | FragmentFunction | string;
   props: Props;
-  nodeChildKey: NodeChildKey;
   children: WDom[];
 }) => {
   if (checkFragmentFunction(tag)) {
@@ -209,23 +229,18 @@ const makeNode = ({
     type: 'element',
     tag,
     props,
-    nodeChildKey: nodeChildKey.value,
     children,
   };
 };
 
 const remakeChildren = (
   nodeParentPointer: NodePointer,
-  nodeChildKey: NodeChildKey,
   children: MiddleStateWDomChildren
 ): WDom[] =>
   children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
 
     childItem.getParent = () => nodeParentPointer.value;
-    if (childItem.componentKey) {
-      nodeChildKey.value.push(childItem.componentKey);
-    }
 
     return childItem;
   });
@@ -235,11 +250,9 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
     return { type: null };
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
-    const nodeChildKey: NodeChildKey = { value: [] };
-    const children = remakeChildren(nodeParentPointer, nodeChildKey, item);
+    const children = remakeChildren(nodeParentPointer, item);
     const node = {
       type: 'loop',
-      nodeChildKey: nodeChildKey.value,
       children,
     };
     nodeParentPointer.value = node;
