@@ -42,7 +42,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
     return () => console.log('UNMOUNT');
   };
   const handleUpdated = () => {
-    console.log('UPDATE - privateValue');
+    console.log('UPDATE - parentValue');
 
     return () => console.log('UPDATED');
   };

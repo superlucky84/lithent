@@ -11,10 +11,12 @@ export const useUpdated = (
   let updateDefs = component!.updateDefs;
   let updateSeq = component!.updateSeq;
 
-  if (checkNeedPushQueue(updateDefs[updateSeq.value] || [], dependencies())) {
-    const callback = effectAction();
-    if (callback) {
-      component!.updateCallbacks.push(callback);
+  if (updateDefs[updateSeq.value]) {
+    if (checkNeedPushQueue(updateDefs[updateSeq.value] || [], dependencies())) {
+      const callback = effectAction();
+      if (callback) {
+        component!.updateCallbacks.push(callback);
+      }
     }
   }
   updateDefs[updateSeq.value] = dependencies();
