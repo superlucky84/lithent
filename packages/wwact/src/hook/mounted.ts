@@ -24,9 +24,9 @@ export const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;
 
   if (componentKey) {
-    const component = componentRef.get(componentKey) || {};
-    const queue = component.mounts;
-    const sequence = component.updateSeq;
+    const component = componentRef.get(componentKey);
+    const queue = component?.mounts;
+    const sequence = component?.updateSeq;
 
     componentKeyRef.value = componentKey;
 

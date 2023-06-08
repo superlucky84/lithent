@@ -1,2 +1,1 @@
-declare const state: <T>(value: T) => [() => T, (setValue: T) => void];
-export default state;
+export declare const state: <T>(value: T) => [() => T, (setValue: T) => void];

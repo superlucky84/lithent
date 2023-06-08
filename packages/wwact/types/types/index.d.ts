@@ -46,19 +46,19 @@ export interface WDom {
 }
 export type ComponentSubKey = 'redrawAction' | 'updateReqs' | 'updateSeq' | 'updateDefs' | 'updateCallbacks' | 'stateVal' | 'stateSeq' | 'mounts' | 'unmounts';
 export type ComponentRef = WeakMap<Props, {
-    redrawAction?: () => void;
-    updateReqs?: (() => void)[];
-    updateSeq?: {
+    redrawAction: () => void;
+    updateReqs: (() => void)[];
+    updateSeq: {
         value: number;
     };
-    updateDefs?: unknown[][];
-    updateCallbacks?: (() => void)[];
-    stateSeq?: {
+    updateDefs: unknown[][];
+    updateCallbacks: (() => void)[];
+    stateSeq: {
         value: number;
     };
-    stateVal?: unknown[];
-    mounts?: (() => void)[];
-    unmounts?: (() => void)[];
+    stateVal: unknown[];
+    mounts: (() => void)[];
+    unmounts: (() => void)[];
 }>;
 export type Param<Updater, Member, Props> = {
     updater: Updater;

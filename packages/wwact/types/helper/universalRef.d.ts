@@ -46,10 +46,12 @@ export declare const makeUpdatedStore: (componentKey: Props) => [{
 export declare const makeStateStore: <T>(componentKey: Props) => [{
     value: number;
 }, T[]];
+export declare const componentRender: (componentKey: Props) => () => void | undefined;
+export declare const setComponetRef: (componentKey: Props) => void;
 export declare const setRedrawAction: ({ componentKey, nodeChildKey, exec, }: {
     componentKey: Props;
     nodeChildKey: Props[];
     exec: () => void;
 }) => void;
 export declare const initUpdateHookState: (componentKey: Props) => Props;
-export declare const initMountHookState: (componentKey: Props) => Props;
+export declare const initMountHookState: (componentKey: Props) => void;

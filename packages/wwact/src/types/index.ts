@@ -81,15 +81,15 @@ export type ComponentSubKey =
 export type ComponentRef = WeakMap<
   Props,
   {
-    redrawAction?: () => void;
-    updateReqs?: (() => void)[];
-    updateSeq?: { value: number };
-    updateDefs?: unknown[][];
-    updateCallbacks?: (() => void)[];
-    stateSeq?: { value: number };
-    stateVal?: unknown[];
-    mounts?: (() => void)[];
-    unmounts?: (() => void)[];
+    redrawAction: () => void;
+    updateReqs: (() => void)[];
+    updateSeq: { value: number };
+    updateDefs: unknown[][];
+    updateCallbacks: (() => void)[];
+    stateSeq: { value: number };
+    stateVal: unknown[];
+    mounts: (() => void)[];
+    unmounts: (() => void)[];
   }
 >;
 
