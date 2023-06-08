@@ -5,6 +5,21 @@ import { effect } from '@/hook/effect';
 import { mounted } from '@/hook/mounted';
 import { update } from '@/hook/update';
 import { makeRef } from '@/hook/ref';
+import { checkFunction } from '@/helper/predicator';
+import {
+  componentRef,
+  componentKeyRef,
+  dataStoreStore,
+  dataStoreRenderQueue,
+} from '@/helper/universalRef';
+
+const ext = {
+  componentRef,
+  componentKeyRef,
+  dataStoreStore,
+  dataStoreRenderQueue,
+  checkFunction,
+};
 
 export type {
   WDom,
@@ -29,4 +44,4 @@ declare global {
   }
 }
 
-export { h, Fragment, render, state, mounted, update, effect, makeRef };
+export { h, Fragment, render, state, mounted, update, effect, makeRef, ext };

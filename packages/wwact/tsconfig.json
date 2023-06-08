@@ -22,7 +22,8 @@
     "jsxFragmentFactory": "Fragment",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "wwact": ["src/index.ts"]
     }
   },
   "include": ["src"]
