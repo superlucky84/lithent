@@ -24,11 +24,10 @@ export const redrawQueue: {
 export const redrawQueueTimeout: { value: null | number } = { value: null };
 export const nodeChildKeyList: { value: NodeChildKey[] } = { value: [] };
 
-export const pushNodeChildKey = (key: Props) => {
-  nodeChildKeyList.value.forEach(item => {
-    item.value.push(key);
-  });
-};
+export const pushNodeChildKey = (key: Props) =>
+  nodeChildKeyList.value.forEach(item => item.value.push(key));
+
+export const cleanNodeChildKey = () => (nodeChildKeyList.value = []);
 
 /**
  * DataStore
@@ -71,13 +70,13 @@ export const setRedrawAction = ({
   exec,
 }: {
   componentKey: Props;
-  nodeChildKey: Props[];
+  nodeChildKey: { value: Props[] };
   exec: () => void;
 }) => {
   componentRef.get(componentKey)!.up = () => {
     redrawQueue.value.push({
       componentKey,
-      nodeChildKey,
+      nodeChildKey: nodeChildKey.value,
       exec,
     });
     if (!redrawQueueTimeout.value) {

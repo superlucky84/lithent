@@ -18,6 +18,7 @@ import {
   needDiffRef,
   pushNodeChildKey,
   nodeChildKeyList,
+  cleanNodeChildKey,
 } from '@/helper/universalRef';
 import { runUpdateCallback } from '@/hook/update';
 import {
@@ -33,7 +34,7 @@ type WDomInfoParam = {
   tag: TagFunction;
   props: Props;
   children: WDom[];
-  nodeChildKey: Props[];
+  nodeChildKey: { value: Props[] };
 };
 type WDomInfoWithRenderParam = WDomInfoParam & {
   reRender: () => WDom;
@@ -77,6 +78,7 @@ const reRenderCustomComponent = ({
   originalWDom: WDom;
 }) => {
   needDiffRef.value = true;
+  cleanNodeChildKey();
 
   const newWDom = makeWDomResolver({ tag, props, children });
   const newWDomTree = makeNewWDomTree({ originalWDom, newWDom });
@@ -115,7 +117,13 @@ const makeWDomResolver = ({
     initMountHookState(componentKey);
 
     const nodeChildKey: NodeChildKey = { value: [] };
+    // 먼저 부모들에게 키를 넣는다.
+    pushNodeChildKey(componentKey);
+    // 나 자신도 구독을 등록한다.
+    nodeChildKeyList.value.push(nodeChildKey);
+
     const componentMaker = tag(props, children);
+
     const customNode = makeCustomNode({
       componentMaker,
       componentKey,
@@ -127,11 +135,9 @@ const makeWDomResolver = ({
 
     const originalWDom = customNode;
 
-    nodeChildKeyList.value.push(nodeChildKey);
-
     setRedrawAction({
       componentKey,
-      nodeChildKey: nodeChildKey.value,
+      nodeChildKey,
       exec: () =>
         reRenderCustomComponent({ tag, props, children, originalWDom }),
     });
@@ -166,13 +172,18 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
 
   // 옛날꺼는 버리고 여기에 새로운 NodeChildKey
   const nodeChildKey: NodeChildKey = { value: [] };
+  // 먼저 부모들에게 키를 넣는다.
+  pushNodeChildKey(componentKey);
+  // 나 자신도 구독을 등록한다.
   nodeChildKeyList.value.push(nodeChildKey);
 
   const originalWDom = componentMaker();
 
+  wDomInfo.nodeChildKey = nodeChildKey;
+
   setRedrawAction({
     componentKey,
-    nodeChildKey: nodeChildKey.value,
+    nodeChildKey,
     exec: () => reRenderCustomComponent({ tag, props, children, originalWDom }),
   });
 
@@ -182,7 +193,7 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
 };
 
 const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
-  const { componentKey, tag, props, children, reRender } = info;
+  const { componentKey, tag, props, children, reRender, nodeChildKey } = info;
 
   Object.assign(wDom, {
     componentProps: props,
@@ -190,6 +201,7 @@ const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
     constructor: tag,
     tagName: tag.name,
     componentKey,
+    nodeChildKey,
     reRender,
   });
 };
