@@ -138,13 +138,10 @@ const remakeChildrenForDiff = ({
   isSameType,
   newWDom,
   originalWDom,
-}: DiffSecondeParam) => {
-  if (isSameType && originalWDom) {
-    return remakeChildrenForUpdate(newWDom, originalWDom);
-  }
-
-  return remakeChildrenForAdd(newWDom);
-};
+}: DiffSecondeParam) =>
+  isSameType && originalWDom
+    ? remakeChildrenForUpdate(newWDom, originalWDom)
+    : remakeChildrenForAdd(newWDom);
 
 const remakeChildrenForAdd = (newWDom: WDom) =>
   (newWDom.children || []).map((item: WDom) => {

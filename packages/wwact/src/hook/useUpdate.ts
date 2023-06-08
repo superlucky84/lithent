@@ -7,28 +7,27 @@ export const useUpdated = (
 ) => {
   const componentKey = componentKeyRef.value;
   const component = componentRef.get(componentKey);
+  const { updateDefs, updateSeq } = component!;
+  const def = updateDefs[updateSeq.value];
 
-  let updateDefs = component!.updateDefs;
-  let updateSeq = component!.updateSeq;
-
-  if (updateDefs[updateSeq.value]) {
-    if (checkNeedPushQueue(updateDefs[updateSeq.value] || [], dependencies())) {
-      const callback = effectAction();
-      if (callback) {
-        component!.updateCallbacks.push(callback);
-      }
+  if (def && checkNeedPushQueue(def, dependencies())) {
+    const callback = effectAction();
+    if (callback) {
+      component!.updateCallbacks.push(callback);
     }
   }
+
   updateDefs[updateSeq.value] = dependencies();
   updateSeq.value += 1;
 };
 
 export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;
+
   if (componentKey) {
     const component = componentRef.get(componentKey);
     const queue = component?.updateCallbacks;
-    const sequence = component!.updateSeq;
+    const sequence = component?.updateSeq;
 
     componentKeyRef.value = componentKey;
 

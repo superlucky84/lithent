@@ -35,7 +35,6 @@ export const render = (
   const Dom = wDomToDom(wDom, true);
 
   if (afterElement) {
-    console.log(wrapElement, afterElement, Dom);
     wrapElement.insertBefore(Dom, afterElement);
   } else {
     wrapElement.appendChild(Dom);
