@@ -8,9 +8,9 @@ import {
 import { unmount } from '@/hook/unmount';
 
 export const mounted = (effectAction: () => void) => {
-  const mounts = componentRef.get(getComponentKey())!.mounts;
+  const mts = componentRef.get(getComponentKey())!.mts;
 
-  mounts.push(effectAction);
+  mts.push(effectAction);
 };
 
 export const runMountedQueueFromWDom = (newWDom: WDom) => {
@@ -18,7 +18,7 @@ export const runMountedQueueFromWDom = (newWDom: WDom) => {
 
   if (componentKey) {
     const component = componentRef.get(componentKey);
-    const queue = component?.mounts;
+    const queue = component?.mts;
     const sequence = component?.upS;
 
     componentKeyRef.value = componentKey;
@@ -28,7 +28,7 @@ export const runMountedQueueFromWDom = (newWDom: WDom) => {
     }
 
     if (queue) {
-      component.mounts = [];
+      component.mts = [];
 
       queue.forEach((effect: Function) => {
         const callback = effect();

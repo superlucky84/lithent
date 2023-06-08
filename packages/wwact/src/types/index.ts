@@ -70,8 +70,8 @@ export type ComponentSubKey =
   | 'upS'
   | 'upD'
   | 'upCB'
-  | 'mounts'
-  | 'unmounts';
+  | 'mts'
+  | 'umts';
 
 export type ComponentRef = WeakMap<
   Props,
@@ -81,8 +81,8 @@ export type ComponentRef = WeakMap<
     upS: { value: number };
     upD: unknown[][];
     upCB: (() => void)[];
-    mounts: (() => void)[];
-    unmounts: (() => void)[];
+    mts: (() => void)[];
+    umts: (() => void)[];
   }
 >;
 

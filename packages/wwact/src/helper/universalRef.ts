@@ -45,8 +45,8 @@ export const setComponetRef = (componentKey: Props) => {
     upS: { value: 0 },
     upD: [],
     upCB: [],
-    mounts: [],
-    unmounts: [],
+    mts: [],
+    umts: [],
   });
 };
 

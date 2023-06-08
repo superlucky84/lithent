@@ -45,7 +45,7 @@ export interface WDom {
     needRerender?: RenderType;
 }
 export type RenderType = 'A' | 'D' | 'R' | 'U' | 'SR' | 'SU' | 'N';
-export type ComponentSubKey = 'up' | 'upR' | 'upS' | 'upD' | 'upCB' | 'mounts' | 'unmounts';
+export type ComponentSubKey = 'up' | 'upR' | 'upS' | 'upD' | 'upCB' | 'mts' | 'umts';
 export type ComponentRef = WeakMap<Props, {
     up: () => void;
     upR: (() => void)[];
@@ -54,8 +54,8 @@ export type ComponentRef = WeakMap<Props, {
     };
     upD: unknown[][];
     upCB: (() => void)[];
-    mounts: (() => void)[];
-    unmounts: (() => void)[];
+    mts: (() => void)[];
+    umts: (() => void)[];
 }>;
 export type Param<Updater, Member, Props> = {
     updater: Updater;
