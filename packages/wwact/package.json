@@ -1,6 +1,6 @@
 {
   "name": "wwact",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "wwact",
   "type": "module",
   "main": "./dist/wwact.umd.cjs",

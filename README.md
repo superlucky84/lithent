@@ -68,7 +68,6 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   const increase = () => {
     setCount(getCount() + 1);
     notRefValue += 1;
-    updater.value += 1;
   };
 
   const handleInputChane = (event: InputEvent) => {
