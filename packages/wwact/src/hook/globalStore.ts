@@ -4,11 +4,11 @@ const {
   componentKeyRef,
   dataStoreStore,
   dataStoreRenderQueue,
-  componentRef,
   checkFunction,
+  componentRender,
 } = ext;
 
-export const sharedUpdater = <T extends {}>(storeKey: string) => {
+export const globalStore = <T extends {}>(storeKey: string) => {
   const componentKey = componentKeyRef.value;
   const dataValue = dataStoreStore[storeKey] as T;
 
@@ -19,12 +19,12 @@ export const sharedUpdater = <T extends {}>(storeKey: string) => {
   const dataStoreQueue = dataStoreRenderQueue;
 
   dataStoreQueue[storeKey] ??= [];
-  dataStoreQueue[storeKey].push(() => componentRef.get(componentKey)?.up);
+  dataStoreQueue[storeKey].push(() => componentRender(componentKey));
 
   return dataValue;
 };
 
-export const makeSharedUpdater = <T extends {}>(
+export const makeGlobalStore = <T extends {}>(
   storeKey: string,
   initValue: T
 ) => {

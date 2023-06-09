@@ -17,6 +17,8 @@ declare const ext: {
         [key: string]: (() => (() => void) | undefined)[];
     };
     checkFunction: (target: unknown) => target is Function;
+    getComponentKey: () => import('./types').Props;
+    componentRender: (componentKey: import('./types').Props) => () => void | undefined;
 };
 export type { WDom, TagFunction, TagFunctionResolver, FragmentFunction, ComponentSubKey, ComponentRef, Props, MiddleStateWDomChildren, MiddleStateWDom, UseDataStoreValue, NodePointer, Param, } from './types';
 declare global {

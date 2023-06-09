@@ -11,6 +11,8 @@ import {
   componentKeyRef,
   dataStoreStore,
   dataStoreRenderQueue,
+  getComponentKey,
+  componentRender,
 } from '@/helper/universalRef';
 
 const ext = {
@@ -19,6 +21,8 @@ const ext = {
   dataStoreStore,
   dataStoreRenderQueue,
   checkFunction,
+  getComponentKey,
+  componentRender,
 };
 
 export type {

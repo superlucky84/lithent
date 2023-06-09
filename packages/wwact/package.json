@@ -9,6 +9,10 @@
     ".": {
       "import": "./dist/wwact.js",
       "require": "./dist/wwact.umd.cjs"
+    },
+    "./store": {
+      "import": "./dist/wwactStore.js",
+      "require": "./dist/wwactStore.umd.cjs"
     }
   },
   "types": "./types/index.d.ts",

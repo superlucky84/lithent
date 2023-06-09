@@ -18,15 +18,16 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, './src'),
       wwact: resolve(__dirname, './src/index.ts'),
+      wwactStore: resolve(__dirname, './src/wwactStore.ts'),
     },
   },
   build: {
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/wwactExtension.ts'),
-      name: 'wwactExtension',
-      fileName: 'wwactExtension',
+      entry: resolve(__dirname, 'src/wwactStore.ts'),
+      name: 'wwactStore',
+      fileName: 'wwactStore',
     },
     rollupOptions: {
       external: ['wwact'],
