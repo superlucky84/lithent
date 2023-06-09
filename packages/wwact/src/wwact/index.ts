@@ -4,7 +4,7 @@ import { state } from '@/hook/state';
 import { effect } from '@/hook/effect';
 import { mounted } from '@/hook/mounted';
 import { update } from '@/hook/update';
-import { makeRef } from '@/hook/ref';
+import { ref } from '@/hook/ref';
 import { checkFunction } from '@/helper/predicator';
 import {
   componentRef,
@@ -49,4 +49,4 @@ declare global {
   }
 }
 
-export { h, Fragment, render, state, mounted, update, effect, makeRef, ext };
+export { h, Fragment, render, state, mounted, update, effect, ref, ext };

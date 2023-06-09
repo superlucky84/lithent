@@ -4,20 +4,20 @@ import {
   Fragment,
   render,
   state,
-  makeRef,
+  ref,
   mounted,
   update,
   effect,
   WDom,
-} from '@/index';
+} from 'wwact';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
 // childen is passed as the second argument.
 const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   // The value is used as a "getter" to make it easy to get and write to in the higher-order functions it returns
-  const [getCount, setCount] = state<number>(1);
-  const [getText, setText] = state<string>('text');
+  const count = state<number>(1);
+  const text = state<string>('text');
   const getParentValue = () => props.parentValue;
   const parentValue = props.parentValue;
 
@@ -25,15 +25,15 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   let notRefValue = props.parentValue;
 
   // Ref is only used to reference the DOM.
-  const domRef = makeRef(null);
+  const domRef = ref(null);
 
   const increase = () => {
-    setCount(getCount() + 1);
+    count.s(count.v + 1);
     notRefValue += 1;
   };
 
   const handleInputChane = (event: InputEvent) => {
-    setText((event.target as HTMLInputElement).value);
+    text.s((event.target as HTMLInputElement).value);
   };
 
   const handleMounted = () => {
@@ -54,7 +54,7 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   effect(
     () => console.log('INJECT'),
     () => console.log('CLEAN_UP'),
-    () => [getCount()]
+    () => [count.v]
   );
 
   // Wrap in a function and return (using a closure to hold the value)
@@ -62,13 +62,13 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
   return () => (
     <Fragment>
       {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
-      <input type="text" value={getText()} onInput={handleInputChane} />
-      <div ref={domRef}>count: {getCount()}</div>
+      <input type="text" value={text.v} onInput={handleInputChane} />
+      <div ref={domRef}>count: {count.v}</div>
       {/* When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property. */}
       <div>parentValue: {props.parentValue} (working)</div>
       <div>parentValue: {getParentValue()} (working)</div>
       <div>parentValue: {parentValue} (not working)</div>
-      <div>sum: {getCount() + notRefValue + props.parentValue}</div>
+      <div>sum: {count.v + notRefValue + props.parentValue}</div>
       {/* It doesn't pull it out from under the reference, it uses the value directly, so you can just use it. */}
       <div>notRefValue: {notRefValue}</div>
       {children}
@@ -78,21 +78,21 @@ const ChildComponent = (props: { parentValue: number }, children: WDom[]) => {
 };
 
 const Root = () => {
-  const [getParentNumber, setParentNumber] = state<number>(7);
+  const parentNumber = state<number>(7);
 
   const increaseParent = () => {
-    setParentNumber(getParentNumber() + 1);
+    parentNumber.s(parentNumber.v + 1);
   };
 
   const decreaseParent = () => {
-    setParentNumber(getParentNumber() - 1);
+    parentNumber.s(parentNumber.v - 1);
   };
 
   return () => (
     <Fragment>
       <button onClick={decreaseParent}>Decrease - Parent</button>
       <div>
-        <ChildComponent parentValue={getParentNumber()}>
+        <ChildComponent parentValue={parentNumber.v}>
           <button onClick={increaseParent}>Increase - Parent</button>
         </ChildComponent>
       </div>
@@ -100,7 +100,5 @@ const Root = () => {
   );
 };
 const root = <Root />;
-
-console.log(root);
 
 render(root, document.getElementById('root'));

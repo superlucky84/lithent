@@ -1,5 +1,5 @@
-import { h, makeRef, update } from '@/index';
-import { localStore } from '@/wwactStore';
+import { h, ref, update } from 'wwact';
+import { localStore } from 'wwact/store';
 import Custom2 from './Custom2';
 
 const useJw = () => {
@@ -20,12 +20,12 @@ const useJw = () => {
 export default function CustomElement() {
   const { data, data2, handle, handle2 } = useJw();
   const data3 = localStore<{ k: number }>({ k: 1 });
-  const hadleRef = makeRef<string>('3');
+  const hadleRef = ref<string>('3');
   const handle3 = () => {
     hadleRef.value = '7';
     data3.k += 1;
   };
-  const domRef = makeRef(null);
+  const domRef = ref(null);
 
   const handleUpdatedDataK = () => () => {
     console.log('domRef', domRef);

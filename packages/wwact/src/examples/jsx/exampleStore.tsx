@@ -1,4 +1,4 @@
-import { h, Fragment, render } from '@/index';
+import { h, Fragment, render } from 'wwact';
 import CustomElement from '@/examples/jsx/components/CustomElement';
 import storeInit from '@/examples/jsx/store';
 

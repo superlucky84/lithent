@@ -3,7 +3,7 @@ import { state, mounted } from 'wwact';
 import { addParams } from '@/hook/params';
 
 export function Router(_props: Props, children: WDom[]) {
-  const [getTargetPath, setTargetPath] = state<string>('');
+  const targetPathString = state<string>('');
   const findPath = (injectPath: string) =>
     children.find(item => item.componentProps?.path === injectPath);
 
@@ -28,7 +28,7 @@ export function Router(_props: Props, children: WDom[]) {
     }
 
     if (targetPath) {
-      setTargetPath(String(targetPath?.componentProps?.path || ''));
+      targetPathString.s(String(targetPath?.componentProps?.path || ''));
     }
   };
 
@@ -51,7 +51,7 @@ export function Router(_props: Props, children: WDom[]) {
         const path = String(item?.componentProps?.path || '');
         const element = item?.componentProps?.element;
 
-        return getTargetPath() === path ? element : null;
+        return targetPathString.v === path ? element : null;
       })}
     </Fragment>
   );

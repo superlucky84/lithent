@@ -1,7 +1,6 @@
 import { GlobalData } from '@/examples/jsx/store';
-import { h, WDom } from '@/index';
-import { mounted, update } from '@/index';
-import { globalStore, localStore } from '@/wwactStore';
+import { h, mounted, update, WDom } from 'wwact';
+import { globalStore, localStore } from 'wwact/store';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },

@@ -1,3 +1,3 @@
-export declare const makeRef: <T>(initValue: T) => {
+export declare const ref: <T>(initValue: T) => {
     value: T;
 };
