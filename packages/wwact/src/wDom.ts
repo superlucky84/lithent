@@ -19,6 +19,7 @@ import {
   pushNodeChildKey,
   nodeChildKeyList,
   cleanNodeChildKey,
+  componentRender,
 } from '@/helper/universalRef';
 import { runUpdateCallback } from '@/hook/update';
 import {
@@ -122,7 +123,7 @@ const makeWDomResolver = ({
     // 나 자신도 구독을 등록한다.
     nodeChildKeyList.value.push(nodeChildKey);
 
-    const componentMaker = tag(props, children);
+    const componentMaker = tag(props, children, componentRender(componentKey));
 
     const customNode = makeCustomNode({
       componentMaker,

@@ -5,7 +5,8 @@ import { globalStore, localStore } from '@/wwactStore';
 
 export default function Custom2(
   props: { k: number; data: { k: number; j: number }; handle3: () => void },
-  children: WDom[]
+  children: WDom[],
+  _renew: () => void
 ) {
   const globalData = globalStore<GlobalData>('globalData');
   const data7 = localStore<{ m: number }>({ m: 1 });

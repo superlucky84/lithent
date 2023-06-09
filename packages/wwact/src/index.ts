@@ -33,6 +33,7 @@ export type {
   ComponentSubKey,
   ComponentRef,
   Props,
+  Renew,
   MiddleStateWDomChildren,
   MiddleStateWDom,
   UseDataStoreValue,
