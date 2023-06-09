@@ -1,25 +1,23 @@
 import { UseDataStoreValue } from '@/types';
-import { ext } from 'wwact';
+import { componentKeyRef, componentRender } from '@/helper/universalRef';
 
-const { componentRef, componentKeyRef } = ext;
-
-export const makeUpdater = <T extends {}>(initValue: T) => {
+export const localStore = <T extends {}>(initValue: T) => {
   const componentKey = componentKeyRef.value;
 
   return updater<T>({
     initValue,
-    render: () => (componentRef.get(componentKey)!.up || (() => {}))(),
+    render: () => componentRender(componentKey)(),
   });
 };
 
-function updater<T extends UseDataStoreValue>({
+export const updater = <T extends UseDataStoreValue>({
   initValue,
   render,
 }: {
   initValue: T;
   render: () => void;
-}) {
-  return new Proxy(initValue, {
+}) =>
+  new Proxy(initValue, {
     get(target: T, prop: string) {
       return target[prop];
     },
@@ -30,4 +28,3 @@ function updater<T extends UseDataStoreValue>({
       return true;
     },
   });
-}

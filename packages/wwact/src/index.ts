@@ -1,6 +1,7 @@
 import { h, Fragment } from '@/wDom';
 import { render } from '@/render';
 import { state } from '@/hook/state';
+import { localStore } from '@/hook/localStore';
 import { effect } from '@/hook/effect';
 import { mounted } from '@/hook/mounted';
 import { update } from '@/hook/update';
@@ -11,6 +12,8 @@ import {
   componentKeyRef,
   dataStoreStore,
   dataStoreRenderQueue,
+  getComponentKey,
+  componentRender,
 } from '@/helper/universalRef';
 
 const ext = {
@@ -19,6 +22,8 @@ const ext = {
   dataStoreStore,
   dataStoreRenderQueue,
   checkFunction,
+  getComponentKey,
+  componentRender,
 };
 
 export type {
@@ -44,4 +49,15 @@ declare global {
   }
 }
 
-export { h, Fragment, render, state, mounted, update, effect, makeRef, ext };
+export {
+  h,
+  Fragment,
+  render,
+  state,
+  localStore,
+  mounted,
+  update,
+  effect,
+  makeRef,
+  ext,
+};
