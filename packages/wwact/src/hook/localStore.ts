@@ -1,5 +1,6 @@
 import { UseDataStoreValue } from '@/types';
-import { componentKeyRef, componentRender } from '@/helper/universalRef';
+import { ext } from 'wwact';
+const { componentKeyRef, componentRender } = ext;
 
 export const localStore = <T extends {}>(initValue: T) => {
   const componentKey = componentKeyRef.value;
