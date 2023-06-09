@@ -22,6 +22,7 @@ export default defineConfig({
     },
   },
   build: {
+    minify: 'terser',
     emptyOutDir: false,
     sourcemap: true,
     lib: {
