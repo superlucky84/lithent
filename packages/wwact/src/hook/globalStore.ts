@@ -24,7 +24,7 @@ export const globalStore = <T extends {}>(storeKey: string) => {
   return dataValue;
 };
 
-export const makeSharedUpdater = <T extends {}>(
+export const makeGlobalStore = <T extends {}>(
   storeKey: string,
   initValue: T
 ) => {

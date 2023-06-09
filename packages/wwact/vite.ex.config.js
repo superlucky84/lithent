@@ -18,6 +18,7 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, './src'),
       wwact: resolve(__dirname, './src/index.ts'),
+      wwactStore: resolve(__dirname, './src/wwactStore.ts'),
     },
   },
   build: {

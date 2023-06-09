@@ -147,9 +147,6 @@ const remakeChildrenForAdd = (newWDom: WDom) =>
   (newWDom.children || []).map((item: WDom) => {
     const childItem = makeNewWDomTree({ newWDom: item });
 
-    if (childItem.componentKey && newWDom.nodeChildKey) {
-      newWDom.nodeChildKey.push(childItem.componentKey);
-    }
     childItem.getParent = () => newWDom;
 
     return childItem;
@@ -169,9 +166,6 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
       originalWDom: (originalWDom.children || [])[index],
     });
 
-    if (childItem.componentKey && newWDom.nodeChildKey) {
-      newWDom.nodeChildKey.push(childItem.componentKey);
-    }
     childItem.getParent = () => newWDom;
 
     return childItem;
@@ -210,9 +204,6 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
       originalChildren.splice(originalChildren.indexOf(originalItem), 1);
     }
 
-    if (childItem.componentKey && newWDom.nodeChildKey) {
-      newWDom.nodeChildKey.push(childItem.componentKey);
-    }
     childItem.getParent = () => newWDom;
 
     return childItem;
