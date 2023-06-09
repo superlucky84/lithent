@@ -11,7 +11,7 @@
       "require": "./dist/Router.umd.cjs"
     }
   },
-  "types": "./types/index.d.ts",
+  "types": "./types/Router.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "vite build"

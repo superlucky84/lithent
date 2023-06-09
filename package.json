@@ -12,8 +12,8 @@
     "clean:module": "pnpm -r exec rm -rf node_modules && rm -rf node_modules",
     "build:all": "pnpm -r build",
     "dev:wwact": "pnpm --filter wwact dev",
-    "dev:wwveal": "pnpm --filter wwveal dev",
-    "dev:router": "pnpm --filter router dev"
+    "dev:docs": "pnpm --filter @wwact/docs dev",
+    "dev:router": "pnpm --filter @wwact/router dev"
   },
   "author": "",
   "license": "ISC",
