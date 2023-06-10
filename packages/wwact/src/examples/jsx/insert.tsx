@@ -1,16 +1,16 @@
 // example.jsx
-import { h, Fragment, render, state } from 'wwact';
+import { h, Fragment, render, wwx, state } from 'wwact';
 
-function Root() {
-  const showFive = state<boolean>(true);
-  const showSix = state<boolean>(true);
+const Root = wwx(function (renew) {
+  const showFive = state<boolean>(true, renew);
+  const showSix = state<boolean>(true, renew);
 
   const toggleFive = () => {
-    showFive.s(!showFive.v);
+    showFive.v = !showFive.v;
   };
 
   const toggleSix = () => {
-    showSix.s(!showSix.v);
+    showSix.v = !showSix.v;
   };
 
   return () => (
@@ -24,7 +24,7 @@ function Root() {
       <li>7</li>
     </Fragment>
   );
-}
+});
 
 render(
   <Root />,

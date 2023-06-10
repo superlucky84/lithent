@@ -1,12 +1,12 @@
 import { GlobalData } from '@/examples/jsx/store';
-import { h, mounted, update, WDom } from 'wwact';
+import { h, mounted, update, wwx } from 'wwact';
 import { globalStore, localStore } from 'wwact/store';
 
-export default function Custom2(
-  props: { k: number; data: { k: number; j: number }; handle3: () => void },
-  children: WDom[],
-  _renew: () => void
-) {
+export default wwx<{
+  k: number;
+  data: { k: number; j: number };
+  handle3: () => void;
+}>(function Custom2(_renew, props, children) {
   const globalData = globalStore<GlobalData>('globalData');
   const data7 = localStore<{ m: number }>({ m: 1 });
   const data = localStore<{ v: string }>({ v: '1' });
@@ -17,6 +17,7 @@ export default function Custom2(
   };
   const handleMounted = () => {
     console.log('CUSTOM2 MOUNTED');
+    return () => console.log('CUSTOM2 UNMOUNT');
   };
   const handleUpdated = () => () => {
     console.log('CUSTOM2 UPDATED --');
@@ -43,4 +44,4 @@ export default function Custom2(
   };
 
   return componentMaker;
-}
+});

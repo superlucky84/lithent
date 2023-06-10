@@ -1,34 +1,28 @@
-import { componentKeyRef, componentRender } from '@/helper/universalRef';
+import { Renew } from '@/types';
 
 export const state = <T>(
-  value: T
+  value: T,
+  renew: Renew
 ): {
   value: T;
-  val: T;
   v: T;
-  set: (newValue: T) => void;
-  s: (newValue: T) => void;
 } => {
-  const componentKey = componentKeyRef.value;
   let result = value;
 
   return {
     get value() {
       return result;
     },
-    get val() {
-      return result;
-    },
     get v() {
       return result;
     },
-    set(newValue: T) {
+    set value(newValue: T) {
       result = newValue;
-      componentRender(componentKey)();
+      renew();
     },
-    s(newValue: T) {
+    set v(newValue: T) {
       result = newValue;
-      componentRender(componentKey)();
+      renew();
     },
   };
 };

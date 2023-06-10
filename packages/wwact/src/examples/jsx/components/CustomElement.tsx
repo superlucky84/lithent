@@ -1,4 +1,4 @@
-import { h, ref, update } from 'wwact';
+import { h, ref, update, wwx } from 'wwact';
 import { localStore } from 'wwact/store';
 import Custom2 from './Custom2';
 
@@ -17,7 +17,7 @@ const useJw = () => {
   return { data, data2, handle, handle2 };
 };
 
-export default function CustomElement() {
+export default wwx(function CustomElement() {
   const { data, data2, handle, handle2 } = useJw();
   const data3 = localStore<{ k: number }>({ k: 1 });
   const hadleRef = ref<string>('3');
@@ -66,4 +66,4 @@ export default function CustomElement() {
   };
 
   return componentMaker;
-}
+});

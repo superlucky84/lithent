@@ -1,19 +1,18 @@
-import { h, Fragment, render } from 'wwact';
+import { h, Fragment, render, wwx } from 'wwact';
 import CustomElement from '@/examples/jsx/components/CustomElement';
 import storeInit from '@/examples/jsx/store';
 
 storeInit();
 
-const MakeVDom = () => () =>
-  (
+const MakeVDom = wwx(() => () => (
+  <Fragment>
+    <CustomElement vava={7} />
+    <CustomElement vava={7} />
     <Fragment>
-      <CustomElement vava={7} />
-      <CustomElement vava={7} />
-      <Fragment>
-        <div>3</div>
-        <div>3</div>
-      </Fragment>
+      <div>3</div>
+      <div>3</div>
     </Fragment>
-  );
+  </Fragment>
+));
 
 render(<MakeVDom />, document.getElementById('root'));
