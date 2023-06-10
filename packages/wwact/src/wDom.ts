@@ -7,6 +7,7 @@ import {
   MiddleStateWDom,
   NodePointer,
   NodeChildKey,
+  Component,
 } from '@/types';
 
 import makeNewWDomTree from '@/diff';
@@ -67,6 +68,11 @@ export const h = (
   return node;
 };
 
+export const wwx =
+  <T>(component: Component<T>) =>
+  () =>
+    component;
+
 const reRenderCustomComponent = ({
   tag,
   props,
@@ -123,7 +129,14 @@ const makeWDomResolver = ({
     // 나 자신도 구독을 등록한다.
     nodeChildKeyList.value.push(nodeChildKey);
 
-    const componentMaker = tag(props, children, componentRender(componentKey));
+    console.log('PROPS', props, children);
+    const component = tag(props, children);
+
+    const componentMaker = component(
+      componentRender(componentKey),
+      props,
+      children
+    );
 
     const customNode = makeCustomNode({
       componentMaker,

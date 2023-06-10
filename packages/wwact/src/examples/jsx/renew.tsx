@@ -1,7 +1,7 @@
 // example.jsx
-import { h, Fragment, render, Props, WDom, Renew } from 'wwact';
+import { h, Fragment, render, Renew, wwx } from 'wwact';
 
-function Renew(_props: Props, _children: WDom[], renew: Renew) {
+const Renew = wwx<{ bb: string }>((renew, _props, children) => {
   let count1 = 0;
   let count2 = 0;
   let count3 = 0;
@@ -22,8 +22,14 @@ function Renew(_props: Props, _children: WDom[], renew: Renew) {
       <li>count3: {count3}</li>
       <li>count4: {count4}</li>
       <button onClick={change}>change</button>
+      {children}
     </Fragment>
   );
-}
+});
 
-render(<Renew />, document.getElementById('root'));
+render(
+  <Renew bb={3} jj="7">
+    aa8
+  </Renew>,
+  document.getElementById('root')
+);

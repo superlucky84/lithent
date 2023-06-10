@@ -1,4 +1,4 @@
-import { h, Fragment } from '@/wDom';
+import { h, Fragment, wwx } from '@/wDom';
 import { render } from '@/render';
 import { state } from '@/hook/state';
 import { effect } from '@/hook/effect';
@@ -49,4 +49,4 @@ declare global {
   }
 }
 
-export { h, Fragment, render, state, mounted, update, effect, ref, ext };
+export { h, Fragment, render, wwx, state, mounted, update, effect, ref, ext };
