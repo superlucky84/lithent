@@ -1,4 +1,4 @@
-import { h, ref, update, wwx, Renew } from 'wwact';
+import { h, ref, updateCallback, wwx, Renew } from 'wwact';
 import { store } from 'wwact/helper';
 import Custom2 from './Custom2';
 
@@ -36,8 +36,8 @@ export default wwx(function (renew) {
     console.log('updated 2k', data2);
   };
 
-  update(handleUpdatedDataK, () => [data.k]);
-  update(handleUpdatedData2K, () => [data2.k]);
+  updateCallback(handleUpdatedDataK, () => [data.k]);
+  updateCallback(handleUpdatedData2K, () => [data2.k]);
 
   const componentMaker = () => {
     return (

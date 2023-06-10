@@ -17,7 +17,7 @@ import {
   checkNormalAttribute,
   checkExisty,
 } from '@/helper/predicator';
-import { runMountedQueueFromWDom } from '@/hook/mounted';
+import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/helper';
 

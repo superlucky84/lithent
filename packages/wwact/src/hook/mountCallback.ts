@@ -7,7 +7,7 @@ import {
 
 import { unmount } from '@/hook/unmount';
 
-export const mounted = (effectAction: () => void) => {
+export const mountCallback = (effectAction: () => void) => {
   const mts = componentRef.get(getComponentKey())!.mts;
 
   mts.push(effectAction);

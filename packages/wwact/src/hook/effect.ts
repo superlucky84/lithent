@@ -1,18 +1,18 @@
-import { update } from '@/hook/update';
-import { mounted } from '@/hook/mounted';
+import { updateCallback } from '@/hook/updateCallback';
+import { mountCallback } from '@/hook/mountCallback';
 
 export const effect = (
   forward: () => (() => void) | void,
   backward: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) => {
-  mounted(() => {
+  mountCallback(() => {
     forward();
 
     return backward;
   });
 
-  update(() => {
+  updateCallback(() => {
     backward();
 
     return forward;

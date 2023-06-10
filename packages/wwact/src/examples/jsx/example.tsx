@@ -1,6 +1,14 @@
 // example.jsx
-import { h, Fragment, render, ref, mounted, update, effect, wwx } from 'wwact';
-import { state, computed } from 'wwact/helper';
+import {
+  h,
+  Fragment,
+  render,
+  ref,
+  mountCallback,
+  updateCallback,
+  wwx,
+} from 'wwact';
+import { state, computed, effect } from 'wwact/helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
@@ -42,8 +50,8 @@ const ChildComponent = wwx<{ parentValue: number }>(
       return () => console.log('UPDATED');
     };
 
-    mounted(handleMounted); // Only Mounted
-    update(handleUpdated, () => [props.parentValue]); // Only Defs Updated (using a closure to update a value)
+    mountCallback(handleMounted);
+    updateCallback(handleUpdated, () => [props.parentValue]); // Only Defs Updated (using a closure to update a value)
 
     // Behaves like `react`'s `useEffect`
     effect(

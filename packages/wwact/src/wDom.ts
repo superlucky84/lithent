@@ -22,7 +22,7 @@ import {
   cleanNodeChildKey,
   componentRender,
 } from '@/helper/universalRef';
-import { runUpdateCallback } from '@/hook/update';
+import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,
   checkCustemComponentFunction,

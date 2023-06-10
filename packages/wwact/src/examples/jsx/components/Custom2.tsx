@@ -1,5 +1,5 @@
 import { GlobalData } from '@/examples/jsx/store';
-import { h, mounted, update, wwx } from 'wwact';
+import { h, mountCallback, updateCallback, wwx } from 'wwact';
 import { protectedStore, store } from 'wwact/helper';
 
 export default wwx<{
@@ -27,8 +27,8 @@ export default wwx<{
     data.v = (event.target as HTMLInputElement).value;
   };
 
-  mounted(handleMounted);
-  update(handleUpdated, () => [globalData.value]);
+  mountCallback(handleMounted);
+  updateCallback(handleUpdated, () => [globalData.value]);
 
   const componentMaker = () => {
     return (

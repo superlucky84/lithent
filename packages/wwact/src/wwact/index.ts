@@ -1,8 +1,7 @@
 import { h, Fragment, wwx } from '@/wDom';
 import { render } from '@/render';
-import { effect } from '@/hook/effect';
-import { mounted } from '@/hook/mounted';
-import { update } from '@/hook/update';
+import { mountCallback } from '@/hook/mountCallback';
+import { updateCallback } from '@/hook/updateCallback';
 import { ref } from '@/hook/ref';
 import { checkFunction } from '@/helper/predicator';
 import {
@@ -48,4 +47,4 @@ declare global {
   }
 }
 
-export { h, Fragment, render, wwx, mounted, update, effect, ref, ext };
+export { h, Fragment, render, wwx, mountCallback, updateCallback, ref, ext };

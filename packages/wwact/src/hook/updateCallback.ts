@@ -7,7 +7,7 @@ import {
 
 import { useUpdated } from '@/hook/useUpdate';
 
-export const update = (
+export const updateCallback = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) => {
