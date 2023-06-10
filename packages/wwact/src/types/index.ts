@@ -4,11 +4,15 @@ export type Props = { [key: string]: unknown };
 
 export type TagFunction = (
   prop: Props,
-  children: WDom[],
-  nenew: () => void
-) => () => WDom;
+  children: WDom[]
+) => (renew: Renew, prop: Props, children: WDom[]) => () => WDom;
 
 export type Renew = () => void;
+export type Component<T> = (
+  renew: Renew,
+  props: T,
+  childen: WDom[]
+) => () => WDom;
 
 export type TagFunctionResolver = {
   tagName: string;
@@ -18,10 +22,7 @@ export type TagFunctionResolver = {
   resolve: (componentKey?: Props) => WDom;
 };
 
-export type FragmentFunction = (
-  props: Props,
-  children: WDom[]
-) => WDom & { isF: boolean };
+export type FragmentFunction = (props: Props, children: WDom[]) => WDom;
 
 export type NodePointer = { value: WDom | undefined };
 
