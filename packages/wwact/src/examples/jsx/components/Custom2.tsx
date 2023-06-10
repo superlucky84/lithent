@@ -1,6 +1,6 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, mounted, update, wwx } from 'wwact';
-import { globalStore, localStore } from 'wwact/store';
+import { globalStore, localStore } from 'wwact/helper';
 
 export default wwx<{
   k: number;

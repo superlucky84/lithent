@@ -1,5 +1,5 @@
 import { h, ref, update, wwx } from 'wwact';
-import { localStore } from 'wwact/store';
+import { localStore } from 'wwact/helper';
 import Custom2 from './Custom2';
 
 const useJw = () => {

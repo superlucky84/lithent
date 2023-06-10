@@ -1,15 +1,6 @@
 // example.jsx
-import {
-  h,
-  Fragment,
-  render,
-  state,
-  ref,
-  mounted,
-  update,
-  effect,
-  wwx,
-} from 'wwact';
+import { h, Fragment, render, ref, mounted, update, effect, wwx } from 'wwact';
+import { state } from 'wwact/helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.

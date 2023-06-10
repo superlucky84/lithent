@@ -1,4 +1,4 @@
-import { makeGlobalStore } from 'wwact/store';
+import { makeGlobalStore } from 'wwact/helper';
 
 const promiseTest = (): Promise<number> => {
   return new Promise(resolve => {
