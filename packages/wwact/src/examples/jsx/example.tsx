@@ -72,7 +72,7 @@ const ChildComponent = wwx<{ parentValue: number }>(
         <div>parentValue: {getParentValue()} (working)</div>
         <div>parentValue: {parentValue} (not working)</div>
         <div>sum: {count.v + notRefValue + props.parentValue}</div>
-        <div>sum2: {summ.v}</div>
+        <div>sum(computed): {summ.v}</div>
         {/* It doesn't pull it out from under the reference, it uses the value directly, so you can just use it. */}
         <div>notRefValue: {notRefValue}</div>
         {children}
