@@ -1,7 +1,7 @@
 // example.jsx
 import { h, Fragment, render, Renew, wwx } from 'wwact';
 
-const Renew = wwx<{ bb: string }>((renew, _props, children) => {
+const Renew = wwx((renew, _props, children) => {
   let count1 = 0;
   let count2 = 0;
   let count3 = 0;
@@ -27,9 +27,4 @@ const Renew = wwx<{ bb: string }>((renew, _props, children) => {
   );
 });
 
-render(
-  <Renew bb={3} jj="7">
-    aa8
-  </Renew>,
-  document.getElementById('root')
-);
+render(<Renew />, document.getElementById('root'));

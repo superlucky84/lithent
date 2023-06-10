@@ -70,7 +70,7 @@ export const h = (
 
 export const wwx =
   <T>(component: Component<T>) =>
-  () =>
+  (_props: T, _children: WDom[]) =>
     component;
 
 const reRenderCustomComponent = ({
@@ -129,9 +129,7 @@ const makeWDomResolver = ({
     // 나 자신도 구독을 등록한다.
     nodeChildKeyList.value.push(nodeChildKey);
 
-    console.log('PROPS', props, children);
     const component = tag(props, children);
-
     const componentMaker = component(
       componentRender(componentKey),
       props,
