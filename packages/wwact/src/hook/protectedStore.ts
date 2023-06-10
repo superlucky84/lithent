@@ -1,30 +1,26 @@
-import { UseDataStoreValue } from '@/types';
+import { UseDataStoreValue, Renew } from '@/types';
 import { ext } from 'wwact';
-const {
-  componentKeyRef,
-  dataStoreStore,
-  dataStoreRenderQueue,
-  checkFunction,
-  componentRender,
-} = ext;
+const { dataStoreStore, dataStoreRenderQueue, checkFunction } = ext;
 
-export const globalStore = <T extends {}>(storeKey: string) => {
-  const componentKey = componentKeyRef.value;
+export const protectedStore = <T extends {}>(
+  storeKey: string,
+  renew: Renew
+) => {
   const dataValue = dataStoreStore[storeKey] as T;
 
   if (!dataValue) {
-    console.error('Data store not exist');
+    throw new Error('Data store not exist');
   }
 
   const dataStoreQueue = dataStoreRenderQueue;
 
   dataStoreQueue[storeKey] ??= [];
-  dataStoreQueue[storeKey].push(() => componentRender(componentKey));
+  dataStoreQueue[storeKey].push(renew);
 
   return dataValue;
 };
 
-export const makeGlobalStore = <T extends {}>(
+export const makeProtectedStore = <T extends {}>(
   storeKey: string,
   initValue: T
 ) => {
@@ -57,14 +53,11 @@ const makeProxyData = <T extends UseDataStoreValue>({
       target[prop] = value;
 
       const dataStoreQueue = dataStoreRenderQueue[storeKey];
-      const trashCollections: (() => (() => void) | undefined)[] = [];
+      const trashCollections: (() => boolean)[] = [];
 
-      dataStoreQueue.forEach(makeRender => {
-        const render = makeRender();
-        if (render) {
-          render();
-        } else {
-          trashCollections.push(makeRender);
+      dataStoreQueue.forEach(renew => {
+        if (!renew()) {
+          trashCollections.push(renew);
         }
       });
 

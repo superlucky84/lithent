@@ -34,7 +34,7 @@ export const cleanNodeChildKey = () => (nodeChildKeyList.value = []);
  */
 export const dataStoreStore: { [key: string]: UseDataStoreValue } = {};
 export const dataStoreRenderQueue: {
-  [key: string]: (() => (() => void) | undefined)[];
+  [key: string]: (() => boolean)[];
 } = {};
 
 /**
@@ -42,8 +42,15 @@ export const dataStoreRenderQueue: {
  */
 export const routerParams: { value: { [key: string]: string } } = { value: {} };
 
-export const componentRender = (componentKey: Props) => () =>
-  componentRef.get(componentKey)?.up();
+export const componentRender = (componentKey: Props) => () => {
+  const up = componentRef.get(componentKey)?.up;
+  if (up) {
+    up();
+    return true;
+  } else {
+    return false;
+  }
+};
 
 export const setComponetRef = (componentKey: Props) => {
   componentRef.set(componentKey, {
@@ -96,9 +103,9 @@ export const initMountHookState = (componentKey: Props) => {
 const execRedrawQueue = () => {
   let childItemList: Props[] = [];
 
-  redrawQueue.value.forEach(
-    item => (childItemList = childItemList.concat(item.nodeChildKey))
-  );
+  redrawQueue.value.forEach(item => {
+    childItemList = childItemList.concat(item.nodeChildKey);
+  });
 
   const addedKey: Props[] = [];
   const result = redrawQueue.value.reduce((acc, item) => {

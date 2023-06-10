@@ -13,5 +13,7 @@ export const runUnmountQueueFromWDom = (newWDom: WDom) => {
 
     componentRef.get(componentKey)!.umts = [];
     queue.forEach(effect => effect());
+
+    componentRef.delete(componentKey);
   }
 };

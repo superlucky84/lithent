@@ -7,7 +7,7 @@ export type TagFunction = (
   children: WDom[]
 ) => (renew: Renew, prop: Props, children: WDom[]) => () => WDom;
 
-export type Renew = () => void;
+export type Renew = () => boolean;
 export type Component<T> = (
   renew: Renew,
   props: T,

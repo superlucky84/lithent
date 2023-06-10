@@ -1,4 +1,4 @@
-import { makeGlobalStore } from 'wwact/helper';
+import { makeProtectedStore } from 'wwact/helper';
 
 const promiseTest = (): Promise<number> => {
   return new Promise(resolve => {
@@ -28,8 +28,8 @@ export default function storeInit() {
     },
   };
 
-  makeGlobalStore<GlobalData>('globalData', storeValue);
-  makeGlobalStore<{ title: string }>('example', {
+  makeProtectedStore<GlobalData>('globalData', storeValue);
+  makeProtectedStore<{ title: string }>('example', {
     title: '나만의 커스텀 프레임웍 제작기!!',
   });
 }
