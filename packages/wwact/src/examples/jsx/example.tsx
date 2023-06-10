@@ -1,6 +1,6 @@
 // example.jsx
 import { h, Fragment, render, ref, mounted, update, effect, wwx } from 'wwact';
-import { state } from 'wwact/helper';
+import { state, computed } from 'wwact/helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
@@ -12,6 +12,9 @@ const ChildComponent = wwx<{ parentValue: number }>(
     const text = state<string>('text', renew);
     const getParentValue = () => props.parentValue;
     const parentValue = props.parentValue;
+    const summ = computed<() => number>(
+      () => count.v + notRefValue + props.parentValue
+    );
 
     // Even if you don't use a ref, the private value is always maintained as a regular variable.
     let notRefValue = props.parentValue;
@@ -61,6 +64,7 @@ const ChildComponent = wwx<{ parentValue: number }>(
         <div>parentValue: {getParentValue()} (working)</div>
         <div>parentValue: {parentValue} (not working)</div>
         <div>sum: {count.v + notRefValue + props.parentValue}</div>
+        <div>sum2: {summ.v}</div>
         {/* It doesn't pull it out from under the reference, it uses the value directly, so you can just use it. */}
         <div>notRefValue: {notRefValue}</div>
         {children}
