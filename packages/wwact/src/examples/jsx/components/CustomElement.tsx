@@ -1,10 +1,10 @@
-import { h, ref, update, wwx } from 'wwact';
-import { localStore } from 'wwact/helper';
+import { h, ref, update, wwx, Renew } from 'wwact';
+import { store } from 'wwact/helper';
 import Custom2 from './Custom2';
 
-const useJw = () => {
-  const data = localStore<{ k: number; j: number }>({ k: 7, j: 1 });
-  const data2 = localStore<{ k: number }>({ k: 1 });
+const useJw = (renew: Renew) => {
+  const data = store<{ k: number; j: number }>({ k: 7, j: 1 }, renew);
+  const data2 = store<{ k: number }>({ k: 1 }, renew);
 
   const handle = () => {
     data.k += 1;
@@ -17,9 +17,9 @@ const useJw = () => {
   return { data, data2, handle, handle2 };
 };
 
-export default wwx(function CustomElement() {
-  const { data, data2, handle, handle2 } = useJw();
-  const data3 = localStore<{ k: number }>({ k: 1 });
+export default wwx(function (renew) {
+  const { data, data2, handle, handle2 } = useJw(renew);
+  const data3 = store<{ k: number }>({ k: 1 }, renew);
   const hadleRef = ref<string>('3');
   const handle3 = () => {
     hadleRef.value = '7';

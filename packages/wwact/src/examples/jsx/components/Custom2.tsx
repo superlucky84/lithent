@@ -1,15 +1,15 @@
 import { GlobalData } from '@/examples/jsx/store';
 import { h, mounted, update, wwx } from 'wwact';
-import { globalStore, localStore } from 'wwact/helper';
+import { globalStore, store } from 'wwact/helper';
 
 export default wwx<{
   k: number;
   data: { k: number; j: number };
   handle3: () => void;
-}>(function Custom2(_renew, props, children) {
+}>(function Custom2(renew, props, children) {
   const globalData = globalStore<GlobalData>('globalData');
-  const data7 = localStore<{ m: number }>({ m: 1 });
-  const data = localStore<{ v: string }>({ v: '1' });
+  const data7 = store<{ m: number }>({ m: 1 }, renew);
+  const data = store<{ v: string }>({ v: '1' }, renew);
 
   const gdataUpdate = () => {
     console.log('gdataUpdate');
