@@ -4,8 +4,9 @@ export type UseDataStoreValue = {
 export type Props = {
     [key: string]: unknown;
 };
-export type TagFunction = (prop: Props, children: WDom[], nenew: () => void) => () => WDom;
-export type Renew = () => void;
+export type TagFunction = (prop: Props, children: WDom[]) => (renew: Renew, prop: Props, children: WDom[]) => () => WDom;
+export type Renew = () => boolean;
+export type Component<T> = (renew: Renew, props: T, childen: WDom[]) => () => WDom;
 export type TagFunctionResolver = {
     tagName: string;
     constructor: Function;
@@ -13,9 +14,7 @@ export type TagFunctionResolver = {
     children: WDom[];
     resolve: (componentKey?: Props) => WDom;
 };
-export type FragmentFunction = (props: Props, children: WDom[]) => WDom & {
-    isF: boolean;
-};
+export type FragmentFunction = (props: Props, children: WDom[]) => WDom;
 export type NodePointer = {
     value: WDom | undefined;
 };
@@ -35,7 +34,7 @@ export interface WDom {
     constructor?: Function;
     children?: WDom[];
     getParent?: () => WDom | undefined;
-    nodeChildKey?: Props[];
+    nodeChildKey?: NodeChildKey;
     text?: string | number;
     componentKey?: Props;
     reRender?: () => WDom;

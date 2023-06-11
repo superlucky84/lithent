@@ -12,3 +12,4 @@
 import { WDom } from './types';
 export declare const render: (wDom: WDom, wrapElement: HTMLElement | null, afterElement?: HTMLElement | null) => void;
 export declare const wDomUpdate: (newWDomTree: WDom) => void;
+export declare const recursiveRemoveEvent: (originalWDom: WDom) => void;

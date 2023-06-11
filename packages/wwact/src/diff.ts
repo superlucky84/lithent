@@ -10,6 +10,7 @@
 import { WDom, TagFunctionResolver, RenderType } from '@/types';
 import { checkCustemComponentFunction } from '@/helper/predicator';
 import { getParent, reRender } from '@/helper';
+import { recursiveRemoveEvent } from '@/render';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
@@ -18,6 +19,7 @@ import {
 } from '@/helper/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
+import { removeNodeChildKey } from '@/helper/universalRef';
 
 type DiffPrimaryParam = {
   originalWDom?: WDom;
@@ -31,7 +33,7 @@ type DiffSecondeParam = {
   isSameType: boolean;
 };
 
-const makeNewWDomTree = ({
+export const makeNewWDomTree = ({
   originalWDom,
   newWDom,
 }: {
@@ -45,9 +47,16 @@ const makeNewWDomTree = ({
   }
   const isSameType = checkSameWDomWithOriginal[type]({ originalWDom, newWDom });
 
-  return remakeNewWDom({ originalWDom, newWDom, isSameType });
+  const result = remakeNewWDom({ originalWDom, newWDom, isSameType });
+
+  if (checkCustemComponentFunction(newWDom)) {
+    if (result?.nodeChildKey) {
+      removeNodeChildKey(result?.nodeChildKey);
+    }
+  }
+
+  return result;
 };
-export default makeNewWDomTree;
 
 const remakeNewWDom = ({
   newWDom,
@@ -81,6 +90,7 @@ const remakeNewWDom = ({
     originalWDom.componentKey
   ) {
     runUnmountQueueFromWDom(originalWDom);
+    recursiveRemoveEvent(originalWDom);
   }
 
   remakeWDom.oldProps = originalWDom?.props;

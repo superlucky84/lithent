@@ -1,7 +1,5 @@
-export declare const state: <T>(value: T) => {
+import { Renew } from '../types';
+export declare const state: <T>(value: T, renew: Renew) => {
     value: T;
-    val: T;
     v: T;
-    set: (newValue: T) => void;
-    s: (newValue: T) => void;
 };

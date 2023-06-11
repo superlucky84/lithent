@@ -1,4 +1,4 @@
-import { WDom, TagFunction, FragmentFunction, Props, MiddleStateWDomChildren } from './types';
+import { WDom, TagFunction, FragmentFunction, Props, MiddleStateWDomChildren, Component } from './types';
 export type Children = WDom[];
 export declare const Fragment: (_props: Props, ...children: WDom[]) => {
     type: string;
@@ -14,3 +14,4 @@ export declare const h: (tag: TagFunction | FragmentFunction | string, props: Pr
     children: WDom[];
     resolve: (componentKey?: Props) => WDom;
 };
+export declare const wwx: <T>(component: Component<T>) => (_props: T, _children: WDom[]) => Component<T>;

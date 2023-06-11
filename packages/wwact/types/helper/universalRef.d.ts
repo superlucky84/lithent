@@ -23,6 +23,7 @@ export declare const nodeChildKeyList: {
     value: NodeChildKey[];
 };
 export declare const pushNodeChildKey: (key: Props) => void;
+export declare const removeNodeChildKey: (item: NodeChildKey) => void;
 export declare const cleanNodeChildKey: () => never[];
 /**
  * DataStore
@@ -31,7 +32,7 @@ export declare const dataStoreStore: {
     [key: string]: UseDataStoreValue;
 };
 export declare const dataStoreRenderQueue: {
-    [key: string]: (() => (() => void) | undefined)[];
+    [key: string]: (() => boolean)[];
 };
 /**
  * Router
@@ -41,7 +42,7 @@ export declare const routerParams: {
         [key: string]: string;
     };
 };
-export declare const componentRender: (componentKey: Props) => () => void | undefined;
+export declare const componentRender: (componentKey: Props) => () => boolean;
 export declare const setComponetRef: (componentKey: Props) => void;
 export declare const getComponentKey: () => Props;
 export declare const getComponentSubInfo: (componentKey: Props, subKey: ComponentSubKey) => (() => void) | (() => void)[] | {

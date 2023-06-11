@@ -51,7 +51,7 @@ export interface WDom {
   constructor?: Function;
   children?: WDom[];
   getParent?: () => WDom | undefined;
-  nodeChildKey?: Props[];
+  nodeChildKey?: NodeChildKey;
   text?: string | number;
   componentKey?: Props;
   reRender?: () => WDom;

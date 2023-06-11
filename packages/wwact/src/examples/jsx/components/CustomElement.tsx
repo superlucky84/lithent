@@ -30,7 +30,7 @@ export default wwx(function (renew) {
   const handleUpdatedDataK = () => () => {
     console.log('domRef', domRef);
     console.log('updated k', data, hadleRef);
-    data3.k += 10;
+    // data3.k += 10;
   };
   const handleUpdatedData2K = () => () => {
     console.log('updated 2k', data2);

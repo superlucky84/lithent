@@ -10,7 +10,7 @@ import {
   Component,
 } from '@/types';
 
-import makeNewWDomTree from '@/diff';
+import { makeNewWDomTree } from '@/diff';
 import { wDomUpdate } from '@/render';
 import {
   initUpdateHookState,
@@ -19,6 +19,7 @@ import {
   needDiffRef,
   pushNodeChildKey,
   nodeChildKeyList,
+  removeNodeChildKey,
   cleanNodeChildKey,
   componentRender,
 } from '@/helper/universalRef';
@@ -124,9 +125,7 @@ const makeWDomResolver = ({
     initMountHookState(componentKey);
 
     const nodeChildKey: NodeChildKey = { value: [] };
-    // 먼저 부모들에게 키를 넣는다.
     pushNodeChildKey(componentKey);
-    // 나 자신도 구독을 등록한다.
     nodeChildKeyList.value.push(nodeChildKey);
 
     const component = tag(props, children);
@@ -153,6 +152,11 @@ const makeWDomResolver = ({
       exec: () =>
         reRenderCustomComponent({ tag, props, children, originalWDom }),
     });
+
+    // update의 경우 diff 에서 제거
+    if (!needDiffRef.value) {
+      removeNodeChildKey(nodeChildKey);
+    }
 
     return customNode;
   };
@@ -182,11 +186,8 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   initUpdateHookState(componentKey);
   runUpdateCallback();
 
-  // 옛날꺼는 버리고 여기에 새로운 NodeChildKey
   const nodeChildKey: NodeChildKey = { value: [] };
-  // 먼저 부모들에게 키를 넣는다.
   pushNodeChildKey(componentKey);
-  // 나 자신도 구독을 등록한다.
   nodeChildKeyList.value.push(nodeChildKey);
 
   const originalWDom = componentMaker();
@@ -200,6 +201,11 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   });
 
   addComponentProps(originalWDom, wDomInfo);
+
+  // update의 경우 diff 에서 제거
+  if (!needDiffRef.value) {
+    removeNodeChildKey(nodeChildKey);
+  }
 
   return originalWDom;
 };

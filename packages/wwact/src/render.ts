@@ -57,6 +57,16 @@ export const wDomUpdate = (newWDomTree: WDom) => {
   }
 };
 
+export const recursiveRemoveEvent = (originalWDom: WDom) => {
+  if (originalWDom.props && originalWDom.el) {
+    removeEvent(originalWDom.props, originalWDom.el);
+  }
+
+  (originalWDom.children || []).forEach((childItem: WDom) => {
+    recursiveRemoveEvent(childItem);
+  });
+};
+
 const typeDelete = (newWDom: WDom) => {
   const parent = newWDom?.el?.parentNode;
 

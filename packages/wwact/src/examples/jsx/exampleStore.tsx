@@ -7,12 +7,15 @@ storeInit();
 const MakeVDom = wwx(() => () => (
   <Fragment>
     <CustomElement vava={7} />
-    <CustomElement vava={7} />
     <Fragment>
       <div>3</div>
       <div>3</div>
     </Fragment>
   </Fragment>
 ));
+const root = <MakeVDom />;
 
-render(<MakeVDom />, document.getElementById('root'));
+//@ts-ignore
+window.root = root;
+
+render(root, document.getElementById('root'));
