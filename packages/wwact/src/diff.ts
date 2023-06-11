@@ -85,7 +85,7 @@ const remakeNewWDom = ({
 
   if (
     needRerender &&
-    ['D', 'R'].includes(needRerender) &&
+    ['D', 'R', 'SR'].includes(needRerender) &&
     originalWDom &&
     originalWDom.componentKey
   ) {
