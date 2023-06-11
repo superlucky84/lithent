@@ -1,8 +1,8 @@
 // example.jsx
-import { h, Fragment, render, wwx } from 'wwact';
+import { h, Fragment, render, wwact } from 'wwact';
 import { state } from 'wwact/helper';
 
-const Root = wwx(function (renew) {
+const Root = wwact(function (renew) {
   const showFive = state<boolean>(true, renew);
   const showSix = state<boolean>(true, renew);
 

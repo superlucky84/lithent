@@ -1,7 +1,7 @@
 // example.jsx
-import { h, Fragment, render, Renew, wwx } from 'wwact';
+import { h, Fragment, render, Renew, wwact } from 'wwact';
 
-const Renew = wwx((renew, _props, children) => {
+const Renew = wwact((renew, _props, children) => {
   let count1 = 0;
   let count2 = 0;
   let count3 = 0;

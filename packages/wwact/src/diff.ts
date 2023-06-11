@@ -49,10 +49,8 @@ export const makeNewWDomTree = ({
 
   const result = remakeNewWDom({ originalWDom, newWDom, isSameType });
 
-  if (checkCustemComponentFunction(newWDom)) {
-    if (result?.nodeChildKey) {
-      removeNodeChildKey(result?.nodeChildKey);
-    }
+  if (result?.nodeChildKey) {
+    removeNodeChildKey(result.nodeChildKey);
   }
 
   return result;
