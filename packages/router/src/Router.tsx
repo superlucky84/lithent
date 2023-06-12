@@ -1,8 +1,6 @@
-import { h, Fragment, WDom, Props } from 'wwact';
+import { h, Fragment, WDom, Props, mountCallback } from 'wwact';
 import { state } from 'wwact/helper';
 import { addParams } from '@/hook/params';
-
-console.log(state);
 
 export function Router(_props: Props, children: WDom[]) {
   const targetPathString = state<string>('');
@@ -41,7 +39,7 @@ export function Router(_props: Props, children: WDom[]) {
 
   window.addEventListener('hashchange', handleHashChange);
 
-  mounted(() => {
+  mountCallback(() => {
     handleHashChange();
 
     return removeEvent;
