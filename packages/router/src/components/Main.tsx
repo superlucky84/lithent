@@ -1,6 +1,6 @@
-import { h, Fragment } from 'wwact';
+import { h, Fragment, mount, TagFunction } from 'wwact';
 
-export default function Main() {
+const Main: TagFunction = mount(function Main() {
   const componentMaker = () => {
     return (
       <div>
@@ -12,4 +12,6 @@ export default function Main() {
     );
   };
   return componentMaker;
-}
+});
+
+export default Main;

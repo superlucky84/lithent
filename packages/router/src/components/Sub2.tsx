@@ -1,7 +1,7 @@
-import { h } from 'wwact';
+import { h, mount, TagFunction } from 'wwact';
 import useParams from '@/hook/params';
 
-export default function Sub2() {
+const Sub2: TagFunction = mount(function Sub2() {
   const params = useParams();
   const handle = () => {
     console.log('a', params);
@@ -15,4 +15,6 @@ export default function Sub2() {
     );
   };
   return componentMaker;
-}
+});
+
+export default Sub2;

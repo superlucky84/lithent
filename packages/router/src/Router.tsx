@@ -1,9 +1,9 @@
-import { h, Fragment, WDom, Props, mountCallback } from 'wwact';
+import { h, Fragment, TagFunction, mountCallback, mount } from 'wwact';
 import { state } from 'wwact/helper';
 import { addParams } from '@/hook/params';
 
-export function Router(_props: Props, children: WDom[]) {
-  const targetPathString = state<string>('');
+export const Router: TagFunction = mount((renew, _props, children) => {
+  const targetPathString = state<string>('', renew);
   const findPath = (injectPath: string) =>
     children.find(item => item.componentProps?.path === injectPath);
 
@@ -28,7 +28,7 @@ export function Router(_props: Props, children: WDom[]) {
     }
 
     if (targetPath) {
-      targetPathString.s(String(targetPath?.componentProps?.path || ''));
+      targetPathString.v = String(targetPath?.componentProps?.path || '');
     }
   };
 
@@ -55,8 +55,8 @@ export function Router(_props: Props, children: WDom[]) {
       })}
     </Fragment>
   );
-}
+});
 
-export function RouterItem() {
+export const RouterItem: TagFunction = mount(function () {
   return () => <div />;
-}
+});

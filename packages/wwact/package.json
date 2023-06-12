@@ -2,18 +2,17 @@
   "name": "wwact",
   "version": "0.21.0",
   "description": "wwact",
-  "type": "module",
   "main": "./dist/wwact.umd.cjs",
-  "module": "./dist/wwact.js",
+  "module": "./dist/wwact.mjs",
   "exports": {
     ".": {
       "types": "./types/index.d.ts",
-      "import": "./dist/wwact.js",
+      "import": "./dist/wwact.mjs",
       "require": "./dist/wwact.umd.cjs"
     },
     "./helper": {
       "types": "./types/helper/index.d.ts",
-      "import": "./dist/helper/wwactHelper.js",
+      "import": "./dist/helper/wwactHelper.mjs",
       "require": "./dist/helper/wwactHelper.umd.cjs"
     }
   },

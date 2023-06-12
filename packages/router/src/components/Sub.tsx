@@ -1,8 +1,10 @@
-import { h } from 'wwact';
+import { h, mount, TagFunction } from 'wwact';
 
-export default function Sub() {
+const Sub: TagFunction = mount(function Sub() {
   const componentMaker = () => {
     return <div>Sub</div>;
   };
   return componentMaker;
-}
+});
+
+export default Sub;
