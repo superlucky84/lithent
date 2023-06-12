@@ -14,4 +14,4 @@ export declare const h: (tag: TagFunction | FragmentFunction | string, props: Pr
     children: WDom[];
     resolve: (componentKey?: Props) => WDom;
 };
-export declare const wwx: <T>(component: Component<T>) => (_props: T, _children: WDom[]) => Component<T>;
+export declare const mount: <T>(component: Component<T>) => (_props: T, _children: WDom[]) => Component<T>;

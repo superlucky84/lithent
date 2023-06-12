@@ -9,7 +9,7 @@
   "scripts": {
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist",
-    "clean:module": "pnpm -r exec rm -rf node_modules && rm -rf node_modules",
+    "clean:module": "pnpm -r exec rm -rf node_modules && rm -rf node_modules && pnpm -r exec rm -rf types",
     "build:all": "pnpm -r build",
     "dev:wwact": "pnpm --filter wwact dev",
     "dev:docs": "pnpm --filter @wwact/docs dev",

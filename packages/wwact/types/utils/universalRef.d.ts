@@ -45,9 +45,9 @@ export declare const routerParams: {
 export declare const componentRender: (componentKey: Props) => () => boolean;
 export declare const setComponetRef: (componentKey: Props) => void;
 export declare const getComponentKey: () => Props;
-export declare const getComponentSubInfo: (componentKey: Props, subKey: ComponentSubKey) => (() => void) | (() => void)[] | {
+export declare const getComponentSubInfo: (componentKey: Props, subKey: ComponentSubKey) => (() => void)[] | {
     value: number;
-} | unknown[][] | (() => void)[] | (() => void)[] | (() => void)[];
+} | (() => void)[] | (() => void)[] | (() => void)[] | unknown[][] | (() => void);
 export declare const setRedrawAction: ({ componentKey, nodeChildKey, exec, }: {
     componentKey: Props;
     nodeChildKey: {

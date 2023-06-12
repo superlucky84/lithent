@@ -1,7 +1,7 @@
 // example.jsx
-import { h, Fragment, render, Renew, wwact } from 'wwact';
+import { h, Fragment, render, Renew, mount } from 'wwact';
 
-const Renew = wwact((renew, _props, children) => {
+const Renew = mount((renew, _props, children) => {
   let count1 = 0;
   let count2 = 0;
   let count3 = 0;

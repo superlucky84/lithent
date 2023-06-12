@@ -1,4 +1,4 @@
-import { h, Fragment, wwact } from '@/wDom';
+import { h, Fragment, mount } from '@/wDom';
 import { render } from '@/render';
 import { mountCallback } from '@/hook/mountCallback';
 import { updateCallback } from '@/hook/updateCallback';
@@ -47,4 +47,4 @@ declare global {
   }
 }
 
-export { h, Fragment, render, wwact, mountCallback, updateCallback, ref, ext };
+export { h, Fragment, render, mount, mountCallback, updateCallback, ref, ext };

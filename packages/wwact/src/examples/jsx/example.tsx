@@ -6,14 +6,14 @@ import {
   ref,
   mountCallback,
   updateCallback,
-  wwact,
+  mount,
 } from 'wwact';
 import { state, computed, effect } from 'wwact/helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
 // childen is passed as the second argument.
-const ChildComponent = wwact<{ parentValue: number }>(
+const ChildComponent = mount<{ parentValue: number }>(
   (renew, props, children) => {
     // The value is used as a "getter" to make it easy to get and write to in the higher-order functions it returns
     const count = state<number>(1, renew);
@@ -82,7 +82,7 @@ const ChildComponent = wwact<{ parentValue: number }>(
   }
 );
 
-const Root = wwact(renew => {
+const Root = mount(renew => {
   const parentNumber = state<number>(7, renew);
 
   const increaseParent = () => {

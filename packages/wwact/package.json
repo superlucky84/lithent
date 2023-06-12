@@ -7,12 +7,14 @@
   "module": "./dist/wwact.js",
   "exports": {
     ".": {
+      "type": "./types/index.d.ts",
       "import": "./dist/wwact.js",
       "require": "./dist/wwact.umd.cjs"
     },
     "./helper": {
-      "import": "./dist/wwactHelper.js",
-      "require": "./dist/wwactHelper.umd.cjs"
+      "type": "./types/helper/index.d.ts",
+      "import": "./dist/helper/wwactHelper.js",
+      "require": "./dist/helper/wwactHelper.umd.cjs"
     }
   },
   "types": "./types/index.d.ts",
@@ -34,7 +36,5 @@
     "url": "https@github.com:superlucky84/wwact.git",
     "directory": "packages/wwact"
   },
-  "keywords": [
-    "wwact"
-  ]
+  "keywords": ["wwact"]
 }

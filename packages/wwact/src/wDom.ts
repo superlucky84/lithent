@@ -69,7 +69,7 @@ export const h = (
   return node;
 };
 
-export const wwact =
+export const mount =
   <T>(component: Component<T>) =>
   (_props: T, _children: WDom[]) =>
     component;

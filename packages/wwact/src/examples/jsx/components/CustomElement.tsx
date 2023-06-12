@@ -1,4 +1,4 @@
-import { h, ref, updateCallback, wwact, Renew } from 'wwact';
+import { h, ref, updateCallback, mount, Renew } from 'wwact';
 import { store } from 'wwact/helper';
 import Custom2 from './Custom2';
 
@@ -17,7 +17,7 @@ const useJw = (renew: Renew) => {
   return { data, data2, handle, handle2 };
 };
 
-export default wwact(function (renew) {
+export default mount(function (renew) {
   const { data, data2, handle, handle2 } = useJw(renew);
   const data3 = store<{ k: number }>({ k: 1 }, renew);
   const hadleRef = ref<string>('3');

@@ -1,6 +1,8 @@
 import { h, Fragment, WDom, Props } from 'wwact';
-import { state, mounted } from 'wwact';
+import { state } from 'wwact/helper';
 import { addParams } from '@/hook/params';
+
+console.log(state);
 
 export function Router(_props: Props, children: WDom[]) {
   const targetPathString = state<string>('');

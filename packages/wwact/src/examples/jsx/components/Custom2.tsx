@@ -1,8 +1,8 @@
 import { GlobalData } from '@/examples/jsx/store';
-import { h, mountCallback, updateCallback, wwact } from 'wwact';
+import { h, mountCallback, updateCallback, mount } from 'wwact';
 import { protectedStore, store } from 'wwact/helper';
 
-export default wwact<{
+export default mount<{
   k: number;
   data: { k: number; j: number };
   handle3: () => void;
