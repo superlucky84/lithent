@@ -1,2 +1,4 @@
 packages:
-  - 'packages/*'
+  - 'helper'
+  - 'wwactDocs'
+  - 'router'

@@ -15,8 +15,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      wwact: resolve(__dirname, './src'),
-      'wwact/helper': resolve(__dirname, './src/helper'),
     },
   },
   build: {
