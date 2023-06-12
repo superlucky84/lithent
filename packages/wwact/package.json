@@ -7,12 +7,12 @@
   "module": "./dist/wwact.js",
   "exports": {
     ".": {
-      "type": "./types/index.d.ts",
+      "types": "./types/index.d.ts",
       "import": "./dist/wwact.js",
       "require": "./dist/wwact.umd.cjs"
     },
     "./helper": {
-      "type": "./types/helper/index.d.ts",
+      "types": "./types/helper/index.d.ts",
       "import": "./dist/helper/wwactHelper.js",
       "require": "./dist/helper/wwactHelper.umd.cjs"
     }
