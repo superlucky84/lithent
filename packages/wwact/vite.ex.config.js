@@ -17,15 +17,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      wwact: resolve(__dirname, './src/wwact'),
-      'wwact/helper': resolve(__dirname, './src/wwact/helper.ts'),
+      wwact: resolve(__dirname, './src'),
+      'wwact/helper': resolve(__dirname, './src/helper'),
     },
   },
   build: {
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/wwact/helper.ts'),
+      entry: resolve(__dirname, 'src/helper'),
       name: 'wwactHelper',
       fileName: 'wwactHelper',
     },

@@ -3,7 +3,7 @@ import {
   redrawQueue,
   redrawQueueTimeout,
   getComponentKey,
-} from '@/helper/universalRef';
+} from '@/utils/universalRef';
 
 import { useUpdated } from '@/hook/useUpdate';
 

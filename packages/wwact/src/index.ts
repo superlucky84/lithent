@@ -3,7 +3,7 @@ import { render } from '@/render';
 import { mountCallback } from '@/hook/mountCallback';
 import { updateCallback } from '@/hook/updateCallback';
 import { ref } from '@/hook/ref';
-import { checkFunction } from '@/helper/predicator';
+import { checkFunction } from '@/utils/predicator';
 import {
   componentRef,
   componentKeyRef,
@@ -11,7 +11,7 @@ import {
   dataStoreRenderQueue,
   getComponentKey,
   componentRender,
-} from '@/helper/universalRef';
+} from '@/utils/universalRef';
 
 const ext = {
   componentRef,

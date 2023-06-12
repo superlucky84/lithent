@@ -8,18 +8,18 @@
  * 4. loop타입의 자식들은 같은 키값을 가졌는지로 동일한지 판단하며 키값이 없을경우 fragment타입처럼 취급한다.
  */
 import { WDom, TagFunctionResolver, RenderType } from '@/types';
-import { checkCustemComponentFunction } from '@/helper/predicator';
-import { getParent, reRender } from '@/helper';
+import { checkCustemComponentFunction } from '@/utils/predicator';
+import { getParent, reRender } from '@/utils';
 import { recursiveRemoveEvent } from '@/render';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
   checkExisty,
-} from '@/helper/predicator';
+} from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
-import { removeNodeChildKey } from '@/helper/universalRef';
+import { removeNodeChildKey } from '@/utils/universalRef';
 
 type DiffPrimaryParam = {
   originalWDom?: WDom;
@@ -84,8 +84,7 @@ const remakeNewWDom = ({
   if (
     needRerender &&
     ['D', 'R', 'SR'].includes(needRerender) &&
-    originalWDom &&
-    originalWDom.componentKey
+    originalWDom?.componentKey
   ) {
     runUnmountQueueFromWDom(originalWDom);
     recursiveRemoveEvent(originalWDom);

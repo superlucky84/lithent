@@ -23,8 +23,8 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"],
-      "wwact": ["src/wwact"],
-      "wwact/helper": ["src/wwact/helper.ts"]
+      "wwact": ["src"],
+      "wwact/helper": ["src/helper"]
     }
   },
   "include": ["src"]

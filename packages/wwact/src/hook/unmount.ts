@@ -1,5 +1,5 @@
 import { WDom, Props } from '@/types';
-import { componentRef, getComponentKey } from '@/helper/universalRef';
+import { componentRef, getComponentKey } from '@/utils/universalRef';
 
 export const unmount = (effectAction: () => void) => {
   componentRef.get(getComponentKey())!.umts.push(effectAction);

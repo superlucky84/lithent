@@ -16,10 +16,10 @@ import {
   checkRefData,
   checkNormalAttribute,
   checkExisty,
-} from '@/helper/predicator';
+} from '@/utils/predicator';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
-import { getParent } from '@/helper';
+import { getParent } from '@/utils';
 
 export const render = (
   wDom: WDom,

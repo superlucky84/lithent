@@ -22,12 +22,12 @@ import {
   removeNodeChildKey,
   cleanNodeChildKey,
   componentRender,
-} from '@/helper/universalRef';
+} from '@/utils/universalRef';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,
   checkCustemComponentFunction,
-} from '@/helper/predicator';
+} from '@/utils/predicator';
 
 export type Children = WDom[];
 

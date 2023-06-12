@@ -3,7 +3,7 @@ import {
   componentKeyRef,
   componentRef,
   getComponentKey,
-} from '@/helper/universalRef';
+} from '@/utils/universalRef';
 
 export const useUpdated = (
   effectAction: () => (() => void) | void,

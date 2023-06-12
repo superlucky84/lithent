@@ -17,8 +17,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      wwact: resolve(__dirname, './src/wwact'),
-      'wwact/helper': resolve(__dirname, './src/wwact/helper.ts'),
+      wwact: resolve(__dirname, './src'),
+      'wwact/helper': resolve(__dirname, './src/helper'),
     },
   },
   build: {
@@ -26,7 +26,7 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/wwact'),
+      entry: resolve(__dirname, 'src'),
       name: 'wwact',
       fileName: 'wwact',
     },
