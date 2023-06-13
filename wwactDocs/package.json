@@ -25,11 +25,11 @@
   },
   "keywords": ["wwact"],
   "devDependencies": {
-    "autoprefixer": "^10.4.14",
-    "postcss": "^8.4.24",
-    "tailwindcss": "^3.3.2",
     "wwact": "workspace:*",
     "wwact-helper": "workspace:*",
-    "wwact-router": "workspace:*"
+    "wwact-router": "workspace:*",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^3.3.2"
   }
 }

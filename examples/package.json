@@ -23,8 +23,11 @@
   "homepage": "https://github.com/superlucky84/wwact",
   "license": "MIT",
   "keywords": ["wwact"],
-  "peerDependencies": {
+  "dependencies": {
     "wwact": "workspace:*",
     "wwact-helper": "workspace:*"
+  },
+  "volta": {
+    "node": "20.3.0"
   }
 }

@@ -29,5 +29,8 @@
   "homepage": "https://github.com/superlucky84/wwact/tree/master/router",
   "keywords": [
     "wwact"
-  ]
+  ],
+  "volta": {
+    "node": "20.3.0"
+  }
 }

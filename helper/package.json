@@ -25,5 +25,8 @@
   "keywords": ["wwact"],
   "peerDependencies": {
     "wwact": "workspace:*"
+  },
+  "volta": {
+    "node": "20.3.0"
   }
 }
