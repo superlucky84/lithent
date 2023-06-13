@@ -9,12 +9,12 @@ export const runUnmountQueueFromWDom = (newWDom: WDom) => {
   const { componentKey, nodeChildKey } = newWDom;
   const childKeys = nodeChildKey?.value;
 
-  if (childKeys) {
-    childKeys.forEach(childKey => removeItem(childKey));
-  }
-
   if (componentKey) {
     removeItem(componentKey);
+  }
+
+  if (childKeys) {
+    childKeys.forEach(childKey => removeItem(childKey));
   }
 };
 

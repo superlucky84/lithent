@@ -78,6 +78,10 @@ export const checkRefData = (
 ): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } =>
   dataKey === 'ref' && typeof dataValue === 'object';
 
+export const checkOptionElement = (element: any): element is HTMLElement => {
+  return element.nodeType === 1 && element.tagName === 'OPTION';
+};
+
 export const checkNormalAttribute = (
   dataValue: unknown
 ): dataValue is number | string =>

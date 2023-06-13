@@ -16,6 +16,7 @@ import {
   checkRefData,
   checkNormalAttribute,
   checkExisty,
+  checkOptionElement,
 } from '@/utils/predicator';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
@@ -277,6 +278,8 @@ const updateProps = ({
         });
       } else if (checkNormalAttribute(dataValue)) {
         (element as HTMLElement).setAttribute(dataKey, String(dataValue));
+      } else if (checkOptionElement(element) && dataKey === 'selected') {
+        (element as HTMLOptionElement).selected = !!dataValue;
       }
 
       delete originalProps[dataKey];
