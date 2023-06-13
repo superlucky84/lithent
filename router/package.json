@@ -1,5 +1,6 @@
 {
   "name": "lithent-router",
+  "private": true,
   "version": "0.6.0",
   "description": "lithent-router",
   "main": "./dist/Router.umd.js",

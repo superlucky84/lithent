@@ -1,8 +1,7 @@
 {
   "name": "lithent",
-  "version": "0.21.0",
+  "version": "0.1.0",
   "description": "lithent",
-  "private": true,
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/lithent.umd.js",
   "module": "./dist/lithent.mjs",
@@ -38,6 +37,19 @@
   "engines": {
     "node": ">=20.3.0"
   },
+  "files": [
+    "src",
+    "dist",
+    "helper/dist",
+    "helper/src",
+    "helper/package.json",
+    "router/dist",
+    "router/src",
+    "router/package.json",
+    "examples/dist",
+    "examples/src",
+    "examples/package.json"
+  ],
   "author": "",
   "repository": {
     "type": "git",
