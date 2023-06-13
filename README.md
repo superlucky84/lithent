@@ -1,19 +1,19 @@
-# Basic Usage
+# litheNT Basic Usage
 
-Wwact is a virtualDOM implementation library that behaves similarly to React.
+litheNT is a virtualDOM implementation library that behaves similarly to React.
 
 [production motive](https://medium.com/p/d14ba89373d3)
 
 A simpler style of library inspired by Reactjs.
 
-The idea of wwact is to keep the value associated with a `component` as a closure.
+The idea of litheNT is to keep the value associated with a `component` as a closure.
 
 There aren't as many rules as in React, you just need to know how closures work in JSX and JavaScript.
 
 ## Install
 
 ```bash
-pnpm add wwact
+pnpm add lithent 
 ```
 
 ## Using JSX
@@ -44,14 +44,14 @@ import {
   ref,
   mountCallback,
   updateCallback,
-  wwx,
-} from 'wwact';
-import { state, computed, effect } from 'wwact/helper';
+  mount,
+} from 'lithent';
+import { state, computed, effect } from 'lithent/helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
 // childen is passed as the second argument.
-const ChildComponent = wwx<{ parentValue: number }>(
+const ChildComponent = mount<{ parentValue: number }>(
   (renew, props, children) => {
     // The value is used as a "getter" to make it easy to get and write to in the higher-order functions it returns
     const count = state<number>(1, renew);
@@ -120,7 +120,7 @@ const ChildComponent = wwx<{ parentValue: number }>(
   }
 );
 
-const Root = wwx(renew => {
+const Root = mount(renew => {
   const parentNumber = state<number>(7, renew);
 
   const increaseParent = () => {
@@ -157,9 +157,9 @@ npm install -g pnpm
 
 ## project install
 ```bash
-git clone https://github.com/superlucky84/wwact.git
+git clone https://github.com/superlucky84/lithent.git
 
-cd wwact
+cd lithent
 
 pnpm install
 ```
@@ -171,32 +171,16 @@ pnpm build:all
 
 ## Running the development environment
 ```bash
-pnpm dev:wwact
+pnpm dev
 ```
 
 ---
 
 # Packages
 
-## wwact
+## lithent
 
-Main module
+## helper 
 
 ## router
-
-Hash routing extension
-
-## compiler
-
-Converter for using template syntax(.wwx)
-
-Can be used using `jsx` without using `wwx`
-
-## vitePlugin
-
-A plugin to connect the template syntax (wwx) and the transpiler to the vite build tool
-
-## wwveal
-
-Presentation tool made with wwact
 
