@@ -8,11 +8,8 @@ import {
 import { unmount } from '@/hook/unmount';
 
 export const mountCallback = (effectAction: () => void) => {
-  console.log(componentRef.get(getComponentKey())!.mts, 'a');
-
   const mts = componentRef.get(getComponentKey())!.mts;
 
-  mts.push(effectAction);
   mts.push(effectAction);
 };
 

@@ -50,9 +50,7 @@ const ChildComponent = mount<{ parentValue: number }>(
       return () => console.log('UPDATED');
     };
 
-    console.log('a');
     mountCallback(handleMounted);
-    console.log('b');
     updateCallback(handleUpdated, () => [props.parentValue]); // Only Defs Updated (using a closure to update a value)
 
     // Behaves like `react`'s `useEffect`

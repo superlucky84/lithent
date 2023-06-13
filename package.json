@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "watch": "vite build --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "clean": "pnpm clean:dist && pnpm clean:module",
