@@ -1,6 +1,6 @@
 const routerParams = { value: {} } as { value: Record<string, string> };
 
-export default function useParams() {
+export function useParams() {
   return routerParams.value;
 }
 

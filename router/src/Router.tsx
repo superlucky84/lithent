@@ -1,6 +1,7 @@
 import { h, Fragment, TagFunction, mountCallback, mount } from 'lithent';
 import { state } from 'lithent/helper';
 import { addParams } from '@/hook/params';
+export { useParams } from '@/hook/params';
 
 export const Router: TagFunction = mount((renew, _props, children) => {
   const targetPathString = state<string>('', renew);

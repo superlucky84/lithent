@@ -31,6 +31,11 @@
       "types": "./helper/dist/index.d.ts",
       "import": "./helper/dist/lithentHelper.mjs",
       "require": "./helper/dist/lithentHelper.umd.js"
+    },
+    "./router": {
+      "types": "./router/dist/Router.d.ts",
+      "import": "./router/dist/Router.mjs",
+      "require": "./router/dist/Router.umd.js"
     }
   },
   "types": "./dist/index.d.ts",

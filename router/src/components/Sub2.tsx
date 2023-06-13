@@ -1,5 +1,5 @@
 import { h, mount, TagFunction } from 'lithent';
-import useParams from '@/hook/params';
+import { useParams } from '@/hook/params';
 
 const Sub2: TagFunction = mount(function () {
   const params = useParams();
