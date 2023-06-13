@@ -1,0 +1,32 @@
+{
+  "name": "@wwact/router",
+  "version": "0.6.0",
+  "description": "@wact/router",
+  "main": "./dist/Router.umd.cjs",
+  "module": "./dist/Router.js",
+  "exports": {
+    ".": {
+      "import": "./dist/Router.js",
+      "require": "./dist/Router.umd.cjs"
+    }
+  },
+  "types": "./types/Router.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "wwact": "workspace:*"
+  },
+  "author": "superlucky84",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/wwact.git",
+    "directory": "packages/router"
+  },
+  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/router",
+  "keywords": [
+    "wwact"
+  ]
+}

@@ -1,12 +1,16 @@
 {
+  "name": "wwact",
+  "version": "0.21.0",
+  "description": "wwact",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "version": "0.0.7",
-  "description": "",
-  "engines": {
-    "node": ">=16.16.0"
-  },
+  "main": "./dist/wwact.umd.js",
+  "module": "./dist/wwact.mjs",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf node_modules && rm -rf node_modules && pnpm -r exec rm -rf types",
@@ -15,8 +19,30 @@
     "dev:docs": "pnpm --filter @wwact/docs dev",
     "dev:router": "pnpm --filter @wwact/router dev"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/wwact.mjs",
+      "require": "./dist/wwact.umd.js"
+    },
+    "./helper": {
+      "types": "./helper/dist/index.d.ts",
+      "import": "./dist/helper/wwactHelper.mjs",
+      "require": "./dist/helper/wwactHelper.umd.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=16.16.0"
+  },
   "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/wwact.git"
+  },
+  "homepage": "https://github.com/superlucky84/wwact",
+  "license": "MIT",
+  "keywords": ["wwact"],
   "devDependencies": {
     "@babel/cli": "^7.18.9",
     "@babel/core": "^7.18.9",
