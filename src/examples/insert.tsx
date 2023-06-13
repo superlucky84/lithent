@@ -28,8 +28,9 @@ const Root = mount(function (renew) {
   );
 });
 
-render(
-  <Root />,
-  document.getElementById('list-root'),
-  document.getElementById('8')
-);
+const R = <Root />;
+
+//@ts-ignore
+window.root = R;
+
+render(R, document.getElementById('list-root'), document.getElementById('8'));

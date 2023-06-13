@@ -68,16 +68,30 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
 };
 
 const typeDelete = (newWDom: WDom) => {
-  const parent = newWDom?.el?.parentNode;
+  const parent = findRealParentElement(newWDom);
 
   if (newWDom.oldProps && newWDom.el) {
     removeEvent(newWDom.oldProps, newWDom.el);
   }
 
   if (parent && newWDom.el) {
-    parent.removeChild(newWDom.el);
+    if (newWDom.el?.nodeType === 1) {
+      parent.removeChild(newWDom.el);
+    } else if (newWDom.el?.nodeType === 11) {
+      findChildWithRemoveElement(newWDom, parent as HTMLElement);
+    }
     delete newWDom.el;
   }
+};
+
+const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
+  (newWDom?.children || []).forEach(item => {
+    if (item.el?.nodeType === 1) {
+      parent.removeChild(item?.el);
+    } else if (item.el?.nodeType === 11) {
+      findChildWithRemoveElement(item, parent);
+    }
+  });
 };
 
 const typeSortedReplace = (newWDom: WDom) => {
@@ -373,14 +387,17 @@ const updateStyle = ({
 const findRealParentElement = (
   vDom: WDom
 ): HTMLElement | DocumentFragment | Text | undefined => {
-  const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
+  const isVirtualType =
+    vDom.type === 'fragment' ||
+    vDom.type === 'loop' ||
+    (!vDom.type && vDom?.el?.nodeType === 11);
 
-  if (vDom.isRoot && vDom.type === 'fragment') {
+  if (vDom.isRoot && isVirtualType) {
     return vDom.wrapElement;
   }
 
   if (!isVirtualType) {
-    return vDom.el;
+    return vDom.el?.parentNode as HTMLElement;
   }
 
   const parentVDom = getParent(vDom);
