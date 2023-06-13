@@ -49,10 +49,18 @@ importers:
       wwact-helper: link:../helper
 
   helper:
-    specifiers: {}
+    specifiers:
+      wwact: workspace:*
+    dependencies:
+      wwact: link:..
 
   router:
-    specifiers: {}
+    specifiers:
+      wwact: workspace:*
+      wwact-helper: workspace:*
+    dependencies:
+      wwact: link:..
+      wwact-helper: link:../helper
 
   wwactDocs:
     specifiers:

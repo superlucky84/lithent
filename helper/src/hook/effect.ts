@@ -1,6 +1,4 @@
-// @ts-ignore
 import { updateCallback } from 'wwact';
-// @ts-ignore
 import { mountCallback } from 'wwact';
 
 export const effect = (
