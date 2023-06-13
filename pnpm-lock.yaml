@@ -42,41 +42,41 @@ importers:
 
   examples:
     specifiers:
-      wwact: workspace:*
-      wwact-helper: workspace:*
+      lithent: workspace:*
+      lithent-helper: workspace:*
     dependencies:
-      wwact: link:..
-      wwact-helper: link:../helper
+      lithent: link:..
+      lithent-helper: link:../helper
 
   helper:
     specifiers:
-      wwact: workspace:*
+      lithent: workspace:*
     dependencies:
-      wwact: link:..
+      lithent: link:..
+
+  lithentDocs:
+    specifiers:
+      autoprefixer: ^10.4.14
+      lithent: workspace:*
+      lithent-helper: workspace:*
+      lithent-router: workspace:*
+      postcss: ^8.4.24
+      tailwindcss: ^3.3.2
+    devDependencies:
+      autoprefixer: 10.4.14_postcss@8.4.24
+      lithent: link:..
+      lithent-helper: link:../helper
+      lithent-router: link:../router
+      postcss: 8.4.24
+      tailwindcss: 3.3.2
 
   router:
     specifiers:
-      wwact: workspace:*
-      wwact-helper: workspace:*
+      lithent: workspace:*
+      lithent-helper: workspace:*
     dependencies:
-      wwact: link:..
-      wwact-helper: link:../helper
-
-  wwactDocs:
-    specifiers:
-      autoprefixer: ^10.4.14
-      postcss: ^8.4.24
-      tailwindcss: ^3.3.2
-      wwact: workspace:*
-      wwact-helper: workspace:*
-      wwact-router: workspace:*
-    devDependencies:
-      autoprefixer: 10.4.14_postcss@8.4.24
-      postcss: 8.4.24
-      tailwindcss: 3.3.2
-      wwact: link:..
-      wwact-helper: link:../helper
-      wwact-router: link:../router
+      lithent: link:..
+      lithent-helper: link:../helper
 
 packages:
 

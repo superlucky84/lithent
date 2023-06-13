@@ -7,8 +7,8 @@ import {
   mountCallback,
   updateCallback,
   mount,
-} from 'wwact';
-import { state, computed, effect } from 'wwact-helper';
+} from 'lithent';
+import { state, computed, effect } from 'lithent-helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.

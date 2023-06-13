@@ -26,10 +26,10 @@ export default defineConfig({
       fileName: 'Router',
     },
     rollupOptions: {
-      external: ['wwact'],
+      external: ['lithent'],
       output: {
         globals: {
-          wwact: 'wwact',
+          lithent: 'lithent',
         },
       },
     },

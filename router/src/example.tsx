@@ -1,4 +1,4 @@
-import { h, Fragment, render, mount } from 'wwact';
+import { h, Fragment, render, mount } from 'lithent';
 import { Router, RouterItem } from '@/Router';
 import Main from '@/components/Main';
 import Sub from '@/components/Sub';

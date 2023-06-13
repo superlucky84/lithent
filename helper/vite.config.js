@@ -22,14 +22,14 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'wwactHelper',
-      fileName: 'wwactHelper',
+      name: 'lithentHelper',
+      fileName: 'lithentHelper',
     },
     rollupOptions: {
-      external: ['wwact'],
+      external: ['lithent'],
       output: {
         globals: {
-          wwact: 'wwact',
+          lithent: 'lithent',
         },
       },
     },

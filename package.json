@@ -1,18 +1,18 @@
 {
-  "name": "wwact",
+  "name": "lithent",
   "version": "0.21.0",
-  "description": "wwact",
+  "description": "lithent",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/wwact.umd.js",
-  "module": "./dist/wwact.mjs",
+  "main": "./dist/lithent.umd.js",
+  "module": "./dist/lithent.mjs",
   "scripts": {
     "dev:core": "vite",
-    "dev:examples": "pnpm --filter wwact-examples dev",
+    "dev:examples": "pnpm --filter lithent-examples dev",
     "build:core": "vite build",
-    "build:helper": "pnpm --filter wwact-helper build",
+    "build:helper": "pnpm --filter lithent-helper build",
     "watch:core": "vite build --watch",
-    "watch:helper": "pnpm --filter wwact-helper watch",
+    "watch:helper": "pnpm --filter lithent-helper watch",
     "build": "pnpm build:core && pnpm -r build",
     "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
     "test": "jest",
@@ -20,18 +20,18 @@
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:docs": "pnpm --filter @wwact/docs dev"
+    "dev:docs": "pnpm --filter lithent-docs dev"
   },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/wwact.mjs",
-      "require": "./dist/wwact.umd.js"
+      "import": "./dist/lithent.mjs",
+      "require": "./dist/lithent.umd.js"
     },
     "./helper": {
       "types": "./helper/dist/index.d.ts",
-      "import": "./helper/dist/wwactHelper.mjs",
-      "require": "./helper/dist/wwactHelper.umd.js"
+      "import": "./helper/dist/lithentHelper.mjs",
+      "require": "./helper/dist/lithentHelper.umd.js"
     }
   },
   "types": "./dist/index.d.ts",
@@ -41,11 +41,11 @@
   "author": "",
   "repository": {
     "type": "git",
-    "url": "https@github.com:superlucky84/wwact.git"
+    "url": "https://github.com/superlucky84/lithent.git"
   },
-  "homepage": "https://github.com/superlucky84/wwact",
+  "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": ["wwact"],
+  "keywords": ["lithent"],
   "devDependencies": {
     "@babel/cli": "^7.18.9",
     "@babel/core": "^7.18.9",

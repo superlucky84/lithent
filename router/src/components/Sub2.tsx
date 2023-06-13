@@ -1,4 +1,4 @@
-import { h, mount, TagFunction } from 'wwact';
+import { h, mount, TagFunction } from 'lithent';
 import useParams from '@/hook/params';
 
 const Sub2: TagFunction = mount(function () {

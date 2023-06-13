@@ -1,4 +1,4 @@
-import { h, Fragment, mount, TagFunction } from 'wwact';
+import { h, Fragment, mount, TagFunction } from 'lithent';
 
 const Main: TagFunction = mount(function () {
   return () => (

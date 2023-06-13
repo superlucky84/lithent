@@ -1,11 +1,11 @@
 {
-  "name": "wwact-helper",
+  "name": "lithent-helper",
   "version": "0.21.0",
-  "description": "wwactHelper",
+  "description": "lithentHelper",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/wwactHelper.umd.js",
-  "module": "./dist/wwactHelper.mjs",
+  "main": "./dist/lithentHelper.umd.js",
+  "module": "./dist/lithentHelper.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
@@ -18,13 +18,13 @@
   "author": "",
   "repository": {
     "type": "git",
-    "url": "https@github.com:superlucky84/wwact.git"
+    "url": "https@github.com:superlucky84/lithent.git"
   },
-  "homepage": "https://github.com/superlucky84/wwact",
+  "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": ["wwact"],
+  "keywords": ["lithent"],
   "peerDependencies": {
-    "wwact": "workspace:*"
+    "lithent": "workspace:*"
   },
   "volta": {
     "node": "20.3.0"

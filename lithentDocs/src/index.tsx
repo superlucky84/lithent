@@ -1,5 +1,5 @@
-import { h, render, mount } from 'wwact';
-import { Router, RouterItem } from 'wwact-router';
+import { h, render, mount } from 'lithent';
+import { Router, RouterItem } from 'lithent-router';
 import Main from '@/components/Main';
 import Sub from '@/components/Sub';
 import Sub2 from '@/components/Sub2';

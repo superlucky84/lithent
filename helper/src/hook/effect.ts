@@ -1,5 +1,5 @@
-import { updateCallback } from 'wwact';
-import { mountCallback } from 'wwact';
+import { updateCallback } from 'lithent';
+import { mountCallback } from 'lithent';
 
 export const effect = (
   forward: () => (() => void) | void,

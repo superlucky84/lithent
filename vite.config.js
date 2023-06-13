@@ -23,8 +23,8 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src'),
-      name: 'wwact',
-      fileName: 'wwact',
+      name: 'lithent',
+      fileName: 'lithent',
     },
   },
   server: {

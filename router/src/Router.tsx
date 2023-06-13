@@ -1,5 +1,5 @@
-import { h, Fragment, TagFunction, mountCallback, mount } from 'wwact';
-import { state } from 'wwact/helper';
+import { h, Fragment, TagFunction, mountCallback, mount } from 'lithent';
+import { state } from 'lithent/helper';
 import { addParams } from '@/hook/params';
 
 export const Router: TagFunction = mount((renew, _props, children) => {

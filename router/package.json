@@ -1,7 +1,7 @@
 {
-  "name": "wwact-router",
+  "name": "lithent-router",
   "version": "0.6.0",
-  "description": "wwact-router",
+  "description": "lithent-router",
   "main": "./dist/Router.umd.js",
   "module": "./dist/Router.mjs",
   "exports": {
@@ -16,19 +16,19 @@
     "build": "vite build"
   },
   "peerDependencies": {
-    "wwact": "workspace:*",
-    "wwact-helper": "workspace:*"
+    "lithent": "workspace:*",
+    "lithent-helper": "workspace:*"
   },
   "author": "superlucky84",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https@github.com:superlucky84/wwact.git",
+    "url": "https@github.com:superlucky84/lithent.git",
     "directory": "router"
   },
-  "homepage": "https://github.com/superlucky84/wwact/tree/master/router",
+  "homepage": "https://github.com/superlucky84/lithent/tree/master/router",
   "keywords": [
-    "wwact"
+    "lithent"
   ],
   "volta": {
     "node": "20.3.0"
