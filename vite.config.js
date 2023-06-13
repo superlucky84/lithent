@@ -27,6 +27,6 @@ export default defineConfig({
     },
   },
   server: {
-    open: '/html/insert.html',
+    open: '/html/renew.html',
   },
 });

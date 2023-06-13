@@ -36,7 +36,7 @@
   },
   "types": "./dist/index.d.ts",
   "engines": {
-    "node": ">=16.16.0"
+    "node": ">=20.3.0"
   },
   "author": "",
   "repository": {
