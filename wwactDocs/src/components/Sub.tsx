@@ -1,8 +1,5 @@
-import { h } from 'wwact';
+import { h, mount } from 'wwact';
 
-export default function Sub() {
-  const componentMaker = () => {
-    return <div>Sub</div>;
-  };
-  return componentMaker;
-}
+export default mount(function Sub() {
+  return () => <div>Sub</div>;
+});

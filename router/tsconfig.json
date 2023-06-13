@@ -4,7 +4,7 @@
     "useDefineForClassFields": true,
     "module": "nodenext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "moduleResolution": "nodenext",
+    "moduleResolution": "Node",
     "declaration": true,
     "allowJs": false,
     "strict": true,

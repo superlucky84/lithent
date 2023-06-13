@@ -9,7 +9,7 @@ export default defineConfig({
     checker({ typescript: true }),
     eslintPlugin({ eslintOptions: { cache: false } }),
     dts({
-      outputDir: ['dist', 'types'],
+      outputDir: ['types'],
     }),
   ],
   resolve: {
@@ -24,14 +24,6 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.tsx'),
       name: 'wwactDocs',
       fileName: 'wwactDocs',
-    },
-    rollupOptions: {
-      external: ['wwact'],
-      output: {
-        globals: {
-          wwact: 'wwact',
-        },
-      },
     },
   },
   server: {

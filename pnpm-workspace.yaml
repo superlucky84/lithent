@@ -1,3 +1,5 @@
 packages:
   - 'helper'
   - 'examples'
+  - 'router'
+  - 'wwactDocs'

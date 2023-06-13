@@ -1,18 +1,5 @@
-import { h } from 'wwact';
-import useParams from '@/hook/params';
+import { h, mount } from 'wwact';
 
-export default function Sub2() {
-  const params = useParams();
-  const handle = () => {
-    console.log('a', params);
-  };
-
-  const componentMaker = () => {
-    return (
-      <div style={{ color: 'red' }} onClick={handle}>
-        Sub222
-      </div>
-    );
-  };
-  return componentMaker;
-}
+export default mount(function Sub2() {
+  return () => <div style={{ color: 'red' }}>Sub222</div>;
+});

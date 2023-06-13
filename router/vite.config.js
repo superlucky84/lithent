@@ -9,7 +9,7 @@ export default defineConfig({
     checker({ typescript: true }),
     eslintPlugin({ eslintOptions: { cache: false } }),
     dts({
-      outputDir: ['dist', 'types'],
+      outputDir: ['dist'],
     }),
   ],
   resolve: {

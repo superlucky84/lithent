@@ -2,9 +2,8 @@
   "private": true,
   "name": "@wwact/docs",
   "version": "0.5.0",
-  "description": "@wact/wwactDocs",
+  "description": "wwact-docs",
   "main": "./dist/wwactDocs.umd.cjs",
-  "type": "module",
   "module": "./dist/wwactDocs.js",
   "exports": {
     ".": {
@@ -12,7 +11,7 @@
       "require": "./dist/wwactDocs.umd.cjs"
     }
   },
-  "types": "./types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "tailwindcss -i ./src/input.css -o ./html/output.css --watch & vite",
     "build": "vite build"
@@ -22,17 +21,15 @@
   "repository": {
     "type": "git",
     "url": "https@github.com:superlucky84/wwact.git",
-    "directory": "packages/router"
+    "directory": "wwactDocs"
   },
-  "homepage": "https://github.com/superlucky84/wwact/tree/master/packages/wwactDocs",
-  "keywords": [
-    "wwact"
-  ],
+  "keywords": ["wwact"],
   "devDependencies": {
-    "@wwact/router": "workspace:*",
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2",
-    "wwact": "workspace:*"
+    "wwact": "workspace:*",
+    "wwact-helper": "workspace:*",
+    "wwact-router": "workspace:*"
   }
 }
