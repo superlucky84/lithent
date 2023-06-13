@@ -8,7 +8,7 @@ import {
   updateCallback,
   mount,
 } from 'wwact';
-import { state, computed, effect } from 'wwact/helper';
+import { state, computed, effect } from 'wwact-helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
@@ -50,7 +50,9 @@ const ChildComponent = mount<{ parentValue: number }>(
       return () => console.log('UPDATED');
     };
 
+    console.log('a');
     mountCallback(handleMounted);
+    console.log('b');
     updateCallback(handleUpdated, () => [props.parentValue]); // Only Defs Updated (using a closure to update a value)
 
     // Behaves like `react`'s `useEffect`

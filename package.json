@@ -4,12 +4,11 @@
   "description": "wwact",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/wwact.umd.cjs",
+  "main": "./dist/wwact.umd.js",
   "module": "./dist/wwact.mjs",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build -c vite.ex.config.js",
-    "esm": "babel --extensions .ts,.tsx --config-file ./babel.config.json --out-dir esm ./src",
+    "build": "vite build",
     "test": "jest",
     "test:watch": "jest --watch",
     "clean": "pnpm clean:dist && pnpm clean:module",
@@ -22,17 +21,17 @@
   },
   "exports": {
     ".": {
-      "types": "./types/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/wwact.mjs",
-      "require": "./dist/wwact.umd.cjs"
+      "require": "./dist/wwact.umd.js"
     },
     "./helper": {
-      "types": "./types/helper/index.d.ts",
+      "types": "./helper/dist/index.d.ts",
       "import": "./dist/helper/wwactHelper.mjs",
-      "require": "./dist/helper/wwactHelper.umd.cjs"
+      "require": "./dist/helper/wwactHelper.umd.js"
     }
   },
-  "types": "./types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "engines": {
     "node": ">=16.16.0"
   },

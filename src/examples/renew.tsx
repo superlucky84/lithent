@@ -1,5 +1,5 @@
 // example.jsx
-import { h, Fragment, render, Renew, mount } from 'wwact';
+import { h, Fragment, render, Renew, mount } from '@/index';
 
 const Renew = mount((renew, _props, children) => {
   let count1 = 0;

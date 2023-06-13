@@ -1,0 +1,30 @@
+{
+  "name": "wwact-examples",
+  "version": "0.21.0",
+  "description": "wwactExamples",
+  "private": true,
+  "packageManager": "pnpm@7.6.0",
+  "main": "./dist/wwactExamples.umd.js",
+  "module": "./dist/wwactExamples.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "watch": "vite build --watch",
+    "build": "vite build"
+  },
+  "engines": {
+    "node": ">=16.16.0"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/wwact.git"
+  },
+  "homepage": "https://github.com/superlucky84/wwact",
+  "license": "MIT",
+  "keywords": ["wwact"],
+  "peerDependencies": {
+    "wwact": "workspace:*",
+    "wwact-helper": "workspace:*"
+  }
+}

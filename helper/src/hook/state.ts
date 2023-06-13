@@ -1,8 +1,6 @@
-import { Renew } from '@/types';
-
 export const state = <T>(
   value: T,
-  renew: Renew
+  renew: () => boolean
 ): {
   value: T;
   v: T;

@@ -21,12 +21,17 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src'),
-      name: 'wwact',
-      fileName: 'wwact',
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'wwactHelper',
+      fileName: 'wwactHelper',
     },
-  },
-  server: {
-    open: '/html/insert.html',
+    rollupOptions: {
+      external: ['wwact'],
+      output: {
+        globals: {
+          wwact: 'wwact',
+        },
+      },
+    },
   },
 });

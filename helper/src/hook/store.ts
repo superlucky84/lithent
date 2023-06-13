@@ -1,13 +1,11 @@
-import { UseDataStoreValue, Renew } from '@/types';
-
-export const store = <T extends {}>(initValue: T, renew: Renew) => {
+export const store = <T extends {}>(initValue: T, renew: () => boolean) => {
   return updater<T>({
     initValue,
     renew,
   });
 };
 
-export const updater = <T extends UseDataStoreValue>({
+export const updater = <T extends { [key: string | symbol]: unknown }>({
   initValue,
   renew,
 }: {

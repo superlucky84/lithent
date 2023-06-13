@@ -9,27 +9,23 @@ export default defineConfig({
     checker({ typescript: true }),
     eslintPlugin({ eslintOptions: { cache: false } }),
     dts({
-      outputDir: ['dist', 'types'],
+      outputDir: ['dist'],
     }),
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './helper'),
+      '@': resolve(__dirname, './src'),
     },
   },
   build: {
     emptyOutDir: false,
     sourcemap: true,
-    lib: {
-      entry: resolve(__dirname, 'src/helper'),
-      name: 'wwact/helper',
-      fileName: 'helper/wwactHelper',
-    },
     rollupOptions: {
-      external: ['wwact'],
+      external: ['wwact', 'wwact-helper'],
       output: {
         globals: {
           wwact: 'wwact',
+          wwactHelper: 'wwact-helper',
         },
       },
     },

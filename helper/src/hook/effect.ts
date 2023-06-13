@@ -1,5 +1,7 @@
-import { updateCallback } from '@/hook/updateCallback';
-import { mountCallback } from '@/hook/mountCallback';
+// @ts-ignore
+import { updateCallback } from 'wwact';
+// @ts-ignore
+import { mountCallback } from 'wwact';
 
 export const effect = (
   forward: () => (() => void) | void,
