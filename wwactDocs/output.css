@@ -642,9 +642,4 @@ video {
       max-width: 1536px;
     }
   }
-
-  .md\:mx-auto {
-    margin-left: auto;
-    margin-right: auto;
-  }
 }

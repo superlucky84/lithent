@@ -13,7 +13,7 @@
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "tailwindcss -i ./src/input.css -o ./html/output.css --watch & vite",
+    "dev": "vite",
     "build": "vite build"
   },
   "author": "superlucky84",

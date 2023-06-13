@@ -20,13 +20,8 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     sourcemap: true,
-    lib: {
-      entry: resolve(__dirname, 'src/index.tsx'),
-      name: 'wwactDocs',
-      fileName: 'wwactDocs',
-    },
   },
   server: {
-    open: '/html/index.html',
+    open: './index.html',
   },
 });

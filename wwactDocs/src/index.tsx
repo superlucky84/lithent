@@ -3,6 +3,7 @@ import { Router, RouterItem } from 'wwact-router';
 import Main from '@/components/Main';
 import Sub from '@/components/Sub';
 import Sub2 from '@/components/Sub2';
+import '@/input.css';
 
 const Root = mount(() => {
   return () => (

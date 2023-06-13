@@ -20,15 +20,6 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     sourcemap: true,
-    rollupOptions: {
-      external: ['wwact', 'wwact-helper'],
-      output: {
-        globals: {
-          wwact: 'wwact',
-          wwactHelper: 'wwact-helper',
-        },
-      },
-    },
   },
   server: {
     open: '/html/jsxExample.html',
