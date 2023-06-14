@@ -34,4 +34,7 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    open: '/html/jsxExample.html',
+  },
 });

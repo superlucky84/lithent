@@ -8,7 +8,7 @@ import {
   updateCallback,
   mount,
 } from 'lithent';
-import { state, computed, effect } from 'lithent-helper';
+import { state, computed, effect, makeStore } from 'lithent-helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
@@ -24,6 +24,21 @@ const ChildComponent = mount<{ parentValue: number }>(
       () => count.v + notRefValue + props.parentValue
     );
 
+    const localStore = makeStore<{ text: string; count: number }>({
+      // key is optional (Can be omitted here as it is only used locally)
+      value: { text: 's', count: 0 },
+      renew,
+    });
+    /*
+    // To share a store, make it externally and use `join`.
+    makeStore<{ text: string; count: number }>({
+      key: 'shardStore'
+      value: { text: 's', count: 0 },
+    });
+
+    const localStore = joinStore('shardStore')
+    */
+
     // Even if you don't use a ref, the private value is always maintained as a regular variable.
     let notRefValue = props.parentValue;
 
@@ -37,6 +52,11 @@ const ChildComponent = mount<{ parentValue: number }>(
 
     const handleInputChane = (event: InputEvent) => {
       text.v = (event.target as HTMLInputElement).value;
+    };
+
+    const localStoreUpdate = () => {
+      localStore.count += 1;
+      localStore.text += '1';
     };
 
     const handleMounted = () => {
@@ -75,8 +95,11 @@ const ChildComponent = mount<{ parentValue: number }>(
         <div>sum(computed): {summ.v}</div>
         {/* It doesn't pull it out from under the reference, it uses the value directly, so you can just use it. */}
         <div>notRefValue: {notRefValue}</div>
+        <div>localStore(text): {localStore.text}</div>
+        <div>localStore(count): {localStore.count}</div>
         {children}
         <button onClick={increase}>Increase</button>
+        <button onClick={localStoreUpdate}>localStoreUpdate</button>
       </Fragment>
     );
   }
