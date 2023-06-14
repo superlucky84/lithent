@@ -6,7 +6,6 @@ import {
   MiddleStateWDomChildren,
   MiddleStateWDom,
   NodePointer,
-  NodeChildKey,
   Component,
 } from '@/types';
 
@@ -17,11 +16,10 @@ import {
   initMountHookState,
   setRedrawAction,
   needDiffRef,
-  pushNodeChildKey,
-  nodeChildKeyList,
   removeNodeChildKey,
   cleanNodeChildKey,
   componentRender,
+  startMakeNodeChildKey,
 } from '@/utils/universalRef';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
@@ -124,10 +122,7 @@ const makeWDomResolver = ({
   const resolve = (componentKey = props) => {
     initMountHookState(componentKey);
 
-    const nodeChildKey: NodeChildKey = { value: [] };
-    pushNodeChildKey(componentKey);
-    nodeChildKeyList.value.push(nodeChildKey);
-
+    const nodeChildKey = startMakeNodeChildKey(componentKey);
     const component = tag(props, children);
     const componentMaker = component(
       componentRender(componentKey),
@@ -186,10 +181,7 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   initUpdateHookState(componentKey);
   runUpdateCallback();
 
-  const nodeChildKey: NodeChildKey = { value: [] };
-  pushNodeChildKey(componentKey);
-  nodeChildKeyList.value.push(nodeChildKey);
-
+  const nodeChildKey = startMakeNodeChildKey(componentKey);
   const originalWDom = componentMaker();
 
   wDomInfo.nodeChildKey = nodeChildKey;

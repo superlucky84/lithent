@@ -16,6 +16,7 @@
     "watch:core": "vite build --watch",
     "watch:helper": "pnpm --filter lithent-helper watch",
     "build": "pnpm build:core && pnpm build:helper && pnpm build:router && pnpm build:examples && pnpm build:docs",
+    "build:p": "pnpm build:core && pnpm -r build",
     "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
     "test": "jest",
     "test:watch": "jest --watch",
