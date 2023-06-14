@@ -24,19 +24,21 @@ const ChildComponent = mount<{ parentValue: number }>(
       () => count.v + notRefValue + props.parentValue
     );
 
-    const localStore = makeStore<{ text: string; count: number }>({
-      // key is optional (Can be omitted here as it is only used locally)
-      value: { text: 's', count: 0 },
-      renew,
-    });
+    const localStore = makeStore<{ text: string; count: number }>(
+      { text: 's', count: 0 },
+      {
+        // key is optional (Can be omitted here as it is only used locally)
+        renew,
+      }
+    );
     /*
     // To share a store, make it externally and use `join`.
-    makeStore<{ text: string; count: number }>({
-      key: 'shardStore'
-      value: { text: 's', count: 0 },
-    });
+    makeStore<{ text: string; count: number }>(
+      { text: 's', count: 0 },
+      { storeKey: 'sharedStore' }
+    );
 
-    const localStore = joinStore('shardStore')
+    const sharedStore = subscribeStore<{ text: string; count: number }>('shardStore', nenew);
     */
 
     // Even if you don't use a ref, the private value is always maintained as a regular variable.
