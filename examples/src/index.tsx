@@ -85,7 +85,11 @@ const ChildComponent = mount<{ parentValue: number }>(
       <Fragment>
         {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
         <div>
-          <textarea value={text.v} onInput={handleInputChane} style={{width: '300px', height: '100px'}} />
+          <textarea
+            value={text.v}
+            onInput={handleInputChane}
+            style={{ width: '300px', height: '100px' }}
+          />
         </div>
         <div>{text.v}</div>
         <div>
