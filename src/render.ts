@@ -380,12 +380,12 @@ const updateStyle = ({
 
   if (elementStyle) {
     Object.entries(style).forEach(([styleKey, dataValue]) => {
-      elementStyle.setProperty(styleKey, dataValue);
+      (elementStyle as any)[styleKey] = dataValue;
       delete originalStyle[styleKey];
     });
 
-    Object.entries(originalStyle).forEach(([styleKey]) =>
-      elementStyle.removeProperty(styleKey)
+    Object.entries(originalStyle).forEach(
+      ([styleKey]) => ((elementStyle as any)[styleKey] = '')
     );
   }
 };

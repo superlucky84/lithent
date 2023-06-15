@@ -1,8 +1,38 @@
-import { h, mount, ref } from 'lithent';
+import { h, mount, ref, mountCallback } from 'lithent';
 import { ContentHeader } from '@/components/contentHeader';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css';
 
 export const Guide = mount(() => {
   const editorEl = ref<HTMLElement | null>(null);
+  const code = `import { h, Fragment, render, Renew, mount } from 'lithent';
+
+const Renew = mount((renew, _props) => {<br>
+  let count = 0;
+
+  const change = () => {
+    count1 += 1;
+    renew();
+  };
+
+  return () => (
+    <Fragment>
+      <li>count: {count}</li>
+      <button onClick={change}>increase</button>
+    </Fragment>
+  );
+});
+
+render(<Renew />, document.getElementById('root'));
+`;
+
+  mountCallback(() => {
+    const html = hljs.highlight(code, {
+      language: 'javascript',
+    }).value;
+
+    (editorEl.value as HTMLElement).innerHTML = html;
+  });
 
   return () => (
     <div class="grid grid-cols-1 px-4 pt-6 xl:grid-cols-2 xl:gap-4 dark:bg-gray-900">
@@ -13,17 +43,8 @@ export const Guide = mount(() => {
         <div class="px-4 py-1 text-gray-400 border border-gray-200 rounded dark:border-gray-600">
           <h3>컨셉</h3>
         </div>
-        <div class="h-32 px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-          <div ref={editorEl}>
-            <p>Hello World!</p>
-            <p>
-              Some initial <strong>bold</strong> text
-            </p>
-            <p>
-              <br />
-            </p>
-          </div>
-          <h3>코드</h3>
+        <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+          <div ref={editorEl} style={{ whiteSpace: 'pre-line' }} />
         </div>
         <div class="h-32 px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
           <h3>코드2</h3>
