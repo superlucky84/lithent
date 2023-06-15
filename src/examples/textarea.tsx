@@ -11,7 +11,7 @@ const TextArea = mount(renew => {
 
   return () => (
     <div>
-      <textarea onInput={changeInput}>{text}</textarea>
+      <textarea onInput={changeInput} value={text} />
       <div>{text}</div>
     </div>
   );

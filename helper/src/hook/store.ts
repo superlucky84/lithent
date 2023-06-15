@@ -7,38 +7,16 @@ const dataStoreRenderQueue: {
   [key: string | symbol]: (() => boolean)[];
 } = {};
 
-export const makeStore = <T extends {}>(
-  value: T,
-  {
-    storeKey = Symbol(),
-    renew,
-  }: {
-    storeKey?: string | symbol;
-    renew?: () => boolean;
-  } = {}
-) => {
+export const store = <T extends {}>(value: T) => {
+  const storeKey = Symbol();
   storeGroup.set(storeKey, value);
 
-  if (renew) {
+  return (renew: () => boolean) => {
     dataStoreRenderQueue[storeKey] ??= [];
     dataStoreRenderQueue[storeKey].push(renew);
-  }
 
-  return updater<T>(storeKey);
-};
-
-export const subscribeStore = <T extends {}>(
-  storeKey: string | symbol,
-  renew: () => boolean
-) => {
-  const store = storeGroup.get(storeKey);
-  if (!store) {
-    throw new Error(`store is not exist`);
-  }
-
-  dataStoreRenderQueue[storeKey].push(renew);
-
-  return updater<T>(storeKey);
+    return updater<T>(storeKey);
+  };
 };
 
 const updater = <T extends { [key: string | symbol]: unknown }>(

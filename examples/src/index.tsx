@@ -8,7 +8,7 @@ import {
   updateCallback,
   mount,
 } from 'lithent';
-import { state, computed, effect, makeStore } from 'lithent-helper';
+import { state, computed, effect, store } from 'lithent-helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
@@ -24,21 +24,15 @@ const ChildComponent = mount<{ parentValue: number }>(
       () => count.v + notRefValue + props.parentValue
     );
 
-    const localStore = makeStore<{ text: string; count: number }>(
-      { text: 's', count: 0 },
-      {
-        // key is optional (Can be omitted here as it is only used locally)
-        renew,
-      }
-    );
+    const localStore = store<{ text: string; count: number }>({
+      text: 's',
+      count: 0,
+    })(renew);
     /*
-    // To share a store, make it externally and use `join`.
-    makeStore<{ text: string; count: number }>(
-      { text: 's', count: 0 },
-      { storeKey: 'sharedStore' }
-    );
+    // To share a store, make it externally and use `asign`.
+    const asignStore = store<{ text: string; count: number }>({ text: 's', count: 0 });
 
-    const sharedStore = subscribeStore<{ text: string; count: number }>('shardStore', nenew);
+    const sharedStore = asignStore(nenew);
     */
 
     // Even if you don't use a ref, the private value is always maintained as a regular variable.

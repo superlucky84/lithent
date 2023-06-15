@@ -82,6 +82,10 @@ export const checkOptionElement = (element: any): element is HTMLElement => {
   return element.nodeType === 1 && element.tagName === 'OPTION';
 };
 
+export const checkTextareaElement = (element: any): element is HTMLElement => {
+  return element.nodeType === 1 && element.tagName === 'TEXTAREA';
+};
+
 export const checkNormalAttribute = (
   dataValue: unknown
 ): dataValue is number | string =>

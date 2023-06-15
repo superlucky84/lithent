@@ -17,6 +17,7 @@ import {
   checkNormalAttribute,
   checkExisty,
   checkOptionElement,
+  checkTextareaElement,
 } from '@/utils/predicator';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
@@ -276,10 +277,12 @@ const updateProps = ({
           newEventHandler: dataValue as (e: Event) => void,
           oldEventHandler: originalProps[dataKey] as (e: Event) => void,
         });
-      } else if (checkNormalAttribute(dataValue)) {
-        (element as HTMLElement).setAttribute(dataKey, String(dataValue));
+      } else if (checkTextareaElement(element) && dataKey === 'value') {
+        (element as HTMLInputElement).value = dataValue as string;
       } else if (checkOptionElement(element) && dataKey === 'selected') {
         (element as HTMLOptionElement).selected = !!dataValue;
+      } else if (checkNormalAttribute(dataValue)) {
+        (element as HTMLElement).setAttribute(dataKey, String(dataValue));
       }
 
       delete originalProps[dataKey];
