@@ -30,7 +30,7 @@ import {
 export type Children = WDom[];
 
 type WDomInfoParam = {
-  componentMaker: () => WDom;
+  componentMaker: (props: Props) => WDom;
   componentKey: Props;
   tag: TagFunction;
   props: Props;
@@ -160,8 +160,8 @@ const makeWDomResolver = ({
 };
 
 const makeCustomNode = (wDomInfo: WDomInfoParam) => {
-  const { componentMaker } = wDomInfo;
-  const customNode = componentMaker();
+  const { componentMaker, props } = wDomInfo;
+  const customNode = componentMaker(props);
   const reRender = makeReRender(wDomInfo);
 
   addComponentProps(customNode, { ...wDomInfo, reRender });
@@ -182,7 +182,7 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   runUpdateCallback();
 
   const nodeChildKey = startMakeNodeChildKey(componentKey);
-  const originalWDom = componentMaker();
+  const originalWDom = componentMaker(props);
 
   wDomInfo.nodeChildKey = nodeChildKey;
 

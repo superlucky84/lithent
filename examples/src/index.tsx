@@ -17,10 +17,13 @@ const ChildComponent = mount<{ parentValue: number }>(
   (renew, props, children) => {
     // The value is used as a "getter" to make it easy to get and write to in the higher-order functions it returns
     const count = state<number>(1, renew);
-    const text = state<string>('text', renew);
+    const text = state<string>(
+      '"destructuring" the "props" value directly from the mount function will cause referencing issues, so if you want to use it, you need to "destructuring" it from the internal function (updater).',
+      renew
+    );
     const getParentValue = () => props.parentValue;
-    const parentValue = props.parentValue;
-    const summ = computed<() => number>(
+    const parentValueFromMount = props.parentValue;
+    const summ = computed<number>(
       () => count.v + notRefValue + props.parentValue
     );
 
@@ -78,24 +81,40 @@ const ChildComponent = mount<{ parentValue: number }>(
 
     // Wrap in a function and return (using a closure to hold the value)
     // This is the "update" function.
-    return () => (
+    return ({ parentValue }) => (
       <Fragment>
         {/* Note that the event is onInput (we use the native event name to avoid confusion). */}
-        <input type="text" value={text.v} onInput={handleInputChane} />
-        <div ref={domRef}>count: {count.v}</div>
-        {/* When the value is updated from the parent component, the function declared inside is executed, so you need to use the `props.` call by reference to output the latest value of the updated property. */}
-        <div>parentValue: {props.parentValue} (working)</div>
-        <div>parentValue: {getParentValue()} (working)</div>
-        <div>parentValue: {parentValue} (not working)</div>
-        <div>sum: {count.v + notRefValue + props.parentValue}</div>
-        <div>sum(computed): {summ.v}</div>
-        {/* It doesn't pull it out from under the reference, it uses the value directly, so you can just use it. */}
-        <div>notRefValue: {notRefValue}</div>
-        <div>localStore(text): {localStore.text}</div>
-        <div>localStore(count): {localStore.count}</div>
-        {children}
+        <div>
+          <textarea value={text.v} onInput={handleInputChane} style={{width: '300px', height: '100px'}} />
+        </div>
+        <div>{text.v}</div>
+        <div>
+          <div style={{ color: 'blue' }}>
+            parentValueFromRef: {props.parentValue} (working)
+          </div>
+          <div style={{ color: 'blue' }}>
+            parentValueFromFunction: {getParentValue()} (working)
+          </div>
+          <div style={{ color: 'blue' }}>
+            parentValueFromUpdaterDestructuring: {parentValue} (working)
+          </div>
+          <div style={{ color: 'red' }}>
+            parentValueFromMounterDestructuring: {parentValueFromMount} (not
+            working)
+          </div>
+        </div>
+        <div>
+          <div ref={domRef}>count: {count.v}</div>
+          <div>sum: {count.v + notRefValue + props.parentValue}</div>
+          <div>sum(computed): {summ.v}</div>
+          {/* It doesn't pull it out from under the reference, it uses the value directly, so you can just use it. */}
+          <div>notRefValue: {notRefValue}</div>
+          <div>localStore(text): {localStore.text}</div>
+          <div>localStore(count): {localStore.count}</div>
+        </div>
         <button onClick={increase}>Increase</button>
         <button onClick={localStoreUpdate}>localStoreUpdate</button>
+        {children}
       </Fragment>
     );
   }
@@ -114,12 +133,10 @@ const Root = mount(renew => {
 
   return () => (
     <Fragment>
+      <ChildComponent parentValue={parentNumber.v}>
+        <button onClick={increaseParent}>Increase - Parent</button>
+      </ChildComponent>
       <button onClick={decreaseParent}>Decrease - Parent</button>
-      <div>
-        <ChildComponent parentValue={parentNumber.v}>
-          <button onClick={increaseParent}>Increase - Parent</button>
-        </ChildComponent>
-      </div>
     </Fragment>
   );
 });

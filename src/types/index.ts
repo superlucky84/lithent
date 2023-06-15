@@ -12,7 +12,7 @@ export type Component<T> = (
   renew: Renew,
   props: T,
   childen: WDom[]
-) => () => WDom;
+) => (props: T) => WDom;
 
 export type TagFunctionResolver = {
   tagName: string;

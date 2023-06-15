@@ -23,7 +23,7 @@
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:docs": "pnpm --filter lithent-docs dev"
+    "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev"
   },
   "exports": {
     ".": {

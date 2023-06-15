@@ -1,5 +1,5 @@
-export const computed = <T extends Function>(
-  value: T
+export const computed = <T>(
+  value: () => T
 ): {
   value: T;
   v: T;
