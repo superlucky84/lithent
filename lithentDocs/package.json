@@ -23,12 +23,15 @@
     "url": "https@github.com:superlucky84/lithent.git",
     "directory": "lithentDocs"
   },
-  "keywords": ["lithent"],
+  "keywords": [
+    "lithent"
+  ],
   "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "highlight.js": "^11.8.0",
     "lithent": "workspace:*",
     "lithent-helper": "workspace:*",
     "lithent-router": "workspace:*",
-    "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2"
   }
