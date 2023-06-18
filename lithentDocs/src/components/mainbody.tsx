@@ -2,6 +2,7 @@ import { h, mount } from 'lithent';
 import { state, computed } from 'lithent/helper';
 import { Guide } from '@/pages/guide';
 import { Install } from '@/pages/install';
+import { Examples } from '@/pages/examples';
 import { assignSharedStore } from '@/store';
 
 export const Mainbody = mount(r => {
@@ -13,7 +14,7 @@ export const Mainbody = mount(r => {
   });
   const matchHash = computed<string>(() => {
     if ('#examples' === hashState.v) {
-      return <div>examples</div>;
+      return <Examples />;
     } else if ('#install' === hashState.v) {
       return <Install />;
     }
