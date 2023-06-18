@@ -89,7 +89,7 @@ const typeDelete = (newWDom: WDom) => {
 };
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
-  (newWDom?.children || []).forEach(item => {
+  (newWDom?.oldChildren || newWDom?.children || []).forEach(item => {
     if (item.el?.nodeType === 1) {
       parent.removeChild(item?.el);
     } else if (item.el?.nodeType === 11) {

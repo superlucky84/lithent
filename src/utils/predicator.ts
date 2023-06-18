@@ -58,10 +58,17 @@ export const checkSameTagElement = ({ originalWDom, newWDom }: DiffParam) =>
   originalWDom?.tag === newWDom.tag &&
   originalWDom?.children?.length === newWDom?.children?.length;
 
-export const checkNormalTypeElement = ({ originalWDom, newWDom }: DiffParam) =>
-  checkPlainWDomType(newWDom) &&
-  originalWDom?.type === newWDom.type &&
-  originalWDom?.children?.length === newWDom?.children?.length;
+export const checkNormalTypeElement = ({
+  originalWDom,
+  newWDom,
+}: DiffParam) => {
+  return (
+    checkPlainWDomType(newWDom) &&
+    originalWDom?.type === newWDom.type &&
+    (originalWDom?.children?.length === newWDom?.children?.length ||
+      newWDom.type === 'loop')
+  );
+};
 
 export const checkExisty = (value: unknown) =>
   value !== null && value !== undefined;

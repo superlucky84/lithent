@@ -50,6 +50,7 @@ export interface WDom {
   tagName?: string;
   constructor?: Function;
   children?: WDom[];
+  oldChildren?: WDom[];
   getParent?: () => WDom | undefined;
   nodeChildKey?: NodeChildKey;
   text?: string | number;
