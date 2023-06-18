@@ -19,6 +19,7 @@ import {
   checkOptionElement,
   checkTextareaElement,
 } from '@/utils/predicator';
+
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/utils';

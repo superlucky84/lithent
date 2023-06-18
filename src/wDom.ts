@@ -102,9 +102,8 @@ const reRenderCustomComponent = ({
     newWDomTree.wrapElement = wrapElement;
   }
 
-  wDomUpdate(newWDomTree);
-
   needDiffRef.value = false;
+  wDomUpdate(newWDomTree);
 };
 
 const makeWDomResolver = ({

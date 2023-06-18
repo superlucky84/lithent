@@ -11,19 +11,20 @@
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
     "build:router": "pnpm --filter lithent-router build",
+    "watch:router": "pnpm --filter lithent-router watch",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
     "watch:core": "vite build --watch",
     "watch:helper": "pnpm --filter lithent-helper watch",
-    "build": "pnpm build:core && pnpm build:helper && pnpm build:router && pnpm build:examples && pnpm build:docs",
+    "build": "pnpm build:core && pnpm build:helper && pnpm build:examples && pnpm build:docs",
     "build:p": "pnpm build:core && pnpm -r build",
-    "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
+    "dev": "pnpm watch:core & pnpm watch:helper & pnpm watch:router & pnpm dev:examples",
     "test": "jest",
     "test:watch": "jest --watch",
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev"
+    "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm watch:router & pnpm --filter lithent-docs dev"
   },
   "exports": {
     ".": {
@@ -35,11 +36,6 @@
       "types": "./helper/dist/index.d.ts",
       "import": "./helper/dist/lithentHelper.mjs",
       "require": "./helper/dist/lithentHelper.umd.js"
-    },
-    "./router": {
-      "types": "./router/dist/Router.d.ts",
-      "import": "./router/dist/Router.mjs",
-      "require": "./router/dist/Router.umd.js"
     }
   },
   "types": "./dist/index.d.ts",
@@ -52,9 +48,6 @@
     "helper/dist",
     "helper/src",
     "helper/package.json",
-    "router/dist",
-    "router/src",
-    "router/package.json",
     "examples/dist",
     "examples/src",
     "examples/package.json"

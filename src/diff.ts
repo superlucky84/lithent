@@ -88,7 +88,7 @@ const remakeNewWDom = ({
   ) {
     runUnmountQueueFromWDom(originalWDom);
     recursiveRemoveEvent(originalWDom);
-    remakeWDom.children = originalWDom.children;
+    // remakeWDom.children = originalWDom.children;
   }
 
   remakeWDom.oldProps = originalWDom?.props;

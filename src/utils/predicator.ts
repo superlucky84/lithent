@@ -55,10 +55,13 @@ export const checkSameFragment = ({ originalWDom, newWDom }: DiffParam) =>
 export const checkSameTagElement = ({ originalWDom, newWDom }: DiffParam) =>
   checkPlainWDomType(newWDom) &&
   originalWDom?.type === 'element' &&
-  originalWDom?.tag === newWDom.tag;
+  originalWDom?.tag === newWDom.tag &&
+  originalWDom?.children?.length === newWDom?.children?.length;
 
 export const checkNormalTypeElement = ({ originalWDom, newWDom }: DiffParam) =>
-  checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
+  checkPlainWDomType(newWDom) &&
+  originalWDom?.type === newWDom.type &&
+  originalWDom?.children?.length === newWDom?.children?.length;
 
 export const checkExisty = (value: unknown) =>
   value !== null && value !== undefined;
