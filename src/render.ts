@@ -70,7 +70,8 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
 };
 
 const typeDelete = (newWDom: WDom) => {
-  const parent = findRealParentElement(newWDom);
+  const parentWDom = getParent(newWDom);
+  const parent = findRealParentElement(parentWDom);
 
   if (newWDom.oldProps && newWDom.el) {
     removeEvent(newWDom.oldProps, newWDom.el);
@@ -268,7 +269,6 @@ const updateProps = ({
         element &&
         typeof dataValue === 'string'
       ) {
-        console.log(dataKey, dataValue);
         (element as HTMLElement).innerHTML = dataValue;
       } else if (checkStyleData(dataKey, dataValue)) {
         const style = dataValue;
@@ -400,17 +400,15 @@ const updateStyle = ({
 const findRealParentElement = (
   vDom: WDom
 ): HTMLElement | DocumentFragment | Text | undefined => {
-  const isVirtualType =
-    vDom.type === 'fragment' ||
-    vDom.type === 'loop' ||
-    (!vDom.type && vDom?.el?.nodeType === 11);
+  const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
+  // const isNull = !vDom.type;
 
   if (vDom.isRoot && isVirtualType) {
     return vDom.wrapElement;
   }
 
   if (!isVirtualType) {
-    return vDom.el?.parentNode as HTMLElement;
+    return vDom.el as HTMLElement;
   }
 
   const parentVDom = getParent(vDom);
