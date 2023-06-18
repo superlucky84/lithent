@@ -1,12 +1,11 @@
-import { h, mount, ref, mountCallback } from 'lithent';
+import { h, mount, mountCallback } from 'lithent';
 import { ContentHeader } from '@/components/contentHeader';
 import hljs from 'highlight.js';
-import 'highlight.js/styles/github-dark.css';
+import 'highlight.js/styles/nord.css';
 
-export const Guide = mount(() => {
-  const editorEl = ref<HTMLElement | null>(null);
+export const Guide = mount(r => {
+  let exCode1 = '';
   const code = `import { h, Fragment, render, Renew, mount } from 'lithent';
-
 const Renew = mount((renew, _props) => {<br>
   let count = 0;
 
@@ -27,11 +26,10 @@ render(<Renew />, document.getElementById('root'));
 `;
 
   mountCallback(() => {
-    const html = hljs.highlight(code, {
+    exCode1 = hljs.highlight(code, {
       language: 'javascript',
     }).value;
-
-    (editorEl.value as HTMLElement).innerHTML = html;
+    r();
   });
 
   return () => (
@@ -43,8 +41,8 @@ render(<Renew />, document.getElementById('root'));
         <div class="px-4 py-1 text-gray-400 border border-gray-200 rounded dark:border-gray-600">
           <h3>컨셉</h3>
         </div>
-        <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-          <div ref={editorEl} style={{ whiteSpace: 'pre-line' }} />
+        <div class="px-4 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+          <div innerHTML={exCode1} style={{ whiteSpace: 'pre' }} />
         </div>
         <div class="h-32 px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
           <h3>코드2</h3>

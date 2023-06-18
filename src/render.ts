@@ -263,6 +263,13 @@ const updateProps = ({
     ([dataKey, dataValue]: [string, unknown]) => {
       if (dataKey === 'key') {
         // Do nothing
+      } else if (
+        dataKey === 'innerHTML' &&
+        element &&
+        typeof dataValue === 'string'
+      ) {
+        console.log(dataKey, dataValue);
+        (element as HTMLElement).innerHTML = dataValue;
       } else if (checkStyleData(dataKey, dataValue)) {
         const style = dataValue;
         const oldStyle = checkStyleData(dataKey, originalProps.style) || {};
