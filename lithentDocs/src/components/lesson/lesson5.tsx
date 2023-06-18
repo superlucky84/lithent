@@ -5,7 +5,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
 const code = `import { h, Fragment, render, mount } from 'lithent';
-
+// import { state } from 'lithent/helper';
 
 const state = <T>(value: T, renew: () => boolean): { value: T } => {
   let result = value;
@@ -65,36 +65,41 @@ const Component = mount((r, _props) => {
 
 export const Lesson5 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-slate-50 text-lg mb-4">Lesson 5 - helper/state</h3>
-      <div class="px-4 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+    <div class="p-2 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
+        EX 5 - helper (state)
+      </h3>
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+        <p class="text-base text-slate-50">Helper</p>
+        <p class="mt-2 text-sm text-gray-400">
+          The "state" function defined in the example code delegates a value and
+          a "renew" function from the component and then executes it whenever
+          the value changes.
+        </p>
+        <p class="mt-2 text-sm text-gray-400">
+          Users can implement and use several forms of helpers themselves by
+          utilizing the "renew" function.
+        </p>
+        <p class="mt-2 text-sm text-gray-400">
+          The state function used in the example is pre-implemented in
+          'lithent/helper', so you can just pull it out and write it to and
+          write it. But it's just an example.
+        </p>
+        <p class="mt-2 text-sm text-gray-400">
+          In addition to "state", we've implemented helper codes like "store",
+          "computed", and "effect" in 'lithent/helper', which are described in
+          detail in the examples page.
+        </p>
+      </div>
+      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <Component />
-      </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-        <p class="mt-2 text-lg text-slate-50">헬퍼 구현</p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          예제 코드에 정의된 state 함수는 컴포넌트로 부터 renew 함수를 받아서
-          값이 변경될때마다 실행시켜 줍니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          사용자는 renew 메서드를 활용하여 여러 가지 형태의 헬퍼를 직접 구현하여
-          사용 가능합니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          예제에 사용된 state 함수는 'lithent/helper' 에 미리 구현되어 있어 꺼내
-          쓰면 됩니다. 하지만 그것은 하나의 예시일 뿐입니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          store, computed, effect 등의 헬퍼 예시 코드들을 넣어 놨습니다. 더 많은
-          예제는 '예제들' 페이지에서 확인할 수 있습니다.
-        </p>
       </div>
     </div>
   );

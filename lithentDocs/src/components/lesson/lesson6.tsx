@@ -15,6 +15,7 @@ const code = `// index.html
 
 // app.tsx
 import { h, Fragment, render, mount } from 'lithent';
+import { store } from 'lithent/helper';
 
 const assignShardStore = store<{ text: string; count: number }>({ text: 'sharedText' });
 
@@ -75,40 +76,39 @@ export const Lesson6 = mount(() => {
   });
 
   return () => (
-    <div class="p-4 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-slate-50 text-lg mb-4">Lesson 6 - render</h3>
-      <div class="px-4 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+    <div class="p-2 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">EX 6 - render</h3>
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+        <p class="text-base text-slate-50">render</p>
+        <p class="mt-2 text-sm text-gray-400">
+          The third argument to the "render" method allows you to insert a
+          virtual dome in front of the specified element.
+        </p>
+        <p class="mt-2 text-sm text-gray-400">
+          The first argument to the "render" method is the virtual dome, the
+          second argument is the virtual dome's parent element, and the third
+          argument specifies the specific location where the virtual dome will
+          be inserted.
+        </p>
+        <p class="mt-2 text-base text-slate-50">store helper</p>
+        <p class="mt-2 text-sm text-gray-400">
+          The "store" used in the example is a helper implementation like
+          "state". A detailed implementation can be found on the examples page.
+        </p>
+      </div>
+      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <div ref={htmlRef}>
           <span>1</span>
           <span>2</span>
           <span>3</span>
         </div>
-      </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-        <p class="mt-2 text-lg text-slate-50">헬퍼 구현</p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          예제 코드에 정의된 state 함수는 컴포넌트로 부터 renew 함수를 받아서
-          값이 변경될때마다 실행시켜 줍니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          사용자는 renew 메서드를 활용하여 여러 가지 형태의 헬퍼를 직접 구현하여
-          사용 가능합니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          예제에 사용된 state 함수는 'lithent/helper' 에 미리 구현되어 있어 꺼내
-          쓰면 됩니다. 하지만 그것은 하나의 예시일 뿐입니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          store, computed, effect 등의 헬퍼 예시 코드들을 넣어 놨습니다. 더 많은
-          예제는 '예제들' 페이지에서 확인할 수 있습니다.
-        </p>
       </div>
     </div>
   );

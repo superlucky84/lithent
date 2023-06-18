@@ -76,30 +76,29 @@ const Parent = mount(renew => {
 
 export const Lesson2 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-slate-50 text-lg mb-4">
-        Lesson 2 - Props (Note the 'closure' approach)
-      </h3>
-      <div class="px-4 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+    <div class="p-2 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">EX 2 - Props</h3>
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+        <p class="text-base text-slate-50">Props</p>
+        <p class="text-sm text-gray-400 font-normal">
+          "props" is given to the "mounter" as the second argument, and to the
+          "updater" as the first argument
+        </p>
+        <p class="mt-2 text-sm text-gray-400 font-normal">
+          Updaters can access and use the "props" values in the mounter as
+          closures, but they can make the mistake of not getting the updated
+          state if the value is "call by value".
+        </p>
+      </div>
+      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <Parent />
-      </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-        <p class="mt-1 text-sm text-slate-200 font-normal">
-          "props" 는 마운터의 두번째 인자로 받거나 업데이트의 첫번째 인자로
-          받아서 사용할수 있습니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-200 font-normal">
-          하지만 업데이터는 마운터의 상태에 클로저로 접근하므로, 가져오는 값이
-          "call by value"로 되어 있는 값은 업데이트된 상태를 가져오지 못한다는걸
-          잊지 마십시오.
-        </p>
       </div>
     </div>
   );

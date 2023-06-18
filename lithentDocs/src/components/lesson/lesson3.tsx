@@ -84,26 +84,29 @@ const Parent = mount(renew => {
 
 export const Lesson3 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-slate-50 text-lg mb-4">Lesson 3 - mountCallback</h3>
-      <div class="px-4 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+    <div class="p-2 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
+        EX 3 - mountCallback
+      </h3>
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+        <p class="text-base text-slate-50">mountCallback</p>
+        <p class="mt-2 text-sm text-gray-400">
+          The "mountcallback" runs after the component is created in the actual
+          dom.
+        </p>
+        <p class="mt-2 text-sm text-gray-400">
+          The function returned by "mountCallback" is executed on unmount.
+        </p>
+      </div>
+      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <Parent />
-      </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-        <p class="mt-2 text-lg text-slate-50">mountCallback</p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          mountCallback 은 컴포넌트가 realdom에 만들어 진 후 실행됩니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          mountCallback 이 리턴하는 함수는 unmount 될때 실행됩니다.
-        </p>
       </div>
     </div>
   );

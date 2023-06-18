@@ -83,28 +83,30 @@ const Parent = mount(renew => {
 
 export const Lesson4 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-slate-50 text-lg mb-4">Lesson 4 - updateCallback</h3>
-      <div class="px-4 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+    <div class="p-2 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
+        EX 4 - updateCallback
+      </h3>
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+        <p class="text-base text-slate-50">updateCallback</p>
+        <p class="mt-2 text-sm text-gray-400">
+          The "updateCallback" is executed after the component is requested to
+          update, but before it is updated. It is used for clean up purposes.
+        </p>
+        <p class="mt-2 text-sm text-gray-400">
+          The function returned by updateCallback is executed after the
+          component update is complete.
+        </p>
+      </div>
+      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
         <Parent />
-      </div>
-      <div class="px-4 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-        <p class="mt-2 text-lg text-slate-50">updateCallback</p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          updateCallback 은 컴포넌트에 update가 요청되어 갱신되기 전에
-          실행됩니다.
-        </p>
-        <p class="mt-1 text-sm text-slate-100 font-thin">
-          updateCallback 이 리턴하는 함수는 컴포넌트가 업데이트 된 후
-          실행됩니다.
-        </p>
       </div>
     </div>
   );
