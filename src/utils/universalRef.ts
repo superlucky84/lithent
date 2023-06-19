@@ -96,12 +96,35 @@ export const initMountHookState = (componentKey: Props) => {
   setComponetRef(componentKey);
 };
 
+const findNodeChilds = (nodeChildKey: Props, result: Props[]): Props[] => {
+  if (nodeChildKey) {
+    result.push(nodeChildKey);
+    const childVd = componentRef.get(nodeChildKey)?.vd?.value;
+    if (childVd?.nodeChildKey) {
+      return findNodeChilds(childVd?.nodeChildKey?.value, result);
+    }
+  }
+
+  return result;
+};
+
 const execRedrawQueue = () => {
+  let childItemList: Props[] = [];
+
+  redrawQueue.value.forEach(item => {
+    childItemList = childItemList.concat(
+      findNodeChilds(item.nodeChildKey, childItemList)
+    );
+  });
+
   const addedKey: Props[] = [];
   const result = redrawQueue.value.reduce((acc, item) => {
     const { componentKey } = item;
 
-    if (addedKey.includes(componentKey)) {
+    if (
+      childItemList.includes(componentKey) ||
+      addedKey.includes(componentKey)
+    ) {
       return acc;
     }
 
