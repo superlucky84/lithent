@@ -186,15 +186,15 @@ const typeReplace = (newWDom: WDom) => {
   const orignalElement = newWDom.el;
 
   if (parentWDom.type && orignalElement) {
-    const parentElement = parentWDom.el;
-    const newElement = wDomToDom(newWDom, true);
+    if (orignalElement.nodeType === 11) {
+      typeSortedReplace(newWDom);
+    } else {
+      const parentElement = findRealParentElement(parentWDom);
+      const newElement = wDomToDom(newWDom, true);
 
-    if (newWDom.oldProps) {
-      removeEvent(newWDom.oldProps, orignalElement);
-    }
-
-    if (parentElement) {
-      parentElement.replaceChild(newElement, orignalElement);
+      if (parentElement) {
+        parentElement.replaceChild(newElement, orignalElement);
+      }
     }
   }
 
