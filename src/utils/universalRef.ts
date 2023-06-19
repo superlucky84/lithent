@@ -26,10 +26,6 @@ export const pushNodeChildKey = (key: Props) => {
   }
 };
 
-export const removeNodeChildKey = (item: NodeChildKey) => {
-  nodeChildKeyList.value.splice(nodeChildKeyList.value.indexOf(item), 1);
-};
-
 export const cleanNodeChildKey = () => (nodeChildKeyList.value = []);
 
 export const startMakeNodeChildKey = (componentKey: Props) => {
