@@ -19,7 +19,6 @@ import {
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
-import { removeNodeChildKey } from '@/utils/universalRef';
 
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
@@ -33,10 +32,6 @@ export const makeNewWDomTree = (
   const isSameType = checkSameWDomWithOriginal[type](newWDom, originalWDom);
 
   const result = remakeNewWDom(newWDom, isSameType, originalWDom);
-
-  if (result?.nodeChildKey) {
-    removeNodeChildKey(result.nodeChildKey);
-  }
 
   return result;
 };

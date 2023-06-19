@@ -7,14 +7,17 @@ export const unmount = (effectAction: () => void) => {
 
 export const runUnmountQueueFromWDom = (newWDom: WDom) => {
   const { componentKey, nodeChildKey } = newWDom;
-  const childKeys = nodeChildKey?.value;
+  const childKey = nodeChildKey?.value;
 
   if (componentKey) {
     removeItem(componentKey);
   }
 
-  if (childKeys) {
-    childKeys.forEach(childKey => removeItem(childKey));
+  if (childKey) {
+    const childVd = componentRef.get(childKey)?.vd?.value;
+    if (childVd) {
+      runUnmountQueueFromWDom(childVd);
+    }
   }
 };
 

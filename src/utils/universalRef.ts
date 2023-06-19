@@ -1,8 +1,8 @@
 import { ComponentRef, ComponentSubKey, Props, NodeChildKey } from '@/types';
 
-type redrawQueueList = {
+type RedrawQueueList = {
   componentKey: Props;
-  nodeChildKey: Props[];
+  nodeChildKey: Props;
   exec: () => void;
 }[];
 
@@ -13,13 +13,18 @@ export const componentKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentRef: ComponentRef = new WeakMap();
 export const redrawQueue: {
-  value: { componentKey: Props; nodeChildKey: Props[]; exec: () => void }[];
+  value: { componentKey: Props; nodeChildKey: Props; exec: () => void }[];
 } = { value: [] };
 export const redrawQueueTimeout: { value: null | number } = { value: null };
 export const nodeChildKeyList: { value: NodeChildKey[] } = { value: [] };
 
-export const pushNodeChildKey = (key: Props) =>
-  nodeChildKeyList.value.forEach(item => item.value.push(key));
+export const pushNodeChildKey = (key: Props) => {
+  // nodeChildKeyList.value.forEach(item => item.value.push(key));
+  const nodeChild = nodeChildKeyList.value.pop();
+  if (nodeChild) {
+    nodeChild.value = key;
+  }
+};
 
 export const removeNodeChildKey = (item: NodeChildKey) => {
   nodeChildKeyList.value.splice(nodeChildKeyList.value.indexOf(item), 1);
@@ -28,7 +33,7 @@ export const removeNodeChildKey = (item: NodeChildKey) => {
 export const cleanNodeChildKey = () => (nodeChildKeyList.value = []);
 
 export const startMakeNodeChildKey = (componentKey: Props) => {
-  const nodeChildKey: NodeChildKey = { value: [] };
+  const nodeChildKey: NodeChildKey = { value: {} };
   pushNodeChildKey(componentKey);
   nodeChildKeyList.value.push(nodeChildKey);
 
@@ -48,6 +53,7 @@ export const componentRender = (componentKey: Props) => () => {
 
 export const setComponetRef = (componentKey: Props) => {
   componentRef.set(componentKey, {
+    vd: { value: null },
     up: () => {},
     upR: [],
     upS: { value: 0 },
@@ -67,7 +73,7 @@ export const getComponentSubInfo = (
 
 export const setRedrawAction = (
   componentKey: Props,
-  nodeChildKey: { value: Props[] },
+  nodeChildKey: { value: Props },
   exec: () => void
 ) => {
   componentRef.get(componentKey)!.up = () => {
@@ -91,20 +97,11 @@ export const initMountHookState = (componentKey: Props) => {
 };
 
 const execRedrawQueue = () => {
-  let childItemList: Props[] = [];
-
-  redrawQueue.value.forEach(item => {
-    childItemList = childItemList.concat(item.nodeChildKey);
-  });
-
   const addedKey: Props[] = [];
   const result = redrawQueue.value.reduce((acc, item) => {
     const { componentKey } = item;
 
-    if (
-      childItemList.includes(componentKey) ||
-      addedKey.includes(componentKey)
-    ) {
+    if (addedKey.includes(componentKey)) {
       return acc;
     }
 
@@ -112,7 +109,7 @@ const execRedrawQueue = () => {
     acc.push(item);
 
     return acc;
-  }, [] as redrawQueueList);
+  }, [] as RedrawQueueList);
 
   while (result.length) {
     const action = result.shift();
