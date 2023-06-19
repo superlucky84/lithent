@@ -54,11 +54,7 @@ export const h = (
   const nodeParentPointer: NodePointer = { value: undefined };
   const newProps = props || {};
   const newChildren = remakeChildren(nodeParentPointer, children);
-  const node = makeNode({
-    tag,
-    props: newProps,
-    children: newChildren,
-  });
+  const node = makeNode(tag, newProps, newChildren);
 
   if (!checkCustemComponentFunction(node)) {
     nodeParentPointer.value = node;
@@ -72,22 +68,17 @@ export const mount =
   (_props: T, _children: WDom[]) =>
     component;
 
-const reRenderCustomComponent = ({
-  tag,
-  props,
-  children,
-  originalWDom,
-}: {
-  tag: TagFunction;
-  props: Props;
-  children: WDom[];
-  originalWDom: WDom;
-}) => {
+const reRenderCustomComponent = (
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  originalWDom: WDom
+) => {
   needDiffRef.value = true;
   cleanNodeChildKey();
 
-  const newWDom = makeWDomResolver({ tag, props, children });
-  const newWDomTree = makeNewWDomTree({ originalWDom, newWDom });
+  const newWDom = makeWDomResolver(tag, props, children);
+  const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
   const { isRoot, getParent, wrapElement } = originalWDom;
 
   newWDomTree.getParent = getParent;
@@ -106,15 +97,7 @@ const reRenderCustomComponent = ({
   wDomUpdate(newWDomTree);
 };
 
-const makeWDomResolver = ({
-  tag,
-  props,
-  children,
-}: {
-  tag: TagFunction;
-  props: Props;
-  children: WDom[];
-}) => {
+const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
   const constructor = tag;
   // 리졸브는 컴포넌트를 새로 만든다.
@@ -140,12 +123,9 @@ const makeWDomResolver = ({
 
     const originalWDom = customNode;
 
-    setRedrawAction({
-      componentKey,
-      nodeChildKey,
-      exec: () =>
-        reRenderCustomComponent({ tag, props, children, originalWDom }),
-    });
+    setRedrawAction(componentKey, nodeChildKey, () =>
+      reRenderCustomComponent(tag, props, children, originalWDom)
+    );
 
     // update의 경우 diff 에서 제거
     if (!needDiffRef.value) {
@@ -185,11 +165,9 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
 
   wDomInfo.nodeChildKey = nodeChildKey;
 
-  setRedrawAction({
-    componentKey,
-    nodeChildKey,
-    exec: () => reRenderCustomComponent({ tag, props, children, originalWDom }),
-  });
+  setRedrawAction(componentKey, nodeChildKey, () =>
+    reRenderCustomComponent(tag, props, children, originalWDom)
+  );
 
   addComponentProps(originalWDom, wDomInfo);
 
@@ -215,19 +193,15 @@ const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
   });
 };
 
-const makeNode = ({
-  tag,
-  props,
-  children,
-}: {
-  tag: TagFunction | FragmentFunction | string;
-  props: Props;
-  children: WDom[];
-}) => {
+const makeNode = (
+  tag: TagFunction | FragmentFunction | string,
+  props: Props,
+  children: WDom[]
+) => {
   if (checkFragmentFunction(tag)) {
     return Fragment(props, ...children);
   } else if (checkCustemComponentFunction(tag)) {
-    const componetMakeResolver = makeWDomResolver({ tag, props, children });
+    const componetMakeResolver = makeWDomResolver(tag, props, children);
 
     return needDiffRef.value
       ? componetMakeResolver

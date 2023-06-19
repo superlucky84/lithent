@@ -275,16 +275,16 @@ const updateProps = ({
         const style = dataValue;
         const oldStyle = checkStyleData(dataKey, originalProps.style) || {};
 
-        updateStyle({ style, oldStyle, element });
+        updateStyle(style, oldStyle, element);
       } else if (checkRefData(dataKey, dataValue)) {
         dataValue.value = element;
       } else if (dataKey.match(/^on/)) {
-        updateEvent({
-          element: element as HTMLElement,
-          eventKey: dataKey,
-          newEventHandler: dataValue as (e: Event) => void,
-          oldEventHandler: originalProps[dataKey] as (e: Event) => void,
-        });
+        updateEvent(
+          element as HTMLElement,
+          dataKey,
+          dataValue as (e: Event) => void,
+          originalProps[dataKey] as (e: Event) => void
+        );
       } else if (checkTextareaElement(element) && dataKey === 'value') {
         (element as HTMLInputElement).value = dataValue as string;
       } else if (checkOptionElement(element) && dataKey === 'selected') {
@@ -348,17 +348,12 @@ const wDomChildrenToDom = (
   }
 };
 
-const updateEvent = ({
-  element,
-  eventKey,
-  newEventHandler,
-  oldEventHandler,
-}: {
-  element: HTMLElement;
-  eventKey: string;
-  newEventHandler: (e: Event) => void;
-  oldEventHandler: (e: Event) => void;
-}) => {
+const updateEvent = (
+  element: HTMLElement,
+  eventKey: string,
+  newEventHandler: (e: Event) => void,
+  oldEventHandler: (e: Event) => void
+) => {
   const eventName = eventKey.replace(/^on(.*)/, (_match, p1) =>
     p1.toLowerCase()
   );
@@ -374,15 +369,11 @@ const updateEvent = ({
   }
 };
 
-const updateStyle = ({
-  style,
-  oldStyle,
-  element,
-}: {
-  style: Record<string, string>;
-  oldStyle: Record<string, string>;
-  element?: HTMLElement | DocumentFragment | Text;
-}) => {
+const updateStyle = (
+  style: Record<string, string>,
+  oldStyle: Record<string, string>,
+  element?: HTMLElement | DocumentFragment | Text
+) => {
   const originalStyle = { ...oldStyle };
   const elementStyle = (element as HTMLElement)?.style;
 

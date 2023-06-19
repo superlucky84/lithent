@@ -7,11 +7,6 @@ import {
   WDomType,
 } from '@/types';
 
-type DiffParam = {
-  originalWDom?: WDom;
-  newWDom: WDom | TagFunction | TagFunctionResolver;
-};
-
 type WDomParam =
   | string
   | WDom
@@ -42,26 +37,32 @@ export const checkPlainType = (wDom: WDomParam, typeName: string) =>
 export const checkEmptyElement = (wDom: WDomParam) =>
   checkPlainWDomType(wDom) && !wDom.type;
 
-export const checkSameCustomComponent = ({
-  originalWDom,
-  newWDom,
-}: DiffParam) => newWDom.constructor === originalWDom?.constructor;
+export const checkSameCustomComponent = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) => newWDom.constructor === originalWDom?.constructor;
 
-export const checkSameFragment = ({ originalWDom, newWDom }: DiffParam) =>
+export const checkSameFragment = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) =>
   checkPlainWDomType(newWDom) &&
   originalWDom?.type === 'fragment' &&
   originalWDom?.children?.length === newWDom?.children?.length;
 
-export const checkSameTagElement = ({ originalWDom, newWDom }: DiffParam) =>
+export const checkSameTagElement = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) =>
   checkPlainWDomType(newWDom) &&
   originalWDom?.type === 'element' &&
   originalWDom?.tag === newWDom.tag &&
   originalWDom?.children?.length === newWDom?.children?.length;
 
-export const checkNormalTypeElement = ({
-  originalWDom,
-  newWDom,
-}: DiffParam) => {
+export const checkNormalTypeElement = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) => {
   return (
     checkPlainWDomType(newWDom) &&
     originalWDom?.type === newWDom.type &&

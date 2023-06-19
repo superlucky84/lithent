@@ -21,33 +21,18 @@ import {
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { removeNodeChildKey } from '@/utils/universalRef';
 
-type DiffPrimaryParam = {
-  originalWDom?: WDom;
-  newWDom: WDom | TagFunctionResolver;
-  isSameType: boolean;
-};
-
-type DiffSecondeParam = {
-  originalWDom?: WDom;
-  newWDom: WDom;
-  isSameType: boolean;
-};
-
-export const makeNewWDomTree = ({
-  originalWDom,
-  newWDom,
-}: {
-  originalWDom?: WDom;
-  newWDom: WDom | TagFunctionResolver;
-}) => {
+export const makeNewWDomTree = (
+  newWDom: WDom | TagFunctionResolver,
+  originalWDom?: WDom
+) => {
   const type = getWDomType(newWDom);
 
   if (!type) {
     throw new Error('Unknown type wdom');
   }
-  const isSameType = checkSameWDomWithOriginal[type]({ originalWDom, newWDom });
+  const isSameType = checkSameWDomWithOriginal[type](newWDom, originalWDom);
 
-  const result = remakeNewWDom({ originalWDom, newWDom, isSameType });
+  const result = remakeNewWDom(newWDom, isSameType, originalWDom);
 
   if (result?.nodeChildKey) {
     removeNodeChildKey(result.nodeChildKey);
@@ -56,24 +41,24 @@ export const makeNewWDomTree = ({
   return result;
 };
 
-const remakeNewWDom = ({
-  newWDom,
-  originalWDom,
-  isSameType,
-}: DiffPrimaryParam) => {
-  const remakeWDom = generalize({ newWDom, originalWDom, isSameType });
+const remakeNewWDom = (
+  newWDom: WDom | TagFunctionResolver,
+  isSameType: boolean,
+  originalWDom?: WDom
+) => {
+  const remakeWDom = generalize(newWDom, isSameType, originalWDom);
 
-  remakeWDom.children = remakeChildrenForDiff({
+  remakeWDom.children = remakeChildrenForDiff(
+    remakeWDom,
     isSameType,
-    newWDom: remakeWDom,
-    originalWDom,
-  });
+    originalWDom
+  );
 
-  const needRerender = addReRenderTypeProperty({
-    originalWDom,
-    newWDom: remakeWDom,
+  const needRerender = addReRenderTypeProperty(
+    remakeWDom,
     isSameType,
-  });
+    originalWDom
+  );
 
   remakeWDom.needRerender = needRerender;
 
@@ -96,11 +81,11 @@ const remakeNewWDom = ({
   return remakeWDom;
 };
 
-const addReRenderTypeProperty = ({
-  originalWDom,
-  newWDom,
-  isSameType,
-}: DiffSecondeParam): RenderType | undefined => {
+const addReRenderTypeProperty = (
+  newWDom: WDom,
+  isSameType: boolean,
+  originalWDom?: WDom
+): RenderType | undefined => {
   const existOriginalWDom = originalWDom && originalWDom.type;
   const isEmptyElement = checkEmptyElement(newWDom);
   const isRoot = !newWDom.getParent;
@@ -128,11 +113,11 @@ const addReRenderTypeProperty = ({
   return result;
 };
 
-const generalize = ({
-  newWDom,
-  originalWDom,
-  isSameType,
-}: DiffPrimaryParam): WDom => {
+const generalize = (
+  newWDom: WDom | TagFunctionResolver,
+  isSameType: boolean,
+  originalWDom?: WDom
+): WDom => {
   if (checkCustemComponentFunction(newWDom)) {
     return isSameType && originalWDom
       ? reRender(originalWDom, newWDom)
@@ -142,18 +127,18 @@ const generalize = ({
   return newWDom;
 };
 
-const remakeChildrenForDiff = ({
-  isSameType,
-  newWDom,
-  originalWDom,
-}: DiffSecondeParam) =>
+const remakeChildrenForDiff = (
+  newWDom: WDom,
+  isSameType: boolean,
+  originalWDom?: WDom
+) =>
   isSameType && originalWDom
     ? remakeChildrenForUpdate(newWDom, originalWDom)
     : remakeChildrenForAdd(newWDom);
 
 const remakeChildrenForAdd = (newWDom: WDom) =>
   (newWDom.children || []).map((item: WDom) => {
-    const childItem = makeNewWDomTree({ newWDom: item });
+    const childItem = makeNewWDomTree(item);
 
     childItem.getParent = () => newWDom;
 
@@ -169,10 +154,10 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
   }
 
   return (newWDom.children || []).map((item: WDom, index: number) => {
-    const childItem = makeNewWDomTree({
-      newWDom: item,
-      originalWDom: (originalWDom.children || [])[index],
-    });
+    const childItem = makeNewWDomTree(
+      item,
+      (originalWDom.children || [])[index]
+    );
 
     childItem.getParent = () => newWDom;
 
@@ -203,10 +188,7 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
 
   const remakedChildren = newChildren.map(item => {
     const originalItem = findSameKeyOriginalItem(item, originalChildren);
-    const childItem = makeNewWDomTree({
-      newWDom: item,
-      originalWDom: originalItem,
-    });
+    const childItem = makeNewWDomTree(item, originalItem);
 
     if (originalItem) {
       originalChildren.splice(originalChildren.indexOf(originalItem), 1);

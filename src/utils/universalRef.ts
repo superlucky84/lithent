@@ -65,15 +65,11 @@ export const getComponentSubInfo = (
   subKey: ComponentSubKey
 ) => componentRef.get(componentKey)![subKey];
 
-export const setRedrawAction = ({
-  componentKey,
-  nodeChildKey,
-  exec,
-}: {
-  componentKey: Props;
-  nodeChildKey: { value: Props[] };
-  exec: () => void;
-}) => {
+export const setRedrawAction = (
+  componentKey: Props,
+  nodeChildKey: { value: Props[] },
+  exec: () => void
+) => {
   componentRef.get(componentKey)!.up = () => {
     redrawQueue.value.push({
       componentKey,
