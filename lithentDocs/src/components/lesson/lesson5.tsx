@@ -65,40 +65,37 @@ const Component = mount((r, _props) => {
 
 export const Lesson5 = mount(() => {
   return () => (
-    <div class="p-2 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
         EX 5 - helper (state)
       </h3>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-        <p class="text-base text-slate-50">Helper</p>
-        <p class="mt-2 text-sm text-gray-400">
-          The "state" function defined in the example code delegates a value and
-          a "renew" function from the component and then executes it whenever
-          the value changes.
-        </p>
-        <p class="mt-2 text-sm text-gray-400">
-          Users can implement and use several forms of helpers themselves by
-          utilizing the "renew" function.
-        </p>
-        <p class="mt-2 text-sm text-gray-400">
-          The state function used in the example is pre-implemented in
-          'lithent/helper', so you can just pull it out and write it to and
-          write it. But it's just an example.
-        </p>
-        <p class="mt-2 text-sm text-gray-400">
-          In addition to "state", we've implemented helper codes like "store",
-          "computed", and "effect" in 'lithent/helper', which are described in
-          detail in the examples page.
-        </p>
-      </div>
-      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        The "state" function defined in the example code delegates a value and a
+        "renew" function from the component and then executes it whenever the
+        value changes.
+      </p>
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        Users can implement and use several forms of helpers themselves by
+        utilizing the "renew" function.
+      </p>
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        The state function used in the example is pre-implemented in
+        'lithent/helper', so you can just pull it out and write it to and write
+        it. But it's just an example.
+      </p>
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        In addition to "state", we've implemented helper codes like "store",
+        "computed", and "effect" in 'lithent/helper', which are described in
+        detail in the examples page.
+      </p>
+      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <Component />
       </div>
     </div>

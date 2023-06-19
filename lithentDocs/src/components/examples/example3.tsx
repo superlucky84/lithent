@@ -4,7 +4,9 @@ import { store } from 'lithent/helper';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code = `// index.html
+const code = `import { h, Fragment, render, mount } from 'lithent';
+import { store } from 'lithent/helper';
+
 /*
 <div>
   <span>1</span>
@@ -13,9 +15,48 @@ const code = `// index.html
 </div>
 */
 
-// app.tsx
-import { h, Fragment, render, mount } from 'lithent';
-import { store } from 'lithent/helper';
+/* store
+const storeGroup = new Map<string | symbol, unknown>();
+const storeRenderList: {[key: string | symbol]: (() => boolean)[];} = {};
+
+export const store = <T extends {}>(value: T) => {
+  const storeKey = Symbol();
+  storeGroup.set(storeKey, value);
+
+  return (renew: () => boolean) => {
+    storeRenderList[storeKey] ??= [];
+    storeRenderList[storeKey].push(renew);
+
+    return updater<T>(storeKey);
+  };
+};
+
+const updater = <T extends { [key: string | symbol]: unknown }>(
+  storeKey: string | symbol
+) =>
+  new Proxy(storeGroup.get(storeKey) as T, {
+    get(target: T, prop: string) {
+      return target[prop];
+    },
+    set(target, prop: keyof T, value) {
+      target[prop] = value;
+      const renderList = storeRenderList[storeKey];
+      const trashCollections: (() => boolean)[] = [];
+
+      renderList.forEach(renew => {
+        if (!renew()) {
+          trashCollections.push(renew);
+        }
+      });
+
+      trashCollections.forEach(deleteTarget =>
+        renderList.splice(renderList.indexOf(deleteTarget), 1)
+      );
+
+      return true;
+    },
+  });
+*/
 
 const assignShardStore = store<{ text: string; count: number }>({ text: 'sharedText' });
 
@@ -55,7 +96,7 @@ const Component = mount(renew => {
   );
 });
 
-export const Lesson6 = mount(() => {
+export const Example3 = mount(() => {
   const htmlRef = ref<null | HTMLElement>(null);
 
   mountCallback(() => {
@@ -76,23 +117,12 @@ export const Lesson6 = mount(() => {
   });
 
   return () => (
-    <div class="p-4 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">EX 6 - render</h3>
-      <p class="text-lg text-slate-50">render</p>
-      <p class="mt-2 text-sm md:text-base text-gray-400">
-        The third argument to the "render" method allows you to insert a virtual
-        dome in front of the specified element.
-      </p>
-      <p class="mt-2 text-sm md:text-base text-gray-400">
-        The first argument to the "render" method is the virtual dome, the
-        second argument is the virtual dome's parent element, and the third
-        argument specifies the specific location where the virtual dome will be
-        inserted.
-      </p>
-      <p class="mt-2 text-lg text-slate-50">store helper</p>
-      <p class="mt-2 text-sm md:text-base text-gray-400">
-        The "store" used in the example is a helper implementation like "state".
-        A detailed implementation can be found on the examples page.
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
+        Example 3 - helper (store)
+      </h3>
+      <p class="text-sm md:text-base text-gray-400">
+        Computed helps you use precomputed values directly in the updater.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div

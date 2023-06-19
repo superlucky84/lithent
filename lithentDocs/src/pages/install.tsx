@@ -18,12 +18,12 @@ const code2 = `// Babel
 `;
 const code3 = `...
 {
-  "plugins": [
-    ["@babel/plugin-transform-react-jsx", {
-      "pragma": "h",
-      "pragmaFrag": "Fragment",
-    }]
-  ]
+  "compilerOptions": {
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    //...
+  }
 }
 ...
 `;
@@ -40,6 +40,7 @@ const code4 = `...
 `;
 
 const code5 = `...
+// typescript config
 {
   "compilerOptions": {
     "jsx": "preserve",
@@ -47,6 +48,17 @@ const code5 = `...
     "jsxFragmentFactory": "Fragment",
     //...
   }
+}
+
+// babel config
+{
+  presets: [
+    "@babel/env",
+    ["@babel/typescript", { jsxPragma: "h" }],
+  ],
+  plugins: [
+    ["@babel/transform-react-jsx", { pragma: "h" }]
+  ],
 }
 ...
 `;
@@ -77,52 +89,56 @@ export const Install = mount(() => {
     <div class="max-w-3xl px-4 pt-6 xl:gap-4 dark:bg-gray-900">
       <ContentHeader title="Install" />
       {/*<!-- Right Content --> */}
-      <div class="p-4 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-        <h3 class="text-slate-50 text-lg mb-2">Install Lithent</h3>
-        <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
-          <div
-            class="font-normal"
-            innerHTML={exCode1}
-            style={{ whiteSpace: 'pre' }}
-          />
-        </div>
-        <h3 class="text-slate-50 text-lg mb-2">Setting JSX - Babel</h3>
-        <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
-          <div
-            class="font-normal"
-            innerHTML={exCode2}
-            style={{ whiteSpace: 'pre' }}
-          />
-        </div>
-        <h3 class="text-slate-50 text-lg mb-2">
-          Setting JSX - Typescript &lt; 4.1.1
-        </h3>
-        <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
-          <div
-            class="font-normal"
-            innerHTML={exCode3}
-            style={{ whiteSpace: 'pre' }}
-          />
-        </div>
-        <h3 class="text-slate-50 text-lg mb-2">
-          Setting JSX - Typescript &gt;= 4.1.1
-        </h3>
-        <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
-          <div
-            class="font-normal"
-            innerHTML={exCode4}
-            style={{ whiteSpace: 'pre' }}
-          />
-        </div>
-        <h3 class="text-slate-50 text-lg mb-2">
-          Setting JSX - If you use TypeScript within a Babel toolchain
-        </h3>
-        <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
-          <div
-            class="font-normal"
-            innerHTML={exCode5}
-            style={{ whiteSpace: 'pre' }}
-          />
+      <h3 class="text-slate-50 text-lg mb-2">Install Lithent</h3>
+      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-black">
+        <div
+          class="font-normal"
+          innerHTML={exCode1}
+          style={{ whiteSpace: 'pre' }}
+        />
+      </div>
+
+      <h3 class="text-slate-50 text-lg mt-8">JSX Setting</h3>
+      <div class="p-4 mb-2 mt-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+        <div>
+          <h3 class="text-slate-50 text-lg mb-2">Setting JSX - Babel</h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode2}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+          <h3 class="text-slate-50 text-lg mb-2 mt-8">
+            Setting JSX - Typescript &lt; 4.1.1
+          </h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode3}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+          <h3 class="text-slate-50 text-lg mb-2 mt-8">
+            Setting JSX - Typescript &gt;= 4.1.1
+          </h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode4}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+          <h3 class="text-slate-50 text-lg mb-2 mt-8">
+            Setting JSX - If you use TypeScript within a Babel toolchain
+          </h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode5}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
         </div>
       </div>
     </div>

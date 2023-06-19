@@ -76,28 +76,25 @@ const Parent = mount(renew => {
 
 export const Lesson2 = mount(() => {
   return () => (
-    <div class="p-2 mb-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">EX 2 - Props</h3>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
-        <p class="text-base text-slate-50">Props</p>
-        <p class="text-sm text-gray-400 font-normal">
-          "props" is given to the "mounter" as the second argument, and to the
-          "updater" as the first argument
-        </p>
-        <p class="mt-2 text-sm text-gray-400 font-normal">
-          Updaters can access and use the "props" values in the mounter as
-          closures, but they can make the mistake of not getting the updated
-          state if the value is "call by value".
-        </p>
-      </div>
-      <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <p class="text-sm md:text-base text-gray-400 font-normal">
+        "props" is given to the "mounter" as the second argument, and to the
+        "updater" as the first argument
+      </p>
+      <p class="mt-2 text-sm md:text-base text-gray-400 font-normal">
+        Updaters can access and use the "props" values in the mounter as
+        closures, but they can make the mistake of not getting the updated state
+        if the value is "call by value".
+      </p>
+      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <Parent />
       </div>
     </div>

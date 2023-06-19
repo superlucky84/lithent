@@ -1,9 +1,8 @@
 /**
  * DataStore
  */
-// const storeGroup: { [key: string]: UseDataStoreValue } = {};
 const storeGroup = new Map<string | symbol, unknown>();
-const dataStoreRenderQueue: {
+const storeRenderList: {
   [key: string | symbol]: (() => boolean)[];
 } = {};
 
@@ -12,8 +11,8 @@ export const store = <T extends {}>(value: T) => {
   storeGroup.set(storeKey, value);
 
   return (renew: () => boolean) => {
-    dataStoreRenderQueue[storeKey] ??= [];
-    dataStoreRenderQueue[storeKey].push(renew);
+    storeRenderList[storeKey] ??= [];
+    storeRenderList[storeKey].push(renew);
 
     return updater<T>(storeKey);
   };
@@ -28,17 +27,17 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
     },
     set(target, prop: keyof T, value) {
       target[prop] = value;
-      const dataStoreQueue = dataStoreRenderQueue[storeKey];
+      const renderList = storeRenderList[storeKey];
       const trashCollections: (() => boolean)[] = [];
 
-      dataStoreQueue.forEach(renew => {
+      renderList.forEach(renew => {
         if (!renew()) {
           trashCollections.push(renew);
         }
       });
 
       trashCollections.forEach(deleteTarget =>
-        dataStoreQueue.splice(dataStoreQueue.indexOf(deleteTarget), 1)
+        renderList.splice(renderList.indexOf(deleteTarget), 1)
       );
 
       return true;

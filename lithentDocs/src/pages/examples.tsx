@@ -2,6 +2,8 @@ import { h, mount } from 'lithent';
 import { ContentHeader } from '@/components/contentHeader';
 import { Example1 } from '@/components/examples/example1';
 import { Example2 } from '@/components/examples/example2';
+import { Example3 } from '@/components/examples/example3';
+import { Example4 } from '@/components/examples/example4';
 
 export const Examples = mount(() => {
   return () => (
@@ -11,6 +13,8 @@ export const Examples = mount(() => {
       {/*<!-- Right Content --> */}
       <Example1 />
       <Example2 />
+      <Example3 />
+      <Example4 />
     </div>
   );
 });
