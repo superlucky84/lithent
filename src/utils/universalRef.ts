@@ -100,8 +100,9 @@ const findNodeChilds = (nodeChildKey: Props, result: Props[]): Props[] => {
   if (nodeChildKey) {
     result.push(nodeChildKey);
     const childVd = componentRef.get(nodeChildKey)?.vd?.value;
-    if (childVd?.nodeChildKey) {
-      return findNodeChilds(childVd?.nodeChildKey?.value, result);
+
+    if (childVd?.nodeChildKey?.value) {
+      return findNodeChilds(childVd.nodeChildKey.value, result);
     }
   }
 

@@ -129,6 +129,9 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
 
     (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
       customNode;
+    if (!needDiffRef.value) {
+      cleanNodeChildKey();
+    }
 
     return customNode;
   };
@@ -171,6 +174,10 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
 
   (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
     originalWDom;
+
+  if (!needDiffRef.value) {
+    cleanNodeChildKey();
+  }
 
   return originalWDom;
 };
