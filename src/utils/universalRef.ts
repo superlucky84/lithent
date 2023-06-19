@@ -1,4 +1,10 @@
-import { ComponentRef, ComponentSubKey, Props, NodeChildKey } from '@/types';
+import {
+  ComponentRef,
+  ComponentSubKey,
+  Props,
+  NodeChildKey,
+  WDom,
+} from '@/types';
 
 type RedrawQueueList = {
   componentKey: Props;
@@ -92,26 +98,25 @@ export const initMountHookState = (componentKey: Props) => {
   setComponetRef(componentKey);
 };
 
-const findNodeChilds = (nodeChildKey: Props, result: Props[]): Props[] => {
-  if (nodeChildKey) {
-    result.push(nodeChildKey);
-    const childVd = componentRef.get(nodeChildKey)?.vd?.value;
-
-    if (childVd?.nodeChildKey?.value) {
-      return findNodeChilds(childVd.nodeChildKey.value, result);
+const recursiveGetChildKeys = (wDom: WDom, result: Props[]) => {
+  (wDom.children || []).forEach(item => {
+    const childComKey = item.componentKey;
+    if (childComKey) {
+      result.push(childComKey);
     }
-  }
 
-  return result;
+    recursiveGetChildKeys(item, result);
+  });
 };
 
 const execRedrawQueue = () => {
   let childItemList: Props[] = [];
 
   redrawQueue.value.forEach(item => {
-    childItemList = childItemList.concat(
-      findNodeChilds(item.nodeChildKey, childItemList)
-    );
+    const childVd = componentRef.get(item.componentKey)?.vd?.value;
+    if (childVd) {
+      recursiveGetChildKeys(childVd, childItemList);
+    }
   });
 
   const addedKey: Props[] = [];

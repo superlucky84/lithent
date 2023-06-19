@@ -6,24 +6,30 @@ export const unmount = (effectAction: () => void) => {
 };
 
 export const runUnmountQueueFromWDom = (newWDom: WDom) => {
-  const { componentKey, nodeChildKey } = newWDom;
-  const childKey = nodeChildKey?.value;
+  const { componentKey } = newWDom;
 
   if (componentKey) {
     removeItem(componentKey);
   }
+  recursiveRunUnmount(newWDom);
+};
 
-  if (childKey) {
-    const childVd = componentRef.get(childKey)?.vd?.value;
-    if (childVd) {
-      runUnmountQueueFromWDom(childVd);
+const recursiveRunUnmount = (wDom: WDom) => {
+  (wDom.children || []).forEach(item => {
+    const childComKey = item.componentKey;
+    if (childComKey) {
+      runUnmountQueueFromWDom(item);
+    } else {
+      recursiveRunUnmount(item);
     }
-  }
+  });
 };
 
 const removeItem = (componentKey: Props) => {
-  const queue = componentRef.get(componentKey)!.umts;
-  componentRef.get(componentKey)!.umts = [];
-  queue.forEach(effect => effect());
-  componentRef.delete(componentKey);
+  const subInfo = componentRef.get(componentKey);
+  if (subInfo) {
+    subInfo!.umts.forEach(effect => effect());
+    subInfo!.umts = [];
+    componentRef.delete(componentKey);
+  }
 };
