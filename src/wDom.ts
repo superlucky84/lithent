@@ -16,9 +16,7 @@ import {
   initMountHookState,
   setRedrawAction,
   needDiffRef,
-  cleanNodeChildKey,
   componentRender,
-  startMakeNodeChildKey,
   getComponentSubInfo,
 } from '@/utils/universalRef';
 import { runUpdateCallback } from '@/hook/updateCallback';
@@ -35,7 +33,6 @@ type WDomInfoParam = {
   tag: TagFunction;
   props: Props;
   children: WDom[];
-  nodeChildKey: { value: Props };
 };
 type WDomInfoWithRenderParam = WDomInfoParam & {
   reRender: () => WDom;
@@ -75,7 +72,6 @@ const reRenderCustomComponent = (
   originalWDom: WDom
 ) => {
   needDiffRef.value = true;
-  cleanNodeChildKey();
 
   const newWDom = makeWDomResolver(tag, props, children);
   const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
@@ -104,7 +100,6 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const resolve = (componentKey = props) => {
     initMountHookState(componentKey);
 
-    const nodeChildKey = startMakeNodeChildKey(componentKey);
     const component = tag(props, children);
     const componentMaker = component(
       componentRender(componentKey),
@@ -118,18 +113,16 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
       tag,
       props,
       children,
-      nodeChildKey,
     });
 
     const originalWDom = customNode;
 
-    setRedrawAction(componentKey, nodeChildKey, () =>
+    setRedrawAction(componentKey, () =>
       reRenderCustomComponent(tag, props, children, originalWDom)
     );
 
     (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
       customNode;
-    cleanNodeChildKey();
 
     return customNode;
   };
@@ -159,12 +152,9 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   initUpdateHookState(componentKey);
   runUpdateCallback();
 
-  const nodeChildKey = startMakeNodeChildKey(componentKey);
   const originalWDom = componentMaker(props);
 
-  wDomInfo.nodeChildKey = nodeChildKey;
-
-  setRedrawAction(componentKey, nodeChildKey, () =>
+  setRedrawAction(componentKey, () =>
     reRenderCustomComponent(tag, props, children, originalWDom)
   );
 
@@ -173,13 +163,11 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
     originalWDom;
 
-  cleanNodeChildKey();
-
   return originalWDom;
 };
 
 const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
-  const { componentKey, tag, props, children, reRender, nodeChildKey } = info;
+  const { componentKey, tag, props, children, reRender } = info;
 
   Object.assign(wDom, {
     componentProps: props,
@@ -187,7 +175,6 @@ const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
     constructor: tag,
     tagName: tag.name,
     componentKey,
-    nodeChildKey,
     reRender,
   });
 };

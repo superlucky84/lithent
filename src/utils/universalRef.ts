@@ -1,14 +1,7 @@
-import {
-  ComponentRef,
-  ComponentSubKey,
-  Props,
-  NodeChildKey,
-  WDom,
-} from '@/types';
+import { ComponentRef, ComponentSubKey, Props, WDom } from '@/types';
 
 type RedrawQueueList = {
   componentKey: Props;
-  nodeChildKey: Props;
   exec: () => void;
 }[];
 
@@ -19,29 +12,9 @@ export const componentKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentRef: ComponentRef = new WeakMap();
 export const redrawQueue: {
-  value: { componentKey: Props; nodeChildKey: Props; exec: () => void }[];
+  value: { componentKey: Props; exec: () => void }[];
 } = { value: [] };
 export const redrawQueueTimeout: { value: null | number } = { value: null };
-export const nodeChildKeyList: { value: NodeChildKey[] } = { value: [] };
-
-export const pushNodeChildKey = (key: Props) => {
-  // nodeChildKeyList.value.forEach(item => item.value.push(key));
-  const nodeChild = nodeChildKeyList.value.pop();
-  if (nodeChild) {
-    nodeChild.value = key;
-  }
-};
-
-export const cleanNodeChildKey = () => (nodeChildKeyList.value = []);
-
-export const startMakeNodeChildKey = (componentKey: Props) => {
-  const nodeChildKey: NodeChildKey = { value: {} };
-  pushNodeChildKey(componentKey);
-  nodeChildKeyList.value.push(nodeChildKey);
-
-  return nodeChildKey;
-};
-
 export const componentRender = (componentKey: Props) => () => {
   const up = componentRef.get(componentKey)?.up;
   let result = false;
@@ -73,15 +46,10 @@ export const getComponentSubInfo = (
   subKey: ComponentSubKey
 ) => componentRef.get(componentKey)![subKey];
 
-export const setRedrawAction = (
-  componentKey: Props,
-  nodeChildKey: { value: Props },
-  exec: () => void
-) => {
+export const setRedrawAction = (componentKey: Props, exec: () => void) => {
   componentRef.get(componentKey)!.up = () => {
     redrawQueue.value.push({
       componentKey,
-      nodeChildKey: nodeChildKey.value,
       exec,
     });
     if (!redrawQueueTimeout.value) {

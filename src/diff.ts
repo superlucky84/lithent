@@ -11,7 +11,6 @@ import { WDom, TagFunctionResolver, RenderType } from '@/types';
 import { checkCustemComponentFunction } from '@/utils/predicator';
 import { getParent, reRender } from '@/utils';
 import { recursiveRemoveEvent } from '@/render';
-import { cleanNodeChildKey } from '@/utils/universalRef';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
@@ -33,10 +32,6 @@ export const makeNewWDomTree = (
   const isSameType = checkSameWDomWithOriginal[type](newWDom, originalWDom);
 
   const result = remakeNewWDom(newWDom, isSameType, originalWDom);
-
-  if (result?.nodeChildKey) {
-    cleanNodeChildKey();
-  }
 
   return result;
 };
