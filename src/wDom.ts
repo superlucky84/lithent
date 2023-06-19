@@ -16,10 +16,10 @@ import {
   initMountHookState,
   setRedrawAction,
   needDiffRef,
-  removeNodeChildKey,
   cleanNodeChildKey,
   componentRender,
   startMakeNodeChildKey,
+  getComponentSubInfo,
 } from '@/utils/universalRef';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
@@ -35,7 +35,7 @@ type WDomInfoParam = {
   tag: TagFunction;
   props: Props;
   children: WDom[];
-  nodeChildKey: { value: Props[] };
+  nodeChildKey: { value: Props };
 };
 type WDomInfoWithRenderParam = WDomInfoParam & {
   reRender: () => WDom;
@@ -127,10 +127,8 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
       reRenderCustomComponent(tag, props, children, originalWDom)
     );
 
-    // update의 경우 diff 에서 제거
-    if (!needDiffRef.value) {
-      removeNodeChildKey(nodeChildKey);
-    }
+    (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
+      customNode;
 
     return customNode;
   };
@@ -171,10 +169,8 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
 
   addComponentProps(originalWDom, wDomInfo);
 
-  // update의 경우 diff 에서 제거
-  if (!needDiffRef.value) {
-    removeNodeChildKey(nodeChildKey);
-  }
+  (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
+    originalWDom;
 
   return originalWDom;
 };

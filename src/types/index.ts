@@ -26,7 +26,7 @@ export type FragmentFunction = (props: Props, children: WDom[]) => WDom;
 
 export type NodePointer = { value: WDom | undefined };
 
-export type NodeChildKey = { value: Props[] };
+export type NodeChildKey = { value: Props };
 
 export type MiddleStateWDom =
   | WDom
@@ -73,6 +73,7 @@ export type RenderType =
   | 'N'; // NONE
 
 export type ComponentSubKey =
+  | 'vd'
   | 'up'
   | 'upR'
   | 'upS'
@@ -84,6 +85,7 @@ export type ComponentSubKey =
 export type ComponentRef = WeakMap<
   Props,
   {
+    vd: { value: null | WDom };
     up: () => void;
     upR: (() => void)[];
     upS: { value: number };
