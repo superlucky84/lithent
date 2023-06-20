@@ -1,6 +1,6 @@
 {
   "name": "lithent",
-  "version": "0.31.1",
+  "version": "0.32.0",
   "description": "lithent",
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/lithent.umd.js",
@@ -18,13 +18,13 @@
     "watch:helper": "pnpm --filter lithent-helper watch",
     "build": "pnpm build:core && pnpm build:helper && pnpm build:examples && pnpm build:docs",
     "build:p": "pnpm build:core && pnpm -r build",
-    "dev": "pnpm watch:core & pnpm watch:helper & pnpm watch:router & pnpm dev:examples",
+    "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
     "test": "jest",
     "test:watch": "jest --watch",
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm watch:router & pnpm --filter lithent-docs dev"
+    "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev"
   },
   "exports": {
     ".": {

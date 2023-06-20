@@ -4,7 +4,7 @@ import { effect, state } from 'lithent/helper';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code = `import { h, Fragment, render, mount, updateCallback, mountCallback } from 'lithent';
+const code = `import { h, Fragment, render, mount } from 'lithent';
 import { state, effect } from 'lithent/helper';
 
 const Children = mount((r, props) => {
