@@ -9,7 +9,7 @@ used lightly with other libraries.
 `(9.54 KiB / gzip: 3.54 KiB)`
 
 ## 🚩 Table of Contents
-* [Basic Guide](#-basic-guide)
+* [Basic Guide](#basic-guide)
 * [How To Install](#how-to-install)
   * [Width HTM](#with-htm)
   * [Width JSX](#with-jsx)
@@ -32,6 +32,13 @@ pnpm add lithent
 
 ```bash
 pnpm add -D htm
+```
+
+```js
+import { h, render, mount } from 'lithent';
+import htm from 'htm';
+const html = htm.bind(h);
+);
 ```
 
 #### With JSX
