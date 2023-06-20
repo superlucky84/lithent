@@ -31,7 +31,6 @@
     "highlight.js": "^11.8.0",
     "lithent": "workspace:*",
     "lithent-helper": "workspace:*",
-    "lithent-router": "workspace:*",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2"
   }
