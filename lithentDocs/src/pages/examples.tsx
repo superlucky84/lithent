@@ -14,7 +14,7 @@ import { Example11 } from '@/components/examples/example11';
 
 export const Examples = mount(() => {
   return () => (
-    <div class="grid grid-cols-1 xl:grid-cols-2 px-4 pt-6 xl:gap-4 dark:bg-gray-900">
+    <div class="grid grid-cols-1 xl:grid-cols-2 px-4 pt-6 xl:gap-4 bg-gray-900">
       <ContentHeader title="Examples" />
 
       {/*<!-- Right Content --> */}
