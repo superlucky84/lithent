@@ -12,7 +12,7 @@ used lightly with other libraries.
 `(9.54 KiB / gzip: 3.54 KiB)`
 
 ## 🚩 Table of Contents
-* [Why Use Lithent](#why-use-litent)
+* [Why Use Lithent](#why-use-lithent)
 * [Basic Guide](#basic-guide)
 * [How To Install](#how-to-install)
   * [Width HTM](#with-htm)
