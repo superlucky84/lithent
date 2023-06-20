@@ -10,7 +10,7 @@ import { Lesson6 } from '@/components/lesson/lesson6';
 // grid grid-cols-1 xl:grid-cols-2
 export const Guide = mount(() => {
   return () => (
-    <div class="max-w-3xl px-4 pt-6 xl:gap-4 bg-gray-900">
+    <div class="max-w-4xl px-4 pt-6 xl:gap-4 bg-gray-900">
       <ContentHeader title="Basic Guide" />
 
       <div class="mb-4 col-span-full xl:mb-2">

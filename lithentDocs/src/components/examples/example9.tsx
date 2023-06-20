@@ -33,7 +33,7 @@ const Input = mount(r => {
 
 export const Example9 = mount(() => {
   return () => (
-    <div class="p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
+    <div class="flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">Example 9 - Input</h3>
       <p class="text-sm md:text-base text-gray-400">
         Test that the "Input" control is working properly.
@@ -45,7 +45,7 @@ export const Example9 = mount(() => {
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
+      <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <Input />
       </div>
     </div>

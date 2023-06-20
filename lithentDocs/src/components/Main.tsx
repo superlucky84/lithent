@@ -15,7 +15,7 @@ export const Main = mount(r => {
       ></div>
       <div
         id="main-content"
-        class="relative w-full h-full max-w-screen-xl overflow-y-auto lg:ml-64 bg-gray-900"
+        class="relative w-full h-full max-w-screen-2xl overflow-y-auto lg:ml-64 bg-gray-900"
       >
         <Mainbody />
       </div>
