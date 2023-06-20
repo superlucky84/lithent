@@ -78,7 +78,7 @@ const Children = mount<{ logEl: { value: HTMLElement | null } }>((r, props) => {
       <button
         onClick={change}
         type="button"
-        class="ml-2 text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+        class="ml-2 text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
       >
         increase
       </button>
@@ -101,7 +101,7 @@ const Parent = mount(renew => {
       <button
         onClick={toggleMount}
         type="button"
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
       >
         toggleMount
       </button>
@@ -112,7 +112,7 @@ const Parent = mount(renew => {
 
 export const Example4 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
         Example 4 - helper (effect)
       </h3>
@@ -140,14 +140,14 @@ export const Example4 = mount(() => {
       <p class="text-sm md:text-base text-gray-400 mb-2">
         The third argument must be a "function" that returns an array
       </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <Parent />
       </div>
     </div>

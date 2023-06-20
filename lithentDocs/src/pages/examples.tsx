@@ -4,6 +4,13 @@ import { Example1 } from '@/components/examples/example1';
 import { Example2 } from '@/components/examples/example2';
 import { Example3 } from '@/components/examples/example3';
 import { Example4 } from '@/components/examples/example4';
+import { Example5 } from '@/components/examples/example5';
+import { Example6 } from '@/components/examples/example6';
+import { Example7 } from '@/components/examples/example7';
+import { Example8 } from '@/components/examples/example8';
+import { Example9 } from '@/components/examples/example9';
+import { Example10 } from '@/components/examples/example10';
+import { Example11 } from '@/components/examples/example11';
 
 export const Examples = mount(() => {
   return () => (
@@ -15,6 +22,13 @@ export const Examples = mount(() => {
       <Example2 />
       <Example3 />
       <Example4 />
+      <Example5 />
+      <Example6 />
+      <Example7 />
+      <Example8 />
+      <Example9 />
+      <Example10 />
+      <Example11 />
     </div>
   );
 });

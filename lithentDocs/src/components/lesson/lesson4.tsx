@@ -87,7 +87,7 @@ const Parent = mount(renew => {
 
 export const Lesson4 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
         Lesson 4 - updateCallback
       </h3>
@@ -104,14 +104,22 @@ export const Lesson4 = mount(() => {
         target values when an update to a specific value needs to be detected.
         If omitted, it will always be executed.
       </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        By combining updateCallback and mountCallback, you can create a helper
+        similar to react's useEffect. Check out the{' '}
+        <a class="text-orange-200" href="#examples">
+          examples
+        </a>{' '}
+        page to see how to use the effect helper.
+      </p>
+      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <Parent />
       </div>
     </div>

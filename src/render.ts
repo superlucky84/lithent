@@ -18,6 +18,8 @@ import {
   checkExisty,
   checkOptionElement,
   checkTextareaElement,
+  checkCheckboxElement,
+  checkRadioElement,
 } from '@/utils/predicator';
 
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
@@ -281,6 +283,10 @@ const updateProps = (
           dataValue as (e: Event) => void,
           originalProps[dataKey] as (e: Event) => void
         );
+      } else if (checkRadioElement(element) && dataKey === 'checked') {
+        (element as HTMLInputElement).checked = !!dataValue;
+      } else if (checkCheckboxElement(element) && dataKey === 'checked') {
+        (element as HTMLInputElement).checked = !!dataValue;
       } else if (checkTextareaElement(element) && dataKey === 'value') {
         (element as HTMLInputElement).value = dataValue as string;
       } else if (checkOptionElement(element) && dataKey === 'selected') {

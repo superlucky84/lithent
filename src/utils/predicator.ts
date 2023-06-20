@@ -97,6 +97,14 @@ export const checkTextareaElement = (element: any): element is HTMLElement => {
   return element.nodeType === 1 && element.tagName === 'TEXTAREA';
 };
 
+export const checkCheckboxElement = (element: any): element is HTMLElement => {
+  return element.nodeType === 1 && element.type === 'checkbox';
+};
+
+export const checkRadioElement = (element: any): element is HTMLElement => {
+  return element.nodeType === 1 && element.type === 'radio';
+};
+
 export const checkNormalAttribute = (
   dataValue: unknown
 ): dataValue is number | string =>
