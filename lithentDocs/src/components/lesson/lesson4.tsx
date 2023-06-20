@@ -6,13 +6,14 @@ import 'highlight.js/styles/hybrid.css';
 const code = `import { h, Fragment, render, mount, updateCallback } from 'lithent';
 
 const Children = mount<{ count: number }>((_r, props) => {
-  updateCallback(() => {
-    console.log('clean up');
+  updateCallback(
+    () => {
+      console.log('clean up');
 
-    return () => {
-      console.log('updated');
-    };
-  });
+      return () => console.log('updated');
+    },
+    () => [props.count]
+  );
   return ({ count }) => <span>child updated count: {count}</span>;
 });
 
@@ -43,17 +44,20 @@ const Children = mount<{
   count: number;
   logEl: { value: HTMLElement | null };
 }>((_r, props) => {
-  updateCallback(() => {
-    const ele = props.logEl.value as HTMLElement;
-    ele.innerHTML += 'clean up<br>';
-    ele.scrollTo(0, ele.scrollHeight);
-
-    return () => {
+  updateCallback(
+    () => {
       const ele = props.logEl.value as HTMLElement;
-      ele.innerHTML += 'updated<br>';
+      ele.innerHTML += 'clean up<br>';
       ele.scrollTo(0, ele.scrollHeight);
-    };
-  });
+
+      return () => {
+        const ele = props.logEl.value as HTMLElement;
+        ele.innerHTML += 'updated<br>';
+        ele.scrollTo(0, ele.scrollHeight);
+      };
+    },
+    () => [props.count]
+  );
   return ({ count }) => <span>child updated count: {count}</span>;
 });
 
@@ -85,7 +89,7 @@ export const Lesson4 = mount(() => {
   return () => (
     <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        EX 4 - updateCallback
+        Lesson 4 - updateCallback
       </h3>
       <p class="mt-2 text-sm md:text-base text-gray-400">
         The "updateCallback" is executed after the component is requested to
@@ -94,6 +98,11 @@ export const Lesson4 = mount(() => {
       <p class="mt-2 text-sm md:text-base text-gray-400">
         The function returned by updateCallback is executed after the component
         update is complete.
+      </p>
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        Defines a function "() =&gt; [props.count]" that returns an array of
+        target values when we need to detect updates to a specific value. If
+        omitted, it will always run.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div

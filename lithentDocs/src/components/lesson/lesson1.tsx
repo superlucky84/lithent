@@ -57,7 +57,7 @@ export const Lesson1 = mount(() => {
   return () => (
     <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        EX 1 - Mounter & Updater & Renew
+        Lesson1 1 - Mounter & Updater & Renew
       </h3>
       <p class="text-base text-lg text-slate-50">Mounter</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
@@ -75,8 +75,8 @@ export const Lesson1 = mount(() => {
       </p>
       <p class="mt-2 text-lg text-slate-50">Renew</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        Triggered when a component needs to be updated within a defined method
-        of the mounter. Use when a component needs to be updated.
+        renew is used when you need to update a component from a method defined
+        in the mounter.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div

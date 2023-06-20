@@ -29,7 +29,7 @@ const Parent = mount(renew => {
   return () => (
     <>
       <button onClick={change}>Toggle</button>
-      {count % 2 === 0 ? <Children count={count} logEl={logEl} /> : null}
+      {count % 2 === 0 ? <Children count={count} /> : null}
     </>
   );
 });
@@ -86,7 +86,7 @@ export const Lesson3 = mount(() => {
   return () => (
     <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        EX 3 - mountCallback
+        Lesson 3 - mountCallback
       </h3>
       <p class="mt-2 text-sm md:text-base text-gray-400">
         The "mountcallback" runs after the component is created in the actual
