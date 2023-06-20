@@ -100,9 +100,9 @@ export const Lesson4 = mount(() => {
         update is complete.
       </p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        Defines a function "() =&gt; [props.count]" that returns an array of
-        target values when we need to detect updates to a specific value. If
-        omitted, it will always run.
+        Defines a function as the second argument that returns an array of
+        target values when an update to a specific value needs to be detected.
+        If omitted, it will always be executed.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div

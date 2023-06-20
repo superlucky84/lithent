@@ -1,4 +1,4 @@
-import { h, mount, render, ref, mountCallback } from 'lithent';
+import { h, Fragment, mount } from 'lithent';
 import { store } from 'lithent/helper';
 
 import hljs from 'highlight.js';
@@ -7,122 +7,80 @@ import 'highlight.js/styles/hybrid.css';
 const code = `import { h, Fragment, render, mount } from 'lithent';
 import { store } from 'lithent/helper';
 
-/*
-<div>
-  <span>1</span>
-  <span>2</span>
-  <span>3</span>
-</div>
-*/
-
-/* store
-const storeGroup = new Map<string | symbol, unknown>();
-const storeRenderList: {[key: string | symbol]: (() => boolean)[];} = {};
-
-export const store = <T extends {}>(value: T) => {
-  const storeKey = Symbol();
-  storeGroup.set(storeKey, value);
-
-  return (renew: () => boolean) => {
-    storeRenderList[storeKey] ??= [];
-    storeRenderList[storeKey].push(renew);
-
-    return updater<T>(storeKey);
-  };
-};
-
-const updater = <T extends { [key: string | symbol]: unknown }>(
-  storeKey: string | symbol
-) =>
-  new Proxy(storeGroup.get(storeKey) as T, {
-    get(target: T, prop: string) {
-      return target[prop];
-    },
-    set(target, prop: keyof T, value) {
-      target[prop] = value;
-      const renderList = storeRenderList[storeKey];
-      const trashCollections: (() => boolean)[] = [];
-
-      renderList.forEach(renew => {
-        if (!renew()) {
-          trashCollections.push(renew);
-        }
-      });
-
-      trashCollections.forEach(deleteTarget =>
-        renderList.splice(renderList.indexOf(deleteTarget), 1)
-      );
-
-      return true;
-    },
-  });
-*/
-
-const assignShardStore = store<{ text: string; count: number }>({ text: 'sharedText' });
-
 const Component = mount(r => {
-  const shardStore = assignShardStore(r);
-  const changeInput = (event) => {
-    shardStore.text = event.target.value;
+  const local = store<{ count1: number; count2: number; count3: number }>({
+    count1: 1,
+    count2: 1,
+    count3: 1,
+  })(r);
+
+  const click = () => {
+    local.count1 += 1;
+    local.count2 -= 1;
+    local.count3 *= 2;
   };
-  return () => <textarea type="text" onInput={changeInput} value={shardStore.text} />;
+  return () => (
+    <>
+      <div>count1: {local.count1}</div>
+      <div>count2: {local.count2}</div>
+      <div>count3: {local.count3}</div>
+      <button type="text" onClick={click}>
+        change count
+      </button>
+    </>
+  );
 });
 
-render(<Component />, element, element.querySelector('span:nth-of-type(2)'));
-render(<Component />, element, element.querySelector('span:nth-of-type(3)'));
+render(<Parent />, document.getElementById('root'));
 `;
 
 const exCode1 = hljs.highlight(code, {
   language: 'javascript',
 }).value;
 
-const assignShardStore = store<{ text: string; count: number }>({
-  text: 'sharedText',
-  count: 3,
-});
+const Component = mount(r => {
+  const local = store<{ count1: number; count2: number; count3: number }>({
+    count1: 1,
+    count2: 1,
+    count3: 1,
+  })(r);
 
-const Component = mount(renew => {
-  const shardStore = assignShardStore(renew);
-  const changeInput = (event: InputEvent) => {
-    shardStore.text = (event.target as HTMLInputElement).value;
+  const click = () => {
+    local.count1 += 1;
+    local.count2 -= 1;
+    local.count3 *= 2;
   };
   return () => (
-    <textarea
-      type="text"
-      onInput={changeInput}
-      value={shardStore.text}
-      style={{ width: '100px', height: '100px' }}
-    />
+    <>
+      <div>count1: {local.count1}</div>
+      <div>count2: {local.count2}</div>
+      <div>count3: {local.count3}</div>
+      <button
+        type="text"
+        onClick={click}
+        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+      >
+        change count
+      </button>
+    </>
   );
 });
 
 export const Example3 = mount(() => {
-  const htmlRef = ref<null | HTMLElement>(null);
-
-  mountCallback(() => {
-    const element = htmlRef.value as HTMLElement;
-    if (element) {
-      render(
-        <Component />,
-        element,
-        element.querySelector('span:nth-of-type(2)') as HTMLElement
-      );
-
-      render(
-        <Component />,
-        element,
-        element.querySelector('span:nth-of-type(3)') as HTMLElement
-      );
-    }
-  });
-
   return () => (
     <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        Example 3 - helper (store)
+        Example 3 - helper (local store)
       </h3>
       <p class="text-sm md:text-base text-gray-400">
-        Computed helps you use precomputed values directly in the updater.
+        You can also use "store" only in local component.&nbsp;
+        <a
+          class="text-orange-200"
+          href="https://github.com/superlucky84/lithent/blob/master/helper/src/hook/store.ts"
+          target="_blank"
+        >
+          source link
+        </a>
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div
@@ -132,11 +90,7 @@ export const Example3 = mount(() => {
         />
       </div>
       <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
-        <div ref={htmlRef}>
-          <span class="p-2">1</span>
-          <span class="p-2">2</span>
-          <span class="p-2">3</span>
-        </div>
+        <Component />
       </div>
     </div>
   );

@@ -91,8 +91,12 @@ export const Lesson6 = mount(() => {
       </p>
       <p class="mt-2 text-lg text-slate-50">store helper</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        The "store" used in the example is a helper implementation like "state".
-        A detailed implementation can be found on the examples page.
+        The "store" used in the examples is a helper implementation, like
+        "state". More detailed usage can be found on the{' '}
+        <a class="text-orange-200" href="#examples">
+          examples
+        </a>{' '}
+        page.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div

@@ -57,7 +57,7 @@ export const Lesson1 = mount(() => {
   return () => (
     <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        Lesson1 1 - Mounter & Updater & Renew
+        Lesson1 - Mounter & Updater & Renew
       </h3>
       <p class="text-base text-lg text-slate-50">Mounter</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">

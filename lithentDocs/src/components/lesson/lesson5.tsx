@@ -85,8 +85,12 @@ export const Lesson5 = mount(() => {
       </p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
         In addition to "state", we've implemented helper codes like "store",
-        "computed", and "effect" in 'lithent/helper', which are described in
-        detail in the examples page.
+        "computed", and "effect" in "lithent/helper", and their usage is
+        described on the{' '}
+        <a class="text-orange-200" href="#examples">
+          examples
+        </a>{' '}
+        page.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
         <div
