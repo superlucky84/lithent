@@ -1,84 +1,87 @@
-# litheNT Basic Usage
+# lithent
 
-litheNT is a virtualDOM implementation library that behaves similarly to React.
+> A lightweight Virtual DOM UI library
 
-[production motive](https://medium.com/p/d14ba89373d3)
-
-Lithent were developed to make it easy to insert VirtualDOM component
+Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
 used lightly with other libraries.
 
-## Basic Guide with Examples
+`(9.54 KiB / gzip: 3.54 KiB)`
+
+## 🚩 Table of Contents
+* [Basic Guide](#-basic-guide)
+* [How To Install](#how-to-install)
+  * [Width HTM](#with-htm)
+  * [Width JSX](#with-jsx)
+* [Examples](#examples)
+* [Develop Guide](#develop-guide)
+
+## Basic Guide
 
 * https://superlucky84.github.io/lithent/
 
-## Install
+## How To Install
 
 ```bash
 pnpm add lithent 
 ```
 
-## With JSX
+#### With HTM
 
-Please include the JSX option in the build tool you use.
+* [Htm Github](https://github.com/developit/htm)
+
+```bash
+pnpm add -D htm
+```
+
+#### With JSX
+
+* [Setting Guide](https://superlucky84.github.io/lithent/#install)
+
+## Examples
+
+* [More Examples](https://superlucky84.github.io/lithent/#examples)
 
 ```js
-// vite.config.js
+import { h, render, mount, Fragment } from 'lithent';
+import { state } from 'lithent/helper';
+import htm from 'htm';
+const html = htm.bind(h);
 
-export default defineConfig({
-  ...
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
-  },
-  ...
+const Component = mount((r, _props) => {
+  const count = state(0, r);
+
+  const change = () => (count.v += 1);
+
+  // Updater
+  return () => html`
+    <${Fragment}>
+      <li>count: ${count.v}</li>
+      <button onClick=${change}>increase</button>
+    <//>
+  `;
 });
-```
 
-## Example
-
-```jsx
-import { h, Fragment, render, mount } from 'lithent';
-import { state, effect } from 'lithent/helper';
-
-const Children = mount((renew, props) => {
-  const count = state<number>(0, renew);
-  const change = () => {
-    count.value += 1;
-  };
-
-  effect(
-    () => console.log('INJECT'),
-    () => console.log('CLEAN UP'),
-    () => [count.value]
-  );
-
-  return () => (
-    <>
-      <button onClick={change} type="button">
-        increase
-      </button>
-      <span>count: {count.v}</span>
-    </>
-  );
-});
+render(html`<${Component} />`, document.getElementById('root'));
 
 // insertBefore
-// render(<Root />, document.getElementById('wrapElement'), document.getElementById('nextElement'));
+// render(<Root />, document.getElementById('root'), document.getElementById('nextElement'));
 
 // appendChild
-render(<Root />, document.getElementById('wrapElement'));
+render(<Root />, document.getElementById('root'));
 ```
 
-# Develop
+## Develop Guide
 
-## pnpm install (this project was created using pnpm.)
+It's open source, so you can develop and contribute together.
+
+### pnpm install (this project was created using pnpm.)
 
 ```bash
 npm install -g pnpm
 ```
 
-## project install
+### project install
 ```bash
 git clone https://github.com/superlucky84/lithent.git
 
@@ -87,12 +90,12 @@ cd lithent
 pnpm install
 ```
 
-## project build
+### project build
 ```bash
 pnpm build
 ```
 
-## Running the development environment
+### Running the development environment
 ```bash
 pnpm dev // or pnpm dev:core
 ```

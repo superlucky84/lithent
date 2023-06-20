@@ -105,4 +105,3 @@ export const Example2 = mount(() => {
     </div>
   );
 });
-

@@ -21,7 +21,7 @@ const state = <T>(value: T, renew: () => boolean): { value: T } => {
   };
 };
 
-const Component = mount((renew, _props) => {
+const Component = mount((r, _props) => {
   const count = state<number>(0, r);
 
   const change = () => count.value += 1;
@@ -29,7 +29,7 @@ const Component = mount((renew, _props) => {
   // Updater
   return () => (
     <>
-      <li>count: {count}</li>
+      <li>count: {count.v}</li>
       <button onClick={change}>increase</button>
     </>
   );
