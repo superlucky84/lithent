@@ -6,13 +6,14 @@ import 'highlight.js/styles/hybrid.css';
 const code = `import { h, Fragment, render, mount, updateCallback } from 'lithent';
 
 const Children = mount<{ count: number }>((_r, props) => {
-  updateCallback(() => {
-    console.log('clean up');
+  updateCallback(
+    () => {
+      console.log('clean up');
 
-    return () => {
-      console.log('updated');
-    };
-  });
+      return () => console.log('updated');
+    },
+    () => [props.count]
+  );
   return ({ count }) => <span>child updated count: {count}</span>;
 });
 
@@ -43,17 +44,20 @@ const Children = mount<{
   count: number;
   logEl: { value: HTMLElement | null };
 }>((_r, props) => {
-  updateCallback(() => {
-    const ele = props.logEl.value as HTMLElement;
-    ele.innerHTML += 'clean up<br>';
-    ele.scrollTo(0, ele.scrollHeight);
-
-    return () => {
+  updateCallback(
+    () => {
       const ele = props.logEl.value as HTMLElement;
-      ele.innerHTML += 'updated<br>';
+      ele.innerHTML += 'clean up<br>';
       ele.scrollTo(0, ele.scrollHeight);
-    };
-  });
+
+      return () => {
+        const ele = props.logEl.value as HTMLElement;
+        ele.innerHTML += 'updated<br>';
+        ele.scrollTo(0, ele.scrollHeight);
+      };
+    },
+    () => [props.count]
+  );
   return ({ count }) => <span>child updated count: {count}</span>;
 });
 
@@ -83,9 +87,9 @@ const Parent = mount(renew => {
 
 export const Lesson4 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        EX 4 - updateCallback
+        Lesson 4 - updateCallback
       </h3>
       <p class="mt-2 text-sm md:text-base text-gray-400">
         The "updateCallback" is executed after the component is requested to
@@ -95,14 +99,27 @@ export const Lesson4 = mount(() => {
         The function returned by updateCallback is executed after the component
         update is complete.
       </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        Defines a function as the second argument that returns an array of
+        target values when an update to a specific value needs to be detected.
+        If omitted, it will always be executed.
+      </p>
+      <p class="mt-2 text-sm md:text-base text-gray-400">
+        By combining updateCallback and mountCallback, you can create a helper
+        similar to react's useEffect. Check out the{' '}
+        <a class="text-orange-200" href="#examples">
+          examples
+        </a>{' '}
+        page to see how to use the effect helper.
+      </p>
+      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <Parent />
       </div>
     </div>

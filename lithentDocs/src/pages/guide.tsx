@@ -16,8 +16,8 @@ export const Guide = mount(() => {
       <div class="mb-4 col-span-full xl:mb-2">
         <p class="text-gray-400">
           Lithent were developed to make it easy to insert VirtualDOM component
-          fragments into pages already drawn with SSR, and are intended for
-          lightweight, secondary use within other libraries.
+          fragments into pages already drawn with SSR, and are intended to be
+          used lightly with other libraries.
         </p>
         <p class="mt-4 text-gray-400">
           After watching the six simple examples below, you should have an

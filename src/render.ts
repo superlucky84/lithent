@@ -18,6 +18,8 @@ import {
   checkExisty,
   checkOptionElement,
   checkTextareaElement,
+  checkCheckboxElement,
+  checkRadioElement,
 } from '@/utils/predicator';
 
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
@@ -228,7 +230,7 @@ const typeUpdate = (newWDom: WDom) => {
   if (element) {
     const { oldProps, props } = newWDom;
 
-    updateProps({ oldProps, props, element });
+    updateProps(props, element, oldProps);
 
     delete newWDom.oldProps;
 
@@ -250,15 +252,11 @@ const updateText = (newWDom: WDom) => {
   }
 };
 
-const updateProps = ({
-  oldProps,
-  props,
-  element,
-}: {
-  oldProps?: Props;
-  props?: Props;
-  element?: HTMLElement | DocumentFragment | Text;
-}) => {
+const updateProps = (
+  props?: Props,
+  element?: HTMLElement | DocumentFragment | Text,
+  oldProps?: Props
+) => {
   const originalProps = { ...oldProps };
 
   Object.entries(props || {}).forEach(
@@ -285,6 +283,10 @@ const updateProps = ({
           dataValue as (e: Event) => void,
           originalProps[dataKey] as (e: Event) => void
         );
+      } else if (checkRadioElement(element) && dataKey === 'checked') {
+        (element as HTMLInputElement).checked = !!dataValue;
+      } else if (checkCheckboxElement(element) && dataKey === 'checked') {
+        (element as HTMLInputElement).checked = !!dataValue;
       } else if (checkTextareaElement(element) && dataKey === 'value') {
         (element as HTMLInputElement).value = dataValue as string;
       } else if (checkOptionElement(element) && dataKey === 'selected') {
@@ -316,7 +318,7 @@ const wDomToDom = (wDom: WDom, init: boolean) => {
   }
 
   wDomChildrenToDom(children, element, init);
-  updateProps({ props, element });
+  updateProps(props, element);
 
   wDom.el = element;
 
@@ -393,8 +395,6 @@ const findRealParentElement = (
   vDom: WDom
 ): HTMLElement | DocumentFragment | Text | undefined => {
   const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
-  // const isNull = !vDom.type;
-
   if (vDom.isRoot && isVirtualType) {
     return vDom.wrapElement;
   }

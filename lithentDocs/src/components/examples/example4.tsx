@@ -4,55 +4,30 @@ import { effect, state } from 'lithent/helper';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code = `import { h, Fragment, render, mount, updateCallback, mountCallback } from 'lithent';
+const code = `import { h, Fragment, render, mount } from 'lithent';
 import { state, effect } from 'lithent/helper';
 
-/* effect
-const effect = (
-  forward: () => (() => void) | void,
-  backward: () => (() => void) | void = () => {},
-  dependencies: () => any[] = () => []
-) => {
-  mountCallback(() => {
-    forward();
-
-    return backward;
-  });
-
-  updateCallback(() => {
-    if (backward) {
-      backward();
-    }
-
-    return forward;
-  }, dependencies);
-};
-
-const Children = mount(r => {
-  let count = 0;
+const Children = mount((r, props) => {
+  const count = state<number>(0, r);
   const change = () => {
-    count += 1;
-    r();
+    count.v += 1;
   };
 
   effect(
-    () => {
-      console.log('INJECT');
-    },
-    () => {
-      console.log('CLEAN_UP');
-    },
-    () => [count]
+    () => console.log('INJECT'),
+    () => console.log('CLEAN UP'),
+    () => [count.v]
   );
 
   return () => (
     <>
-      <button onClick={change} type="button">increase</button>
-      <span>count: {count}</span>
+      <button onClick={change} type="button">
+        increase
+      </button>
+      <span>count: {count.v}</span>
     </>
   );
 });
-*/
 
 const Parent = mount(renew => {
   let mountState = true;
@@ -63,15 +38,10 @@ const Parent = mount(renew => {
 
   return () => (
     <>
-      <div class="text-sm overflow-y-scroll h-12"></div>
-      <button
-        onClick={toggleMount}
-        type="button"
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-      >
+      <button onClick={toggleMount} type="button">
         toggleMount
       </button>
-      {mountState ? <Children /> : null}
+      {mountState ? <Children logEl={logEl} /> : null}
     </>
   );
 });
@@ -108,7 +78,7 @@ const Children = mount<{ logEl: { value: HTMLElement | null } }>((r, props) => {
       <button
         onClick={change}
         type="button"
-        class="ml-2 text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+        class="ml-2 text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
       >
         increase
       </button>
@@ -131,7 +101,7 @@ const Parent = mount(renew => {
       <button
         onClick={toggleMount}
         type="button"
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
       >
         toggleMount
       </button>
@@ -142,13 +112,22 @@ const Parent = mount(renew => {
 
 export const Example4 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
         Example 4 - helper (effect)
       </h3>
       <p class="text-sm md:text-base text-gray-400 mb-2">
+        <a
+          class="text-orange-200"
+          href="https://github.com/superlucky84/lithent/blob/master/helper/src/hook/effect.ts"
+          target="_blank"
+        >
+          source link
+        </a>
+      </p>
+      <p class="text-sm md:text-base text-gray-400 mb-2">
         The first argument is an action that should happen after the monted or
-        updated.
+        updated.&nbsp;
       </p>
       <p class="text-sm md:text-base text-gray-400 mb-2">
         The second argument is a function to clean up before unmounting or
@@ -161,14 +140,14 @@ export const Example4 = mount(() => {
       <p class="text-sm md:text-base text-gray-400 mb-2">
         The third argument must be a "function" that returns an array
       </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <Parent />
       </div>
     </div>

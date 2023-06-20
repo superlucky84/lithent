@@ -1,5 +1,4 @@
 packages:
   - 'helper'
   - 'examples'
-  - 'router'
   - 'lithentDocs'

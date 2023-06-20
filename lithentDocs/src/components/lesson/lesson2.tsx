@@ -66,7 +66,7 @@ const Parent = mount(renew => {
       <button
         onClick={change}
         type="button"
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
+        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
       >
         Increase
       </button>
@@ -76,25 +76,25 @@ const Parent = mount(renew => {
 
 export const Lesson2 = mount(() => {
   return () => (
-    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 dark:border-gray-700 sm:p-6 dark:bg-gray-800">
-      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">EX 2 - Props</h3>
+    <div class="p-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">Lesson 2 - Props</h3>
       <p class="text-sm md:text-base text-gray-400 font-normal">
-        "props" is given to the "mounter" as the second argument, and to the
-        "updater" as the first argument
+        "props" is provided as the second argument to the "mounter" function and
+        as the first argument to the "updater".
       </p>
       <p class="mt-2 text-sm md:text-base text-gray-400 font-normal">
-        Updaters can access and use the "props" values in the mounter as
-        closures, but they can make the mistake of not getting the updated state
-        if the value is "call by value".
+        The updater function can access the "mounter"'s "props" value with a
+        closure, but be careful because you can make the mistake of not getting
+        the updated state if the value is "call by value".
       </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
           class="font-normal"
           innerHTML={exCode1}
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded dark:border-gray-600 bg-slate-950">
+      <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <Parent />
       </div>
     </div>
