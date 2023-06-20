@@ -11,6 +11,8 @@ import { Example8 } from '@/components/examples/example8';
 import { Example9 } from '@/components/examples/example9';
 import { Example10 } from '@/components/examples/example10';
 import { Example11 } from '@/components/examples/example11';
+import { Example12 } from '@/components/examples/example12';
+import { Example13 } from '@/components/examples/example13';
 
 export const Examples = mount(() => {
   return () => (
@@ -29,6 +31,8 @@ export const Examples = mount(() => {
       <Example9 />
       <Example10 />
       <Example11 />
+      <Example12 />
+      <Example13 />
     </div>
   );
 });

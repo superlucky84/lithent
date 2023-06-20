@@ -40,6 +40,7 @@ export const render = (
   const Dom = wDomToDom(wDom, true);
 
   if (afterElement) {
+    wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else {
     wrapElement.appendChild(Dom);
@@ -121,7 +122,14 @@ const typeAdd = (
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
-    const nextEl = startFindNextBrotherElement(newWDom, parentWDom);
+    const isLoop = parentWDom.type === 'loop';
+
+    let nextEl;
+    if (isLoop) {
+      nextEl = startFindNextBrotherElement(parentWDom, getParent(parentWDom));
+    } else {
+      nextEl = startFindNextBrotherElement(newWDom, parentWDom);
+    }
 
     if (newElement && parentEl) {
       if (nextEl) {
@@ -153,6 +161,8 @@ const startFindNextBrotherElement = (
 
   if (!parentWDom.isRoot && ['fragment', 'loop'].includes(parentType)) {
     return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
+  } else if (parentWDom.isRoot && parentWDom.afterElement) {
+    return parentWDom.afterElement;
   }
 
   return undefined;

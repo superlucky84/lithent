@@ -56,6 +56,7 @@ export interface WDom {
   componentProps?: Props;
   componentChildren?: WDom[];
   wrapElement?: HTMLElement;
+  afterElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?: RenderType;
 }

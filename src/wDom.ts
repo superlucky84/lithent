@@ -75,7 +75,7 @@ const reRenderCustomComponent = (
 
   const newWDom = makeWDomResolver(tag, props, children);
   const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
-  const { isRoot, getParent, wrapElement } = originalWDom;
+  const { isRoot, getParent, wrapElement, afterElement } = originalWDom;
 
   newWDomTree.getParent = getParent;
 
@@ -87,6 +87,7 @@ const reRenderCustomComponent = (
   } else {
     newWDomTree.isRoot = true;
     newWDomTree.wrapElement = wrapElement;
+    newWDomTree.afterElement = afterElement;
   }
 
   needDiffRef.value = false;
