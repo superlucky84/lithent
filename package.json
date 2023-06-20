@@ -10,8 +10,6 @@
     "dev:examples": "pnpm --filter lithent-examples dev",
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
-    "build:router": "pnpm --filter lithent-router build",
-    "watch:router": "pnpm --filter lithent-router watch",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
     "watch:core": "vite build --watch",
