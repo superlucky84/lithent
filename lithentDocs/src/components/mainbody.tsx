@@ -3,6 +3,7 @@ import { state, computed } from 'lithent/helper';
 import { Guide } from '@/pages/guide';
 import { Install } from '@/pages/install';
 import { Examples } from '@/pages/examples';
+import { About } from '@/pages/about';
 import { assignSharedStore } from '@/store';
 
 export const Mainbody = mount(r => {
@@ -17,9 +18,11 @@ export const Mainbody = mount(r => {
       return <Examples />;
     } else if ('#install' === hashState.v) {
       return <Install />;
+    } else if ('#about' === hashState.v) {
+      return <About />;
     }
     return <Guide />;
   });
 
-  return () => <main>{matchHash.v}</main>;
+  return () => <main class="h-full">{matchHash.v}</main>;
 });

@@ -12,12 +12,35 @@ used lightly with other libraries.
 `(9.54 KiB / gzip: 3.54 KiB)`
 
 ## 🚩 Table of Contents
+* [Why Use Lithent](#why-use-litent)
 * [Basic Guide](#basic-guide)
 * [How To Install](#how-to-install)
   * [Width HTM](#with-htm)
   * [Width JSX](#with-jsx)
 * [Examples](#examples)
 * [Develop Guide](#develop-guide)
+
+## Why use Lithent?
+
+### Lithent have the bare minimum of necessary functionality, with no unnecessary features.
+
+Since 'react' and 'vue', there have been a lot of UI libraries coming out that boast full-stack functionality.
+
+However, in the real world of development, there are times when you need to build something using only the bare minimum of key features, rather than a full-stack, full-featured library.
+
+Lithent has implemented the bare minimum functionality needed to create and update virtual DOM in general (we only need to know 'render', 'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
+
+We provide code to extend the basic functionality in the form of 'helpers', but using them is only optional and we want to encourage talented users to extend and develop custom helpers for their own projects.
+
+
+### Approach with the developer-friendly concept of closures between "component mounter" and "renderer"
+
+Many existing UI libraries have their advantages, but they also create rules that are too strong and rigid for fear of users making mistakes.
+
+JavaScript users are used to using closures and love to develop with them. 
+
+"Lithent" provide a familiar approach to real-world JavaScript development because they leverage the properties of higher-order functions and closures in the component mounter to define the properties of the component and get the mounted information from the renderer.
+
 
 ## Basic Guide
 
