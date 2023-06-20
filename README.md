@@ -6,6 +6,8 @@ Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
 used lightly with other libraries.
 
+* https://superlucky84.github.io/lithent
+
 `(9.54 KiB / gzip: 3.54 KiB)`
 
 ## 🚩 Table of Contents
