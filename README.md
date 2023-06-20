@@ -69,13 +69,11 @@ const Component = mount((r, _props) => {
   `;
 });
 
-render(html`<${Component} />`, document.getElementById('root'));
-
 // insertBefore
-// render(<Root />, document.getElementById('root'), document.getElementById('nextElement'));
+// render(`<${Component} />`, document.getElementById('root'), document.getElementById('nextElement'));
 
 // appendChild
-render(<Root />, document.getElementById('root'));
+render(html`<${Component} />`, document.getElementById('root'));
 ```
 
 ## Develop Guide
