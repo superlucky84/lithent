@@ -24,7 +24,7 @@ export const Guide = mount(() => {
           </a>{' '}
         </p>
         <p class="mt-4 text-gray-400">
-          After watching the six simple examples below, you should have an
+          After watching the eight simple examples below, you should have an
           almost complete understanding of Lithent.
         </p>
       </div>
