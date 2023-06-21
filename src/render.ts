@@ -87,7 +87,7 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
 };
 
 const rootDelete = (newWDom: WDom) => {
-  const parent = findRealParentElement(newWDom) as HTMLElement;
+  const parent = newWDom.wrapElement as HTMLElement;
 
   deleteRealDom(newWDom, parent);
 };
