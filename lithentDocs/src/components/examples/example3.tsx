@@ -72,15 +72,17 @@ export const Example3 = mount(() => {
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
         Example 3 - helper (local store)
       </h3>
-      <p class="text-sm md:text-base text-gray-400">
-        You can also use "store" only in local component.&nbsp;
+      <p class="text-sm md:text-base text-gray-400 mb-2">
         <a
-          class="text-orange-200"
+          class="text-orange-200 hover:underline"
           href="https://github.com/superlucky84/lithent/blob/master/helper/src/hook/store.ts"
           target="_blank"
         >
-          source link
+          view helper code
         </a>
+      </p>
+      <p class="text-sm md:text-base text-gray-400">
+        You can also use "store" only in local component.&nbsp;
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div

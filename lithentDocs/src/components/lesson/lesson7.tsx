@@ -3,25 +3,18 @@ import { h, mount, render, ref, mountCallback } from 'lithent';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code = `// index.html
+const code = `import { h, render, mount } from 'lithent';
+
 /*
 <div>
-  <span>1</span>
-  <span>2</span>
-  <span>3</span>
-  <button id="remove-button">remove first component</button>
+  <button id="remove-button">Destroy Component</button>
 </div>
 */
 
-// app.tsx
-import { h, Fragment, render, mount } from 'lithent';
-import { store } from 'lithent/helper';
-
 const Component = mount(() => () => <strong>Component</strong>);
-const destroyFirst = render(<Component />, element, element.querySelector('span:nth-of-type(2)'));
-render(<Component />, element, element.querySelector('span:nth-of-type(3)'));
+const destroy = render(<Component />, element, element.querySelector('button'));
 
-document.getElementById('remove-button').addEventListener('click', destroyFirst);
+document.getElementById('remove-button').addEventListener('click', destroy);
 `;
 
 const exCode1 = hljs.highlight(code, {
@@ -41,13 +34,7 @@ export const Lesson7 = mount(() => {
       destroy = render(
         <Component />,
         element,
-        element.querySelector('span:nth-of-type(2)') as HTMLElement
-      );
-
-      render(
-        <Component />,
-        element,
-        element.querySelector('span:nth-of-type(3)') as HTMLElement
+        element.querySelector('button') as HTMLElement
       );
     }
     buttenRef.value?.addEventListener('click', () => {
@@ -73,14 +60,11 @@ export const Lesson7 = mount(() => {
       </div>
       <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div ref={htmlRef}>
-          <span class="p-2">1</span>
-          <span class="p-2">2</span>
-          <span class="p-2">3</span>
           <button
             ref={buttenRef}
-            class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
+            class="ml-2 text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
           >
-            remove first component
+            Destroy Component
           </button>
         </div>
       </div>
