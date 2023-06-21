@@ -51,6 +51,8 @@ JavaScript users are used to using closures and love to develop with them.
 pnpm add lithent
 ```
 
+It's easier to use lithent with JSX or HTM.
+
 #### With HTM
 
 - [Htm Github](https://github.com/developit/htm)
