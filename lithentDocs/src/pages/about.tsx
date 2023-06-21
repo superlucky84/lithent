@@ -25,10 +25,9 @@ export const About = mount(() => {
         'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
       </p>
       <p class="text-gray-400 mt-4">
-        We provide code to extend the basic functionality in the form of
-        'helpers', but using them is only optional and we want to encourage
-        talented users to extend and develop custom helpers for their own
-        projects.
+        We provide code in the form of 'helpers' that extend the basic
+        functionality, but using the helpers is only optional and talented users
+        can extend and develop custom helpers for their own projects.
       </p>
       <h3 class="text-slate-50 text-lg mt-4">
         Approach with the developer-friendly concept of closures between

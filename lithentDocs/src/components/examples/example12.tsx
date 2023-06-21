@@ -100,8 +100,8 @@ export const Example12 = mount(() => {
         Example 12 - Root With Fragment
       </h3>
       <p class="text-sm md:text-base text-gray-400">
-        Test that 'Lithent' can correctly handle virtual dome elements when real
-        and virtual dome elements are mixed under one parent.
+        Test that 'Lithent' can correctly handle virtual DOM elements when real
+        and virtual DOM elements are mixed under one parent.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div

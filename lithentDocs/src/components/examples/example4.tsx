@@ -131,7 +131,7 @@ export const Example4 = mount(() => {
       </p>
       <p class="text-sm md:text-base text-gray-400 mb-2">
         The second argument is a function to clean up before unmounting or
-        updating the dome.
+        updating the DOM.
       </p>
       <p class="text-sm md:text-base text-gray-400 mb-2">
         The third argument puts in a dependency to detect updates only when a

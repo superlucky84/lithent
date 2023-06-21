@@ -79,7 +79,7 @@ export const Example2 = mount(() => {
         Example 2 - helper (store)
       </h3>
       <p class="text-sm md:text-base text-gray-400">
-        Computed helps you use precomputed values directly in the updater.&nbsp;
+        "store" is a helper for creating objects that share values.&nbsp;
         <a
           class="text-orange-200"
           href="https://github.com/superlucky84/lithent/blob/master/helper/src/hook/store.ts"
@@ -87,6 +87,10 @@ export const Example2 = mount(() => {
         >
           source link
         </a>
+      </p>
+      <p class="text-sm md:text-base text-gray-400">
+        Once again, the helper's functionality is just an example, and you can
+        use it to improve your implementation.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div

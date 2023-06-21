@@ -76,18 +76,17 @@ export const Lesson6 = mount(() => {
   });
 
   return () => (
-    <div class="p-4 mb-2 space-y-1  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
+    <div class="p-4 mb-2 border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">Lesson 6 - render</h3>
       <p class="text-lg text-slate-50">render</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
         The third argument to the "render" method allows you to insert a virtual
-        dome in front of the specified element.
+        DOM in front of the specified element.
       </p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        The first argument to the "render" method is the virtual dome, the
-        second argument is the virtual dome's parent element, and the third
-        argument specifies the specific location where the virtual dome will be
-        inserted.
+        The first argument to the "render" method is the virtual DOM, the second
+        argument is the virtual DOM's parent element, and the third argument
+        specifies the specific location where the virtual DOM will be inserted.
       </p>
       <p class="mt-2 text-lg text-slate-50">store helper</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">

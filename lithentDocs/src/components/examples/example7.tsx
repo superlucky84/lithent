@@ -30,7 +30,7 @@ export const Example7 = mount(() => {
       </h3>
       <p class="text-sm md:text-base text-gray-400">
         Tests the "innerHTML", which is used when you need to put string html
-        inside the virtualdome in special circumstances.
+        inside the virtual DOM in special circumstances.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
