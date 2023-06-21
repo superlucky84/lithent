@@ -4,10 +4,9 @@ import { state } from 'lithent/helper';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code = `import { h, mount, render, ref, mountCallback } from 'lithent';
+const code = `import { h, mount, render, ref } from 'lithent';
 import { state } from 'lithent/helper';
 
-// index.html
 /*
 <div id="root">
   <button>increase</button>
@@ -18,6 +17,7 @@ const Component = mount<{ apiRef: { value: null | (() => void) } }>(
   (r, { apiRef }) => {
     const count = state<number>(0, r);
     const elementRef = ref<null | HTMLElement>(null);
+
     apiRef.value = () => {
       count.v += 1;
       elementRef.value.style.border = '1px solid red';

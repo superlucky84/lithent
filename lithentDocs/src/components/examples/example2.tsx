@@ -78,15 +78,17 @@ export const Example2 = mount(() => {
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
         Example 2 - helper (store)
       </h3>
-      <p class="text-sm md:text-base text-gray-400">
-        "store" is a helper for creating objects that share values.&nbsp;
+      <p class="text-sm md:text-base text-gray-400 mb-2">
         <a
-          class="text-orange-200"
+          class="text-orange-200 hover:underline"
           href="https://github.com/superlucky84/lithent/blob/master/helper/src/hook/store.ts"
           target="_blank"
         >
-          source link
+          view helper code
         </a>
+      </p>
+      <p class="text-sm md:text-base text-gray-400">
+        "store" is a helper for creating objects that share values.&nbsp;
       </p>
       <p class="text-sm md:text-base text-gray-400">
         Once again, the helper's functionality is just an example, and you can
