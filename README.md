@@ -64,7 +64,6 @@ pnpm add -D htm
 import { h, render, mount } from 'lithent';
 import htm from 'htm';
 const html = htm.bind(h);
-);
 ```
 
 #### With JSX

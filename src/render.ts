@@ -22,6 +22,8 @@ import {
   checkRadioElement,
 } from '@/utils/predicator';
 
+import { componentRef } from '@/utils/universalRef';
+import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/utils';
@@ -45,6 +47,17 @@ export const render = (
   } else {
     wrapElement.appendChild(Dom);
   }
+
+  return () => {
+    if (wDom.componentProps) {
+      const component = componentRef.get(wDom.componentProps)?.vd.value;
+      if (component) {
+        runUnmountQueueFromWDom(component);
+        recursiveRemoveEvent(component);
+        rootDelete(component);
+      }
+    }
+  };
 };
 
 export const wDomUpdate = (newWDomTree: WDom) => {
@@ -73,14 +86,24 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
   });
 };
 
+const rootDelete = (newWDom: WDom) => {
+  const parent = findRealParentElement(newWDom) as HTMLElement;
+
+  deleteRealDom(newWDom, parent);
+};
+
 const typeDelete = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
-  const parent = findRealParentElement(parentWDom);
+  const parent = findRealParentElement(parentWDom) as HTMLElement;
 
   if (newWDom.oldProps && newWDom.el) {
     removeEvent(newWDom.oldProps, newWDom.el);
   }
 
+  deleteRealDom(newWDom, parent);
+};
+
+const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
     if (newWDom.el?.nodeType === 1) {
       parent.removeChild(newWDom.el);
@@ -221,7 +244,13 @@ const removeEvent = (
     Object.entries(oldProps || {}).forEach(
       ([dataKey, dataValue]: [string, unknown]) => {
         if (dataKey.match(/^on/)) {
-          element.removeEventListener(dataKey, dataValue as (e: Event) => void);
+          const eventName = dataKey.replace(/^on(.*)/, (_match, p1) =>
+            p1.toLowerCase()
+          );
+          element.removeEventListener(
+            eventName,
+            dataValue as (e: Event) => void
+          );
         }
       }
     );

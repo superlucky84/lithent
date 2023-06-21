@@ -11,7 +11,6 @@ const html = htm.bind(h);
 const Component = mount(() => () => html\`<li>count: \${'htm example'}</li>\`;
 
 render(html\`<\${Component} />\`);
-);
 `;
 
 const code = `$ npm install lithent`;

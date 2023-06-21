@@ -27,17 +27,6 @@ import {
 
 export type Children = WDom[];
 
-type WDomInfoParam = {
-  componentMaker: (props: Props) => WDom;
-  componentKey: Props;
-  tag: TagFunction;
-  props: Props;
-  children: WDom[];
-};
-type WDomInfoWithRenderParam = WDomInfoParam & {
-  reRender: () => WDom;
-};
-
 export const Fragment = (_props: Props, ...children: WDom[]) => ({
   type: 'fragment',
   children,
@@ -108,13 +97,13 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
       children
     );
 
-    const customNode = makeCustomNode({
+    const customNode = makeCustomNode(
       componentMaker,
       componentKey,
       tag,
       props,
-      children,
-    });
+      children
+    );
 
     const originalWDom = customNode;
 
@@ -131,25 +120,47 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   return { tagName, constructor, props, children, resolve };
 };
 
-const makeCustomNode = (wDomInfo: WDomInfoParam) => {
-  const { componentMaker, props } = wDomInfo;
+const makeCustomNode = (
+  componentMaker: (props: Props) => WDom,
+  componentKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[]
+) => {
   const customNode = componentMaker(props);
-  const reRender = makeReRender(wDomInfo);
+  const reRender = makeReRender(
+    componentMaker,
+    componentKey,
+    tag,
+    props,
+    children
+  );
 
-  addComponentProps(customNode, { ...wDomInfo, reRender });
+  addComponentProps(customNode, componentKey, tag, props, children, reRender);
 
   return customNode;
 };
 
-const makeReRender = (wDomInfo: WDomInfoParam) => {
-  const reRender = () => wDomMaker({ ...wDomInfo, reRender });
-
+const makeReRender = (
+  componentMaker: (props: Props) => WDom,
+  componentKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[]
+) => {
+  const reRender = () =>
+    wDomMaker(componentMaker, componentKey, tag, props, children, reRender);
   return reRender;
 };
 
-const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
-  const { componentMaker, componentKey, tag, props, children } = wDomInfo;
-
+const wDomMaker = (
+  componentMaker: (props: Props) => WDom,
+  componentKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  reRender: () => WDom
+) => {
   initUpdateHookState(componentKey);
   runUpdateCallback();
 
@@ -159,7 +170,7 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
     reRenderCustomComponent(tag, props, children, originalWDom)
   );
 
-  addComponentProps(originalWDom, wDomInfo);
+  addComponentProps(originalWDom, componentKey, tag, props, children, reRender);
 
   (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
     originalWDom;
@@ -167,9 +178,14 @@ const wDomMaker = (wDomInfo: WDomInfoWithRenderParam) => {
   return originalWDom;
 };
 
-const addComponentProps = (wDom: WDom, info: WDomInfoWithRenderParam) => {
-  const { componentKey, tag, props, children, reRender } = info;
-
+const addComponentProps = (
+  wDom: WDom,
+  componentKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  reRender: () => WDom
+) => {
   Object.assign(wDom, {
     componentProps: props,
     componentChildren: children,
