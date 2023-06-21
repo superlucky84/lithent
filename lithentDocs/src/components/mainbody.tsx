@@ -12,6 +12,7 @@ export const Mainbody = mount(r => {
   window.addEventListener('hashchange', () => {
     hashState.v = location.hash;
     shardStore.showHiddenMenu = false;
+    window.scrollTo(0, 0);
   });
   const matchHash = computed<string>(() => {
     if ('#examples' === hashState.v) {
