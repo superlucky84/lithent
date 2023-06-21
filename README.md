@@ -47,6 +47,8 @@ JavaScript users are used to using closures and love to develop with them.
 
 ## How To Install
 
+It's easier to use lithent with JSX or HTM.
+
 ```bash
 pnpm add lithent
 ```
