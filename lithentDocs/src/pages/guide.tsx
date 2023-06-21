@@ -6,6 +6,8 @@ import { Lesson3 } from '@/components/lesson/lesson3';
 import { Lesson4 } from '@/components/lesson/lesson4';
 import { Lesson5 } from '@/components/lesson/lesson5';
 import { Lesson6 } from '@/components/lesson/lesson6';
+import { Lesson7 } from '@/components/lesson/lesson7';
+import { Lesson8 } from '@/components/lesson/lesson8';
 
 // grid grid-cols-1 xl:grid-cols-2
 export const Guide = mount(() => {
@@ -33,6 +35,8 @@ export const Guide = mount(() => {
       <Lesson4 />
       <Lesson5 />
       <Lesson6 />
+      <Lesson7 />
+      <Lesson8 />
     </div>
   );
 });
