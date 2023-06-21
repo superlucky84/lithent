@@ -1,6 +1,6 @@
 {
   "name": "lithent",
-  "version": "0.32.0",
+  "version": "0.34.0",
   "description": "lithent",
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/lithent.umd.js",

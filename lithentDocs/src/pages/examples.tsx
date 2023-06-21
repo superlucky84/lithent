@@ -11,10 +11,13 @@ import { Example8 } from '@/components/examples/example8';
 import { Example9 } from '@/components/examples/example9';
 import { Example10 } from '@/components/examples/example10';
 import { Example11 } from '@/components/examples/example11';
+import { Example12 } from '@/components/examples/example12';
+import { Example13 } from '@/components/examples/example13';
+import { Example14 } from '@/components/examples/example14';
 
 export const Examples = mount(() => {
   return () => (
-    <div class="grid grid-cols-1 xl:grid-cols-2 px-4 pt-6 xl:gap-4 dark:bg-gray-900">
+    <div class="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 px-4 pt-6 xl:gap-4 bg-gray-900">
       <ContentHeader title="Examples" />
 
       {/*<!-- Right Content --> */}
@@ -29,6 +32,9 @@ export const Examples = mount(() => {
       <Example9 />
       <Example10 />
       <Example11 />
+      <Example12 />
+      <Example13 />
+      <Example14 />
     </div>
   );
 });

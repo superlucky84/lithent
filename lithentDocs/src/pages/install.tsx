@@ -11,7 +11,6 @@ const html = htm.bind(h);
 const Component = mount(() => () => html\`<li>count: \${'htm example'}</li>\`;
 
 render(html\`<\${Component} />\`);
-);
 `;
 
 const code = `$ npm install lithent`;
@@ -117,8 +116,30 @@ export const Install = mount(() => {
         />
       </div>
 
+      <h3 class="text-slate-50 text-lg mt-8">With HTM</h3>
+      <div class="p-4 mb-2 mt-2 space-y-1  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
+        <div>
+          <h3 class="text-slate-50 text-lg mb-2">htm install</h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode6}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+          <h3 class="text-slate-50 text-lg mb-2 mt-2">htm setting</h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode7}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+        </div>
+      </div>
+
       <h3 class="text-slate-50 text-lg mt-8">With JSX</h3>
-      <div class="p-4 mb-2 mt-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
+      <div class="p-4 mb-2 mt-2 space-y-1  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
         <div>
           <h3 class="text-slate-50 text-lg mb-2">Setting JSX - Babel</h3>
           <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
@@ -155,28 +176,6 @@ export const Install = mount(() => {
             <div
               class="font-normal"
               innerHTML={exCode5}
-              style={{ whiteSpace: 'pre' }}
-            />
-          </div>
-        </div>
-      </div>
-
-      <h3 class="text-slate-50 text-lg mt-8">With HTM</h3>
-      <div class="p-4 mb-2 mt-2 space-y-1 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
-        <div>
-          <h3 class="text-slate-50 text-lg mb-2">htm install</h3>
-          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
-            <div
-              class="font-normal"
-              innerHTML={exCode6}
-              style={{ whiteSpace: 'pre' }}
-            />
-          </div>
-          <h3 class="text-slate-50 text-lg mb-2 mt-2">htm setting</h3>
-          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
-            <div
-              class="font-normal"
-              innerHTML={exCode7}
               style={{ whiteSpace: 'pre' }}
             />
           </div>

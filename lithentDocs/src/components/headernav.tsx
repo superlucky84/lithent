@@ -8,7 +8,7 @@ export const HeaderNav = mount(r => {
   };
 
   return () => (
-    <nav class="fixed z-30 w-full bg-white border-b bg-gray-800 border-gray-700">
+    <nav class="fixed z-30 w-full border-b bg-gray-800 border-gray-700">
       <div class="px-3 py-3 lg:px-5 lg:pl-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center justify-start">

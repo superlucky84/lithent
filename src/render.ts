@@ -22,6 +22,8 @@ import {
   checkRadioElement,
 } from '@/utils/predicator';
 
+import { componentRef } from '@/utils/universalRef';
+import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent } from '@/utils';
@@ -40,10 +42,22 @@ export const render = (
   const Dom = wDomToDom(wDom, true);
 
   if (afterElement) {
+    wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else {
     wrapElement.appendChild(Dom);
   }
+
+  return () => {
+    if (wDom.componentProps) {
+      const component = componentRef.get(wDom.componentProps)?.vd.value;
+      if (component) {
+        runUnmountQueueFromWDom(component);
+        recursiveRemoveEvent(component);
+        rootDelete(component);
+      }
+    }
+  };
 };
 
 export const wDomUpdate = (newWDomTree: WDom) => {
@@ -72,14 +86,24 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
   });
 };
 
+const rootDelete = (newWDom: WDom) => {
+  const parent = findRealParentElement(newWDom) as HTMLElement;
+
+  deleteRealDom(newWDom, parent);
+};
+
 const typeDelete = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
-  const parent = findRealParentElement(parentWDom);
+  const parent = findRealParentElement(parentWDom) as HTMLElement;
 
   if (newWDom.oldProps && newWDom.el) {
     removeEvent(newWDom.oldProps, newWDom.el);
   }
 
+  deleteRealDom(newWDom, parent);
+};
+
+const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
     if (newWDom.el?.nodeType === 1) {
       parent.removeChild(newWDom.el);
@@ -121,7 +145,14 @@ const typeAdd = (
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
-    const nextEl = startFindNextBrotherElement(newWDom, parentWDom);
+    const isLoop = parentWDom.type === 'loop';
+
+    let nextEl;
+    if (isLoop) {
+      nextEl = startFindNextBrotherElement(parentWDom, getParent(parentWDom));
+    } else {
+      nextEl = startFindNextBrotherElement(newWDom, parentWDom);
+    }
 
     if (newElement && parentEl) {
       if (nextEl) {
@@ -153,6 +184,8 @@ const startFindNextBrotherElement = (
 
   if (!parentWDom.isRoot && ['fragment', 'loop'].includes(parentType)) {
     return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
+  } else if (parentWDom.isRoot && parentWDom.afterElement) {
+    return parentWDom.afterElement;
   }
 
   return undefined;
@@ -211,7 +244,13 @@ const removeEvent = (
     Object.entries(oldProps || {}).forEach(
       ([dataKey, dataValue]: [string, unknown]) => {
         if (dataKey.match(/^on/)) {
-          element.removeEventListener(dataKey, dataValue as (e: Event) => void);
+          const eventName = dataKey.replace(/^on(.*)/, (_match, p1) =>
+            p1.toLowerCase()
+          );
+          element.removeEventListener(
+            eventName,
+            dataValue as (e: Event) => void
+          );
         }
       }
     );
