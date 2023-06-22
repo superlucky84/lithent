@@ -115,7 +115,9 @@ export const Install = mount(() => {
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-
+      <div class="py-2 overflow-x-auto text-sm text-gray-50 ">
+        It's easier to use lithent with JSX or HTM.
+      </div>
       <h3 class="text-slate-50 text-lg mt-8">With HTM</h3>
       <div class="p-4 mb-2 mt-2 space-y-1  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
         <div>
@@ -137,7 +139,6 @@ export const Install = mount(() => {
           </div>
         </div>
       </div>
-
       <h3 class="text-slate-50 text-lg mt-8">With JSX</h3>
       <div class="p-4 mb-2 mt-2 space-y-1  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
         <div>
