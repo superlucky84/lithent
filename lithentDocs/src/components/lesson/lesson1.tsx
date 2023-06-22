@@ -10,7 +10,7 @@ const Component = mount((renew, _props) => {
   let count = 0;
 
   const change = () => {
-    count1 += 1;
+    count += 1;
     // Renew
     renew();
   };

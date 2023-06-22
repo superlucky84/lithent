@@ -21,10 +21,7 @@ const Loop = mount(function (renew) {
 
   return () => (
     <Fragment>
-      <button
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-        onClick={handle}
-      >
+      <button onClick={handle}>
         change list
       </button>
       {list.map(item => (
