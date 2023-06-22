@@ -161,7 +161,7 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
   unUsedChildren.map(unusedItem => {
     const el = unusedItem.el;
 
-    if (el && el.parentNode) {
+    if (el?.parentNode) {
       el.parentNode.removeChild(el);
     }
   });
