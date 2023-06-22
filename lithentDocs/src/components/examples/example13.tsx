@@ -30,6 +30,18 @@ const Loop = mount(function (renew) {
     </Fragment>
   );
 });
+
+/*
+<ul id="list-root">
+  <li>1</li><li>2</li><li>3</li><li id="nextTarget">8</li><li>9</li>
+</ul>
+*/
+
+render(
+  <Loop />,
+  document.querySelector('#list-root'),
+  document.querySelector('#nextTarget')
+);
 `;
 
 const exCode1 = hljs.highlight(code, {

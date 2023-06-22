@@ -80,8 +80,8 @@ export const Lesson5 = mount(() => {
       </p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
         The state function used in the example is pre-implemented in
-        'lithent/helper', so you can just pull it out and write it to and write
-        it. But it's just an example.
+        'lithent/helper', so you can just pull it out and use it to and use it.
+        But it's just an example.
       </p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
         In addition to "state", we've implemented helper codes like "store",

@@ -4,7 +4,7 @@
 
 Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
-used lightly with other libraries.
+used lightly in a variety of situations.
 
 - https://superlucky84.github.io/lithent
   - (This guide page is written in lithent.)
@@ -16,8 +16,8 @@ used lightly with other libraries.
 - [Why Use Lithent](#why-use-lithent)
 - [Basic Guide](#basic-guide)
 - [How To Install](#how-to-install)
-  - [Width HTM](#with-htm)
-  - [Width JSX](#with-jsx)
+  - [With HTM](#with-htm)
+  - [With JSX](#with-jsx)
 - [Examples](#examples)
 - [Develop Guide](#develop-guide)
 
@@ -52,6 +52,8 @@ It's easier to use lithent with JSX or HTM.
 ```bash
 pnpm add lithent
 ```
+
+It's easier to use lithent with JSX or HTM.
 
 #### With HTM
 
