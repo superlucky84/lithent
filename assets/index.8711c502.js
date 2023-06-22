@@ -499,11 +499,18 @@ const Input = mount(r => {
 });
 `,DS=W.highlight(yS,{language:"javascript"}).value,MS=y(t=>{const e=Ee("input",t),n=r=>{e.v=r.target.value};return()=>o("input",{type:"text",onInput:n,value:e.v})}),xS=y(()=>()=>o("div",{class:"flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800"},o("h3",{class:"text-slate-50 text-lg md:text-2xl mb-2"},"Example 9 - Input"),o("p",{class:"text-sm md:text-base text-gray-400"},'Test that the "Input" control is working properly.'),o("div",{class:"mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o("div",{class:"font-normal",innerHTML:DS,style:{whiteSpace:"pre"}})),o("div",{class:"flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o(MS,null)))),LS=`import { h, mount } from 'lithent';
 import { state } from 'lithent/helper';
+
 const Checkbox = mount(r => {
-  const text = state<Set<string>>(new Set(['sara']), r);
+  const checkedList = state<string[]>(['sara'], r);
 
   const handleInput = (event: InputEvent) => {
-    text.v.add((event.target as HTMLInputElement).value);
+    const value = (event.target as HTMLInputElement).value;
+
+    if (checkedList.v.includes(value)) {
+      checkedList.v = [...checkedList.v.filter(item => item !== value)];
+    } else {
+      checkedList.v = [...checkedList.v, value];
+    }
   };
 
   return () => (
@@ -513,7 +520,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="john"
-        checked={text.v.has('john')}
+        checked={checkedList.v.includes('john')}
       />{' '}
       John
       <input
@@ -521,7 +528,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="sara"
-        checked={text.v.has('sara')}
+        checked={checkedList.v.includes('sara')}
       />{' '}
       Sara
       <input
@@ -529,45 +536,45 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="tom"
-        checked={text.v.has('tom')}
+        checked={checkedList.v.includes('tom')}
       />{' '}
       Tom
     </>
   );
 });
-`,wS=W.highlight(LS,{language:"javascript"}).value,PS=y(t=>{const e=Ee(new Set(["sara"]),t),n=r=>{e.v.add(r.target.value)};return()=>o(Q,null,o("input",{type:"checkbox",name:"checkname",onChange:n,value:"john",checked:e.v.has("john")})," ","John",o("input",{type:"checkbox",name:"checkname",onChange:n,value:"sara",checked:e.v.has("sara")})," ","Sara",o("input",{type:"checkbox",name:"checkname",onChange:n,value:"tom",checked:e.v.has("tom")})," ","Tom")}),kS=y(()=>()=>o("div",{class:"flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800"},o("h3",{class:"text-slate-50 text-lg md:text-2xl mb-2"},"Example 10 - Checkbox"),o("p",{class:"text-sm md:text-base text-gray-400"},'Test that the "Checkbox" control is working properly.'),o("div",{class:"mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o("div",{class:"font-normal",innerHTML:wS,style:{whiteSpace:"pre"}})),o("div",{class:"flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o(PS,null)))),US=`import { h, mount } from 'lithent';
+`,wS=W.highlight(LS,{language:"javascript"}).value,PS=y(t=>{const e=Ee(["sara"],t),n=r=>{const a=r.target.value;e.v.includes(a)?e.v=[...e.v.filter(l=>l!==a)]:e.v=[...e.v,a]};return()=>o(Q,null,o("input",{type:"checkbox",name:"checkname",onChange:n,value:"john",checked:e.v.includes("john")})," ","John",o("input",{type:"checkbox",name:"checkname",onChange:n,value:"sara",checked:e.v.includes("sara")})," ","Sara",o("input",{type:"checkbox",name:"checkname",onChange:n,value:"tom",checked:e.v.includes("tom")})," ","Tom")}),kS=y(()=>()=>o("div",{class:"flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800"},o("h3",{class:"text-slate-50 text-lg md:text-2xl mb-2"},"Example 10 - Checkbox"),o("p",{class:"text-sm md:text-base text-gray-400"},'Test that the "Checkbox" control is working properly.'),o("div",{class:"mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o("div",{class:"font-normal",innerHTML:wS,style:{whiteSpace:"pre"}})),o("div",{class:"flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o(PS,null)))),US=`import { h, mount } from 'lithent';
 import { state } from 'lithent/helper';
-const Checkbox = mount(r => {
-  const text = state<Set<string>>(new Set(['sara']), r);
+const Radio = mount(r => {
+  const text = state<string>('sara', r);
 
   const handleInput = (event: InputEvent) => {
-    text.v.add((event.target as HTMLInputElement).value);
+    text.v = (event.target as HTMLInputElement).value;
   };
 
   return () => (
     <>
       <input
-        type="checkbox"
+        type="radio"
         name="checkname"
         onChange={handleInput}
         value="john"
-        checked={text.v.has('john')}
+        checked={text.v === 'john'}
       />{' '}
       John
       <input
-        type="checkbox"
+        type="radio"
         name="checkname"
         onChange={handleInput}
         value="sara"
-        checked={text.v.has('sara')}
+        checked={text.v === 'sara'}
       />{' '}
       Sara
       <input
-        type="checkbox"
+        type="radio"
         name="checkname"
         onChange={handleInput}
         value="tom"
-        checked={text.v.has('tom')}
+        checked={text.v === 'tom'}
       />{' '}
       Tom
     </>
@@ -716,4 +723,4 @@ const Root = mount(renew => {
 
 render(<Root />, document.getElementById('root'));
 `,nT=W.highlight(tT,{language:"javascript"}).value,rT=y(()=>({count:t})=>o(Q,null,o("span",null,"depth2: ",t))),aT=y(()=>({count:t})=>o(Q,null,o("span",null,"depth1: ",t)," ",o(rT,{count:t}))),iT=y(t=>{let e=0;const n=()=>{e+=1,t()};return()=>o(Q,null,o("button",{class:"ml-2 text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800",onClick:n},"increase"),o(aT,{count:e}))}),oT=y(()=>()=>o("div",{class:"flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800"},o("h3",{class:"text-slate-50 text-lg md:text-2xl mb-2"},"Example 15 - Nested Prop Update"),o("p",{class:"text-sm md:text-base text-gray-400 mb-2"},"Test that props are passed well to nested components."),o("div",{class:"mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o("div",{class:"font-normal",innerHTML:nT,style:{whiteSpace:"pre"}})),o("div",{class:"flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"},o(iT,null)))),sT=y(()=>()=>o("div",{class:"grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 px-4 pt-6 xl:gap-4 bg-gray-900"},o(Ze,{title:"Examples"}),o(jg,null),o(rS,null),o(sS,null),o(uS,null),o(gS,null),o(RS,null),o(OS,null),o(hS,null),o(xS,null),o(kS,null),o(GS,null),o(VS,null),o(KS,null),o(eT,null),o(oT,null))),lT=y(()=>()=>o("div",{class:"max-w-xl mb-8 px-4 pt-6 xl:gap-4 bg-gray-900"},o(Ze,{title:"Why use Lithent?"}),o("h3",{class:"text-slate-50 text-lg mt-4"},"Lithent have the bare minimum of necessary functionality, with no unnecessary features."),o("p",{class:"text-gray-400 mt-4"},"Since 'react' and 'vue', there have been a lot of UI libraries coming out that boast full-stack functionality."),o("p",{class:"text-gray-400 mt-4"},"However, in the real world of development, there are times when you need to build something using only the bare minimum of key features, rather than a full-stack, full-featured library."),o("p",{class:"text-gray-400 mt-4"},"Lithent has implemented the bare minimum functionality needed to create and update virtual DOM in general (we only need to know 'render', 'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback')."),o("p",{class:"text-gray-400 mt-4"},"We provide code in the form of 'helpers' that extend the basic functionality, but using the helpers is only optional and talented users can extend and develop custom helpers for their own projects."),o("h3",{class:"text-slate-50 text-lg mt-4"},'Approach with the developer-friendly concept of closures between "component mounter" and "renderer"'),o("p",{class:"text-gray-400 mt-4"},"Many existing UI libraries have their advantages, but they also create rules that are too strong and rigid for fear of users making mistakes."),o("p",{class:"text-gray-400 mt-4"},"JavaScript users are used to using closures and love to develop with them."),o("p",{class:"text-gray-400 mt-4"},'"Lithent" provides a familiar approach to my JavaScript development, as it leverages the properties of higher-order functions and closures to define and recycle the state of a component.'))),cT=y(t=>{const e=Ha(t),n=Ee(location.hash,t);window.addEventListener("hashchange",()=>{n.v=location.hash,e.showHiddenMenu=!1,window.scrollTo(0,0)});const r=sc(()=>n.v==="#examples"?o(sT,null):n.v==="#install"?o(Qg,null):n.v==="#about"?o(lT,null):o(wg,null));return()=>o("main",{class:"h-full"},r.v)}),_T=y(t=>{const e=Ha(t);return()=>o("div",{class:"flex pt-16 overflow-hidden bg-gray-900"},o(hd,{isHidden:!e.showHiddenMenu}),o("div",{class:"fixed inset-0 z-10 hidden bg-gray-900/90",id:"sidebarBackdrop"}),o("div",{id:"main-content",class:"relative w-full h-full max-w-screen-2xl overflow-y-auto lg:ml-64 bg-gray-900"},o(cT,null)))});const dT=y(()=>()=>o(Q,null,o(Ad,null),o(_T,null)));Te(o(dT,null),document.body);
-//# sourceMappingURL=index.02ebe412.js.map
+//# sourceMappingURL=index.8711c502.js.map
