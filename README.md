@@ -16,8 +16,8 @@ used lightly with other libraries.
 - [Why Use Lithent](#why-use-lithent)
 - [Basic Guide](#basic-guide)
 - [How To Install](#how-to-install)
-  - [Width HTM](#with-htm)
-  - [Width JSX](#with-jsx)
+  - [With HTM](#with-htm)
+  - [With JSX](#with-jsx)
 - [Examples](#examples)
 - [Develop Guide](#develop-guide)
 
