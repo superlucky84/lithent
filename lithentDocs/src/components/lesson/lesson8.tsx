@@ -73,7 +73,7 @@ export const Lesson8 = mount(() => {
     <div class="p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">Lesson 8 - ref</h3>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        A reference is simply an object with a "value" property. As shown in the
+        A "ref" is simply an object with a "value" property. As shown in the
         example, a "ref" allows you to change the internal state of the root
         component from outside the root component.
       </p>

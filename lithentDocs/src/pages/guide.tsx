@@ -16,9 +16,9 @@ export const Guide = mount(() => {
       <ContentHeader title="Basic Guide" />
       <div class="mb-4 col-span-full xl:mb-2">
         <p class="mt-2 text-gray-400">
-          Lithent were developed to make it easy to insert VirtualDOM component
+          Lithent were developed to make it easy to insert Virtual DOM component
           fragments into pages already drawn with SSR, and are intended to be
-          used lightly with other libraries &nbsp;
+          used lightly in a variety of situations. &nbsp;
           <a href="#about" class="text-orange-400 hover:underline">
             (Detailed introduction)
           </a>{' '}
