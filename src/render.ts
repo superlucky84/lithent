@@ -226,20 +226,18 @@ const typeReplace = (newWDom: WDom) => {
 
 const removeEvent = (
   oldProps: Props,
-  element?: HTMLElement | DocumentFragment | Text
+  element: HTMLElement | DocumentFragment | Text
 ) => {
-  if (element) {
-    Object.entries(oldProps || {}).forEach(
-      ([dataKey, dataValue]: [string, unknown]) => {
-        if (dataKey.match(/^on/)) {
-          element.removeEventListener(
-            getEventName(dataKey),
-            dataValue as (e: Event) => void
-          );
-        }
+  Object.entries(oldProps || {}).forEach(
+    ([dataKey, dataValue]: [string, unknown]) => {
+      if (dataKey.match(/^on/)) {
+        element.removeEventListener(
+          getEventName(dataKey),
+          dataValue as (e: Event) => void
+        );
       }
-    );
-  }
+    }
+  );
 };
 
 const typeUpdate = (newWDom: WDom) => {
