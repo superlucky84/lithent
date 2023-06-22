@@ -42,10 +42,9 @@ export const About = mount(() => {
         them.
       </p>
       <p class="text-gray-400 mt-4">
-        "Lithent" provide a familiar approach to real-world JavaScript
-        development because they leverage the properties of higher-order
-        functions and closures in the component mounter to define the properties
-        of the component and get the mounted information from the renderer.
+        "Lithent" provides a familiar approach to my JavaScript development, as
+        it leverages the properties of higher-order functions and closures to
+        define and recycle the state of a component.
       </p>
     </div>
   );
