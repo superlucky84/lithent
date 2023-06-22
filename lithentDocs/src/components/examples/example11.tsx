@@ -6,37 +6,37 @@ import 'highlight.js/styles/hybrid.css';
 
 const code = `import { h, mount } from 'lithent';
 import { state } from 'lithent/helper';
-const Checkbox = mount(r => {
-  const text = state<Set<string>>(new Set(['sara']), r);
+const Radio = mount(r => {
+  const text = state<string>('sara', r);
 
   const handleInput = (event: InputEvent) => {
-    text.v.add((event.target as HTMLInputElement).value);
+    text.v = (event.target as HTMLInputElement).value;
   };
 
   return () => (
     <>
       <input
-        type="checkbox"
+        type="radio"
         name="checkname"
         onChange={handleInput}
         value="john"
-        checked={text.v.has('john')}
+        checked={text.v === 'john'}
       />{' '}
       John
       <input
-        type="checkbox"
+        type="radio"
         name="checkname"
         onChange={handleInput}
         value="sara"
-        checked={text.v.has('sara')}
+        checked={text.v === 'sara'}
       />{' '}
       Sara
       <input
-        type="checkbox"
+        type="radio"
         name="checkname"
         onChange={handleInput}
         value="tom"
-        checked={text.v.has('tom')}
+        checked={text.v === 'tom'}
       />{' '}
       Tom
     </>
@@ -48,7 +48,7 @@ const exCode1 = hljs.highlight(code, {
   language: 'javascript',
 }).value;
 
-const Checkbox = mount(r => {
+const Radio = mount(r => {
   const text = state<string>('sara', r);
 
   const handleInput = (event: InputEvent) => {
@@ -100,7 +100,7 @@ export const Example11 = mount(() => {
         />
       </div>
       <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <Checkbox />
+        <Radio />
       </div>
     </div>
   );
