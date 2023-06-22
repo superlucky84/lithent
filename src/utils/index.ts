@@ -31,6 +31,9 @@ export const reRender = (vDom: WDom, infoVdom: TagFunctionResolver) => {
   return newVDom;
 };
 
+export const getEventName = (eventKey: string) =>
+  eventKey.replace(/^on(.*)/, (_match, p1) => p1.toLowerCase());
+
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
     Object.keys(props).forEach(key => delete props[key]);
@@ -50,3 +53,4 @@ const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
     }
   }
 };
+
