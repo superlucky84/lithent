@@ -17,9 +17,13 @@ used lightly in a variety of situations.
 - [Why Use Lithent](#why-use-lithent)
 - [Basic Guide](#basic-guide)
 - [How To Install](#how-to-install)
+  - [Use NPM](#use-npm)
+  - [Use CDN](#or-use-cdn)
   - [With HTM](#with-htm)
   - [With JSX](#with-jsx)
 - [Examples](#examples)
+  - [With ESM](#with-esm)
+  - [With UMD](#with-umd)
 - [Develop Guide](#develop-guide)
 
 ## Why use Lithent?
@@ -48,9 +52,17 @@ JavaScript users are used to using closures and love to develop with them.
 
 ## How To Install
 
+#### Use NPM
+
 ```bash
 pnpm add lithent
 ```
+
+#### Or Use CDN
+
+UMD : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.umd.js
+EMS : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.mjs
+
 
 It's easier to use lithent with JSX or HTM.
 
@@ -76,6 +88,7 @@ const html = htm.bind(h);
 
 - [More Examples](https://superlucky84.github.io/lithent/#examples)
 
+#### With ESM
 ```js
 import { h, render, mount, Fragment } from 'lithent';
 import { state } from 'lithent/helper';
@@ -101,6 +114,39 @@ const Component = mount((r, _props) => {
 
 // appendChild
 render(html`<${Component} />`, document.getElementById('root'));
+```
+
+#### With UMD
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.js"></script>
+
+<div id="root"></div>
+
+<script>
+const { h, Fragment, render, mount } = lithent;
+const html = htm.bind(h);
+
+const Component = mount(renew => {
+  count = 0;
+
+  const change = () => {
+    count += 1;
+      renew();
+  };
+
+  // Updater
+  return () => html`
+    <${Fragment}>
+      <li>count: ${count}</li>
+      <button onClick=${change}>increase</button>
+    <//>
+  `;
+});
+
+render(html`<${Component} />`, document.getElementById('root'));
+</script>
 ```
 
 ## Develop Guide
