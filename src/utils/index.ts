@@ -3,11 +3,7 @@ import { WDom, TagFunctionResolver, Props } from '@/types';
 export const getParent = (vDom: WDom) => {
   const parentVDom = vDom.getParent && vDom.getParent();
 
-  if (!parentVDom) {
-    throw Error('Not found parent vDom');
-  }
-
-  return parentVDom;
+  return parentVDom as WDom;
 };
 
 export const reRender = (vDom: WDom, infoVdom: TagFunctionResolver) => {
@@ -24,11 +20,7 @@ export const reRender = (vDom: WDom, infoVdom: TagFunctionResolver) => {
 
   const newVDom = vDom.reRender && vDom.reRender();
 
-  if (!newVDom) {
-    throw Error('Unable reRender');
-  }
-
-  return newVDom;
+  return newVDom as WDom;
 };
 
 export const getEventName = (eventKey: string) =>
@@ -53,4 +45,3 @@ const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
     }
   }
 };
-

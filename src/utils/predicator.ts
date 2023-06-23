@@ -90,11 +90,8 @@ export const checkOptionElement = (element: any): element is HTMLElement =>
 export const checkTextareaElement = (element: any): element is HTMLElement =>
   element.nodeType === 1 && element.tagName === 'TEXTAREA';
 
-export const checkCheckboxElement = (element: any): element is HTMLElement =>
-  element.nodeType === 1 && element.type === 'checkbox';
-
-export const checkRadioElement = (element: any): element is HTMLElement =>
-  element.nodeType === 1 && element.type === 'radio';
+export const checkCheckableElement = (element: any): element is HTMLElement =>
+  element.nodeType === 1 && ['radio', 'checkbox'].includes(element.type);
 
 export const checkNormalAttribute = (
   dataValue: unknown
@@ -103,8 +100,8 @@ export const checkNormalAttribute = (
 
 export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver
-): WDomType | undefined => {
-  let result: WDomType | undefined;
+): WDomType => {
+  let result: WDomType = 'et';
 
   if (checkCustemComponentFunction(wDom)) {
     result = 'c';

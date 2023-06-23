@@ -6,8 +6,7 @@ import {
   checkExisty,
   checkOptionElement,
   checkTextareaElement,
-  checkCheckboxElement,
-  checkRadioElement,
+  checkCheckableElement,
 } from '@/utils/predicator';
 
 import { componentRef } from '@/utils/universalRef';
@@ -21,9 +20,7 @@ export const render = (
   wrapElement: HTMLElement | null,
   afterElement?: HTMLElement | null
 ) => {
-  if (!wrapElement) {
-    throw Error('WrapELement is null');
-  }
+  wrapElement ??= document.body;
   wDom.isRoot = true;
   wDom.wrapElement = wrapElement;
 
@@ -52,15 +49,14 @@ export const wDomUpdate = (newWDomTree: WDom) => {
   const { needRerender } = newWDomTree;
 
   if (needRerender && needRerender !== 'N') {
-    const exec = {
+    ({
       A: typeAdd,
       D: typeDelete,
       R: typeReplace,
       U: typeUpdate,
       SR: typeSortedReplace,
       SU: typeSortedUpdate,
-    }[needRerender];
-    exec(newWDomTree);
+    })[needRerender](newWDomTree);
   }
 };
 
@@ -75,20 +71,18 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
 };
 
 const rootDelete = (newWDom: WDom) => {
-  const parent = newWDom.wrapElement as HTMLElement;
-
-  deleteRealDom(newWDom, parent);
+  deleteRealDom(newWDom, newWDom.wrapElement as HTMLElement);
 };
 
 const typeDelete = (newWDom: WDom) => {
-  const parentWDom = getParent(newWDom);
-  const parent = findRealParentElement(parentWDom) as HTMLElement;
-
   if (newWDom.oldProps && newWDom.el) {
     removeEvent(newWDom.oldProps, newWDom.el);
   }
 
-  deleteRealDom(newWDom, parent);
+  deleteRealDom(
+    newWDom,
+    findRealParentElement(getParent(newWDom)) as HTMLElement
+  );
 };
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
@@ -134,13 +128,9 @@ const typeAdd = (
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
     const isLoop = parentWDom.type === 'loop';
-
-    let nextEl;
-    if (isLoop) {
-      nextEl = startFindNextBrotherElement(parentWDom, getParent(parentWDom));
-    } else {
-      nextEl = startFindNextBrotherElement(newWDom, parentWDom);
-    }
+    const nextEl = isLoop
+      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+      : startFindNextBrotherElement(newWDom, parentWDom);
 
     if (newElement && parentEl) {
       if (nextEl) {
@@ -308,10 +298,7 @@ const updateProps = (
           dataValue as (e: Event) => void,
           originalProps[dataKey] as (e: Event) => void
         );
-      } else if (
-        (checkCheckboxElement(element) || checkRadioElement(element)) &&
-        dataKey === 'checked'
-      ) {
+      } else if (checkCheckableElement(element) && dataKey === 'checked') {
         (element as HTMLInputElement).checked = !!dataValue;
       } else if (checkTextareaElement(element) && dataKey === 'value') {
         (element as HTMLInputElement).value = dataValue as string;
@@ -341,6 +328,8 @@ const wDomToDom = (wDom: WDom) => {
     element = document.createElement(tag);
   } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
+  } else {
+    element = document.createElement('e');
   }
 
   wDomChildrenToDom(children, element);
@@ -350,7 +339,7 @@ const wDomToDom = (wDom: WDom) => {
 
   runMountedQueueFromWDom(wDom);
 
-  return element || document.createElement('div');
+  return element;
 };
 
 const wDomChildrenToDom = (
