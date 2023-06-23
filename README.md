@@ -1,6 +1,6 @@
 # lithent
 
-> A lightweight Virtual DOM UI library
+> An extensible virtual DOM library for lightweight use in a variety of environments.
 
 Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
