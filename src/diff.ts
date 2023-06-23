@@ -14,19 +14,12 @@ import { runUnmountQueueFromWDom } from '@/hook/unmount';
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
   originalWDom?: WDom
-) => {
-  const type = getWDomType(newWDom);
-
-  if (!type) {
-    throw new Error('Unknown type wdom');
-  }
-
-  const isSameType = checkSameWDomWithOriginal[type](newWDom, originalWDom);
-
-  const result = remakeNewWDom(newWDom, isSameType, originalWDom);
-
-  return result;
-};
+) =>
+  remakeNewWDom(
+    newWDom,
+    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+    originalWDom
+  );
 
 const remakeNewWDom = (
   newWDom: WDom | TagFunctionResolver,
@@ -161,7 +154,7 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
   unUsedChildren.map(unusedItem => {
     const el = unusedItem.el;
 
-    if (el && el.parentNode) {
+    if (el?.parentNode) {
       el.parentNode.removeChild(el);
     }
   });

@@ -1,15 +1,3 @@
-/**
- * Rerender시 실제 dom에 반영해줘야 하는 상태
- *
- * 1. (ADD). 가상돔 비교시 오리지날이 없으면 새로 추가되는 dom으로 판단한다.
- * 2. (REPLACE). 오리지날이 있고 같은 엘리먼트타입이 아닌 경우 해당 위치의 태그 자체를 교체해준다.
- * 3. (UPDATE). 오리지날이 있고 같은 타입이면 dom의 속성만 변경해 주며, 텍스트 노드일 경우는 텍스트를 교체해준다.
- * 4. (DELETE). 오리지날이 있고 새로운 엘리먼트 타입은 null타입일 경우 dom을 삭제한다.
- * 5. (SORTED-REPLACE). loop의 경우 REPLACE라도 키값에 의해 순서가 변경될 수 있으므로 새로운 dom을 단순히 기존 위치에 교체하지 않고 새로 삼입하여 정렬한다.
- * 6. (SORTED-UPDATE). loop의 경우 UPDATE라도 키값에 의해 순서가 변경될수 있으므로 재 삽입하여 정렬한다.
- * 7. (NONE). text타입의 경우 text가 같다면 변경이 필요 없으므로 방치한다. (Todo. 다른 타입의 경우 처리필요)
- */
-
 import { WDom, Props } from '@/types';
 import {
   checkStyleData,
@@ -18,28 +6,25 @@ import {
   checkExisty,
   checkOptionElement,
   checkTextareaElement,
-  checkCheckboxElement,
-  checkRadioElement,
+  checkCheckableElement,
 } from '@/utils/predicator';
 
 import { componentRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
-import { getParent } from '@/utils';
+import { getParent, getEventName } from '@/utils';
 
 export const render = (
   wDom: WDom,
   wrapElement: HTMLElement | null,
   afterElement?: HTMLElement | null
 ) => {
-  if (!wrapElement) {
-    throw Error('WrapELement is null');
-  }
+  wrapElement ??= document.body;
   wDom.isRoot = true;
   wDom.wrapElement = wrapElement;
 
-  const Dom = wDomToDom(wDom, true);
+  const Dom = wDomToDom(wDom);
 
   if (afterElement) {
     wDom.afterElement = afterElement;
@@ -64,15 +49,14 @@ export const wDomUpdate = (newWDomTree: WDom) => {
   const { needRerender } = newWDomTree;
 
   if (needRerender && needRerender !== 'N') {
-    const exec = {
+    ({
       A: typeAdd,
       D: typeDelete,
       R: typeReplace,
       U: typeUpdate,
       SR: typeSortedReplace,
       SU: typeSortedUpdate,
-    }[needRerender];
-    exec(newWDomTree);
+    })[needRerender](newWDomTree);
   }
 };
 
@@ -87,20 +71,18 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
 };
 
 const rootDelete = (newWDom: WDom) => {
-  const parent = newWDom.wrapElement as HTMLElement;
-
-  deleteRealDom(newWDom, parent);
+  deleteRealDom(newWDom, newWDom.wrapElement as HTMLElement);
 };
 
 const typeDelete = (newWDom: WDom) => {
-  const parentWDom = getParent(newWDom);
-  const parent = findRealParentElement(parentWDom) as HTMLElement;
-
   if (newWDom.oldProps && newWDom.el) {
     removeEvent(newWDom.oldProps, newWDom.el);
   }
 
-  deleteRealDom(newWDom, parent);
+  deleteRealDom(
+    newWDom,
+    findRealParentElement(getParent(newWDom)) as HTMLElement
+  );
 };
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
@@ -139,20 +121,16 @@ const typeAdd = (
   newElement?: HTMLElement | DocumentFragment | Text
 ) => {
   if (!newElement) {
-    newElement = wDomToDom(newWDom, true);
+    newElement = wDomToDom(newWDom);
   }
 
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
     const isLoop = parentWDom.type === 'loop';
-
-    let nextEl;
-    if (isLoop) {
-      nextEl = startFindNextBrotherElement(parentWDom, getParent(parentWDom));
-    } else {
-      nextEl = startFindNextBrotherElement(newWDom, parentWDom);
-    }
+    const nextEl = isLoop
+      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+      : startFindNextBrotherElement(newWDom, parentWDom);
 
     if (newElement && parentEl) {
       if (nextEl) {
@@ -225,7 +203,7 @@ const typeReplace = (newWDom: WDom) => {
       typeSortedReplace(newWDom);
     } else {
       const parentElement = findRealParentElement(parentWDom);
-      const newElement = wDomToDom(newWDom, true);
+      const newElement = wDomToDom(newWDom);
 
       if (parentElement) {
         parentElement.replaceChild(newElement, orignalElement);
@@ -238,23 +216,18 @@ const typeReplace = (newWDom: WDom) => {
 
 const removeEvent = (
   oldProps: Props,
-  element?: HTMLElement | DocumentFragment | Text
+  element: HTMLElement | DocumentFragment | Text
 ) => {
-  if (element) {
-    Object.entries(oldProps || {}).forEach(
-      ([dataKey, dataValue]: [string, unknown]) => {
-        if (dataKey.match(/^on/)) {
-          const eventName = dataKey.replace(/^on(.*)/, (_match, p1) =>
-            p1.toLowerCase()
-          );
-          element.removeEventListener(
-            eventName,
-            dataValue as (e: Event) => void
-          );
-        }
+  Object.entries(oldProps || {}).forEach(
+    ([dataKey, dataValue]: [string, unknown]) => {
+      if (dataKey.match(/^on/)) {
+        element.removeEventListener(
+          getEventName(dataKey),
+          dataValue as (e: Event) => void
+        );
       }
-    );
-  }
+    }
+  );
 };
 
 const typeUpdate = (newWDom: WDom) => {
@@ -309,10 +282,13 @@ const updateProps = (
       ) {
         (element as HTMLElement).innerHTML = dataValue;
       } else if (checkStyleData(dataKey, dataValue)) {
-        const style = dataValue;
-        const oldStyle = checkStyleData(dataKey, originalProps.style) || {};
-
-        updateStyle(style, oldStyle, element);
+        updateStyle(
+          dataValue,
+          checkStyleData(dataKey, originalProps.style)
+            ? originalProps.style
+            : {},
+          element
+        );
       } else if (checkRefData(dataKey, dataValue)) {
         dataValue.value = element;
       } else if (dataKey.match(/^on/)) {
@@ -322,9 +298,7 @@ const updateProps = (
           dataValue as (e: Event) => void,
           originalProps[dataKey] as (e: Event) => void
         );
-      } else if (checkRadioElement(element) && dataKey === 'checked') {
-        (element as HTMLInputElement).checked = !!dataValue;
-      } else if (checkCheckboxElement(element) && dataKey === 'checked') {
+      } else if (checkCheckableElement(element) && dataKey === 'checked') {
         (element as HTMLInputElement).checked = !!dataValue;
       } else if (checkTextareaElement(element) && dataKey === 'value') {
         (element as HTMLInputElement).value = dataValue as string;
@@ -343,7 +317,7 @@ const updateProps = (
   );
 };
 
-const wDomToDom = (wDom: WDom, init: boolean) => {
+const wDomToDom = (wDom: WDom) => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = type === 'fragment' || type === 'loop';
@@ -354,38 +328,37 @@ const wDomToDom = (wDom: WDom, init: boolean) => {
     element = document.createElement(tag);
   } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
+  } else {
+    element = document.createElement('e');
   }
 
-  wDomChildrenToDom(children, element, init);
+  wDomChildrenToDom(children, element);
   updateProps(props, element);
 
   wDom.el = element;
 
   runMountedQueueFromWDom(wDom);
 
-  return element || document.createElement('div');
+  return element;
 };
 
 const wDomChildrenToDom = (
   children: WDom[],
-  parentElement?: HTMLElement | DocumentFragment | Text,
-  init?: boolean
+  parentElement?: HTMLElement | DocumentFragment | Text
 ) => {
-  if (init) {
-    const elementChildren = children.reduce(
-      (acc: DocumentFragment, childItem: WDom) => {
-        if (childItem.type) {
-          acc.appendChild(wDomToDom(childItem, init));
-        }
+  const elementChildren = children.reduce(
+    (acc: DocumentFragment, childItem: WDom) => {
+      if (childItem.type) {
+        acc.appendChild(wDomToDom(childItem));
+      }
 
-        return acc;
-      },
-      new DocumentFragment()
-    );
+      return acc;
+    },
+    new DocumentFragment()
+  );
 
-    if (parentElement && elementChildren.hasChildNodes()) {
-      parentElement.appendChild(elementChildren);
-    }
+  if (parentElement && elementChildren.hasChildNodes()) {
+    parentElement.appendChild(elementChildren);
   }
 };
 
@@ -395,9 +368,7 @@ const updateEvent = (
   newEventHandler: (e: Event) => void,
   oldEventHandler: (e: Event) => void
 ) => {
-  const eventName = eventKey.replace(/^on(.*)/, (_match, p1) =>
-    p1.toLowerCase()
-  );
+  const eventName = getEventName(eventKey);
 
   if (oldEventHandler !== newEventHandler) {
     if (oldEventHandler) {
@@ -442,7 +413,5 @@ const findRealParentElement = (
     return vDom.el as HTMLElement;
   }
 
-  const parentVDom = getParent(vDom);
-
-  return findRealParentElement(parentVDom);
+  return findRealParentElement(getParent(vDom));
 };

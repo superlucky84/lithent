@@ -6,11 +6,18 @@ import 'highlight.js/styles/hybrid.css';
 
 const code = `import { h, mount } from 'lithent';
 import { state } from 'lithent/helper';
+
 const Checkbox = mount(r => {
-  const text = state<Set<string>>(new Set(['sara']), r);
+  const checkedList = state<string[]>(['sara'], r);
 
   const handleInput = (event: InputEvent) => {
-    text.v.add((event.target as HTMLInputElement).value);
+    const value = (event.target as HTMLInputElement).value;
+
+    if (checkedList.v.includes(value)) {
+      checkedList.v = [...checkedList.v.filter(item => item !== value)];
+    } else {
+      checkedList.v = [...checkedList.v, value];
+    }
   };
 
   return () => (
@@ -20,7 +27,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="john"
-        checked={text.v.has('john')}
+        checked={checkedList.v.includes('john')}
       />{' '}
       John
       <input
@@ -28,7 +35,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="sara"
-        checked={text.v.has('sara')}
+        checked={checkedList.v.includes('sara')}
       />{' '}
       Sara
       <input
@@ -36,7 +43,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="tom"
-        checked={text.v.has('tom')}
+        checked={checkedList.v.includes('tom')}
       />{' '}
       Tom
     </>
@@ -49,10 +56,17 @@ const exCode1 = hljs.highlight(code, {
 }).value;
 
 const Checkbox = mount(r => {
-  const text = state<Set<string>>(new Set(['sara']), r);
+  const checkedList = state<string[]>(['sara'], r);
 
   const handleInput = (event: InputEvent) => {
-    text.v.add((event.target as HTMLInputElement).value);
+    const value = (event.target as HTMLInputElement).value;
+    const isInclude = checkedList.v.includes(value);
+
+    if (isInclude) {
+      checkedList.v = [...checkedList.v.filter(item => item !== value)];
+    } else {
+      checkedList.v = [...checkedList.v, value];
+    }
   };
 
   return () => (
@@ -62,7 +76,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="john"
-        checked={text.v.has('john')}
+        checked={checkedList.v.includes('john')}
       />{' '}
       John
       <input
@@ -70,7 +84,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="sara"
-        checked={text.v.has('sara')}
+        checked={checkedList.v.includes('sara')}
       />{' '}
       Sara
       <input
@@ -78,7 +92,7 @@ const Checkbox = mount(r => {
         name="checkname"
         onChange={handleInput}
         value="tom"
-        checked={text.v.has('tom')}
+        checked={checkedList.v.includes('tom')}
       />{' '}
       Tom
     </>

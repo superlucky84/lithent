@@ -17,6 +17,44 @@ type WDomParam =
 /**
  * Predicator
  */
+
+const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
+  typeof wDom === 'object' && !('resolve' in wDom);
+
+const checkPlainType = (wDom: WDomParam, typeName: string) =>
+  checkPlainWDomType(wDom) && wDom.type === typeName;
+
+const checkSameCustomComponent = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) => newWDom.constructor === originalWDom?.constructor;
+
+const checkSameFragment = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) =>
+  checkPlainWDomType(newWDom) &&
+  originalWDom?.type === 'fragment' &&
+  originalWDom?.children?.length === newWDom?.children?.length;
+
+const checkSameTagElement = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) =>
+  checkPlainWDomType(newWDom) &&
+  originalWDom?.type === 'element' &&
+  originalWDom?.tag === newWDom.tag &&
+  originalWDom?.children?.length === newWDom?.children?.length;
+
+const checkNormalTypeElement = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
+) =>
+  checkPlainWDomType(newWDom) &&
+  originalWDom?.type === newWDom.type &&
+  (originalWDom?.children?.length === newWDom?.children?.length ||
+    newWDom.type === 'loop');
+
 export const checkCustemComponentFunction = (
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver =>
@@ -28,54 +66,11 @@ export const checkFragmentFunction = (
 ): target is FragmentFunction =>
   typeof target === 'function' && target === Fragment;
 
-export const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
-  typeof wDom === 'object' && !('resolve' in wDom);
-
-export const checkPlainType = (wDom: WDomParam, typeName: string) =>
-  checkPlainWDomType(wDom) && wDom.type === typeName;
-
 export const checkEmptyElement = (wDom: WDomParam) =>
   checkPlainWDomType(wDom) && !wDom.type;
 
-export const checkSameCustomComponent = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-) => newWDom.constructor === originalWDom?.constructor;
-
-export const checkSameFragment = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-) =>
-  checkPlainWDomType(newWDom) &&
-  originalWDom?.type === 'fragment' &&
-  originalWDom?.children?.length === newWDom?.children?.length;
-
-export const checkSameTagElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-) =>
-  checkPlainWDomType(newWDom) &&
-  originalWDom?.type === 'element' &&
-  originalWDom?.tag === newWDom.tag &&
-  originalWDom?.children?.length === newWDom?.children?.length;
-
-export const checkNormalTypeElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-) => {
-  return (
-    checkPlainWDomType(newWDom) &&
-    originalWDom?.type === newWDom.type &&
-    (originalWDom?.children?.length === newWDom?.children?.length ||
-      newWDom.type === 'loop')
-  );
-};
-
 export const checkExisty = (value: unknown) =>
   value !== null && value !== undefined;
-
-export const checkFunction = (target: unknown): target is Function =>
-  typeof target === 'function';
 
 export const checkStyleData = (
   dataKey: string,
@@ -89,21 +84,14 @@ export const checkRefData = (
 ): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } =>
   dataKey === 'ref' && typeof dataValue === 'object';
 
-export const checkOptionElement = (element: any): element is HTMLElement => {
-  return element.nodeType === 1 && element.tagName === 'OPTION';
-};
+export const checkOptionElement = (element: any): element is HTMLElement =>
+  element.nodeType === 1 && element.tagName === 'OPTION';
 
-export const checkTextareaElement = (element: any): element is HTMLElement => {
-  return element.nodeType === 1 && element.tagName === 'TEXTAREA';
-};
+export const checkTextareaElement = (element: any): element is HTMLElement =>
+  element.nodeType === 1 && element.tagName === 'TEXTAREA';
 
-export const checkCheckboxElement = (element: any): element is HTMLElement => {
-  return element.nodeType === 1 && element.type === 'checkbox';
-};
-
-export const checkRadioElement = (element: any): element is HTMLElement => {
-  return element.nodeType === 1 && element.type === 'radio';
-};
+export const checkCheckableElement = (element: any): element is HTMLElement =>
+  element.nodeType === 1 && ['radio', 'checkbox'].includes(element.type);
 
 export const checkNormalAttribute = (
   dataValue: unknown
@@ -112,8 +100,8 @@ export const checkNormalAttribute = (
 
 export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver
-): WDomType | undefined => {
-  let result: WDomType | undefined;
+): WDomType => {
+  let result: WDomType = 'et';
 
   if (checkCustemComponentFunction(wDom)) {
     result = 'c';

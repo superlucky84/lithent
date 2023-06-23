@@ -1,6 +1,6 @@
 # lithent
 
-> A lightweight Virtual DOM UI library
+> An extensible virtual DOM library for lightweight use in a variety of environments.
 
 Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
@@ -9,7 +9,8 @@ used lightly in a variety of situations.
 - https://superlucky84.github.io/lithent
   - (This guide page is written in lithent.)
 
-`(9.54 KiB / gzip: 3.54 KiB)`
+`(9.47 KiB / gzip: 3.49 KiB)`
+
 
 ## 🚩 Table of Contents
 
@@ -39,7 +40,7 @@ Many existing UI libraries have their advantages, but they also create rules tha
 
 JavaScript users are used to using closures and love to develop with them.
 
-"Lithent" provide a familiar approach to real-world JavaScript development because they leverage the properties of higher-order functions and closures in the component mounter to define the properties of the component and get the mounted information from the renderer.
+"Lithent" provides a familiar approach to my JavaScript development, as it leverages the properties of higher-order functions and closures to define and recycle the state of a component.
 
 ## Basic Guide
 
