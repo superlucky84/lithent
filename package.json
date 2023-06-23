@@ -1,7 +1,7 @@
 {
   "name": "lithent",
   "version": "0.36.1",
-  "description": "lithent",
+  "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/lithent.umd.js",
   "module": "./dist/lithent.mjs",
