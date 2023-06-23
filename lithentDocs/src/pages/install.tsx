@@ -176,7 +176,7 @@ export const Install = mount(() => {
 
   return () => (
     <div class="max-w-3xl px-4 pt-6 xl:gap-4 bg-gray-900">
-      <div class="text-xs text-slate-500">* Quick Jump</div>
+      <div class="text-xs text-slate-500">* Table of Contents</div>
       <button
         onClick={() => moveScroll('install')}
         class="block ml-4 text-xs text-slate-500 hover:underline"
