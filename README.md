@@ -62,7 +62,7 @@ pnpm add lithent
 
 * UMD : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.umd.js
 * UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@0.36.2/helper/dist/lithentHelper.umd.js
-* EMS : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.mjs
+* ESM : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.mjs
 * ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@0.36.2/helper/dist/lithentHelper.mjs
 
 
