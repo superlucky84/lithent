@@ -60,8 +60,8 @@ pnpm add lithent
 
 #### Or Use CDN
 
-UMD : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.umd.js
-EMS : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.umd.js
+* EMS : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -133,7 +133,7 @@ const Component = mount(renew => {
 
   const change = () => {
     count += 1;
-      renew();
+    renew();
   };
 
   // Updater
