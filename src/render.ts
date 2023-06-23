@@ -27,7 +27,7 @@ export const render = (
   wDom.isRoot = true;
   wDom.wrapElement = wrapElement;
 
-  const Dom = wDomToDom(wDom, true);
+  const Dom = wDomToDom(wDom);
 
   if (afterElement) {
     wDom.afterElement = afterElement;
@@ -127,7 +127,7 @@ const typeAdd = (
   newElement?: HTMLElement | DocumentFragment | Text
 ) => {
   if (!newElement) {
-    newElement = wDomToDom(newWDom, true);
+    newElement = wDomToDom(newWDom);
   }
 
   const parentWDom = getParent(newWDom);
@@ -213,7 +213,7 @@ const typeReplace = (newWDom: WDom) => {
       typeSortedReplace(newWDom);
     } else {
       const parentElement = findRealParentElement(parentWDom);
-      const newElement = wDomToDom(newWDom, true);
+      const newElement = wDomToDom(newWDom);
 
       if (parentElement) {
         parentElement.replaceChild(newElement, orignalElement);
@@ -308,9 +308,10 @@ const updateProps = (
           dataValue as (e: Event) => void,
           originalProps[dataKey] as (e: Event) => void
         );
-      } else if (checkRadioElement(element) && dataKey === 'checked') {
-        (element as HTMLInputElement).checked = !!dataValue;
-      } else if (checkCheckboxElement(element) && dataKey === 'checked') {
+      } else if (
+        (checkCheckboxElement(element) || checkRadioElement(element)) &&
+        dataKey === 'checked'
+      ) {
         (element as HTMLInputElement).checked = !!dataValue;
       } else if (checkTextareaElement(element) && dataKey === 'value') {
         (element as HTMLInputElement).value = dataValue as string;
@@ -329,7 +330,7 @@ const updateProps = (
   );
 };
 
-const wDomToDom = (wDom: WDom, init: boolean) => {
+const wDomToDom = (wDom: WDom) => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = type === 'fragment' || type === 'loop';
@@ -342,7 +343,7 @@ const wDomToDom = (wDom: WDom, init: boolean) => {
     element = document.createTextNode(String(text));
   }
 
-  wDomChildrenToDom(children, element, init);
+  wDomChildrenToDom(children, element);
   updateProps(props, element);
 
   wDom.el = element;
@@ -354,24 +355,21 @@ const wDomToDom = (wDom: WDom, init: boolean) => {
 
 const wDomChildrenToDom = (
   children: WDom[],
-  parentElement?: HTMLElement | DocumentFragment | Text,
-  init?: boolean
+  parentElement?: HTMLElement | DocumentFragment | Text
 ) => {
-  if (init) {
-    const elementChildren = children.reduce(
-      (acc: DocumentFragment, childItem: WDom) => {
-        if (childItem.type) {
-          acc.appendChild(wDomToDom(childItem, init));
-        }
+  const elementChildren = children.reduce(
+    (acc: DocumentFragment, childItem: WDom) => {
+      if (childItem.type) {
+        acc.appendChild(wDomToDom(childItem));
+      }
 
-        return acc;
-      },
-      new DocumentFragment()
-    );
+      return acc;
+    },
+    new DocumentFragment()
+  );
 
-    if (parentElement && elementChildren.hasChildNodes()) {
-      parentElement.appendChild(elementChildren);
-    }
+  if (parentElement && elementChildren.hasChildNodes()) {
+    parentElement.appendChild(elementChildren);
   }
 };
 

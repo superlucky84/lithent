@@ -26,7 +26,7 @@ export const componentRender = (componentKey: Props) => () => {
   return result;
 };
 
-export const setComponetRef = (componentKey: Props) => {
+const setComponetRef = (componentKey: Props) => {
   componentRef.set(componentKey, {
     vd: { value: null },
     up: () => {},
