@@ -61,7 +61,9 @@ pnpm add lithent
 #### Or Use CDN
 
 * UMD : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.umd.js
+  * UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@0.36.2/helper/dist/lithentHelper.umd.js
 * EMS : https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.mjs
+  * ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@0.36.2/helper/dist/lithentHelper.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -120,12 +122,14 @@ render(html`<${Component} />`, document.getElementById('root'));
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/lithent@0.36.2/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@0.36.2/helper/dist/lithentHelper.umd.js"></script-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.js"></script>
 
 <div id="root"></div>
 
 <script>
 const { h, Fragment, render, mount } = lithent;
+// const { state } = lithentHelper;
 const html = htm.bind(h);
 
 const Component = mount(renew => {
