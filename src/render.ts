@@ -266,7 +266,7 @@ const updateText = (newWDom: WDom) => {
 
 const updateProps = (
   props?: Props,
-  element?: HTMLElement | DocumentFragment | Text,
+  element?: HTMLElement | Element | DocumentFragment | Text,
   oldProps?: Props
 ) => {
   const originalProps = { ...oldProps };
@@ -346,8 +346,8 @@ const wDomToDom = (wDom: WDom) => {
     element = document.createElement('e');
   }
 
-  wDomChildrenToDom(children, element as HTMLElement);
-  updateProps(props, element as HTMLElement);
+  wDomChildrenToDom(children, element);
+  updateProps(props, element);
 
   wDom.el = element as HTMLElement;
 
@@ -362,7 +362,7 @@ const wDomToDom = (wDom: WDom) => {
 
 const wDomChildrenToDom = (
   children: WDom[],
-  parentElement?: HTMLElement | DocumentFragment | Text
+  parentElement?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const elementChildren = children.reduce(
     (acc: DocumentFragment, childItem: WDom) => {
@@ -402,7 +402,7 @@ const updateEvent = (
 const updateStyle = (
   style: Record<string, string>,
   oldStyle: Record<string, string>,
-  element?: HTMLElement | DocumentFragment | Text
+  element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const originalStyle = { ...oldStyle };
   const elementStyle = (element as HTMLElement)?.style;

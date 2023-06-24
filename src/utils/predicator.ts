@@ -81,8 +81,9 @@ export const checkStyleData = (
 export const checkRefData = (
   dataKey: string,
   dataValue: unknown
-): dataValue is { value: HTMLElement | DocumentFragment | Text | undefined } =>
-  dataKey === 'ref' && typeof dataValue === 'object';
+): dataValue is {
+  value: HTMLElement | Element | DocumentFragment | Text | undefined;
+} => dataKey === 'ref' && typeof dataValue === 'object';
 
 export const checkOptionElement = (element: any): element is HTMLElement =>
   element.nodeType === 1 && element.tagName === 'OPTION';
