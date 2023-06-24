@@ -9,11 +9,11 @@ import {
   checkCheckableElement,
 } from '@/utils/predicator';
 
-import { componentRef } from '@/utils/universalRef';
+import { componentRef, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
-import { getParent, getEventName } from '@/utils';
+import { getParent, getEventName, getAttrKey } from '@/utils';
 
 export const render = (
   wDom: WDom,
@@ -34,13 +34,11 @@ export const render = (
   }
 
   return () => {
-    if (wDom.componentProps) {
-      const component = componentRef.get(wDom.componentProps)?.vd.value;
-      if (component) {
-        runUnmountQueueFromWDom(component);
-        recursiveRemoveEvent(component);
-        rootDelete(component);
-      }
+    const component = componentRef.get(wDom.componentProps || {})?.vd.value;
+    if (component) {
+      runUnmountQueueFromWDom(component);
+      recursiveRemoveEvent(component);
+      rootDelete(component);
     }
   };
 };
@@ -121,7 +119,7 @@ const typeAdd = (
   newElement?: HTMLElement | DocumentFragment | Text
 ) => {
   if (!newElement) {
-    newElement = wDomToDom(newWDom);
+    newElement = wDomToDom(newWDom) as HTMLElement;
   }
 
   const parentWDom = getParent(newWDom);
@@ -266,7 +264,7 @@ const updateText = (newWDom: WDom) => {
 
 const updateProps = (
   props?: Props,
-  element?: HTMLElement | DocumentFragment | Text,
+  element?: HTMLElement | Element | DocumentFragment | Text,
   oldProps?: Props
 ) => {
   const originalProps = { ...oldProps };
@@ -275,11 +273,7 @@ const updateProps = (
     ([dataKey, dataValue]: [string, unknown]) => {
       if (dataKey === 'key') {
         // Do nothing
-      } else if (
-        dataKey === 'innerHTML' &&
-        element &&
-        typeof dataValue === 'string'
-      ) {
+      } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
         (element as HTMLElement).innerHTML = dataValue;
       } else if (checkStyleData(dataKey, dataValue)) {
         updateStyle(
@@ -305,7 +299,18 @@ const updateProps = (
       } else if (checkOptionElement(element) && dataKey === 'selected') {
         (element as HTMLOptionElement).selected = !!dataValue;
       } else if (checkNormalAttribute(dataValue)) {
-        (element as HTMLElement).setAttribute(dataKey, String(dataValue));
+        if (xmlnsRef.value && dataKey !== 'xmlns') {
+          (element as HTMLElement).setAttributeNS(
+            null,
+            getAttrKey(dataKey),
+            String(dataValue)
+          );
+        } else {
+          (element as HTMLElement).setAttribute(
+            getAttrKey(dataKey),
+            String(dataValue)
+          );
+        }
       }
 
       delete originalProps[dataKey];
@@ -322,10 +327,16 @@ const wDomToDom = (wDom: WDom) => {
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = type === 'fragment' || type === 'loop';
 
+  if (tag === 'svg') {
+    xmlnsRef.value = String(props?.xmlns);
+  }
+
   if (isVirtualType) {
     element = new DocumentFragment();
   } else if (type === 'element' && tag) {
-    element = document.createElement(tag);
+    element = xmlnsRef.value
+      ? document.createElementNS(xmlnsRef.value, tag)
+      : document.createElement(tag);
   } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
   } else {
@@ -335,16 +346,20 @@ const wDomToDom = (wDom: WDom) => {
   wDomChildrenToDom(children, element);
   updateProps(props, element);
 
-  wDom.el = element;
+  wDom.el = element as HTMLElement;
 
   runMountedQueueFromWDom(wDom);
+
+  if (tag === 'svg') {
+    xmlnsRef.value = '';
+  }
 
   return element;
 };
 
 const wDomChildrenToDom = (
   children: WDom[],
-  parentElement?: HTMLElement | DocumentFragment | Text
+  parentElement?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const elementChildren = children.reduce(
     (acc: DocumentFragment, childItem: WDom) => {
@@ -384,7 +399,7 @@ const updateEvent = (
 const updateStyle = (
   style: Record<string, string>,
   oldStyle: Record<string, string>,
-  element?: HTMLElement | DocumentFragment | Text
+  element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const originalStyle = { ...oldStyle };
   const elementStyle = (element as HTMLElement)?.style;

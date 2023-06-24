@@ -1,4 +1,4 @@
-import { h, mount, mountCallback, Fragment, render } from 'lithent';
+import { h, mount, mountCallback, Fragment, render, ref } from 'lithent';
 
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
@@ -65,18 +65,16 @@ const Loop = mount(function () {
 });
 
 export const Example16 = mount(() => {
+  const wrapEl = ref<null | HTMLElement>(null);
+  const nextEl = ref<null | HTMLElement>(null);
+  const buttenEl = ref<null | HTMLElement>(null);
+
   mountCallback(() => {
-    setTimeout(() => {
-      const wrap = document.querySelector('#list-root3') as HTMLElement;
-      const destroy = render(
-        <Loop />,
-        wrap,
-        document.querySelector('#nextTarget3') as HTMLElement
-      );
-      document
-        .getElementById('destroy-button')
-        ?.addEventListener('click', destroy);
-    });
+    const wrap = wrapEl.value as HTMLElement;
+    const next = nextEl.value as HTMLElement;
+    const button = buttenEl.value as HTMLElement;
+    const destroy = render(<Loop />, wrap, next);
+    button.addEventListener('click', destroy);
   });
   return () => (
     <div class="flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
@@ -94,12 +92,22 @@ export const Example16 = mount(() => {
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div
-        class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"
-        innerHTML={
-          '<ul id="list-root3"> <li>1</li> <li>2</li> <li>3</li> <li id="nextTarget3">8</li> <li>9</li> </ul><button id="destroy-button" class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800" >destroy</button>'
-        }
-      />
+      <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
+        <ul ref={wrapEl} id="list-root3">
+          <li>1</li> <li>2</li> <li>3</li>{' '}
+          <li ref={nextEl} id="nextTarget3">
+            8
+          </li>{' '}
+          <li>9</li>{' '}
+        </ul>
+        <button
+          ref={buttenEl}
+          id="destroy-button"
+          class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
+        >
+          destroy
+        </button>
+      </div>
     </div>
   );
 });

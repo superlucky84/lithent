@@ -1,4 +1,4 @@
-import { h, mount, mountCallback, Fragment, render } from 'lithent';
+import { h, mount, mountCallback, Fragment, render, ref } from 'lithent';
 
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
@@ -81,14 +81,14 @@ const Loop = mount(function (renew) {
 });
 
 export const Example13 = mount(() => {
+  const wrapEl = ref<null | HTMLElement>(null);
+  const nextEl = ref<null | HTMLElement>(null);
+
   mountCallback(() => {
     setTimeout(() => {
-      const wrap = document.querySelector('#list-root2') as HTMLElement;
-      render(
-        <Loop />,
-        wrap,
-        document.querySelector('#nextTarget2') as HTMLElement
-      );
+      const wrap = wrapEl.value as HTMLElement;
+      const next = nextEl.value as HTMLElement;
+      render(<Loop />, wrap, next);
     });
   });
   return () => (
@@ -108,12 +108,12 @@ export const Example13 = mount(() => {
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div
-        class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"
-        innerHTML={
-          '<ul id="list-root2"> <li>1</li> <li>2</li> <li>3</li> <li id="nextTarget2">8</li> <li>9</li> </ul>'
-        }
-      />
+      <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
+        <ul ref={wrapEl}>
+          <li>1</li> <li>2</li> <li>3</li> <li ref={nextEl}>8</li>
+          <li>9</li>
+        </ul>
+      </div>
     </div>
   );
 });
