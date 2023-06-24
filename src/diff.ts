@@ -185,13 +185,10 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
   };
 };
 
-const findSameKeyOriginalItem = (item: WDom, originalChildren: WDom[]) => {
-  const key = getKey(item);
-
-  return originalChildren.find(
-    orignalChildItem => getKey(orignalChildItem) === key
+const findSameKeyOriginalItem = (item: WDom, originalChildren: WDom[]) =>
+  originalChildren.find(
+    orignalChildItem => getKey(orignalChildItem) === getKey(item)
   );
-};
 
 const getKey = (target: WDom) =>
   target?.componentProps?.key ?? target?.props?.key;
