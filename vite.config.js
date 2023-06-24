@@ -27,6 +27,6 @@ export default defineConfig({
     },
   },
   server: {
-    open: '/html/svg.html',
+    open: '/html/renew.html',
   },
 });
