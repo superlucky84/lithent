@@ -13,7 +13,7 @@ import { componentRef, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
-import { getParent, getEventName } from '@/utils';
+import { getParent, getEventName, getAttrKey } from '@/utils';
 
 export const render = (
   wDom: WDom,
@@ -308,11 +308,14 @@ const updateProps = (
         if (xmlnsRef.value && dataKey !== 'xmlns') {
           (element as HTMLElement).setAttributeNS(
             null,
-            dataKey,
+            getAttrKey(dataKey),
             String(dataValue)
           );
         } else {
-          (element as HTMLElement).setAttribute(dataKey, String(dataValue));
+          (element as HTMLElement).setAttribute(
+            getAttrKey(dataKey),
+            String(dataValue)
+          );
         }
       }
 
