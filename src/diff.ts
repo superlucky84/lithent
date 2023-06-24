@@ -117,13 +117,10 @@ const remakeChildrenForDiff = (
     : remakeChildrenForAdd(newWDom);
 
 const remakeChildrenForAdd = (newWDom: WDom) =>
-  (newWDom.children || []).map((item: WDom) => {
-    const childItem = makeNewWDomTree(item);
-
-    childItem.getParent = () => newWDom;
-
-    return childItem;
-  });
+  (newWDom.children || []).map((item: WDom) => ({
+    ...makeNewWDomTree(item),
+    getParent: () => newWDom,
+  }));
 
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
   if (
@@ -133,20 +130,14 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
     return remakeChildrenForLoopUpdate(newWDom, originalWDom);
   }
 
-  return (newWDom.children || []).map((item: WDom, index: number) => {
-    const childItem = makeNewWDomTree(
-      item,
-      (originalWDom.children || [])[index]
-    );
-
-    childItem.getParent = () => newWDom;
-
-    return childItem;
-  });
+  return (newWDom.children || []).map((item: WDom, index: number) => ({
+    ...makeNewWDomTree(item, (originalWDom.children || [])[index]),
+    getParent: () => newWDom,
+  }));
 };
 
 const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
-  const { remakedChildren, unUsedChildren } = diffLoopChildren(
+  const [remakedChildren, unUsedChildren] = diffLoopChildren(
     newWDom,
     originalWDom
   );
@@ -165,7 +156,6 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
 const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
   const newChildren = [...(newWDom.children || [])];
   const originalChildren = [...(originalWDom.children || [])];
-
   const remakedChildren = newChildren.map(item => {
     const originalItem = findSameKeyOriginalItem(item, originalChildren);
     const childItem = makeNewWDomTree(item, originalItem);
@@ -179,10 +169,7 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
     return childItem;
   });
 
-  return {
-    remakedChildren,
-    unUsedChildren: originalChildren,
-  };
+  return [remakedChildren, originalChildren];
 };
 
 const findSameKeyOriginalItem = (item: WDom, originalChildren: WDom[]) =>
