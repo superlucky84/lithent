@@ -117,10 +117,13 @@ const remakeChildrenForDiff = (
     : remakeChildrenForAdd(newWDom);
 
 const remakeChildrenForAdd = (newWDom: WDom) =>
-  (newWDom.children || []).map((item: WDom) => ({
-    ...makeNewWDomTree(item),
-    getParent: () => newWDom,
-  }));
+  (newWDom.children || []).map((item: WDom) => {
+    const childItem = makeNewWDomTree(item);
+
+    childItem.getParent = () => newWDom;
+
+    return childItem;
+  });
 
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
   if (
@@ -130,10 +133,16 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
     return remakeChildrenForLoopUpdate(newWDom, originalWDom);
   }
 
-  return (newWDom.children || []).map((item: WDom, index: number) => ({
-    ...makeNewWDomTree(item, (originalWDom.children || [])[index]),
-    getParent: () => newWDom,
-  }));
+  return (newWDom.children || []).map((item: WDom, index: number) => {
+    const childItem = makeNewWDomTree(
+      item,
+      (originalWDom.children || [])[index]
+    );
+
+    childItem.getParent = () => newWDom;
+
+    return childItem;
+  });
 };
 
 const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
