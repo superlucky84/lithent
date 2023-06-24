@@ -25,8 +25,6 @@ import {
   checkCustemComponentFunction,
 } from '@/utils/predicator';
 
-export type Children = WDom[];
-
 export const Fragment = (_props: Props, ...children: WDom[]) => ({
   type: 'fragment',
   children,
@@ -128,15 +126,15 @@ const makeCustomNode = (
   children: WDom[]
 ) => {
   const customNode = componentMaker(props);
-  const reRender = makeReRender(
-    componentMaker,
+
+  addComponentProps(
+    customNode,
     componentKey,
     tag,
     props,
-    children
+    children,
+    makeReRender(componentMaker, componentKey, tag, props, children)
   );
-
-  addComponentProps(customNode, componentKey, tag, props, children, reRender);
 
   return customNode;
 };
@@ -223,13 +221,10 @@ const remakeChildren = (
   nodeParentPointer: NodePointer,
   children: MiddleStateWDomChildren
 ): WDom[] =>
-  children.map((item: MiddleStateWDom) => {
-    const childItem = makeChildrenItem(item);
-
-    childItem.getParent = () => nodeParentPointer.value;
-
-    return childItem;
-  });
+  children.map((item: MiddleStateWDom) => ({
+    ...makeChildrenItem(item),
+    getParent: () => nodeParentPointer.value,
+  }));
 
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {

@@ -26,7 +26,8 @@ export const reRender = (vDom: WDom, infoVdom: TagFunctionResolver) => {
 export const getEventName = (eventKey: string) =>
   eventKey.replace(/^on(.*)/, (_match, p1) => p1.toLowerCase());
 
-export const getAttrKey = (keyName: string) => keyName === 'className' ? 'class' : keyName;
+export const getAttrKey = (keyName: string) =>
+  keyName === 'className' ? 'class' : keyName;
 
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {

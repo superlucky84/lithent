@@ -1,4 +1,4 @@
-import { h, mount, mountCallback, Fragment, render } from 'lithent';
+import { h, mount, mountCallback, Fragment, render, ref } from 'lithent';
 import { state } from 'lithent/helper';
 
 import hljs from 'highlight.js';
@@ -84,15 +84,12 @@ const Root = mount(function (r) {
 });
 
 export const Example12 = mount(() => {
+  const wrapEl = ref<null | HTMLElement>(null);
+  const nextEl = ref<null | HTMLElement>(null);
   mountCallback(() => {
-    setTimeout(() => {
-      const wrap = document.querySelector('#list-root') as HTMLElement;
-      render(
-        <Root />,
-        wrap,
-        document.querySelector('#nextTarget') as HTMLElement
-      );
-    });
+    const wrap = wrapEl.value as HTMLElement;
+    const next = nextEl.value as HTMLElement;
+    render(<Root />, wrap, next);
   });
   return () => (
     <div class="flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
@@ -110,12 +107,11 @@ export const Example12 = mount(() => {
           style={{ whiteSpace: 'pre' }}
         />
       </div>
-      <div
-        class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950"
-        innerHTML={
-          '<ul id="list-root"> <li>1</li> <li>2</li> <li>3</li> <li id="nextTarget">8</li> <li>9</li> </ul>'
-        }
-      />
+      <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
+        <ul ref={wrapEl}>
+          <li>1</li> <li>2</li> <li>3</li> <li ref={nextEl}>8</li> <li>9</li>
+        </ul>
+      </div>
     </div>
   );
 });

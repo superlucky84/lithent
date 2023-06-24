@@ -34,13 +34,11 @@ export const render = (
   }
 
   return () => {
-    if (wDom.componentProps) {
-      const component = componentRef.get(wDom.componentProps)?.vd.value;
-      if (component) {
-        runUnmountQueueFromWDom(component);
-        recursiveRemoveEvent(component);
-        rootDelete(component);
-      }
+    const component = componentRef.get(wDom.componentProps || {})?.vd.value;
+    if (component) {
+      runUnmountQueueFromWDom(component);
+      recursiveRemoveEvent(component);
+      rootDelete(component);
     }
   };
 };
@@ -275,11 +273,7 @@ const updateProps = (
     ([dataKey, dataValue]: [string, unknown]) => {
       if (dataKey === 'key') {
         // Do nothing
-      } else if (
-        dataKey === 'innerHTML' &&
-        element &&
-        typeof dataValue === 'string'
-      ) {
+      } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
         (element as HTMLElement).innerHTML = dataValue;
       } else if (checkStyleData(dataKey, dataValue)) {
         updateStyle(
@@ -334,7 +328,7 @@ const wDomToDom = (wDom: WDom) => {
   const isVirtualType = type === 'fragment' || type === 'loop';
 
   if (tag === 'svg') {
-    xmlnsRef.value = String(props?.xmlns || 'http://www.w3.org/2000/svg');
+    xmlnsRef.value = String(props?.xmlns);
   }
 
   if (isVirtualType) {
