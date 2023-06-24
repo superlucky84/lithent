@@ -9,7 +9,7 @@ import {
   checkCheckableElement,
 } from '@/utils/predicator';
 
-import { componentRef } from '@/utils/universalRef';
+import { componentRef, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { runMountedQueueFromWDom } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
@@ -121,7 +121,7 @@ const typeAdd = (
   newElement?: HTMLElement | DocumentFragment | Text
 ) => {
   if (!newElement) {
-    newElement = wDomToDom(newWDom);
+    newElement = wDomToDom(newWDom) as HTMLElement;
   }
 
   const parentWDom = getParent(newWDom);
@@ -305,7 +305,15 @@ const updateProps = (
       } else if (checkOptionElement(element) && dataKey === 'selected') {
         (element as HTMLOptionElement).selected = !!dataValue;
       } else if (checkNormalAttribute(dataValue)) {
-        (element as HTMLElement).setAttribute(dataKey, String(dataValue));
+        if (xmlnsRef.value && dataKey !== 'xmlns') {
+          (element as HTMLElement).setAttributeNS(
+            null,
+            dataKey,
+            String(dataValue)
+          );
+        } else {
+          (element as HTMLElement).setAttribute(dataKey, String(dataValue));
+        }
       }
 
       delete originalProps[dataKey];
@@ -322,22 +330,32 @@ const wDomToDom = (wDom: WDom) => {
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = type === 'fragment' || type === 'loop';
 
+  if (tag === 'svg') {
+    xmlnsRef.value = String(props?.xmlns || 'http://www.w3.org/2000/svg');
+  }
+
   if (isVirtualType) {
     element = new DocumentFragment();
   } else if (type === 'element' && tag) {
-    element = document.createElement(tag);
+    element = xmlnsRef.value
+      ? document.createElementNS(xmlnsRef.value, tag)
+      : document.createElement(tag);
   } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
   } else {
     element = document.createElement('e');
   }
 
-  wDomChildrenToDom(children, element);
-  updateProps(props, element);
+  wDomChildrenToDom(children, element as HTMLElement);
+  updateProps(props, element as HTMLElement);
 
-  wDom.el = element;
+  wDom.el = element as HTMLElement;
 
   runMountedQueueFromWDom(wDom);
+
+  if (tag === 'svg') {
+    xmlnsRef.value = '';
+  }
 
   return element;
 };

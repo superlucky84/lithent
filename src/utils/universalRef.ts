@@ -8,6 +8,7 @@ type RedrawQueueList = {
 /**
  * Common
  */
+export const xmlnsRef: { value: string } = { value: '' };
 export const componentKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentRef: ComponentRef = new WeakMap();
