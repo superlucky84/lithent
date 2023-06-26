@@ -208,6 +208,7 @@ const typeReplace = (newWDom: WDom) => {
       if (parentElement) {
         parentElement.replaceChild(newElement, orignalElement);
       }
+      execMountedQueue();
     }
   }
 };

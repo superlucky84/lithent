@@ -81,7 +81,6 @@ const recursiveGetChildKeys = (wDom: WDom, result: Props[]) => {
 };
 
 const execRedrawQueue = () => {
-  console.log('exec');
   let childItemList: Props[] = [];
 
   redrawQueue.forEach(item => {
