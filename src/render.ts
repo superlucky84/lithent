@@ -7,6 +7,7 @@ import {
   checkOptionElement,
   checkTextareaElement,
   checkCheckableElement,
+  checkVirtualType,
 } from '@/utils/predicator';
 
 import { componentRef, xmlnsRef } from '@/utils/universalRef';
@@ -160,7 +161,7 @@ const startFindNextBrotherElement = (
     return finedNextEl;
   }
 
-  if (!parentWDom.isRoot && ['fragment', 'loop'].includes(parentType)) {
+  if (!parentWDom.isRoot && checkVirtualType(parentType)) {
     return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
   } else if (parentWDom.isRoot && parentWDom.afterElement) {
     return parentWDom.afterElement;
@@ -179,7 +180,7 @@ const findChildFragmentNextElement = (
     ) => {
       const type = bItem.type;
       const el = bItem.el;
-      const isFragment = type && ['fragment', 'loop'].includes(type);
+      const isFragment = type && checkVirtualType(type);
 
       if (targetEl) {
         return targetEl;
@@ -326,7 +327,7 @@ const updateProps = (
 const wDomToDom = (wDom: WDom) => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
-  const isVirtualType = type === 'fragment' || type === 'loop';
+  const isVirtualType = checkVirtualType(type);
 
   if (tag === 'svg') {
     xmlnsRef.value = String(props?.xmlns);
@@ -420,7 +421,7 @@ const updateStyle = (
 const findRealParentElement = (
   vDom: WDom
 ): HTMLElement | DocumentFragment | Text | undefined => {
-  const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
+  const isVirtualType = checkVirtualType(vDom.type);
   if (vDom.isRoot && isVirtualType) {
     return vDom.wrapElement;
   }

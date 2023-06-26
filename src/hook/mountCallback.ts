@@ -12,7 +12,11 @@ export const execMountedQueue = () => {
   mountedQueue.forEach(item => runMountedQueueFromWDom(item));
   mountedQueue = [];
 };
-export const addMountedQueue = (wDom: WDom) => mountedQueue.push(wDom);
+export const addMountedQueue = (wDom: WDom) => {
+  if (wDom.componentKey) {
+    mountedQueue.push(wDom);
+  }
+};
 export const mountCallback = (effectAction: () => void) =>
   componentRef.get(getComponentKey())!.mts.push(effectAction);
 
