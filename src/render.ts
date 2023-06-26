@@ -11,7 +11,7 @@ import {
 
 import { componentRef, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
-import { runMountedQueueFromWDom } from '@/hook/mountCallback';
+import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent, getEventName, getAttrKey } from '@/utils';
 
@@ -32,6 +32,8 @@ export const render = (
   } else {
     wrapElement.appendChild(Dom);
   }
+
+  execMountedQueue();
 
   return () => {
     const component = componentRef.get(wDom.componentProps || {})?.vd.value;
@@ -136,10 +138,10 @@ const typeAdd = (
       } else {
         parentEl.appendChild(newElement);
       }
+
+      execMountedQueue();
     }
   }
-
-  runMountedQueueFromWDom(newWDom);
 };
 
 const startFindNextBrotherElement = (
@@ -208,8 +210,6 @@ const typeReplace = (newWDom: WDom) => {
       }
     }
   }
-
-  runMountedQueueFromWDom(newWDom);
 };
 
 const removeEvent = (
@@ -348,7 +348,7 @@ const wDomToDom = (wDom: WDom) => {
 
   wDom.el = element as HTMLElement;
 
-  runMountedQueueFromWDom(wDom);
+  addMountedQueue(wDom);
 
   if (tag === 'svg') {
     xmlnsRef.value = '';

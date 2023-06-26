@@ -5,6 +5,9 @@ type RedrawQueueList = {
   exec: () => void;
 }[];
 
+let redrawQueue: { componentKey: Props; exec: () => void }[] = [];
+let redrawQueueTimeout: boolean = false;
+
 /**
  * Common
  */
@@ -12,12 +15,7 @@ export const xmlnsRef: { value: string } = { value: '' };
 export const componentKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentRef: ComponentRef = new WeakMap();
-export const redrawQueue: {
-  value: { componentKey: Props; exec: () => void }[];
-} = { value: [] };
-export const redrawQueueTimeout: { value: boolean } = {
-  value: false,
-};
+
 export const componentRender = (componentKey: Props) => () => {
   const up = componentRef.get(componentKey)?.up;
   let result = false;
@@ -51,13 +49,13 @@ export const getComponentSubInfo = (
 
 export const setRedrawAction = (componentKey: Props, exec: () => void) => {
   componentRef.get(componentKey)!.up = () => {
-    redrawQueue.value.push({
+    redrawQueue.push({
       componentKey,
       exec,
     });
 
-    if (!redrawQueueTimeout.value) {
-      redrawQueueTimeout.value = true;
+    if (!redrawQueueTimeout) {
+      redrawQueueTimeout = true;
       queueMicrotask(execRedrawQueue);
     }
   };
@@ -86,7 +84,7 @@ const execRedrawQueue = () => {
   console.log('exec');
   let childItemList: Props[] = [];
 
-  redrawQueue.value.forEach(item => {
+  redrawQueue.forEach(item => {
     const childVd = componentRef.get(item.componentKey)?.vd?.value;
     if (childVd) {
       recursiveGetChildKeys(childVd, childItemList);
@@ -94,7 +92,7 @@ const execRedrawQueue = () => {
   });
 
   const addedKey: Props[] = [];
-  const result = redrawQueue.value.reduce((acc, item) => {
+  const result = redrawQueue.reduce((acc, item) => {
     const { componentKey } = item;
 
     if (
@@ -116,4 +114,7 @@ const execRedrawQueue = () => {
       action.exec();
     }
   }
+
+  redrawQueue = [];
+  redrawQueueTimeout = false;
 };

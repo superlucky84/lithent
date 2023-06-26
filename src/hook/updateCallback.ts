@@ -1,9 +1,4 @@
-import {
-  componentRef,
-  redrawQueue,
-  redrawQueueTimeout,
-  getComponentKey,
-} from '@/utils/universalRef';
+import { componentRef, getComponentKey } from '@/utils/universalRef';
 
 import { useUpdated } from '@/hook/useUpdate';
 
@@ -23,7 +18,4 @@ export const runUpdateCallback = () => {
   if (updateReqs?.length) {
     updateReqs.forEach(callback => callback());
   }
-
-  redrawQueue.value = [];
-  redrawQueueTimeout.value = false;
 };
