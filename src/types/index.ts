@@ -80,19 +80,18 @@ export type ComponentSubKey =
   | 'mts'
   | 'umts';
 
-export type ComponentRef = WeakMap<
-  Props,
-  {
-    vd: { value: null | WDom };
-    up: () => void;
-    upR: (() => void)[];
-    upS: { value: number };
-    upD: unknown[][];
-    upCB: (() => void)[];
-    mts: (() => void)[];
-    umts: (() => void)[];
-  }
->;
+export type ComponentRef = WeakMap<Props, ComponentInfo>;
+
+export type ComponentInfo = {
+  vd: { value: null | WDom };
+  up: () => void;
+  upR: (() => void)[];
+  upS: { value: number };
+  upD: unknown[][];
+  upCB: (() => void)[];
+  mts: (() => void)[];
+  umts: (() => void)[];
+};
 
 export type Param<Updater, Member, Props> = {
   updater: Updater;

@@ -26,6 +26,10 @@ export default defineConfig({
       fileName: 'lithent',
     },
   },
+  test: {
+    environment: 'jsdom',
+    includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
+  },
   server: {
     open: '/html/renew.html',
   },

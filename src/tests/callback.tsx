@@ -61,7 +61,6 @@ const CallbackRoot = mount(renew => {
 
   const toggle = () => {
     isShow = !isShow;
-    console.log(isShow);
     renew();
   };
 

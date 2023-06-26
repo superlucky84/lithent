@@ -55,6 +55,9 @@ const checkNormalTypeElement = (
   (originalWDom?.children?.length === newWDom?.children?.length ||
     newWDom.type === 'loop');
 
+export const checkVirtualType = (type: string | null) =>
+  type && ['fragment', 'loop'].includes(type);
+
 export const checkCustemComponentFunction = (
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver =>

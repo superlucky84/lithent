@@ -7,11 +7,12 @@ import {
   checkOptionElement,
   checkTextareaElement,
   checkCheckableElement,
+  checkVirtualType,
 } from '@/utils/predicator';
 
 import { componentRef, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
-import { runMountedQueueFromWDom } from '@/hook/mountCallback';
+import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
 import { getParent, getEventName, getAttrKey } from '@/utils';
 
@@ -32,6 +33,8 @@ export const render = (
   } else {
     wrapElement.appendChild(Dom);
   }
+
+  execMountedQueue();
 
   return () => {
     const component = componentRef.get(wDom.componentProps || {})?.vd.value;
@@ -136,10 +139,10 @@ const typeAdd = (
       } else {
         parentEl.appendChild(newElement);
       }
+
+      execMountedQueue();
     }
   }
-
-  runMountedQueueFromWDom(newWDom);
 };
 
 const startFindNextBrotherElement = (
@@ -158,7 +161,7 @@ const startFindNextBrotherElement = (
     return finedNextEl;
   }
 
-  if (!parentWDom.isRoot && ['fragment', 'loop'].includes(parentType)) {
+  if (!parentWDom.isRoot && checkVirtualType(parentType)) {
     return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
   } else if (parentWDom.isRoot && parentWDom.afterElement) {
     return parentWDom.afterElement;
@@ -177,7 +180,7 @@ const findChildFragmentNextElement = (
     ) => {
       const type = bItem.type;
       const el = bItem.el;
-      const isFragment = type && ['fragment', 'loop'].includes(type);
+      const isFragment = type && checkVirtualType(type);
 
       if (targetEl) {
         return targetEl;
@@ -206,10 +209,9 @@ const typeReplace = (newWDom: WDom) => {
       if (parentElement) {
         parentElement.replaceChild(newElement, orignalElement);
       }
+      execMountedQueue();
     }
   }
-
-  runMountedQueueFromWDom(newWDom);
 };
 
 const removeEvent = (
@@ -325,7 +327,7 @@ const updateProps = (
 const wDomToDom = (wDom: WDom) => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
-  const isVirtualType = type === 'fragment' || type === 'loop';
+  const isVirtualType = checkVirtualType(type);
 
   if (tag === 'svg') {
     xmlnsRef.value = String(props?.xmlns);
@@ -348,7 +350,7 @@ const wDomToDom = (wDom: WDom) => {
 
   wDom.el = element as HTMLElement;
 
-  runMountedQueueFromWDom(wDom);
+  addMountedQueue(wDom);
 
   if (tag === 'svg') {
     xmlnsRef.value = '';
@@ -419,7 +421,7 @@ const updateStyle = (
 const findRealParentElement = (
   vDom: WDom
 ): HTMLElement | DocumentFragment | Text | undefined => {
-  const isVirtualType = vDom.type === 'fragment' || vDom.type === 'loop';
+  const isVirtualType = checkVirtualType(vDom.type);
   if (vDom.isRoot && isVirtualType) {
     return vDom.wrapElement;
   }

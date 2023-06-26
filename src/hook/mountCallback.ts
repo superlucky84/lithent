@@ -4,14 +4,21 @@ import {
   componentRef,
   getComponentKey,
 } from '@/utils/universalRef';
-
 import { unmount } from '@/hook/unmount';
 
-export const mountCallback = (effectAction: () => void) => {
-  const mts = componentRef.get(getComponentKey())!.mts;
+let mountedQueue: WDom[] = [];
 
-  mts.push(effectAction);
+export const execMountedQueue = () => {
+  mountedQueue.forEach(item => runMountedQueueFromWDom(item));
+  mountedQueue = [];
 };
+export const addMountedQueue = (wDom: WDom) => {
+  if (wDom.componentKey) {
+    mountedQueue.push(wDom);
+  }
+};
+export const mountCallback = (effectAction: () => void) =>
+  componentRef.get(getComponentKey())!.mts.push(effectAction);
 
 export const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { componentKey } = newWDom;
