@@ -24,6 +24,7 @@ used lightly in a variety of situations.
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
+- [Test](#test)
 - [Develop Guide](#develop-guide)
 
 ## Why use Lithent?
@@ -151,6 +152,13 @@ const Component = mount(renew => {
 
 render(html`<${Component} />`, document.getElementById('root'));
 </script>
+```
+
+## Test
+
+```bash
+// pnpm install
+pnpm test
 ```
 
 ## Develop Guide
