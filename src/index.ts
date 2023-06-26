@@ -2,7 +2,7 @@ import { h, Fragment, mount } from '@/wDom';
 import { render } from '@/render';
 import { mountCallback } from '@/hook/mountCallback';
 import { updateCallback } from '@/hook/updateCallback';
-import { ref } from '@/hook/ref';
+import { ref, nextTick } from '@/hook/ref';
 
 export type {
   WDom,
@@ -27,4 +27,13 @@ declare global {
   }
 }
 
-export { h, Fragment, render, mount, mountCallback, updateCallback, ref };
+export {
+  h,
+  Fragment,
+  render,
+  mount,
+  mountCallback,
+  updateCallback,
+  ref,
+  nextTick,
+};

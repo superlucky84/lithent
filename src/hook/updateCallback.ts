@@ -25,5 +25,5 @@ export const runUpdateCallback = () => {
   }
 
   redrawQueue.value = [];
-  redrawQueueTimeout.value = null;
+  redrawQueueTimeout.value = false;
 };

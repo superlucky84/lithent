@@ -28,7 +28,7 @@ export default defineConfig({
   },
   test: {
     environment: 'happy-dom',
-    includeSource: ['src/examples/*.{js,ts,jsx,tsx}'],
+    includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
   },
   server: {
     open: '/html/renew.html',

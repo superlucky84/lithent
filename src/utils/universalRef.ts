@@ -15,8 +15,8 @@ export const componentRef: ComponentRef = new WeakMap();
 export const redrawQueue: {
   value: { componentKey: Props; exec: () => void }[];
 } = { value: [] };
-export const redrawQueueTimeout: { value: null | number | NodeJS.Timeout } = {
-  value: null,
+export const redrawQueueTimeout: { value: boolean } = {
+  value: false,
 };
 export const componentRender = (componentKey: Props) => () => {
   const up = componentRef.get(componentKey)?.up;
@@ -55,8 +55,10 @@ export const setRedrawAction = (componentKey: Props, exec: () => void) => {
       componentKey,
       exec,
     });
+
     if (!redrawQueueTimeout.value) {
-      redrawQueueTimeout.value = setTimeout(execRedrawQueue);
+      redrawQueueTimeout.value = true;
+      queueMicrotask(execRedrawQueue);
     }
   };
 };
@@ -81,6 +83,7 @@ const recursiveGetChildKeys = (wDom: WDom, result: Props[]) => {
 };
 
 const execRedrawQueue = () => {
+  console.log('exec');
   let childItemList: Props[] = [];
 
   redrawQueue.value.forEach(item => {

@@ -1,5 +1,6 @@
 // example.jsx
-import { h, Fragment, render, Renew, mount } from '@/index';
+import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
+const clickRef = ref<null | (() => void)>(null);
 
 const Renew = mount((renew, _props) => {
   let count1 = 0;
@@ -14,6 +15,7 @@ const Renew = mount((renew, _props) => {
     count4 -= 1;
     renew();
   };
+  clickRef.value = change;
 
   return () => (
     <Fragment>
@@ -26,12 +28,22 @@ const Renew = mount((renew, _props) => {
   );
 });
 
-render(<Renew />, document.getElementById('root'));
+const testWrap =
+  document.getElementById('root') || document.createElement('div');
+
+render(<Renew />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
   it('add', () => {
-    // console.log(rootElement.outerHTML);
+    console.log(testWrap.outerHTML);
     expect(true).toBe(true);
+    if (clickRef.value) {
+      clickRef.value();
+      console.log('click');
+    }
+    nextTick().then(() => {
+      console.log(testWrap.outerHTML);
+    });
   });
 }
