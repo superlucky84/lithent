@@ -17,7 +17,7 @@
     "build": "pnpm build:core && pnpm build:helper && pnpm build:examples && pnpm build:docs",
     "build:p": "pnpm build:core && pnpm -r build",
     "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
-    "test": "vitest",
+    "test": "vitest run --reporter verbose",
     "coverage": "vitest run --coverage",
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
