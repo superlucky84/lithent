@@ -1,14 +1,5 @@
 // example.jsx
-import {
-  h,
-  Fragment,
-  render,
-  Renew,
-  mount,
-  ref,
-  mountCallback,
-  nextTick,
-} from '@/index';
+import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 
 const Renew = mount((renew, _props) => {
@@ -26,11 +17,6 @@ const Renew = mount((renew, _props) => {
     renew();
   };
   testChangeRef.value = change;
-
-  mountCallback(() => {
-    // console.log(el.value);
-    console.log(document.querySelector('button'));
-  });
 
   return () => (
     <Fragment>
@@ -52,16 +38,19 @@ render(<Renew />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('add', () => {
-    // @ts-ignore
-    console.log(testWrap.outerHTML, document.querySelector('button').outerHTML);
-    expect(true).toBe(true);
+  it('Is renew working properly?', () => {
+    expect(testWrap.outerHTML).toBe(
+      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+    );
     if (testChangeRef.value) {
       testChangeRef.value();
-      console.log('click');
+      testChangeRef.value();
+      testChangeRef.value();
     }
     nextTick().then(() => {
-      console.log(testWrap.outerHTML, testWrap.querySelector('button'));
+      expect(testWrap.outerHTML).toBe(
+        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+      );
     });
   });
 }
