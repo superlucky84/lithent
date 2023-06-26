@@ -1,55 +1,95 @@
-// example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
+import { h, Fragment, render, mount, ref, nextTick } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  let count2 = 0;
-  let count3 = 0;
-  let count4 = 0;
-  const el = ref<null | HTMLElement>(null);
+const storeGroup = new Map<string | symbol, unknown>();
+const storeRenderList: {
+  [key: string | symbol]: (() => boolean)[];
+} = {};
 
-  const change = () => {
-    count1 += 1;
-    count2 += 2;
-    count3 += 3;
-    count4 -= 1;
-    renew();
+export const store = <T extends {}>(value: T) => {
+  const storeKey = Symbol();
+  storeGroup.set(storeKey, value);
+
+  return (renew: () => boolean) => {
+    storeRenderList[storeKey] ??= [];
+    storeRenderList[storeKey].push(renew);
+
+    return updater<T>(storeKey);
   };
-  testChangeRef.value = change;
+};
 
+const updater = <T extends { [key: string | symbol]: unknown }>(
+  storeKey: string | symbol
+) =>
+  new Proxy(storeGroup.get(storeKey) as T, {
+    get(target: T, prop: string) {
+      return target[prop];
+    },
+    set(target, prop: keyof T, value) {
+      target[prop] = value;
+      const renderList = storeRenderList[storeKey];
+      const trashCollections: (() => boolean)[] = [];
+
+      renderList.forEach(renew => {
+        if (!renew()) {
+          trashCollections.push(renew);
+        }
+      });
+
+      trashCollections.forEach(deleteTarget =>
+        renderList.splice(renderList.indexOf(deleteTarget), 1)
+      );
+
+      return true;
+    },
+  });
+
+const Component = mount(r => {
+  const local = store<{ count1: number; count2: number; count3: number }>({
+    count1: 1,
+    count2: 1,
+    count3: 1,
+  })(r);
+
+  const click = () => {
+    local.count1 += 1;
+    local.count2 -= 1;
+    local.count3 *= 2;
+  };
+  testChangeRef.value = click;
   return () => (
-    <Fragment>
-      <li>count1: {count1}</li>
-      <li>count2: {count2}</li>
-      <li>count3: {count3}</li>
-      <li>count4: {count4}</li>
-      <button ref={el} onClick={change}>
-        change
+    <>
+      <div>count1: {local.count1}</div>
+      <div>count2: {local.count2}</div>
+      <div>count3: {local.count3}</div>
+      <button type="text" onClick={click}>
+        change count
       </button>
-    </Fragment>
+    </>
   );
 });
 
 const testWrap =
   document.getElementById('root') || document.createElement('div');
 
-render(<Renew />, testWrap);
+render(<Component />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+  it('A DOM should be created that reflects the initial values of your store.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<div><div>count1: 1</div><div>count2: 1</div><div>count3: 1</div><button type="text">change count</button></div>'
     );
     if (testChangeRef.value) {
       testChangeRef.value();
       testChangeRef.value();
       testChangeRef.value();
     }
+  });
+  it('You should see a DOM that reflects the changed store values.', () => {
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<div><div>count1: 4</div><div>count2: -2</div><div>count3: 8</div><button type="text">change count</button></div>'
       );
     });
   });

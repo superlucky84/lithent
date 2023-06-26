@@ -1,55 +1,137 @@
-// example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
+import {
+  h,
+  Fragment,
+  render,
+  mount,
+  ref,
+  nextTick,
+  updateCallback,
+  mountCallback,
+} from '@/index';
+
+let injectLogCount = 0;
+let clenupLogCount = 0;
 const testChangeRef = ref<null | (() => void)>(null);
+const testChangeUnmountRef = ref<null | (() => void)>(null);
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  let count2 = 0;
-  let count3 = 0;
-  let count4 = 0;
-  const el = ref<null | HTMLElement>(null);
+export const effect = (
+  forward: () => (() => void) | void,
+  backward: () => (() => void) | void = () => {},
+  dependencies: () => any[] = () => []
+) => {
+  mountCallback(() => {
+    forward();
 
+    return backward;
+  });
+
+  updateCallback(() => {
+    if (backward) {
+      backward();
+    }
+
+    return forward;
+  }, dependencies);
+};
+
+const Children = mount(renew => {
+  let count = 0;
   const change = () => {
-    count1 += 1;
-    count2 += 2;
-    count3 += 3;
-    count4 -= 1;
+    count += 1;
     renew();
   };
   testChangeRef.value = change;
 
+  effect(
+    () => {
+      console.log('INJECT');
+      injectLogCount += 1;
+    },
+    () => {
+      console.log('CLEAN UP');
+      clenupLogCount += 1;
+    },
+    () => [count]
+  );
+
   return () => (
-    <Fragment>
-      <li>count1: {count1}</li>
-      <li>count2: {count2}</li>
-      <li>count3: {count3}</li>
-      <li>count4: {count4}</li>
-      <button ref={el} onClick={change}>
-        change
+    <>
+      <button onClick={change} type="button">
+        increase
       </button>
-    </Fragment>
+      <span>count: {count}</span>
+    </>
+  );
+});
+
+const Parent = mount(renew => {
+  let mountState = true;
+  const toggleMount = () => {
+    mountState = !mountState;
+    renew();
+  };
+  testChangeUnmountRef.value = toggleMount;
+
+  return () => (
+    <>
+      <button onClick={toggleMount} type="button">
+        toggleMount
+      </button>
+      {mountState ? <Children /> : null}
+    </>
   );
 });
 
 const testWrap =
   document.getElementById('root') || document.createElement('div');
 
-render(<Renew />, testWrap);
+render(<Parent />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+  it('Once mounted, only the inect value should be incremented by 1, and it will have the expected DOM state.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<div><button type="button">toggleMount</button><button type="button">increase</button><span>count: 0</span></div>'
     );
+    expect(injectLogCount).toBe(1);
+    expect(clenupLogCount).toBe(0);
+  });
+
+  it('When unmounted, clean up should be incremented by 1 and the inect value should remain unchanged.', () => {
+    if (testChangeUnmountRef.value) {
+      testChangeUnmountRef.value();
+    }
+    nextTick().then(() => {
+      expect(injectLogCount).toBe(1);
+      expect(clenupLogCount).toBe(1);
+      expect(testWrap.outerHTML).toBe(
+        '<div><button type="button">toggleMount</button></div>'
+      );
+    });
+  });
+
+  it('When I remount, only the INJECT value goes up by 1, and the DOM is visible again where it had disappeared.', () => {
+    if (testChangeUnmountRef.value) {
+      testChangeUnmountRef.value();
+    }
+    nextTick().then(() => {
+      expect(clenupLogCount).toBe(1);
+      expect(injectLogCount).toBe(2);
+      expect(testWrap.outerHTML).toBe(
+        '<div><button type="button">toggleMount</button><button type="button">increase</button><span>count: 0</span></div>'
+      );
+    });
+  });
+
+  it('When updated, CLEAN UP and INJECT are incremented by 1 each, and the count in the DOM is also incremented by 1.', () => {
     if (testChangeRef.value) {
-      testChangeRef.value();
-      testChangeRef.value();
       testChangeRef.value();
     }
     nextTick().then(() => {
+      expect(clenupLogCount).toBe(2);
+      expect(injectLogCount).toBe(3);
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<div><button type="button">toggleMount</button><button type="button">increase</button><span>count: 1</span></div>'
       );
     });
   });

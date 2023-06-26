@@ -1,14 +1,4 @@
-// example.jsx
-import {
-  h,
-  Fragment,
-  mountCallback,
-  render,
-  Renew,
-  mount,
-  ref,
-  nextTick,
-} from '@/index';
+import { h, render, mount, ref, nextTick } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 
 const storeGroup = new Map<string | symbol, unknown>();
@@ -64,6 +54,9 @@ const Component = mount(renew => {
   const changeInput = (event: InputEvent) => {
     shardStore.text = (event.target as HTMLInputElement).value;
   };
+  testChangeRef.value = () => {
+    shardStore.text = 'newSharedText';
+  };
   return () => (
     <textarea
       type="text"
@@ -74,46 +67,38 @@ const Component = mount(renew => {
   );
 });
 
-/*
-<div ref={htmlRef}>
-  <span class="p-2">1</span>
-  <span class="p-2">2</span>
-  <span class="p-2">3</span>
-</div>
-*/
+document.body.innerHTML = `<div id="root"><span>1</span><span>2</span><span>3</span></div>`;
+
+const testWrap = document.getElementById('root') as HTMLElement;
 
 render(
   <Component />,
-  element,
-  element.querySelector('span:nth-of-type(2)') as HTMLElement
+  testWrap,
+  testWrap.querySelector('span:nth-of-type(2)') as HTMLElement
 );
 
 render(
   <Component />,
-  element,
-  element.querySelector('span:nth-of-type(3)') as HTMLElement
+  testWrap,
+  testWrap.querySelector('span:nth-of-type(3)') as HTMLElement
 );
-
-const testWrap =
-  document.getElementById('root') || document.createElement('div');
-
-render(<Renew />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+
+  it('A DOM should be created with the textarea inserted in the middle, and the initial values you set for the textarea should be set.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<div id="root"><span>1</span><textarea type="text" style="width: 100px; height: 100px;"></textarea><span>2</span><textarea type="text" style="width: 100px; height: 100px;"></textarea><span>3</span></div>'
     );
+    expect(testWrap?.querySelector('textarea')?.value).toBe('sharedText');
+  });
+
+  it('If you change the value of the store, the value of the textarea should also change.', () => {
     if (testChangeRef.value) {
-      testChangeRef.value();
-      testChangeRef.value();
       testChangeRef.value();
     }
     nextTick().then(() => {
-      expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
-      );
+      expect(testWrap?.querySelector('textarea')?.value).toBe('newSharedText');
     });
   });
 }
