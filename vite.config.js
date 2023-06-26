@@ -26,6 +26,10 @@ export default defineConfig({
       fileName: 'lithent',
     },
   },
+  test: {
+    environment: 'happy-dom',
+    includeSource: ['src/examples/*.{js,ts,jsx,tsx}'],
+  },
   server: {
     open: '/html/renew.html',
   },

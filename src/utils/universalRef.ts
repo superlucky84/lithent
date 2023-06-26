@@ -15,7 +15,9 @@ export const componentRef: ComponentRef = new WeakMap();
 export const redrawQueue: {
   value: { componentKey: Props; exec: () => void }[];
 } = { value: [] };
-export const redrawQueueTimeout: { value: null | number } = { value: null };
+export const redrawQueueTimeout: { value: null | number | NodeJS.Timeout } = {
+  value: null,
+};
 export const componentRender = (componentKey: Props) => () => {
   const up = componentRef.get(componentKey)?.up;
   let result = false;

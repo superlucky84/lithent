@@ -17,8 +17,7 @@
     "build": "pnpm build:core && pnpm build:helper && pnpm build:examples && pnpm build:docs",
     "build:p": "pnpm build:core && pnpm -r build",
     "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "vitest",
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
@@ -58,7 +57,9 @@
   },
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": ["lithent"],
+  "keywords": [
+    "lithent"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.18.9",
     "@babel/core": "^7.18.9",
@@ -76,7 +77,9 @@
     "typescript": "^4.7.4",
     "vite": "3.2.7",
     "vite-plugin-checker": "^0.4.9",
-    "vite-plugin-dts": "^2.3.0"
+    "vite-plugin-dts": "^2.3.0",
+    "vitest": "^0.32.2",
+    "happy-dom": "^9.20.3"
   },
   "volta": {
     "node": "20.3.0"

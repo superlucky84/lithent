@@ -27,3 +27,11 @@ const Renew = mount((renew, _props) => {
 });
 
 render(<Renew />, document.getElementById('root'));
+
+if (import.meta.vitest) {
+  const { it, expect } = import.meta.vitest;
+  it('add', () => {
+    // console.log(rootElement.outerHTML);
+    expect(true).toBe(true);
+  });
+}
