@@ -1,55 +1,75 @@
-// example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
-const testChangeRef = ref<null | (() => void)>(null);
+import { h, Fragment, render, mount, ref, nextTick } from '@/index';
+const testChangeFiveRef = ref<null | (() => void)>(null);
+const testChangeSixRef = ref<null | (() => void)>(null);
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  let count2 = 0;
-  let count3 = 0;
-  let count4 = 0;
-  const el = ref<null | HTMLElement>(null);
+const Root = mount(function (r) {
+  let showFive = true;
+  let showSix = true;
 
-  const change = () => {
-    count1 += 1;
-    count2 += 2;
-    count3 += 3;
-    count4 -= 1;
-    renew();
+  const toggleFive = () => {
+    showFive = !showFive;
+    r();
   };
-  testChangeRef.value = change;
+  const toggleSix = () => {
+    showSix = !showSix;
+    r();
+  };
+
+  testChangeFiveRef.value = () => {
+    showFive = !showFive;
+    r();
+  };
+
+  testChangeSixRef.value = () => {
+    showSix = !showSix;
+    r();
+  };
 
   return () => (
     <Fragment>
-      <li>count1: {count1}</li>
-      <li>count2: {count2}</li>
-      <li>count3: {count3}</li>
-      <li>count4: {count4}</li>
-      <button ref={el} onClick={change}>
-        change
-      </button>
+      <li>
+        4 <button onClick={toggleFive}>toggleFive</button>
+        <button onClick={toggleSix}>toggleSix</button>
+      </li>
+      {showFive ? <li>5</li> : null}
+      {showSix ? <li>6</li> : null}
+      <li>7</li>
     </Fragment>
   );
 });
 
-const testWrap =
-  document.getElementById('root') || document.createElement('div');
+document.body.innerHTML = `<ul id="root"> <li>1</li> <li>2</li> <li>3</li> <li id="next">8</li> <li>9</li> </ul>`;
 
-render(<Renew />, testWrap);
+const testWrap = document.getElementById('root') as HTMLElement;
+
+render(<Root />, testWrap, document.getElementById('next'));
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+  it("Test that 'Lithent' can correctly handle virtual DOM elements when real and virtual DOM elements are mixed under one parent.", () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<ul id="root"> <li>1</li> <li>2</li> <li>3</li> <li>4 <button>toggleFive</button><button>toggleSix</button></li><li>5</li><li>6</li><li>7</li><li id="next">8</li> <li>9</li> </ul>'
     );
-    if (testChangeRef.value) {
-      testChangeRef.value();
-      testChangeRef.value();
-      testChangeRef.value();
+  });
+
+  it('The toggle button should remove only the 5.', () => {
+    if (testChangeFiveRef.value && testChangeSixRef.value) {
+      testChangeFiveRef.value();
     }
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<ul id="root"> <li>1</li> <li>2</li> <li>3</li> <li>4 <button>toggleFive</button><button>toggleSix</button></li><li>6</li><li>7</li><li id="next">8</li> <li>9</li> </ul>'
+      );
+    });
+  });
+
+  it('The toggle button should remove only the 6.', () => {
+    if (testChangeFiveRef.value && testChangeSixRef.value) {
+      testChangeSixRef.value();
+    }
+    nextTick().then(() => {
+      expect(testWrap.outerHTML).toBe(
+        '<ul id="root"> <li>1</li> <li>2</li> <li>3</li> <li>4 <button>toggleFive</button><button>toggleSix</button></li><li>7</li><li id="next">8</li> <li>9</li> </ul>'
       );
     });
   });

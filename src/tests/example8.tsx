@@ -1,32 +1,40 @@
-// example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
-const testChangeRef = ref<null | (() => void)>(null);
+import { h, Fragment, render, mount, ref, nextTick } from '@/index';
+const testChangeRef = ref<null | ((newValue: string) => void)>(null);
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  let count2 = 0;
-  let count3 = 0;
-  let count4 = 0;
-  const el = ref<null | HTMLElement>(null);
+const Selectbox = mount(renew => {
+  let value = '4';
 
-  const change = () => {
-    count1 += 1;
-    count2 += 2;
-    count3 += 3;
-    count4 -= 1;
+  const changeChange = (event: InputEvent) => {
+    value = (event.target as HTMLInputElement).value;
     renew();
   };
-  testChangeRef.value = change;
+  testChangeRef.value = (newValue: string) => {
+    value = newValue;
+    renew();
+  };
 
   return () => (
     <Fragment>
-      <li>count1: {count1}</li>
-      <li>count2: {count2}</li>
-      <li>count3: {count3}</li>
-      <li>count4: {count4}</li>
-      <button ref={el} onClick={change}>
-        change
-      </button>
+      <div>{value}</div>
+      <div>
+        <select name="jselect" onChange={changeChange}>
+          <option value="1" selected={value === '1'}>
+            1
+          </option>
+          <option value="2" selected={value === '2'}>
+            2
+          </option>
+          <option value="3" selected={value === '3'}>
+            3
+          </option>
+          <option value="4" selected={value === '4'}>
+            4
+          </option>
+          <option value="5" selected={value === '5'}>
+            5
+          </option>
+        </select>
+      </div>
     </Fragment>
   );
 });
@@ -34,23 +42,27 @@ const Renew = mount((renew, _props) => {
 const testWrap =
   document.getElementById('root') || document.createElement('div');
 
-render(<Renew />, testWrap);
+render(<Selectbox />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+  it('Should see a selectbox with the default values set.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<div><div>4</div><div><select name="jselect"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div></div>'
     );
+
+    expect(testWrap?.querySelector('select')?.value).toBe('4');
+  });
+
+  it('Should see a selectbox reflecting the changed value.', () => {
     if (testChangeRef.value) {
-      testChangeRef.value();
-      testChangeRef.value();
-      testChangeRef.value();
+      testChangeRef.value('1');
     }
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<div><div>1</div><div><select name="jselect"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div></div>'
       );
+      expect(testWrap?.querySelector('select')?.value).toBe('1');
     });
   });
 }

@@ -27,7 +27,7 @@ export default defineConfig({
     },
   },
   test: {
-    environment: 'happy-dom',
+    environment: 'jsdom',
     includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
   },
   server: {

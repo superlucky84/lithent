@@ -1,55 +1,48 @@
-// example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
-const testChangeRef = ref<null | (() => void)>(null);
+import { h, Fragment, render, mount, nextTick } from '@/index';
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  let count2 = 0;
-  let count3 = 0;
-  let count4 = 0;
-  const el = ref<null | HTMLElement>(null);
-
-  const change = () => {
-    count1 += 1;
-    count2 += 2;
-    count3 += 3;
-    count4 -= 1;
-    renew();
-  };
-  testChangeRef.value = change;
+const Loop = mount(function () {
+  const list: { key: number; value: string }[] = [
+    { key: 4, value: '4' },
+    { key: 5, value: '5' },
+    { key: 6, value: '6' },
+    { key: 7, value: '7' },
+  ];
 
   return () => (
     <Fragment>
-      <li>count1: {count1}</li>
-      <li>count2: {count2}</li>
-      <li>count3: {count3}</li>
-      <li>count4: {count4}</li>
-      <button ref={el} onClick={change}>
-        change
-      </button>
+      {list.map(item => (
+        <div key={item.key} class="text-orange-300">
+          {item.value}
+        </div>
+      ))}
     </Fragment>
   );
 });
 
-const testWrap =
-  document.getElementById('root') || document.createElement('div');
+document.body.innerHTML =
+  '<ul id="root" > <li>1</li> <li>2</li> <li>3</li> <li id="next" id="nextTarget"> 8 </li> <li>9</li> </ul>';
 
-render(<Renew />, testWrap);
+const testWrap = document.getElementById('root') as HTMLElement;
+
+const destroy = render(
+  <Loop />,
+  testWrap,
+  document.getElementById('nextTarget')
+);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+  it("The 'destroy function' also works well when the loop type is stuck in the middle of the actual DOM.", () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<ul id="root"> <li>1</li> <li>2</li> <li>3</li> <li id="next"> 8 </li> <li>9</li> <div class="text-orange-300">4</div><div class="text-orange-300">5</div><div class="text-orange-300">6</div><div class="text-orange-300">7</div></ul>'
     );
-    if (testChangeRef.value) {
-      testChangeRef.value();
-      testChangeRef.value();
-      testChangeRef.value();
-    }
+  });
+
+  it('The destroy function should work fine.', () => {
+    destroy();
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<ul id="root"> <li>1</li> <li>2</li> <li>3</li> <li id="next"> 8 </li> <li>9</li> </ul>'
       );
     });
   });

@@ -1,56 +1,46 @@
 // example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
-const testChangeRef = ref<null | (() => void)>(null);
+import { h, render, mount, ref, nextTick } from '@/index';
+const testChangeRef = ref<null | ((newText: string) => void)>(null);
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  let count2 = 0;
-  let count3 = 0;
-  let count4 = 0;
-  const el = ref<null | HTMLElement>(null);
+const Input = mount(r => {
+  let text = 'initText';
 
-  const change = () => {
-    count1 += 1;
-    count2 += 2;
-    count3 += 3;
-    count4 -= 1;
-    renew();
+  const handleInput = (event: InputEvent) => {
+    text = (event.target as HTMLInputElement).value;
+    r();
   };
-  testChangeRef.value = change;
+  testChangeRef.value = (newText: string) => {
+    text = newText;
+    r();
+  };
 
-  return () => (
-    <Fragment>
-      <li>count1: {count1}</li>
-      <li>count2: {count2}</li>
-      <li>count3: {count3}</li>
-      <li>count4: {count4}</li>
-      <button ref={el} onClick={change}>
-        change
-      </button>
-    </Fragment>
-  );
+  return () => <input type="text" onInput={handleInput} value={text} />;
 });
 
 const testWrap =
   document.getElementById('root') || document.createElement('div');
 
-render(<Renew />, testWrap);
+render(<Input />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+
+  it('The initialized text should be reflected in the input.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<div><input type="text" value="initText"></div>'
     );
+    expect(testWrap?.querySelector('input')?.value).toBe('initText');
+  });
+
+  it('The text reflecting the change should appear in the input.', () => {
     if (testChangeRef.value) {
-      testChangeRef.value();
-      testChangeRef.value();
-      testChangeRef.value();
+      testChangeRef.value('newText');
     }
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<div><input type="text" value="newText"></div>'
       );
+      expect(testWrap?.querySelector('input')?.value).toBe('newText');
     });
   });
 }

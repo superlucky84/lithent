@@ -1,32 +1,71 @@
-// example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
+import {
+  h,
+  Fragment,
+  render,
+  mount,
+  ref,
+  nextTick,
+  mountCallback,
+} from '@/index';
+
+let mountCount1 = 0;
+let mountCount2 = 0;
+let unmountCount1 = 0;
+let unmountCount2 = 0;
+
 const testChangeRef = ref<null | (() => void)>(null);
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  let count2 = 0;
-  let count3 = 0;
-  let count4 = 0;
-  const el = ref<null | HTMLElement>(null);
-
-  const change = () => {
-    count1 += 1;
-    count2 += 2;
-    count3 += 3;
-    count4 -= 1;
-    renew();
-  };
-  testChangeRef.value = change;
+const Depth2 = mount(() => {
+  mountCallback(() => {
+    console.log('mount2');
+    mountCount2 += 1;
+    return () => {
+      console.log('unmount2');
+      unmountCount2 += 1;
+    };
+  });
 
   return () => (
     <Fragment>
-      <li>count1: {count1}</li>
-      <li>count2: {count2}</li>
-      <li>count3: {count3}</li>
-      <li>count4: {count4}</li>
-      <button ref={el} onClick={change}>
-        change
-      </button>
+      <span>depth2</span>
+    </Fragment>
+  );
+});
+
+const Depth1 = mount(() => {
+  mountCallback(() => {
+    console.log('mount1');
+    mountCount1 += 1;
+    return () => {
+      console.log('unmount1');
+      unmountCount1 += 1;
+    };
+  });
+
+  return () => (
+    <Fragment>
+      <span>depth1</span>
+      <Depth2 />
+    </Fragment>
+  );
+});
+
+const CallbackRoot = mount(renew => {
+  let isShow = true;
+  let logEl = ref(null);
+
+  const toggle = () => {
+    isShow = !isShow;
+    renew();
+  };
+  testChangeRef.value = () => {
+    toggle();
+  };
+
+  return () => (
+    <Fragment>
+      <button onClick={toggle}>TOGGLE</button>
+      {isShow ? <Depth1 logEl={logEl} /> : null}
     </Fragment>
   );
 });
@@ -34,23 +73,43 @@ const Renew = mount((renew, _props) => {
 const testWrap =
   document.getElementById('root') || document.createElement('div');
 
-render(<Renew />, testWrap);
+render(<CallbackRoot />, testWrap);
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
+  it('Test that the unmount callback works with nested components.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<div><button>TOGGLE</button><span>depth1</span><span>depth2</span></div>'
     );
+    expect(mountCount1).toBe(1);
+    expect(mountCount2).toBe(1);
+    expect(unmountCount1).toBe(0);
+    expect(unmountCount2).toBe(0);
+  });
+  it('Unmount should work fine.', () => {
     if (testChangeRef.value) {
       testChangeRef.value();
-      testChangeRef.value();
+    }
+    nextTick().then(() => {
+      expect(testWrap.outerHTML).toBe('<div><button>TOGGLE</button></div>');
+      expect(mountCount1).toBe(1);
+      expect(mountCount2).toBe(1);
+      expect(unmountCount1).toBe(1);
+      expect(unmountCount2).toBe(1);
+    });
+  });
+  it('mount should work fine.', () => {
+    if (testChangeRef.value) {
       testChangeRef.value();
     }
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<div><button>TOGGLE</button><span>depth1</span><span>depth2</span></div>'
       );
+      expect(mountCount1).toBe(2);
+      expect(mountCount2).toBe(2);
+      expect(unmountCount1).toBe(1);
+      expect(unmountCount2).toBe(1);
     });
   });
 }
