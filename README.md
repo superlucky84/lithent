@@ -116,7 +116,7 @@ const Component = mount((r, _props) => {
 // render(`<${Component} />`, document.getElementById('root'), document.getElementById('nextElement'));
 
 // appendChild
-render(html`<${Component} />`, document.getElementById('root'));
+const destroy = render(html`<${Component} />`, document.getElementById('root'));
 ```
 
 #### With UMD
@@ -150,7 +150,7 @@ const Component = mount(renew => {
   `;
 });
 
-render(html`<${Component} />`, document.getElementById('root'));
+const destroy = render(html`<${Component} />`, document.getElementById('root'));
 </script>
 ```
 
