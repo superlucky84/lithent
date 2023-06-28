@@ -8,7 +8,7 @@ import {
   updateCallback,
   mount,
 } from 'lithent';
-import { state, computed, effect, store } from 'lithent-helper';
+import { state, computed, effect, store } from 'lithent/helper';
 
 // This is the "mount" function.
 // This function is only executed on mount, and on update, only updates `props` and then executes the internal return function.
