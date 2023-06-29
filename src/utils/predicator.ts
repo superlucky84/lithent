@@ -53,7 +53,12 @@ const checkNormalTypeElement = (
   checkPlainWDomType(newWDom) &&
   originalWDom?.type === newWDom.type &&
   (originalWDom?.children?.length === newWDom?.children?.length ||
-    newWDom.type === 'loop');
+    (newWDom.type === 'loop' &&
+      checkExisty(getKey((newWDom.children || [])[0])) &&
+      checkExisty(getKey((originalWDom.children || [])[0]))));
+
+export const getKey = (target: WDom) =>
+  target?.componentProps?.key ?? target?.props?.key;
 
 export const checkVirtualType = (type: string | null) =>
   type && ['fragment', 'loop'].includes(type);

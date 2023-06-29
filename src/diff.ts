@@ -1,5 +1,5 @@
 import { WDom, TagFunctionResolver, RenderType } from '@/types';
-import { checkCustemComponentFunction } from '@/utils/predicator';
+import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent, reRender } from '@/utils';
 import { recursiveRemoveEvent } from '@/render';
 import {
@@ -46,14 +46,12 @@ const remakeNewWDom = (
     remakeWDom.el = originalWDom.el;
   }
 
-  if (
-    needRerender &&
-    ['D', 'R', 'SR'].includes(needRerender) &&
-    originalWDom?.componentKey
-  ) {
-    runUnmountQueueFromWDom(originalWDom);
-    recursiveRemoveEvent(originalWDom);
-    remakeWDom.oldChildren = originalWDom.children;
+  if (needRerender && ['D', 'R', 'SR'].includes(needRerender)) {
+    if (originalWDom?.componentKey) {
+      runUnmountQueueFromWDom(originalWDom);
+      recursiveRemoveEvent(originalWDom);
+    }
+    remakeWDom.oldChildren = originalWDom?.children;
   }
 
   remakeWDom.oldProps = originalWDom?.props;
@@ -185,6 +183,3 @@ const findSameKeyOriginalItem = (item: WDom, originalChildren: WDom[]) =>
   originalChildren.find(
     orignalChildItem => getKey(orignalChildItem) === getKey(item)
   );
-
-const getKey = (target: WDom) =>
-  target?.componentProps?.key ?? target?.props?.key;
