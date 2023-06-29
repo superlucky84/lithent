@@ -100,15 +100,17 @@ import { state } from 'lithent/helper';
 import htm from 'htm';
 const html = htm.bind(h);
 
-const Component = mount((r, _props) => {
-  const count = state(0, r);
+const Component = mount((renew, _props) => {
+  const count = state(0, renew);
 
-  const change = () => (count.v += 1);
+  const change = () => {
+    count.value += 1;
+  };
 
   // Updater
   return () => html`
     <${Fragment}>
-      <li>count: ${count.v}</li>
+      <li>count: ${count.value}</li>
       <button onClick=${change}>increase</button>
     <//>
   `;
