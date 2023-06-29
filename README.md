@@ -31,13 +31,15 @@ used lightly in a variety of situations.
 
 ### Lithent have the bare minimum of necessary functionality, with no unnecessary features.
 
-Since 'react' and 'vue', there have been a lot of UI libraries coming out that boast full-stack functionality.
+ Lithent have the bare minimum of necessary functionality, with no unnecessary features.
 
-However, in the real world of development, there are times when you need to build something using only the bare minimum of key features, rather than a full-stack, full-featured library.
+In a real-world development environment, you may want to use Virtual DOM lightly, with only the bare minimum of core functionality.
 
-Lithent has implemented the bare minimum functionality needed to create and update virtual DOM in general (we only need to know 'render', 'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
+"Lithent" makes it easy to add, remove, and update virtual domes to specific parts of a pre-drawn SSR page.
 
-We provide code in the form of 'helpers' that extend the basic functionality, but using the helpers is only optional and talented users can extend and develop custom helpers for their own projects.
+"Lithent" has implemented the bare minimum functionality needed to create and update virtual DOM in general (we only need to know 'render', 'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
+
+We provide code in the form of 'helpers' that extend the basic functionality, but using the helpers is only optional and users can extend and develop custom helpers for their own projects.
 
 ### Approach with the developer-friendly concept of closures between "component mounter" and "renderer"
 

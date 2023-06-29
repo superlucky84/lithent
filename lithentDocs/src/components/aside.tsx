@@ -1,6 +1,9 @@
 import { h, mount } from 'lithent';
+import { computed } from 'lithent/helper';
 
 export const Aside = mount<{ isHidden: boolean }>(() => {
+  const hashState = computed<string>(() => location.hash);
+
   return ({ isHidden }) => (
     <aside
       id="sidebar"
@@ -13,7 +16,13 @@ export const Aside = mount<{ isHidden: boolean }>(() => {
         <div class="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
           <div class="flex-1 px-3 space-y-1 divide-y divide-gray-200 bg-gray-800 divide-gray-700">
             <ul class="pb-2 space-y-2">
-              <li>
+              <li
+                class={
+                  hashState.v === '#install'
+                    ? 'border border-gray-200 border-dashed rounded'
+                    : ''
+                }
+              >
                 <a
                   href="#install"
                   target="_self"
@@ -37,7 +46,13 @@ export const Aside = mount<{ isHidden: boolean }>(() => {
                   </span>
                 </a>
               </li>
-              <li>
+              <li
+                class={
+                  !['#install', '#examples', '#about'].includes(hashState.v)
+                    ? 'border border-gray-200 border-dashed rounded'
+                    : ''
+                }
+              >
                 <a
                   href="#main"
                   target="_self"
@@ -61,7 +76,13 @@ export const Aside = mount<{ isHidden: boolean }>(() => {
                   </span>
                 </a>
               </li>
-              <li>
+              <li
+                class={
+                  hashState.v === '#examples'
+                    ? 'border border-gray-200 border-dashed rounded'
+                    : ''
+                }
+              >
                 <a
                   href="#examples"
                   target="_self"
@@ -80,7 +101,13 @@ export const Aside = mount<{ isHidden: boolean }>(() => {
                   </span>
                 </a>
               </li>
-              <li>
+              <li
+                class={
+                  hashState.v === '#about'
+                    ? 'border border-gray-200 border-dashed rounded'
+                    : ''
+                }
+              >
                 <a
                   href="#about"
                   target="_self"

@@ -1,116 +1,101 @@
-import { h, mount, Fragment, updateCallback, ref } from 'lithent';
+import { h, mount, render, ref, mountCallback } from 'lithent';
+import { store } from 'lithent/helper';
 
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code = `import { h, Fragment, render, mount, updateCallback } from 'lithent';
+const code = `// index.html
+/*
+<div>
+  <span>1</span>
+  <span>2</span>
+  <span>3</span>
+</div>
+*/
 
-const Children = mount<{ count: number }>((_r, props) => {
-  updateCallback(
-    () => {
-      console.log('clean up');
+// app.tsx
+import { h, Fragment, render, mount } from 'lithent';
+import { store } from 'lithent/helper';
 
-      return () => console.log('updated');
-    },
-    () => [props.count]
-  );
-  return ({ count }) => <span>child updated count: {count}</span>;
-});
+const assignShardStore = store<{ text: string; count: number }>({ text: 'sharedText' });
 
-const Parent = mount(renew => {
-  let count = 0;
-
-  const change = () => {
-    count += 1;
-    renew();
+const Component = mount(r => {
+  const shardStore = assignShardStore(r);
+  const changeInput = (event) => {
+    shardStore.text = event.target.value;
   };
-
-  return () => (
-    <>
-      <button onClick={change}>Update</button>
-      <Children count={count} />
-    </>
-  );
+  return () => <textarea type="text" onInput={changeInput} value={shardStore.text} />;
 });
 
-render(<Parent />, document.getElementById('root'));
+render(<Component />, element, element.querySelector('span:nth-of-type(2)'));
+render(<Component />, element, element.querySelector('span:nth-of-type(3)'));
 `;
 
 const exCode1 = hljs.highlight(code, {
   language: 'javascript',
 }).value;
 
-const Children = mount<{
-  count: number;
-  logEl: { value: HTMLElement | null };
-}>((_r, props) => {
-  updateCallback(
-    () => {
-      const ele = props.logEl.value as HTMLElement;
-      ele.innerHTML += 'clean up<br>';
-      ele.scrollTo(0, ele.scrollHeight);
-
-      return () => {
-        const ele = props.logEl.value as HTMLElement;
-        ele.innerHTML += 'updated<br>';
-        ele.scrollTo(0, ele.scrollHeight);
-      };
-    },
-    () => [props.count]
-  );
-  return ({ count }) => <span>child updated count: {count}</span>;
+const assignShardStore = store<{ text: string; count: number }>({
+  text: 'sharedText',
+  count: 3,
 });
 
-const Parent = mount(renew => {
-  let logEl = ref(null);
-  let count = 0;
-
-  const change = () => {
-    count += 1;
-    renew();
+const Component = mount(renew => {
+  const shardStore = assignShardStore(renew);
+  const changeInput = (event: InputEvent) => {
+    shardStore.text = (event.target as HTMLInputElement).value;
   };
-
   return () => (
-    <>
-      <div ref={logEl} class="text-sm overflow-y-scroll h-12"></div>
-      <button
-        onClick={change}
-        type="button"
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-      >
-        Update
-      </button>
-      <Children count={count} logEl={logEl} />
-    </>
+    <textarea
+      type="text"
+      onInput={changeInput}
+      value={shardStore.text}
+      style={{ width: '100px', height: '100px' }}
+    />
   );
 });
 
 export const Lesson4 = mount(() => {
+  const htmlRef = ref<null | HTMLElement>(null);
+
+  mountCallback(() => {
+    const element = htmlRef.value as HTMLElement;
+    if (element) {
+      render(
+        <Component />,
+        element,
+        element.querySelector('span:nth-of-type(2)') as HTMLElement
+      );
+
+      render(
+        <Component />,
+        element,
+        element.querySelector('span:nth-of-type(3)') as HTMLElement
+      );
+    }
+  });
+
   return () => (
-    <div class="p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
-      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        Lesson 4 - updateCallback
-      </h3>
+    <div class="p-4 mb-2 border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
+      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">Lesson 4 - render</h3>
+      <p class="text-lg text-slate-50">render</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        The "updateCallback" is executed after the component is requested to
-        update, but before it is updated. It is used for clean up purposes.
+        The third argument to the "render" method allows you to insert a virtual
+        DOM in front of the specified element.
       </p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        The function returned by updateCallback is executed after the component
-        update is complete.
+        The first argument to the "render" method is the virtual DOM, the second
+        argument is the virtual DOM's parent element, and the third argument
+        specifies the specific location where the virtual DOM will be inserted.
       </p>
+      <p class="mt-2 text-lg text-slate-50">store helper</p>
       <p class="mt-2 text-sm md:text-base text-gray-400">
-        Defines a function as the second argument that returns an array of
-        target values when an update to a specific value needs to be detected.
-        If omitted, it will always be executed.
-      </p>
-      <p class="mt-2 text-sm md:text-base text-gray-400">
-        By combining updateCallback and mountCallback, you can create a helper
-        similar to react's useEffect. Check out the{' '}
+        The "store" used in the examples is a helper implementation, like
+        "state". More detailed usage can be found on the{' '}
         <a class="text-orange-200" href="#examples">
           examples
         </a>{' '}
-        page to see how to use the effect helper.
+        page.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
@@ -120,7 +105,11 @@ export const Lesson4 = mount(() => {
         />
       </div>
       <div class="px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <Parent />
+        <div ref={htmlRef}>
+          <span class="p-2">1</span>
+          <span class="p-2">2</span>
+          <span class="p-2">3</span>
+        </div>
       </div>
     </div>
   );

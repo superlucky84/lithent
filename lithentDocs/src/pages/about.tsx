@@ -11,23 +11,22 @@ export const About = mount(() => {
         unnecessary features.
       </h3>
       <p class="text-gray-400 mt-4">
-        Since 'react' and 'vue', there have been a lot of UI libraries coming
-        out that boast full-stack functionality.
+        In a real-world development environment, you may want to use Virtual DOM
+        lightly, with only the bare minimum of core functionality.
       </p>
       <p class="text-gray-400 mt-4">
-        However, in the real world of development, there are times when you need
-        to build something using only the bare minimum of key features, rather
-        than a full-stack, full-featured library.
+        "Lithent" makes it easy to add, remove, and update virtual domes to
+        specific parts of a pre-drawn SSR page.
       </p>
       <p class="text-gray-400 mt-4">
-        Lithent has implemented the bare minimum functionality needed to create
-        and update virtual DOM in general (we only need to know 'render',
+        "Lithent" has implemented the bare minimum functionality needed to
+        create and update virtual DOM in general (we only need to know 'render',
         'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
       </p>
       <p class="text-gray-400 mt-4">
         We provide code in the form of 'helpers' that extend the basic
-        functionality, but using the helpers is only optional and talented users
-        can extend and develop custom helpers for their own projects.
+        functionality, but using the helpers is only optional and users can
+        extend and develop custom helpers for their own projects.
       </p>
       <h3 class="text-slate-50 text-lg mt-4">
         Approach with the developer-friendly concept of closures between
