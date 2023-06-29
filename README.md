@@ -9,7 +9,7 @@ used lightly in a variety of situations.
 - https://superlucky84.github.io/lithent
   - (This guide page is written in lithent.)
 
-`(9.62 KiB / gzip: 3.58 KiB)`
+`(9.68 KiB / gzip: 3.60 KiB)`
 
 
 ## 🚩 Table of Contents
@@ -61,10 +61,10 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.0.0/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.0.0/helper/dist/lithentHelper.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.0.0/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.0.0/helper/dist/lithentHelper.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.0.1/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.0.1/helper/dist/lithentHelper.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.0.1/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.0.1/helper/dist/lithentHelper.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -122,8 +122,8 @@ const destroy = render(html`<${Component} />`, document.getElementById('root'));
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.0.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.0.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.0.1/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.0.1/helper/dist/lithentHelper.umd.js"></script-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.js"></script>
 
 <div id="root"></div>
