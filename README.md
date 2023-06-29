@@ -6,7 +6,7 @@ Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
 used lightly in a variety of situations.
 
-- https://superlucky84.github.io/lithent
+- https://superlucky.co.kr
   - (This guide page is written in lithent.)
 
 `(9.68 KiB / gzip: 3.60 KiB)`
@@ -49,7 +49,7 @@ JavaScript users are used to using closures and love to develop with them.
 
 ## Basic Guide
 
-- https://superlucky84.github.io/lithent/
+- https://superlucky.co.kr
 
 ## How To Install
 
@@ -85,11 +85,11 @@ const html = htm.bind(h);
 
 #### With JSX
 
-- [Setting Guide](https://superlucky84.github.io/lithent/#install)
+- [Setting Guide](https://superlucky.co.kr/#install)
 
 ## Examples
 
-- [More Examples](https://superlucky84.github.io/lithent/#examples)
+- [More Examples](https://superlucky.co.kr/#examples)
 
 #### With ESM
 ```js
