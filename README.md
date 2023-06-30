@@ -16,6 +16,7 @@ used lightly in a variety of situations.
 
 - [Why Use Lithent](#why-use-lithent)
 - [Basic Guide](#basic-guide)
+- [Test](#test)
 - [How To Install](#how-to-install)
   - [Use NPM](#use-npm)
   - [Use CDN](#or-use-cdn)
@@ -24,7 +25,6 @@ used lightly in a variety of situations.
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
-- [Test](#test)
 - [Develop Guide](#develop-guide)
 
 ## Why use Lithent?
@@ -50,6 +50,13 @@ JavaScript users are used to using closures and love to develop with them.
 ## Basic Guide
 
 - https://superlucky84.github.io/lithent/
+
+## Test
+
+```bash
+// pnpm install
+pnpm test
+```
 
 ## How To Install
 
@@ -154,13 +161,6 @@ const Component = mount(renew => {
 
 const destroy = render(html`<${Component} />`, document.getElementById('root'));
 </script>
-```
-
-## Test
-
-```bash
-// pnpm install
-pnpm test
 ```
 
 ## Develop Guide
