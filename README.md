@@ -31,8 +31,6 @@ used lightly in a variety of situations.
 
 ### Lithent have the bare minimum of necessary functionality, with no unnecessary features.
 
- Lithent have the bare minimum of necessary functionality, with no unnecessary features.
-
 In a real-world development environment, you may want to use Virtual DOM lightly, with only the bare minimum of core functionality.
 
 "Lithent" makes it easy to add, remove, and update virtual domes to specific parts of a pre-drawn SSR page.
