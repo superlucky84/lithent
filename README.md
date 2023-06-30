@@ -16,12 +16,12 @@ used lightly in a variety of situations.
 
 - [Why Use Lithent](#why-use-lithent)
 - [Basic Guide](#basic-guide)
-- [Test](#test)
 - [How To Install](#how-to-install)
   - [Use NPM](#use-npm)
   - [Use CDN](#or-use-cdn)
   - [With HTM](#with-htm)
   - [With JSX](#with-jsx)
+- [Test](#test)
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
@@ -50,13 +50,6 @@ JavaScript users are used to using closures and love to develop with them.
 ## Basic Guide
 
 - https://superlucky84.github.io/lithent/
-
-## Test
-
-```bash
-// pnpm install
-pnpm test
-```
 
 ## How To Install
 
@@ -93,6 +86,13 @@ const html = htm.bind(h);
 #### With JSX
 
 - [Setting Guide](https://superlucky84.github.io/lithent/#install)
+
+## Test
+
+```bash
+// pnpm install
+pnpm test
+```
 
 ## Examples
 
