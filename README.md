@@ -21,11 +21,11 @@ used lightly in a variety of situations.
   - [Use CDN](#or-use-cdn)
   - [With HTM](#with-htm)
   - [With JSX](#with-jsx)
-- [Test](#test)
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
 - [Develop Guide](#develop-guide)
+- [Test](#test)
 
 ## Why use Lithent?
 
@@ -86,13 +86,6 @@ const html = htm.bind(h);
 #### With JSX
 
 - [Setting Guide](https://superlucky84.github.io/lithent/#install)
-
-## Test
-
-```bash
-// pnpm install
-pnpm test
-```
 
 ## Examples
 
@@ -194,3 +187,11 @@ pnpm build
 ```bash
 pnpm dev // or pnpm dev:core
 ```
+
+## Test
+
+```bash
+// pnpm install
+pnpm test
+```
+
