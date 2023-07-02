@@ -27,27 +27,32 @@ const remakeNewWDom = (
   originalWDom?: WDom
 ) => {
   const remakeWDom = generalize(newWDom, isSameType, originalWDom);
-
-  remakeWDom.children = remakeChildrenForDiff(
+  const param: [newWDom: WDom, isSameType: boolean, originalWDom?: WDom] = [
     remakeWDom,
     isSameType,
-    originalWDom
-  );
+    originalWDom,
+  ];
+  const needRerender = addReRenderTypeProperty(...param);
 
-  const needRerender = addReRenderTypeProperty(
-    remakeWDom,
-    isSameType,
-    originalWDom
-  );
-
+  remakeWDom.children = remakeChildrenForDiff(...param);
   remakeWDom.needRerender = needRerender;
 
+  inheritPropForRender(remakeWDom, originalWDom, needRerender);
+
+  return remakeWDom;
+};
+
+const inheritPropForRender = (
+  remakeWDom: WDom,
+  originalWDom?: WDom,
+  needRerender?: RenderType
+) => {
   if (needRerender !== 'A' && originalWDom) {
     remakeWDom.el = originalWDom.el;
   }
 
   if (needRerender && ['D', 'R', 'SR'].includes(needRerender)) {
-    if (originalWDom?.componentKey) {
+    if (originalWDom?.compKey) {
       runUnmountQueueFromWDom(originalWDom);
       recursiveRemoveEvent(originalWDom);
     }
@@ -55,8 +60,6 @@ const remakeNewWDom = (
   }
 
   remakeWDom.oldProps = originalWDom?.props;
-
-  return remakeWDom;
 };
 
 const addReRenderTypeProperty = (

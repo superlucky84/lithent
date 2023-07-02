@@ -27,7 +27,10 @@ const checkPlainType = (wDom: WDomParam, typeName: string) =>
 const checkSameCustomComponent = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
-) => newWDom.constructor === originalWDom?.constructor;
+) =>
+  'ctor' in newWDom
+    ? newWDom.ctor === originalWDom?.ctor
+    : newWDom === originalWDom?.ctor;
 
 const checkSameFragment = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
@@ -58,7 +61,7 @@ const checkNormalTypeElement = (
       checkExisty(getKey((originalWDom.children || [])[0]))));
 
 export const getKey = (target: WDom) =>
-  target?.componentProps?.key ?? target?.props?.key;
+  target?.compProps?.key ?? target?.props?.key;
 
 export const checkVirtualType = (type: string | null) =>
   type && ['fragment', 'loop'].includes(type);

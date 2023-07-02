@@ -14,7 +14,7 @@ import { componentRef, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
-import { getParent, getEventName, getAttrKey } from '@/utils';
+import { getParent, getEventName, getAttrKey, entries, keys } from '@/utils';
 
 export const render = (
   wDom: WDom,
@@ -37,7 +37,7 @@ export const render = (
   execMountedQueue();
 
   return () => {
-    const component = componentRef.get(wDom.componentProps || {})?.vd.value;
+    const component = componentRef.get(wDom.compProps || {})?.vd.value;
     if (component) {
       runUnmountQueueFromWDom(component);
       recursiveRemoveEvent(component);
@@ -218,16 +218,14 @@ const removeEvent = (
   oldProps: Props,
   element: HTMLElement | DocumentFragment | Text
 ) => {
-  Object.entries(oldProps || {}).forEach(
-    ([dataKey, dataValue]: [string, unknown]) => {
-      if (dataKey.match(/^on/)) {
-        element.removeEventListener(
-          getEventName(dataKey),
-          dataValue as (e: Event) => void
-        );
-      }
+  entries(oldProps || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
+    if (dataKey.match(/^on/)) {
+      element.removeEventListener(
+        getEventName(dataKey),
+        dataValue as (e: Event) => void
+      );
     }
-  );
+  });
 };
 
 const typeUpdate = (newWDom: WDom) => {
@@ -271,55 +269,51 @@ const updateProps = (
 ) => {
   const originalProps = { ...oldProps };
 
-  Object.entries(props || {}).forEach(
-    ([dataKey, dataValue]: [string, unknown]) => {
-      if (dataKey === 'key') {
-        // Do nothing
-      } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
-        (element as HTMLElement).innerHTML = dataValue;
-      } else if (checkStyleData(dataKey, dataValue)) {
-        updateStyle(
-          dataValue,
-          checkStyleData(dataKey, originalProps.style)
-            ? originalProps.style
-            : {},
-          element
+  entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
+    if (dataKey === 'key') {
+      // Do nothing
+    } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
+      (element as HTMLElement).innerHTML = dataValue;
+    } else if (checkStyleData(dataKey, dataValue)) {
+      updateStyle(
+        dataValue,
+        checkStyleData(dataKey, originalProps.style) ? originalProps.style : {},
+        element
+      );
+    } else if (checkRefData(dataKey, dataValue)) {
+      dataValue.value = element;
+    } else if (dataKey.match(/^on/)) {
+      updateEvent(
+        element as HTMLElement,
+        dataKey,
+        dataValue as (e: Event) => void,
+        originalProps[dataKey] as (e: Event) => void
+      );
+    } else if (checkCheckableElement(element) && dataKey === 'checked') {
+      (element as HTMLInputElement).checked = !!dataValue;
+    } else if (checkTextareaElement(element) && dataKey === 'value') {
+      (element as HTMLInputElement).value = dataValue as string;
+    } else if (checkOptionElement(element) && dataKey === 'selected') {
+      (element as HTMLOptionElement).selected = !!dataValue;
+    } else if (checkNormalAttribute(dataValue)) {
+      if (xmlnsRef.value && dataKey !== 'xmlns') {
+        (element as HTMLElement).setAttributeNS(
+          null,
+          getAttrKey(dataKey),
+          String(dataValue)
         );
-      } else if (checkRefData(dataKey, dataValue)) {
-        dataValue.value = element;
-      } else if (dataKey.match(/^on/)) {
-        updateEvent(
-          element as HTMLElement,
-          dataKey,
-          dataValue as (e: Event) => void,
-          originalProps[dataKey] as (e: Event) => void
+      } else {
+        (element as HTMLElement).setAttribute(
+          getAttrKey(dataKey),
+          String(dataValue)
         );
-      } else if (checkCheckableElement(element) && dataKey === 'checked') {
-        (element as HTMLInputElement).checked = !!dataValue;
-      } else if (checkTextareaElement(element) && dataKey === 'value') {
-        (element as HTMLInputElement).value = dataValue as string;
-      } else if (checkOptionElement(element) && dataKey === 'selected') {
-        (element as HTMLOptionElement).selected = !!dataValue;
-      } else if (checkNormalAttribute(dataValue)) {
-        if (xmlnsRef.value && dataKey !== 'xmlns') {
-          (element as HTMLElement).setAttributeNS(
-            null,
-            getAttrKey(dataKey),
-            String(dataValue)
-          );
-        } else {
-          (element as HTMLElement).setAttribute(
-            getAttrKey(dataKey),
-            String(dataValue)
-          );
-        }
       }
-
-      delete originalProps[dataKey];
     }
-  );
 
-  Object.keys(originalProps).forEach(dataKey =>
+    delete originalProps[dataKey];
+  });
+
+  keys(originalProps).forEach(dataKey =>
     (element as HTMLElement).removeAttribute(dataKey)
   );
 };
@@ -407,12 +401,12 @@ const updateStyle = (
   const elementStyle = (element as HTMLElement)?.style;
 
   if (elementStyle) {
-    Object.entries(style).forEach(([styleKey, dataValue]) => {
+    entries(style).forEach(([styleKey, dataValue]) => {
       (elementStyle as any)[styleKey] = dataValue;
       delete originalStyle[styleKey];
     });
 
-    Object.entries(originalStyle).forEach(
+    entries(originalStyle).forEach(
       ([styleKey]) => ((elementStyle as any)[styleKey] = '')
     );
   }

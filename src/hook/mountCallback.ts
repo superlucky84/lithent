@@ -1,6 +1,6 @@
 import { WDom } from '@/types';
 import {
-  componentKeyRef,
+  compKeyRef,
   componentRef,
   getComponentKey,
 } from '@/utils/universalRef';
@@ -13,7 +13,7 @@ export const execMountedQueue = () => {
   mountedQueue = [];
 };
 export const addMountedQueue = (wDom: WDom) => {
-  if (wDom.componentKey) {
+  if (wDom.compKey) {
     mountedQueue.push(wDom);
   }
 };
@@ -21,14 +21,14 @@ export const mountCallback = (effectAction: () => void) =>
   componentRef.get(getComponentKey())!.mts.push(effectAction);
 
 export const runMountedQueueFromWDom = (newWDom: WDom) => {
-  const { componentKey } = newWDom;
+  const { compKey } = newWDom;
 
-  if (componentKey) {
-    const component = componentRef.get(componentKey);
+  if (compKey) {
+    const component = componentRef.get(compKey);
     const queue = component?.mts;
     const sequence = component?.upS;
 
-    componentKeyRef.value = componentKey;
+    compKeyRef.value = compKey;
 
     if (sequence) {
       sequence.value = 0;
