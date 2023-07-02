@@ -92,7 +92,7 @@ const code4 = `...
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
+    "jsxImportSource": "lithent",
     //...
   }
 }
