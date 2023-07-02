@@ -1,23 +1,23 @@
 import { ComponentRef, ComponentSubKey, Props, WDom } from '@/types';
 
 type RedrawQueueList = {
-  componentKey: Props;
+  compKey: Props;
   exec: () => void;
 }[];
 
-let redrawQueue: { componentKey: Props; exec: () => void }[] = [];
+let redrawQueue: { compKey: Props; exec: () => void }[] = [];
 let redrawQueueTimeout: boolean = false;
 
 /**
  * Common
  */
 export const xmlnsRef: { value: string } = { value: '' };
-export const componentKeyRef: { value: Props } = { value: {} };
+export const compKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentRef: ComponentRef = new WeakMap();
 
-export const componentRender = (componentKey: Props) => () => {
-  const up = componentRef.get(componentKey)?.up;
+export const componentRender = (compKey: Props) => () => {
+  const up = componentRef.get(compKey)?.up;
   let result = false;
   if (up) {
     up();
@@ -27,8 +27,8 @@ export const componentRender = (componentKey: Props) => () => {
   return result;
 };
 
-const setComponetRef = (componentKey: Props) => {
-  componentRef.set(componentKey, {
+const setComponetRef = (compKey: Props) => {
+  componentRef.set(compKey, {
     vd: { value: null },
     up: () => {},
     upR: [],
@@ -40,17 +40,15 @@ const setComponetRef = (componentKey: Props) => {
   });
 };
 
-export const getComponentKey = () => componentKeyRef.value;
+export const getComponentKey = () => compKeyRef.value;
 
-export const getComponentSubInfo = (
-  componentKey: Props,
-  subKey: ComponentSubKey
-) => componentRef.get(componentKey)![subKey];
+export const getComponentSubInfo = (compKey: Props, subKey: ComponentSubKey) =>
+  componentRef.get(compKey)![subKey];
 
-export const setRedrawAction = (componentKey: Props, exec: () => void) => {
-  componentRef.get(componentKey)!.up = () => {
+export const setRedrawAction = (compKey: Props, exec: () => void) => {
+  componentRef.get(compKey)!.up = () => {
     redrawQueue.push({
-      componentKey,
+      compKey,
       exec,
     });
 
@@ -61,17 +59,17 @@ export const setRedrawAction = (componentKey: Props, exec: () => void) => {
   };
 };
 
-export const initUpdateHookState = (componentKey: Props) =>
-  (componentKeyRef.value = componentKey);
+export const initUpdateHookState = (compKey: Props) =>
+  (compKeyRef.value = compKey);
 
-export const initMountHookState = (componentKey: Props) => {
-  componentKeyRef.value = componentKey;
-  setComponetRef(componentKey);
+export const initMountHookState = (compKey: Props) => {
+  compKeyRef.value = compKey;
+  setComponetRef(compKey);
 };
 
 const recursiveGetChildKeys = (wDom: WDom, result: Props[]) => {
   (wDom.children || []).forEach(item => {
-    const childComKey = item.componentKey;
+    const childComKey = item.compKey;
     if (childComKey) {
       result.push(childComKey);
     }
@@ -84,7 +82,7 @@ const execRedrawQueue = () => {
   let childItemList: Props[] = [];
 
   redrawQueue.forEach(item => {
-    const childVd = componentRef.get(item.componentKey)?.vd?.value;
+    const childVd = componentRef.get(item.compKey)?.vd?.value;
     if (childVd) {
       recursiveGetChildKeys(childVd, childItemList);
     }
@@ -92,16 +90,13 @@ const execRedrawQueue = () => {
 
   const addedKey: Props[] = [];
   const result = redrawQueue.reduce((acc, item) => {
-    const { componentKey } = item;
+    const { compKey } = item;
 
-    if (
-      childItemList.includes(componentKey) ||
-      addedKey.includes(componentKey)
-    ) {
+    if (childItemList.includes(compKey) || addedKey.includes(compKey)) {
       return acc;
     }
 
-    addedKey.push(componentKey);
+    addedKey.push(compKey);
     acc.push(item);
 
     return acc;

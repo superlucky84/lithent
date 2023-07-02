@@ -16,10 +16,10 @@ export type Component<T> = (
 
 export type TagFunctionResolver = {
   tagName: string;
-  constructor: Function;
+  ctor: Function;
   props: Props;
   children: WDom[];
-  resolve: (componentKey?: Props) => WDom;
+  resolve: (compKey?: Props) => WDom;
 };
 
 export type FragmentFunction = (props: Props, children: WDom[]) => WDom;
@@ -46,15 +46,15 @@ export interface WDom {
   props?: Props;
   oldProps?: Props;
   tagName?: string;
-  constructor?: Function;
+  ctor?: Function;
   children?: WDom[];
   oldChildren?: WDom[];
   getParent?: () => WDom | undefined;
   text?: string | number;
-  componentKey?: Props;
+  compKey?: Props;
   reRender?: () => WDom;
-  componentProps?: Props;
-  componentChildren?: WDom[];
+  compProps?: Props;
+  compChild?: WDom[];
   wrapElement?: HTMLElement;
   afterElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;

@@ -24,6 +24,7 @@ import {
   checkFragmentFunction,
   checkCustemComponentFunction,
 } from '@/utils/predicator';
+import { assign } from '@/utils';
 
 export const Fragment = (_props: Props, ...children: WDom[]) => ({
   type: 'fragment',
@@ -83,21 +84,17 @@ const reRenderCustomComponent = (
 
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
-  const constructor = tag;
+  const ctor = tag;
   // 리졸브는 컴포넌트를 새로 만든다.
-  const resolve = (componentKey = props) => {
-    initMountHookState(componentKey);
+  const resolve = (compKey = props) => {
+    initMountHookState(compKey);
 
     const component = tag(props, children);
-    const componentMaker = component(
-      componentRender(componentKey),
-      props,
-      children
-    );
+    const componentMaker = component(componentRender(compKey), props, children);
 
     const customNode = makeCustomNode(
       componentMaker,
-      componentKey,
+      compKey,
       tag,
       props,
       children
@@ -105,22 +102,21 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
 
     const originalWDom = customNode;
 
-    setRedrawAction(componentKey, () =>
+    setRedrawAction(compKey, () =>
       reRenderCustomComponent(tag, props, children, originalWDom)
     );
 
-    (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
-      customNode;
+    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = customNode;
 
     return customNode;
   };
 
-  return { tagName, constructor, props, children, resolve };
+  return { tagName, ctor, props, children, resolve };
 };
 
 const makeCustomNode = (
   componentMaker: (props: Props) => WDom,
-  componentKey: Props,
+  compKey: Props,
   tag: TagFunction,
   props: Props,
   children: WDom[]
@@ -129,11 +125,11 @@ const makeCustomNode = (
 
   addComponentProps(
     customNode,
-    componentKey,
+    compKey,
     tag,
     props,
     children,
-    makeReRender(componentMaker, componentKey, tag, props, children)
+    makeReRender(componentMaker, compKey, tag, props, children)
   );
 
   return customNode;
@@ -141,55 +137,54 @@ const makeCustomNode = (
 
 const makeReRender = (
   componentMaker: (props: Props) => WDom,
-  componentKey: Props,
+  compKey: Props,
   tag: TagFunction,
   props: Props,
   children: WDom[]
 ) => {
   const reRender = () =>
-    wDomMaker(componentMaker, componentKey, tag, props, children, reRender);
+    wDomMaker(componentMaker, compKey, tag, props, children, reRender);
   return reRender;
 };
 
 const wDomMaker = (
   componentMaker: (props: Props) => WDom,
-  componentKey: Props,
+  compKey: Props,
   tag: TagFunction,
   props: Props,
   children: WDom[],
   reRender: () => WDom
 ) => {
-  initUpdateHookState(componentKey);
+  initUpdateHookState(compKey);
   runUpdateCallback();
 
   const originalWDom = componentMaker(props);
 
-  setRedrawAction(componentKey, () =>
+  setRedrawAction(compKey, () =>
     reRenderCustomComponent(tag, props, children, originalWDom)
   );
 
-  addComponentProps(originalWDom, componentKey, tag, props, children, reRender);
+  addComponentProps(originalWDom, compKey, tag, props, children, reRender);
 
-  (getComponentSubInfo(componentKey, 'vd') as { value: WDom }).value =
-    originalWDom;
+  (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = originalWDom;
 
   return originalWDom;
 };
 
 const addComponentProps = (
   wDom: WDom,
-  componentKey: Props,
+  compKey: Props,
   tag: TagFunction,
   props: Props,
   children: WDom[],
   reRender: () => WDom
 ) => {
-  Object.assign(wDom, {
-    componentProps: props,
-    componentChildren: children,
-    constructor: tag,
+  assign(wDom, {
+    compProps: props,
+    compChild: children,
+    ctor: tag,
     tagName: tag.name,
-    componentKey,
+    compKey,
     reRender,
   });
 };

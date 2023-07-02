@@ -7,7 +7,7 @@ export const getParent = (vDom: WDom) => {
 };
 
 export const reRender = (vDom: WDom, infoVdom: TagFunctionResolver) => {
-  const { componentProps: props, componentChildren: children } = vDom;
+  const { compProps: props, compChild: children } = vDom;
   const { props: infoProps, children: infoChidren } = infoVdom;
 
   if (props) {
@@ -29,13 +29,15 @@ export const getEventName = (eventKey: string) =>
 export const getAttrKey = (keyName: string) =>
   keyName === 'className' ? 'class' : keyName;
 
+export const entries = Object.entries;
+export const keys = Object.keys;
+export const assign = Object.assign;
+
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
-    Object.keys(props).forEach(key => delete props[key]);
+    keys(props).forEach(key => delete props[key]);
 
-    Object.entries(infoProps || {}).forEach(
-      ([key, value]) => (props[key] = value)
-    );
+    entries(infoProps || {}).forEach(([key, value]) => (props[key] = value));
   }
 };
 
