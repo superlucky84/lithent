@@ -10,6 +10,7 @@ import {
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
+import { assign } from '@/utils';
 
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
@@ -118,13 +119,9 @@ const remakeChildrenForDiff = (
     : remakeChildrenForAdd(newWDom);
 
 const remakeChildrenForAdd = (newWDom: WDom) =>
-  (newWDom.children || []).map((item: WDom) => {
-    const childItem = makeNewWDomTree(item);
-
-    childItem.getParent = () => newWDom;
-
-    return childItem;
-  });
+  (newWDom.children || []).map((item: WDom) =>
+    assign(makeNewWDomTree(item), { getParent: () => newWDom })
+  );
 
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
   if (
@@ -134,16 +131,11 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
     return remakeChildrenForLoopUpdate(newWDom, originalWDom);
   }
 
-  return (newWDom.children || []).map((item: WDom, index: number) => {
-    const childItem = makeNewWDomTree(
-      item,
-      (originalWDom.children || [])[index]
-    );
-
-    childItem.getParent = () => newWDom;
-
-    return childItem;
-  });
+  return (newWDom.children || []).map((item: WDom, index: number) =>
+    assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {
+      getParent: () => newWDom,
+    })
+  );
 };
 
 const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {

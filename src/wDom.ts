@@ -216,13 +216,9 @@ const remakeChildren = (
   nodeParentPointer: NodePointer,
   children: MiddleStateWDomChildren
 ): WDom[] =>
-  children.map((item: MiddleStateWDom) => {
-    const childItem = makeChildrenItem(item);
-
-    childItem.getParent = () => nodeParentPointer.value;
-
-    return childItem;
-  });
+  children.map((item: MiddleStateWDom) =>
+    assign(makeChildrenItem(item), { getParent: () => nodeParentPointer.value })
+  );
 
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {
