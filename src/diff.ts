@@ -123,20 +123,14 @@ const remakeChildrenForAdd = (newWDom: WDom) =>
     assign(makeNewWDomTree(item), { getParent: () => newWDom })
   );
 
-const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
-  if (
-    newWDom.type === 'loop' &&
-    checkExisty(getKey((newWDom.children || [])[0]))
-  ) {
-    return remakeChildrenForLoopUpdate(newWDom, originalWDom);
-  }
-
-  return (newWDom.children || []).map((item: WDom, index: number) =>
-    assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {
-      getParent: () => newWDom,
-    })
-  );
-};
+const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
+  newWDom.type === 'loop' && checkExisty(getKey((newWDom.children || [])[0]))
+    ? remakeChildrenForLoopUpdate(newWDom, originalWDom)
+    : (newWDom.children || []).map((item: WDom, index: number) =>
+        assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {
+          getParent: () => newWDom,
+        })
+      );
 
 const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
   const [remakedChildren, unUsedChildren] = diffLoopChildren(
