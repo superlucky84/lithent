@@ -2,7 +2,6 @@ import { WDom, Props } from '@/types';
 import {
   checkStyleData,
   checkRefData,
-  checkNormalAttribute,
   checkExisty,
   checkOptionElement,
   checkTextareaElement,
@@ -270,6 +269,7 @@ const updateProps = (
   const originalProps = { ...oldProps };
 
   entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
+    let chkRemoveProp = true;
     if (dataKey === 'key') {
       // Do nothing
     } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
@@ -295,27 +295,46 @@ const updateProps = (
       (element as HTMLInputElement).value = dataValue as string;
     } else if (checkOptionElement(element) && dataKey === 'selected') {
       (element as HTMLOptionElement).selected = !!dataValue;
-    } else if (checkNormalAttribute(dataValue)) {
-      if (xmlnsRef.value && dataKey !== 'xmlns') {
-        (element as HTMLElement).setAttributeNS(
-          null,
-          getAttrKey(dataKey),
-          String(dataValue)
-        );
-      } else {
-        (element as HTMLElement).setAttribute(
-          getAttrKey(dataKey),
-          String(dataValue)
-        );
+    } else if (dataKey) {
+      [chkRemoveProp, dataValue] = makeAttrDataValue(dataValue);
+
+      if (chkRemoveProp) {
+        if (xmlnsRef.value && dataKey !== 'xmlns') {
+          (element as HTMLElement).setAttributeNS(
+            null,
+            getAttrKey(dataKey),
+            <string>dataValue
+          );
+        } else {
+          (element as HTMLElement).setAttribute(
+            getAttrKey(dataKey),
+            <string>dataValue
+          );
+        }
       }
     }
 
-    delete originalProps[dataKey];
+    if (chkRemoveProp) {
+      delete originalProps[dataKey];
+    }
   });
 
   keys(originalProps).forEach(dataKey =>
     (element as HTMLElement).removeAttribute(dataKey)
   );
+};
+
+const makeAttrDataValue = (dataValue: unknown): [boolean, string] => {
+  let allowSetAttr = true;
+  if (typeof dataValue === 'boolean') {
+    if (!dataValue) {
+      allowSetAttr = false;
+    }
+
+    dataValue = '';
+  }
+
+  return [allowSetAttr, String(dataValue)];
 };
 
 const wDomToDom = (wDom: WDom) => {

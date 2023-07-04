@@ -105,11 +105,6 @@ export const checkTextareaElement = (element: any): element is HTMLElement =>
 export const checkCheckableElement = (element: any): element is HTMLElement =>
   element.nodeType === 1 && ['radio', 'checkbox'].includes(element.type);
 
-export const checkNormalAttribute = (
-  dataValue: unknown
-): dataValue is number | string =>
-  typeof dataValue === 'number' || typeof dataValue === 'string';
-
 export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver
 ): WDomType => {

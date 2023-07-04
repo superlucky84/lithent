@@ -27,6 +27,7 @@ const Renew = mount((renew, _props) => {
       <button ref={el} onClick={change}>
         change
       </button>
+      <button disabled={count1 % 2 === 0}>change</button>
     </Fragment>
   );
 });
@@ -40,7 +41,7 @@ if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
   it('Is renew working properly?', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button></div>'
+      '<div><li>count1: 0</li><li>count2: 0</li><li>count3: 0</li><li>count4: 0</li><button>change</button><button disabled="">change</button></div>'
     );
     if (testChangeRef.value) {
       testChangeRef.value();
@@ -49,7 +50,7 @@ if (import.meta.vitest) {
     }
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button></div>'
+        '<div><li>count1: 3</li><li>count2: 6</li><li>count3: 9</li><li>count4: -3</li><button>change</button><button>change</button></div>'
       );
     });
   });
