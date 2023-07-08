@@ -76,10 +76,10 @@
     "prettier": "^2.3.2",
     "terser": "^5.17.7",
     "typescript": "^4.7.4",
-    "vite": "3.2.7",
-    "vite-plugin-checker": "^0.4.9",
     "vite-plugin-dts": "^2.3.0",
-    "vitest": "^0.32.2"
+    "vitest": "^0.32.2",
+    "vite": "^4.4.2",
+    "vite-plugin-checker": "^0.6.1"
   },
   "volta": {
     "node": "20.3.0"
