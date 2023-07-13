@@ -122,6 +122,11 @@ const makeCustomNode = (
   children: WDom[]
 ) => {
   const customNode = componentMaker(props);
+  if (customNode.reRender) {
+    throw new Error(
+      'The root of a component must not be a component, use "Fragment"'
+    );
+  }
 
   addComponentProps(
     customNode,

@@ -37,8 +37,7 @@ const Nested = mount(function (r) {
   );
 });
 
-const testWrap =
-  document.getElementById('root') || document.createElement('div');
+const testWrap = document.getElementById('root') || document.createElement('div');
 
 render(<Nested />, testWrap);
 
