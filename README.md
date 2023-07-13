@@ -113,11 +113,9 @@ const Component = mount((renew, _props) => {
   `;
 });
 
-// insertBefore
-// render(`<${Component} />`, document.getElementById('root'), document.getElementById('nextElement'));
-
-// appendChild
-const destroy = render(html`<${Component} />`, document.getElementById('root'));
+// appendChild or insertBefore
+// The third argument is an optional value for insertBefore.
+const destroy = render(html`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
 ```
 
 #### With UMD
@@ -151,7 +149,9 @@ const Component = mount(renew => {
   `;
 });
 
-const destroy = render(html`<${Component} />`, document.getElementById('root'));
+// appendChild or insertBefore
+// The third argument is an optional value for insertBefore.
+const destroy = render(html`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
 </script>
 ```
 
