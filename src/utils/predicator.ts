@@ -55,7 +55,7 @@ const checkNormalTypeElement = (
 ) =>
   checkPlainWDomType(newWDom) &&
   originalWDom?.type === newWDom.type &&
-  (originalWDom?.children?.length === newWDom?.children?.length ||
+  (newWDom.type !== 'loop' ||
     (newWDom.type === 'loop' &&
       checkExisty(getKey((newWDom.children || [])[0])) &&
       checkExisty(getKey((originalWDom.children || [])[0]))));
