@@ -3,8 +3,8 @@ import { ContentHeader } from '@/components/contentHeader';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code7 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.0.5/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.0.5/helper/dist/lithentHelper.umd.js"></script-->
+const code7 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.0.6/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.0.6/helper/dist/lithentHelper.umd.js"></script-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.js"></script>
 
 <div id="root"></div>
@@ -207,13 +207,13 @@ export const Install = mount(() => {
       </div>
       <h3 class="text-slate-50 text-xl mt-2 mb-2">Or Use CDN</h3>
       <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
-        <p>https://cdn.jsdelivr.net/npm/lithent@1.0.5/dist/lithent.umd.js</p>
+        <p>https://cdn.jsdelivr.net/npm/lithent@1.0.6/dist/lithent.umd.js</p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.0.5/helper/dist/lithentHelper.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.0.6/helper/dist/lithentHelper.umd.js
         </p>
-        <p>https://cdn.jsdelivr.net/npm/lithent@1.0.5/dist/lithent.mjs</p>
+        <p>https://cdn.jsdelivr.net/npm/lithent@1.0.6/dist/lithent.mjs</p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.0.5/helper/dist/lithentHelper.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.0.6/helper/dist/lithentHelper.mjs
         </p>
       </div>
       <div class="py-2 mb-4 overflow-x-auto text-sm text-gray-50 ">
