@@ -162,7 +162,11 @@ const startFindNextBrotherElement = (
 
   if (!parentWDom.isRoot && checkVirtualType(parentType)) {
     return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
-  } else if (parentWDom.isRoot && parentWDom.afterElement) {
+  } else if (
+    parentWDom.isRoot &&
+    checkVirtualType(parentType) &&
+    parentWDom.afterElement
+  ) {
     return parentWDom.afterElement;
   }
 
