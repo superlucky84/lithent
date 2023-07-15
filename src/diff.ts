@@ -1,6 +1,6 @@
-import { WDom, TagFunctionResolver, RenderType } from '@/types';
+import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
-import { getParent, reRender } from '@/utils';
+import { getParent } from '@/utils';
 import { recursiveRemoveEvent } from '@/render';
 import {
   checkEmptyElement,
@@ -10,7 +10,7 @@ import {
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
-import { assign } from '@/utils';
+import { assign, keys, entries } from '@/utils';
 
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
@@ -95,6 +95,41 @@ const addReRenderTypeProperty = (
   return result;
 };
 
+const updateProps = (props: Props, infoProps: Props) => {
+  if (props && infoProps !== props) {
+    keys(props).forEach(key => delete props[key]);
+
+    entries(infoProps || {}).forEach(([key, value]) => (props[key] = value));
+  }
+};
+
+const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
+  if (children && infoChidren !== children) {
+    children.splice(0, children.length);
+
+    if (infoChidren) {
+      infoChidren.forEach(childrenItem => children.push(childrenItem));
+    }
+  }
+};
+
+const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
+  const { compProps: props, compChild: children } = vDom;
+  const { props: infoProps, children: infoChidren } = infoVdom;
+
+  if (props) {
+    updateProps(props, infoProps);
+  }
+
+  if (children) {
+    updateChildren(children, infoChidren);
+  }
+
+  const newVDom = vDom.reRender && vDom.reRender();
+
+  return newVDom as WDom;
+};
+
 const generalize = (
   newWDom: WDom | TagFunctionResolver,
   isSameType: boolean,
@@ -102,7 +137,7 @@ const generalize = (
 ): WDom => {
   if (checkCustemComponentFunction(newWDom)) {
     return isSameType && originalWDom
-      ? reRender(originalWDom, newWDom)
+      ? runUpdate(originalWDom, newWDom)
       : newWDom.resolve();
   }
 

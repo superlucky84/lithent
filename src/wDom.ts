@@ -14,11 +14,10 @@ import { wDomUpdate } from '@/render';
 import {
   initUpdateHookState,
   initMountHookState,
-  setRedrawAction,
   needDiffRef,
-  componentRender,
   getComponentSubInfo,
 } from '@/utils/universalRef';
+import { setRedrawAction, componentUpdate } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,
@@ -90,7 +89,7 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
     initMountHookState(compKey);
 
     const component = tag(props, children);
-    const componentMaker = component(componentRender(compKey), props, children);
+    const componentMaker = component(componentUpdate(compKey), props, children);
 
     const customNode = makeCustomNode(
       componentMaker,

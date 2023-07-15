@@ -100,6 +100,11 @@ export type Param<Updater, Member, Props> = {
   children: WDom[];
 };
 
+export type RedrawQueueList = {
+  compKey: Props;
+  exec: () => void;
+}[];
+
 declare namespace JSX {
   interface IntrinsicElements {
     [name: string]: any;
