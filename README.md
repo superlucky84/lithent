@@ -32,7 +32,7 @@ used lightly in a variety of situations.
 
 In a real-world development environment, you may want to use Virtual DOM lightly, with only the bare minimum of core functionality.
 
-"Lithent" makes it easy to add, remove, and update virtual domes to specific parts of a pre-drawn SSR page.
+"Lithent" makes it easy to add, remove, and update virtual DOM to specific parts of a pre-drawn SSR page.
 
 "Lithent" has implemented the bare minimum functionality needed to create and update virtual DOM in general (we only need to know 'render', 'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
 
