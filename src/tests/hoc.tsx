@@ -65,4 +65,6 @@ if (import.meta.vitest) {
       '<div><div><li>count1: 0</li><button>change</button><button disabled="">change</button></div></div>'
     );
   });
+} else {
+  render(<RenewError />, testWrap);
 }

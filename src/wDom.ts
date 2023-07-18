@@ -123,7 +123,7 @@ const makeCustomNode = (
   const customNode = componentMaker(props);
   if (customNode.reRender) {
     throw new Error(
-      'The root of a component must not be a component, use "Fragment"'
+      'Avoid the case where the first element of a component is a component. Instead of "mount(()=>()=><Component />)" replace it with something like "mount(()=>()=><Fragment><Component /></Fragment>)".'
     );
   }
 
