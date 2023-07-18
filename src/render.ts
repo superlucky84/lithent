@@ -13,7 +13,16 @@ import { componentRef, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
-import { getParent, getEventName, getAttrKey, entries, keys } from '@/utils';
+import { getParent, entries, keys } from '@/utils';
+
+const getAttrKey = (keyName: string) =>
+  keyName === 'className' ? 'class' : keyName;
+
+const getEventName = (eventKey: string) =>
+  eventKey.replace(/^on(.*)/, (_match, p1) => p1.toLowerCase());
+
+const DF = () => new DocumentFragment();
+const CE = (t: string) => document.createElement(t);
 
 export const render = (
   wDom: WDom,
@@ -351,15 +360,15 @@ const wDomToDom = (wDom: WDom) => {
   }
 
   if (isVirtualType) {
-    element = new DocumentFragment();
+    element = DF();
   } else if (type === 'element' && tag) {
     element = xmlnsRef.value
       ? document.createElementNS(xmlnsRef.value, tag)
-      : document.createElement(tag);
+      : CE(tag);
   } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
   } else {
-    element = document.createElement('e');
+    element = CE('e');
   }
 
   wDomChildrenToDom(children, element);
@@ -388,7 +397,7 @@ const wDomChildrenToDom = (
 
       return acc;
     },
-    new DocumentFragment()
+    DF()
   );
 
   if (parentElement && elementChildren.hasChildNodes()) {
