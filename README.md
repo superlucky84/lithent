@@ -65,6 +65,7 @@ pnpm add lithent
 * UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.2.1/helper/dist/lithentHelper.umd.js
 * UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.1/tag/dist/lithentTag.umd.js
 * ESM : https://cdn.jsdelivr.net/npm/lithent@1.2.1/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.2.1/helper/dist/lithentHelper.mjs
 * ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.1/tag/dist/lithentTag.mjs
 
 
@@ -95,8 +96,8 @@ const html = htm.bind(h);
 #### With ESM
 ```js
 import { h, render, mount, Fragment } from 'lithent';
-import { state } from 'lithent/helper';
 import { lTag } from 'lithent/tag';
+import { state } from 'lithent/helper';
 
 const Component = mount((renew, _props) => {
   const count = state(0, renew);
