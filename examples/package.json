@@ -12,9 +12,6 @@
     "watch": "vite build --watch",
     "build": "vite build"
   },
-  "engines": {
-    "node": ">=16.16.0"
-  },
   "author": "",
   "repository": {
     "type": "git",
