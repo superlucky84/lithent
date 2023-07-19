@@ -60,10 +60,10 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.1.0/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.1.0/helper/dist/lithentHelper.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.1.0/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.1.0/helper/dist/lithentHelper.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.1.1/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.1.1/helper/dist/lithentHelper.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.1.1/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.1.1/helper/dist/lithentHelper.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -121,8 +121,8 @@ const destroy = render(html`<${Component} />`, document.getElementById('root'), 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.1.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.1.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.1.1/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.1.1/helper/dist/lithentHelper.umd.js"></script-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.js"></script>
 
 <div id="root"></div>
