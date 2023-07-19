@@ -1,4 +1,5 @@
 packages:
   - 'helper'
+  - 'tag'
   - 'examples'
   - 'lithentDocs'

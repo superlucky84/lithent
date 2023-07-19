@@ -1,19 +1,16 @@
 {
-  "name": "lithent-examples",
+  "name": "lithent-tag",
   "version": "0.21.0",
-  "description": "lithentExamples",
+  "description": "lithentTag",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithentExamples.umd.js",
-  "module": "./dist/lithentExamples.mjs",
+  "main": "./dist/lithentTag.umd.js",
+  "module": "./dist/lithentTag.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "watch": "vite build --watch",
     "build": "vite build"
-  },
-  "engines": {
-    "node": ">=16.16.0"
   },
   "author": "",
   "repository": {
@@ -22,13 +19,12 @@
   },
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": [
-    "lithent"
-  ],
+  "keywords": ["lithent"],
   "dependencies": {
-    "lithent": "workspace:*",
-    "lithent-helper": "workspace:*",
-    "lithent-tag": "workspace:*"
+    "htm": "^3.1.1"
+  },
+  "peerDependencies": {
+    "lithent": "workspace:*"
   },
   "volta": {
     "node": "20.3.0"

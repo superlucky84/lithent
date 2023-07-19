@@ -23,6 +23,7 @@ used lightly in a variety of situations.
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
+- [Related Projects](#related-projects)
 - [Develop Guide](#develop-guide)
 - [Test](#test)
 
@@ -60,10 +61,11 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.1.1/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.1.1/helper/dist/lithentHelper.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.1.1/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.1.1/helper/dist/lithentHelper.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.2.1/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.2.1/helper/dist/lithentHelper.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.1/tag/dist/lithentTag.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.2.1/dist/lithent.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.1/tag/dist/lithentTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -94,8 +96,7 @@ const html = htm.bind(h);
 ```js
 import { h, render, mount, Fragment } from 'lithent';
 import { state } from 'lithent/helper';
-import htm from 'htm';
-const html = htm.bind(h);
+import { lTag } from 'lithent/tag';
 
 const Component = mount((renew, _props) => {
   const count = state(0, renew);
@@ -105,7 +106,7 @@ const Component = mount((renew, _props) => {
   };
 
   // Updater
-  return () => html`
+  return () => lTag`
     <${Fragment}>
       <li>count: ${count.value}</li>
       <button onClick=${change}>increase</button>
@@ -115,22 +116,22 @@ const Component = mount((renew, _props) => {
 
 // appendChild or insertBefore
 // The third argument is an optional value for insertBefore.
-const destroy = render(html`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
+const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
 ```
 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.1.1/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.1.1/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/htm/3.1.1/htm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.2.1/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.2.1/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.2.1/tag/dist/lithentTag.umd.js"></script>
 
 <div id="root"></div>
 
 <script>
 const { h, Fragment, render, mount } = lithent;
+const { lTag } = lithentTag;
 // const { state } = lithentHelper;
-const html = htm.bind(h);
 
 const Component = mount(renew => {
   count = 0;
@@ -141,7 +142,7 @@ const Component = mount(renew => {
   };
 
   // Updater
-  return () => html`
+  return () => lTag`
     <${Fragment}>
       <li>count: ${count}</li>
       <button onClick=${change}>increase</button>
@@ -151,9 +152,12 @@ const Component = mount(renew => {
 
 // appendChild or insertBefore
 // The third argument is an optional value for insertBefore.
-const destroy = render(html`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
+const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
 </script>
 ```
+
+## Related Projects
+- [htm](https://www.npmjs.com/package/htm) - making **H**yperscript **T**agged **M**arkup possible
 
 ## Develop Guide
 

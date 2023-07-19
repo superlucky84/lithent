@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -80,10 +80,9 @@ importers:
       lithent-helper:
         specifier: workspace:*
         version: link:../helper
-    devDependencies:
-      htm:
-        specifier: ^3.1.1
-        version: 3.1.1
+      lithent-tag:
+        specifier: workspace:*
+        version: link:../tag
 
   helper:
     dependencies:
@@ -111,6 +110,15 @@ importers:
       tailwindcss:
         specifier: ^3.3.2
         version: 3.3.2
+
+  tag:
+    dependencies:
+      htm:
+        specifier: ^3.1.1
+        version: 3.1.1
+      lithent:
+        specifier: workspace:*
+        version: link:..
 
 packages:
 
@@ -2094,7 +2102,7 @@ packages:
 
   /htm@3.1.1:
     resolution: {integrity: sha512-983Vyg8NwUE7JkZ6NmOqpCZ+sh1bKv2iYTlUkzlWmA5JD2acKoxd4KVxbMmxX/85mtfdnDmTFoNKcg5DGAvxNQ==}
-    dev: true
+    dev: false
 
   /html-encoding-sniffer@3.0.0:
     resolution: {integrity: sha512-oWv4T4yJ52iKrufjnyZPkrN0CH3QnrUqdB6In1g5Fe1mia8GmF36gnfNySxoZtxD5+NmYw1EElVXiBk93UeskA==}

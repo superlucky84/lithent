@@ -1,8 +1,6 @@
-import { h, render, mount, Fragment, WDom } from 'lithent';
+import { render, mount, Fragment, WDom } from 'lithent';
 import { state } from 'lithent/helper';
-import htm from 'htm';
-
-const html = htm.bind(h);
+import { lTag } from 'lithent/tag';
 
 const Component = mount(r => {
   const count = state(0, r);
@@ -11,7 +9,7 @@ const Component = mount(r => {
 
   // Updater
   return (): WDom =>
-    html`
+    lTag`
       <${Fragment}>
         <li>count: ${count.v}</li>
         <button onClick=${change}>increase</button>
@@ -19,4 +17,4 @@ const Component = mount(r => {
     ` as WDom;
 });
 
-render(html`<${Component} />` as WDom, document.getElementById('root'));
+render(lTag`<${Component} />` as WDom, document.getElementById('root'));
