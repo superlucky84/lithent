@@ -75,14 +75,9 @@ It's easier to use lithent with JSX or HTM.
 
 - [Htm Github](https://github.com/developit/htm)
 
-```bash
-pnpm add -D htm
-```
-
 ```js
-import { h, render, mount } from 'lithent';
-import htm from 'htm';
-const html = htm.bind(h);
+import { lTag } from 'lithent/tag';
+const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
 ```
 
 #### With JSX
