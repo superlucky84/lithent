@@ -50,6 +50,9 @@
     "helper/dist",
     "helper/src",
     "helper/package.json",
+    "tag/dist",
+    "tag/src",
+    "tag/package.json",
     "examples/dist",
     "examples/src",
     "examples/package.json"
