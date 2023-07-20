@@ -1,8 +1,6 @@
-import { render, WDom } from 'lithent';
+import { render, WDom, nextTick } from 'lithent';
 
-const nextTick = () => Promise.resolve();
-
-export const portal = (
+export const nextTickRender = (
   wDomMaker: () => WDom,
   wrapElement: HTMLElement | null,
   afterElement?: HTMLElement | null
