@@ -33,10 +33,6 @@ export const About = mount(() => {
         "component mounter" and "renderer"
       </h3>
       <p class="text-gray-400 mt-4">
-        Many existing UI libraries have their advantages, but they also create
-        rules that are too strong and rigid for fear of users making mistakes.
-      </p>
-      <p class="text-gray-400 mt-4">
         JavaScript users are used to using closures and love to develop with
         them.
       </p>

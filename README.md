@@ -41,8 +41,6 @@ We provide code in the form of 'helpers' that extend the basic functionality, bu
 
 ### Approach with the developer-friendly concept of closures between "component mounter" and "renderer"
 
-Many existing UI libraries have their advantages, but they also create rules that are too strong and rigid for fear of users making mistakes.
-
 JavaScript users are used to using closures and love to develop with them.
 
 "Lithent" provides a familiar approach to my JavaScript development, as it leverages the properties of higher-order functions and closures to define and recycle the state of a component.
