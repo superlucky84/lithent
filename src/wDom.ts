@@ -78,6 +78,7 @@ const reRenderCustomComponent = (
   }
 
   needDiffRef.value = false;
+  console.log(newWDomTree);
   wDomUpdate(newWDomTree);
 };
 
