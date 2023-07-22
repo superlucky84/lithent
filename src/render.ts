@@ -66,6 +66,7 @@ export const wDomUpdate = (newWDomTree: WDom) => {
       SR: typeSortedReplace,
       SU: typeSortedUpdate,
     })[needRerender](newWDomTree);
+    delete newWDomTree.needRerender;
   }
 };
 
@@ -137,9 +138,10 @@ const typeAdd = (
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
     const isLoop = parentWDom.type === 'loop';
-    const nextEl = isLoop
-      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
-      : startFindNextBrotherElement(newWDom, parentWDom);
+    const nextEl =
+      isLoop && parentWDom.needRerender
+        ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+        : startFindNextBrotherElement(newWDom, parentWDom);
 
     if (newElement && parentEl) {
       if (nextEl) {
