@@ -71,9 +71,10 @@ const addReRenderTypeProperty = (
   const existOriginalWDom = originalWDom && originalWDom.type;
   const isEmptyElement = checkEmptyElement(newWDom);
   const isRoot = newWDom.isRoot;
-  const parentType = !isRoot && originalWDom && getParent(originalWDom)?.type;
+  const origParentType =
+    !isRoot && originalWDom && getParent(originalWDom)?.type;
   const key = getKey(newWDom);
-  const isKeyCheckedWDom = parentType === 'loop' && checkExisty(key);
+  const isKeyCheckedWDom = origParentType === 'loop' && checkExisty(key);
   const isSameText =
     newWDom.type === 'text' &&
     isSameType &&
