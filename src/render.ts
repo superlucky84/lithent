@@ -83,7 +83,7 @@ const rootDelete = (newWDom: WDom) => {
   deleteRealDom(newWDom, newWDom.wrapElement as HTMLElement);
 };
 
-const typeDelete = (newWDom: WDom) => {
+export const typeDelete = (newWDom: WDom) => {
   if (newWDom.oldProps && newWDom.el) {
     removeEvent(newWDom.oldProps, newWDom.el);
   }

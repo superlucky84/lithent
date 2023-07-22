@@ -1,7 +1,7 @@
 import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent } from '@/utils';
-import { recursiveRemoveEvent } from '@/render';
+import { typeDelete, recursiveRemoveEvent } from '@/render';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
@@ -173,13 +173,7 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
     originalWDom
   );
 
-  unUsedChildren.map(unusedItem => {
-    const el = unusedItem.el;
-
-    if (el?.parentNode) {
-      el.parentNode.removeChild(el);
-    }
-  });
+  unUsedChildren.map(unusedItem => typeDelete(unusedItem));
 
   return remakedChildren;
 };
