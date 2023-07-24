@@ -9,7 +9,7 @@ used lightly in a variety of situations.
 - https://superlucky84.github.io/lithent
   - (This guide page is written in lithent.)
 
-`(9.90 kB │ gzip: 3.87 kB)`
+`(9.91 kB │ gzip: 3.87 kB)`
 
 ## 🚩 Table of Contents
 
@@ -59,12 +59,12 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.2.3/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.2.3/helper/dist/lithentHelper.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.3/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.2.3/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.2.3/helper/dist/lithentHelper.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.3/tag/dist/lithentTag.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.2.4/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.2.4/helper/dist/lithentHelper.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.4/tag/dist/lithentTag.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.2.4/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.2.4/helper/dist/lithentHelper.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.2.4/tag/dist/lithentTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -116,9 +116,9 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.2.3/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.2.3/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.2.3/tag/dist/lithentTag.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.2.4/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.2.4/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.2.4/tag/dist/lithentTag.umd.js"></script>
 
 <div id="root"></div>
 
