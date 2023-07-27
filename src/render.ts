@@ -128,11 +128,9 @@ const typeSortedUpdate = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
-    const isLoop = parentWDom.type === 'loop';
-    const nextEl =
-      isLoop && parentWDom.needRerender
-        ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
-        : startFindNextBrotherElement(newWDom, parentWDom);
+    const nextEl = parentWDom.needRerender
+      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+      : startFindNextBrotherElement(newWDom, parentWDom);
 
     if (newElement && parentEl) {
       if (nextEl) {
@@ -159,20 +157,15 @@ const getElementFromFragment = (newWDom: WDom) => {
   return newWDom.el;
 };
 
-const typeAdd = (
-  newWDom: WDom,
-  newElement?: HTMLElement | DocumentFragment | Text
-) => {
-  if (!newElement) {
-    newElement = wDomToDom(newWDom) as HTMLElement;
-  }
+const typeAdd = (newWDom: WDom) => {
+  const newElement = wDomToDom(newWDom) as HTMLElement;
 
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
     const nextEl = startFindNextBrotherElement(newWDom, parentWDom);
 
-    if (newElement && parentEl) {
+    if (parentEl) {
       if (nextEl) {
         parentEl.insertBefore(newElement, nextEl);
       } else {
