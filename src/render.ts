@@ -122,8 +122,34 @@ const typeSortedReplace = (newWDom: WDom) => {
 };
 
 const typeSortedUpdate = (newWDom: WDom) => {
-  typeDelete(newWDom);
-  typeAdd(newWDom, newWDom.el);
+  // typeDelete(newWDom);
+  // typeAdd(newWDom, newWDom.el);
+  typeUpdate(newWDom);
+  console.log(newWDom);
+
+  const newElement = newWDom.el;
+  console.log('123', newElement);
+  /*
+  const parentWDom = getParent(newWDom);
+  if (parentWDom.type) {
+    const parentEl = findRealParentElement(parentWDom);
+    const isLoop = parentWDom.type === 'loop';
+    const nextEl =
+      isLoop && parentWDom.needRerender
+        ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+        : startFindNextBrotherElement(newWDom, parentWDom);
+
+    if (newElement && parentEl) {
+      if (nextEl) {
+        console.log('a');
+        parentEl.insertBefore(newElement, nextEl);
+      } else {
+        console.log('b', parentEl, newElement?.children);
+        parentEl.appendChild(newElement);
+      }
+    }
+  }
+  */
 };
 
 const typeAdd = (
