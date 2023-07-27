@@ -122,8 +122,6 @@ const typeSortedReplace = (newWDom: WDom) => {
 };
 
 const typeSortedUpdate = (newWDom: WDom) => {
-  typeUpdate(newWDom);
-
   const newElement = getElementFromFragment(newWDom);
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
@@ -140,6 +138,8 @@ const typeSortedUpdate = (newWDom: WDom) => {
       }
     }
   }
+
+  typeUpdate(newWDom);
 };
 
 const getElementFromFragment = (newWDom: WDom) => {

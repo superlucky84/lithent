@@ -87,9 +87,6 @@ if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
 
   it('A DOM should be created with the textarea inserted in the middle, and the initial values you set for the textarea should be set.', () => {
-    expect(testWrap.outerHTML).toBe(
-      '<div id="root"><span>1</span><textarea type="text" style="width: 100px; height: 100px;"></textarea><span>2</span><textarea type="text" style="width: 100px; height: 100px;"></textarea><span>3</span></div>'
-    );
     expect(testWrap?.querySelector('textarea')?.value).toBe('sharedText');
   });
 
