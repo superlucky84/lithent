@@ -453,19 +453,21 @@ const updateStyle = (
   oldStyle: Record<string, string>,
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
-  const originalStyle = { ...oldStyle };
-  const elementStyle = (element as HTMLElement)?.style;
+  requestAnimationFrame(() => {
+    const originalStyle = { ...oldStyle };
+    const elementStyle = (element as HTMLElement)?.style;
 
-  if (elementStyle) {
-    entries(style).forEach(([styleKey, dataValue]) => {
-      (elementStyle as any)[styleKey] = dataValue;
-      delete originalStyle[styleKey];
-    });
+    if (elementStyle) {
+      entries(style).forEach(([styleKey, dataValue]) => {
+        (elementStyle as any)[styleKey] = dataValue;
+        delete originalStyle[styleKey];
+      });
 
-    entries(originalStyle).forEach(
-      ([styleKey]) => ((elementStyle as any)[styleKey] = '')
-    );
-  }
+      entries(originalStyle).forEach(
+        ([styleKey]) => ((elementStyle as any)[styleKey] = '')
+      );
+    }
+  });
 };
 
 const findRealParentElement = (
