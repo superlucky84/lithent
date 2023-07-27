@@ -336,17 +336,13 @@ const updateProps = (
       [chkRemoveProp, dataValue] = makeAttrDataValue(dataValue);
 
       if (chkRemoveProp) {
-        if (xmlnsRef.value && dataKey !== 'xmlns') {
-          (element as HTMLElement).setAttributeNS(
-            null,
-            getAttrKey(dataKey),
-            <string>dataValue
-          );
+        const newDataKey = getAttrKey(dataKey);
+        if (newDataKey === 'class') {
+          requestAnimationFrame(() => {
+            setAttr(newDataKey, element as HTMLElement, dataValue as string);
+          });
         } else {
-          (element as HTMLElement).setAttribute(
-            getAttrKey(dataKey),
-            <string>dataValue
-          );
+          setAttr(newDataKey, element as HTMLElement, dataValue as string);
         }
       }
     }
@@ -359,6 +355,14 @@ const updateProps = (
   keys(originalProps).forEach(dataKey =>
     (element as HTMLElement).removeAttribute(dataKey)
   );
+};
+
+const setAttr = (dataKey: string, element: HTMLElement, dataValue: string) => {
+  if (xmlnsRef.value && dataKey !== 'xmlns') {
+    element.setAttributeNS(null, dataKey, dataValue);
+  } else {
+    element.setAttribute(dataKey, dataValue);
+  }
 };
 
 const makeAttrDataValue = (dataValue: unknown): [boolean, string] => {
