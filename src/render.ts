@@ -338,7 +338,7 @@ const updateProps = (
       if (chkRemoveProp) {
         const newDataKey = getAttrKey(dataKey);
         if (newDataKey === 'class') {
-          requestAnimationFrame(() => {
+          setTimeout(() => {
             setAttr(newDataKey, element as HTMLElement, dataValue as string);
           });
         } else {
@@ -457,7 +457,7 @@ const updateStyle = (
   oldStyle: Record<string, string>,
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
-  requestAnimationFrame(() => {
+  setTimeout(() => {
     const originalStyle = { ...oldStyle };
     const elementStyle = (element as HTMLElement)?.style;
 
