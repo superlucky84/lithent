@@ -105,23 +105,22 @@ const addReRenderTypeProperty = (
   return result;
 };
 
-function chkDiffLoopOrder(newWDom: WDom, originalWDom: WDom) {
+const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
   const origChildren = [...(originalWDom?.children || [])];
   const newChildren = [...(newWDom?.children || [])];
-
-  const filteredChildren = origChildren.filter(item => {
-    const key = getKey(item);
-    return newChildren.find(newItem => key === getKey(newItem));
-  });
-
+  const filteredChildren = origChildren.filter(item =>
+    newChildren.find(newItem => getKey(item) === getKey(newItem))
+  );
   let isSame = filteredChildren.length === newChildren.length;
+
   if (isSame) {
     isSame = filteredChildren.every(
       (item, index) => getKey(item) === getKey(newChildren[index])
     );
   }
+
   return isSame;
-}
+};
 
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {

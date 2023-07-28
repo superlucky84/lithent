@@ -9,7 +9,7 @@ used lightly in a variety of situations.
 - https://superlucky84.github.io/lithent
   - (This guide page is written in lithent.)
 
-`(10.27 kB │ gzip: 3.96 kB)`
+`(10.42 kB │ gzip: 4.03 kB)`
 
 ## 🚩 Table of Contents
 
