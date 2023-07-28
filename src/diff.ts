@@ -71,8 +71,8 @@ const addReRenderTypeProperty = (
   const existOriginalWDom = originalWDom && originalWDom.type;
   const isEmptyElement = checkEmptyElement(newWDom);
   const isRoot = newWDom.isRoot;
-  const origParentType =
-    !isRoot && originalWDom && getParent(originalWDom)?.type;
+  const originalParentWDom = originalWDom && getParent(originalWDom);
+  const origParentType = !isRoot && originalParentWDom?.type;
   const key = getKey(newWDom);
   const isKeyCheckedWDom = origParentType === 'loop' && checkExisty(key);
   const isSameText =
@@ -93,8 +93,35 @@ const addReRenderTypeProperty = (
     result = isKeyCheckedWDom ? 'SR' : 'R';
   }
 
+  if (
+    newWDom.type === 'loop' &&
+    result === 'U' &&
+    originalWDom &&
+    chkDiffLoopOrder(newWDom, originalWDom)
+  ) {
+    result = 'CNSU';
+  }
+
   return result;
 };
+
+function chkDiffLoopOrder(newWDom: WDom, originalWDom: WDom) {
+  const origChildren = [...(originalWDom?.children || [])];
+  const newChildren = [...(newWDom?.children || [])];
+
+  const filteredChildren = origChildren.filter(item => {
+    const key = getKey(item);
+    return newChildren.find(newItem => key === getKey(newItem));
+  });
+
+  let isSame = filteredChildren.length === newChildren.length;
+  if (isSame) {
+    isSame = filteredChildren.every(
+      (item, index) => getKey(item) === getKey(newChildren[index])
+    );
+  }
+  return isSame;
+}
 
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
