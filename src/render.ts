@@ -63,6 +63,7 @@ export const wDomUpdate = (newWDomTree: WDom) => {
       D: typeDelete,
       R: typeReplace,
       U: typeUpdate,
+      CNSU: typeUpdate,
       SR: typeSortedReplace,
       SU: typeSortedUpdate,
     })[needRerender](newWDomTree);
@@ -124,19 +125,21 @@ const typeSortedReplace = (newWDom: WDom) => {
 const typeSortedUpdate = (newWDom: WDom) => {
   typeUpdate(newWDom);
 
-  const newElement = getElementFromFragment(newWDom);
   const parentWDom = getParent(newWDom);
-  if (parentWDom.type) {
-    const parentEl = findRealParentElement(parentWDom);
-    const nextEl = parentWDom.needRerender
-      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
-      : startFindNextBrotherElement(newWDom, parentWDom);
+  if (parentWDom.needRerender !== 'CNSU') {
+    const newElement = getElementFromFragment(newWDom);
+    if (parentWDom.type) {
+      const parentEl = findRealParentElement(parentWDom);
+      const nextEl = parentWDom.needRerender
+        ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+        : startFindNextBrotherElement(newWDom, parentWDom);
 
-    if (newElement && parentEl) {
-      if (nextEl) {
-        parentEl.insertBefore(newElement, nextEl);
-      } else {
-        parentEl.appendChild(newElement);
+      if (newElement && parentEl) {
+        if (nextEl) {
+          parentEl.insertBefore(newElement, nextEl);
+        } else {
+          parentEl.appendChild(newElement);
+        }
       }
     }
   }
@@ -336,14 +339,11 @@ const updateProps = (
       [chkRemoveProp, dataValue] = makeAttrDataValue(dataValue);
 
       if (chkRemoveProp) {
-        const newDataKey = getAttrKey(dataKey);
-        if (newDataKey === 'class') {
-          setTimeout(() => {
-            setAttr(newDataKey, element as HTMLElement, dataValue as string);
-          });
-        } else {
-          setAttr(newDataKey, element as HTMLElement, dataValue as string);
-        }
+        setAttr(
+          getAttrKey(dataKey),
+          element as HTMLElement,
+          dataValue as string
+        );
       }
     }
 
@@ -457,21 +457,19 @@ const updateStyle = (
   oldStyle: Record<string, string>,
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
-  setTimeout(() => {
-    const originalStyle = { ...oldStyle };
-    const elementStyle = (element as HTMLElement)?.style;
+  const originalStyle = { ...oldStyle };
+  const elementStyle = (element as HTMLElement)?.style;
 
-    if (elementStyle) {
-      entries(style).forEach(([styleKey, dataValue]) => {
-        (elementStyle as any)[styleKey] = dataValue;
-        delete originalStyle[styleKey];
-      });
+  if (elementStyle) {
+    entries(style).forEach(([styleKey, dataValue]) => {
+      (elementStyle as any)[styleKey] = dataValue;
+      delete originalStyle[styleKey];
+    });
 
-      entries(originalStyle).forEach(
-        ([styleKey]) => ((elementStyle as any)[styleKey] = '')
-      );
-    }
-  });
+    entries(originalStyle).forEach(
+      ([styleKey]) => ((elementStyle as any)[styleKey] = '')
+    );
+  }
 };
 
 const findRealParentElement = (
