@@ -128,19 +128,36 @@ const typeSortedUpdate = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
   if (parentWDom.needRerender !== 'CNSU') {
     const newElement = getElementFromFragment(newWDom);
-    if (parentWDom.type) {
-      const parentEl = findRealParentElement(parentWDom);
-      const nextEl = parentWDom.needRerender
+
+    typeAdd(newWDom, newElement);
+  }
+};
+
+const typeAdd = (
+  newWDom: WDom,
+  newElement?: HTMLElement | DocumentFragment | Text
+) => {
+  if (!newElement) {
+    newElement = wDomToDom(newWDom) as HTMLElement;
+  }
+
+  const parentWDom = getParent(newWDom);
+  if (parentWDom.type) {
+    const parentEl = findRealParentElement(parentWDom);
+    const isLoop = parentWDom.type === 'loop';
+    const nextEl =
+      isLoop && parentWDom.needRerender && parentWDom.needRerender !== 'CNSU'
         ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
         : startFindNextBrotherElement(newWDom, parentWDom);
 
-      if (newElement && parentEl) {
-        if (nextEl) {
-          parentEl.insertBefore(newElement, nextEl);
-        } else {
-          parentEl.appendChild(newElement);
-        }
+    if (newElement && parentEl) {
+      if (nextEl) {
+        parentEl.insertBefore(newElement, nextEl);
+      } else {
+        parentEl.appendChild(newElement);
       }
+
+      execMountedQueue();
     }
   }
 };
@@ -158,26 +175,6 @@ const getElementFromFragment = (newWDom: WDom) => {
   }
 
   return newWDom.el;
-};
-
-const typeAdd = (newWDom: WDom) => {
-  const newElement = wDomToDom(newWDom) as HTMLElement;
-
-  const parentWDom = getParent(newWDom);
-  if (parentWDom.type) {
-    const parentEl = findRealParentElement(parentWDom);
-    const nextEl = startFindNextBrotherElement(newWDom, parentWDom);
-
-    if (parentEl) {
-      if (nextEl) {
-        parentEl.insertBefore(newElement, nextEl);
-      } else {
-        parentEl.appendChild(newElement);
-      }
-
-      execMountedQueue();
-    }
-  }
 };
 
 const startFindNextBrotherElement = (
