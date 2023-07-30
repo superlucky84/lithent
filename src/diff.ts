@@ -107,7 +107,9 @@ const addReRenderTypeProperty = (
 
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
   const origChildren = [...(originalWDom?.children || [])];
-  const newChildren = [...(newWDom?.children || [])];
+  const newChildren = [...(newWDom?.children || [])].filter(item =>
+    origChildren.find(newItem => getKey(item) === getKey(newItem))
+  );
   const filteredChildren = origChildren.filter(item =>
     newChildren.find(newItem => getKey(item) === getKey(newItem))
   );
