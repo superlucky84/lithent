@@ -40,6 +40,10 @@ const remakeNewWDom = (
 
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
+  if (originalWDom) {
+    delete originalWDom.children;
+  }
+
   return remakeWDom;
 };
 

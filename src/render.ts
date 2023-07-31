@@ -67,7 +67,10 @@ export const wDomUpdate = (newWDomTree: WDom) => {
       SR: typeSortedReplace,
       SU: typeSortedUpdate,
     })[needRerender](newWDomTree);
+
     delete newWDomTree.needRerender;
+    delete newWDomTree.oldChildren;
+    delete newWDomTree.oldProps;
   }
 };
 
