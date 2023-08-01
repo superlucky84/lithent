@@ -310,7 +310,8 @@ const updateProps = (
 
   entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
     let chkRemoveProp = true;
-    if (dataKey === 'key') {
+
+    if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
       // Do nothing
     } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
       (element as HTMLElement).innerHTML = dataValue;
