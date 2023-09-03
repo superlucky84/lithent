@@ -34,13 +34,16 @@ const remakeNewWDom = (
     originalWDom,
   ];
   const needRerender = addReRenderTypeProperty(...param);
+  const isNoting = needRerender === 'N';
 
-  remakeWDom.children = remakeChildrenForDiff(...param);
+  if (!isNoting) {
+    remakeWDom.children = remakeChildrenForDiff(...param);
+  }
+
   remakeWDom.needRerender = needRerender;
-
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
-  if (originalWDom) {
+  if (!isNoting && originalWDom) {
     delete originalWDom.children;
   }
 
@@ -83,11 +86,12 @@ const addReRenderTypeProperty = (
     newWDom.type === 'text' &&
     isSameType &&
     newWDom.text === originalWDom?.text;
+  const isSameWDom = newWDom === originalWDom;
 
   let result: RenderType | undefined;
   if (isEmptyElement) {
     result = 'D';
-  } else if (isSameText) {
+  } else if (isSameText || isSameWDom) {
     result = 'N';
   } else if (!existOriginalWDom) {
     result = 'A';
