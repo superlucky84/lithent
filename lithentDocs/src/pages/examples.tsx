@@ -17,6 +17,7 @@ import { Example14 } from '@/components/examples/example14';
 import { Example15 } from '@/components/examples/example15';
 import { Example16 } from '@/components/examples/example16';
 import { Example17 } from '@/components/examples/example17';
+import { Example18 } from '@/components/examples/example18';
 
 export const Examples = mount(() => {
   return () => (
@@ -41,6 +42,7 @@ export const Examples = mount(() => {
       <Example15 />
       <Example16 />
       <Example17 />
+      <Example18 />
     </div>
   );
 });
