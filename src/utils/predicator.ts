@@ -52,13 +52,17 @@ const checkSameTagElement = (
 const checkNormalTypeElement = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
+) => checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
+
+const checkLoopTypeElement = (
+  newWDom: WDom | TagFunction | TagFunctionResolver,
+  originalWDom?: WDom
 ) =>
   checkPlainWDomType(newWDom) &&
   originalWDom?.type === newWDom.type &&
-  (newWDom.type !== 'loop' ||
-    (newWDom.type === 'loop' &&
-      checkExisty(getKey((newWDom.children || [])[0])) &&
-      checkExisty(getKey((originalWDom.children || [])[0]))));
+  ((checkExisty(getKey((newWDom.children || [])[0])) &&
+    checkExisty(getKey((originalWDom.children || [])[0]))) ||
+    originalWDom?.children?.length === newWDom?.children?.length);
 
 export const getKey = (target: WDom) =>
   target?.compProps?.key ?? target?.props?.key;
@@ -129,7 +133,7 @@ export const getWDomType = (
 
 export const checkSameWDomWithOriginal = {
   c: checkSameCustomComponent,
-  l: checkNormalTypeElement,
+  l: checkLoopTypeElement,
   t: checkNormalTypeElement,
   e: checkSameTagElement,
   f: checkSameFragment,
