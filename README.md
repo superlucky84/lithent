@@ -24,7 +24,7 @@ used lightly in a variety of situations.
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
 - [Related Projects](#related-projects)
-- [Thanks for the introduction](#aa)
+- [Thanks for the introduction](#thanks-for-the-introduction)
 - [Develop Guide](#develop-guide)
 - [Test](#test)
 
