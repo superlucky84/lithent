@@ -12,7 +12,7 @@ used lightly in a variety of situations.
 `(10.66 kB │ gzip: 4.08 kB)`
 
 ## 🚩 Table of Contents
-
+- [Thanks for the introduction](#thanks-for-the-introduction)
 - [Why Use Lithent](#why-use-lithent)
 - [Basic Guide](#basic-guide)
 - [How To Install](#how-to-install)
@@ -24,9 +24,14 @@ used lightly in a variety of situations.
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
 - [Related Projects](#related-projects)
-- [Thanks for the introduction](#thanks-for-the-introduction)
 - [Develop Guide](#develop-guide)
 - [Test](#test)
+
+## Thanks for the introduction
+- [unsuckjs](https://unsuckjs.com/)
+- [jster](https://jster.net/blog/jster-198/)
+- [frontendweekly](https://frontendweekly.co/issues/365)
+- [webtoolsweekly](https://webtoolsweekly.com/archives/issue-531/)
 
 ## Why use Lithent?
 
@@ -153,12 +158,6 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 
 ## Related Projects
 - [htm](https://www.npmjs.com/package/htm) - making **H**yperscript **T**agged **M**arkup possible
-
-## Thanks for the introduction
-- [unsuckjs](https://unsuckjs.com/)
-- [jster](https://jster.net/blog/jster-198/)
-- [frontendweekly](https://frontendweekly.co/issues/365)
-- [webtoolsweekly](https://webtoolsweekly.com/archives/issue-531/)
 
 ## Develop Guide
 
