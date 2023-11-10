@@ -210,7 +210,7 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
     originalWDom
   );
 
-  unUsedChildren.map(unusedItem => {
+  unUsedChildren.forEach(unusedItem => {
     runUnmountQueueFromWDom(unusedItem);
     recursiveRemoveEvent(unusedItem);
     typeDelete(unusedItem);
