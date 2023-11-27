@@ -78,6 +78,7 @@ const reRenderCustomComponent = (
   }
 
   needDiffRef.value = false;
+
   wDomUpdate(newWDomTree);
 };
 
@@ -120,11 +121,20 @@ const makeCustomNode = (
   props: Props,
   children: WDom[]
 ) => {
-  const customNode = componentMaker(props);
+  let newCustomComponentMaker = componentMaker;
+  let customNode = componentMaker(props);
+
   if (customNode.reRender) {
-    throw new Error(
-      'Avoid the case where the first element of a component is a component. Instead of "mount(()=>()=><Component />)" replace it with something like "mount(()=>()=><Fragment><Component /></Fragment>)".'
-    );
+    newCustomComponentMaker = (newProps: Props): WDom => {
+      const customNode = componentMaker(newProps);
+      const newNode = Fragment({}, customNode);
+
+      customNode.getParent = () => newNode;
+
+      return newNode;
+    };
+
+    customNode = newCustomComponentMaker(props);
   }
 
   addComponentProps(
@@ -133,7 +143,7 @@ const makeCustomNode = (
     tag,
     props,
     children,
-    makeReRender(componentMaker, compKey, tag, props, children)
+    makeReRender(newCustomComponentMaker, compKey, tag, props, children)
   );
 
   return customNode;

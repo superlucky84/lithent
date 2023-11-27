@@ -1,5 +1,5 @@
 // example.jsx
-import { h, Fragment, render, Renew, mount, ref } from '@/index';
+import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 
 const Renew2 = mount<{
@@ -17,7 +17,7 @@ const Renew2 = mount<{
   };
 });
 
-const RenewError = mount(function one(renew, _props) {
+const RenewHoc = mount(function one(renew, _props) {
   let count1 = 0;
 
   const change = () => {
@@ -55,16 +55,33 @@ const testWrap =
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
 
-  it('The root element that the component draws should not be a component.', () => {
-    expect(() => render(<RenewError />, testWrap)).toThrowError();
+  it('It also works when the root element that the component draws is a component.', () => {
+    render(<RenewHoc />, testWrap);
+    expect(testWrap.outerHTML).toBe(
+      '<div><div><li>count1: 0</li><button>change</button><button disabled="">change</button></div></div>'
+    );
+  });
+
+  it('Value updates work correctly when the root element drawn by the component is a component.', () => {
+    if (testChangeRef.value) {
+      testChangeRef.value();
+    }
+    nextTick().then(() => {
+      expect(testWrap.outerHTML).toBe(
+        '<div><div><li>count1: 1</li><button>change</button><button>change</button></div></div>'
+      );
+    });
   });
 
   it('The root element drawn by a component behaves normally when it is not a component.', () => {
+    const testWrap =
+      document.getElementById('root') || document.createElement('div');
+
     render(<Renew />, testWrap);
     expect(testWrap.outerHTML).toBe(
       '<div><div><li>count1: 0</li><button>change</button><button disabled="">change</button></div></div>'
     );
   });
 } else {
-  render(<RenewError />, testWrap);
+  render(<RenewHoc />, testWrap);
 }
