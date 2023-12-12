@@ -1,12 +1,17 @@
-import { h, render, mount, ref, nextTick } from '@/index';
-const testChangeRef = ref<null | (() => void)>(null);
+import { h, render, mount, Fragment, ref, nextTick } from '@/index';
 
 type StoreValue = {
   [key: string | symbol]: (() => boolean)[];
 };
 
+const testChangeRef1 = ref<null | (() => void)>(null);
+const testChangeRef2 = ref<null | (() => void)>(null);
+const testChangeRef3 = ref<null | (() => void)>(null);
+
 const storeGroup = new Map<string | symbol, unknown>();
+
 const storeRenderList: StoreValue = {};
+
 const storeRenderObserveMap: {
   [key: string | symbol]: StoreValue;
 } = {};
@@ -92,32 +97,62 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
   });
 };
 
-const assignShardStore = store<{ text: string; count: number }>({
-  text: 'sharedText',
-  count: 3,
+const assignShardStore = store<{
+  count1: number;
+  count2: number;
+  count3: number;
+}>({
+  count1: 0,
+  count2: 0,
+  count3: 0,
 });
 
 const Component = mount(renew => {
-  const shardStore = assignShardStore(renew);
-  const changeInput = (event: InputEvent) => {
-    shardStore.text = (event.target as HTMLInputElement).value;
+  const shardStore = assignShardStore(renew, store => [
+    store.count1,
+    store.count3,
+  ]);
+
+  const changeCount1 = () => {
+    shardStore.count1 += 1;
   };
-  testChangeRef.value = () => {
-    shardStore.text = 'newSharedText';
+
+  const changeCount2 = () => {
+    shardStore.count2 += 1;
   };
+
+  const changeCount3 = () => {
+    shardStore.count3 += 1;
+  };
+
+  testChangeRef1.value = changeCount1;
+  testChangeRef2.value = changeCount2;
+  testChangeRef3.value = changeCount3;
+
   return () => (
-    <textarea
-      type="text"
-      onInput={changeInput}
-      value={shardStore.text}
-      style={{ width: '100px', height: '100px' }}
-    />
+    <Fragment>
+      <button type="button" onClick={changeCount1}>
+        count1: {shardStore.count1}
+      </button>
+      <button type="button" onClick={changeCount2}>
+        count2: {shardStore.count2}
+      </button>
+      <button type="button" onClick={changeCount3}>
+        count3: {shardStore.count3}
+      </button>
+    </Fragment>
   );
 });
 
 document.body.innerHTML = `<div id="root"><span>1</span><span>2</span><span>3</span></div>`;
+const testbad = document.createElement('div');
+testbad.id = 'root';
 
-const testWrap = document.getElementById('root') as HTMLElement;
+testbad.innerHTML = '<span>1</span><span>2</span><span>3</span>';
+
+const testWrap =
+  (document.getElementById('root') as HTMLElement) ||
+  document.createElement('div');
 
 render(
   <Component />,
@@ -134,16 +169,22 @@ render(
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
 
-  it('A DOM should be created with the textarea inserted in the middle, and the initial values you set for the textarea should be set.', () => {
-    expect(testWrap?.querySelector('textarea')?.value).toBe('sharedText');
+  it('If the observer function is specified when assigning from helper/store, only the specified value can be retrieved.', () => {
+    expect(testWrap.outerHTML).toBe(
+      '<div id="root"><span>1</span><button type="button">count1: 0</button><button type="button">count2: </button><button type="button">count3: 0</button><span>2</span><button type="button">count1: 0</button><button type="button">count2: </button><button type="button">count3: 0</button><span>3</span></div>'
+    );
   });
 
-  it('If you change the value of the store, the value of the textarea should also change.', () => {
-    if (testChangeRef.value) {
-      testChangeRef.value();
+  it('If you define an observer function to get a value from store, you must also restrict updates to the value.', () => {
+    if (testChangeRef1.value && testChangeRef2.value && testChangeRef3.value) {
+      testChangeRef1.value();
+      testChangeRef2.value();
+      testChangeRef3.value();
     }
     nextTick().then(() => {
-      expect(testWrap?.querySelector('textarea')?.value).toBe('newSharedText');
+      expect(testWrap.outerHTML).toBe(
+        '<div id="root"><span>1</span><button type="button">count1: 1</button><button type="button">count2: </button><button type="button">count3: 1</button><span>2</span><button type="button">count1: 1</button><button type="button">count2: </button><button type="button">count3: 1</button><span>3</span></div>'
+      );
     });
   });
 }
