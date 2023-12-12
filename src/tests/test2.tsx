@@ -1,19 +1,34 @@
 import { h, render, mount, ref, nextTick } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 
-const storeGroup = new Map<string | symbol, unknown>();
-const storeRenderList: {
+type StoreValue = {
   [key: string | symbol]: (() => boolean)[];
+};
+
+const storeGroup = new Map<string | symbol, unknown>();
+const storeRenderList: StoreValue = {};
+const storeRenderObserveMap: {
+  [key: string | symbol]: StoreValue;
 } = {};
 
 export const store = <T extends {}>(value: T) => {
   const storeKey = Symbol();
   storeGroup.set(storeKey, value);
 
-  return (renew?: () => boolean) => {
+  return (renew?: () => boolean, makeObserver?: (store: T) => unknown[]) => {
     if (renew) {
-      storeRenderList[storeKey] ??= [];
-      storeRenderList[storeKey].push(renew);
+      if (makeObserver) {
+        const renewRef: { value: (() => boolean) | null } = { value: renew };
+        const makedProxy = updater<T>(storeKey, renewRef);
+
+        makeObserver(makedProxy);
+        renewRef.value = null;
+
+        return makedProxy;
+      } else {
+        storeRenderList[storeKey] ??= [];
+        storeRenderList[storeKey].push(renew);
+      }
     }
 
     return updater<T>(storeKey);
@@ -21,15 +36,38 @@ export const store = <T extends {}>(value: T) => {
 };
 
 const updater = <T extends { [key: string | symbol]: unknown }>(
-  storeKey: string | symbol
-) =>
-  new Proxy(storeGroup.get(storeKey) as T, {
-    get(target: T, prop: string) {
-      return target[prop];
+  storeKey: string | symbol,
+  renewRef?: { value: (() => boolean) | null }
+) => {
+  const allowedAccessProp: (keyof T)[] = [];
+
+  return new Proxy(storeGroup.get(storeKey) as T, {
+    get(target: T, prop: keyof T) {
+      if (renewRef?.value) {
+        storeRenderObserveMap[storeKey] ??= {};
+        storeRenderObserveMap[storeKey][prop] ??= [];
+
+        if (!storeRenderObserveMap[storeKey][prop].includes(renewRef.value)) {
+          storeRenderObserveMap[storeKey][prop].push(renewRef.value);
+          allowedAccessProp.push(prop);
+        }
+      }
+
+      if (allowedAccessProp.includes(prop) || !renewRef) {
+        return target[prop];
+      }
+
+      return null;
     },
     set(target, prop: keyof T, value) {
-      target[prop] = value;
-      const renderList = storeRenderList[storeKey];
+      if (allowedAccessProp.includes(prop) || !renewRef) {
+        target[prop] = value;
+      }
+
+      const renderList = storeRenderList[storeKey] || [];
+      const renderObserveList: (() => boolean)[] = renewRef
+        ? storeRenderObserveMap[storeKey][prop] || []
+        : [];
       const trashCollections: (() => boolean)[] = [];
 
       renderList.forEach(renew => {
@@ -38,13 +76,21 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
         }
       });
 
-      trashCollections.forEach(deleteTarget =>
-        renderList.splice(renderList.indexOf(deleteTarget), 1)
-      );
+      renderObserveList.forEach(renew => {
+        if (!renew()) {
+          trashCollections.push(renew);
+        }
+      });
+
+      trashCollections.forEach(deleteTarget => {
+        renderList.splice(renderList.indexOf(deleteTarget), 1);
+        renderObserveList.splice(renderObserveList.indexOf(deleteTarget), 1);
+      });
 
       return true;
     },
   });
+};
 
 const assignShardStore = store<{ text: string; count: number }>({
   text: 'sharedText',
