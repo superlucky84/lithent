@@ -17,10 +17,13 @@ const code = `// index.html
 import { h, Fragment, render, mount } from 'lithent';
 import { store } from 'lithent/helper';
 
-const assignShardStore = store<{ text: string; count: number }>({ text: 'sharedText' });
+const assignShardStore = store<{ text: string; count: number }>({ text: 'sharedText', count: 3 });
 
 const Component = mount(r => {
-  const shardStore = assignShardStore(r);
+  // The value of "shardStore.count" is null.
+  // To get the value, you must include it in the second argument, the function return array.
+  // If you omit the second argument, then all values in the store are fetched.
+  const shardStore = assignShardStore(r, (store) => [store.text]);
   const changeInput = (event) => {
     shardStore.text = event.target.value;
   };
@@ -41,7 +44,7 @@ const assignShardStore = store<{ text: string; count: number }>({
 });
 
 const Component = mount(renew => {
-  const shardStore = assignShardStore(renew);
+  const shardStore = assignShardStore(renew, store => [store.text]);
   const changeInput = (event: InputEvent) => {
     shardStore.text = (event.target as HTMLInputElement).value;
   };
