@@ -65,12 +65,12 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.5.2/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.5.2/helper/dist/lithentHelper.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.5.2/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.5.2/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.5.2/helper/dist/lithentHelper.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.5.2/tag/dist/lithentTag.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.6.0/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.6.0/helper/dist/lithentHelper.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.6.0/tag/dist/lithentTag.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.6.0/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.6.0/helper/dist/lithentHelper.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.6.0/tag/dist/lithentTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -122,9 +122,9 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.5.2/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.5.2/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.5.2/tag/dist/lithentTag.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.6.0/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.6.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.6.0/tag/dist/lithentTag.umd.js"></script>
 
 <div id="root"></div>
 
