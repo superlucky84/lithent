@@ -10,9 +10,11 @@ export const store = <T extends {}>(value: T) => {
   const storeKey = Symbol();
   storeGroup.set(storeKey, value);
 
-  return (renew: () => boolean) => {
-    storeRenderList[storeKey] ??= [];
-    storeRenderList[storeKey].push(renew);
+  return (renew?: () => boolean) => {
+    if (renew) {
+      storeRenderList[storeKey] ??= [];
+      storeRenderList[storeKey].push(renew);
+    }
 
     return updater<T>(storeKey);
   };
