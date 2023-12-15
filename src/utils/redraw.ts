@@ -1,4 +1,4 @@
-import { Props, WDom } from '@/types';
+import { Props } from '@/types';
 import { componentRef } from '@/utils/universalRef';
 
 let redrawQueue: { compKey: Props; exec: () => void }[] = [];
