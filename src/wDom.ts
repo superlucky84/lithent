@@ -58,11 +58,11 @@ const reRenderCustomComponent = (
   children: WDom[],
   originalWDom: WDom
 ) => {
-  needDiffRef.value = true;
-
   if (originalWDom.isLegacy) {
     return;
   }
+
+  needDiffRef.value = true;
 
   const newWDom = makeWDomResolver(tag, props, children);
   const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
