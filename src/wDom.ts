@@ -60,6 +60,10 @@ const reRenderCustomComponent = (
 ) => {
   needDiffRef.value = true;
 
+  if (originalWDom.isLegacy) {
+    return;
+  }
+
   const newWDom = makeWDomResolver(tag, props, children);
   const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
   const { isRoot, getParent, wrapElement, afterElement } = originalWDom;

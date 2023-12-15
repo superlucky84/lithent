@@ -44,6 +44,7 @@ const remakeNewWDom = (
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
   if (!isNoting && originalWDom) {
+    originalWDom.isLegacy = true;
     delete originalWDom.children;
   }
 

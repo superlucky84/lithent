@@ -59,6 +59,7 @@ export interface WDom {
   afterElement?: HTMLElement;
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?: RenderType;
+  isLegacy?: boolean;
 }
 
 export type RenderType =
