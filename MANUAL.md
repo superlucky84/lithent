@@ -7,13 +7,13 @@
 
 ## 소개
 
-Lithent는 JSX를 기반으로 만들어진 경량(zip 3kb) 가상돔 UI 라이브러입니다.
+Lithent는 JSX를 기반으로 만들어진 경량(zip 3kb) 가상돔 UI 라이브러리입니다.
 
-별도의 빌드 툴 없이도 스크립트로드 만으로 가볍게 사용할 수 있으며, 이미 그려진 html문서에 동적으로 빈번한 변경이 많은 DOM 영역을 가상돔과 연결하여 쉽게 업데이트 하거나 제거 할 수 있도록 고안되었다. 물론 빌드툴과 함께 사용해도 좋으며 SPA 페이지를 만드는데 사용해도 좋다.
+별도의 빌드 툴 없이도 스크립트로드 만으로 가볍게 사용할 수 있으며, 이미 그려진 html문서에 동적으로 빈번한 변경이 많은 DOM 영역을 가상돔과 연결하여 쉽게 업데이트하거나 제거할 수 있도록 고안되었습니다. 물론 빌드툴과 함께 사용해도 좋으며 SPA 페이지를 만드는 데 사용해도 좋습니다.
 
-빌드툴과 함께 사용할 경우 JSX를 직접 사용할수 있으며, 빌드 툴 없이 사용할 경우 라이브러리가 제공하는 [Tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates)를 사용하여 JSX와 매우 유사한 방식으로 사용할 수 있다.
+빌드툴과 함께 사용할 경우 JSX를 직접 사용할 수 있으며, 빌드 툴 없이 사용할 경우 라이브러리가 제공하는 [Tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates)를 사용하여 JSX와 매우 유사한 방식으로 사용할 수 있습니다.
 
-컴포넌트를 정의할때 고차함수 및 클로저의 속성을 이용하여 정의하고 재활용하는 방식을 기본 아이디어로 채택하여 개발했다.
+컴포넌트를 정의할 때 고차함수 및 클로저의 특성을 이용하여 정의하고 재활용하는 방식을 기본 아이디어로 채택하여 개발했습니다.
 
 * 목차
     * 기본 기능
@@ -24,12 +24,12 @@ Lithent는 JSX를 기반으로 만들어진 경량(zip 3kb) 가상돔 UI 라이�
         * 마운트 콜백
         * 업데이트 콜백
     * 확장 기능
-        * 스테이트 헬퍼
-        * 스토어 헬퍼
-        * 캐시 업데이터 헬퍼
+        * state 헬퍼
+        * store 헬퍼
+        * cacheUpdate 헬퍼
         * effect 헬퍼
-        * 컴퓨티드 헬퍼
-        * 넥스트틱 헬퍼
+        * computed 헬퍼
+        * nextTick 헬퍼
     * lTag (Tagged templates 지원)
 
 ## 기본 기능
@@ -319,7 +319,7 @@ store 헬퍼의 구현 방법은 state 헬퍼의 구현방법과 유사합니다
 store의 구현 코드는 모든 헬퍼 코드 중 가장 복잡하지만 그래봤자 100줄도 안되므로 어렵지 않게 파악 가능합니다. 코드는 [(저장소)](https://github.com/superlucky84/lithent/blob/master/helper/src/hook/store.ts)에서 확인 가능합니다.
 
 
-### 캐시 업데이터 헬퍼
+### cacheUpdate 헬퍼
 
 업데이터에 cacheUpdate 함수를 사용하여 감싸주면, 불필요한 상태에서는 리렌더링이 발생하지 않도록 설정할 수 있습니다..
 
@@ -393,7 +393,7 @@ const Children = mount((r, props) => {
 });
 ```
 
-### 컴퓨티드 헬퍼
+### computed 헬퍼
 
 computed 헬퍼는 복잡한 계산식을 JSX 표현식 내에서 중복으로 사용할 경우 템플릿이 다소 복잡해 보일 수 있으므로, 미리 값을 계산하여 쉽게 사용할 수 있게 해주는 코드 입니다.
 
@@ -427,7 +427,7 @@ const Component = mount(renew => {
 render(<Component />, document.getElementById('root'));
 ```
 
-### 넥스트틱 헬퍼
+### nextTick 헬퍼
 
 
 넥스트틱 헬퍼는 다음 DOM 업데이트 플러시를 기다리는 유틸리티입니다. 사용자는 컴포넌트의 변경 요청 후, 가상돔이 실제 DOM에 완벽하게 적용된 시점을 보장받은 후 이후 작업을 진행하기 위해 넥스트틱 헬퍼를 사용할 수 있습니다. 예를 들면 특정 이벤트 후 변경되는 컴포넌트의 상태를 테스트 하기위해 사용할 수 있습니다.
