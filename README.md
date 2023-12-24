@@ -7,7 +7,7 @@ fragments into pages already drawn with SSR, and are intended to be
 used lightly in a variety of situations.
 
 - [Home Page](https://superlucky84.github.io/lithent) - (This page is written in lithent.)
-- [Korean Guide Document](https://medium.com/@joongwon/medium에서-gist-사용하기-d61b8ddae226)
+- [Korean Guide Document](https://medium.com/@superlucky84/lithent-전체-기능-설명서-3cfab04c0722)
 
 `(10.21 kB │ gzip: 3.90 kB)`
 
