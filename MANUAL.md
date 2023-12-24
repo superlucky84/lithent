@@ -1,4 +1,4 @@
-# Lithent
+# Lithent 전체 기능 설명서
 
 필자가 만든 경량 가상돔 라이브러리의 [Lithent](https://github.com/superlucky84/lithent)의 전체 기능 설명을 문서로 남깁니다.
 
@@ -92,7 +92,7 @@ render(<Component increaseCount={1} />, document.getElementById('root'));
 
 `업데이터`는 첫 번째 인자로 `props`를 제공받습니다. 물론 클로저를 이용하여 마운터에 있는 `props`를 참조할 수도 있습니다. 아래 예제코드를 보십시오.
 
-```
+```tsx
 import { h, Fragment, render, mount } from 'lithent';
 
 const Child = mount<{ count: number }>((_r, props) => {
@@ -137,7 +137,7 @@ Lithent는 `render 함수`를 제공합니다. `render 함수`는 가상돔과 �
 
 많이 설명할 필요 없이 아래 예제를 보면 바로 이해할 수 있습니다.
 
-```
+```tsx
 /* index.html
 <div>
   <span>1</span>
@@ -368,7 +368,7 @@ render(<Component />, document.getElementById('root'));
 
   주의해야 할 점은 세 번째 인수는 배열을 반환하는 것 "함수"여야 합니다. 그리고 `effect 헬퍼`도 다른 기능들과 마찬가지로 마운터의 모든 값에 클로저를 이용해 접근하므로, 사용하려는 값의 `call by value`, `call by reference` 상태를 잘 확인하고 사용해야 합니다.
 
-```ts
+```tsx
 import { h, Fragment, render, mount } from 'lithent';
 import { state, effect } from 'lithent/helper';
 
@@ -438,7 +438,7 @@ Lithent는 동시에 여러번 컴포넌트의 업데이트 요청이 일어나�
 
 `nextTick 헬퍼`는 브라우저의 마이크로테스크큐에 쌓인 리랜더 요청이 모두 끝난 후 실행 되어야 하는 콜백을 마이크로테스크큐의 맨 마지막에 추가로 넣어줍니다.
 
-```js
+```tsx
 nextTick().then(() => {
   expect(testWrap.outerHTML).toBe(
     '<div><button>insCount1</button><button>insCount2</button><span>depth1: 0 - 0</span> </div>'
@@ -454,7 +454,7 @@ nextTick().then(() => {
 
 아래의 예처럼 사용할 수 있습니다.
 
-```ts
+```js
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/dist/lithent.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/helper/dist/lithentHelper.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/tag/dist/lithentTag.umd.js"></script>
