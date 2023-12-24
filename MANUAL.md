@@ -2,7 +2,7 @@
 
 필자가 만든 경량 가상돔 라이브러리의 [Lithent](https://github.com/superlucky84/lithent)의 전체 기능 설명을 문서로 남깁니다.
 
-* 저장소 - [Link](https://superlucky84.github.io/lithent/)
+* 저장소 - [Link](https://github.com/superlucky84/lithent)
 * 가이드페이지 - [Link](https://superlucky84.github.io/lithent/)
 
 ## 소개
@@ -15,22 +15,23 @@ Lithent는 JSX를 기반으로 만들어진 경량(zip 3kb) 가상돔 UI 라이�
 
 컴포넌트를 정의할 때 고차함수 및 클로저의 특성을 이용하여 정의하고 재활용하는 방식을 기본 아이디어로 채택하여 개발했습니다.
 
-* 목차
-    * 기본 기능
-        * 마운터
-        * 업데이터
-        * 리뉴어
-        * 랜더
-        * 마운트 콜백
-        * 업데이트 콜백
-    * 확장 기능
-        * state 헬퍼
-        * store 헬퍼
-        * cacheUpdate 헬퍼
-        * effect 헬퍼
-        * computed 헬퍼
-        * nextTick 헬퍼
-    * lTag (Tagged templates 지원)
+## 목차
+
+* 기본 기능
+    * 마운터
+    * 업데이터
+    * 리뉴어
+    * 랜더
+    * 마운트 콜백
+    * 업데이트 콜백
+* 확장 기능
+    * state 헬퍼
+    * store 헬퍼
+    * cacheUpdate 헬퍼
+    * effect 헬퍼
+    * computed 헬퍼
+    * nextTick 헬퍼
+* lTag (Tagged templates 지원)
 
 ## 기본 기능
 
@@ -454,7 +455,7 @@ nextTick().then(() => {
 
 아래의 예처럼 사용할 수 있습니다.
 
-```js
+```html
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/dist/lithent.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/helper/dist/lithentHelper.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/tag/dist/lithentTag.umd.js"></script>
