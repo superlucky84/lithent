@@ -6,8 +6,8 @@ Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
 used lightly in a variety of situations.
 
-- https://superlucky84.github.io/lithent
-  - (This guide page is written in lithent.)
+- [Home Page](https://superlucky84.github.io/lithent) - (This page is written in lithent.)
+- [Korean Guide Document](https://medium.com/@joongwon/medium에서-gist-사용하기-d61b8ddae226)
 
 `(10.21 kB │ gzip: 3.90 kB)`
 
