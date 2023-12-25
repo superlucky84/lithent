@@ -2,12 +2,12 @@
 
 > An extensible virtual DOM library for lightweight use in a variety of environments.
 
+- [Korean Guide Document](https://medium.com/@superlucky84/lithent-전체-기능-설명서-3cfab04c0722)
+- [Home Page](https://superlucky84.github.io/lithent) - (This page is written in lithent.)
+
 Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
 used lightly in a variety of situations.
-
-- [Home Page](https://superlucky84.github.io/lithent) - (This page is written in lithent.)
-- [Korean Guide Document](https://medium.com/@superlucky84/lithent-전체-기능-설명서-3cfab04c0722)
 
 `(10.21 kB │ gzip: 3.90 kB)`
 
