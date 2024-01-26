@@ -1,18 +1,19 @@
-// import { h } from 'lithent';
+import { h } from 'lithent';
+import type { Props, WDom, MiddleStateWDom } from 'lithent';
 
-export const tags = new Proxy(
+type FTags = {
+  [tagName: string]: (
+    props: Props | null,
+    ...childrens: MiddleStateWDom[]
+  ) => WDom;
+};
+
+export const fTags: FTags = new Proxy(
   {},
   {
-    get(_, tagName) {
-      const tagFunction = (...allArgs: any[]) => {
-        const [firstArgs, ...restArgs] = allArgs;
-        const existProps = typeof firstArgs === 'object';
-        const props = existProps ? firstArgs : null;
-        const childrens = existProps ? restArgs : allArgs;
-
-        h(tagName, props, ...childrens);
-      };
-      return tagFunction;
+    get(_: {}, tagName: string) {
+      return (props?: Props | null, ...childrens: MiddleStateWDom[]) =>
+        h(tagName, props || {}, ...childrens);
     },
   }
 );

@@ -22,8 +22,8 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'lithentTag',
-      fileName: 'lithentTag',
+      name: 'lithentFtag',
+      fileName: 'lithentFtag',
     },
     rollupOptions: {
       external: ['lithent'],
