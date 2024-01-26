@@ -22,31 +22,27 @@
 // section(
 //   div({ class: 'wrap' })
 // );
-const h = () => {
-  console.log('h');
+const h = (tagName, props, childrens) => {
+  console.log('h', tagName, props, childrens);
 };
 
 const tags = new Proxy(
   {},
   {
-    get(target, tagName) {
-      const f = (...allArgs) => {
+    get(_, tagName) {
+      const tagFunction = (...allArgs) => {
         const [firstArgs, ...restArgs] = allArgs;
-        const makeTagName = tagName;
         const existProps = typeof firstArgs === 'object';
-        const props = existProps ? firstArgs : {};
+        const props = existProps ? firstArgs : null;
         const childrens = existProps ? restArgs : allArgs;
 
-        console.log(makeTagName);
-        console.log(firstArgs, restArgs);
-        console.log('PROPS', props);
-        console.log('CHILDRENS', childrens);
+        h(tagName, props, ...childrens);
       };
-      return f;
+      return tagFunction;
     },
   }
 );
 
-const { div, p } = tags;
+const { div, p, a } = tags;
 
-div({ a: 3 }, p());
+div({ a: 3 }, p('a', a({ href: 'ss' })));

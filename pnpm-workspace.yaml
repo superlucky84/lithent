@@ -1,5 +1,6 @@
 packages:
   - 'helper'
   - 'tag'
+  - 'ftag'
   - 'examples'
   - 'lithentDocs'

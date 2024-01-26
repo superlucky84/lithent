@@ -1,0 +1,29 @@
+{
+  "name": "lithent-ftag",
+  "version": "0.21.0",
+  "description": "lithentFtag",
+  "private": true,
+  "packageManager": "pnpm@7.6.0",
+  "main": "./dist/lithentFtag.umd.js",
+  "module": "./dist/lithentFtag.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "watch": "vite build --watch",
+    "build": "vite build"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": ["lithent"],
+  "peerDependencies": {
+    "lithent": "workspace:*"
+  },
+  "volta": {
+    "node": "20.3.0"
+  }
+}
