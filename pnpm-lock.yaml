@@ -69,7 +69,7 @@ importers:
         specifier: workspace:*
         version: link:../tag
 
-  ftag:
+  ftags:
     dependencies:
       lithent:
         specifier: workspace:*

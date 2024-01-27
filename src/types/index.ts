@@ -4,7 +4,7 @@ export type Props = { [key: string]: unknown };
 
 export type TagFunction = (
   prop: Props,
-  children: WDom[]
+  children: MiddleStateWDomChildren
 ) => (renew: Renew, prop: Props, children: WDom[]) => (props: Props) => WDom;
 
 export type Renew = () => boolean;
@@ -40,7 +40,7 @@ export type MiddleStateWDomChildren = MiddleStateWDom[];
 export type WDomType = 'c' | 'f' | 'e' | 'l' | 't' | 'et';
 
 export interface WDom {
-  type: string | null;
+  type?: string | null;
   isRoot?: boolean;
   tag?: string;
   props?: Props;

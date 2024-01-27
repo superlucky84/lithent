@@ -1,11 +1,11 @@
 {
-  "name": "lithent-ftag",
+  "name": "lithent-ftags",
   "version": "0.21.0",
-  "description": "lithentFtag",
+  "description": "lithentFTags",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithentFtag.umd.js",
-  "module": "./dist/lithentFtag.mjs",
+  "main": "./dist/lithentFTags.umd.js",
+  "module": "./dist/lithentFTags.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",

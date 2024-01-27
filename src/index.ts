@@ -9,6 +9,7 @@ export type {
   TagFunction,
   TagFunctionResolver,
   FragmentFunction,
+  Component,
   ComponentSubKey,
   ComponentRef,
   Props,

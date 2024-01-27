@@ -11,11 +11,12 @@
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
     "build:tag": "pnpm --filter lithent-tag build",
+    "build:ftags": "pnpm --filter lithent-ftags build",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
     "watch:core": "vite build --watch",
     "watch:helper": "pnpm --filter lithent-helper watch",
-    "build": "pnpm build:core && pnpm build:helper && pnpm build:tag && pnpm build:examples && pnpm build:docs",
+    "build": "pnpm build:core && pnpm build:helper && pnpm build:ftags && pnpm build:tag && pnpm build:examples && pnpm build:docs",
     "build:p": "pnpm build:core && pnpm -r build",
     "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
     "test": "vitest run --reporter verbose",
@@ -41,6 +42,11 @@
       "types": "./tag/dist/index.d.ts",
       "import": "./tag/dist/lithentTag.mjs",
       "require": "./tag/dist/lithentTag.umd.js"
+    },
+    "./ftags": {
+      "types": "./ftags/dist/index.d.ts",
+      "import": "./ftags/dist/lithentFTags.mjs",
+      "require": "./ftags/dist/lithentFTags.umd.js"
     }
   },
   "types": "./dist/index.d.ts",
@@ -53,6 +59,9 @@
     "tag/dist",
     "tag/src",
     "tag/package.json",
+    "ftags/dist",
+    "ftags/src",
+    "ftags/package.json",
     "examples/dist",
     "examples/src",
     "examples/package.json"

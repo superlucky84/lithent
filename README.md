@@ -20,6 +20,7 @@ used lightly in a variety of situations.
   - [Use CDN](#or-use-cdn)
   - [With HTM](#with-htm)
   - [With JSX](#with-jsx)
+  - [With FTAGS](#with-ftags)
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
@@ -88,6 +89,37 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 
 - [Setting Guide](https://superlucky84.github.io/lithent/#install)
 
+
+#### With FTAGS
+
+```ts
+import { render, h } from 'lithent';
+import { fTags, fMount } from 'lithent/ftags';
+
+const { section, div, p, br, strong } = fTags;
+
+const FTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
+  return () =>
+    div(
+      { style: 'border: 1px solid red' },
+      'first inner',
+      div({}, 'second inner'),
+      props.firstProp,
+      ...children
+    );
+});
+
+render(
+  FTagComponent(
+    { firstProp: 3 },
+    div({ style: 'border: 1px solid green' }, `Fchildren1`),
+    'Fchildren2',
+    br()
+  ),
+  document.getElementById('root')
+);
+```
+
 ## Examples
 
 - [More Examples](https://superlucky84.github.io/lithent/#examples)
@@ -125,6 +157,7 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/dist/lithent.umd.js"></script>
 <!--script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/helper/dist/lithentHelper.umd.js"></script-->
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/tag/dist/lithentTag.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/ftags/dist/lithentFTags.umd.js"></script-->
 
 <div id="root"></div>
 
