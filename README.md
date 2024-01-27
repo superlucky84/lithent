@@ -92,6 +92,9 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 
 #### With FTAGS
 
+You can markup by calling a function.
+When creating components, use `fMount` instead of `mount`.
+
 ```ts
 import { render, h } from 'lithent';
 import { fTags, fMount } from 'lithent/ftags';
