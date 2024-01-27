@@ -61,13 +61,13 @@ const checkLoopTypeElement = (
   checkPlainWDomType(newWDom) &&
   originalWDom?.type === newWDom.type &&
   ((checkExisty(getKey((newWDom.children || [])[0])) &&
-    checkExisty(getKey((originalWDom.children || [])[0]))) ||
+    checkExisty(getKey((originalWDom?.children || [])[0]))) ||
     originalWDom?.children?.length === newWDom?.children?.length);
 
 export const getKey = (target: WDom) =>
   target?.compProps?.key ?? target?.props?.key;
 
-export const checkVirtualType = (type: string | null) =>
+export const checkVirtualType = (type?: string | null) =>
   type && ['fragment', 'loop'].includes(type);
 
 export const checkCustemComponentFunction = (

@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import eslintPlugin from '@nabla/vite-plugin-eslint';
 import dts from 'vite-plugin-dts';
+
 export default defineConfig({
   plugins: [
     checker({ typescript: true }),
@@ -17,20 +18,23 @@ export default defineConfig({
     },
   },
   build: {
-    minify: 'terser',
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src'),
-      name: 'lithent',
-      fileName: 'lithent',
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'lithentFTags',
+      fileName: 'lithentFTags',
+    },
+    rollupOptions: {
+      external: ['lithent'],
+      output: {
+        globals: {
+          lithent: 'lithent',
+        },
+      },
     },
   },
-  test: {
-    environment: 'jsdom',
-    includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
-  },
   server: {
-    open: '/html/ftag.html',
+    open: '/html/jsxExample.html',
   },
 });

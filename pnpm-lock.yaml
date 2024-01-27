@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -68,6 +68,12 @@ importers:
       lithent-tag:
         specifier: workspace:*
         version: link:../tag
+
+  ftags:
+    dependencies:
+      lithent:
+        specifier: workspace:*
+        version: link:..
 
   helper:
     dependencies:
