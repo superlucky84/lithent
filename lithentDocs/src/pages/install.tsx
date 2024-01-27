@@ -3,9 +3,46 @@ import { ContentHeader } from '@/components/contentHeader';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code7 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/tag/dist/lithentTag.umd.js"></script>
+const code10 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentFTags.umd.js"></script>
+
+<div id="root"></div>
+
+<script>
+const { render } = lithent;
+const { fTags, fMount, FFragment } = lithentFTags;
+// const { state } = lithentHelper;
+
+const { section, div, p, br, strong } = fTags;
+
+const FTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
+  return () =>
+    FFragment(
+      {},
+      'first inner',
+      div({ style: 'border: 1px solid red' }, 'second inner'),
+      props.firstProp,
+      ...children
+    );
+});
+
+render(
+  FTagComponent(
+    { firstProp: 3 },
+    div({ style: 'border: 1px solid green' }, \`Fchildren1\`),
+    'Fchildren2',
+    br()
+  ),
+  document.getElementById('root')
+);
+
+</script>
+`;
+
+const code7 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentTag.umd.js"></script>
 
 <div id="root"></div>
 
@@ -60,7 +97,7 @@ const Component = mount((r, _props) => {
 const destroy = render(lTag\`<\${Component} />\`, document.getElementById('root'));
 `;
 
-const code9 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.7.0/tag/dist/lithentTag.umd.js"></script>;
+const code9 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentTag.umd.js"></script>;
 const { lTag } = lithentTag;
 const destroy = render(lTag\`<\${Component} />\`, document.getElementById('root'));
 `;
@@ -165,6 +202,10 @@ const exCode9 = hljs.highlight(code9, {
   language: 'javascript',
 }).value;
 
+const exCode10 = hljs.highlight(code10, {
+  language: 'javascript',
+}).value;
+
 // grid grid-cols-1 xl:grid-cols-2
 export const Install = mount(() => {
   const installEl = ref<HTMLElement | null>(null);
@@ -219,21 +260,21 @@ export const Install = mount(() => {
       <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
         <p> </p>
         <p>## umd</p>
-        <p>https://cdn.jsdelivr.net/npm/lithent@1.7.0/dist/lithent.umd.js</p>
+        <p>https://cdn.jsdelivr.net/npm/lithent@1.8.0/dist/lithent.umd.js</p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.7.0/helper/dist/lithentHelper.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.8.0/helper/dist/lithentHelper.umd.js
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.7.0/tag/dist/lithentTag.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentTag.umd.js
         </p>
         <p>&nbsp;</p>
         <p>## esm</p>
-        <p>https://cdn.jsdelivr.net/npm/lithent@1.7.0/dist/lithent.mjs</p>
+        <p>https://cdn.jsdelivr.net/npm/lithent@1.8.0/dist/lithent.mjs</p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.7.0/helper/dist/lithentHelper.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.8.0/helper/dist/lithentHelper.mjs
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.7.0/tag/dist/lithentTag.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentTag.mjs
         </p>
       </div>
       <div class="py-2 mb-4 overflow-x-auto text-sm text-gray-50 ">
@@ -320,6 +361,14 @@ export const Install = mount(() => {
             <div
               class="font-normal"
               innerHTML={exCode7}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+          <h3 class="text-slate-50 text-lg mb-2 mt-8">UMD WITH FTAGS</h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode10}
               style={{ whiteSpace: 'pre' }}
             />
           </div>

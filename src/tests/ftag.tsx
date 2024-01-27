@@ -1,9 +1,10 @@
-import { render, h } from '@/index';
+import { render, h, Fragment } from '@/index';
 
 import type {
   Props,
   WDom,
   MiddleStateWDom,
+  FragmentFunction,
   Component,
   TagFunction,
 } from '@/index';
@@ -30,14 +31,18 @@ const fMount = <T,>(component: Component<T>) => {
     h(tagFunction as TagFunction, props || {}, children);
 };
 
+const FFragment = (props: Props, ...children: MiddleStateWDom[]) => {
+  return h(Fragment as FragmentFunction, props, ...children);
+};
+
 const { section, div, p, br, strong } = fTags;
 
 const FTagComponent = fMount<{ a: number }>((_r, props, children) => {
   return () =>
-    div(
-      { style: 'border: 1px solid red' },
+    FFragment(
+      {},
       'first inner',
-      div({}, 'second inner'),
+      div({ style: 'border: 1px solid red' }, 'second inner'),
       props.a,
       ...children
     );

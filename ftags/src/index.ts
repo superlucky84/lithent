@@ -1,7 +1,8 @@
-import { h } from 'lithent';
+import { h, Fragment } from 'lithent';
 import type {
   Props,
   WDom,
+  FragmentFunction,
   MiddleStateWDom,
   Component,
   TagFunction,
@@ -21,6 +22,10 @@ export const fTags: FTags = new Proxy(
     },
   }
 );
+
+export const FFragment = (props: Props, ...children: MiddleStateWDom[]) => {
+  return h(Fragment as FragmentFunction, props, ...children);
+};
 
 export const fMount = <T>(component: Component<T>) => {
   const tagFunction = (_props: T, _children: WDom[]) => component;
