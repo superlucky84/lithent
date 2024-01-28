@@ -11,7 +11,9 @@ Lithent는 JSX를 기반으로 만들어진 경량(zip 3kb) 가상돔 UI 라이�
 
 별도의 빌드 툴 없이 스크립트 로드만으로 가볍게 사용할 수 있으며, 이미 그려진 html문서에 동적으로 빈번한 변경이 많은 DOM 영역을 가상돔과 연결하여 쉽게 업데이트하거나 제거할 수 있도록 고안되었습니다. 물론 빌드툴과 함께 사용해도 좋으며 SPA 페이지를 만드는 데 사용해도 좋습니다.
 
-빌드툴과 함께 사용할 경우 JSX를 직접 사용할 수 있으며, 빌드 툴 없이 사용할 경우 라이브러리가 제공하는 [Tagged templates]를 사용하여 JSX와 매우 유사한 방식으로 사용할 수 있습니다.
+빌드툴과 함께 사용할 경우 JSX를 직접 사용할 수 있으며, 빌드 툴 없이 사용할 경우 라이브러리가 제공하는 [Tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates)를 사용하여 JSX와 매우 유사한 방식으로 사용할 수 있습니다.
+
+또한 JSX와 Tagged templates 외에도 라이브러리가 제공하는 `fTags`를 사용하면 함수를 호출하는 방식으로 마크업을 정의할 수 있습니다.
 
 컴포넌트를의 상태나 기능을 정의할 때, 고차함수 및 클로저의 특성을 이용하여 정의하고 재활용하는 방식을 기본 아이디어로 채택하여 개발했습니다.
 
@@ -31,7 +33,8 @@ Lithent는 JSX를 기반으로 만들어진 경량(zip 3kb) 가상돔 UI 라이�
     * effect 헬퍼
     * computed 헬퍼
     * nextTick 헬퍼
-* lTag (Tagged templates 지원)
+* lTag (Tagged templates 를 이용한 마크업 지원)
+* fTags (함수 호출방식 마크업 지원)
 
 ## 기본 기능
 
@@ -495,5 +498,49 @@ const destroy = render(lTag`<${Component} propValue=${1} />`, document.getElemen
 </script>
 ```
 
+## fTags (함수 호출방식 마크업 지원)
+
+`fTag`를 사용하면 JSX나 `h (createElement)`를 직접 사용하지 않고도 **함수 호출 방식으로 마크업을 정의**할 수 있습니다. 별도의 트랜스파일러도 필요하지 않습니다.
+
+컴포넌트를 생성하기 위한 기본기능의 `mount` 대신 `fMount`를 사용하며, 기본기능의 `Fragment 컴포넌트`대신 `fFragment 함수`를 사용합니다.
+
+`div , section, p` 와 같은 일반 태그들은 `fTag` 객체에서 태그에 해당하는 함수를 가져다가 사용하면 됩니다.
+
+아래의 예처럼 사용할 수 있습니다.
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTags.umd.js"></script>
+
+<script>
+// import { render } from 'lithent';
+// import { fTags, fFragment, fMount } from 'lithent/ftags';
+const { render } = lithent;
+const { fTags, fMount, fFragment } = lithentFTags;
+  
+const { section, div, p, br, strong } = fTags;
+
+const fTagComponent = fMount((_r, props, children) => {
+  return () =>
+    fFragment(
+      'first inner',
+      div({ style: 'border: 1px solid red' }, 'second inner'),
+      props.firstProp,
+      ...children
+    );
+});
+
+render(
+  fTagComponent(
+    { firstProp: 3 },
+    div({ style: 'border: 1px solid green' }, `Fchildren1`),
+    'Fchildren2',
+    br()
+  ),
+  document.getElementById('root')
+);
+</script>
+```
 
 
