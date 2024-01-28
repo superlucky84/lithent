@@ -80,14 +80,15 @@ It's easier to use lithent with JSX or HTM.
 
 #### With JSX
 
-- [Setting Guide](https://superlucky84.github.io/lithent/#install)
+* Lithent is built on top of JSX.
+  * [Setting Guide](https://superlucky84.github.io/lithent/#install)
 
 
 #### With FTAGS
 
-You can markup by calling a function.
-When creating components, use `fMount` instead of `mount`.
-When creating fragment, use `fFragment` instead of `Fragment`.
+You don't need to use h functions or JSX, you can call functions to mark them up.
+When creating a component, use `fMount` instead of `mount`.
+When creating a fragment, use `fFragment` instead of `Fragment`.
 
 ```ts
 import { render, h } from 'lithent';
