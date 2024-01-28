@@ -1,6 +1,6 @@
 # ➿ lithent
 
-> An extensible virtual DOM library for lightweight use in a variety of environments.
+> An extensible JSX-based virtual DOM library for lightweight use in a variety of environments.
 
 - [Korean Guide Document](https://medium.com/@superlucky84/lithent-전체-기능-설명서-3cfab04c0722)
 - [Home Page](https://superlucky84.github.io/lithent) - (This page is written in lithent.)
