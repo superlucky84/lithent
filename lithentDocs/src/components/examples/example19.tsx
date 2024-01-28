@@ -39,9 +39,9 @@ export const Example19 = mount(() => {
     <div class="flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">Example 19 - fTags</h3>
       <p class="text-sm md:text-base text-gray-400 mb-2">
-        You can markup by calling a function. When creating components, use
-        `fMount` instead of `mount`. When creating fragment, use `fFragment`
-        instead of `Fragment`.
+        You don't need to use h functions or JSX, you can call functions to mark
+        them up. When creating a component, use `fMount` instead of `mount`.
+        When creating a fragment, use `fFragment` instead of `Fragment`.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
         <div
