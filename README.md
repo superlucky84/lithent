@@ -18,9 +18,9 @@ used lightly in a variety of situations.
 - [How To Install](#how-to-install)
   - [Use NPM](#use-npm)
   - [Use CDN](#or-use-cdn)
-  - [With HTM](#with-htm)
   - [With JSX](#with-jsx)
   - [With FTAGS](#with-ftags)
+  - [With HTM](#with-htm)
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
@@ -78,15 +78,6 @@ pnpm add lithent
 
 It's easier to use lithent with JSX or HTM.
 
-#### With HTM
-
-- [Htm Github](https://github.com/developit/htm)
-
-```js
-import { lTag } from 'lithent/tag';
-const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
-```
-
 #### With JSX
 
 - [Setting Guide](https://superlucky84.github.io/lithent/#install)
@@ -124,6 +115,16 @@ render(
   document.getElementById('root')
 );
 ```
+
+#### With HTM
+
+- [Htm Github](https://github.com/developit/htm)
+
+```js
+import { lTag } from 'lithent/tag';
+const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
+```
+
 
 ## Examples
 
