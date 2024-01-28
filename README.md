@@ -68,12 +68,12 @@ pnpm add lithent
 
 * UMD : https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.umd.js
 * UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.umd.js
 * UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTags.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.umd.js
 * ESM : https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.mjs
 * ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.mjs
 * ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTag.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
