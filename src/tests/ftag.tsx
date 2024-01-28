@@ -31,16 +31,15 @@ const fMount = <T,>(component: Component<T>) => {
     h(tagFunction as TagFunction, props || {}, children);
 };
 
-const FFragment = (props: Props, ...children: MiddleStateWDom[]) => {
-  return h(Fragment as FragmentFunction, props, ...children);
+const fFragment = (...children: MiddleStateWDom[]) => {
+  return h(Fragment as FragmentFunction, {}, ...children);
 };
 
 const { section, div, p, br, strong } = fTags;
 
-const FTagComponent = fMount<{ a: number }>((_r, props, children) => {
+const fTagComponent = fMount<{ a: number }>((_r, props, children) => {
   return () =>
-    FFragment(
-      {},
+    fFragment(
       'first inner',
       div({ style: 'border: 1px solid red' }, 'second inner'),
       props.a,
@@ -49,7 +48,7 @@ const FTagComponent = fMount<{ a: number }>((_r, props, children) => {
 });
 
 render(
-  FTagComponent(
+  fTagComponent(
     { a: 3 },
     div({ style: 'border: 1px solid green' }, `Fchildren1`),
     'Fchildren2',

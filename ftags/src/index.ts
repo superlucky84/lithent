@@ -27,6 +27,10 @@ export const FFragment = (props: Props, ...children: MiddleStateWDom[]) => {
   return h(Fragment as FragmentFunction, props, ...children);
 };
 
+export const fFragment = (...children: MiddleStateWDom[]) => {
+  return h(Fragment as FragmentFunction, {}, ...children);
+};
+
 export const fMount = <T>(component: Component<T>) => {
   const tagFunction = (_props: T, _children: WDom[]) => component;
 

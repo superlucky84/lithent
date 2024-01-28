@@ -66,12 +66,14 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.8.0/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.8.0/helper/dist/lithentHelper.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.8.0/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.8.0/helper/dist/lithentHelper.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentTag.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.umd.js
+* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTags.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.mjs
+* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -94,18 +96,17 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 
 You can markup by calling a function.
 When creating components, use `fMount` instead of `mount`.
-When creating fragment, use `FFragment` instead of `Fragment`.
+When creating fragment, use `fFragment` instead of `Fragment`.
 
 ```ts
 import { render, h } from 'lithent';
-import { fTags, FFragment, fMount } from 'lithent/ftags';
+import { fTags, fFragment, fMount } from 'lithent/ftags';
 
 const { section, div, p, br, strong } = fTags;
 
-const FTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
+const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
   return () =>
-    FFragment(
-      {},
+    fFragment(
       'first inner',
       div({ style: 'border: 1px solid red' }, 'second inner'),
       props.firstProp,
@@ -114,7 +115,7 @@ const FTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
 });
 
 render(
-  FTagComponent(
+  fTagComponent(
     { firstProp: 3 },
     div({ style: 'border: 1px solid green' }, `Fchildren1`),
     'Fchildren2',
@@ -158,10 +159,10 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.8.0/ftags/dist/lithentFTags.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTags.umd.js"></script-->
 
 <div id="root"></div>
 

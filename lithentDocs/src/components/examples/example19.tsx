@@ -5,14 +5,13 @@ import 'highlight.js/styles/hybrid.css';
 
 const code = `
 import { render } from 'lithent';
-import { fTags, fMount, FFragment } from 'lithent/ftags';
+import { fTags, fMount, fFragment } from 'lithent/ftags';
 
 const { section, div, p, br, strong } = fTags;
 
-const FTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
+const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
   return () =>
-    FFragment(
-      {},
+    fFragment(
       'first inner',
       div({ style: 'border: 1px solid red' }, 'second inner'),
       props.firstProp,
@@ -21,7 +20,7 @@ const FTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
 });
 
 render(
-  FTagComponent(
+  fTagComponent(
     { firstProp: 3 },
     div({ style: 'border: 1px solid green' }, \`Fchildren1\`),
     'Fchildren2',
@@ -41,7 +40,7 @@ export const Example19 = mount(() => {
       <h3 class="text-slate-50 text-lg md:text-2xl mb-2">Example 19 - fTags</h3>
       <p class="text-sm md:text-base text-gray-400 mb-2">
         You can markup by calling a function. When creating components, use
-        `fMount` instead of `mount`. When creating fragment, use `FFragment`
+        `fMount` instead of `mount`. When creating fragment, use `fFragment`
         instead of `Fragment`.
       </p>
       <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
