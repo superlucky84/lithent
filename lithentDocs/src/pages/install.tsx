@@ -5,7 +5,7 @@ import 'highlight.js/styles/hybrid.css';
 
 const code10 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/dist/lithent.umd.js"></script>
 <!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentFTags.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTags.umd.js"></script>
 
 <div id="root"></div>
 
@@ -42,7 +42,7 @@ render(
 const code7 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/dist/lithent.umd.js"></script>
 <!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.umd.js"></script-->
 <script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentFTags.umd.js"></script-->
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTags.umd.js"></script-->
 
 <div id="root"></div>
 
@@ -265,10 +265,10 @@ export const Install = mount(() => {
           https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.umd.js
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTags.umd.js
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentFTags.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.umd.js
         </p>
         <p>&nbsp;</p>
         <p>## esm</p>
@@ -277,10 +277,10 @@ export const Install = mount(() => {
           https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.mjs
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTags.mjs
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentFTags.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.mjs
         </p>
       </div>
       <div class="py-2 mb-4 overflow-x-auto text-sm text-gray-50 ">

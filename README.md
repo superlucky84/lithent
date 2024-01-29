@@ -72,7 +72,7 @@ pnpm add lithent
 * UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.umd.js
 * ESM : https://cdn.jsdelivr.net/npm/lithent@1.9.1/dist/lithent.mjs
 * ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.mjs
-* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTag.mjs
+* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTags.mjs
 * ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.mjs
 
 
