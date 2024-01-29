@@ -66,14 +66,14 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.umd.js
-* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTags.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.mjs
-* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTag.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.9.1/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.umd.js
+* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTags.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.9.1/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.mjs
+* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTag.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -100,7 +100,7 @@ const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
   return () =>
     fFragment(
       'first inner',
-      div({ style: 'border: 1px solid red' }, 'second inner'),
+      div({ style: { border: '1px solid red' } }, 'second inner'),
       props.firstProp,
       ...children
     );
@@ -109,7 +109,7 @@ const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
 render(
   fTagComponent(
     { firstProp: 3 },
-    div({ style: 'border: 1px solid green' }, `Fchildren1`),
+    div({ style: { border: '1px solid green' } }, `Fchildren1`),
     'Fchildren2',
     br()
   ),
@@ -161,10 +161,10 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.0/ftags/dist/lithentFTags.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/tag/dist/lithentTag.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.9.1/ftags/dist/lithentFTags.umd.js"></script-->
 
 <div id="root"></div>
 

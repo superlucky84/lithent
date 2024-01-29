@@ -35,5 +35,5 @@ export const fMount = <T>(component: Component<T>) => {
   const tagFunction = (_props: T, _children: WDom[]) => component;
 
   return (props?: T, ...children: MiddleStateWDom[]) =>
-    h(tagFunction as TagFunction, props || {}, children);
+    h(tagFunction as TagFunction, props || {}, ...children);
 };

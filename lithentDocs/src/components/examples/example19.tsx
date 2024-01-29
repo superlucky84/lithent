@@ -13,7 +13,7 @@ const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
   return () =>
     fFragment(
       'first inner',
-      div({ style: 'border: 1px solid red' }, 'second inner'),
+      div({ style: { border: '1px solid red' } }, 'second inner'),
       props.firstProp,
       ...children
     );
@@ -22,7 +22,7 @@ const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
 render(
   fTagComponent(
     { firstProp: 3 },
-    div({ style: 'border: 1px solid green' }, \`Fchildren1\`),
+    div({ style: { border: '1px solid green' } }, \`Fchildren1\`),
     'Fchildren2',
     br()
   ),
