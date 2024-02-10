@@ -46,11 +46,13 @@ export const render = (
 
   return () => {
     const component = componentRef.get(wDom.compProps || {})?.vd.value;
+
     if (component) {
       runUnmountQueueFromWDom(component);
-      recursiveRemoveEvent(component);
-      rootDelete(component);
     }
+
+    recursiveRemoveEvent(component || wDom);
+    rootDelete(component || wDom);
   };
 };
 
@@ -101,7 +103,7 @@ export const typeDelete = (newWDom: WDom) => {
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
-    if (newWDom.el?.nodeType === 1) {
+    if ([1, 3].includes(newWDom.el?.nodeType)) {
       parent.removeChild(newWDom.el);
     } else if (newWDom.el?.nodeType === 11) {
       findChildWithRemoveElement(newWDom, parent as HTMLElement);
@@ -112,10 +114,13 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
   (newWDom?.oldChildren || newWDom?.children || []).forEach(item => {
-    if (item.el?.nodeType === 1) {
-      parent.removeChild(item?.el);
-    } else if (item.el?.nodeType === 11) {
-      findChildWithRemoveElement(item, parent);
+    const nodeType = item.el?.nodeType;
+    if (nodeType) {
+      if ([1, 3].includes(nodeType)) {
+        parent.removeChild(item?.el as HTMLElement);
+      } else if (nodeType === 11) {
+        findChildWithRemoveElement(item, parent);
+      }
     }
   });
 };

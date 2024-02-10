@@ -103,7 +103,7 @@ if (import.meta.vitest) {
 
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><div><button>handle</button><div>start</div>   <div>two</div> <div>three</div> <div>four</div><div>end</div></div></div>'
+        '<div><div><button>handle</button><div>start</div><div>two</div> <div>three</div> <div>four</div><div>end</div></div></div>'
       );
     });
   });

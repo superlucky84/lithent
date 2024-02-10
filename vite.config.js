@@ -31,6 +31,6 @@ export default defineConfig({
     includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
   },
   server: {
-    open: '/html/ftag.html',
+    open: '/html/destroy.html',
   },
 });
