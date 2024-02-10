@@ -31,7 +31,6 @@ used lightly in a variety of situations.
 ## Thanks for the introduction
 - [unsuckjs](https://unsuckjs.com/)
 - [jster](https://jster.net/blog/jster-198/)
-- [frontendweekly](https://frontendweekly.co/issues/365)
 - [webtoolsweekly](https://webtoolsweekly.com/archives/issue-531/)
 
 ## Why use Lithent?
