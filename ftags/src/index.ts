@@ -23,10 +23,6 @@ export const fTags: FTags = new Proxy(
   }
 );
 
-export const FFragment = (props: Props, ...children: MiddleStateWDom[]) => {
-  return h(Fragment as FragmentFunction, props, ...children);
-};
-
 export const fFragment = (...children: MiddleStateWDom[]) => {
   return h(Fragment as FragmentFunction, {}, ...children);
 };
