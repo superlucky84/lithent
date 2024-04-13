@@ -1,11 +1,10 @@
 {
   "name": "lithent",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/lithent.umd.js",
-  "module": "./dist/lithent.mjs",
-  "scripts": {
+  "module": "./dist/lithent.mjs", "scripts": {
     "dev:core": "vite",
     "dev:examples": "pnpm --filter lithent-examples dev",
     "build:core": "vite build",
