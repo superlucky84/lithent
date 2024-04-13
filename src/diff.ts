@@ -61,7 +61,7 @@ const inheritPropForRender = (
   }
 
   if (needRerender && ['D', 'R', 'SR'].includes(needRerender)) {
-    if (originalWDom?.compKey) {
+    if (originalWDom) {
       runUnmountQueueFromWDom(originalWDom);
       recursiveRemoveEvent(originalWDom);
     }
