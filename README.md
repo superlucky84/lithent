@@ -1,5 +1,10 @@
 # ➿ lithent
 
+![npm](https://img.shields.io/npm/v/lithent)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/lithent)
+![npm](https://img.shields.io/npm/dt/lithent)
+![NPM](https://img.shields.io/npm/l/lithent)
+
 > An extensible JSX-based virtual DOM library for lightweight use in a variety of environments.
 
 - [Manual](https://medium.com/p/13d6fe6d3330)
