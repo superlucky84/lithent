@@ -96,10 +96,21 @@ When creating a component, use `fMount` instead of `mount`.
 When creating a fragment, use `fFragment` instead of `Fragment`.
 
 ```ts
+/* ESM */
 import { render, h } from 'lithent';
 import { fTags, fFragment, fMount } from 'lithent/ftags';
 
 const { section, div, p, br, strong } = fTags;
+
+/* UMD
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.3/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.3/helper/dist/lithentHelper.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.9.3/ftags/dist/lithentFTags.umd.js"></script>
+
+const { render } = lithent;
+const { fTags, fMount, fFragment } = lithentFTags;
+const { section, div, p, br, strong } = fTags;
+*/
 
 const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
   return () =>
