@@ -1,11 +1,12 @@
 {
+  "type": "module",
   "name": "lithent-tag",
   "version": "0.21.0",
   "description": "lithentTag",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithentTag.umd.js",
-  "module": "./dist/lithentTag.mjs",
+  "main": "./dist/lithentTag.umd.cjs",
+  "module": "./dist/lithentTag.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",

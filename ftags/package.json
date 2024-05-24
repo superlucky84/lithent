@@ -5,8 +5,8 @@
   "description": "lithentFTags",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithentFTags.umd.js",
-  "module": "./dist/lithentFTags.mjs",
+  "main": "./dist/lithentFTags.umd.cjs",
+  "module": "./dist/lithentFTags.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",

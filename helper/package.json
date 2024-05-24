@@ -5,8 +5,8 @@
   "description": "lithentHelper",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithentHelper.umd.js",
-  "module": "./dist/lithentHelper.mjs",
+  "main": "./dist/lithentHelper.umd.cjs",
+  "module": "./dist/lithentHelper.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
