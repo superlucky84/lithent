@@ -1,10 +1,12 @@
 {
+  "type": "module",
   "name": "lithent",
   "version": "1.9.3",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/lithent.umd.js",
-  "module": "./dist/lithent.mjs", "scripts": {
+  "module": "./dist/lithent.mjs",
+  "scripts": {
     "dev:core": "vite",
     "dev:examples": "pnpm --filter lithent-examples dev",
     "build:core": "vite build",
@@ -29,22 +31,22 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/lithent.mjs",
+      "import": "./dist/lithent.js",
       "require": "./dist/lithent.umd.js"
     },
     "./helper": {
       "types": "./helper/dist/index.d.ts",
-      "import": "./helper/dist/lithentHelper.mjs",
+      "import": "./helper/dist/lithentHelper.js",
       "require": "./helper/dist/lithentHelper.umd.js"
     },
     "./tag": {
       "types": "./tag/dist/index.d.ts",
-      "import": "./tag/dist/lithentTag.mjs",
+      "import": "./tag/dist/lithentTag.js",
       "require": "./tag/dist/lithentTag.umd.js"
     },
     "./ftags": {
       "types": "./ftags/dist/index.d.ts",
-      "import": "./ftags/dist/lithentFTags.mjs",
+      "import": "./ftags/dist/lithentFTags.js",
       "require": "./ftags/dist/lithentFTags.umd.js"
     }
   },
@@ -76,10 +78,8 @@
     "lithent"
   ],
   "devDependencies": {
-    "@nabla/vite-plugin-eslint": "^1.4.1",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
-    "@vitest/coverage-v8": "^0.32.2",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -88,12 +88,16 @@
     "prettier": "^2.3.2",
     "terser": "^5.17.7",
     "typescript": "^4.7.4",
-    "vite-plugin-dts": "^2.3.0",
-    "vitest": "^0.32.2",
-    "vite": "^4.4.2",
-    "vite-plugin-checker": "^0.6.1"
+    "vite": "^5.2.0",
+    "vite-plugin-checker": "^0.6.1",
+    "vite-plugin-dts": "^2.3.0"
   },
   "volta": {
     "node": "20.3.0"
+  },
+  "dependencies": {
+    "@vitest/coverage-v8": "^1.6.0",
+    "vite-plugin-eslint": "^1.8.1",
+    "vitest": "^1.6.0"
   }
 }

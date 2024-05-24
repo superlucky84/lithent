@@ -1,12 +1,12 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
-import eslintPlugin from '@nabla/vite-plugin-eslint';
+import eslint from 'vite-plugin-eslint';
 import dts from 'vite-plugin-dts';
 export default defineConfig({
   plugins: [
     checker({ typescript: true }),
-    eslintPlugin({ eslintOptions: { cache: false } }),
+    eslint(),
     dts({
       outputDir: ['dist'],
     }),
@@ -17,7 +17,6 @@ export default defineConfig({
     },
   },
   build: {
-    minify: 'terser',
     emptyOutDir: false,
     sourcemap: true,
     lib: {
