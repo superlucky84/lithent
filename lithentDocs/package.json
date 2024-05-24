@@ -1,14 +1,15 @@
 {
+  "type": "module",
   "private": true,
   "name": "lithent-docs",
   "version": "0.5.0",
   "description": "lithent-docs",
-  "main": "./dist/lithentDocs.umd.cjs",
-  "module": "./dist/lithentDocs.js",
+  "main": "./dist/lithentDocs.umd.js",
+  "module": "./dist/lithentDocs.mjs",
   "exports": {
     ".": {
-      "import": "./dist/lithentDocs.js",
-      "require": "./dist/lithentDocs.umd.cjs"
+      "import": "./dist/lithentDocs.mjs",
+      "require": "./dist/lithentDocs.umd.js"
     }
   },
   "types": "./dist/index.d.ts",

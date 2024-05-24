@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "lithent-examples",
   "version": "0.21.0",
   "description": "lithentExamples",
