@@ -5,8 +5,8 @@
   "description": "lithentExamples",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithentExamples.umd.cjs",
-  "module": "./dist/lithentExamples.js",
+  "main": "./dist/lithentExamples.umd.js",
+  "module": "./dist/lithentExamples.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",

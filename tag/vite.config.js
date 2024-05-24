@@ -23,7 +23,9 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentTag',
-      fileName: 'lithentTag',
+      fileName: format => {
+        return format === 'umd' ? 'lithentTag.umd.js' : 'lithentTag.mjs';
+      },
     },
     rollupOptions: {
       external: ['lithent'],

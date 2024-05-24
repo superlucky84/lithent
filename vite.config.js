@@ -22,7 +22,9 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src'),
       name: 'lithent',
-      fileName: 'lithent',
+      fileName: format => {
+        return format === 'umd' ? 'lithent.umd.js' : 'lithent.mjs';
+      },
     },
   },
   test: {

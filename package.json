@@ -4,8 +4,8 @@
   "version": "1.9.3",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithent.umd.cjs",
-  "module": "./dist/lithent.js",
+  "main": "./dist/lithent.umd.js",
+  "module": "./dist/lithent.mjs",
   "scripts": {
     "dev:core": "vite",
     "dev:examples": "pnpm --filter lithent-examples dev",
@@ -31,23 +31,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/lithent.js",
-      "require": "./dist/lithent.umd.cjs"
+      "import": "./dist/lithent.mjs",
+      "require": "./dist/lithent.umd.js"
     },
     "./helper": {
       "types": "./helper/dist/index.d.ts",
-      "import": "./helper/dist/lithentHelper.js",
-      "require": "./helper/dist/lithentHelper.umd.cjs"
+      "import": "./helper/dist/lithentHelper.mjs",
+      "require": "./helper/dist/lithentHelper.umd.js"
     },
     "./tag": {
       "types": "./tag/dist/index.d.ts",
-      "import": "./tag/dist/lithentTag.js",
-      "require": "./tag/dist/lithentTag.umd.cjs"
+      "import": "./tag/dist/lithentTag.mjs",
+      "require": "./tag/dist/lithentTag.umd.js"
     },
     "./ftags": {
       "types": "./ftags/dist/index.d.ts",
-      "import": "./ftags/dist/lithentFTags.js",
-      "require": "./ftags/dist/lithentFTags.umd.cjs"
+      "import": "./ftags/dist/lithentFTags.mjs",
+      "require": "./ftags/dist/lithentFTags.umd.js"
     }
   },
   "types": "./dist/index.d.ts",
