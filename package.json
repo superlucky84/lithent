@@ -90,14 +90,12 @@
     "typescript": "^4.7.4",
     "vite": "^5.2.0",
     "vite-plugin-checker": "^0.6.1",
-    "vite-plugin-dts": "^2.3.0"
-  },
-  "volta": {
-    "node": "20.3.0"
-  },
-  "dependencies": {
+    "vite-plugin-dts": "^2.3.0",
     "@vitest/coverage-v8": "^1.6.0",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^1.6.0"
+  },
+  "volta": {
+    "node": "20.3.0"
   }
 }
