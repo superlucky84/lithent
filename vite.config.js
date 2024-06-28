@@ -32,6 +32,6 @@ export default defineConfig({
     includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
   },
   server: {
-    open: '/html/unmount.html',
+    open: '/html/core-renew.html',
   },
 });

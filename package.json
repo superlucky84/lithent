@@ -8,7 +8,9 @@
   "module": "./dist/lithent.mjs",
   "scripts": {
     "dev:core": "vite",
-    "dev:examples": "pnpm --filter lithent-examples dev",
+    "dev": "vite",
+    "dev:examples": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-examples dev",
+    "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev",
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
     "build:tag": "pnpm --filter lithent-tag build",
@@ -19,14 +21,12 @@
     "watch:helper": "pnpm --filter lithent-helper watch",
     "build": "pnpm build:core && pnpm build:helper && pnpm build:ftags && pnpm build:tag && pnpm build:examples && pnpm build:docs",
     "build:p": "pnpm build:core && pnpm -r build",
-    "dev": "pnpm watch:core & pnpm watch:helper & pnpm dev:examples",
     "test": "vitest run --reporter verbose",
     "test:dev": "vitest",
     "coverage": "vitest run --coverage",
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
-    "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules",
-    "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev"
+    "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules"
   },
   "exports": {
     ".": {
