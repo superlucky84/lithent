@@ -36,7 +36,7 @@ const remakeNewWDom = (
   const needRerender = addReRenderTypeProperty(...param);
   const isNoting = needRerender === 'N';
 
-  if (!isNoting) {
+  if (!isNoting && needRerender !== 'D') {
     remakeWDom.children = remakeChildrenForDiff(...param);
   }
 
