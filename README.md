@@ -1,13 +1,13 @@
-# ➿ lithent
 
+## ➿ lithent
 > An extensible JSX-based virtual DOM library for lightweight use in a variety of environments.
+
+![lithent-text](https://github.com/user-attachments/assets/a8848484-d315-4f81-be3b-61490d2be2b9)
 
 ![npm](https://img.shields.io/npm/v/lithent)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/lithent)
 ![npm](https://img.shields.io/npm/dt/lithent)
 ![NPM](https://img.shields.io/npm/l/lithent)
-
-![lithent200](https://github.com/user-attachments/assets/4f3b56c8-b425-4bde-af92-297ed59e0ad1)
 
 
 - [Manual](https://medium.com/p/13d6fe6d3330)
