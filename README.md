@@ -15,8 +15,8 @@ Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
 used lightly in a variety of situations.
 
-`(lithent.mjs  14.14 kB │ gzip: 4.46 kB │ map: 60.02 kB)`
-`(lithent.umd.js  10.33 kB │ gzip: 4.05 kB │ map: 58.44 kB)`
+`(lithent.mjs  14.11 kB │ gzip: 4.46 kB │ map: 59.97 kB)`
+`(lithent.umd.js  10.30 kB │ gzip: 4.04 kB │ map: 58.39 kB)`
 
 ## 🚩 Table of Contents
 - [Thanks for the introduction](#thanks-for-the-introduction)
@@ -72,14 +72,14 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.10.1/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.10.1/helper/dist/lithentHelper.umd.js
-* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.10.1/ftags/dist/lithentFTags.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.10.1/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.10.1/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.10.1/helper/dist/lithentHelper.mjs
-* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.10.1/ftags/dist/lithentFTags.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.10.1/tag/dist/lithentTag.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.10.2/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.10.2/helper/dist/lithentHelper.umd.js
+* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.10.2/ftags/dist/lithentFTags.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.10.2/tag/dist/lithentTag.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.10.2/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.10.2/helper/dist/lithentHelper.mjs
+* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.10.2/ftags/dist/lithentFTags.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.10.2/tag/dist/lithentTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -104,9 +104,9 @@ import { fTags, fFragment, fMount } from 'lithent/ftags';
 const { section, div, p, br, strong } = fTags;
 
 /* UMD
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.1/dist/lithent.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.1/helper/dist/lithentHelper.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.1/ftags/dist/lithentFTags.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.2/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.2/helper/dist/lithentHelper.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.2/ftags/dist/lithentFTags.umd.js"></script>
 
 const { render } = lithent;
 const { fTags, fMount, fFragment } = lithentFTags;
@@ -178,10 +178,10 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.1/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.10.1/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.1/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.10.1/ftags/dist/lithentFTags.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.2/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.10.2/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.10.2/tag/dist/lithentTag.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.10.2/ftags/dist/lithentFTags.umd.js"></script-->
 
 <div id="root"></div>
 
