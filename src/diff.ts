@@ -34,16 +34,15 @@ const remakeNewWDom = (
     originalWDom,
   ];
   const needRerender = addReRenderTypeProperty(...param);
-  const isNoting = needRerender === 'N';
 
-  if (!isNoting) {
+  if (needRerender && !['N', 'D', 'R', 'SR'].includes(needRerender)) {
     remakeWDom.children = remakeChildrenForDiff(...param);
   }
 
   remakeWDom.needRerender = needRerender;
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
-  if (!isNoting && originalWDom) {
+  if (needRerender !== 'N' && originalWDom) {
     originalWDom.isLegacy = true;
     delete originalWDom.children;
   }
