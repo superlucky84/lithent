@@ -36,6 +36,10 @@ export default defineConfig({
       },
     },
   },
+  test: {
+    environment: 'jsdom',
+    includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
+  },
   server: {
     open: '/html/jsxExample.html',
   },
