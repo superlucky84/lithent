@@ -10,6 +10,7 @@
     "dev:core": "vite",
     "dev": "vite",
     "dev:examples": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-examples dev",
+    "dev:helper": "pnpm watch:core & pnpm --filter lithent-helper dev",
     "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev",
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
