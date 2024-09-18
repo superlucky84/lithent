@@ -108,7 +108,7 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
       const trashCollections: Renew<T>[] = [];
 
       renderList.forEach(renew => {
-        if (!renew(result)) {
+        if (renew(result) === false) {
           trashCollections.push(renew);
         }
       });
@@ -119,7 +119,7 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
             []
           : [];
         renderObserveList.forEach(renew => {
-          if (!renew(result)) {
+          if (renew(result) === false) {
             trashCollections.push(renew);
           }
         });
