@@ -11,6 +11,10 @@ const subscribe = store<{ count1: number; count2: number; count3: number }>({
 let proxySubscribeChkValue: number = 0;
 
 const abortControl = new AbortController();
+// @ts-ignore
+window.abort = abortControl;
+
+console.log(abortControl);
 const proxyFirst = subscribe(
   store => {
     proxySubscribeChkValue = store.count1;
@@ -23,6 +27,8 @@ const proxyFirst = subscribe(
 );
 
 console.log(proxyFirst);
+// @ts-ignore
+window.proxyFirst = proxyFirst;
 
 const Component = mount(r => {
   const local = subscribe(r, store => [store.count3]);
