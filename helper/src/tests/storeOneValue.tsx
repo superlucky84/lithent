@@ -17,7 +17,7 @@ const proxyFirst = subscribe(store => {
 console.log(proxyFirst);
 
 const Component = mount(r => {
-  const local = subscribe(r);
+  const local = subscribe(r, null, { cache: false });
   const localArr = subscribeArr(r);
 
   const click = () => {

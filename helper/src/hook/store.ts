@@ -8,6 +8,8 @@ type StoreValue = {
   [key: string | symbol]: Set<Run>;
 };
 
+const DEFAULT_OPTION = { cache: true };
+
 export const store = <V>(initialValue: V) => {
   type T = StoreType<V>;
 
@@ -24,8 +26,14 @@ export const store = <V>(initialValue: V) => {
   const storeRenderObserveList: StoreValue[] = [];
   const cacheMap = new WeakMap<Renew<T>, T>();
 
-  return (renew?: Renew<T>, makeObserver?: (store: T) => unknown[]) => {
-    if (renew && cacheMap.has(renew)) {
+  return (
+    renew?: Renew<T>,
+    makeObserver?: ((store: T) => unknown[]) | null,
+    userOption?: { cache?: boolean }
+  ) => {
+    const { cache } = Object.assign({}, DEFAULT_OPTION, userOption || {});
+
+    if (cache && renew && cacheMap.has(renew)) {
       return cacheMap.get(renew)!;
     }
 
