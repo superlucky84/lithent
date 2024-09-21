@@ -318,6 +318,8 @@ const updateProps = (
 
     if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
       // Do nothing
+    } else if (dataKey === 'portal' && typeof dataValue === 'object') {
+      // Do nothing
     } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
       (element as HTMLElement).innerHTML = dataValue;
     } else if (checkStyleData(dataKey, dataValue)) {
@@ -396,9 +398,13 @@ const wDomToDom = (wDom: WDom) => {
   if (isVirtualType) {
     element = DF();
   } else if (type === 'element' && tag) {
-    element = xmlnsRef.value
-      ? document.createElementNS(xmlnsRef.value, tag)
-      : CE(tag);
+    if (tag === 'portal' && props?.portal) {
+      element = props.portal as HTMLElement;
+    } else {
+      element = xmlnsRef.value
+        ? document.createElementNS(xmlnsRef.value, tag)
+        : CE(tag);
+    }
   } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
   } else {
@@ -426,7 +432,11 @@ const wDomChildrenToDom = (
   const elementChildren = children.reduce(
     (acc: DocumentFragment, childItem: WDom) => {
       if (childItem.type) {
-        acc.appendChild(wDomToDom(childItem));
+        const childElement = wDomToDom(childItem);
+
+        if (childItem.tag !== 'portal') {
+          acc.appendChild(childElement);
+        }
       }
 
       return acc;
