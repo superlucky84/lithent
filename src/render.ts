@@ -159,10 +159,12 @@ const typeAdd = (
         : startFindNextBrotherElement(newWDom, parentWDom);
 
     if (newElement && parentEl) {
-      if (nextEl) {
-        parentEl.insertBefore(newElement, nextEl);
-      } else {
-        parentEl.appendChild(newElement);
+      if (newWDom.tag !== 'portal') {
+        if (nextEl) {
+          parentEl.insertBefore(newElement, nextEl);
+        } else {
+          parentEl.appendChild(newElement);
+        }
       }
 
       execMountedQueue();
@@ -250,7 +252,7 @@ const typeReplace = (newWDom: WDom) => {
       const parentElement = findRealParentElement(parentWDom);
       const newElement = wDomToDom(newWDom);
 
-      if (parentElement) {
+      if (parentElement && newWDom.tag !== 'portal') {
         parentElement.replaceChild(newElement, orignalElement);
       }
       execMountedQueue();

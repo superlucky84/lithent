@@ -1,5 +1,5 @@
 import { h, mount } from 'lithent';
-import { state, computed } from 'lithent/helper';
+import { computed } from 'lithent/helper';
 import { Guide } from '@/pages/guide';
 import { Install } from '@/pages/install';
 import { Examples } from '@/pages/examples';
@@ -8,18 +8,19 @@ import { assignSharedStore } from '@/store';
 
 export const Mainbody = mount(r => {
   const shardStore = assignSharedStore(r);
-  const hashState = state<string>(location.hash, r);
+  let hashState = location.hash;
   window.addEventListener('hashchange', () => {
-    hashState.v = location.hash;
+    hashState = location.hash;
     shardStore.showHiddenMenu = false;
+    shardStore.hashState = hashState;
     window.scrollTo(0, 0);
   });
   const matchHash = computed<string>(() => {
-    if ('#examples' === hashState.v) {
+    if ('#examples' === hashState) {
       return <Examples />;
-    } else if ('#install' === hashState.v) {
+    } else if ('#install' === hashState) {
       return <Install />;
-    } else if ('#about' === hashState.v) {
+    } else if ('#about' === hashState) {
       return <About />;
     }
     return <Guide />;

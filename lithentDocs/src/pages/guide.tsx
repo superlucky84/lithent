@@ -8,6 +8,7 @@ import { Lesson5 } from '@/components/lesson/lesson5';
 import { Lesson6 } from '@/components/lesson/lesson6';
 import { Lesson7 } from '@/components/lesson/lesson7';
 import { Lesson8 } from '@/components/lesson/lesson8';
+import { Lesson9 } from '@/components/lesson/lesson9';
 
 // grid grid-cols-1 xl:grid-cols-2
 export const Guide = mount(() => {
@@ -24,7 +25,7 @@ export const Guide = mount(() => {
           </a>{' '}
         </p>
         <p class="mt-4 text-gray-400">
-          After watching the eight simple examples below, you should have an
+          After watching the nine simple examples below, you should have an
           almost complete understanding of Lithent.
         </p>
       </div>
@@ -37,6 +38,7 @@ export const Guide = mount(() => {
       <Lesson6 />
       <Lesson7 />
       <Lesson8 />
+      <Lesson9 />
     </div>
   );
 });
