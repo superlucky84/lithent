@@ -38,6 +38,9 @@ export const store = <V>(initialValue: V) => {
     }
 
     const storeRenderObserveMap: StoreValue = {};
+    // const allowedAccessProp: (keyof T)[] = [];
+    const allowedAccessProp: Set<keyof T> = new Set();
+
     let makedProxy: { value: null | T } = { value: null };
     let run: Run = () => {};
 
@@ -49,6 +52,7 @@ export const store = <V>(initialValue: V) => {
         value,
         allowInitSetting,
         storeRenderList,
+        allowedAccessProp,
         run,
         storeRenderObserveMap,
         storeRenderObserveList
@@ -59,7 +63,12 @@ export const store = <V>(initialValue: V) => {
     }
 
     if (!makedProxy.value) {
-      makedProxy.value = updater<T>(value, allowInitSetting, storeRenderList);
+      makedProxy.value = updater<T>(
+        value,
+        allowInitSetting,
+        storeRenderList,
+        allowedAccessProp
+      );
 
       if (renew) {
         run = () => renew(makedProxy.value!);
@@ -68,7 +77,12 @@ export const store = <V>(initialValue: V) => {
     }
 
     if (renew) {
-      runFirstEmit(run, storeRenderList, storeRenderObserveMap);
+      runFirstEmit<T>(
+        run,
+        storeRenderList,
+        storeRenderObserveMap,
+        allowedAccessProp
+      );
       cacheMap.set(renew, makedProxy.value);
     }
 
@@ -80,12 +94,11 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
   value: T,
   allowInitSetting: { value: boolean },
   storeRenderList: Set<Run>,
+  allowedAccessProp: Set<keyof T>,
   run?: Run,
   storeRenderObserveMap?: StoreValue,
   storeRenderObserveList?: StoreValue[]
 ) => {
-  const allowedAccessProp: (keyof T)[] = [];
-
   const result = new Proxy(value, {
     get(target: T, prop: keyof T) {
       if (run && storeRenderObserveMap && allowInitSetting.value) {
@@ -93,11 +106,11 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
 
         if (!storeRenderObserveMap[prop].has(run)) {
           storeRenderObserveMap[prop].add(run);
-          allowedAccessProp.push(prop);
+          allowedAccessProp.add(prop);
         }
       }
 
-      if (allowedAccessProp.includes(prop) || !run) {
+      if (allowedAccessProp.has(prop) || !run) {
         return target[prop];
       }
 
@@ -106,7 +119,7 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
     set(target, prop: keyof T, value) {
       if (target[prop] === value) {
         return true;
-      } else if (allowedAccessProp.includes(prop) || !run) {
+      } else if (allowedAccessProp.has(prop) || !run) {
         target[prop] = value;
       } else {
         return true;
@@ -165,10 +178,11 @@ const runWithtrashCollectUnit = (storeRenderList: Set<Run>) => {
   return trashes;
 };
 
-const runFirstEmit = (
+const runFirstEmit = <T>(
   run: () => boolean | void | AbortSignal,
   storeRenderList: Set<Run>,
-  storeRenderObserveMap: StoreValue
+  storeRenderObserveMap: StoreValue,
+  allowedAccessProp: Set<keyof T>
 ) => {
   const renewResult = run();
 
@@ -178,8 +192,9 @@ const runFirstEmit = (
 
       storeRenderList.delete(run);
 
-      Object.values(renderObserveList).forEach(item => {
+      Object.entries(renderObserveList).forEach(([key, item]) => {
         item.delete(run);
+        allowedAccessProp.delete(key as keyof T);
       });
     });
   }
