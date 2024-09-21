@@ -1,4 +1,4 @@
-export { h, Fragment, mount } from '@/wDom';
+export { h, Fragment, portal, mount } from '@/wDom';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
 export { updateCallback } from '@/hook/updateCallback';

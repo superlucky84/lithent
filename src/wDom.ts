@@ -47,6 +47,10 @@ export const h = (
   return node;
 };
 
+export const portal = (wDom: WDom, portal: HTMLElement) => {
+  return h('portal', { portal }, wDom);
+};
+
 export const mount =
   <T>(component: Component<T>) =>
   (_props: T, _children: WDom[]) =>
