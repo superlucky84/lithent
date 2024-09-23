@@ -145,26 +145,34 @@ const execDependentCallbacks = <T>(
   prop: keyof T,
   run?: () => boolean | AbortSignal | void
 ) => {
-  const trashCollections: Run[] = [];
+  const trashCollections: Set<Run> = new Set();
 
-  trashCollections.push(...runWithtrashCollectUnit(storeRenderList));
+  // trashCollections.push(...runWithtrashCollectUnit(storeRenderList));
+  runWithtrashCollectUnit(storeRenderList).forEach(value =>
+    trashCollections.add(value)
+  );
 
   (storeRenderObserveList || []).forEach(storeRenderObserveMap => {
     const renderObserveList: Set<Run> = run
       ? storeRenderObserveMap[prop] || new Set<Run>()
       : new Set<Run>();
 
-    trashCollections.push(...runWithtrashCollectUnit(renderObserveList));
+    runWithtrashCollectUnit(renderObserveList).forEach(value =>
+      trashCollections.add(value)
+    );
 
-    removeTrashCollect(trashCollections, [...renderObserveList.values()]);
+    removeTrashCollect(trashCollections, renderObserveList);
   });
 
-  removeTrashCollect(trashCollections, [...storeRenderList.values()]);
+  removeTrashCollect(trashCollections, storeRenderList);
 };
 
-const removeTrashCollect = (trashCollections: Run[], targetList: Run[]) => {
+const removeTrashCollect = (
+  trashCollections: Set<Run>,
+  targetList: Set<Run>
+) => {
   trashCollections.forEach(deleteTarget => {
-    targetList.splice(targetList.indexOf(deleteTarget), 1);
+    targetList.delete(deleteTarget);
   });
 };
 
