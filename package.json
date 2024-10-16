@@ -12,6 +12,7 @@
     "dev:examples": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-examples dev",
     "dev:helper": "pnpm watch:core & pnpm --filter lithent-helper dev",
     "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev",
+
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
     "build:!helper": "pnpm --filter '!lithent-helper' build",
@@ -19,15 +20,17 @@
     "build:ftags": "pnpm --filter lithent-ftags build",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
-    "watch:core": "vite build --watch",
-    "watch:helper": "pnpm --filter lithent-helper watch",
     "build:sequence": "pnpm build:core && pnpm build:helper",
     "build:parallel": "pnpm build:!helper",
     "build": "pnpm run build:sequence && pnpm run build:parallel",
+
+    "watch:core": "vite build --watch",
+    "watch:helper": "pnpm --filter lithent-helper watch",
+
     "test:core": "vitest run --reporter verbose",
     "test": "pnpm test:core && pnpm --filter lithent-helper test",
     "test:dev": "vitest",
-    "coverage": "vitest run --coverage",
+
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules"
@@ -82,9 +85,9 @@
     "lithent"
   ],
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.5.0",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
-    "@vitest/coverage-v8": "^1.6.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -93,11 +96,10 @@
     "prettier": "^2.8.8",
     "terser": "^5.18.1",
     "typescript": "^4.9.5",
-    "vite": "^5.2.0",
+    "vite": "^5.4.8",
     "vite-plugin-checker": "^0.6.1",
     "vite-plugin-dts": "^2.3.0",
-    "vite-plugin-eslint": "^1.8.1",
-    "vitest": "^1.6.0"
+    "vitest": "^2.1.2"
   },
   "volta": {
     "node": "20.3.0"
