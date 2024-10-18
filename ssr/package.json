@@ -1,0 +1,34 @@
+{
+  "type": "module",
+  "name": "lithent-ssr",
+  "version": "0.0.1",
+  "description": "lithentSsr",
+  "private": true,
+  "packageManager": "pnpm@7.6.0",
+  "main": "./dist/lithentSsr.umd.js",
+  "module": "./dist/lithentSsr.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "test": "vitest run --reporter verbose",
+    "watch": "vite build --watch",
+    "build": "vite build"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": ["lithent"],
+  "peerDependencies": {
+    "lithent": "1.0.0"
+  },
+  "devDependencies": {
+    "lithent": "workspace:*"
+  },
+  "volta": {
+    "node": "20.3.0"
+  }
+}

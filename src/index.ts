@@ -3,6 +3,8 @@ export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
 export { updateCallback } from '@/hook/updateCallback';
 export { ref, nextTick } from '@/hook/ref';
+export { checkVirtualType, checkExisty } from '@/utils/predicator';
+export { xmlnsRef } from '@/utils/universalRef';
 
 export type {
   WDom,
