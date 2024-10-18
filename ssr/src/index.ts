@@ -1,12 +1,5 @@
 import type { WDom } from 'lithent';
-import {
-  h,
-  mount,
-  render,
-  checkExisty,
-  checkVirtualType,
-  xmlnsRef,
-} from 'lithent';
+import { checkExisty, checkVirtualType, xmlnsRef } from 'lithent';
 
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
@@ -59,7 +52,7 @@ function wDomChildrenToDom(
   const elementChildren = children.reduce(
     (acc: DocumentFragment, childItem: WDom) => {
       if (childItem.type) {
-        const childElement = wDomToDom(childItem);
+        const childElement = wDomToString(childItem);
 
         if (childItem.tag !== 'portal') {
           acc.appendChild(childElement);
