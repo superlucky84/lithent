@@ -1,5 +1,6 @@
 import { ComponentRef, ComponentSubKey, Props } from '@/types';
 
+export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
