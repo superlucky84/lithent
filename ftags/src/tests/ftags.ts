@@ -3,7 +3,7 @@ import { fMount, fTags, fFragment } from '@/index';
 
 const { section, div, p, br, strong } = fTags;
 
-const fTagComponent = fMount<{ a: number }>((_r, props, children) => {
+const fTagComponent = fMount<any>((_r, props, children) => {
   return () =>
     fFragment(
       'first inner',
@@ -22,7 +22,6 @@ render(
     section(
       'section first inner',
       p(
-        {},
         'p tag wrap',
         strong(
           { style: 'font-style: italic; padding: 2px' },

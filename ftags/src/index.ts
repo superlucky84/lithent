@@ -17,13 +17,11 @@ export const fTags: FTags = new Proxy(
   {},
   {
     get(_: {}, tagName: string) {
-      // return (props?: Props, ...childrens: MiddleStateWDom[]) => {
       return (...param: (Props | MiddleStateWDom)[]) => {
         const props = param[0];
         const childrens = param.slice(1);
 
         if (isPropType(props)) {
-          console.log('1111', tagName, props);
           return h(tagName, props || {}, ...childrens);
         } else if (props !== undefined) {
           return h(tagName, {}, props, ...childrens);
@@ -42,7 +40,14 @@ export const fFragment = (...children: MiddleStateWDom[]) => {
 export const fMount = <T>(component: Component<T>) => {
   const tagFunction = (_props: T, _children: WDom[]) => component;
 
-  return (props?: T, ...children: MiddleStateWDom[]) => {
+  return (
+    ...param: unknown extends T
+      ? (Props | MiddleStateWDom)[]
+      : [T, ...MiddleStateWDom[]]
+  ) => {
+    const props = param[0];
+    const children = param.slice(1) as MiddleStateWDom[];
+
     if (isPropType(props)) {
       return h(tagFunction as TagFunction, props || {}, ...children);
     } else if (props !== undefined) {
