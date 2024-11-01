@@ -25,7 +25,7 @@
     "watch:core": "vite build --watch",
     "watch:helper": "pnpm --filter lithent-helper watch",
     "test:core": "vitest run --reporter verbose",
-    "test": "pnpm test:core && pnpm --filter lithent-helper test",
+    "test": "pnpm test:core && pnpm --filter lithent-helper test && pnpm --filter lithent-ftags test",
     "test:dev": "vitest",
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",

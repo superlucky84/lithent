@@ -58,7 +58,6 @@ const testWrap =
 render(<Component />, testWrap);
 
 if (import.meta.vitest) {
-  console.log('3234235');
   const { it, expect } = import.meta.vitest;
   it('A DOM should be created that reflects the initial values of your store.', () => {
     expect(testWrap.outerHTML).toBe(
