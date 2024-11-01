@@ -1,4 +1,4 @@
-import { h, Fragment } from 'lithent';
+import { h, Fragment, isPropType } from 'lithent';
 import type {
   Props,
   WDom,
@@ -17,8 +17,15 @@ export const fTags: FTags = new Proxy(
   {},
   {
     get(_: {}, tagName: string) {
-      return (props?: Props, ...childrens: MiddleStateWDom[]) =>
-        h(tagName, props || {}, ...childrens);
+      return (props?: Props, ...childrens: MiddleStateWDom[]) => {
+        if (isPropType(props)) {
+          return h(tagName, props || {}, ...childrens);
+        } else if (props !== undefined) {
+          return h(tagName, {}, props, ...childrens);
+        }
+
+        return h(tagName, {}, ...childrens);
+      };
     },
   }
 );
@@ -30,6 +37,13 @@ export const fFragment = (...children: MiddleStateWDom[]) => {
 export const fMount = <T>(component: Component<T>) => {
   const tagFunction = (_props: T, _children: WDom[]) => component;
 
-  return (props?: T, ...children: MiddleStateWDom[]) =>
-    h(tagFunction as TagFunction, props || {}, ...children);
+  return (props?: T, ...children: MiddleStateWDom[]) => {
+    if (isPropType(props)) {
+      return h(tagFunction as TagFunction, props || {}, ...children);
+    } else if (props !== undefined) {
+      return h(tagFunction as TagFunction, {}, props, ...children);
+    }
+
+    return h(tagFunction as TagFunction, {}, ...children);
+  };
 };

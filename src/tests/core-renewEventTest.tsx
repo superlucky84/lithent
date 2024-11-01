@@ -1,5 +1,6 @@
 // example.jsx
-import { h, Fragment, render, Renew, mount, ref, nextTick } from '@/index';
+import type { Renew } from '@/index';
+import { h, Fragment, render, mount, ref, nextTick } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 const testChangeRef2 = ref<null | (() => void)>(null);
 

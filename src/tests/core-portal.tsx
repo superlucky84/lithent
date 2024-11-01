@@ -1,14 +1,6 @@
 // example.jsx
-import {
-  h,
-  Fragment,
-  render,
-  Renew,
-  mount,
-  ref,
-  portal,
-  nextTick,
-} from '@/index';
+import type { Renew } from '@/index';
+import { h, Fragment, render, mount, ref, portal, nextTick } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 
 const Renew = mount((renew, _props) => {

@@ -1,4 +1,5 @@
 import { WDom, Props } from '@/types';
+
 import { wdomSymbol } from '@/utils/universalRef';
 
 export const getParent = (vDom: WDom) =>

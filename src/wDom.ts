@@ -26,11 +26,12 @@ import {
 } from '@/utils/predicator';
 import { assign } from '@/utils';
 
-export const Fragment = (_props: Props, ...children: WDom[]) => ({
-  type: 'fragment',
-  [wdomSymbol]: true,
-  children,
-});
+export const Fragment = (_props: Props, ...children: WDom[]) =>
+  ({
+    type: 'fragment',
+    [wdomSymbol]: true,
+    children,
+  } as WDom);
 
 export const h = (
   tag: TagFunction | FragmentFunction | string,
@@ -234,7 +235,7 @@ const makeNode = (
     tag,
     props,
     children,
-  };
+  } as WDom;
 };
 
 const remakeChildren = (
@@ -247,7 +248,7 @@ const remakeChildren = (
 
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {
-    return { type: null, [wdomSymbol]: true };
+    return { type: null, [wdomSymbol]: true } as WDom;
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
@@ -255,12 +256,12 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
       type: 'loop',
       [wdomSymbol]: true,
       children,
-    };
+    } as WDom;
     nodeParentPointer.value = node;
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 'text', [wdomSymbol]: true, text: item };
+    return { type: 'text', [wdomSymbol]: true, text: item } as WDom;
   }
 
   return item;
