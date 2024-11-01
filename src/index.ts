@@ -1,4 +1,5 @@
 export { h, Fragment, portal, mount } from '@/wDom';
+export { isPropType } from '@/utils';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
 export { updateCallback } from '@/hook/updateCallback';

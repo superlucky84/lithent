@@ -1,4 +1,4 @@
-import { render, h, Fragment } from '@/index';
+import { render, h, Fragment, isPropType } from '@/index';
 
 import type {
   Props,
@@ -18,8 +18,15 @@ const fTags: FTags = new Proxy(
   {},
   {
     get(_: {}, tagName: string) {
-      return (props?: Props, ...childrens: MiddleStateWDom[]) =>
-        h(tagName, props || {}, ...childrens);
+      return (props?: Props, ...childrens: MiddleStateWDom[]) => {
+        if (isPropType(props)) {
+          return h(tagName, props || {}, ...childrens);
+        } else if (props !== undefined) {
+          return h(tagName, {}, props, ...childrens);
+        }
+
+        return h(tagName, {}, ...childrens);
+      };
     },
   }
 );
@@ -27,8 +34,15 @@ const fTags: FTags = new Proxy(
 const fMount = <T,>(component: Component<T>) => {
   const tagFunction = (_props: T, _children: WDom[]) => component;
 
-  return (props?: T, ...children: MiddleStateWDom[]) =>
-    h(tagFunction as TagFunction, props || {}, ...children);
+  return (props?: T, ...children: MiddleStateWDom[]) => {
+    if (isPropType(props)) {
+      return h(tagFunction as TagFunction, props || {}, ...children);
+    } else if (props !== undefined) {
+      return h(tagFunction as TagFunction, {}, props, ...children);
+    }
+
+    return h(tagFunction as TagFunction, {}, ...children);
+  };
 };
 
 const fFragment = (...children: MiddleStateWDom[]) => {
