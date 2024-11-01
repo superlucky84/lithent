@@ -16,6 +16,7 @@ import {
   initMountHookState,
   needDiffRef,
   getComponentSubInfo,
+  wdomSymbol,
 } from '@/utils/universalRef';
 import { setRedrawAction, componentUpdate } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
@@ -27,6 +28,7 @@ import { assign } from '@/utils';
 
 export const Fragment = (_props: Props, ...children: WDom[]) => ({
   type: 'fragment',
+  [wdomSymbol]: true,
   children,
 });
 
@@ -228,6 +230,7 @@ const makeNode = (
 
   return {
     type: 'element',
+    [wdomSymbol]: true,
     tag,
     props,
     children,
@@ -244,19 +247,20 @@ const remakeChildren = (
 
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {
-    return { type: null };
+    return { type: null, [wdomSymbol]: true };
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
     const node = {
       type: 'loop',
+      [wdomSymbol]: true,
       children,
     };
     nodeParentPointer.value = node;
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 'text', text: item };
+    return { type: 'text', [wdomSymbol]: true, text: item };
   }
 
   return item;
