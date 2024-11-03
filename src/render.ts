@@ -336,7 +336,7 @@ const updateProps = (
         originalProps[dataKey] as (e: Event) => void
       );
     } else if (dataKey) {
-      if (hasAccessorMethods(element, dataKey)) {
+      if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
         (element as { [key: string]: any })[dataKey] = dataValue;
       } else {
         setAttr(
