@@ -106,11 +106,7 @@ export const hasAccessorMethods = (target: unknown, dataKey: string) => {
     dataKey
   );
 
-  return (
-    descriptor &&
-    descriptor.hasOwnProperty('get') &&
-    descriptor.hasOwnProperty('set')
-  );
+  return descriptor && descriptor.get && descriptor.set;
 };
 
 export const getWDomType = (
