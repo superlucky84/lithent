@@ -6,10 +6,7 @@ let redrawQueueTimeout: boolean = false;
 
 export const setRedrawAction = (compKey: Props, exec: () => void) => {
   componentRef.get(compKey)!.up = () => {
-    redrawQueue.push({
-      compKey,
-      exec,
-    });
+    redrawQueue.push({ compKey, exec });
 
     if (!redrawQueueTimeout) {
       redrawQueueTimeout = true;

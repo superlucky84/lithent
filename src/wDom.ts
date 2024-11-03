@@ -111,14 +111,6 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
       children
     );
 
-    const originalWDom = customNode;
-
-    setRedrawAction(compKey, () =>
-      reRenderCustomComponent(tag, props, children, originalWDom)
-    );
-
-    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = customNode;
-
     return customNode;
   };
 
@@ -148,14 +140,15 @@ const makeCustomNode = (
     customNode = newCustomComponentMaker(props);
   }
 
-  addComponentProps(
-    customNode,
+  const reRender = makeReRender(
+    newCustomComponentMaker,
     compKey,
     tag,
     props,
-    children,
-    makeReRender(newCustomComponentMaker, compKey, tag, props, children)
+    children
   );
+
+  addComponentProps(customNode, compKey, tag, props, children, reRender);
 
   return customNode;
 };
@@ -183,17 +176,11 @@ const wDomMaker = (
   initUpdateHookState(compKey);
   runUpdateCallback();
 
-  const originalWDom = componentMaker(props);
+  const customNode = componentMaker(props);
 
-  setRedrawAction(compKey, () =>
-    reRenderCustomComponent(tag, props, children, originalWDom)
-  );
+  addComponentProps(customNode, compKey, tag, props, children, reRender);
 
-  addComponentProps(originalWDom, compKey, tag, props, children, reRender);
-
-  (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = originalWDom;
-
-  return originalWDom;
+  return customNode;
 };
 
 const addComponentProps = (
@@ -212,6 +199,12 @@ const addComponentProps = (
     compKey,
     reRender,
   });
+
+  setRedrawAction(compKey, () =>
+    reRenderCustomComponent(tag, props, children, wDom)
+  );
+
+  (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
 };
 
 const makeNode = (
