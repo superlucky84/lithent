@@ -26,10 +26,9 @@ if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
 
   it('The initialized text should be reflected in the input.', () => {
-    expect(testWrap.outerHTML).toBe(
-      '<div><input type="text" value="initText"></div>'
+    expect((testWrap.querySelector('input') as HTMLInputElement).value).toBe(
+      'initText'
     );
-    expect(testWrap?.querySelector('input')?.value).toBe('initText');
   });
 
   it('The text reflecting the change should appear in the input.', () => {
@@ -37,10 +36,9 @@ if (import.meta.vitest) {
       testChangeRef.value('newText');
     }
     nextTick().then(() => {
-      expect(testWrap.outerHTML).toBe(
-        '<div><input type="text" value="newText"></div>'
+      expect((testWrap.querySelector('input') as HTMLInputElement).value).toBe(
+        'newText'
       );
-      expect(testWrap?.querySelector('input')?.value).toBe('newText');
     });
   });
 }

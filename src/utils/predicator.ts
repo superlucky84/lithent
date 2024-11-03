@@ -100,14 +100,18 @@ export const checkRefData = (
   value: HTMLElement | Element | DocumentFragment | Text | undefined;
 } => dataKey === 'ref' && typeof dataValue === 'object';
 
-export const checkOptionElement = (element: any): element is HTMLElement =>
-  element.nodeType === 1 && element.tagName === 'OPTION';
+export const hasAccessorMethods = (target: unknown, dataKey: string) => {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    target!.constructor.prototype,
+    dataKey
+  );
 
-export const checkTextareaElement = (element: any): element is HTMLElement =>
-  element.nodeType === 1 && element.tagName === 'TEXTAREA';
-
-export const checkCheckableElement = (element: any): element is HTMLElement =>
-  element.nodeType === 1 && ['radio', 'checkbox'].includes(element.type);
+  return (
+    descriptor &&
+    descriptor.hasOwnProperty('get') &&
+    descriptor.hasOwnProperty('set')
+  );
+};
 
 export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver

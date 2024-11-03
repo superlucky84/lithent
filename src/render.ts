@@ -3,10 +3,8 @@ import {
   checkStyleData,
   checkRefData,
   checkExisty,
-  checkOptionElement,
-  checkTextareaElement,
-  checkCheckableElement,
   checkVirtualType,
+  hasAccessorMethods,
 } from '@/utils/predicator';
 
 import { componentRef, xmlnsRef } from '@/utils/universalRef';
@@ -316,8 +314,6 @@ const updateProps = (
   const originalProps = { ...oldProps };
 
   entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
-    let chkRemoveProp = true;
-
     if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
       // Do nothing
     } else if (dataKey === 'portal' && typeof dataValue === 'object') {
@@ -339,16 +335,10 @@ const updateProps = (
         dataValue as (e: Event) => void,
         originalProps[dataKey] as (e: Event) => void
       );
-    } else if (checkCheckableElement(element) && dataKey === 'checked') {
-      (element as HTMLInputElement).checked = !!dataValue;
-    } else if (checkTextareaElement(element) && dataKey === 'value') {
-      (element as HTMLInputElement).value = dataValue as string;
-    } else if (checkOptionElement(element) && dataKey === 'selected') {
-      (element as HTMLOptionElement).selected = !!dataValue;
     } else if (dataKey) {
-      [chkRemoveProp, dataValue] = makeAttrDataValue(dataValue);
-
-      if (chkRemoveProp) {
+      if (hasAccessorMethods(element, dataKey)) {
+        (element as { [key: string]: any })[dataKey] = dataValue;
+      } else {
         setAttr(
           getAttrKey(dataKey),
           element as HTMLElement,
@@ -357,9 +347,7 @@ const updateProps = (
       }
     }
 
-    if (chkRemoveProp) {
-      delete originalProps[dataKey];
-    }
+    delete originalProps[dataKey];
   });
 
   keys(originalProps).forEach(dataKey =>
@@ -373,19 +361,6 @@ const setAttr = (dataKey: string, element: HTMLElement, dataValue: string) => {
   } else {
     element.setAttribute(dataKey, dataValue);
   }
-};
-
-const makeAttrDataValue = (dataValue: unknown): [boolean, string] => {
-  let allowSetAttr = true;
-  if (typeof dataValue === 'boolean') {
-    if (!dataValue) {
-      allowSetAttr = false;
-    }
-
-    dataValue = '';
-  }
-
-  return [allowSetAttr, String(dataValue)];
 };
 
 const wDomToDom = (wDom: WDom) => {
