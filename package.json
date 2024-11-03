@@ -1,9 +1,9 @@
 {
   "type": "module",
   "name": "lithent",
-  "version": "1.14.0",
+  "version": "1.14.1",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
-  "packageManager": "pnpm@7.6.0",
+  "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithent.umd.js",
   "module": "./dist/lithent.mjs",
   "scripts": {
