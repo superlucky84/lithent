@@ -68,7 +68,6 @@ const reRenderCustomComponent = (
   if (originalWDom.isLegacy) {
     return;
   }
-
   needDiffRef.value = true;
 
   const newWDom = makeWDomResolver(tag, props, children);
