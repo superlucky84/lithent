@@ -1,38 +1,11 @@
-import {
-  h,
-  Fragment,
-  render,
-  mount,
-  ref,
-  nextTick,
-  updateCallback,
-  mountCallback,
-} from '@/index';
+import { h, Fragment, render, mount, ref, nextTick } from 'lithent';
+
+import { effect } from '@/index';
 
 let injectLogCount = 0;
 let clenupLogCount = 0;
 const testChangeRef = ref<null | (() => void)>(null);
 const testChangeUnmountRef = ref<null | (() => void)>(null);
-
-export const effect = (
-  forward: () => (() => void) | void,
-  backward: () => (() => void) | void = () => {},
-  dependencies: () => any[] = () => []
-) => {
-  mountCallback(() => {
-    forward();
-
-    return backward;
-  });
-
-  updateCallback(() => {
-    if (backward) {
-      backward();
-    }
-
-    return forward;
-  }, dependencies);
-};
 
 const Children = mount(renew => {
   let count = 0;
