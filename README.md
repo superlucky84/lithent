@@ -21,8 +21,8 @@ Lithent were developed to make it easy to insert Virtual DOM component
 fragments into pages already drawn with SSR, and are intended to be
 used lightly in a variety of situations.
 
-`(lithent.mjs  14.28 kB │ gzip: 4.50 kB │ map: 59.82 kB)`
-`(lithent.umd.js  10.43 kB │ gzip: 4.04 kB │ map: 58.24 kB)`
+`(lithent.mjs  14.25 kB │ gzip: 4.49 kB │ map: 59.74 kB)`
+`(lithent.umd.js  10.39 kB │ gzip: 4.03 kB │ map: 58.16 kB)`
 
 ## 🚩 Table of Contents
 - [Thanks for the introduction](#thanks-for-the-introduction)
