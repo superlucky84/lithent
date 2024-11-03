@@ -35,6 +35,6 @@ export default defineConfig({
     includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
   },
   server: {
-    open: '/html/portal.html',
+    open: '/html/renew.html',
   },
 });

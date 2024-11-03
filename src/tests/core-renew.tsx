@@ -1,6 +1,14 @@
 // example.jsx
 import type { Renew } from '@/index';
-import { h, Fragment, render, mount, ref, nextTick } from '@/index';
+import {
+  h,
+  Fragment,
+  render,
+  mount,
+  ref,
+  nextTick,
+  updateCallback,
+} from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
 
 const Renew = mount((renew, _props) => {
@@ -12,12 +20,24 @@ const Renew = mount((renew, _props) => {
 
   const change = () => {
     count1 += 1;
+    renew();
     count2 += 2;
+    renew();
     count3 += 3;
+    renew();
     count4 -= 1;
+    renew();
+    renew();
+    renew();
     renew();
   };
   testChangeRef.value = change;
+  updateCallback(() => {
+    console.log('UPDATE');
+    return () => {
+      console.log('UPDATED');
+    };
+  });
 
   return () => (
     <Fragment>
