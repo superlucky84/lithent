@@ -27,7 +27,7 @@ export const componentUpdate = (compKey: Props) => () => {
 };
 
 const execRedrawQueue = () => {
-  redrawQueue.values().forEach(item => {
+  redrawQueue.forEach((item: () => void) => {
     item();
   });
 
