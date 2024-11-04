@@ -5,37 +5,13 @@ import {
   mount,
   ref,
   nextTick,
-  Props,
-  WDom,
   updateCallback,
-} from '@/index';
+} from 'lithent';
+
+import { cacheUpdate } from '@/index';
 
 const testChange1Ref = ref<null | (() => void)>(null);
 const testChange2Ref = ref<null | (() => void)>(null);
-
-function cacheUpdate(
-  checkFunction: () => unknown[],
-  updater: (props: Props) => WDom
-) {
-  let originalDefs: unknown[] = [];
-  let originalUpdater: WDom | null = null;
-
-  return (props: Props) => {
-    const newDefs = checkFunction();
-    const isSame = originalDefs.every((def, index) => def === newDefs[index]);
-
-    originalDefs = newDefs;
-
-    if (isSame && originalUpdater) {
-      return originalUpdater;
-    }
-
-    const newUpdater = updater(props);
-    originalUpdater = newUpdater;
-
-    return newUpdater;
-  };
-}
 
 const Depth1 = mount<{ count1: number; count2: number }>(() => {
   updateCallback(() => {

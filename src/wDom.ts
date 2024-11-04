@@ -16,6 +16,7 @@ import {
   initMountHookState,
   needDiffRef,
   getComponentSubInfo,
+  wdomSymbol,
 } from '@/utils/universalRef';
 import { setRedrawAction, componentUpdate } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
@@ -25,10 +26,12 @@ import {
 } from '@/utils/predicator';
 import { assign } from '@/utils';
 
-export const Fragment = (_props: Props, ...children: WDom[]) => ({
-  type: 'fragment',
-  children,
-});
+export const Fragment = (_props: Props, ...children: WDom[]) =>
+  ({
+    type: 'fragment',
+    [wdomSymbol]: true,
+    children,
+  } as WDom);
 
 export const h = (
   tag: TagFunction | FragmentFunction | string,
@@ -65,7 +68,6 @@ const reRenderCustomComponent = (
   if (originalWDom.isLegacy) {
     return;
   }
-
   needDiffRef.value = true;
 
   const newWDom = makeWDomResolver(tag, props, children);
@@ -108,14 +110,6 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
       children
     );
 
-    const originalWDom = customNode;
-
-    setRedrawAction(compKey, () =>
-      reRenderCustomComponent(tag, props, children, originalWDom)
-    );
-
-    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = customNode;
-
     return customNode;
   };
 
@@ -145,14 +139,15 @@ const makeCustomNode = (
     customNode = newCustomComponentMaker(props);
   }
 
-  addComponentProps(
-    customNode,
+  const reRender = makeReRender(
+    newCustomComponentMaker,
     compKey,
     tag,
     props,
-    children,
-    makeReRender(newCustomComponentMaker, compKey, tag, props, children)
+    children
   );
+
+  addComponentProps(customNode, compKey, tag, props, children, reRender);
 
   return customNode;
 };
@@ -180,17 +175,11 @@ const wDomMaker = (
   initUpdateHookState(compKey);
   runUpdateCallback();
 
-  const originalWDom = componentMaker(props);
+  const customNode = componentMaker(props);
 
-  setRedrawAction(compKey, () =>
-    reRenderCustomComponent(tag, props, children, originalWDom)
-  );
+  addComponentProps(customNode, compKey, tag, props, children, reRender);
 
-  addComponentProps(originalWDom, compKey, tag, props, children, reRender);
-
-  (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = originalWDom;
-
-  return originalWDom;
+  return customNode;
 };
 
 const addComponentProps = (
@@ -209,6 +198,12 @@ const addComponentProps = (
     compKey,
     reRender,
   });
+
+  setRedrawAction(compKey, () =>
+    reRenderCustomComponent(tag, props, children, wDom)
+  );
+
+  (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
 };
 
 const makeNode = (
@@ -228,10 +223,11 @@ const makeNode = (
 
   return {
     type: 'element',
+    [wdomSymbol]: true,
     tag,
     props,
     children,
-  };
+  } as WDom;
 };
 
 const remakeChildren = (
@@ -244,19 +240,20 @@ const remakeChildren = (
 
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {
-    return { type: null };
+    return { type: null, [wdomSymbol]: true } as WDom;
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
     const node = {
       type: 'loop',
+      [wdomSymbol]: true,
       children,
-    };
+    } as WDom;
     nodeParentPointer.value = node;
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 'text', text: item };
+    return { type: 'text', [wdomSymbol]: true, text: item } as WDom;
   }
 
   return item;

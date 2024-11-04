@@ -1,9 +1,9 @@
 {
   "type": "module",
   "name": "lithent",
-  "version": "1.13.1",
+  "version": "1.14.1",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
-  "packageManager": "pnpm@7.6.0",
+  "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithent.umd.js",
   "module": "./dist/lithent.mjs",
   "scripts": {
@@ -13,7 +13,6 @@
     "dev:helper": "pnpm watch:core & pnpm --filter lithent-helper dev",
     "dev:ssr": "pnpm watch:core & pnpm --filter lithent-ssr dev",
     "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev",
-
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
     "build:!helper": "pnpm --filter '!lithent-helper' build",
@@ -25,14 +24,11 @@
     "build:sequence": "pnpm build:core && pnpm build:helper",
     "build:parallel": "pnpm build:!helper",
     "build": "pnpm run build:sequence && pnpm run build:parallel",
-
     "watch:core": "vite build --watch",
     "watch:helper": "pnpm --filter lithent-helper watch",
-
     "test:core": "vitest run --reporter verbose",
-    "test": "pnpm test:core && pnpm --filter lithent-helper test",
+    "test": "pnpm test:core && pnpm --filter lithent-helper test && pnpm --filter lithent-ftags test",
     "test:dev": "vitest",
-
     "clean": "pnpm clean:dist && pnpm clean:module",
     "clean:dist": "pnpm -r exec rm -rf dist && rm -rf dist",
     "clean:module": "pnpm -r exec rm -rf dist node_modules && rm -rf node_modules"
@@ -96,20 +92,20 @@
   ],
   "devDependencies": {
     "@testing-library/jest-dom": "^6.5.0",
-    "@typescript-eslint/eslint-plugin": "^5.60.0",
-    "@typescript-eslint/parser": "^5.60.0",
-    "eslint": "^7.32.0",
+    "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "happy-dom": "^9.20.3",
     "jsdom": "^22.1.0",
     "prettier": "^2.8.8",
     "terser": "^5.18.1",
-    "typescript": "^4.9.5",
+    "typescript": "^5.6.3",
     "vite": "^5.4.8",
     "vite-plugin-checker": "^0.6.1",
     "vite-plugin-dts": "^2.3.0",
-    "vitest": "^2.1.2"
+    "vitest": "^2.1.2",
+    "@typescript-eslint/eslint-plugin": "^8.12.2",
+    "@typescript-eslint/parser": "^8.12.2"
   },
   "volta": {
     "node": "20.3.0"

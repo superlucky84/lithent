@@ -1,3 +1,5 @@
+import { wdomSymbol } from '@/utils/universalRef';
+
 export type UseDataStoreValue = { [key: string | symbol]: unknown };
 
 export type Props = { [key: string]: unknown };
@@ -60,6 +62,7 @@ export interface WDom {
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?: RenderType;
   isLegacy?: boolean;
+  [wdomSymbol]?: boolean;
 }
 
 export type RenderType =

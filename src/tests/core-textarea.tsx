@@ -12,6 +12,8 @@ const TextArea = mount(renew => {
   return () => (
     <div>
       <textarea onInput={changeInput} value={text} />
+      <input type="text" onInput={changeInput} value={text} />
+      <input type="password" onInput={changeInput} value={text} />
       <div>{text}</div>
     </div>
   );

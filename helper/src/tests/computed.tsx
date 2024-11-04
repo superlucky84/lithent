@@ -1,30 +1,6 @@
-// example.jsx
-import { h, Fragment, render, mount, ref, nextTick } from '@/index';
+import { h, Fragment, render, mount, ref, nextTick } from 'lithent';
+import { computed } from '@/index';
 const testChangeRef = ref<null | (() => void)>(null);
-
-const computed = <T,>(
-  value: () => T
-): {
-  value: T;
-  v: T;
-} => {
-  let result = value;
-
-  return {
-    get value() {
-      return result();
-    },
-    get v() {
-      return result();
-    },
-    set value(_newValue: T) {
-      throw new Error(`You can't change 'computed'`);
-    },
-    set v(_newValue: T) {
-      throw new Error(`You can't change 'computed'`);
-    },
-  };
-};
 
 const Component = mount(renew => {
   let count = 1;

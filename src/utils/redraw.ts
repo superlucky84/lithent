@@ -1,15 +1,12 @@
 import { Props } from '@/types';
 import { componentRef } from '@/utils/universalRef';
 
-let redrawQueue: { compKey: Props; exec: () => void }[] = [];
+const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
 
 export const setRedrawAction = (compKey: Props, exec: () => void) => {
   componentRef.get(compKey)!.up = () => {
-    redrawQueue.push({
-      compKey,
-      exec,
-    });
+    redrawQueue.set(compKey, exec);
 
     if (!redrawQueueTimeout) {
       redrawQueueTimeout = true;
@@ -30,10 +27,10 @@ export const componentUpdate = (compKey: Props) => () => {
 };
 
 const execRedrawQueue = () => {
-  redrawQueue.forEach(item => {
-    item.exec();
+  redrawQueue.forEach((item: () => void) => {
+    item();
   });
 
-  redrawQueue = [];
+  redrawQueue.clear();
   redrawQueueTimeout = false;
 };
