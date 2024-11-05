@@ -44,9 +44,9 @@ function wDomToString(wDom: WDom) {
     element = wDomChildrenToDom(children, element);
   } else if (type === 'element' && tag) {
     if (isAllowSelfClose(tag) && !children.length) {
-      element = `<${tag} />`;
+      element = `<${tag} ${makeProp()} />`;
     } else {
-      element = `<${tag}>`;
+      element = `<${tag} ${makeProp()}>`;
       element = wDomChildrenToDom(children, element);
       element = `${element}</${tag}>`;
     }
@@ -54,7 +54,7 @@ function wDomToString(wDom: WDom) {
     element = String(text);
     element = wDomChildrenToDom(children, element);
   } else {
-    element = '<e>';
+    element = `<e ${makeProp()} >`;
     element = wDomChildrenToDom(children, element);
     element = `${element}</e>`;
   }
@@ -63,6 +63,10 @@ function wDomToString(wDom: WDom) {
   // updateProps(props, element);
 
   return element;
+}
+
+function makeProp() {
+  return '';
 }
 
 function wDomChildrenToDom(children: WDom[], parentElement?: string) {
