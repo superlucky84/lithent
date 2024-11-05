@@ -1,54 +1,47 @@
 import type { WDom } from 'lithent';
-import { checkExisty, checkVirtualType, xmlnsRef } from 'lithent';
-
-const DF = () => new DocumentFragment();
-const CE = (t: string) => document.createElement(t);
+import { checkExisty, checkVirtualType } from 'lithent';
 
 export function renderToString(wDom: WDom) {
   return wDomToString(wDom);
 }
 
 function wDomToString(wDom: WDom) {
-  let element;
-  const { type, tag, text, props, children = [] } = wDom;
+  let element = '';
+  // const { type, tag, text, props, children = [] } = wDom;
+  const { type, tag, text, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
 
   if (isVirtualType) {
-    element = DF();
+    element = wDomChildrenToDom(children, element);
   } else if (type === 'element' && tag) {
-    element = CE(tag);
+    element = `<${tag}>`;
+    element = wDomChildrenToDom(children, element);
+    element = `${element}</${tag}>`;
   } else if (type === 'text' && checkExisty(text)) {
-    element = document.createTextNode(String(text));
+    element = String(text);
+    element = wDomChildrenToDom(children, element);
   } else {
-    element = CE('e');
+    element = '<e>';
+    element = wDomChildrenToDom(children, element);
+    element = `${element}</e>`;
   }
 
-  wDomChildrenToDom(children, element);
+  // 태그 닫기
   // updateProps(props, element);
 
   return element;
 }
 
-function wDomChildrenToDom(
-  children: WDom[],
-  parentElement?: HTMLElement | Element | DocumentFragment | Text
-) {
-  const elementChildren = children.reduce(
-    (acc: DocumentFragment, childItem: WDom) => {
-      if (childItem.type) {
-        const childElement = wDomToString(childItem);
+function wDomChildrenToDom(children: WDom[], parentElement?: string) {
+  const newString = children.reduce((acc: string, childItem: WDom) => {
+    if (childItem.type) {
+      const childElement = wDomToString(childItem);
 
-        if (childItem.tag !== 'portal') {
-          acc.appendChild(childElement);
-        }
-      }
+      acc += childElement;
+    }
 
-      return acc;
-    },
-    DF()
-  );
+    return acc;
+  }, parentElement || '');
 
-  if (parentElement && elementChildren.hasChildNodes()) {
-    parentElement.appendChild(elementChildren);
-  }
+  return newString;
 }
