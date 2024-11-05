@@ -46,24 +46,14 @@ function checkRefData(
   return dataKey === 'ref' && typeof dataValue === 'object';
 }
 
-function updateStyle(
-  style: Record<string, string>,
-  oldStyle: Record<string, string>,
-  element?: HTMLElement | Element | DocumentFragment | Text
-) {
-  const originalStyle = { ...oldStyle };
-  const elementStyle = (element as HTMLElement)?.style;
-
-  if (elementStyle) {
-    Object.entries(style).forEach(([styleKey, dataValue]) => {
-      (elementStyle as any)[styleKey] = dataValue;
-      delete originalStyle[styleKey];
-    });
-
-    Object.entries(originalStyle).forEach(
-      ([styleKey]) => ((elementStyle as any)[styleKey] = '')
-    );
-  }
+function styleObjectToString(styleObj: Record<string, string>) {
+  return Object.entries(styleObj)
+    .map(([key, value]) => {
+      // camelCase를 kebab-case로 변환 (예: borderTop -> border-top)
+      const kebabKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+      return `${kebabKey}: ${value};`;
+    })
+    .join(' ');
 }
 
 export function renderToString(wDom: WDom) {
@@ -72,17 +62,20 @@ export function renderToString(wDom: WDom) {
 
 function wDomToString(wDom: WDom) {
   let element = '';
-  // const { type, tag, text, props, children = [] } = wDom;
-  const { type, tag, text, children = [] } = wDom;
+  const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
 
   if (isVirtualType) {
     element = wDomChildrenToDom(children, element);
   } else if (type === 'element' && tag) {
-    if (isAllowSelfClose(tag) && !children.length) {
-      element = `<${tag}${makeProp()} />`;
+    const innerHTML = props?.innerHTML;
+
+    if (innerHTML) {
+      element = `<${tag}${makeProp(props)}>${innerHTML}</${tag}>`;
+    } else if (isAllowSelfClose(tag) && !children.length) {
+      element = `<${tag}${makeProp(props)} />`;
     } else {
-      element = `<${tag}${makeProp()}>`;
+      element = `<${tag}${makeProp(props)}>`;
       element = wDomChildrenToDom(children, element);
       element = `${element}</${tag}>`;
     }
@@ -90,9 +83,15 @@ function wDomToString(wDom: WDom) {
     element = String(text);
     element = wDomChildrenToDom(children, element);
   } else {
-    element = `<e${makeProp()} >`;
-    element = wDomChildrenToDom(children, element);
-    element = `${element}</e>`;
+    const innerHTML = props?.innerHTML;
+
+    if (innerHTML) {
+      element = `<e${makeProp(props)}>${innerHTML}</e>`;
+    } else {
+      element = `<e${makeProp(props)}>`;
+      element = wDomChildrenToDom(children, element);
+      element = `${element}</e>`;
+    }
   }
 
   return element;
@@ -112,52 +111,29 @@ function wDomChildrenToDom(children: WDom[], parentElement?: string) {
   return newString;
 }
 
-function makeProp(
-  props?: Props,
-  element?: HTMLElement | Element | DocumentFragment | Text,
-  oldProps?: Props
-) {
-  const originalProps = { ...oldProps };
+function makeProp(props?: Props) {
+  let attrGroup: string[] = [];
 
   Object.entries(props || {}).forEach(
     ([dataKey, dataValue]: [string, unknown]) => {
-      if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
+      if (dataKey === 'key') {
         // Do nothing
       } else if (dataKey === 'portal' && typeof dataValue === 'object') {
         // Do nothing
       } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
-        (element as HTMLElement).innerHTML = dataValue;
+        // Do nothing
       } else if (checkStyleData(dataKey, dataValue)) {
-        /*
-        updateStyle(
-          dataValue,
-          checkStyleData(dataKey, originalProps.style)
-            ? originalProps.style
-            : {},
-          element
-        );
-        */
+        const cssString = styleObjectToString(dataValue);
+        attrGroup.push(`style="${cssString}"`);
       } else if (checkRefData(dataKey, dataValue)) {
-        dataValue.value = element;
+        // Do nothing
       } else if (dataKey.match(/^on/)) {
         // Do nothing
       } else if (dataKey) {
-        /*
-        if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
-          (element as { [key: string]: any })[dataKey] = dataValue;
-        } else {
-          setAttr(
-            getAttrKey(dataKey),
-            element as HTMLElement,
-            dataValue as string
-          );
-        }
-        */
+        attrGroup.push(`${dataKey}="${String(dataValue)}"`);
       }
     }
   );
 
-  keys(originalProps).forEach(dataKey =>
-    (element as HTMLElement).removeAttribute(dataKey)
-  );
+  return attrGroup.length ? ' ' + attrGroup.join(' ') : '';
 }

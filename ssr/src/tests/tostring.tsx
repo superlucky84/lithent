@@ -6,8 +6,10 @@ const Root = mount(_r => {
     <div style={{ border: '1px solid red' }}>
       asve
       <br />
-      <section />
-      <span id="aa11">123124</span>
+      <section innerHTML="<article>ss</article>" />
+      <span id="aa11" data-max-string="va">
+        {'  '}123124
+      </span>
     </div>
   );
 });
