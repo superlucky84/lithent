@@ -1,4 +1,4 @@
-import type { WDom } from 'lithent';
+import type { WDom, Props } from 'lithent';
 
 const SELF_CLOSE_ALLLOW = [
   'area',
@@ -44,9 +44,9 @@ function wDomToString(wDom: WDom) {
     element = wDomChildrenToDom(children, element);
   } else if (type === 'element' && tag) {
     if (isAllowSelfClose(tag) && !children.length) {
-      element = `<${tag} ${makeProp()} />`;
+      element = `<${tag}${makeProp()} />`;
     } else {
-      element = `<${tag} ${makeProp()}>`;
+      element = `<${tag}${makeProp()}>`;
       element = wDomChildrenToDom(children, element);
       element = `${element}</${tag}>`;
     }
@@ -54,19 +54,12 @@ function wDomToString(wDom: WDom) {
     element = String(text);
     element = wDomChildrenToDom(children, element);
   } else {
-    element = `<e ${makeProp()} >`;
+    element = `<e${makeProp()} >`;
     element = wDomChildrenToDom(children, element);
     element = `${element}</e>`;
   }
 
-  // 태그 닫기
-  // updateProps(props, element);
-
   return element;
-}
-
-function makeProp() {
-  return '';
 }
 
 function wDomChildrenToDom(children: WDom[], parentElement?: string) {
@@ -81,4 +74,52 @@ function wDomChildrenToDom(children: WDom[], parentElement?: string) {
   }, parentElement || '');
 
   return newString;
+}
+
+function makeProp(
+  props?: Props,
+  element?: HTMLElement | Element | DocumentFragment | Text,
+  oldProps?: Props
+) {
+  const originalProps = { ...oldProps };
+
+  Object.entries(props || {}).forEach(
+    ([dataKey, dataValue]: [string, unknown]) => {
+      if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
+        // Do nothing
+      } else if (dataKey === 'portal' && typeof dataValue === 'object') {
+        // Do nothing
+      } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
+        (element as HTMLElement).innerHTML = dataValue;
+      } else if (checkStyleData(dataKey, dataValue)) {
+        updateStyle(
+          dataValue,
+          checkStyleData(dataKey, originalProps.style)
+            ? originalProps.style
+            : {},
+          element
+        );
+      } else if (checkRefData(dataKey, dataValue)) {
+        dataValue.value = element;
+      } else if (dataKey.match(/^on/)) {
+        // Do nothing
+      } else if (dataKey) {
+        if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
+          (element as { [key: string]: any })[dataKey] = dataValue;
+        } else {
+          setAttr(
+            getAttrKey(dataKey),
+            element as HTMLElement,
+            dataValue as string
+          );
+        }
+      }
+
+      delete originalProps[dataKey];
+    }
+  );
+
+  keys(originalProps).forEach(dataKey =>
+    (element as HTMLElement).removeAttribute(dataKey)
+  );
 }
