@@ -13,20 +13,10 @@ function wDomToString(wDom: WDom) {
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
 
-  if (tag === 'svg') {
-    xmlnsRef.value = String(props?.xmlns);
-  }
-
   if (isVirtualType) {
     element = DF();
   } else if (type === 'element' && tag) {
-    if (tag === 'portal' && props?.portal) {
-      element = props.portal as HTMLElement;
-    } else {
-      element = xmlnsRef.value
-        ? document.createElementNS(xmlnsRef.value, tag)
-        : CE(tag);
-    }
+    element = CE(tag);
   } else if (type === 'text' && checkExisty(text)) {
     element = document.createTextNode(String(text));
   } else {
@@ -35,12 +25,6 @@ function wDomToString(wDom: WDom) {
 
   wDomChildrenToDom(children, element);
   // updateProps(props, element);
-
-  wDom.el = element as HTMLElement;
-
-  if (tag === 'svg') {
-    xmlnsRef.value = '';
-  }
 
   return element;
 }
