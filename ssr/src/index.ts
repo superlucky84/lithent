@@ -1,4 +1,27 @@
 import type { WDom } from 'lithent';
+
+const SELF_CLOSE_ALLLOW = [
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+];
+
+function isAllowSelfClose(tagname: string) {
+  return SELF_CLOSE_ALLLOW.includes(tagname);
+}
+
 function checkExisty(value: unknown) {
   return value !== null && value !== undefined;
 }
@@ -20,9 +43,13 @@ function wDomToString(wDom: WDom) {
   if (isVirtualType) {
     element = wDomChildrenToDom(children, element);
   } else if (type === 'element' && tag) {
-    element = `<${tag}>`;
-    element = wDomChildrenToDom(children, element);
-    element = `${element}</${tag}>`;
+    if (isAllowSelfClose(tag) && !children.length) {
+      element = `<${tag} />`;
+    } else {
+      element = `<${tag}>`;
+      element = wDomChildrenToDom(children, element);
+      element = `${element}</${tag}>`;
+    }
   } else if (type === 'text' && checkExisty(text)) {
     element = String(text);
     element = wDomChildrenToDom(children, element);
