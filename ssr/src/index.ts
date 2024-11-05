@@ -1,5 +1,11 @@
 import type { WDom } from 'lithent';
-import { checkExisty, checkVirtualType } from 'lithent';
+function checkExisty(value: unknown) {
+  return value !== null && value !== undefined;
+}
+
+function checkVirtualType(type?: string | null) {
+  return type && ['fragment', 'loop'].includes(type);
+}
 
 export function renderToString(wDom: WDom) {
   return wDomToString(wDom);
