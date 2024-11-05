@@ -30,6 +30,42 @@ function checkVirtualType(type?: string | null) {
   return type && ['fragment', 'loop'].includes(type);
 }
 
+function checkStyleData(
+  dataKey: string,
+  dataValue: unknown
+): dataValue is Record<string, string> {
+  return dataKey === 'style' && typeof dataValue === 'object';
+}
+
+function checkRefData(
+  dataKey: string,
+  dataValue: unknown
+): dataValue is {
+  value: HTMLElement | Element | DocumentFragment | Text | undefined;
+} {
+  return dataKey === 'ref' && typeof dataValue === 'object';
+}
+
+function updateStyle(
+  style: Record<string, string>,
+  oldStyle: Record<string, string>,
+  element?: HTMLElement | Element | DocumentFragment | Text
+) {
+  const originalStyle = { ...oldStyle };
+  const elementStyle = (element as HTMLElement)?.style;
+
+  if (elementStyle) {
+    Object.entries(style).forEach(([styleKey, dataValue]) => {
+      (elementStyle as any)[styleKey] = dataValue;
+      delete originalStyle[styleKey];
+    });
+
+    Object.entries(originalStyle).forEach(
+      ([styleKey]) => ((elementStyle as any)[styleKey] = '')
+    );
+  }
+}
+
 export function renderToString(wDom: WDom) {
   return wDomToString(wDom);
 }
@@ -92,6 +128,7 @@ function makeProp(
       } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
         (element as HTMLElement).innerHTML = dataValue;
       } else if (checkStyleData(dataKey, dataValue)) {
+        /*
         updateStyle(
           dataValue,
           checkStyleData(dataKey, originalProps.style)
@@ -99,11 +136,13 @@ function makeProp(
             : {},
           element
         );
+        */
       } else if (checkRefData(dataKey, dataValue)) {
         dataValue.value = element;
       } else if (dataKey.match(/^on/)) {
         // Do nothing
       } else if (dataKey) {
+        /*
         if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
           (element as { [key: string]: any })[dataKey] = dataValue;
         } else {
@@ -113,9 +152,8 @@ function makeProp(
             dataValue as string
           );
         }
+        */
       }
-
-      delete originalProps[dataKey];
     }
   );
 
