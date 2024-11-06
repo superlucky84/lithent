@@ -21,11 +21,14 @@
   },
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": ["lithent"],
+  "keywords": [
+    "lithent"
+  ],
   "peerDependencies": {
     "lithent": "1.0.0"
   },
   "devDependencies": {
+    "express": "^4.21.1",
     "lithent": "workspace:*"
   },
   "volta": {

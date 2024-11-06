@@ -15,6 +15,7 @@ const Root = mount(_r => {
   );
 });
 
-const result = renderToString(<Root />);
+export default Root;
 
-console.log(result);
+// const result = renderToString(<Root />);
+// console.log(result);
