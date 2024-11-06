@@ -25,9 +25,9 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'lithentHelper',
+      name: 'lithentSsr',
       fileName: format => {
-        return format === 'umd' ? 'lithentHelper.umd.js' : 'lithentHelper.mjs';
+        return format === 'umd' ? 'lithentSsr.umd.js' : 'lithentSsr.mjs';
       },
     },
     rollupOptions: {

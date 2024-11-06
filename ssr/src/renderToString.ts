@@ -61,6 +61,7 @@ export function renderToString(wDom: WDom) {
 }
 
 function wDomToString(wDom: WDom) {
+  console.log('wdom', wDom);
   let element = '';
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);

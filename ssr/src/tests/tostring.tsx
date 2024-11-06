@@ -1,5 +1,5 @@
 import { h, mount } from 'lithent';
-import { renderToString } from '@/index';
+// import { renderToString } from '@/index';
 
 const Root = mount(_r => {
   return () => (

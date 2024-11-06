@@ -1,8 +1,11 @@
 // server.js
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import { renderToString } from './src/index';
-// import path from 'path';
+import { h } from 'lithent';
+import { renderToString } from './dist/lithentSsr.mjs';
+import path from 'path';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 async function createServer() {
   const app = express();
@@ -18,16 +21,17 @@ async function createServer() {
       },
     },
   });
-  app.use(vite.middlewares);
+
+  app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
 
   // 기본 라우트 설정
   app.get('/', async (_req, res) => {
     try {
       // React 컴포넌트를 가져와서 렌더링
       const { default: Root } = await vite.ssrLoadModule(
-        './src/tests/tostring.jsx'
+        '@/tests/tostring.tsx'
       );
-      const appHtml = renderToString(Root());
+      const appHtml = renderToString(h(Root));
 
       const html = `
         <!DOCTYPE html>
@@ -39,11 +43,13 @@ async function createServer() {
           </head>
           <body>
             <div id="app">${appHtml}</div>
-            <script type="module" src="/src/main.jsx"></script>
+            <script type="module">
+                import { hydration }  from "/dist/lithentSsr.mjs"
+                console.log('HYDRATION', hydration);
+            </script>
           </body>
         </html>
       `;
-
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (e) {
       vite.ssrFixStacktrace(e);
@@ -51,6 +57,8 @@ async function createServer() {
       res.status(500).end(e.message);
     }
   });
+
+  app.use(vite.middlewares);
 
   app.listen(3000, () => {
     console.log('Server is running at http://localhost:3000');
