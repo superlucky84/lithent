@@ -40,12 +40,17 @@ async function createServer() {
             <meta charset="UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>Express with Vite and JSX</title>
+            <script src="/dist/lithentSsr.umd.js"></script>
           </head>
           <body>
-            <div id="app">${appHtml}</div>
-            <script type="module">
-                import { hydration }  from "/dist/lithentSsr.mjs"
-                console.log('HYDRATION', hydration);
+            <div id="app">
+              ${appHtml}
+            </div>
+            <script>
+              const { run } =  window.lithentSsr
+              console.log('RUN', run);
+
+              run(document.getElementById('app'));
             </script>
           </body>
         </html>

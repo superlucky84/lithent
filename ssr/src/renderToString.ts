@@ -60,6 +60,9 @@ export function renderToString(wDom: WDom) {
   return wDomToString(wDom);
 }
 
+/**
+ * 가상돔 객체 덩어리를 문자열 태그로 바꿔준다.
+ */
 function wDomToString(wDom: WDom) {
   console.log('wdom', wDom);
   let element = '';
@@ -98,6 +101,9 @@ function wDomToString(wDom: WDom) {
   return element;
 }
 
+/**
+ * 가상돔 객체 덩어리를 문자열 태그로 바꿔준다.
+ */
 function wDomChildrenToDom(children: WDom[], parentElement?: string) {
   const newString = children.reduce((acc: string, childItem: WDom) => {
     if (childItem.type) {

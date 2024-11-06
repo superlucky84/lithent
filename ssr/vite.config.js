@@ -3,6 +3,18 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 
+/*
+ *     rollupOptions: {
+      external: ['lithent'],
+      output: {
+        globals: {
+          lithent: 'lithent',
+        },
+      },
+    },
+
+ * */
+
 export default defineConfig({
   plugins: [
     checker({
@@ -28,14 +40,6 @@ export default defineConfig({
       name: 'lithentSsr',
       fileName: format => {
         return format === 'umd' ? 'lithentSsr.umd.js' : 'lithentSsr.mjs';
-      },
-    },
-    rollupOptions: {
-      external: ['lithent'],
-      output: {
-        globals: {
-          lithent: 'lithent',
-        },
       },
     },
   },
