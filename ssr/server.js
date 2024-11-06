@@ -10,6 +10,13 @@ async function createServer() {
   // Vite 서버 생성 및 미들웨어 적용
   const vite = await createViteServer({
     server: { middlewareMode: 'ssr' },
+    root: process.cwd(), // 프로젝트 루트 디렉터리 설정 (옵션)
+    plugins: [], // 필요한 Vite 플러그인 추가 (옵션)
+    resolve: {
+      alias: {
+        '@': '/src', // 경로 별칭 설정 (옵션)
+      },
+    },
   });
   app.use(vite.middlewares);
 
