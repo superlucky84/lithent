@@ -7,6 +7,7 @@ const Root = mount(_r => {
       asve
       <br />
       <section innerHTML="<article>ss</article>" />
+      <button disabled={true}>a</button>
       <span id="aa11" data-max-string="va">
         {'  '}123124
       </span>

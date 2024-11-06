@@ -126,7 +126,9 @@ function makeProp(props?: Props) {
         if (checkStyleData(dataKey, dataValue)) {
           const cssString = styleObjectToString(dataValue);
           attrGroup.push(`style="${cssString}"`);
-        } else if (dataKey) {
+        } else if (dataKey && dataValue === true) {
+          attrGroup.push(`${dataKey}="${dataKey}"`);
+        } else if (dataKey && typeof dataValue !== 'boolean') {
           attrGroup.push(`${dataKey}="${String(dataValue)}"`);
         }
       }
