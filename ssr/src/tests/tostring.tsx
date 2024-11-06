@@ -5,6 +5,7 @@ const Root = mount(_r => {
   return () => (
     <Fragment>
       111 222
+      {/* <!-- aa --> */}
       <div>aaa</div>
       <div style={{ border: '1px solid red' }}>
         asve
