@@ -4,7 +4,7 @@ import { h, mount, Fragment } from 'lithent';
 const Root = mount(_r => {
   return () => (
     <Fragment>
-      111 222
+      111 222 45
       {/* <!-- aa --> */}
       <div>aaa</div>
       <div style={{ border: '1px solid red' }}>
