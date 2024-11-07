@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     checker({
       typescript: true,
@@ -31,7 +31,7 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      external: ['lithent'],
+      external: mode === 'production' ? ['lithent'] : [],
       output: {
         globals: {
           lithent: 'lithent',
@@ -46,4 +46,4 @@ export default defineConfig({
   server: {
     open: '/html/jsxExample.html',
   },
-});
+}));

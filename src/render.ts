@@ -35,14 +35,11 @@ export const render = (
   const Dom = wDomToDom(wDom, isHydration);
 
   if (afterElement) {
-    console.log('aaaaaaaaaaaaaaaa');
     wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else if (!isHydration) {
-    console.log('ssssssssssssssss');
     wrapElement.appendChild(Dom);
   }
-  console.log('vvvvvvvvvvvvvvvv');
 
   execMountedQueue();
 
@@ -405,11 +402,12 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
       element = CE('e');
     }
 
-    wDomChildrenToDom(children, element, isHydration);
     wDom.el = element as HTMLElement;
   } else {
     element = wDom.el;
   }
+
+  wDomChildrenToDom(children, element, isHydration);
 
   updateProps(props, element, null, isHydration);
 

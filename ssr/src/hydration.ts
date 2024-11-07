@@ -37,10 +37,12 @@ function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
  * wDom에 el 속성을 붙여준다(재귀)
  */
 function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
+  let index = 0;
+  console.log(realDomList);
   realDomList
     .filter((item: any) => filteredEmptyTextNode(item))
-    .forEach((realDomItem, index) => {
-      const wDomItem = wDomList[index];
+    .forEach(realDomItem => {
+      let wDomItem = wDomList[index];
       const nodeType = realDomItem.nodeType;
 
       if (
@@ -50,6 +52,12 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
         ['text', 'element'].includes(wDomItem.type)
       ) {
         if (wDomItem.type === 'text' && nodeType === 3) {
+          // 텍스트 노드 다시 만들기 처리
+          console.log(
+            '11',
+            `"${wDomItem.text}"`,
+            `"${(realDomItem as Text).data.trim()}"`
+          );
           wDomItem.el = realDomItem as Text;
         } else if (
           wDomItem.type === 'element' &&
@@ -67,6 +75,7 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
           Array.from(realDomItem.childNodes)
         );
       }
+      index += 1;
     });
 }
 
