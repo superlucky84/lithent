@@ -390,7 +390,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
       element = CE('e');
     }
 
-    wDomChildrenToDom(children, element);
+    wDomChildrenToDom(children, element, isHydration);
     wDom.el = element as HTMLElement;
   } else {
     element = wDom.el;
@@ -409,12 +409,13 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
 
 const wDomChildrenToDom = (
   children: WDom[],
-  parentElement?: HTMLElement | Element | DocumentFragment | Text
+  parentElement?: HTMLElement | Element | DocumentFragment | Text,
+  isHydration?: boolean
 ) => {
   const elementChildren = children.reduce(
     (acc: DocumentFragment, childItem: WDom) => {
       if (childItem.type) {
-        const childElement = wDomToDom(childItem);
+        const childElement = wDomToDom(childItem, isHydration);
 
         if (childItem.tag !== 'portal') {
           acc.appendChild(childElement);
