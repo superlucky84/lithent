@@ -40,6 +40,7 @@ async function createServer() {
             <meta charset="UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <title>Express with Vite and JSX</title>
+            <script src="https://cdn.jsdelivr.net/npm/lithent@1.14.1/dist/lithent.umd.js"></script>
             <script src="/dist/lithentSsr.umd.js"></script>
           </head>
           <body>
