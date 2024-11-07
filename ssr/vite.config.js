@@ -3,18 +3,6 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 
-/*
-     rollupOptions: {
-      external: ['lithent'],
-      output: {
-        globals: {
-          lithent: 'lithent',
-        },
-      },
-    },
-
- * */
-
 export default defineConfig({
   plugins: [
     checker({
