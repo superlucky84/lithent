@@ -21,7 +21,7 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
     "baseUrl": "./",
-    "types": ["vitest/importMeta"],
+    "types": ["vitest/importMeta", "vite/client"],
     "paths": {
       "@/*": ["src/*"]
     }
