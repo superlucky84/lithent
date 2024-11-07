@@ -35,11 +35,14 @@ export const render = (
   const Dom = wDomToDom(wDom, isHydration);
 
   if (afterElement) {
+    console.log('aaaaaaaaaaaaaaaa');
     wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else if (!isHydration) {
+    console.log('ssssssssssssssss');
     wrapElement.appendChild(Dom);
   }
+  console.log('vvvvvvvvvvvvvvvv');
 
   execMountedQueue();
 
@@ -310,45 +313,57 @@ const updateText = (newWDom: WDom) => {
 const updateProps = (
   props?: Props,
   element?: HTMLElement | Element | DocumentFragment | Text,
-  oldProps?: Props
+  oldProps?: Props | null,
+  isHydration?: boolean
 ) => {
   const originalProps = { ...oldProps };
 
   entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
-    if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
-      // Do nothing
-    } else if (dataKey === 'portal' && typeof dataValue === 'object') {
-      // Do nothing
-    } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
-      (element as HTMLElement).innerHTML = dataValue;
-    } else if (checkStyleData(dataKey, dataValue)) {
-      updateStyle(
-        dataValue,
-        checkStyleData(dataKey, originalProps.style) ? originalProps.style : {},
-        element
-      );
-    } else if (checkRefData(dataKey, dataValue)) {
-      dataValue.value = element;
-    } else if (dataKey.match(/^on/)) {
+    if (isHydration && dataKey.match(/^on/)) {
       updateEvent(
         element as HTMLElement,
         dataKey,
         dataValue as (e: Event) => void,
         originalProps[dataKey] as (e: Event) => void
       );
-    } else if (dataKey) {
-      if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
-        (element as { [key: string]: any })[dataKey] = dataValue;
-      } else {
-        setAttr(
-          getAttrKey(dataKey),
-          element as HTMLElement,
-          dataValue as string
+    } else {
+      if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
+        // Do nothing
+      } else if (dataKey === 'portal' && typeof dataValue === 'object') {
+        // Do nothing
+      } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
+        (element as HTMLElement).innerHTML = dataValue;
+      } else if (checkStyleData(dataKey, dataValue)) {
+        updateStyle(
+          dataValue,
+          checkStyleData(dataKey, originalProps.style)
+            ? originalProps.style
+            : {},
+          element
         );
+      } else if (checkRefData(dataKey, dataValue)) {
+        dataValue.value = element;
+      } else if (dataKey.match(/^on/)) {
+        updateEvent(
+          element as HTMLElement,
+          dataKey,
+          dataValue as (e: Event) => void,
+          originalProps[dataKey] as (e: Event) => void
+        );
+      } else if (dataKey) {
+        if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
+          (element as { [key: string]: any })[dataKey] = dataValue;
+        } else {
+          setAttr(
+            getAttrKey(dataKey),
+            element as HTMLElement,
+            dataValue as string
+          );
+        }
       }
-    }
 
-    delete originalProps[dataKey];
+      delete originalProps[dataKey];
+    }
   });
 
   keys(originalProps).forEach(dataKey =>
@@ -396,7 +411,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
     element = wDom.el;
   }
 
-  updateProps(props, element);
+  updateProps(props, element, null, isHydration);
 
   addMountedQueue(wDom);
 
@@ -417,7 +432,7 @@ const wDomChildrenToDom = (
       if (childItem.type) {
         const childElement = wDomToDom(childItem, isHydration);
 
-        if (childItem.tag !== 'portal') {
+        if (childItem.tag !== 'portal' && !isHydration) {
           acc.appendChild(childElement);
         }
       }
@@ -427,7 +442,7 @@ const wDomChildrenToDom = (
     DF()
   );
 
-  if (parentElement && elementChildren.hasChildNodes()) {
+  if (!isHydration && parentElement && elementChildren.hasChildNodes()) {
     parentElement.appendChild(elementChildren);
   }
 };

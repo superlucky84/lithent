@@ -1,4 +1,4 @@
-// import { render } from 'lithent';
+import { render } from 'lithent';
 import type { WDom } from 'lithent';
 
 /**
@@ -14,7 +14,7 @@ export function hydration(wDom: WDom, wrapElement: HTMLElement) {
   /**
    * wDom에 이벤트를 붙여준다.
    */
-  // render(wDom, wrapElement, null, true);
+  render(wDom, wrapElement, null, true);
 }
 
 /**
