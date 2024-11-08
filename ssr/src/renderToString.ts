@@ -87,15 +87,9 @@ function wDomToString(wDom: WDom) {
     element = String(text);
     element = wDomChildrenToDom(children, element);
   } else {
-    const innerHTML = props?.innerHTML;
-
-    if (innerHTML) {
-      element = `<e${makeProp(props)}>${innerHTML}</e>`;
-    } else {
-      element = `<e${makeProp(props)}>`;
-      element = wDomChildrenToDom(children, element);
-      element = `${element}</e>`;
-    }
+    throw new Error(
+      'An attempt was made to render an abnormal virtual DOM object.'
+    );
   }
 
   return element;

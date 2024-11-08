@@ -5,7 +5,6 @@ import type { WDom } from 'lithent';
  * hydration
  */
 export function hydration(wDom: WDom, wrapElement: HTMLElement) {
-  console.log('WDOM', wDom);
   /**
    * wDom에 el 속성을 붙여준다.
    */
@@ -38,7 +37,6 @@ function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
  */
 function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
   let index = 0;
-  console.log(realDomList);
   realDomList
     .filter((item: any) => filteredEmptyTextNode(item))
     .forEach(realDomItem => {
@@ -52,13 +50,12 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
         ['text', 'element'].includes(wDomItem.type)
       ) {
         if (wDomItem.type === 'text' && nodeType === 3) {
-          // 텍스트 노드 다시 만들기 처리
-          console.log(
-            '11',
-            `"${wDomItem.text}"`,
-            `"${(realDomItem as Text).data.trim()}"`
+          const { tFragment, nIndex } = processConsecutiveTextNodes(
+            wDomList,
+            index
           );
-          wDomItem.el = realDomItem as Text;
+          index = nIndex;
+          realDomItem!.parentElement!.replaceChild(tFragment, realDomItem);
         } else if (
           wDomItem.type === 'element' &&
           realDomItem instanceof HTMLElement
@@ -101,4 +98,33 @@ function flatFlagmentFromList(wDomlist: WDom[]) {
     }
     return acc;
   }, []);
+}
+
+function processConsecutiveTextNodes(wDomList: WDom[], cIndex: number) {
+  // cIndex
+  const textWDomList: WDom[] = collectAdjacentTextNode(wDomList, cIndex, []);
+  const tFragment = new DocumentFragment();
+  textWDomList.forEach(item => {
+    const textNode = document.createTextNode(String(item.text));
+    item.el = textNode;
+    tFragment.appendChild(textNode);
+  });
+
+  return {
+    tFragment,
+    nIndex: cIndex + (textWDomList.length - 1),
+  };
+}
+
+function collectAdjacentTextNode(
+  wDomList: WDom[],
+  cIndex: number,
+  acc: WDom[]
+): WDom[] {
+  if (wDomList[cIndex] && wDomList[cIndex].type === 'text') {
+    acc.push(wDomList[cIndex]);
+
+    return collectAdjacentTextNode(wDomList, cIndex + 1, [...acc]);
+  }
+  return acc;
 }
