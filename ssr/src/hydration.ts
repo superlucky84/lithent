@@ -6,18 +6,18 @@ import type { WDom } from 'lithent';
  */
 export function hydration(wDom: WDom, wrapElement: HTMLElement) {
   /**
-   * wDom에 el 속성을 붙여준다.
+   * Attach the el property to wDom.
    */
   addElement(wDom, wrapElement);
 
   /**
-   * wDom에 이벤트를 붙여준다.
+   * Attach events to wDom.
    */
   render(wDom, wrapElement, null, true);
 }
 
 /**
- * wDom에 el 속성을 붙여준다.
+ * Attach the el property to wDom.
  */
 function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
   const wDomList = flatFlagmentFromList(
@@ -33,7 +33,7 @@ function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
 }
 
 /**
- * wDom에 el 속성을 붙여준다(재귀)
+ * Attach the el property to wDom recursively.
  */
 function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
   let index = 0;
@@ -77,7 +77,7 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
 }
 
 /**
- * 공백문자인 텍스트 노드는 무시
+ * Whitespace text nodes are ignored.
  */
 function filteredEmptyTextNode(item: HTMLElement | Text) {
   if (item.nodeType === 3 && !(item as Text).data.replace(/\s*/g, '')) {
@@ -87,7 +87,7 @@ function filteredEmptyTextNode(item: HTMLElement | Text) {
 }
 
 /**
- * 중첩된 fragment 타입은 납작하게 펴준다.
+ * Flattens nested fragment types.
  */
 function flatFlagmentFromList(wDomlist: WDom[]) {
   return wDomlist.reduce((acc: WDom[], item: WDom) => {
@@ -100,8 +100,10 @@ function flatFlagmentFromList(wDomlist: WDom[]) {
   }, []);
 }
 
+/**
+ * Hydration is applied to consecutively rendered text node objects.
+ */
 function processConsecutiveTextNodes(wDomList: WDom[], cIndex: number) {
-  // cIndex
   const textWDomList: WDom[] = collectAdjacentTextNode(wDomList, cIndex, []);
   const tFragment = new DocumentFragment();
   textWDomList.forEach(item => {
@@ -116,6 +118,9 @@ function processConsecutiveTextNodes(wDomList: WDom[], cIndex: number) {
   };
 }
 
+/**
+ * Collect consecutive text nodes.
+ */
 function collectAdjacentTextNode(
   wDomList: WDom[],
   cIndex: number,

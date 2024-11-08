@@ -1,67 +1,22 @@
 import type { WDom, Props } from 'lithent';
+import {
+  isAllowSelfClose,
+  checkExisty,
+  checkVirtualType,
+  checkStyleData,
+  checkRefData,
+  styleObjectToString,
+} from '@/helper';
 
-const SELF_CLOSE_ALLLOW = [
-  'area',
-  'base',
-  'br',
-  'col',
-  'embed',
-  'hr',
-  'img',
-  'input',
-  'keygen',
-  'link',
-  'meta',
-  'param',
-  'source',
-  'track',
-  'wbr',
-];
-
-function isAllowSelfClose(tagname: string) {
-  return SELF_CLOSE_ALLLOW.includes(tagname);
-}
-
-function checkExisty(value: unknown) {
-  return value !== null && value !== undefined;
-}
-
-function checkVirtualType(type?: string | null) {
-  return type && ['fragment', 'loop'].includes(type);
-}
-
-function checkStyleData(
-  dataKey: string,
-  dataValue: unknown
-): dataValue is Record<string, string> {
-  return dataKey === 'style' && typeof dataValue === 'object';
-}
-
-function checkRefData(
-  dataKey: string,
-  dataValue: unknown
-): dataValue is {
-  value: HTMLElement | Element | DocumentFragment | Text | undefined;
-} {
-  return dataKey === 'ref' && typeof dataValue === 'object';
-}
-
-function styleObjectToString(styleObj: Record<string, string>) {
-  return Object.entries(styleObj)
-    .map(([key, value]) => {
-      // camelCase를 kebab-case로 변환 (예: borderTop -> border-top)
-      const kebabKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
-      return `${kebabKey}: ${value};`;
-    })
-    .join(' ');
-}
-
+/**
+ * Main function of renderToString"
+ */
 export function renderToString(wDom: WDom) {
   return wDomToString(wDom);
 }
 
 /**
- * 가상돔 객체 덩어리를 문자열 태그로 바꿔준다.
+ * Converts a chunk of virtual DOM objects into string tags.
  */
 function wDomToString(wDom: WDom) {
   console.log('wdom', wDom);
@@ -96,7 +51,7 @@ function wDomToString(wDom: WDom) {
 }
 
 /**
- * 가상돔 객체 덩어리를 문자열 태그로 바꿔준다.
+ * Converts all child nodes of a virtual DOM object into string tags.
  */
 function wDomChildrenToDom(children: WDom[], parentElement?: string) {
   const newString = children.reduce((acc: string, childItem: WDom) => {
@@ -112,6 +67,9 @@ function wDomChildrenToDom(children: WDom[], parentElement?: string) {
   return newString;
 }
 
+/**
+ * Creates and attaches a prop string to the tag.
+ */
 function makeProp(props?: Props) {
   let attrGroup: string[] = [];
 
