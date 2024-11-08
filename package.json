@@ -11,10 +11,12 @@
     "dev": "vite",
     "dev:examples": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-examples dev",
     "dev:helper": "pnpm watch:core & pnpm --filter lithent-helper dev",
+    "dev:ssr": "pnpm watch:core & pnpm --filter lithent-ssr dev",
     "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev",
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
     "build:!helper": "pnpm --filter '!lithent-helper' build",
+    "build:ssr": "pnpm --filter lithent-ssr build",
     "build:tag": "pnpm --filter lithent-tag build",
     "build:ftags": "pnpm --filter lithent-ftags build",
     "build:examples": "pnpm --filter lithent-examples build",
@@ -42,6 +44,11 @@
       "import": "./helper/dist/lithentHelper.mjs",
       "require": "./helper/dist/lithentHelper.umd.js"
     },
+    "./ssr": {
+      "types": "./ssr/dist/index.d.ts",
+      "import": "./ssr/dist/lithentSsr.mjs",
+      "require": "./ssr/dist/lithentSsr.umd.js"
+    },
     "./tag": {
       "types": "./tag/dist/index.d.ts",
       "import": "./tag/dist/lithentTag.mjs",
@@ -60,6 +67,9 @@
     "helper/dist",
     "helper/src",
     "helper/package.json",
+    "ssr/dist",
+    "ssr/src",
+    "ssr/package.json",
     "tag/dist",
     "tag/src",
     "tag/package.json",

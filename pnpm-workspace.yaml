@@ -1,5 +1,6 @@
 packages:
   - 'helper'
+  - 'ssr'
   - 'tag'
   - 'ftags'
   - 'examples'

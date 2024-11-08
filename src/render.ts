@@ -25,18 +25,19 @@ const CE = (t: string) => document.createElement(t);
 export const render = (
   wDom: WDom,
   wrapElement: HTMLElement | null,
-  afterElement?: HTMLElement | null
+  afterElement?: HTMLElement | null,
+  isHydration?: boolean
 ) => {
-  wrapElement ??= document.body;
   wDom.isRoot = true;
+  wrapElement ??= document.body;
   wDom.wrapElement = wrapElement;
 
-  const Dom = wDomToDom(wDom);
+  const Dom = wDomToDom(wDom, isHydration);
 
   if (afterElement) {
     wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
-  } else {
+  } else if (!isHydration) {
     wrapElement.appendChild(Dom);
   }
 
@@ -309,45 +310,57 @@ const updateText = (newWDom: WDom) => {
 const updateProps = (
   props?: Props,
   element?: HTMLElement | Element | DocumentFragment | Text,
-  oldProps?: Props
+  oldProps?: Props | null,
+  isHydration?: boolean
 ) => {
   const originalProps = { ...oldProps };
 
   entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
-    if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
-      // Do nothing
-    } else if (dataKey === 'portal' && typeof dataValue === 'object') {
-      // Do nothing
-    } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
-      (element as HTMLElement).innerHTML = dataValue;
-    } else if (checkStyleData(dataKey, dataValue)) {
-      updateStyle(
-        dataValue,
-        checkStyleData(dataKey, originalProps.style) ? originalProps.style : {},
-        element
-      );
-    } else if (checkRefData(dataKey, dataValue)) {
-      dataValue.value = element;
-    } else if (dataKey.match(/^on/)) {
+    if (isHydration && dataKey.match(/^on/)) {
       updateEvent(
         element as HTMLElement,
         dataKey,
         dataValue as (e: Event) => void,
         originalProps[dataKey] as (e: Event) => void
       );
-    } else if (dataKey) {
-      if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
-        (element as { [key: string]: any })[dataKey] = dataValue;
-      } else {
-        setAttr(
-          getAttrKey(dataKey),
-          element as HTMLElement,
-          dataValue as string
+    } else {
+      if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
+        // Do nothing
+      } else if (dataKey === 'portal' && typeof dataValue === 'object') {
+        // Do nothing
+      } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
+        (element as HTMLElement).innerHTML = dataValue;
+      } else if (checkStyleData(dataKey, dataValue)) {
+        updateStyle(
+          dataValue,
+          checkStyleData(dataKey, originalProps.style)
+            ? originalProps.style
+            : {},
+          element
         );
+      } else if (checkRefData(dataKey, dataValue)) {
+        dataValue.value = element;
+      } else if (dataKey.match(/^on/)) {
+        updateEvent(
+          element as HTMLElement,
+          dataKey,
+          dataValue as (e: Event) => void,
+          originalProps[dataKey] as (e: Event) => void
+        );
+      } else if (dataKey) {
+        if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
+          (element as { [key: string]: any })[dataKey] = dataValue;
+        } else {
+          setAttr(
+            getAttrKey(dataKey),
+            element as HTMLElement,
+            dataValue as string
+          );
+        }
       }
-    }
 
-    delete originalProps[dataKey];
+      delete originalProps[dataKey];
+    }
   });
 
   keys(originalProps).forEach(dataKey =>
@@ -363,7 +376,7 @@ const setAttr = (dataKey: string, element: HTMLElement, dataValue: string) => {
   }
 };
 
-const wDomToDom = (wDom: WDom) => {
+const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
@@ -372,26 +385,31 @@ const wDomToDom = (wDom: WDom) => {
     xmlnsRef.value = String(props?.xmlns);
   }
 
-  if (isVirtualType) {
-    element = DF();
-  } else if (type === 'element' && tag) {
-    if (tag === 'portal' && props?.portal) {
-      element = props.portal as HTMLElement;
+  if (!isHydration) {
+    if (isVirtualType) {
+      element = DF();
+    } else if (type === 'element' && tag) {
+      if (tag === 'portal' && props?.portal) {
+        element = props.portal as HTMLElement;
+      } else {
+        element = xmlnsRef.value
+          ? document.createElementNS(xmlnsRef.value, tag)
+          : CE(tag);
+      }
+    } else if (type === 'text' && checkExisty(text)) {
+      element = document.createTextNode(String(text));
     } else {
-      element = xmlnsRef.value
-        ? document.createElementNS(xmlnsRef.value, tag)
-        : CE(tag);
+      element = CE('e');
     }
-  } else if (type === 'text' && checkExisty(text)) {
-    element = document.createTextNode(String(text));
+
+    wDom.el = element as HTMLElement;
   } else {
-    element = CE('e');
+    element = wDom.el;
   }
 
-  wDomChildrenToDom(children, element);
-  updateProps(props, element);
+  wDomChildrenToDom(children, element, isHydration);
 
-  wDom.el = element as HTMLElement;
+  updateProps(props, element, null, isHydration);
 
   addMountedQueue(wDom);
 
@@ -399,19 +417,20 @@ const wDomToDom = (wDom: WDom) => {
     xmlnsRef.value = '';
   }
 
-  return element;
+  return element as HTMLElement;
 };
 
 const wDomChildrenToDom = (
   children: WDom[],
-  parentElement?: HTMLElement | Element | DocumentFragment | Text
+  parentElement?: HTMLElement | Element | DocumentFragment | Text,
+  isHydration?: boolean
 ) => {
   const elementChildren = children.reduce(
     (acc: DocumentFragment, childItem: WDom) => {
       if (childItem.type) {
-        const childElement = wDomToDom(childItem);
+        const childElement = wDomToDom(childItem, isHydration);
 
-        if (childItem.tag !== 'portal') {
+        if (childItem.tag !== 'portal' && !isHydration) {
           acc.appendChild(childElement);
         }
       }
@@ -421,7 +440,7 @@ const wDomChildrenToDom = (
     DF()
   );
 
-  if (parentElement && elementChildren.hasChildNodes()) {
+  if (!isHydration && parentElement && elementChildren.hasChildNodes()) {
     parentElement.appendChild(elementChildren);
   }
 };
