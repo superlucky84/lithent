@@ -5,3 +5,4 @@ packages:
   - 'ftags'
   - 'examples'
   - 'lithentDocs'
+  - 'expressLithent'
