@@ -56,7 +56,7 @@ export const portal = (wDom: WDom, portal: HTMLElement) => {
 
 export const mount =
   <T>(component: Component<T>) =>
-  (_props: T, _children: WDom[]) =>
+  (_props: T, _children?: MiddleStateWDomChildren) =>
     component;
 
 const reRenderCustomComponent = (

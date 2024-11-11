@@ -1,5 +1,5 @@
-import { render } from 'lithent';
-import type { WDom } from 'lithent';
+import { h, render } from 'lithent';
+import type { WDom, TagFunction } from 'lithent';
 
 /**
  * hydration
@@ -16,6 +16,14 @@ export function hydration(wDom: WDom, wrapElement: HTMLElement) {
   render(wDom, wrapElement, null, true);
 }
 
+export function hydrateOnClient(tagFunction: TagFunction) {
+  if (typeof window !== 'undefined') {
+    hydration(h(tagFunction, {}), document.documentElement);
+    return;
+  }
+  return tagFunction;
+}
+
 /**
  * Attach the el property to wDom.
  */
@@ -25,7 +33,10 @@ function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
       ? [...(wDomOrig.children || [])]
       : [wDomOrig]
   );
-  const realDomList = Array.from(wrapElement.childNodes);
+  const realDomList =
+    wrapElement.tagName === 'HTML'
+      ? [wrapElement]
+      : Array.from(wrapElement.childNodes);
 
   if (wDomList) {
     addElementProcessChildren(wDomList, realDomList);
@@ -77,12 +88,21 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
 }
 
 /**
- * Whitespace text nodes are ignored.
+ * Whitespace or text nodes are ignored.
  */
 function filteredEmptyTextNode(item: HTMLElement | Text) {
   if (item.nodeType === 3 && !(item as Text).data.replace(/\s*/g, '')) {
     return false;
   }
+
+  if (
+    item.parentNode?.nodeName === 'HTML' &&
+    item.nodeType === 1 &&
+    !['HEAD', 'BODY'].includes((item as HTMLElement).tagName)
+  ) {
+    return false;
+  }
+
   return true;
 }
 

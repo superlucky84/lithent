@@ -6,7 +6,7 @@ export type Props = { [key: string]: unknown };
 
 export type TagFunction = (
   prop: Props,
-  children: MiddleStateWDomChildren
+  children?: MiddleStateWDomChildren
 ) => (renew: Renew, prop: Props, children: WDom[]) => (props: Props) => WDom;
 
 export type Renew = () => boolean;
