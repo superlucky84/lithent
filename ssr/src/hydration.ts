@@ -53,6 +53,7 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
     .forEach(realDomItem => {
       let wDomItem = wDomList[index];
       const nodeType = realDomItem.nodeType;
+      let pass = false;
 
       if (
         realDomItem &&
@@ -72,18 +73,24 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
           realDomItem instanceof HTMLElement
         ) {
           if ((realDomItem.tagName || '').toLowerCase() !== wDomItem.tag) {
-            throw new Error('Hydration Error - not matched tagname');
+            // throw new Error('Hydration Error - not matched tagname');
+            pass = true;
+          } else {
+            wDomItem.el = realDomItem as HTMLElement;
           }
-
-          wDomItem.el = realDomItem as HTMLElement;
         }
 
-        addElementProcessChildren(
-          flatFlagmentFromList(wDomItem.children || []),
-          Array.from(realDomItem.childNodes)
-        );
+        if (!pass) {
+          addElementProcessChildren(
+            flatFlagmentFromList(wDomItem.children || []),
+            Array.from(realDomItem.childNodes)
+          );
+        }
       }
-      index += 1;
+
+      if (!pass) {
+        index += 1;
+      }
     });
 }
 
@@ -92,14 +99,6 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
  */
 function filteredEmptyTextNode(item: HTMLElement | Text) {
   if (item.nodeType === 3 && !(item as Text).data.replace(/\s*/g, '')) {
-    return false;
-  }
-
-  if (
-    item.parentNode?.nodeName === 'HTML' &&
-    item.nodeType === 1 &&
-    !['HEAD', 'BODY'].includes((item as HTMLElement).tagName)
-  ) {
     return false;
   }
 
