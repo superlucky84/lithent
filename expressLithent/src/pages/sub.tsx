@@ -1,3 +1,4 @@
+import { renderWithHydration } from 'lithent/ssr';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
 
@@ -14,4 +15,4 @@ const Sub = mount(_r => {
   );
 });
 
-export default Sub;
+export default renderWithHydration(Sub);

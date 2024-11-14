@@ -10,6 +10,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "node watch-and-restart.js",
+    "start": "cross-env NODE_ENV=production node server.js",
     "test": "vitest run --reporter verbose",
     "watch": "vite build --watch --mode development",
     "build": "vite build"
@@ -25,6 +26,7 @@
     "lithent"
   ],
   "dependencies": {
+    "cross-env": "^7.0.3",
     "express": "^4.21.1",
     "lithent": "workspace:*"
   },

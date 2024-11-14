@@ -1,4 +1,4 @@
-import { hydrateOnClient } from 'lithent/ssr';
+import { renderWithHydration } from 'lithent/ssr';
 import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
@@ -22,4 +22,4 @@ const Index = mount(r => {
   );
 });
 
-export default hydrateOnClient(Index);
+export default renderWithHydration(Index);
