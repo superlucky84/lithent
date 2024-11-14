@@ -1,4 +1,4 @@
-import { h, render } from 'lithent';
+import { render } from 'lithent';
 import type { WDom } from 'lithent';
 
 /**
