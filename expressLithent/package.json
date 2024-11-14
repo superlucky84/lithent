@@ -5,11 +5,11 @@
   "description": "lithentSsr",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/lithentSsr.umd.js",
-  "module": "./dist/lithentSsr.mjs",
+  "main": "./dist/expressLithent.umd.js",
+  "module": "./dist/expressLithent.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "concurrently \"nodemon --watch server.js --watch src server.js \" \"vite build --watch --mode development\"",
+    "dev": "node watch-and-restart.js",
     "test": "vitest run --reporter verbose",
     "watch": "vite build --watch --mode development",
     "build": "vite build"
@@ -33,7 +33,6 @@
   },
   "devDependencies": {
     "chokidar": "^4.0.1",
-    "concurrently": "^9.1.0",
-    "nodemon": "^3.1.7"
+    "concurrently": "^9.1.0"
   }
 }

@@ -31,22 +31,25 @@ async function createServer() {
     const path = key.split('.')[0];
     console.log('PATH', path);
 
-    app.get(`/${path === 'index' ? '' : path}`, async (_req, res) => {
+    app.get(`/${path === 'index' ? '' : path}`, async (req, res) => {
       try {
         // React 컴포넌트를 가져와서 렌더링
         // const { default: Root } = await vite.ssrLoadModule('@/index.tsx');
-        const scriptSrc = getScriptPath(path);
         const { default: Page } = await vite.ssrLoadModule(
           `@/pages/${path}.tsx`
         );
         const appHtmlOrig = `<!doctype html>${renderToString(h(Page))}`;
 
-        const appHtml = appHtmlOrig.replace(
-          '<script type="module" data-type="lithent-ssr-module"></script>',
-          `<script type="module" src="${scriptSrc}"></script>`
+        const transformedHtml = await vite.transformIndexHtml(
+          req.originalUrl,
+          appHtmlOrig
+        );
+        const finalHtml = transformedHtml.replace(
+          '</body>',
+          `<script type="module" src="/src/pages/${path}.tsx"></script></body>`
         );
 
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(appHtml);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       } catch (e) {
         vite.ssrFixStacktrace(e);
         console.error(e);
