@@ -2,8 +2,6 @@
 import path, { resolve } from 'path';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import { h } from 'lithent';
-import { renderToString } from 'lithent/ssr';
 import fs from 'fs';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
@@ -33,12 +31,12 @@ async function createServer() {
 
     app.get(`/${path === 'index' ? '' : path}`, async (req, res) => {
       try {
-        // React 컴포넌트를 가져와서 렌더링
-        // const { default: Root } = await vite.ssrLoadModule('@/index.tsx');
+        console.log('ENV', process.env.NODE_ENV);
+
         const { default: Page } = await vite.ssrLoadModule(
           `@/pages/${path}.tsx`
         );
-        const appHtmlOrig = `<!doctype html>${renderToString(h(Page))}`;
+        const appHtmlOrig = `<!doctype html>${Page}`;
 
         const transformedHtml = await vite.transformIndexHtml(
           req.originalUrl,

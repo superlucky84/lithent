@@ -1,5 +1,5 @@
 import { h, render } from 'lithent';
-import type { WDom, TagFunction } from 'lithent';
+import type { WDom } from 'lithent';
 
 /**
  * hydration
@@ -14,14 +14,6 @@ export function hydration(wDom: WDom, wrapElement: HTMLElement) {
    * Attach events to wDom.
    */
   render(wDom, wrapElement, null, true);
-}
-
-export function hydrateOnClient(tagFunction: TagFunction) {
-  if (typeof window !== 'undefined') {
-    hydration(h(tagFunction, {}), document.documentElement);
-    return;
-  }
-  return tagFunction;
 }
 
 /**
