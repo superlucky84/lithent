@@ -11,16 +11,20 @@ async function createServer() {
   const app = express();
 
   // Vite 서버 생성 및 미들웨어 적용
-  const vite = await createViteServer({
-    server: { middlewareMode: 'ssr' },
-    root: process.cwd(),
-    plugins: [],
-    resolve: {
-      alias: {
-        '@': '/src',
+  const isDev = process.env.NODE_ENV === 'development';
+  let vite;
+  if (isDev) {
+    vite = await createViteServer({
+      server: { middlewareMode: 'ssr' },
+      root: process.cwd(),
+      plugins: [],
+      resolve: {
+        alias: {
+          '@': '/src',
+        },
       },
-    },
-  });
+    });
+  }
 
   app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
 
@@ -49,7 +53,7 @@ async function createServer() {
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       } catch (e) {
-        vite.ssrFixStacktrace(e);
+        isDev && vite.ssrFixStacktrace(e);
         console.error(e);
         res.status(500).end(e.message);
       }
