@@ -1,8 +1,8 @@
 {
   "type": "module",
-  "name": "express-lithent",
+  "name": "create-express-lithent",
   "version": "0.0.1",
-  "description": "lithentSsr",
+  "description": "create-express-lithent",
   "private": true,
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/expressLithent.umd.js",
