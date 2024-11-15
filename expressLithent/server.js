@@ -11,7 +11,8 @@ async function createServer() {
   const app = express();
 
   // Vite 서버 생성 및 미들웨어 적용
-  const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV !== 'production';
+  console.log('ISDEV', isDev, process.env.NODE_ENV);
   let vite;
   if (isDev) {
     vite = await createViteServer({
@@ -47,7 +48,7 @@ async function createServer() {
           );
           finalHtml = transformedHtml.replace(
             '</body>',
-            `<script type="module" src="/src/pages/${path}.tsx"></script></body>`
+            `<script type="module" src="/src/pages/${routePath}.tsx"></script></body>`
           );
         } else {
           const resourcePath = getScriptPath(routePath);
@@ -80,15 +81,6 @@ async function createServer() {
 }
 
 createServer();
-
-/*
-function getScriptPath(routeString) {
-  const directoryPath = path.resolve(__dirname, 'dist/assets');
-  const files = fs.readdirSync(directoryPath);
-  const targetFile = files.find(file => file.startsWith(`${routeString}.tsx`));
-  return targetFile ? `/dist/assets/${targetFile}` : null;
-}
-*/
 
 function getScriptPath(routeString) {
   const directoryPath = path.resolve(__dirname, 'dist');
