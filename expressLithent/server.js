@@ -29,27 +29,39 @@ async function createServer() {
   app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
 
   Object.entries(entries).forEach(([key, value]) => {
-    console.log(key, value);
-    const path = key.split('.')[0];
-    console.log('PATH', path);
+    const routePath = key.split('.')[0];
 
-    app.get(`/${path === 'index' ? '' : path}`, async (req, res) => {
+    app.get(`/${routePath === 'index' ? '' : routePath}`, async (req, res) => {
       try {
-        console.log('ENV', process.env.NODE_ENV);
+        let finalHtml = '';
 
-        const { default: Page } = await vite.ssrLoadModule(
-          `@/pages/${path}.tsx`
-        );
-        const appHtmlOrig = `<!doctype html>${Page}`;
+        if (isDev) {
+          const { default: Page } = await vite.ssrLoadModule(
+            `@/pages/${routePath}.tsx`
+          );
+          const appHtmlOrig = `<!doctype html>${Page}`;
 
-        const transformedHtml = await vite.transformIndexHtml(
-          req.originalUrl,
-          appHtmlOrig
-        );
-        const finalHtml = transformedHtml.replace(
-          '</body>',
-          `<script type="module" src="/src/pages/${path}.tsx"></script></body>`
-        );
+          const transformedHtml = await vite.transformIndexHtml(
+            req.originalUrl,
+            appHtmlOrig
+          );
+          finalHtml = transformedHtml.replace(
+            '</body>',
+            `<script type="module" src="/src/pages/${path}.tsx"></script></body>`
+          );
+        } else {
+          const resourcePath = getScriptPath(routePath);
+          const modulePath = path.resolve(__dirname, resourcePath);
+          const module = await import(modulePath);
+          const Page = module.default;
+          const appHtmlOrig = `<!doctype html>${Page}`;
+
+          const scriptPath = resourcePath; // 경로에 맞게 수정 필요
+          finalHtml = appHtmlOrig.replace(
+            '</body>',
+            `<script type="module" src="${scriptPath}"></script></body>`
+          );
+        }
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       } catch (e) {
@@ -60,7 +72,7 @@ async function createServer() {
     });
   });
 
-  app.use(vite.middlewares);
+  isDev && app.use(vite.middlewares);
 
   app.listen(3000, () => {
     console.log('Server is running at http://localhost:3000');
@@ -69,11 +81,22 @@ async function createServer() {
 
 createServer();
 
+/*
 function getScriptPath(routeString) {
   const directoryPath = path.resolve(__dirname, 'dist/assets');
   const files = fs.readdirSync(directoryPath);
   const targetFile = files.find(file => file.startsWith(`${routeString}.tsx`));
   return targetFile ? `/dist/assets/${targetFile}` : null;
+}
+*/
+
+function getScriptPath(routeString) {
+  const directoryPath = path.resolve(__dirname, 'dist');
+  const files = fs.readdirSync(directoryPath);
+  const targetFile = files.find(
+    file => file.startsWith(`${routeString}`) && file.endsWith('.js')
+  );
+  return targetFile ? `dist/${targetFile}` : null;
 }
 
 function getEntries() {

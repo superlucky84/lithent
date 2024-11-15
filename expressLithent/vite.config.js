@@ -24,17 +24,22 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    lib: {
+      entry: cachedEntries,
+      name: 'MyLibrary',
+      formats: ['es'], // 원하는 포맷으로 설정 (ESM, UMD 등)
+      fileName: (format, entryName) => `${entryName}.${format}.js`, // 출력 파일 이름 설정
+    },
     rollupOptions: {
-      input: cachedEntries, // 초기 엔트리 설정
-      external: mode === 'production' ? [] : [],
+      // 각 엔트리마다 별도의 번들 파일을 생성
+      input: cachedEntries,
       output: {
         globals: {
-          lithent: 'lithent',
+          lithent: 'lithent', // 글로벌 변수 설정 (필요시)
         },
+        entryFileNames: '[name].js', // 출력 파일 이름
       },
     },
-    outDir: 'dist',
-    emptyOutDir: true,
   },
   test: {
     environment: 'jsdom',
