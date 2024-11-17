@@ -9,6 +9,7 @@
   "module": "./dist/expressLithent.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "test": "pnpm build && pnpm start",
     "build": "tsc",
     "start": "node ./dist/cli.js"
   },
