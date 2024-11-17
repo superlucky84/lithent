@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "create-express-lithent",
+  "name": "express-lithent",
   "version": "0.0.1",
   "description": "create-express-lithent",
   "private": true,
