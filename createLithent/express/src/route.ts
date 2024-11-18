@@ -9,11 +9,14 @@ const cacheRender = {} as any;
 async function loadPage(dynamicPath: string) {
   const key = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
   if (cacheRender[key]) {
+    console.log('11');
     cacheRender[key]();
   } else if (modules[key]) {
-    const res = await import(key);
-    // const kk = await modules[key](); // 모듈을 비동기로 로드
-    cacheRender[key] = res.default;
+    // const res = await import(key);
+    const res = await modules[key](); // 모듈을 비동기로 로드
+    //@ts-ignore
+    res.default();
+    cacheRender[key] = (res as any).default;
   }
 }
 
@@ -56,7 +59,9 @@ export function render(tagFunction: TagFunction) {
 
     routeRef.destroy = destroy;
 
-    return destroy;
+    return typeof destroy === 'string'
+      ? destroy
+      : () => lRender(h(tagFunction, {}), document.documentElement);
   }
 
   const rRender = () => lRender(h(tagFunction, {}), document.documentElement);
