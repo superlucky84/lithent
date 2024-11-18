@@ -1,13 +1,14 @@
 /*
 import process from "node:process";
-import fse from "fs-extra";
 import stripAnsi from "strip-ansi";
 import rm from "rimraf";
 import execa from "execa";
-import sortPackageJSON from "sort-package-json";
 */
+import sortPackageJSON from 'sort-package-json';
 import fs from 'node:fs';
 import os from 'node:os';
+// @ts-ignore
+import fse from 'fs-extra';
 import path from 'node:path';
 import arg from 'arg';
 import {
@@ -19,8 +20,17 @@ import {
   isInteractive,
   info,
   toValidProjectName,
+  ensureDirectory,
+  stripDirectoryFromPath,
+  debug,
+  fileExists,
+  isValidJsonObject,
+  getDirectoryFilesRecursive,
+  IGNORED_TEMPLATE_DIRECTORIES,
 } from './utils.js';
+import { renderLoadingIndicator } from './loading-indicator.js';
 import { prompt } from './prompt.js';
+import { copyTemplate, CopyTemplateError } from './copy-template.js';
 
 const packageManagerExecScript: Record<PackageManager, string> = {
   npm: 'npx',
@@ -63,7 +73,12 @@ export async function createRemix(argv: string[]) {
     return;
   }
 
-  let steps = [introStep, projectNameStep];
+  let steps = [
+    introStep,
+    projectNameStep,
+    copyTemplateToTempDirStep,
+    copyTempDirToAppDirStep,
+  ];
 
   try {
     for (let step of steps) {
@@ -99,7 +114,7 @@ async function projectNameStep(ctx: Context) {
       type: 'text',
       label: title('dir'),
       message: 'Where should we create your new project?',
-      initial: './my-remix-app',
+      initial: './my-lithent-app',
     });
     ctx.cwd = name!;
     ctx.projectName = toValidProjectName(name!);
@@ -280,7 +295,7 @@ async function getContext(argv: string[]): Promise<Context> {
   let context: Context = {
     tempDir: path.join(
       await fs.promises.realpath(os.tmpdir()),
-      `create-remix--${Math.random().toString(36).substr(2, 8)}`
+      `create-lithent--${Math.random().toString(36).substr(2, 8)}`
     ),
     cwd,
     overwrite,
@@ -312,4 +327,228 @@ function validatePackageManager(pkgManager: string): PackageManager {
   return packageManagerExecScript.hasOwnProperty(pkgManager)
     ? (pkgManager as PackageManager)
     : 'npm';
+}
+
+async function copyTemplateToTempDirStep(ctx: Context) {
+  if (ctx.template) {
+    log('');
+    info('Template:', ['Using ', color.reset(ctx.template), '...']);
+  } else {
+    log('');
+    info('Using basic template', [
+      'See https://lithent/guides/templates for more',
+    ]);
+  }
+
+  let template =
+    ctx.template ??
+    'https://github.com/superlucky84/lithent/tree/createlithent/createLithent/express';
+
+  console.log('TEMPLATE', template, ctx.tempDir);
+
+  await loadingIndicator({
+    start: 'Template copying...',
+    end: 'Template copied',
+    while: async () => {
+      await ensureDirectory(ctx.tempDir);
+      if (ctx.debug) {
+        debug(`Extracting to: ${ctx.tempDir}`);
+      }
+
+      let result = await copyTemplate(template, ctx.tempDir, {
+        debug: ctx.debug,
+        token: ctx.token,
+        async onError(err) {
+          error(
+            'Oh no!',
+            err instanceof CopyTemplateError
+              ? err.message
+              : 'Something went wrong. Run `create-remix --debug` to see more info.\n\n' +
+                  'Open an issue to report the problem at '
+          );
+          throw err;
+        },
+        async log(message) {
+          if (ctx.debug) {
+            debug(message);
+            await sleep(500);
+          }
+        },
+      });
+
+      if (result?.localTemplateDirectory) {
+        ctx.tempDir = path.resolve(result.localTemplateDirectory);
+      }
+    },
+    ctx,
+  });
+}
+
+async function copyTempDirToAppDirStep(ctx: Context) {
+  await ensureDirectory(ctx.cwd);
+
+  let files1 = await getDirectoryFilesRecursive(ctx.tempDir);
+  let files2 = await getDirectoryFilesRecursive(ctx.cwd);
+  let collisions = files1
+    .filter(f => files2.includes(f))
+    .sort((a, b) => a.localeCompare(b));
+
+  if (collisions.length > 0) {
+    let getFileList = (prefix: string) => {
+      let moreFiles = collisions.length - 5;
+      let lines = ['', ...collisions.slice(0, 5)];
+      if (moreFiles > 0) {
+        lines.push(`and ${moreFiles} more...`);
+      }
+      return lines.join(`\n${prefix}`);
+    };
+
+    if (ctx.overwrite) {
+      info(
+        'Overwrite:',
+        `overwriting files due to \`--overwrite\`:${getFileList('           ')}`
+      );
+    } else if (!ctx.interactive) {
+      error(
+        'Oh no!',
+        `Destination directory contains files that would be overwritten\n` +
+          `         and no \`--overwrite\` flag was included in a non-interactive\n` +
+          `         environment. The following files would be overwritten:` +
+          getFileList('           ')
+      );
+      throw new Error(
+        'File collisions detected in a non-interactive environment'
+      );
+    } else {
+      if (ctx.debug) {
+        debug(`Colliding files:${getFileList('          ')}`);
+      }
+
+      let { overwrite } = await ctx.prompt({
+        name: 'overwrite',
+        type: 'confirm',
+        label: title('overwrite'),
+        message:
+          `Your project directory contains files that will be overwritten by\n` +
+          `             this template (you can force with \`--overwrite\`)\n\n` +
+          `             Files that would be overwritten:` +
+          `${getFileList('               ')}\n\n` +
+          `             Do you wish to continue?\n` +
+          `             `,
+        initial: false,
+      });
+      if (!overwrite) {
+        throw new Error('Exiting to avoid overwriting files');
+      }
+    }
+  }
+
+  await fse.copy(ctx.tempDir, ctx.cwd, {
+    //@ts-ignore
+    filter(src, dest) {
+      // We never copy .git/ or node_modules/ directories since it's highly
+      // unlikely we want them copied - and because templates are primarily
+      // being pulled from git tarballs which won't have .git/ and shouldn't
+      // have node_modules/
+      let file = stripDirectoryFromPath(ctx.tempDir, src);
+      let isIgnored = IGNORED_TEMPLATE_DIRECTORIES.includes(file);
+      if (isIgnored) {
+        if (ctx.debug) {
+          debug(`Skipping copy of ${file} directory from template`);
+        }
+        return false;
+      }
+      return true;
+    },
+  });
+
+  await updatePackageJSON(ctx);
+  ctx.initScriptPath = await getInitScriptPath(ctx.cwd);
+}
+
+async function getInitScriptPath(cwd: string) {
+  let initScriptDir = path.join(cwd, 'remix.init');
+  let initScriptPath = path.resolve(initScriptDir, 'index.js');
+  return (await fileExists(initScriptPath)) ? initScriptPath : null;
+}
+
+async function updatePackageJSON(ctx: Context) {
+  let packageJSONPath = path.join(ctx.cwd, 'package.json');
+  if (!fs.existsSync(packageJSONPath)) {
+    let relativePath = path.relative(process.cwd(), ctx.cwd);
+    error(
+      'Oh no!',
+      'The provided template must be a Remix project with a `package.json` ' +
+        `file, but that file does not exist in ${color.bold(relativePath)}.`
+    );
+    throw new Error(`package.json does not exist in ${ctx.cwd}`);
+  }
+
+  let contents = await fs.promises.readFile(packageJSONPath, 'utf-8');
+  let packageJSON: any;
+  try {
+    packageJSON = JSON.parse(contents);
+    if (!isValidJsonObject(packageJSON)) {
+      throw Error();
+    }
+  } catch (err) {
+    error(
+      'Oh no!',
+      'The provided template must be a Remix project with a `package.json` ' +
+        `file, but that file is invalid.`
+    );
+    throw err;
+  }
+
+  for (let pkgKey of ['dependencies', 'devDependencies'] as const) {
+    let dependencies = packageJSON[pkgKey];
+    if (!dependencies) continue;
+
+    if (!isValidJsonObject(dependencies)) {
+      error(
+        'Oh no!',
+        'The provided template must be a Remix project with a `package.json` ' +
+          `file, but its ${pkgKey} value is invalid.`
+      );
+      throw new Error(`package.json ${pkgKey} are invalid`);
+    }
+
+    for (let dependency in dependencies) {
+      let version = dependencies[dependency];
+      if (
+        (dependency.startsWith('@remix-run/') || dependency === 'remix') &&
+        version === '*'
+      ) {
+        /*
+        dependencies[dependency] = semver.prerelease(ctx.remixVersion)
+          ? // Templates created from prereleases should pin to a specific version
+            ctx.remixVersion
+          : '^' + ctx.remixVersion;
+          */
+      }
+    }
+  }
+
+  if (!ctx.initScriptPath) {
+    packageJSON.name = ctx.projectName;
+  }
+
+  fs.promises.writeFile(
+    packageJSONPath,
+    JSON.stringify(sortPackageJSON(packageJSON), null, 2),
+    'utf-8'
+  );
+}
+
+async function loadingIndicator(args: {
+  start: string;
+  end: string;
+  while: (...args: any) => Promise<any>;
+  ctx: Context;
+}) {
+  let { ctx, ...rest } = args;
+  await renderLoadingIndicator({
+    ...rest,
+    noMotion: args.ctx.noMotion,
+  });
 }
