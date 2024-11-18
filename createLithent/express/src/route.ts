@@ -3,21 +3,17 @@ import type { TagFunction } from 'lithent';
 import { renderWithHydration } from 'lithent/ssr';
 import { store } from 'lithent/helper';
 
-/*
-const pageMap: Record<string, string> = {
-  '/': '@/pages/index',
-  '/about': '@/pages/about',
-  '/contact': '@/pages/contact',
-};
-*/
-
-// @/pages 디렉터리 내의 모든 파일을 가져오는 glob 패턴
 const modules = import.meta.glob('./pages/*.tsx');
+const cacheRender = {} as any;
 
-function loadPage(dynamicPath: string) {
+async function loadPage(dynamicPath: string) {
   const key = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
-  if (modules[key]) {
-    modules[key](); // 모듈을 비동기로 로드
+  if (cacheRender[key]) {
+    cacheRender[key]();
+  } else if (modules[key]) {
+    const res = await import(key);
+    // const kk = await modules[key](); // 모듈을 비동기로 로드
+    cacheRender[key] = res.default;
   }
 }
 
@@ -39,19 +35,10 @@ export const routeRef = routeAssign(
       typeof state.destroy === 'function'
     ) {
       init = false;
-      console.log(init, state.page);
       state.destroy();
-      // render('', document.documentElement);
-      // import(`@/pages${state.page === '/' ? '/index' : state.page}`).then(
-      /*
-      import(`@/pages/main`).then(res => {
-        console.log('RES', res);
-      });
-      */
 
       loadPage(state.page);
     }
-    console.log('7777');
     prePage = state.page;
   },
   store => [store.page, store.destroy]
@@ -72,9 +59,10 @@ export function render(tagFunction: TagFunction) {
     return destroy;
   }
 
-  const destroy = lRender(h(tagFunction, {}), document.documentElement);
+  const rRender = () => lRender(h(tagFunction, {}), document.documentElement);
+  const destroy = rRender();
 
   routeRef.destroy = destroy;
 
-  return destroy;
+  return rRender;
 }
