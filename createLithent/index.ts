@@ -1,9 +1,9 @@
 /*
 import process from "node:process";
-import stripAnsi from "strip-ansi";
 import rm from "rimraf";
 import execa from "execa";
 */
+import stripAnsi from 'strip-ansi';
 import sortPackageJSON from 'sort-package-json';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -78,6 +78,7 @@ export async function createRemix(argv: string[]) {
     projectNameStep,
     copyTemplateToTempDirStep,
     copyTempDirToAppDirStep,
+    doneStep,
   ];
 
   try {
@@ -538,6 +539,31 @@ async function updatePackageJSON(ctx: Context) {
     JSON.stringify(sortPackageJSON(packageJSON), null, 2),
     'utf-8'
   );
+}
+
+async function doneStep(ctx: Context) {
+  let projectDir = path.relative(process.cwd(), ctx.cwd);
+
+  let max = process.stdout.columns;
+  let prefix = max < 80 ? ' ' : ' '.repeat(9);
+  await sleep(200);
+
+  log(`\n ${color.bgWhite(color.black(' done '))}  That's it!`);
+  await sleep(100);
+  if (projectDir !== '') {
+    let enter = [
+      `\n${prefix}Enter your project directory using`,
+      color.cyan(`cd .${path.sep}${projectDir}`),
+    ];
+    let len = enter[0].length + stripAnsi(enter[1]).length;
+    log(enter.join(len > max ? '\n' + prefix : ' '));
+  }
+  log(
+    `${prefix}Check out ${color.bold(
+      'README.md'
+    )} for development and deploy instructions.`
+  );
+  await sleep(200);
 }
 
 async function loadingIndicator(args: {
