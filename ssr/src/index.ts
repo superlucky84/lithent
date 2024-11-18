@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { h } from 'lithent';
 import type { TagFunction } from 'lithent';
 import Test from '@/tests/tostring';
 import { renderToString as _renderToString } from '@/renderToString';
@@ -14,11 +14,6 @@ export function renderWithHydration(tagFunction: TagFunction) {
 
   return _renderToString(h(tagFunction, {}));
 }
-
-export const Script = mount(() => {
-  return () =>
-    h('script', { type: 'module', 'data-type': 'lithent-ssr-module' });
-});
 
 let _run: ((wrap: HTMLElement) => void) | undefined;
 
