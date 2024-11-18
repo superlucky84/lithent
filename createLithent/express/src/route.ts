@@ -12,10 +12,10 @@ const pageMap: Record<string, string> = {
 */
 
 // @/pages 디렉터리 내의 모든 파일을 가져오는 glob 패턴
-const modules = import.meta.glob('../pages/*.tsx');
+const modules = import.meta.glob('./pages/*.tsx');
 
 function loadPage(dynamicPath: string) {
-  const key = `../pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
+  const key = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
   if (modules[key]) {
     modules[key](); // 모듈을 비동기로 로드
   }

@@ -1,7 +1,7 @@
 import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
-import { render } from '@/store/route';
+import { render } from '@/route';
 
 const Index = mount(r => {
   const num = state(1, r);

@@ -38,7 +38,11 @@ export const render = (
     wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else if (!isHydration) {
-    wrapElement.appendChild(Dom);
+    if (wrapElement.tagName === 'HTML' && wrapElement?.parentNode) {
+      (wrapElement.parentNode as HTMLElement).replaceChild(Dom, wrapElement);
+    } else {
+      wrapElement.appendChild(Dom);
+    }
   }
 
   execMountedQueue();
