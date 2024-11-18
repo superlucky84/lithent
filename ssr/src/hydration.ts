@@ -13,17 +13,21 @@ export function hydration(wDom: WDom, wrapElement: HTMLElement) {
   /**
    * Attach events to wDom.
    */
-  render(wDom, wrapElement, null, true);
+  return render(wDom, wrapElement, null, true);
 }
 
 /**
  * Attach the el property to wDom.
  */
 function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
+  const isVirtualType =
+    wDomOrig.type && ['fragment', 'loop'].includes(wDomOrig.type);
+
+  if (isVirtualType) {
+    wDomOrig.el = new DocumentFragment();
+  }
   const wDomList = flatFlagmentFromList(
-    wDomOrig.type && ['fragment', 'loop'].includes(wDomOrig.type)
-      ? [...(wDomOrig.children || [])]
-      : [wDomOrig]
+    isVirtualType ? [...(wDomOrig.children || [])] : [wDomOrig]
   );
   const realDomList =
     wrapElement.tagName === 'HTML'
@@ -103,6 +107,7 @@ function filteredEmptyTextNode(item: HTMLElement | Text) {
 function flatFlagmentFromList(wDomlist: WDom[]) {
   return wDomlist.reduce((acc: WDom[], item: WDom) => {
     if (item.type && ['fragment', 'loop'].includes(item.type)) {
+      item.el = new DocumentFragment();
       acc.push(...flatFlagmentFromList(item?.children || []));
     } else {
       acc.push(item);

@@ -12,7 +12,6 @@ async function createServer() {
 
   // Vite 서버 생성 및 미들웨어 적용
   const isDev = process.env.NODE_ENV !== 'production';
-  console.log('ISDEV', isDev, process.env.NODE_ENV);
   let vite;
   if (isDev) {
     vite = await createViteServer({

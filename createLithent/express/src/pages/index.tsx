@@ -1,7 +1,7 @@
-import { renderWithHydration } from 'lithent/ssr';
 import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
+import { render } from '@/store/route';
 
 const Index = mount(r => {
   const num = state(1, r);
@@ -14,7 +14,7 @@ const Index = mount(r => {
       <div>999</div>
       <div>
         <span>{num.value}</span>
-        main <button onClick={handleClick}>increase =-{num.value} </button>
+        INDEX <button onClick={handleClick}>increase =-{num.value} </button>
         ava
       </div>
       <div>7779</div>
@@ -22,4 +22,4 @@ const Index = mount(r => {
   );
 });
 
-export default renderWithHydration(Index);
+export default render(Index);

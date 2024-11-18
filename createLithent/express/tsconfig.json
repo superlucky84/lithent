@@ -21,6 +21,7 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
     "baseUrl": "./",
+    "types": ["vite/client"],
     "paths": {
       "@/*": ["src/*"]
     }

@@ -1,6 +1,6 @@
-import { renderWithHydration } from 'lithent/ssr';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
+import { render } from '@/store/route';
 
 const Sub = mount(_r => {
   const handleClick = () => {
@@ -15,4 +15,4 @@ const Sub = mount(_r => {
   );
 });
 
-export default renderWithHydration(Sub);
+export default render(Sub);

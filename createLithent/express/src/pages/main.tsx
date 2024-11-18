@@ -1,7 +1,7 @@
-import { renderWithHydration } from 'lithent/ssr';
 import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
+import { render } from '@/store/route';
 
 const Main = mount(r => {
   const num = state(1, r);
@@ -22,4 +22,4 @@ const Main = mount(r => {
   );
 });
 
-export default renderWithHydration(Main);
+export default render(Main);

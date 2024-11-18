@@ -9,8 +9,7 @@ export const hydration = _hydration;
 
 export function renderWithHydration(tagFunction: TagFunction) {
   if (typeof window !== 'undefined') {
-    hydration(h(tagFunction, {}), document.documentElement);
-    return;
+    return hydration(h(tagFunction, {}), document.documentElement);
   }
 
   return _renderToString(h(tagFunction, {}));
