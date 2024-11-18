@@ -10,14 +10,14 @@ const Index = mount(r => {
   };
   return () => (
     <Layout>
-      <div>09990</div>
+      <div>09991</div>
       <div>999</div>
       <div>
         <span>{num.value}</span>
         INDEX <button onClick={handleClick}>increase =-{num.value} </button>
         ava
       </div>
-      <div>7779</div>
+      <div>77790</div>
     </Layout>
   );
 });
