@@ -1,8 +1,8 @@
 /*
 import process from "node:process";
 import rm from "rimraf";
-import execa from "execa";
 */
+import execa from 'execa';
 import stripAnsi from 'strip-ansi';
 import sortPackageJSON from 'sort-package-json';
 import fs from 'node:fs';
@@ -65,9 +65,8 @@ interface Context {
 }
 
 export async function createRemix(argv: string[]) {
-  console.log('3333333');
   const ctx = await getContext(argv);
-  console.log('CLI', ctx.help);
+  console.log('CLI', ctx);
   if (ctx.help) {
     printHelp(ctx);
     return;
@@ -78,6 +77,8 @@ export async function createRemix(argv: string[]) {
     projectNameStep,
     copyTemplateToTempDirStep,
     copyTempDirToAppDirStep,
+    installDependenciesQuestionStep,
+    installDependenciesStep,
     doneStep,
   ];
 
@@ -564,6 +565,79 @@ async function doneStep(ctx: Context) {
     )} for development and deploy instructions.`
   );
   await sleep(200);
+}
+
+async function installDependenciesStep(ctx: Context) {
+  let { install, pkgManager, showInstallOutput, cwd } = ctx;
+
+  if (!install) {
+    await sleep(100);
+    info('Skipping install step.', [
+      'Remember to install dependencies after setup with ',
+      color.reset(`${pkgManager} install`),
+      '.',
+    ]);
+    return;
+  }
+
+  function runInstall() {
+    return installDependencies({
+      cwd,
+      pkgManager,
+      showInstallOutput,
+    });
+  }
+
+  if (showInstallOutput) {
+    log('');
+    info(`Install`, `Dependencies installing with ${pkgManager}...`);
+    log('');
+    await runInstall();
+    log('');
+    return;
+  }
+
+  log('');
+  await loadingIndicator({
+    start: `Dependencies installing with ${pkgManager}...`,
+    end: 'Dependencies installed',
+    while: runInstall,
+    ctx,
+  });
+}
+
+async function installDependencies({
+  pkgManager,
+  cwd,
+  showInstallOutput,
+}: {
+  pkgManager: PackageManager;
+  cwd: string;
+  showInstallOutput: boolean;
+}) {
+  try {
+    await execa(pkgManager, ['install'], {
+      cwd,
+      stdio: showInstallOutput ? 'inherit' : 'ignore',
+    });
+  } catch (err) {
+    error('Oh no!', 'Failed to install dependencies.');
+    throw err;
+  }
+}
+
+async function installDependenciesQuestionStep(ctx: Context) {
+  if (ctx.install === undefined) {
+    let { deps = true } = await ctx.prompt({
+      name: 'deps',
+      type: 'confirm',
+      label: title('deps'),
+      message: `Install dependencies with ${ctx.pkgManager}?`,
+      hint: 'recommended',
+      initial: true,
+    });
+    ctx.install = deps;
+  }
 }
 
 async function loadingIndicator(args: {
