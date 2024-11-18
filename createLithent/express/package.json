@@ -1,0 +1,40 @@
+{
+  "type": "module",
+  "name": "express-lithent",
+  "version": "0.0.1",
+  "description": "create-express-lithent",
+  "private": true,
+  "packageManager": "pnpm@7.6.0",
+  "main": "./dist/expressLithent.umd.js",
+  "module": "./dist/expressLithent.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "node watch-and-restart.js",
+    "start": "cross-env NODE_ENV=production node server.js",
+    "test": "vitest run --reporter verbose",
+    "watch": "vite build --watch --mode development",
+    "build": "vite build"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent"
+  ],
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "express": "^4.21.1",
+    "lithent": "workspace:*"
+  },
+  "volta": {
+    "node": "20.3.0"
+  },
+  "devDependencies": {
+    "chokidar": "^4.0.1",
+    "concurrently": "^9.1.0"
+  }
+}

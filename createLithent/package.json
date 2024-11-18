@@ -1,0 +1,55 @@
+{
+  "type": "module",
+  "name": "create-lithent",
+  "version": "0.0.1",
+  "description": "create-express-lithent",
+  "private": true,
+  "packageManager": "pnpm@7.6.0",
+  "main": "./dist/expressLithent.umd.js",
+  "module": "./dist/expressLithent.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "pnpm build && pnpm start",
+    "build": "tsc",
+    "start": "node ./dist/cli.js"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent"
+  ],
+  "dependencies": {
+    "arg": "^5.0.1",
+    "chalk": "^4.1.2",
+    "execa": "5.1.1",
+    "gunzip-maybe": "^1.4.2",
+    "log-update": "^5.0.1",
+    "proxy-agent": "^6.3.0",
+    "recursive-readdir": "^2.2.3",
+    "rimraf": "^4.1.2",
+    "semver": "^7.3.7",
+    "sisteransi": "^1.0.5",
+    "sort-package-json": "^1.55.0",
+    "strip-ansi": "^6.0.1",
+    "tar-fs": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/gunzip-maybe": "^1.4.0",
+    "@types/recursive-readdir": "^2.2.1",
+    "@types/tar-fs": "^2.0.1",
+    "esbuild": "0.17.6",
+    "esbuild-register": "^3.3.2",
+    "fs-extra": "^10.0.0",
+    "msw": "^1.2.3",
+    "tiny-invariant": "^1.2.0",
+    "ts-node": "^10.9.2"
+  },
+  "volta": {
+    "node": "20.3.0"
+  }
+}
