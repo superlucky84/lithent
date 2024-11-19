@@ -12,8 +12,6 @@ async function createServer() {
   const entries = getEntries();
   const app = express();
 
-  console.log('entries', entries);
-
   // Vite 서버 생성 및 미들웨어 적용
   const isDev = process.env.NODE_ENV !== 'production';
   let vite;
@@ -54,11 +52,16 @@ async function createServer() {
 
       app.get(`/${expressPath.replace(/_/g, ':')}`, async (req, res, next) => {
         if (
-          isDev &&
-          Object.values(req.params).includes('@vite-plugin-checker-runtime')
+          req.originalUrl === '/@vite-plugin-checker-runtime' ||
+          Object.values(req.params).includes('@vite-plugin-checker-runtime') ||
+          Object.values(req.params).includes('favicon.ico')
         ) {
           next();
+          return;
         }
+
+        console.log('EP', req.originalUrl, expressPath);
+
         const props = { params: req.params, query: req.query };
 
         try {
@@ -92,7 +95,7 @@ async function createServer() {
               import { routeRef } from '/src/route';
               routeRef.page = location.pathname;
               routeRef.destroy = hydration(h(Page, ${JSON.stringify(
-                props
+                Object.assign(props, { initProp })
               )}), document.documentElement);
               </script></body>`
             );
@@ -105,14 +108,17 @@ async function createServer() {
             const module = await import(modulePath);
             const Page = module.default;
             const makeInitProp = module.makeInitProp;
-            const PageString = renderToString(h(Page, props));
-            const appHtmlOrig = `<!doctype html>${PageString}`;
-            const scriptPath = resourcePath; // 경로에 맞게 수정 필요
 
             let initProp = null;
             if (makeInitProp) {
               initProp = await makeInitProp();
             }
+
+            const PageString = renderToString(
+              h(Page, Object.assign(props, { initProp }))
+            );
+            const appHtmlOrig = `<!doctype html>${PageString}`;
+            const scriptPath = resourcePath; // 경로에 맞게 수정 필요
 
             finalHtml = appHtmlOrig.replace(
               '</body>',

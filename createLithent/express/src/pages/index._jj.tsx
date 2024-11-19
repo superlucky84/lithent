@@ -30,7 +30,7 @@ const Main = mount<
 
   return () => (
     <Layout>
-      <div>9!0</div>
+      <div>!9!000</div>
       <div>{initProp.count}</div>
       <div>99999</div>
       <div>
