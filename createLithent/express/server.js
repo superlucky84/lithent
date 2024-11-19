@@ -60,8 +60,6 @@ async function createServer() {
           return;
         }
 
-        console.log('EP', req.originalUrl, expressPath);
-
         const props = { params: req.params, query: req.query };
 
         try {
