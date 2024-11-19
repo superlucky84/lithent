@@ -52,7 +52,13 @@ async function createServer() {
         .filter(item => item)
         .join('/');
 
-      app.get(`/${expressPath.replace(/_/g, ':')}`, async (req, res) => {
+      app.get(`/${expressPath.replace(/_/g, ':')}`, async (req, res, next) => {
+        if (
+          isDev &&
+          Object.values(req.params).includes('@vite-plugin-checker-runtime')
+        ) {
+          next();
+        }
         const props = { params: req.params, query: req.query };
 
         try {
