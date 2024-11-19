@@ -1,6 +1,5 @@
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
-import { render } from '@/route';
 
 const Sub = mount(_r => {
   const handleClick = () => {
@@ -15,4 +14,4 @@ const Sub = mount(_r => {
   );
 });
 
-export default render(Sub);
+export default Sub;

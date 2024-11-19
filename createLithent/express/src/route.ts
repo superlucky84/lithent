@@ -9,14 +9,14 @@ const cacheRender = {} as any;
 async function loadPage(dynamicPath: string) {
   const key = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
   if (cacheRender[key]) {
-    console.log('11');
     cacheRender[key]();
   } else if (modules[key]) {
     // const res = await import(key);
     const res = await modules[key](); // 모듈을 비동기로 로드
     //@ts-ignore
-    res.default();
-    cacheRender[key] = (res as any).default;
+    const render = () => lRender(h(res.default), document.documentElement);
+    render();
+    cacheRender[key] = render;
   }
 }
 
@@ -33,6 +33,7 @@ let prePage = '';
 export const routeRef = routeAssign(
   state => {
     if (
+      init &&
       state &&
       state.page !== prePage &&
       typeof state.destroy === 'function'
@@ -50,7 +51,6 @@ export const routeRef = routeAssign(
 if (typeof window !== 'undefined') {
   //@ts-ignore
   window.routeRef = routeRef;
-  routeRef.page = location.pathname;
 }
 
 export function render(tagFunction: TagFunction) {

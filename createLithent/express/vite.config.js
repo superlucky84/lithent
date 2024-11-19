@@ -6,6 +6,8 @@ import fs from 'fs';
 
 let cachedEntries = getEntries();
 
+console.log('CACHEDENTRIES', cachedEntries);
+
 export default defineConfig(({ mode }) => ({
   plugins: [
     checker({
@@ -49,11 +51,15 @@ export default defineConfig(({ mode }) => ({
 
 function getEntries() {
   const entriesDir = resolve(__dirname, 'src/pages');
+  const utilDir = resolve(__dirname, 'src');
   const files = fs.readdirSync(entriesDir);
-
-  return files.reduce((entries, file) => {
-    const name = file.replace(/\.js$/, ''); // 확장자 제거
+  const entries = files.reduce((entries, file) => {
+    const name = file; // 확장자 제거
     entries[name] = resolve(entriesDir, file);
     return entries;
   }, {});
+
+  entries['utils.ts'] = `${utilDir}/utils.ts`;
+
+  return entries;
 }

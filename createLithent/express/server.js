@@ -1,6 +1,8 @@
 // server.js
 import path, { resolve } from 'path';
 import express from 'express';
+import { h } from 'lithent';
+import { renderToString } from 'lithent/ssr';
 import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 
@@ -61,27 +63,47 @@ async function createServer() {
             const { default: Page } = await vite.ssrLoadModule(
               `@/pages/${key}`
             );
-            const appHtmlOrig = `<!doctype html>${Page}`;
+            const PageString = renderToString(h(Page));
+            const appHtmlOrig = `<!doctype html>${PageString}`;
 
             const transformedHtml = await vite.transformIndexHtml(
               req.originalUrl,
               appHtmlOrig
             );
+            // `<script type="module" src="/src/pages/${key}"></script></body>`
             finalHtml = transformedHtml.replace(
               '</body>',
-              `<script type="module" src="/src/pages/${key}"></script></body>`
+              `<script type="module">
+              import Page from '/src/pages/${key}';
+              import { h, hydration } from '/src/utils';
+              import { routeRef } from '/src/route';
+              routeRef.page = location.pathname;
+              routeRef.destroy = hydration(h(Page, {}), document.documentElement);
+              </script></body>`
             );
           } else {
+            const utilResourcePath = getScriptPath('utils.ts');
+            const routeResourcePath = getScriptPath('route.ts');
             const resourcePath = getScriptPath(key);
             const modulePath = path.resolve(__dirname, resourcePath);
+            // const utilPath = path.resolve(__dirname, utilResourcePath);
             const module = await import(modulePath);
             const Page = module.default;
-            const appHtmlOrig = `<!doctype html>${Page}`;
+            const PageString = renderToString(h(Page));
+            const appHtmlOrig = `<!doctype html>${PageString}`;
 
             const scriptPath = resourcePath; // 경로에 맞게 수정 필요
+            // `<script type="module" src="${scriptPath}"></script></body>`
             finalHtml = appHtmlOrig.replace(
               '</body>',
-              `<script type="module" src="${scriptPath}"></script></body>`
+              `<script type="module">
+              import Page from '/${scriptPath}';
+
+              import { h, hydration } from '/${utilResourcePath}';
+              import { routeRef } from '/${routeResourcePath}';
+              routeRef.page = location.pathname;
+              routeRef.destroy = window.hydration(h(Page, {}), document.documentElement);
+              </script></body>`
             );
           }
 

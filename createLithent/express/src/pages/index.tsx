@@ -1,7 +1,6 @@
 import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
-import { render } from '@/route';
 
 const Index = mount(r => {
   const num = state(1, r);
@@ -10,7 +9,7 @@ const Index = mount(r => {
   };
   return () => (
     <Layout>
-      <div>09991</div>
+      <div>12333444777</div>
       <div>999</div>
       <div>
         <span>{num.value}</span>
@@ -22,4 +21,4 @@ const Index = mount(r => {
   );
 });
 
-export default render(Index);
+export default Index;
