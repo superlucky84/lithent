@@ -58,21 +58,26 @@ async function createServer() {
         try {
           let finalHtml = '';
 
-          console.log('PARAMS', req.params);
-          console.log('PQUER', req.query);
-
           if (isDev) {
-            const { default: Page } = await vite.ssrLoadModule(
+            const { default: Page, makeInitProp } = await vite.ssrLoadModule(
               `@/pages/${key}`
             );
-            const PageString = renderToString(h(Page, props));
+
+            let initProp = null;
+            if (makeInitProp) {
+              initProp = await makeInitProp();
+            }
+
+            const PageString = renderToString(
+              h(Page, Object.assign(props, { initProp }))
+            );
             const appHtmlOrig = `<!doctype html>${PageString}`;
 
             const transformedHtml = await vite.transformIndexHtml(
               req.originalUrl,
               appHtmlOrig
             );
-            // `<script type="module" src="/src/pages/${key}"></script></body>`
+
             finalHtml = transformedHtml.replace(
               '</body>',
               `<script type="module">
@@ -90,14 +95,19 @@ async function createServer() {
             const routeResourcePath = getScriptPath('route.ts');
             const resourcePath = getScriptPath(key);
             const modulePath = path.resolve(__dirname, resourcePath);
-            // const utilPath = path.resolve(__dirname, utilResourcePath);
+
             const module = await import(modulePath);
             const Page = module.default;
+            const makeInitProp = module.makeInitProp;
             const PageString = renderToString(h(Page, props));
             const appHtmlOrig = `<!doctype html>${PageString}`;
-
             const scriptPath = resourcePath; // 경로에 맞게 수정 필요
-            // `<script type="module" src="${scriptPath}"></script></body>`
+
+            let initProp = null;
+            if (makeInitProp) {
+              initProp = await makeInitProp();
+            }
+
             finalHtml = appHtmlOrig.replace(
               '</body>',
               `<script type="module">
@@ -107,7 +117,7 @@ async function createServer() {
               import { routeRef } from '/${routeResourcePath}';
               routeRef.page = location.pathname;
               routeRef.destroy = hydration(h(Page, ${JSON.stringify(
-                props
+                Object.assign(props, { initProp })
               )}), document.documentElement);
               </script></body>`
             );

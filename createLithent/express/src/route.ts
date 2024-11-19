@@ -64,13 +64,20 @@ async function loadPage(dynamicPath: string) {
 
   console.log('KEY', key, params);
 
-  if (key) {
-    if (pageModules[key]) {
-      const res = await pageModules[key]();
-
-      //@ts-ignore
-      lRender(h(res.default, { params, query }), document.documentElement);
+  if (key && pageModules[key]) {
+    const res = await pageModules[key]();
+    //@ts-ignore
+    const makeInitProp = res.makeInitProp;
+    let initProp = null;
+    if (makeInitProp) {
+      initProp = await makeInitProp();
     }
+
+    lRender(
+      //@ts-ignore
+      h(res.default, { params, query, initProp }),
+      document.documentElement
+    );
   } else {
     location.href = comparePage;
   }
