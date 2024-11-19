@@ -11,8 +11,7 @@ async function loadPage(dynamicPath: string) {
   if (cacheRender[key]) {
     cacheRender[key]();
   } else if (modules[key]) {
-    // const res = await import(key);
-    const res = await modules[key](); // 모듈을 비동기로 로드
+    const res = await modules[key]();
     //@ts-ignore
     const render = () => lRender(h(res.default), document.documentElement);
     render();
@@ -33,7 +32,6 @@ let prePage = '';
 export const routeRef = routeAssign(
   state => {
     if (
-      init &&
       state &&
       state.page !== prePage &&
       typeof state.destroy === 'function'

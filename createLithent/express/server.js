@@ -102,7 +102,7 @@ async function createServer() {
               import { h, hydration } from '/${utilResourcePath}';
               import { routeRef } from '/${routeResourcePath}';
               routeRef.page = location.pathname;
-              routeRef.destroy = window.hydration(h(Page, {}), document.documentElement);
+              routeRef.destroy = hydration(h(Page, {}), document.documentElement);
               </script></body>`
             );
           }

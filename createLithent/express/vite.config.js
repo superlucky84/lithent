@@ -60,6 +60,7 @@ function getEntries() {
   }, {});
 
   entries['utils.ts'] = `${utilDir}/utils.ts`;
+  entries['route.ts'] = `${utilDir}/route.ts`;
 
   return entries;
 }
