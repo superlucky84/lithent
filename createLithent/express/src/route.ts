@@ -3,15 +3,29 @@ import type { TagFunction } from 'lithent';
 import { renderWithHydration } from 'lithent/ssr';
 import { store } from 'lithent/helper';
 
-const modules = import.meta.glob('./pages/*.tsx');
-const cacheRender = {} as any;
+const pageModules = import.meta.glob('./pages/*.tsx');
+const cacheRender: { [key: string]: () => void } = {};
+
+function findPageModlueKey(pageModuleKeys: string[], key: string) {
+  const keySegmentList = key.split('/');
+  console.log('KEYSEGMENTLIST', keySegmentList);
+
+  console.log(pageModuleKeys);
+
+  pageModuleKeys.find(item => {
+    const moduleSegmentList = item.split('/');
+    console.log('MODULESEGMENTLIST', moduleSegmentList);
+  });
+}
 
 async function loadPage(dynamicPath: string) {
   const key = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
+  findPageModlueKey(Object.keys(pageModules), key);
+
   if (cacheRender[key]) {
     cacheRender[key]();
-  } else if (modules[key]) {
-    const res = await modules[key]();
+  } else if (pageModules[key]) {
+    const res = await pageModules[key]();
     //@ts-ignore
     const render = () => lRender(h(res.default), document.documentElement);
     render();
