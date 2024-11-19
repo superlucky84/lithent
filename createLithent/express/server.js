@@ -122,7 +122,15 @@ async function createServer() {
       });
     });
 
-  isDev && app.use(vite.middlewares);
+  // 404 핸들러
+  if (isDev) {
+    app.use(vite.middlewares);
+  } else {
+    app.use((_req, res, next) => {
+      res.status(404).set({ 'Content-Type': 'text/html' }).end('404 Not Found');
+      next();
+    });
+  }
 
   app.listen(3000, () => {
     console.log('Server is running at http://localhost:3000');
