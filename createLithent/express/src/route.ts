@@ -7,13 +7,13 @@ const pageModules = import.meta.glob('./pages/*.tsx');
 const cacheRender: { [key: string]: () => void } = {};
 
 function findPageModlueKey(pageModuleKeys: string[], key: string) {
-  const keySegmentList = key.split('/');
-  console.log('KEYSEGMENTLIST', keySegmentList);
+  console.log('KEY', key);
+  console.log('KEYSEGMENTLIST', key.split(/(?:\/|\.)/));
 
   console.log(pageModuleKeys);
 
   pageModuleKeys.find(item => {
-    const moduleSegmentList = item.split('/');
+    const moduleSegmentList = item.split(/(?:\/|\.)/);
     console.log('MODULESEGMENTLIST', moduleSegmentList);
   });
 }
