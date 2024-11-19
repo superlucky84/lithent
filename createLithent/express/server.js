@@ -53,6 +53,8 @@ async function createServer() {
         .join('/');
 
       app.get(`/${expressPath.replace(/_/g, ':')}`, async (req, res) => {
+        const props = { params: req.params, query: req.query };
+
         try {
           let finalHtml = '';
 
@@ -63,7 +65,7 @@ async function createServer() {
             const { default: Page } = await vite.ssrLoadModule(
               `@/pages/${key}`
             );
-            const PageString = renderToString(h(Page));
+            const PageString = renderToString(h(Page, props));
             const appHtmlOrig = `<!doctype html>${PageString}`;
 
             const transformedHtml = await vite.transformIndexHtml(
@@ -78,7 +80,9 @@ async function createServer() {
               import { h, hydration } from '/src/utils';
               import { routeRef } from '/src/route';
               routeRef.page = location.pathname;
-              routeRef.destroy = hydration(h(Page, {}), document.documentElement);
+              routeRef.destroy = hydration(h(Page, ${JSON.stringify(
+                props
+              )}), document.documentElement);
               </script></body>`
             );
           } else {
@@ -89,7 +93,7 @@ async function createServer() {
             // const utilPath = path.resolve(__dirname, utilResourcePath);
             const module = await import(modulePath);
             const Page = module.default;
-            const PageString = renderToString(h(Page));
+            const PageString = renderToString(h(Page, props));
             const appHtmlOrig = `<!doctype html>${PageString}`;
 
             const scriptPath = resourcePath; // 경로에 맞게 수정 필요
@@ -102,7 +106,9 @@ async function createServer() {
               import { h, hydration } from '/${utilResourcePath}';
               import { routeRef } from '/${routeResourcePath}';
               routeRef.page = location.pathname;
-              routeRef.destroy = hydration(h(Page, {}), document.documentElement);
+              routeRef.destroy = hydration(h(Page, ${JSON.stringify(
+                props
+              )}), document.documentElement);
               </script></body>`
             );
           }

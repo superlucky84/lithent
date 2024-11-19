@@ -1,13 +1,17 @@
 import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
-import { render } from '@/route';
+import { PageProps } from '@/types';
 
-const Main = mount(r => {
+const Main = mount<PageProps>((r, props) => {
+  const params = props.params;
   const num = state(1, r);
   const handleClick = () => {
     num.value += 1;
   };
+
+  console.log('PARAMS', params);
+
   return () => (
     <Layout>
       <div>9!0</div>
@@ -22,4 +26,4 @@ const Main = mount(r => {
   );
 });
 
-export default render(Main);
+export default Main;
