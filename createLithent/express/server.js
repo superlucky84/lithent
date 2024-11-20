@@ -8,25 +8,25 @@ import fs from 'fs';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
+// Vite 서버 생성 및 미들웨어 적용
+const isDev = process.env.NODE_ENV !== 'production';
+let vite;
+if (isDev) {
+  vite = await createViteServer({
+    server: { middlewareMode: 'ssr', hmr: true },
+    root: process.cwd(),
+    plugins: [],
+    resolve: {
+      alias: {
+        '@': '/src',
+      },
+    },
+  });
+}
+
 async function createServer() {
   const entries = getEntries();
   const app = express();
-
-  // Vite 서버 생성 및 미들웨어 적용
-  const isDev = process.env.NODE_ENV !== 'production';
-  let vite;
-  if (isDev) {
-    vite = await createViteServer({
-      server: { middlewareMode: 'ssr', hmr: true },
-      root: process.cwd(),
-      plugins: [],
-      resolve: {
-        alias: {
-          '@': '/src',
-        },
-      },
-    });
-  }
 
   if (!isDev) {
     app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
