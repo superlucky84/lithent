@@ -5,6 +5,7 @@ import { h } from 'lithent';
 import { renderToString } from 'lithent/ssr';
 import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
+import sortFiles from './sortFiles.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
@@ -32,62 +33,53 @@ async function createServer() {
     app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
   }
 
-  Object.entries(entries)
-    .sort((a, b) => {
-      if (a[0].length > b[0].length) {
-        return 1;
-      } else if (a[0].length < b[0].length) {
-        return -1;
+  sortFiles(Object.keys(entries)).forEach(key => {
+    const pathSplit = key.split('.');
+    const newPathSplit = pathSplit.slice(0, pathSplit.length - 1);
+
+    const expressPath = newPathSplit
+      .map(item => (item === 'index' ? '' : item))
+      .filter(item => item)
+      .join('/');
+
+    app.get(`/${expressPath.replace(/_/g, ':')}`, async (req, res, next) => {
+      if (
+        req.originalUrl === '/@vite-plugin-checker-runtime' ||
+        Object.values(req.params).includes('@vite-plugin-checker-runtime') ||
+        Object.values(req.params).includes('favicon.ico')
+      ) {
+        next();
+        return;
       }
-      return 0;
-    })
-    .forEach(([key, value]) => {
-      const pathSplit = key.split('.');
-      const newPathSplit = pathSplit.slice(0, pathSplit.length - 1);
 
-      const expressPath = newPathSplit
-        .map(item => (item === 'index' ? '' : item))
-        .filter(item => item)
-        .join('/');
+      const props = { params: req.params, query: req.query };
 
-      app.get(`/${expressPath.replace(/_/g, ':')}`, async (req, res, next) => {
-        if (
-          req.originalUrl === '/@vite-plugin-checker-runtime' ||
-          Object.values(req.params).includes('@vite-plugin-checker-runtime') ||
-          Object.values(req.params).includes('favicon.ico')
-        ) {
-          next();
-          return;
-        }
+      try {
+        let finalHtml = '';
 
-        const props = { params: req.params, query: req.query };
+        if (isDev) {
+          const { default: Page, makeInitProp } = await vite.ssrLoadModule(
+            `@/pages/${key}`
+          );
 
-        try {
-          let finalHtml = '';
+          let initProp = null;
+          if (makeInitProp) {
+            initProp = await makeInitProp();
+          }
 
-          if (isDev) {
-            const { default: Page, makeInitProp } = await vite.ssrLoadModule(
-              `@/pages/${key}`
-            );
+          const PageString = renderToString(
+            h(Page, Object.assign(props, { initProp }))
+          );
+          const appHtmlOrig = `<!doctype html>${PageString}`;
 
-            let initProp = null;
-            if (makeInitProp) {
-              initProp = await makeInitProp();
-            }
+          const transformedHtml = await vite.transformIndexHtml(
+            req.originalUrl,
+            appHtmlOrig
+          );
 
-            const PageString = renderToString(
-              h(Page, Object.assign(props, { initProp }))
-            );
-            const appHtmlOrig = `<!doctype html>${PageString}`;
-
-            const transformedHtml = await vite.transformIndexHtml(
-              req.originalUrl,
-              appHtmlOrig
-            );
-
-            finalHtml = transformedHtml.replace(
-              '</body>',
-              `<script type="module">
+          finalHtml = transformedHtml.replace(
+            '</body>',
+            `<script type="module">
               import Page from '/src/pages/${key}';
               import { h, hydration } from '/src/utils';
               import { makeRoute } from '/src/route';
@@ -98,31 +90,31 @@ async function createServer() {
                 Object.assign(props, { initProp })
               )}), document.documentElement);
               </script></body>`
-            );
-          } else {
-            const utilResourcePath = getScriptPath('utils.ts');
-            const routeResourcePath = getScriptPath('route.ts');
-            const resourcePath = getScriptPath(key);
-            const modulePath = path.resolve(__dirname, resourcePath);
+          );
+        } else {
+          const utilResourcePath = getScriptPath('utils.ts');
+          const routeResourcePath = getScriptPath('route.ts');
+          const resourcePath = getScriptPath(key);
+          const modulePath = path.resolve(__dirname, resourcePath);
 
-            const module = await import(modulePath);
-            const Page = module.default;
-            const makeInitProp = module.makeInitProp;
+          const module = await import(modulePath);
+          const Page = module.default;
+          const makeInitProp = module.makeInitProp;
 
-            let initProp = null;
-            if (makeInitProp) {
-              initProp = await makeInitProp();
-            }
+          let initProp = null;
+          if (makeInitProp) {
+            initProp = await makeInitProp();
+          }
 
-            const PageString = renderToString(
-              h(Page, Object.assign(props, { initProp }))
-            );
-            const appHtmlOrig = `<!doctype html>${PageString}`;
-            const scriptPath = resourcePath; // 경로에 맞게 수정 필요
+          const PageString = renderToString(
+            h(Page, Object.assign(props, { initProp }))
+          );
+          const appHtmlOrig = `<!doctype html>${PageString}`;
+          const scriptPath = resourcePath; // 경로에 맞게 수정 필요
 
-            finalHtml = appHtmlOrig.replace(
-              '</body>',
-              `<script type="module">
+          finalHtml = appHtmlOrig.replace(
+            '</body>',
+            `<script type="module">
               import Page from '/${scriptPath}';
 
               import { h, hydration } from '/${utilResourcePath}';
@@ -134,17 +126,17 @@ async function createServer() {
                 Object.assign(props, { initProp })
               )}), document.documentElement);
               </script></body>`
-            );
-          }
-
-          res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
-        } catch (e) {
-          isDev && vite.ssrFixStacktrace(e);
-          console.error(e);
-          res.status(500).end(e.message);
+          );
         }
-      });
+
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+      } catch (e) {
+        isDev && vite.ssrFixStacktrace(e);
+        console.error(e);
+        res.status(500).end(e.message);
+      }
     });
+  });
 
   // 404 핸들러
   if (isDev) {

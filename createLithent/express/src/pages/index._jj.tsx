@@ -35,7 +35,7 @@ const Main = mount<
       <div>99999</div>
       <div>
         <span>{num.value}</span>
-        main <button onClick={handleClick}>increase =-{num.value} </button>
+        index <button onClick={handleClick}>increase =-{num.value} </button>
         ava
       </div>
       <div>77790</div>
