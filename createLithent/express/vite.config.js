@@ -4,9 +4,7 @@ import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 import fs from 'fs';
 
-let cachedEntries = getEntries();
-
-console.log('CACHEDENTRIES', cachedEntries);
+const cachedEntries = getEntries();
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -29,16 +27,6 @@ export default defineConfig(({ mode }) => ({
     lib: {
       entry: cachedEntries,
       formats: ['es'], // 원하는 포맷으로 설정 (ESM, UMD 등)
-    },
-    rollupOptions: {
-      // 각 엔트리마다 별도의 번들 파일을 생성
-      input: cachedEntries,
-      output: {
-        globals: {
-          lithent: 'lithent', // 글로벌 변수 설정 (필요시)
-        },
-        entryFileNames: '[name].[hash].js', // 출력 파일 이름
-      },
     },
   },
   test: {
