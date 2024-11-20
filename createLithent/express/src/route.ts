@@ -1,11 +1,12 @@
 import { render as lRender, h } from 'lithent';
 import { store } from 'lithent/helper';
 
+let initPage = '';
 const pageModules = import.meta.glob('./pages/*.tsx');
 
 function compareArraysWithUnderscore(arr1: string[], arr2: string[]) {
   const params: Record<string, string> = {};
-  // 배열 길이가 다르면 일치하지 않음
+
   if (arr1.length !== arr2.length) {
     return [false];
   }
@@ -15,21 +16,18 @@ function compareArraysWithUnderscore(arr1: string[], arr2: string[]) {
     const item2 = arr2[i];
 
     if (!item2.startsWith('_') && item1 !== item2) {
-      return [false]; // 값이 다르면 false
+      return [false];
     } else if (item2.startsWith('_')) {
       params[item2.replace(/^_/, '')] = item1;
     }
   }
 
-  // 모든 조건을 만족하면 true
   return [true, params];
 }
 
-function findPageModlueKey(pageModuleKeys: string[], key: string) {
-  const targetSegments = key.split(/(?:\/|\.)/);
-  console.log('ts', targetSegments);
-
+function findMatch(targetSegments: string[], pageModuleKeys: string[]) {
   let params: Record<string, string> = {};
+
   const matchItem = pageModuleKeys.find(item => {
     const moduleSegmentList = item.split(/(?:\/|\.)/);
     const res = compareArraysWithUnderscore(targetSegments, moduleSegmentList);
@@ -39,7 +37,18 @@ function findPageModlueKey(pageModuleKeys: string[], key: string) {
     return res[0];
   });
 
-  console.log('PARAM 0', params);
+  return { matchItem, params };
+}
+
+function findPageModlueKey(pageModuleKeys: string[], key: string) {
+  const targetSegments = key.split(/(?:\/|\.)/);
+
+  let { matchItem, params } = findMatch(targetSegments, pageModuleKeys);
+  if (!matchItem) {
+    targetSegments.splice(targetSegments.indexOf('pages') + 1, 0, 'index');
+    ({ matchItem, params } = findMatch(targetSegments, pageModuleKeys));
+  }
+
   return { key: matchItem, params };
 }
 
@@ -62,8 +71,6 @@ async function loadPage(dynamicPath: string) {
     comparePage
   );
 
-  console.log('KEY', key, params);
-
   if (key && pageModules[key]) {
     const res = await pageModules[key]();
     //@ts-ignore
@@ -83,7 +90,7 @@ async function loadPage(dynamicPath: string) {
   }
 }
 
-export const routeAssign = store<{
+const routeAssign = store<{
   page: string;
   destroy: (() => void) | string;
 }>({
@@ -91,24 +98,48 @@ export const routeAssign = store<{
   destroy: '',
 });
 
-let prePage = '';
-export const routeRef = routeAssign(
+const routeRef = routeAssign(
   state => {
     if (
       state &&
-      state.page !== prePage &&
+      state.page !== initPage &&
       typeof state.destroy === 'function'
     ) {
       state.destroy();
 
       loadPage(state.page);
     }
-    prePage = state.page;
+    initPage = state.page;
   },
   store => [store.page, store.destroy]
 );
 
-if (typeof window !== 'undefined') {
+export function makeRoute() {
+  if (typeof window !== 'undefined') {
+    //@ts-ignore
+    if (!window.routeRef) {
+      //@ts-ignore
+      window.routeRef = routeRef;
+      //@ts-ignore
+      window.navigate = navigate;
+
+      window.addEventListener('popstate', _ => {
+        const { pathname, search } = window.location;
+
+        //@ts-ignore
+        window.routeRef.page = `${pathname}${search}`;
+      });
+    }
+
+    //@ts-ignore
+    return window.routeRef;
+  }
+
+  return null;
+}
+
+export function navigate(pagePath: string) {
+  history.pushState(null, '', pagePath);
   //@ts-ignore
-  window.routeRef = routeRef;
+  window.routeRef.page = pagePath;
 }

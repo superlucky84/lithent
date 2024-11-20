@@ -90,7 +90,9 @@ async function createServer() {
               `<script type="module">
               import Page from '/src/pages/${key}';
               import { h, hydration } from '/src/utils';
-              import { routeRef } from '/src/route';
+              import { makeRoute } from '/src/route';
+
+              const routeRef = makeRoute();
               routeRef.page = location.pathname;
               routeRef.destroy = hydration(h(Page, ${JSON.stringify(
                 Object.assign(props, { initProp })
@@ -124,7 +126,9 @@ async function createServer() {
               import Page from '/${scriptPath}';
 
               import { h, hydration } from '/${utilResourcePath}';
-              import { routeRef } from '/${routeResourcePath}';
+              import { makeRoute } from '/${routeResourcePath}';
+
+              const routeRef = makeRoute();
               routeRef.page = location.pathname;
               routeRef.destroy = hydration(h(Page, ${JSON.stringify(
                 Object.assign(props, { initProp })

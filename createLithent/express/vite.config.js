@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => ({
         globals: {
           lithent: 'lithent', // 글로벌 변수 설정 (필요시)
         },
-        entryFileNames: '[name].js', // 출력 파일 이름
+        entryFileNames: '[name].[hash].js', // 출력 파일 이름
       },
     },
   },
