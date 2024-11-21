@@ -9,7 +9,10 @@ import sortFiles from './sortFiles.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-// Vite 서버 생성 및 미들웨어 적용
+const isTailwindConfigPresent = fs.existsSync(
+  path.join(__dirname, 'tailwind.config.ts')
+);
+
 const isDev = process.env.NODE_ENV !== 'production';
 let vite;
 if (isDev) {
@@ -112,10 +115,9 @@ async function createServer() {
           const appHtmlOrig = `<!doctype html>${PageString}`;
           const scriptPath = resourcePath; // 경로에 맞게 수정 필요
 
-          finalHtml = appHtmlOrig
-            .replace(
-              '</body>',
-              `<script type="module">
+          finalHtml = appHtmlOrig.replace(
+            '</body>',
+            `<script type="module">
               import Page from '/${scriptPath}';
 
               import { h, hydration } from '/${utilResourcePath}';
@@ -127,11 +129,14 @@ async function createServer() {
                 Object.assign(props, { initProp })
               )}), document.documentElement);
               </script></body>`
-            )
-            .replace(
+          );
+
+          if (isTailwindConfigPresent) {
+            finalHtml = finalHtml.replace(
               '</head>',
               '<link rel="stylesheet" href="/dist/style.css" /></head>'
             );
+          }
         }
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
