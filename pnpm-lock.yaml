@@ -136,12 +136,18 @@ importers:
         specifier: workspace:*
         version: link:../..
     devDependencies:
+      autoprefixer:
+        specifier: ^10.4.14
+        version: 10.4.14(postcss@8.4.47)
       chokidar:
         specifier: ^4.0.1
         version: 4.0.1
       concurrently:
         specifier: ^9.1.0
         version: 9.1.0
+      postcss:
+        specifier: ^8.4.24
+        version: 8.4.47
       tailwindcss:
         specifier: ^3.3.2
         version: 3.3.2(ts-node@10.9.2(@types/node@22.9.0)(typescript@5.6.3))
@@ -3127,7 +3133,7 @@ snapshots:
   '@babel/code-frame@7.24.6':
     dependencies:
       '@babel/highlight': 7.24.6
-      picocolors: 1.0.1
+      picocolors: 1.1.0
 
   '@babel/helper-string-parser@7.24.6': {}
 
@@ -3855,6 +3861,16 @@ snapshots:
       normalize-range: 0.1.2
       picocolors: 1.0.1
       postcss: 8.4.24
+      postcss-value-parser: 4.2.0
+
+  autoprefixer@10.4.14(postcss@8.4.47):
+    dependencies:
+      browserslist: 4.23.0
+      caniuse-lite: 1.0.30001621
+      fraction.js: 4.3.7
+      normalize-range: 0.1.2
+      picocolors: 1.0.1
+      postcss: 8.4.47
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:

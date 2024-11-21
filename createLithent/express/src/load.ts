@@ -4,8 +4,6 @@ import { hydration } from 'lithent/ssr';
 const pageModules = import.meta.glob('./pages/*.tsx');
 import { makeRoute } from '@/route';
 
-console.log('PAGEMODULES', pageModules);
-
 export default async function load(key: string, props: Props) {
   const res = await pageModules[`./pages/${key}`]();
   const routeRef = makeRoute();

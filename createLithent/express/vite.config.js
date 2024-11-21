@@ -20,9 +20,7 @@ export default defineConfig(({ mode }) => ({
     }),
   ],
   css: {
-    postcss: {
-      plugins: [tailwindcss()],
-    },
+    postcss: './postcss.config.js', // PostCSS 설정 파일 경로
   },
   resolve: {
     alias: {
