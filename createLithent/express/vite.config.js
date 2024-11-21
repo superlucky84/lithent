@@ -51,8 +51,7 @@ function getEntries() {
     return entries;
   }, {});
 
-  entries['utils.ts'] = `${utilDir}/utils.ts`;
-  entries['route.ts'] = `${utilDir}/route.ts`;
+  entries['load.ts'] = `${utilDir}/load.ts`;
 
   return entries;
 }

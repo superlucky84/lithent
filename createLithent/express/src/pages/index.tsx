@@ -1,6 +1,9 @@
 import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 import Layout from '@/layout';
+import { navigate } from '@/route';
+
+console.log('NVAI', navigate);
 
 const Index = mount(r => {
   const num = state(1, r);
@@ -10,7 +13,7 @@ const Index = mount(r => {
   return () => (
     <Layout>
       <h1 className="text-3xl font-bold underline">Hello world!</h1>
-      <div>123</div>
+      <div>12334</div>
       <div>999990277</div>
       <div>
         <span>{num.value}</span>

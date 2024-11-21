@@ -115,31 +115,16 @@ const routeRef = routeAssign(
 );
 
 export function makeRoute() {
-  if (typeof window !== 'undefined') {
-    //@ts-ignore
-    if (!window.routeRef) {
-      //@ts-ignore
-      window.routeRef = routeRef;
-      //@ts-ignore
-      window.navigate = navigate;
+  window.addEventListener('popstate', _ => {
+    const { pathname, search } = window.location;
 
-      window.addEventListener('popstate', _ => {
-        const { pathname, search } = window.location;
+    routeRef.page = `${pathname}${search}`;
+  });
 
-        //@ts-ignore
-        window.routeRef.page = `${pathname}${search}`;
-      });
-    }
-
-    //@ts-ignore
-    return window.routeRef;
-  }
-
-  return null;
+  return routeRef;
 }
 
 export function navigate(pagePath: string) {
   history.pushState(null, '', pagePath);
-  //@ts-ignore
-  window.routeRef.page = pagePath;
+  routeRef.page = pagePath;
 }

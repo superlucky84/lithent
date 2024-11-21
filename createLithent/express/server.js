@@ -83,20 +83,14 @@ async function createServer() {
           finalHtml = transformedHtml.replace(
             '</body>',
             `<script type="module">
-              import Page from '/src/pages/${key}';
-              import { h, hydration } from '/src/utils';
-              import { makeRoute } from '/src/route';
-
-              const routeRef = makeRoute();
-              routeRef.page = location.pathname;
-              routeRef.destroy = hydration(h(Page, ${JSON.stringify(
-                Object.assign(props, { initProp })
-              )}), document.documentElement);
-              </script></body>`
+              import load from '/src/load';
+              load('${key}', ${JSON.stringify(
+              Object.assign(props, { initProp })
+            )});
+             </script></body>`
           );
         } else {
-          const utilResourcePath = getScriptPath('utils.ts');
-          const routeResourcePath = getScriptPath('route.ts');
+          const loadResourcePath = getScriptPath('load.ts');
           const resourcePath = getScriptPath(key);
           const modulePath = path.resolve(__dirname, resourcePath);
 
@@ -113,21 +107,14 @@ async function createServer() {
             h(Page, Object.assign(props, { initProp }))
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
-          const scriptPath = resourcePath; // 경로에 맞게 수정 필요
-
           finalHtml = appHtmlOrig.replace(
             '</body>',
             `<script type="module">
-              import Page from '/${scriptPath}';
+              import load from '/${loadResourcePath}';
 
-              import { h, hydration } from '/${utilResourcePath}';
-              import { makeRoute } from '/${routeResourcePath}';
-
-              const routeRef = makeRoute();
-              routeRef.page = location.pathname;
-              routeRef.destroy = hydration(h(Page, ${JSON.stringify(
-                Object.assign(props, { initProp })
-              )}), document.documentElement);
+              load('${key}', ${JSON.stringify(
+              Object.assign(props, { initProp })
+            )});
               </script></body>`
           );
 
