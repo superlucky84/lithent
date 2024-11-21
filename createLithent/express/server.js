@@ -112,9 +112,10 @@ async function createServer() {
           const appHtmlOrig = `<!doctype html>${PageString}`;
           const scriptPath = resourcePath; // 경로에 맞게 수정 필요
 
-          finalHtml = appHtmlOrig.replace(
-            '</body>',
-            `<script type="module">
+          finalHtml = appHtmlOrig
+            .replace(
+              '</body>',
+              `<script type="module">
               import Page from '/${scriptPath}';
 
               import { h, hydration } from '/${utilResourcePath}';
@@ -126,7 +127,11 @@ async function createServer() {
                 Object.assign(props, { initProp })
               )}), document.documentElement);
               </script></body>`
-          );
+            )
+            .replace(
+              '</head>',
+              '<link rel="stylesheet" href="/dist/style.css" /></head>'
+            );
         }
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);

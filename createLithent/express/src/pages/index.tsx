@@ -9,6 +9,7 @@ const Index = mount(r => {
   };
   return () => (
     <Layout>
+      <h1 className="text-3xl font-bold underline">Hello world!</h1>
       <div>123</div>
       <div>999990277</div>
       <div>

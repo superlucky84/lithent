@@ -1,4 +1,5 @@
 import { h, mount } from 'lithent';
+import '@/index.css';
 
 const Layout = mount((_r, _props, children) => {
   return () => (
