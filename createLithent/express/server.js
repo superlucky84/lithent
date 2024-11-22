@@ -71,7 +71,7 @@ async function createServer() {
           }
 
           const PageString = renderToString(
-            h(Layout, {}, h(Page, Object.assign(props, { initProp })))
+            h(Layout, {}, h(Page, Object.assign({}, props, { initProp })))
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
 
@@ -85,7 +85,7 @@ async function createServer() {
             `<script type="module">
               import load from '/src/load';
               load('${key}', ${JSON.stringify(
-              Object.assign(props, { initProp })
+              Object.assign({}, props, { initProp })
             )});
              </script></body>`
           );

@@ -9,10 +9,12 @@ export default async function load(key: string, props: Props) {
   const res = await pageModules[`./pages/${key}`]();
   const routeRef = makeRoute();
 
-  routeRef.page = location.pathname;
+  const { pathname, search } = location;
+
+  routeRef.page = `${pathname}${search}`;
   hydration(
     // @ts-ignore
-    h(Layout, {}, h(res!.default as TagFunction, Object.assign(props))),
+    h(Layout, {}, h(res!.default as TagFunction, props)),
     document.documentElement
   );
 }

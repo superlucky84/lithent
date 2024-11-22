@@ -95,12 +95,13 @@ const routeAssign = store<{
   component: null,
 });
 
+let init = false;
 export const routeRef = routeAssign(
   state => {
-    console.log('APAGWE', state.page);
-    if (state.page) {
+    if (state.page && init) {
       loadPage(state.page);
     }
+    init = true;
   },
   store => [store.page]
 );

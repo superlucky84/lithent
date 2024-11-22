@@ -1,10 +1,16 @@
 import { state, computed } from '@/engine/helper';
-import { h, mount, Fragment } from '@/engine';
+import { h, mount, Fragment, updateCallback } from '@/engine';
 import { selectedDepartmentWatch } from '@/store';
 import clsx from '@/helper/clsx';
 import type { Department } from '@/types';
 
-const DepartmentTree = mount<{ departmantTree: Department }>(_renew => {
+const DepartmentTree = mount<{ departmantTree: Department }>(renew => {
+  const selectedCode = selectedDepartmentWatch(renew, state => [state.code]);
+
+  console.log('00000000000000000000000000');
+  updateCallback(() => {
+    console.log('787777777777', selectedCode.code);
+  });
   return ({ departmantTree }) => (
     <ul class="pl-2">
       {departmantTree.children.map(item => (

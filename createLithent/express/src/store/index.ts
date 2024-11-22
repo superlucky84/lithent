@@ -43,10 +43,13 @@ export const selectedMemberWatch = store<{
   id: '',
   info: null,
 });
+export const selectMemberRef = selectedMemberWatch();
+
 selectedMemberWatch(
   state => {
     const info = allMemberRef.value.find(item => state.id && item.id);
-    if (info) {
+    if (info && state.id) {
+      console.log('UPDATEID', info);
       state.info = info;
     }
   },

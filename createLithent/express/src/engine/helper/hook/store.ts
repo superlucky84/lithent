@@ -38,7 +38,6 @@ export const store = <V>(initialValue: V) => {
     }
 
     const storeRenderObserveMap: StoreValue = {};
-    // const allowedAccessProp: (keyof T)[] = [];
     const allowedAccessProp: Set<keyof T> = new Set();
 
     let makedProxy: { value: null | T } = { value: null };
@@ -53,9 +52,9 @@ export const store = <V>(initialValue: V) => {
         allowInitSetting,
         storeRenderList,
         allowedAccessProp,
+        storeRenderObserveList,
         run,
-        storeRenderObserveMap,
-        storeRenderObserveList
+        storeRenderObserveMap
       );
       allowInitSetting.value = true;
       makeObserver(makedProxy.value);
@@ -67,7 +66,8 @@ export const store = <V>(initialValue: V) => {
         value,
         allowInitSetting,
         storeRenderList,
-        allowedAccessProp
+        allowedAccessProp,
+        storeRenderObserveList
       );
 
       if (renew) {
@@ -95,9 +95,9 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
   allowInitSetting: { value: boolean },
   storeRenderList: Set<Run>,
   allowedAccessProp: Set<keyof T>,
+  storeRenderObserveList: StoreValue[],
   run?: Run,
-  storeRenderObserveMap?: StoreValue,
-  storeRenderObserveList?: StoreValue[]
+  storeRenderObserveMap?: StoreValue
 ) => {
   const result = new Proxy(value, {
     get(target: T, prop: keyof T) {
@@ -119,12 +119,7 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
 
       target[prop] = value;
 
-      execDependentCallbacks(
-        storeRenderList,
-        storeRenderObserveList,
-        prop,
-        run
-      );
+      execDependentCallbacks(storeRenderList, storeRenderObserveList, prop);
 
       return true;
     },
@@ -136,8 +131,7 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
 const execDependentCallbacks = <T>(
   storeRenderList: Set<Run>,
   storeRenderObserveList: StoreValue[] = [],
-  prop: keyof T,
-  run?: () => boolean | AbortSignal | void
+  prop: keyof T
 ) => {
   const trashCollections: Set<Run> = new Set();
 
@@ -147,9 +141,8 @@ const execDependentCallbacks = <T>(
   );
 
   (storeRenderObserveList || []).forEach(storeRenderObserveMap => {
-    const renderObserveList: Set<Run> = run
-      ? storeRenderObserveMap[prop] || new Set<Run>()
-      : new Set<Run>();
+    const renderObserveList: Set<Run> =
+      storeRenderObserveMap[prop] || new Set<Run>();
 
     runWithtrashCollectUnit(renderObserveList).forEach(value =>
       trashCollections.add(value)
@@ -174,6 +167,7 @@ const runWithtrashCollectUnit = (storeRenderList: Set<Run>) => {
   const trashes: Run[] = [];
   storeRenderList.forEach(run => {
     if (run() === false) {
+      console.log('TRASH!!!!!!!');
       trashes.push(run);
     }
   });
