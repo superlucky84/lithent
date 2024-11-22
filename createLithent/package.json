@@ -1,8 +1,8 @@
 {
   "type": "module",
-  "name": "create-lithent",
+  "name": "create-lithent-app",
   "version": "0.0.1",
-  "description": "create-express-app",
+  "description": "create-lithent-app",
   "private": true,
   "packageManager": "pnpm@7.6.0",
   "main": "./dist/expressLithent.umd.js",
