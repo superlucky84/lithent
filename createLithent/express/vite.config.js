@@ -46,6 +46,7 @@ function getEntries() {
   }, {});
 
   entries['load.ts'] = `${utilDir}/load.ts`;
+  entries['layout.tsx'] = `${utilDir}/layout.tsx`;
 
   return entries;
 }

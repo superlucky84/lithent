@@ -9,10 +9,6 @@ import sortFiles from './sortFiles.js';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
-const isTailwindConfigPresent = fs.existsSync(
-  path.join(__dirname, 'tailwind.config.ts')
-);
-
 const isDev = process.env.NODE_ENV !== 'production';
 let vite;
 vite = await createViteServer({
@@ -28,6 +24,7 @@ vite = await createViteServer({
 
 const { h } = await vite.ssrLoadModule(`@/engine`);
 const { renderToString } = await vite.ssrLoadModule(`@/engine/ssr`);
+const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
 
 async function createServer() {
   const entries = getEntries();
@@ -74,7 +71,7 @@ async function createServer() {
           }
 
           const PageString = renderToString(
-            h(Page, Object.assign(props, { initProp }))
+            h(Layout, {}, h(Page, Object.assign(props, { initProp })))
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
 
@@ -107,7 +104,7 @@ async function createServer() {
           }
 
           const PageString = renderToString(
-            h(Page, Object.assign(props, { initProp }))
+            h(Layout, {}, h(Page, Object.assign(props, { initProp })))
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
           finalHtml = appHtmlOrig.replace(
@@ -120,13 +117,6 @@ async function createServer() {
             )});
               </script></body>`
           );
-
-          if (isTailwindConfigPresent) {
-            finalHtml = finalHtml.replace(
-              '</head>',
-              '<link rel="stylesheet" href="/dist/style.css" /></head>'
-            );
-          }
         }
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);

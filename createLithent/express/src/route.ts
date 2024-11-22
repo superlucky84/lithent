@@ -1,7 +1,7 @@
-import { render as lRender, h } from '@/engine';
+import { h } from '@/engine';
+import type { WDom } from '@/engine';
 import { store } from '@/engine/helper';
 
-let initPage = '';
 const pageModules = import.meta.glob('./pages/*.tsx');
 
 function compareArraysWithUnderscore(arr1: string[], arr2: string[]) {
@@ -79,12 +79,18 @@ async function loadPage(dynamicPath: string) {
     if (makeInitProp) {
       initProp = await makeInitProp();
     }
+    console.log('KEY', key);
 
+    //@ts-ignore
+    routeRef.component = h(res.default, { params, query, initProp });
+
+    /*
     lRender(
       //@ts-ignore
       h(res.default, { params, query, initProp }),
       document.documentElement
     );
+    */
   } else {
     location.href = comparePage;
   }
@@ -92,23 +98,20 @@ async function loadPage(dynamicPath: string) {
 
 const routeAssign = store<{
   page: string;
+  component: WDom | null;
   destroy: (() => void) | string;
 }>({
   page: '',
+  component: null,
   destroy: '',
 });
 
-const routeRef = routeAssign(
+export const routeRef = routeAssign(
   state => {
-    if (
-      state &&
-      state.page !== initPage &&
-      typeof state.destroy === 'function'
-    ) {
-      state.destroy();
+    console.log('APAGWE', state.page);
+    if (state.page) {
       loadPage(state.page);
     }
-    initPage = state.page;
   },
   store => [store.page, store.destroy]
 );
