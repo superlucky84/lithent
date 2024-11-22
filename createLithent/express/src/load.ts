@@ -10,7 +10,7 @@ export default async function load(key: string, props: Props) {
   const routeRef = makeRoute();
 
   routeRef.page = location.pathname;
-  routeRef.destroy = hydration(
+  hydration(
     // @ts-ignore
     h(Layout, {}, h(res!.default as TagFunction, Object.assign(props))),
     document.documentElement

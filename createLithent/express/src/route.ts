@@ -79,18 +79,9 @@ async function loadPage(dynamicPath: string) {
     if (makeInitProp) {
       initProp = await makeInitProp();
     }
-    console.log('KEY', key);
 
     //@ts-ignore
     routeRef.component = h(res.default, { params, query, initProp });
-
-    /*
-    lRender(
-      //@ts-ignore
-      h(res.default, { params, query, initProp }),
-      document.documentElement
-    );
-    */
   } else {
     location.href = comparePage;
   }
@@ -99,11 +90,9 @@ async function loadPage(dynamicPath: string) {
 const routeAssign = store<{
   page: string;
   component: WDom | null;
-  destroy: (() => void) | string;
 }>({
   page: '',
   component: null,
-  destroy: '',
 });
 
 export const routeRef = routeAssign(
@@ -113,7 +102,7 @@ export const routeRef = routeAssign(
       loadPage(state.page);
     }
   },
-  store => [store.page, store.destroy]
+  store => [store.page]
 );
 
 export function makeRoute() {
