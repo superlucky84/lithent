@@ -3,7 +3,6 @@ import { defineConfig, build } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 import fs from 'fs';
-import tailwindcss from 'tailwindcss';
 
 const cachedEntries = getEntries();
 
@@ -19,9 +18,6 @@ export default defineConfig(({ mode }) => ({
       outputDir: ['dist'],
     }),
   ],
-  css: {
-    postcss: './postcss.config.js', // PostCSS 설정 파일 경로
-  },
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),

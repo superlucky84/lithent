@@ -9,10 +9,10 @@ const Sub = mount<PageProps>((_r, props) => {
   };
 
   console.log('PARAMS', params);
-
   return () => (
     <Layout>
       <div>
+        <h1 className="text-3xl font-bold underline">Hello world!</h1>
         sub <button onClick={handleClick}>increase</button>
       </div>
     </Layout>
