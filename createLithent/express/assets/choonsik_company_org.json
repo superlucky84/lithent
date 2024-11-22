@@ -1,0 +1,338 @@
+{
+  "userList": [
+    {
+      "id": "choonsik",
+      "name": "춘식",
+      "departmentName": "대표",
+      "departmentCode": "11003",
+      "departmentNamePath": "춘식company;대표",
+      "departmentCodePath": "10000;11003",
+      "dutyName": "대표",
+      "dutyCode": "110",
+      "telephoneNumber": "010-0000-0000",
+      "email": "choonsik@kakaobank.com"
+    },
+    {
+      "id": "elly",
+      "name": "안나연",
+      "departmentName": "신사업개발",
+      "departmentCode": "19400",
+      "departmentNamePath": "춘식company;대표;개발;신사업개발",
+      "departmentCodePath": "10000;11003;19000;19400",
+      "dutyName": "팀장",
+      "dutyCode": "710",
+      "telephoneNumber": "010-0000-0000",
+      "email": "elly@kakaobank.com"
+    },
+    {
+      "id": "alice",
+      "name": "김현아",
+      "departmentName": "신사업개발",
+      "departmentCode": "19400",
+      "departmentNamePath": "춘식company;대표;개발;신사업개발",
+      "departmentCodePath": "10000;11003;19000;19400",
+      "dutyName": "팀원",
+      "dutyCode": "999",
+      "telephoneNumber": "010-0000-0000",
+      "email": "alice@kakaobank.com"
+    },
+    {
+      "id": "ryan",
+      "name": "라이언",
+      "departmentName": "신사업개발",
+      "departmentCode": "19400",
+      "departmentNamePath": "춘식company;대표;개발;신사업개발",
+      "departmentCodePath": "10000;11003;19000;19400",
+      "dutyName": "팀원",
+      "dutyCode": "999",
+      "telephoneNumber": "010-0000-0000",
+      "email": "ryan@kakaobank.com"
+    },
+    {
+      "id": "may",
+      "name": "남소연",
+      "departmentName": "디자인",
+      "departmentCode": "14200",
+      "departmentNamePath": "춘식company;대표;서비스;디자인",
+      "departmentCodePath": "10000;11003;13980;14200",
+      "dutyName": "팀장",
+      "dutyCode": "710",
+      "telephoneNumber": "010-0000-0000",
+      "email": "may@kakaobank.com"
+    },
+    {
+      "id": "joy",
+      "name": "이수민",
+      "departmentName": "인사",
+      "departmentCode": "13101",
+      "departmentNamePath": "춘식company;대표;매니지먼트;인사",
+      "telephoneNumber": "010-0000-0000",
+      "dutyName": "팀장",
+      "dutyCode": "710",
+      "departmentCodePath": "10000;11003;13020;13101",
+      "email": "joy@kakaobank.com"
+    },
+    {
+      "id": "maya",
+      "name": "권유진",
+      "departmentName": "총무",
+      "departmentCode": "13102",
+      "dutyName": "팀장",
+      "dutyCode": "710",
+      "departmentNamePath": "춘식company;대표;매니지먼트;총무",
+      "telephoneNumber": "010-0000-0000",
+      "departmentCodePath": "10000;11003;13020;13102",
+      "email": "maya@kakaobank.com"
+    },
+    {
+      "id": "luna",
+      "name": "김혜경",
+      "departmentName": "총무",
+      "departmentCode": "13102",
+      "departmentNamePath": "춘식company;대표;매니지먼트;총무",
+      "departmentCodePath": "10000;11003;13020;13102",
+      "dutyName": "팀원",
+      "dutyCode": "999",
+      "telephoneNumber": "010-0000-0000",
+      "email": "luna@kakaobank.com"
+    },
+    {
+      "id": "belly",
+      "name": "이지연",
+      "departmentName": "서비스개발",
+      "departmentCode": "19500",
+      "departmentNamePath": "춘식company;대표;개발;서비스개발",
+      "departmentCodePath": "10000;11003;19000;19500",
+      "dutyName": "팀장",
+      "dutyCode": "710",
+      "telephoneNumber": "010-0000-0000",
+      "email": "belly@kakaobank.com"
+    },
+    {
+      "id": "glory",
+      "name": "노선경",
+      "departmentName": "수신개발",
+      "departmentCode": "19520",
+      "departmentNamePath": "춘식company;대표;개발;서비스개발;수신개발",
+      "departmentCodePath": "10000;11003;19000;19500;19520",
+      "dutyName": "팀장",
+      "dutyCode": "715",
+      "telephoneNumber": "010-0000-0000",
+      "email": "glory@kakaobank.com"
+    },
+    {
+      "id": "luke",
+      "name": "김진희",
+      "departmentName": "수신개발",
+      "departmentCode": "19520",
+      "departmentNamePath": "춘식company;대표;개발;서비스개발;수신개발",
+      "departmentCodePath": "10000;11003;19000;19500;19520",
+      "dutyName": "팀원",
+      "dutyCode": "999",
+      "telephoneNumber": "010-0000-0000",
+      "email": "luke@kakaobank.com"
+    },
+    {
+      "id": "janice",
+      "name": "남민석",
+      "departmentName": "채널서버",
+      "departmentCode": "14721",
+      "departmentNamePath": "춘식company;대표;개발;서비스개발;채널서버",
+      "departmentCodePath": "10000;11003;19000;19500;14721",
+      "dutyName": "팀장",
+      "dutyCode": "715",
+      "telephoneNumber": "010-0000-0000",
+      "email": "janice@kakaobank.com"
+    },
+    {
+      "id": "hoon",
+      "name": "지주희",
+      "departmentName": "채널서버",
+      "departmentCode": "14721",
+      "departmentNamePath": "춘식company;대표;개발;서비스개발;채널서버",
+      "departmentCodePath": "10000;11003;19000;19500;14721",
+      "dutyName": "팀원",
+      "dutyCode": "999",
+      "telephoneNumber": "010-0000-0000",
+      "email": "hoon@kakaobank.com"
+    },
+    {
+      "id": "jay",
+      "name": "고진성",
+      "departmentName": "여신개발",
+      "departmentCode": "14741",
+      "departmentNamePath": "춘식company;대표;개발;서비스개발;여신개발",
+      "departmentCodePath": "10000;11003;19000;19500;14741",
+      "dutyName": "팀장",
+      "dutyCode": "715",
+      "telephoneNumber": "010-0000-0000",
+      "email": "jay@kakaobank.com"
+    },
+    {
+      "id": "lizzy",
+      "name": "최재만",
+      "departmentName": "모바일개발",
+      "departmentCode": "19600",
+      "departmentNamePath": "춘식company;대표;개발;모바일개발",
+      "departmentCodePath": "10000;11003;19000;19600",
+      "dutyName": "팀장",
+      "dutyCode": "710",
+      "telephoneNumber": "010-0000-0000",
+      "email": "lizzy@kakaobank.com"
+    },
+    {
+      "id": "alan",
+      "name": "곽지은",
+      "departmentName": "서비스",
+      "departmentCode": "13980",
+      "departmentNamePath": "춘식company;대표;서비스",
+      "departmentCodePath": "10000;11003;13980",
+      "dutyName": "그룹장",
+      "dutyCode": "700",
+      "telephoneNumber": "010-0000-0000",
+      "email": "alan@kakaobank.com"
+    },
+    {
+      "id": "moa",
+      "name": "김혜린",
+      "departmentName": "디자인",
+      "departmentCode": "14200",
+      "departmentNamePath": "춘식company;대표;서비스;디자인",
+      "departmentCodePath": "10000;11003;13980;14200",
+      "dutyName": "팀원",
+      "dutyCode": "999",
+      "telephoneNumber": "010-0000-0000",
+      "email": "moa@kakaobank.com"
+    },
+    {
+      "id": "nikki",
+      "name": "이하영",
+      "departmentName": "매니지먼트",
+      "departmentCode": "13020",
+      "departmentNamePath": "춘식company;대표;매니지먼트",
+      "departmentCodePath": "10000;11003;13020",
+      "dutyName": "그룹장",
+      "dutyCode": "700",
+      "telephoneNumber": "010-0000-0000",
+      "email": "nikki@kakaobank.com"
+    },
+    {
+      "id": "top",
+      "name": "허진영",
+      "departmentName": "사외이사",
+      "departmentCode": "11001",
+      "departmentNamePath": "춘식company;사외이사",
+      "departmentCodePath": "10000;11001",
+      "dutyName": "팀원",
+      "dutyCode": "999",
+      "telephoneNumber": "010-0000-0000",
+      "email": "top@kakaobank.com"
+    },
+    {
+      "id": "lucy",
+      "name": "이영은",
+      "departmentName": "마케팅",
+      "departmentCode": "14080",
+      "departmentNamePath": "춘식company;대표;서비스;마케팅",
+      "departmentCodePath": "10000;11003;13980;14080",
+      "dutyName": "팀장",
+      "dutyCode": "710",
+      "telephoneNumber": "010-0000-0000",
+      "email": "lucy@kakaobank.com"
+    },
+    {
+      "id": "jack",
+      "name": "김형식",
+      "departmentName": "개발",
+      "departmentCode": "19000",
+      "dutyName": "그룹장",
+      "dutyCode": "700",
+      "departmentNamePath": "춘식company;대표;개발",
+      "departmentCodePath": "10000;11003;19000",
+      "telephoneNumber": "010-9177-4246",
+      "email": "jack@kakaobank.com"
+    }
+  ],
+  "departmentList": [
+    {
+      "code": "10000",
+      "name": "춘식company",
+      "parentCode": "0"
+    },
+    {
+      "code": "11003",
+      "name": "대표",
+      "parentCode": "10000"
+    },
+    {
+      "code": "13020",
+      "name": "매니지먼트",
+      "parentCode": "11003"
+    },
+    {
+      "code": "13101",
+      "name": "인사",
+      "parentCode": "13020"
+    },
+    {
+      "code": "13102",
+      "name": "총무",
+      "parentCode": "13020"
+    },
+    {
+      "code": "13980",
+      "name": "서비스",
+      "parentCode": "11003"
+    },
+    {
+      "code": "14200",
+      "name": "디자인",
+      "parentCode": "13980"
+    },
+    {
+      "code": "14080",
+      "name": "마케팅",
+      "parentCode": "13980"
+    },
+    {
+      "code": "19000",
+      "name": "개발",
+      "parentCode": "11003"
+    },
+    {
+      "code": "19400",
+      "name": "신사업개발",
+      "parentCode": "19000"
+    },
+    {
+      "code": "19500",
+      "name": "서비스개발",
+      "parentCode": "19000"
+    },
+    {
+      "code": "19520",
+      "name": "수신개발",
+      "parentCode": "19500"
+    },
+    {
+      "code": "14721",
+      "name": "채널서버",
+      "parentCode": "19500"
+    },
+    {
+      "code": "14741",
+      "name": "여신개발",
+      "parentCode": "19500"
+    },
+    {
+      "code": "19600",
+      "name": "모바일개발",
+      "parentCode": "19000"
+    },
+    {
+      "code": "11001",
+      "name": "사외이사",
+      "parentCode": "10000"
+    }
+  ]
+}

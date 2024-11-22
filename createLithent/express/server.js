@@ -37,6 +37,8 @@ async function createServer() {
     app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
   }
 
+  app.use('/assets', express.static(path.resolve(__dirname, 'assets')));
+
   sortFiles(Object.keys(entries)).forEach(key => {
     const pathSplit = key.split('.');
     const newPathSplit = pathSplit.slice(0, pathSplit.length - 1);
