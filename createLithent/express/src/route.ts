@@ -1,7 +1,8 @@
-import { h } from '@/engine';
-import type { WDom } from '@/engine';
+import { render as lRender, h } from '@/engine';
 import { store } from '@/engine/helper';
+import { selectMemberRef } from '@/store';
 
+let initPage = '';
 const pageModules = import.meta.glob('./pages/*.tsx');
 
 function compareArraysWithUnderscore(arr1: string[], arr2: string[]) {
@@ -62,6 +63,7 @@ function parseQueryStringToMap(queryString: string) {
 }
 
 async function loadPage(dynamicPath: string) {
+  console.log('jinwoo');
   const orgPage = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
   const comparePage = orgPage.replace(/\?[^\.]*/, '');
   const queryOrg = orgPage.replace(/.*(\?[^\.]*).tsx/, '$1');
@@ -80,8 +82,11 @@ async function loadPage(dynamicPath: string) {
       initProp = await makeInitProp();
     }
 
-    //@ts-ignore
-    routeRef.component = h(res.default, { params, query, initProp });
+    lRender(
+      //@ts-ignore
+      h(res.default, { params, query, initProp }),
+      document.documentElement
+    );
   } else {
     location.href = comparePage;
   }
@@ -89,28 +94,48 @@ async function loadPage(dynamicPath: string) {
 
 const routeAssign = store<{
   page: string;
-  component: WDom | null;
+  destroy: (() => void) | string;
 }>({
   page: '',
-  component: null,
+  destroy: '',
 });
 
-let init = false;
-export const routeRef = routeAssign(
+const routeRef = routeAssign(
   state => {
-    if (state.page && init) {
+    console.log('isdgsdgsdgsdgsdgsdgsdg');
+    if (
+      state &&
+      state.page !== initPage &&
+      typeof state.destroy === 'function'
+    ) {
+      state.destroy();
+
       loadPage(state.page);
     }
-    init = true;
+    initPage = state.page;
   },
-  store => [store.page]
+  store => [store.page, store.destroy]
 );
 
 export function makeRoute() {
   window.addEventListener('popstate', _ => {
     const { pathname, search } = window.location;
+    const base = window.location.origin;
 
-    routeRef.page = `${pathname}${search}`;
+    const urlA = new URL(routeRef.page, base);
+    const urlB = new URL(pathname, base);
+
+    if (urlA.pathname === urlB.pathname) {
+      if (urlA.search !== urlB.search) {
+        const userSearchParam = new URLSearchParams(search);
+        const userId = userSearchParam.get('userId');
+        if (userId) {
+          selectMemberRef.id = userId;
+        }
+      }
+    } else {
+      routeRef.page = `${pathname}${search}`;
+    }
   });
 
   return routeRef;
@@ -118,5 +143,21 @@ export function makeRoute() {
 
 export function navigate(pagePath: string) {
   history.pushState(null, '', pagePath);
-  routeRef.page = pagePath;
+  const base = window.location.origin;
+
+  const urlA = new URL(routeRef.page, base);
+  const urlB = new URL(pagePath, base);
+  if (urlA.pathname === urlB.pathname) {
+    if (urlA.search !== urlB.search) {
+      const userSearchParam = new URLSearchParams(urlB.search);
+      const userId = userSearchParam.get('userId');
+      if (userId) {
+        selectMemberRef.id = userId;
+      }
+    } else {
+      selectMemberRef.id = '';
+    }
+  } else {
+    routeRef.page = pagePath;
+  }
 }

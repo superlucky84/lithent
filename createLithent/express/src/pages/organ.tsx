@@ -1,4 +1,5 @@
-import { h, mount, Fragment } from '@/engine';
+import { h, mount, updateCallback } from '@/engine';
+import Layout from '@/layout';
 import { makeDepartmentTree } from '@/helper/calculator';
 import DepartmentTree from '@/components/DepartmentTree';
 import UserList from '@/components/UserList';
@@ -18,6 +19,9 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
   const { departmentList, userList } = initProp;
   const { departmantTree } = makeDepartmentTree(departmentList);
 
+  updateCallback(() => {
+    console.log('7');
+  });
   selectMemberRef.id = props.query.userId;
 
   allMemberRef.value = userList.map(item => {
@@ -29,7 +33,7 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
   });
 
   return () => (
-    <Fragment>
+    <Layout>
       <div class="w-1/3 h-full bg-red-500 flex items-center justify-center">
         <DepartmentTree departmantTree={departmantTree} />
       </div>
@@ -39,7 +43,7 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
       <div class="w-1/3 h-full bg-blue-500 flex items-center justify-center">
         <UserItem />
       </div>
-    </Fragment>
+    </Layout>
   );
 });
 

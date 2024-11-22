@@ -47,9 +47,9 @@ export const selectMemberRef = selectedMemberWatch();
 
 selectedMemberWatch(
   state => {
-    const info = allMemberRef.value.find(item => state.id && item.id);
+    const info = allMemberRef.value.find(item => state.id === item.id);
     if (info && state.id) {
-      console.log('UPDATEID', info);
+      console.log('UPDATEID', info.id, state.id);
       state.info = info;
     }
   },

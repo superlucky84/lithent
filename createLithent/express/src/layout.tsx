@@ -1,5 +1,4 @@
 import { h, mount } from '@/engine';
-import { routeRef } from '@/route';
 
 const Layout = mount((_r, _props, children) => {
   return () => (
@@ -15,7 +14,7 @@ const Layout = mount((_r, _props, children) => {
         />
       </head>
       <body class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="w-3/4 h-[80vh] flex">{routeRef.component || children}</div>
+        <div class="w-3/4 h-[80vh] flex">{children}</div>
       </body>
     </html>
   );

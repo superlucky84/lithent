@@ -11,7 +11,9 @@ const UserItem = mount(renew => {
     console.log('VVVVVVVVVVVVVVVVVV');
   });
   updateCallback(() => {
-    console.log('AAAAAAAA');
+    return () => {
+      console.log('AAAAAAAA');
+    };
   });
 
   return () => <ul>{userInfo.id}</ul>;
