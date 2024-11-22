@@ -12,8 +12,10 @@ export type Organ = {
 export type User = {
   departmentCode: string;
   departmentCodePath: string;
+  departmentCodeList: string[];
   departmentName: string;
   departmentNamePath: string;
+  departmentNameList: string[];
   dutyCode: string;
   dutyName: string;
   email: string;

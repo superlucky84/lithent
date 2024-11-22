@@ -1,11 +1,12 @@
 import { state, computed } from '@/engine/helper';
 import { h, mount, Fragment } from '@/engine';
 import { selectedDepartmentWatch } from '@/store';
+import clsx from '@/helper/clsx';
 import type { Department } from '@/types';
 
 const DepartmentTree = mount<{ departmantTree: Department }>(_renew => {
   return ({ departmantTree }) => (
-    <ul style={{ paddingLeft: '10px' }}>
+    <ul class="pl-2">
       {departmantTree.children.map(item => (
         <DepartmentItem item={item} />
       ))}
@@ -14,7 +15,7 @@ const DepartmentTree = mount<{ departmantTree: Department }>(_renew => {
 });
 
 const DepartmentItem = mount<{ item: Department }>((renew, props) => {
-  const opend = state(true, renew);
+  const opend = state(false, renew);
 
   /**
    * 스토어에서 선택부서 코드만 구독
@@ -35,19 +36,18 @@ const DepartmentItem = mount<{ item: Department }>((renew, props) => {
 
   const handleSelect = (code: string) => {
     selectedCode.code = code;
+    opend.value = true;
   };
 
   return ({ item }) => (
     <Fragment>
-      <li
-        style={{
-          border: `1px solid ${isSelected.value ? 'red' : 'black'}`,
-        }}
-      >
+      <li class={clsx('relative', { 'bg-stone-200': isSelected.value })}>
         {hasChildren.value && (
-          <button onClick={handleToggle}>{opend.value ? '-' : '+'}</button>
+          <button class="absolute -left-3" onClick={handleToggle}>
+            {opend.value ? '-' : '+'}
+          </button>
         )}
-        <button onClick={() => handleSelect(item.code)}>{item.code}</button>
+        <button onClick={() => handleSelect(item.code)}>{item.name}</button>
       </li>
       {hasChildren.value && opend.value && (
         <DepartmentTree departmantTree={item} />

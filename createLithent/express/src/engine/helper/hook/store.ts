@@ -110,20 +110,14 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
         }
       }
 
-      if (allowedAccessProp.has(prop) || !run) {
-        return target[prop];
-      }
-
-      return null;
+      return target[prop];
     },
     set(target, prop: keyof T, value) {
       if (target[prop] === value) {
         return true;
-      } else if (allowedAccessProp.has(prop) || !run) {
-        target[prop] = value;
-      } else {
-        return true;
       }
+
+      target[prop] = value;
 
       execDependentCallbacks(
         storeRenderList,

@@ -7,10 +7,13 @@ const Layout = mount((_r, _props, children) => {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Create Lithent App</title>
-        <link rel="stylesheet" href="/dist/style.css" />
+        <link
+          rel="stylesheet"
+          href={`/dist/style.css?${new Date().getTime()}`}
+        />
       </head>
-      <body class="antialiased text-gray-800 dark:bg-black dark:text-gray-400">
-        {children}
+      <body class="flex items-center justify-center min-h-screen bg-gray-100">
+        <div class="w-3/4 h-[80vh] flex">{children}</div>
       </body>
     </html>
   );

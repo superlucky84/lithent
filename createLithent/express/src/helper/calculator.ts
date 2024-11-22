@@ -9,7 +9,7 @@ export function makeDepartmentTree(departmentList: DepartmentList) {
     return acc;
   }, {} as Record<string, Department>);
 
-  return Object.entries(departmantMap).reduce(
+  const departmantTree = Object.entries(departmantMap).reduce(
     (acc, [_code, item]: [string, Department]) => {
       const isRoot = item.parentCode === '0';
       const parentItem = departmantMap[item.parentCode];
@@ -23,4 +23,6 @@ export function makeDepartmentTree(departmentList: DepartmentList) {
     },
     { code: '0', parentCode: '0', name: 'ROOT', children: [] } as Department
   );
+
+  return { departmantTree, departmantMap };
 }
