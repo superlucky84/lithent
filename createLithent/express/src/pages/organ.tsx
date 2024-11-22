@@ -1,10 +1,8 @@
 import { h, mount } from '@/engine';
 import Layout from '@/layout';
-import { navigate } from '@/route';
+import { makeDepartmentTree } from '@/helper/calculator';
 import DepartmentTree from '@/components/DepartmentTree';
-import type { Organ, PageProps, Department, DepartmentRoot } from '@/types';
-
-console.log(navigate);
+import type { Organ, PageProps } from '@/types';
 
 export const makeInitProp = async () => {
   const result = await fetch(
@@ -16,29 +14,7 @@ export const makeInitProp = async () => {
 const Organ = mount<PageProps<Organ>>((_renew, props) => {
   const initProp = props.initProp;
   const { departmentList } = initProp;
-
-  console.log('QUERY', departmentList);
-  const departmantMap = departmentList.reduce((acc, item) => {
-    acc[item.code] = { ...item, children: [] };
-    return acc;
-  }, {} as Record<string, Department>);
-
-  const departmantTree = Object.entries(departmantMap).reduce(
-    (acc, [_code, item]: [string, Department]) => {
-      const isRoot = item.parentCode === '0';
-      const parentItem = departmantMap[item.parentCode];
-
-      if (isRoot && acc.children) {
-        acc.children.push(item);
-      } else if (parentItem.children) {
-        parentItem.children.push(item);
-      }
-      return acc;
-    },
-    { code: '0', parentCode: '0', name: 'ROOT', children: [] } as DepartmentRoot
-  );
-
-  console.log('DEPARTMANTMAP', departmantTree);
+  const departmantTree = makeDepartmentTree(departmentList);
 
   return () => (
     <Layout>
