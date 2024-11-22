@@ -9,7 +9,7 @@ export type Organ = {
   departmentList: DepartmentList;
 };
 
-export type UserList = {
+export type User = {
   departmentCode: string;
   departmentCodePath: string;
   departmentName: string;
@@ -20,10 +20,21 @@ export type UserList = {
   id: string;
   name: string;
   telephoneNumber: string;
-}[];
+};
 
-export type DepartmentList = {
+export type DepartmentRoot = {
   code: string;
   name: string;
   parentCode: string;
-}[];
+  children: Department[];
+};
+
+export type Department = {
+  code: string;
+  name: string;
+  parentCode: string;
+  children: Department[];
+};
+
+export type UserList = User[];
+export type DepartmentList = Department[];
