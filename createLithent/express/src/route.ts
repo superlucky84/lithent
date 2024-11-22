@@ -106,7 +106,6 @@ const routeRef = routeAssign(
       typeof state.destroy === 'function'
     ) {
       state.destroy();
-
       loadPage(state.page);
     }
     initPage = state.page;

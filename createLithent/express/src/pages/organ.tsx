@@ -1,8 +1,8 @@
 import { h, mount } from '@/engine';
-import { navigate } from '@/route';
 import Layout from '@/layout';
 import { makeDepartmentTree } from '@/helper/calculator';
 import DepartmentTree from '@/components/DepartmentTree';
+import UserList from '@/components/UserList';
 import { allMemberRef } from '@/store';
 import type { Organ, PageProps } from '@/types';
 
@@ -12,8 +12,6 @@ export const makeInitProp = async () => {
   );
   return result.json();
 };
-
-console.log(navigate);
 
 const Organ = mount<PageProps<Organ>>((_renew, props) => {
   const initProp = props.initProp;
@@ -34,7 +32,7 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
         <DepartmentTree departmantTree={departmantTree} />
       </div>
       <div class="w-1/2 h-full bg-green-500 flex items-center justify-center">
-        BOx2
+        <UserList />
       </div>
     </Layout>
   );
