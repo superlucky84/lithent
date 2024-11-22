@@ -1,5 +1,5 @@
-import { state } from 'lithent/helper';
-import { h, mount } from 'lithent';
+import { state } from '@/engine/helper';
+import { h, mount } from '@/engine';
 import Layout from '@/layout';
 import { PageProps } from '@/types';
 

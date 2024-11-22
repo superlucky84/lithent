@@ -1,5 +1,5 @@
-import { render as lRender, h } from 'lithent';
-import { store } from 'lithent/helper';
+import { render as lRender, h } from '@/engine';
+import { store } from '@/engine/helper';
 
 let initPage = '';
 const pageModules = import.meta.glob('./pages/*.tsx');

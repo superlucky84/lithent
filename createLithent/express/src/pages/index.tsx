@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { h, mount } from '@/engine';
 import Layout from '@/layout';
 import { navigate } from '@/route';
 

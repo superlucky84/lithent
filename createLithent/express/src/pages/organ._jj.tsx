@@ -1,5 +1,5 @@
-import { state } from 'lithent/helper';
-import { h, mount } from 'lithent';
+import { state } from '@/engine/helper';
+import { h, mount } from '@/engine';
 import Layout from '@/layout';
 import { PageProps } from '@/types';
 
@@ -30,12 +30,15 @@ const Main = mount<
 
   return () => (
     <Layout>
-      <div>9!0</div>
+      <div>!9!000</div>
       <div>{initProp.count}</div>
       <div>99999</div>
       <div>
         <span>{num.value}</span>
-        main <button onClick={handleClick}>increase =-{num.value} </button>
+        index{' '}
+        <button class="btn" onClick={handleClick}>
+          increase =-{num.value}{' '}
+        </button>
         ava
       </div>
       <div>77790</div>

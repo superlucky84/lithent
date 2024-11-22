@@ -1,6 +1,6 @@
-import { h } from 'lithent';
-import type { Props, TagFunction } from 'lithent';
-import { hydration } from 'lithent/ssr';
+import { h } from '@/engine';
+import type { Props, TagFunction } from '@/engine';
+import { hydration } from '@/engine/ssr';
 const pageModules = import.meta.glob('./pages/*.tsx');
 import { makeRoute } from '@/route';
 

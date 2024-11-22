@@ -1,8 +1,8 @@
 // server.js
 import path, { resolve } from 'path';
 import express from 'express';
-import { h } from 'lithent';
-import { renderToString } from 'lithent/ssr';
+// import { h } from 'lithent';
+// import { renderToString } from 'lithent/ssr';
 import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 import sortFiles from './sortFiles.js';
@@ -15,18 +15,19 @@ const isTailwindConfigPresent = fs.existsSync(
 
 const isDev = process.env.NODE_ENV !== 'production';
 let vite;
-if (isDev) {
-  vite = await createViteServer({
-    server: { middlewareMode: 'ssr', hmr: true },
-    root: process.cwd(),
-    plugins: [],
-    resolve: {
-      alias: {
-        '@': '/src',
-      },
+vite = await createViteServer({
+  server: { middlewareMode: 'ssr', hmr: true },
+  root: process.cwd(),
+  plugins: [],
+  resolve: {
+    alias: {
+      '@': '/src',
     },
-  });
-}
+  },
+});
+
+const { h } = await vite.ssrLoadModule(`@/engine`);
+const { renderToString } = await vite.ssrLoadModule(`@/engine/ssr`);
 
 async function createServer() {
   const entries = getEntries();

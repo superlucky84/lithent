@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { h, mount } from '@/engine';
 
 const Layout = mount((_r, _props, children) => {
   return () => (
