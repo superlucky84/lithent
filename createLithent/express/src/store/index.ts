@@ -51,6 +51,8 @@ selectedMemberWatch(
     if (info && state.id) {
       console.log('UPDATEID', info.id, state.id);
       state.info = info;
+    } else {
+      state.info = null;
     }
   },
   state => [state.id]

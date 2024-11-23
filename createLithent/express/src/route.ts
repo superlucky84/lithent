@@ -119,45 +119,46 @@ const routeRef = routeAssign(
 
 export function makeRoute() {
   window.addEventListener('popstate', _ => {
-    const { pathname, search } = window.location;
-    const base = window.location.origin;
+    const { pathname, search, origin } = window.location;
 
-    const urlA = new URL(routeRef.page, base);
-    const urlB = new URL(pathname, base);
+    const urlA = new URL(routeRef.page, origin);
+    const urlB = new URL(`${pathname}${search}`, origin);
 
-    if (urlA.pathname === urlB.pathname) {
-      if (urlA.search !== urlB.search) {
-        const userSearchParam = new URLSearchParams(search);
-        const userId = userSearchParam.get('userId');
-        if (userId) {
-          selectMemberRef.id = userId;
-        }
-      }
-    } else {
-      routeRef.page = `${pathname}${search}`;
-    }
+    execRoute(urlA, urlB, false);
   });
 
   return routeRef;
 }
 
 export function navigate(pagePath: string) {
-  history.pushState(null, '', pagePath);
-  const base = window.location.origin;
+  const { pathname, search, origin } = window.location;
 
-  const urlA = new URL(routeRef.page, base);
-  const urlB = new URL(pagePath, base);
+  const urlA = new URL(`${pathname}${search}`, origin);
+  const urlB = new URL(pagePath, origin);
+
+  execRoute(urlA, urlB, true);
+}
+
+function execRoute(urlA: URL, urlB: URL, isPush?: boolean) {
   if (urlA.pathname === urlB.pathname) {
-    if (urlA.search !== urlB.search) {
+    if (!urlB.search || urlA.search === urlB.search) {
+      selectMemberRef.id = '';
+    } else if (urlA.search !== urlB.search) {
       const userSearchParam = new URLSearchParams(urlB.search);
       const userId = userSearchParam.get('userId');
       if (userId) {
         selectMemberRef.id = userId;
       }
-    } else {
-      selectMemberRef.id = '';
     }
   } else {
-    routeRef.page = pagePath;
+    routeRef.page = `${urlB.pathname}${urlB.search}`;
+  }
+
+  if (isPush) {
+    if (!selectMemberRef.id) {
+      history.pushState(null, '', urlA.pathname);
+    } else {
+      history.pushState(null, '', `${urlB.pathname}${urlB.search}`);
+    }
   }
 }

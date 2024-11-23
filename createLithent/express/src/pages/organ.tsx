@@ -1,4 +1,4 @@
-import { h, mount, updateCallback } from '@/engine';
+import { h, mount, mountCallback } from '@/engine';
 import Layout from '@/layout';
 import { makeDepartmentTree } from '@/helper/calculator';
 import DepartmentTree from '@/components/DepartmentTree';
@@ -19,10 +19,10 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
   const { departmentList, userList } = initProp;
   const { departmantTree } = makeDepartmentTree(departmentList);
 
-  updateCallback(() => {
+  mountCallback(() => {
     console.log('7');
+    selectMemberRef.id = props.query.userId;
   });
-  selectMemberRef.id = props.query.userId;
 
   allMemberRef.value = userList.map(item => {
     return {
