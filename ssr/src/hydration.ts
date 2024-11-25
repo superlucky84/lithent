@@ -1,5 +1,5 @@
-import { render } from '@/engine';
-import type { WDom } from '@/engine';
+import { render } from 'lithent';
+import type { WDom } from 'lithent';
 
 /**
  * hydration
