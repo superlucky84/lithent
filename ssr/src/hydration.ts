@@ -1,5 +1,5 @@
-import { render } from 'lithent';
-import type { WDom } from 'lithent';
+import { render } from '@/engine';
+import type { WDom } from '@/engine';
 
 /**
  * hydration
@@ -50,6 +50,11 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
       let wDomItem = wDomList[index];
       const nodeType = realDomItem.nodeType;
       let pass = false;
+
+      if (wDomItem?.type === null) {
+        index += 1;
+        wDomItem = wDomList[index];
+      }
 
       if (
         realDomItem &&
