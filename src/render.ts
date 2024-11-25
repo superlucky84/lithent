@@ -38,7 +38,11 @@ export const render = (
     wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else if (!isHydration) {
-    wrapElement.appendChild(Dom);
+    if (wrapElement.tagName === 'HTML') {
+      wrapElement.replaceWith(Dom);
+    } else {
+      wrapElement.appendChild(Dom);
+    }
   }
 
   execMountedQueue();
@@ -116,7 +120,11 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
     const nodeType = item.el?.nodeType;
     if (nodeType) {
       if ([1, 3].includes(nodeType)) {
-        parent.removeChild(item?.el as HTMLElement);
+        if ((item.el as HTMLElement).tagName === 'HTML') {
+          (item.el as HTMLElement).innerHTML = '';
+        } else {
+          (item.el as HTMLElement).remove();
+        }
       } else if (nodeType === 11) {
         findChildWithRemoveElement(item, parent);
       }

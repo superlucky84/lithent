@@ -21,8 +21,15 @@ const setComponetRef = (compKey: Props) => {
 
 export const getComponentKey = () => compKeyRef.value;
 
-export const getComponentSubInfo = (compKey: Props, subKey: ComponentSubKey) =>
-  componentRef.get(compKey)![subKey];
+export const getComponentSubInfo = (
+  compKey: Props,
+  subKey: ComponentSubKey
+) => {
+  if (componentRef.get(compKey)) {
+    return componentRef.get(compKey)![subKey];
+  }
+  return null;
+};
 
 export const initUpdateHookState = (compKey: Props) =>
   (compKeyRef.value = compKey);

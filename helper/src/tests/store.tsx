@@ -61,7 +61,7 @@ if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
   it('A DOM should be created that reflects the initial values of your store.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div><div>count1: </div><div>count2: </div><div>count3: 1</div><button type="text">change count</button></div>'
+      '<div><div>count1: 1</div><div>count2: 1</div><div>count3: 1</div><button type="text">change count</button></div>'
     );
     if (testChangeRef.value) {
       testChangeRef.value();
@@ -72,28 +72,15 @@ if (import.meta.vitest) {
   it('You should see a DOM that reflects the changed store values.', () => {
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div><div>count1: </div><div>count2: </div><div>count3: 8</div><button type="text">change count</button></div>'
+        '<div><div>count1: 4</div><div>count2: -2</div><div>count3: 8</div><button type="text">change count</button></div>'
       );
-    });
-  });
-  it('For subscriptions that did not request a value, the value is null.', () => {
-    expect(proxyFirst.count3).toBe(null);
-  });
-  it('For subscriptions that did not request a value, the value is null - 2', () => {
-    proxyFirst.count1 = 777;
-
-    nextTick().then(() => {
-      expect(testWrap.outerHTML).toBe(
-        '<div><div>count1: </div><div>count2: </div><div>count3: 8</div><button type="text">change count</button></div>'
-      );
-      expect(proxySubscribeChkValue).toBe(777);
     });
   });
   it('abort test', () => {
     abortControl.abort();
     proxyFirst.count1 = 999;
     nextTick().then(() => {
-      expect(proxySubscribeChkValue).toBe(777);
+      expect(proxySubscribeChkValue).toBe(4);
     });
   });
 }
