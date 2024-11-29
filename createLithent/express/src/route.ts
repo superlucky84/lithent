@@ -1,6 +1,8 @@
-import { render as lRender, h } from '@/engine';
-import { store } from '@/engine/helper';
+import type { WDom } from 'lithent';
+import { h } from 'lithent';
+import { store } from 'lithent/helper';
 import { selectMemberRef } from '@/store';
+// import Layout from '@/layout';
 
 let initPage = '';
 const pageModules = import.meta.glob('./pages/*.tsx');
@@ -63,7 +65,6 @@ function parseQueryStringToMap(queryString: string) {
 }
 
 async function loadPage(dynamicPath: string) {
-  console.log('jinwoo');
   const orgPage = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
   const comparePage = orgPage.replace(/\?[^\.]*/, '');
   const queryOrg = orgPage.replace(/.*(\?[^\.]*).tsx/, '$1');
@@ -81,12 +82,13 @@ async function loadPage(dynamicPath: string) {
     if (makeInitProp) {
       initProp = await makeInitProp();
     }
-
-    lRender(
-      //@ts-ignore
-      h(res.default, { params, query, initProp }),
-      document.documentElement
-    );
+    //@ts-ignore
+    const Page = h(res.default, { params, query, initProp });
+    const rVDom = routeRef.rVDom;
+    if (rVDom?.compProps) {
+      rVDom.compProps.page = Page;
+      routeRef.renew();
+    }
   } else {
     location.href = comparePage;
   }
@@ -95,26 +97,24 @@ async function loadPage(dynamicPath: string) {
 const routeAssign = store<{
   page: string;
   destroy: (() => void) | string;
+  renew: () => void;
+  rVDom: WDom | null;
 }>({
   page: '',
   destroy: '',
+  renew: () => {},
+  rVDom: null,
 });
 
 const routeRef = routeAssign(
   state => {
-    console.log('isdgsdgsdgsdgsdgsdgsdg');
-    if (
-      state &&
-      state.page !== initPage &&
-      typeof state.destroy === 'function'
-    ) {
-      state.destroy();
-
+    if (state && state.page !== initPage && state.rVDom) {
+      console.log('RUN LOAD PAGE');
       loadPage(state.page);
     }
     initPage = state.page;
   },
-  store => [store.page, store.destroy]
+  store => [store.page]
 );
 
 export function makeRoute() {
@@ -151,14 +151,12 @@ function execRoute(urlA: URL, urlB: URL, isPush?: boolean) {
       }
     }
   } else {
+    console.log('0 - 0000000000000000', routeRef.page);
     routeRef.page = `${urlB.pathname}${urlB.search}`;
+    console.log('0 - 7777777777777777', routeRef.page);
   }
 
   if (isPush) {
-    if (!selectMemberRef.id) {
-      history.pushState(null, '', urlA.pathname);
-    } else {
-      history.pushState(null, '', `${urlB.pathname}${urlB.search}`);
-    }
+    history.pushState(null, '', `${urlB.pathname}${urlB.search}`);
   }
 }

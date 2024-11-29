@@ -1,5 +1,5 @@
-import { state, computed } from '@/engine/helper';
-import { h, mount, Fragment } from '@/engine';
+import { state, computed } from 'lithent/helper';
+import { h, mount, Fragment } from 'lithent';
 import { selectedDepartmentWatch } from '@/store';
 import clsx from '@/helper/clsx';
 import type { Department } from '@/types';

@@ -1,5 +1,4 @@
-import { h, mount, mountCallback } from '@/engine';
-import Layout from '@/layout';
+import { h, Fragment, mount, mountCallback } from 'lithent';
 import { makeDepartmentTree } from '@/helper/calculator';
 import DepartmentTree from '@/components/DepartmentTree';
 import UserList from '@/components/UserList';
@@ -33,7 +32,7 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
   });
 
   return () => (
-    <Layout>
+    <Fragment>
       <div class="w-1/3 h-full bg-red-500 flex items-center justify-center">
         <DepartmentTree departmantTree={departmantTree} />
       </div>
@@ -43,7 +42,7 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
       <div class="w-1/3 h-full bg-blue-500 flex items-center justify-center">
         <UserItem />
       </div>
-    </Layout>
+    </Fragment>
   );
 });
 

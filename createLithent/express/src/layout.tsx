@@ -1,6 +1,7 @@
-import { h, mount } from '@/engine';
+import type { WDom } from 'lithent';
+import { h, mount } from 'lithent';
 
-const Layout = mount((_r, _props, children) => {
+const Layout = mount<{ page: WDom }>((_r, props) => {
   return () => (
     <html lang="en" class="light" style="color-scheme: light;">
       <head>
@@ -14,7 +15,7 @@ const Layout = mount((_r, _props, children) => {
         />
       </head>
       <body class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="w-3/4 h-[80vh] flex">{children}</div>
+        <div class="w-3/4 h-[80vh] flex">{props.page}</div>
       </body>
     </html>
   );

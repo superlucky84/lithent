@@ -1,8 +1,9 @@
-import { h } from '@/engine';
-import type { Props, TagFunction } from '@/engine';
-import { hydration } from '@/engine/ssr';
+import { h, componentUpdate } from 'lithent';
+import type { WDom, Props, TagFunction } from 'lithent';
+import { hydration } from 'lithent/ssr';
 const pageModules = import.meta.glob('./pages/*.tsx');
 import { makeRoute } from '@/route';
+import Layout from '@/layout';
 
 export default async function load(key: string, props: Props) {
   const res = await pageModules[`./pages/${key}`]();
@@ -10,10 +11,16 @@ export default async function load(key: string, props: Props) {
 
   const { pathname, search } = location;
 
+  // @ts-ignore
+  const Page = h(res!.default as TagFunction, props) as WDom;
+  const LayoutWDom = h(Layout as TagFunction, {
+    page: Page,
+  }) as WDom;
+  const renewRoot =
+    (LayoutWDom.compKey && componentUpdate(LayoutWDom.compKey)) || (() => {});
+
   routeRef.page = `${pathname}${search}`;
-  routeRef.destroy = hydration(
-    // @ts-ignore
-    h(res!.default as TagFunction, props),
-    document.documentElement
-  );
+  routeRef.destroy = hydration(LayoutWDom, document.documentElement);
+  routeRef.renew = renewRoot;
+  routeRef.rVDom = LayoutWDom;
 }

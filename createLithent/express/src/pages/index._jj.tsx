@@ -1,6 +1,5 @@
-import { state } from '@/engine/helper';
-import { h, mount } from '@/engine';
-import Layout from '@/layout';
+import { state } from 'lithent/helper';
+import { h, mount, Fragment } from 'lithent';
 import { PageProps } from '@/types';
 
 export const makeInitProp = async () => {
@@ -29,7 +28,7 @@ const Main = mount<
   console.log('INITPROP', initProp);
 
   return () => (
-    <Layout>
+    <Fragment>
       <div>!9!000</div>
       <div>{initProp.count}</div>
       <div>99999</div>
@@ -42,7 +41,7 @@ const Main = mount<
         ava
       </div>
       <div>77790</div>
-    </Layout>
+    </Fragment>
   );
 });
 

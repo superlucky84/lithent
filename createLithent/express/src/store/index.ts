@@ -1,5 +1,5 @@
 import type { UserList, User } from '@/types';
-import { store } from '@/engine/helper';
+import { store } from 'lithent/helper';
 
 /**
  * 모든맴버

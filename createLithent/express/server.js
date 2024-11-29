@@ -1,8 +1,8 @@
 // server.js
 import path, { resolve } from 'path';
 import express from 'express';
-// import { h } from 'lithent';
-// import { renderToString } from 'lithent/ssr';
+import { h } from 'lithent';
+import { renderToString } from 'lithent/ssr';
 import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 import sortFiles from './sortFiles.js';
@@ -22,8 +22,6 @@ vite = await createViteServer({
   },
 });
 
-const { h } = await vite.ssrLoadModule(`@/engine`);
-const { renderToString } = await vite.ssrLoadModule(`@/engine/ssr`);
 const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
 
 async function createServer() {
@@ -71,7 +69,7 @@ async function createServer() {
           }
 
           const PageString = renderToString(
-            h(Page, Object.assign({}, props, { initProp }))
+            h(Layout, { page: h(Page, Object.assign({}, props, { initProp })) })
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
 
@@ -91,12 +89,19 @@ async function createServer() {
           );
         } else {
           const loadResourcePath = getScriptPath('load.ts');
+
           const resourcePath = getScriptPath(key);
           const modulePath = path.resolve(__dirname, resourcePath);
+
+          const layoutResourcePath = getScriptPath('layout.ts');
+          const layoutPath = path.resolve(__dirname, layoutResourcePath);
 
           const module = await import(modulePath);
           const Page = module.default;
           const makeInitProp = module.makeInitProp;
+
+          const layoutModule = await import(layoutPath);
+          const layoutComponent = layoutModule.default;
 
           let initProp = null;
           if (makeInitProp) {
@@ -104,8 +109,11 @@ async function createServer() {
           }
 
           const PageString = renderToString(
-            h(Page, Object.assign(props, { initProp }))
+            h(layoutComponent, {
+              page: h(Page, Object.assign(props, { initProp })),
+            })
           );
+
           const appHtmlOrig = `<!doctype html>${PageString}`;
           finalHtml = appHtmlOrig.replace(
             '</body>',
