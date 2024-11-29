@@ -77,21 +77,33 @@ render(
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
 
-  it('If the observer function is specified when assigning from helper/store, only the specified value can be retrieved.', () => {
+  it('Even if you specify an observer function when assigning from a helper/store, you must be able to reference the value.', () => {
     expect(testWrap.outerHTML).toBe(
-      '<div id="root"><span>1</span><button type="button">count1: 0</button><button type="button">count2: </button><button type="button">count3: 0</button><span>2</span><button type="button">count1: 0</button><button type="button">count2: </button><button type="button">count3: 0</button><span>3</span></div>'
+      '<div id="root"><span>1</span><button type="button">count1: 0</button><button type="button">count2: 0</button><button type="button">count3: 0</button><span>2</span><button type="button">count1: 0</button><button type="button">count2: 0</button><button type="button">count3: 0</button><span>3</span></div>'
     );
   });
 
-  it('If you define an observer function to get a value from store, you must also restrict updates to the value.', () => {
-    if (testChangeRef1.value && testChangeRef2.value && testChangeRef3.value) {
-      testChangeRef1.value();
+  it('If the subscription array has no values, you should not detect a value change.', () => {
+    if (testChangeRef2.value) {
       testChangeRef2.value();
-      testChangeRef3.value();
+      testChangeRef2.value();
     }
     nextTick().then(() => {
       expect(testWrap.outerHTML).toBe(
-        '<div id="root"><span>1</span><button type="button">count1: 1</button><button type="button">count2: </button><button type="button">count3: 1</button><span>2</span><button type="button">count1: 1</button><button type="button">count2: </button><button type="button">count3: 1</button><span>3</span></div>'
+        '<div id="root"><span>1</span><button type="button">count1: 0</button><button type="button">count2: 0</button><button type="button">count3: 0</button><span>2</span><button type="button">count1: 0</button><button type="button">count2: 0</button><button type="button">count3: 0</button><span>3</span></div>'
+      );
+    });
+  });
+
+  it('If the subscription array has values, we need to detect changes.', () => {
+    if (testChangeRef1.value) {
+      testChangeRef1.value();
+      testChangeRef1.value();
+      testChangeRef1.value();
+    }
+    nextTick().then(() => {
+      expect(testWrap.outerHTML).toBe(
+        '<div id="root"><span>1</span><button type="button">count1: 3</button><button type="button">count2: 2</button><button type="button">count3: 0</button><span>2</span><button type="button">count1: 3</button><button type="button">count2: 2</button><button type="button">count3: 0</button><span>3</span></div>'
       );
     });
   });

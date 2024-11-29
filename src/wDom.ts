@@ -26,6 +26,9 @@ import {
 } from '@/utils/predicator';
 import { assign } from '@/utils';
 
+/**
+ * 여러 요소를 그룹화 할수 있게 해준다.
+ */
 export const Fragment = (_props: Props, ...children: WDom[]) =>
   ({
     type: 'fragment',
@@ -33,6 +36,9 @@ export const Fragment = (_props: Props, ...children: WDom[]) =>
     children,
   } as WDom);
 
+/**
+ * 엘리먼트 생성 (createElement)
+ */
 export const h = (
   tag: TagFunction | FragmentFunction | string,
   props: Props,
@@ -50,15 +56,24 @@ export const h = (
   return node;
 };
 
+/**
+ * 포털을 가능하게 해준다.
+ */
 export const portal = (wDom: WDom, portal: HTMLElement) => {
   return h('portal', { portal }, wDom);
 };
 
+/**
+ * 컴포넌트 생성을 도와준다
+ */
 export const mount =
   <T>(component: Component<T>) =>
   (_props: T, _children?: MiddleStateWDomChildren) =>
     component;
 
+/**
+ * 특정 컴포넌트부터 새로 그려준다.
+ */
 const reRenderCustomComponent = (
   tag: TagFunction,
   props: Props,
@@ -92,6 +107,9 @@ const reRenderCustomComponent = (
   wDomUpdate(newWDomTree);
 };
 
+/**
+ * 가상돔을 리랜더링 할때 기존 가상돔과 diff를 위한 중간단계 생성
+ */
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
   const ctor = tag;
@@ -116,6 +134,9 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   return { tagName, ctor, props, children, resolve };
 };
 
+/**
+ * 컴포넌트로 부터 실제 가상돔 노드를 만든다.
+ */
 const makeCustomNode = (
   componentMaker: (props: Props) => WDom,
   compKey: Props,
@@ -152,6 +173,9 @@ const makeCustomNode = (
   return customNode;
 };
 
+/**
+ * 컴포넌트로 부터 실제로 가상돔이 만들어질때, 추후 다시그리기 위한 리랜더 메서드 생성
+ */
 const makeReRender = (
   componentMaker: (props: Props) => WDom,
   compKey: Props,
@@ -164,6 +188,9 @@ const makeReRender = (
   return reRender;
 };
 
+/**
+ * 리렌더 메서드로 부터 다시그리기 위한 시작점
+ */
 const wDomMaker = (
   componentMaker: (props: Props) => WDom,
   compKey: Props,
@@ -182,6 +209,9 @@ const wDomMaker = (
   return customNode;
 };
 
+/**
+ * 커스텀 컴포넌트 노드를만들때 가상돔 객체에 기타 정보 속성을 붙여준다
+ */
 const addComponentProps = (
   wDom: WDom,
   compKey: Props,
@@ -203,9 +233,14 @@ const addComponentProps = (
     reRenderCustomComponent(tag, props, children, wDom)
   );
 
-  (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
+  if (getComponentSubInfo(compKey, 'vd')) {
+    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
+  }
 };
 
+/**
+ * h 함수로 부터 가상돔이 만들어지는 시작점
+ */
 const makeNode = (
   tag: TagFunction | FragmentFunction | string,
   props: Props,
@@ -230,6 +265,9 @@ const makeNode = (
   } as WDom;
 };
 
+/**
+ * 가상돔의 자식 가상돔들을 재귀 처리해주는 시작점
+ */
 const remakeChildren = (
   nodeParentPointer: NodePointer,
   children: MiddleStateWDomChildren
@@ -238,6 +276,9 @@ const remakeChildren = (
     assign(makeChildrenItem(item), { getParent: () => nodeParentPointer.value })
   );
 
+/**
+ * 가상돔의 자식 가상돔들을 재귀 처리
+ */
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {
     return { type: null, [wdomSymbol]: true } as WDom;

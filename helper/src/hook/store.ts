@@ -10,7 +10,10 @@ type StoreValue = {
 
 const DEFAULT_OPTION = { cache: true };
 
-export const store = <V>(initialValue: V) => {
+/**
+ * 리액티브 스토어 생성
+ */
+export function store<V>(initialValue: V) {
   type T = StoreType<V>;
 
   const allowInitSetting = { value: false };
@@ -38,7 +41,6 @@ export const store = <V>(initialValue: V) => {
     }
 
     const storeRenderObserveMap: StoreValue = {};
-    // const allowedAccessProp: (keyof T)[] = [];
     const allowedAccessProp: Set<keyof T> = new Set();
 
     let makedProxy: { value: null | T } = { value: null };
@@ -53,9 +55,9 @@ export const store = <V>(initialValue: V) => {
         allowInitSetting,
         storeRenderList,
         allowedAccessProp,
+        storeRenderObserveList,
         run,
-        storeRenderObserveMap,
-        storeRenderObserveList
+        storeRenderObserveMap
       );
       allowInitSetting.value = true;
       makeObserver(makedProxy.value);
@@ -67,7 +69,8 @@ export const store = <V>(initialValue: V) => {
         value,
         allowInitSetting,
         storeRenderList,
-        allowedAccessProp
+        allowedAccessProp,
+        storeRenderObserveList
       );
 
       if (renew) {
@@ -88,17 +91,20 @@ export const store = <V>(initialValue: V) => {
 
     return makedProxy.value;
   };
-};
+}
 
-const updater = <T extends { [key: string | symbol]: unknown }>(
+/**
+ * 사용자에게 노출될 프록시 개체 생성
+ */
+function updater<T extends { [key: string | symbol]: unknown }>(
   value: T,
   allowInitSetting: { value: boolean },
   storeRenderList: Set<Run>,
   allowedAccessProp: Set<keyof T>,
+  storeRenderObserveList: StoreValue[],
   run?: Run,
-  storeRenderObserveMap?: StoreValue,
-  storeRenderObserveList?: StoreValue[]
-) => {
+  storeRenderObserveMap?: StoreValue
+) {
   const result = new Proxy(value, {
     get(target: T, prop: keyof T) {
       if (run && storeRenderObserveMap && allowInitSetting.value) {
@@ -110,41 +116,32 @@ const updater = <T extends { [key: string | symbol]: unknown }>(
         }
       }
 
-      if (allowedAccessProp.has(prop) || !run) {
-        return target[prop];
-      }
-
-      return null;
+      return target[prop];
     },
     set(target, prop: keyof T, value) {
       if (target[prop] === value) {
         return true;
-      } else if (allowedAccessProp.has(prop) || !run) {
-        target[prop] = value;
-      } else {
-        return true;
       }
 
-      execDependentCallbacks(
-        storeRenderList,
-        storeRenderObserveList,
-        prop,
-        run
-      );
+      target[prop] = value;
+
+      execDependentCallbacks(storeRenderList, storeRenderObserveList, prop);
 
       return true;
     },
   });
 
   return result;
-};
+}
 
-const execDependentCallbacks = <T>(
+/**
+ * 값 변경시 의존성이 있는 콜백을 찾아서 실행
+ */
+function execDependentCallbacks<T>(
   storeRenderList: Set<Run>,
   storeRenderObserveList: StoreValue[] = [],
-  prop: keyof T,
-  run?: () => boolean | AbortSignal | void
-) => {
+  prop: keyof T
+) {
   const trashCollections: Set<Run> = new Set();
 
   // trashCollections.push(...runWithtrashCollectUnit(storeRenderList));
@@ -153,9 +150,8 @@ const execDependentCallbacks = <T>(
   );
 
   (storeRenderObserveList || []).forEach(storeRenderObserveMap => {
-    const renderObserveList: Set<Run> = run
-      ? storeRenderObserveMap[prop] || new Set<Run>()
-      : new Set<Run>();
+    const renderObserveList: Set<Run> =
+      storeRenderObserveMap[prop] || new Set<Run>();
 
     runWithtrashCollectUnit(renderObserveList).forEach(value =>
       trashCollections.add(value)
@@ -165,18 +161,21 @@ const execDependentCallbacks = <T>(
   });
 
   removeTrashCollect(trashCollections, storeRenderList);
-};
+}
 
-const removeTrashCollect = (
-  trashCollections: Set<Run>,
-  targetList: Set<Run>
-) => {
+/**
+ * 의미 없어진 구독 콜백 제거
+ */
+function removeTrashCollect(trashCollections: Set<Run>, targetList: Set<Run>) {
   trashCollections.forEach(deleteTarget => {
     targetList.delete(deleteTarget);
   });
-};
+}
 
-const runWithtrashCollectUnit = (storeRenderList: Set<Run>) => {
+/**
+ * 단발성 구독 함수는 한번 실행 하고 제거
+ */
+function runWithtrashCollectUnit(storeRenderList: Set<Run>) {
   const trashes: Run[] = [];
   storeRenderList.forEach(run => {
     if (run() === false) {
@@ -184,14 +183,17 @@ const runWithtrashCollectUnit = (storeRenderList: Set<Run>) => {
     }
   });
   return trashes;
-};
+}
 
-const runFirstEmit = <T>(
+/**
+ * 구독이 처음 실행되면 abort 이벤트 수집하여 바인딩
+ */
+function runFirstEmit<T>(
   run: () => boolean | void | AbortSignal,
   storeRenderList: Set<Run>,
   storeRenderObserveMap: StoreValue,
   allowedAccessProp: Set<keyof T>
-) => {
+) {
   const renewResult = run();
 
   if (renewResult instanceof AbortSignal) {
@@ -206,4 +208,4 @@ const runFirstEmit = <T>(
       });
     });
   }
-};
+}

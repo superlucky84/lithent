@@ -51,6 +51,11 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
       const nodeType = realDomItem.nodeType;
       let pass = false;
 
+      if (wDomItem?.type === null) {
+        index += 1;
+        wDomItem = wDomList[index];
+      }
+
       if (
         realDomItem &&
         wDomItem &&

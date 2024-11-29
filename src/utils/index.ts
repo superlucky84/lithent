@@ -11,6 +11,7 @@ export const assign = Object.assign;
 export const isPropType = (obj: unknown): obj is Props => {
   return (
     typeof obj === 'object' &&
+    !Array.isArray(obj) &&
     !Object.getOwnPropertySymbols(obj).includes(wdomSymbol)
   );
 };

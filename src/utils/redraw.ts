@@ -5,14 +5,16 @@ const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
 
 export const setRedrawAction = (compKey: Props, exec: () => void) => {
-  componentRef.get(compKey)!.up = () => {
-    redrawQueue.set(compKey, exec);
+  if (componentRef.get(compKey)) {
+    componentRef.get(compKey)!.up = () => {
+      redrawQueue.set(compKey, exec);
 
-    if (!redrawQueueTimeout) {
-      redrawQueueTimeout = true;
-      queueMicrotask(execRedrawQueue);
-    }
-  };
+      if (!redrawQueueTimeout) {
+        redrawQueueTimeout = true;
+        queueMicrotask(execRedrawQueue);
+      }
+    };
+  }
 };
 
 export const componentUpdate = (compKey: Props) => () => {
