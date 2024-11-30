@@ -5,11 +5,13 @@ const pageModules = import.meta.glob('./pages/*.tsx');
 import { makeRoute } from '@/route';
 import Layout from '@/layout';
 
-export default async function load(key: string, props: Props) {
+export default async function load(key: string, props: Props, initProp: any) {
   const res = await pageModules[`./pages/${key}`]();
   const routeRef = makeRoute();
 
   const { pathname, search } = location;
+
+  (globalThis as any).pagedata = initProp;
 
   // const Page = h(res!.default as TagFunction, props) as WDom;
   const LayoutWDom = h(
@@ -29,4 +31,8 @@ export default async function load(key: string, props: Props) {
   routeRef.destroy = hydration(LayoutWDom, document.documentElement);
   routeRef.renew = renewRoot;
   routeRef.rVDom = LayoutWDom;
+}
+
+export function loadData<T>() {
+  return (globalThis as any).pagedata as T;
 }

@@ -1,5 +1,4 @@
 import type { WDom } from 'lithent';
-import { h } from 'lithent';
 import { store } from 'lithent/helper';
 import { selectMemberRef } from '@/store';
 // import Layout from '@/layout';
@@ -82,6 +81,7 @@ async function loadPage(dynamicPath: string) {
     if (makeInitProp) {
       initProp = await makeInitProp();
     }
+    (globalThis as any).pagedata = initProp;
     //@ts-ignore
     // const Page = h(res.default, { params, query, initProp });
     const Page = res.default;
@@ -90,7 +90,6 @@ async function loadPage(dynamicPath: string) {
       rVDom.compProps.page = Page;
       rVDom.compProps.query = query;
       rVDom.compProps.params = params;
-      rVDom.compProps.initProp = initProp;
       routeRef.renew();
     }
   } else {

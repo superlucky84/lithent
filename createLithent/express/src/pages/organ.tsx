@@ -5,17 +5,25 @@ import UserList from '@/components/UserList';
 import UserItem from '@/components/UserItem';
 import { allMemberRef, selectMemberRef } from '@/store';
 import type { Organ, PageProps } from '@/types';
+import { loadData } from '@/load';
 
 export const makeInitProp = async () => {
   const result = await fetch(
     'http://localhost:3000/assets/choonsik_company_org.json'
   );
-  return result.json();
+  const data = await result.json();
+
+  return {
+    layout: {
+      title: 'organ',
+    },
+    data,
+  };
 };
 
 const Organ = mount<PageProps<Organ>>((_renew, props) => {
-  const initProp = props.initProp;
-  const { departmentList, userList } = initProp;
+  const initProp = loadData<Organ>();
+  const { departmentList, userList } = initProp.data;
   const { departmantTree } = makeDepartmentTree(departmentList);
 
   mountCallback(() => {

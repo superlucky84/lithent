@@ -5,8 +5,10 @@ export type PageProps<T = null> = {
 };
 
 export type Organ = {
-  userList: UserList;
-  departmentList: DepartmentList;
+  data: {
+    userList: UserList;
+    departmentList: DepartmentList;
+  };
 };
 
 export type User = {

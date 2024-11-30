@@ -3,6 +3,14 @@ import { navigate } from '@/route';
 
 console.log('NVAI', navigate);
 
+export const makeInitProp = () => {
+  return {
+    layout: {
+      title: 'INDEX',
+    },
+  };
+};
+
 const Index = mount(_r => {
   return () => (
     <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">

@@ -68,9 +68,11 @@ async function createServer() {
             initProp = await makeInitProp();
           }
 
+          globalThis.pagedata = initProp;
+
           const PageString = renderToString(
             // h(Layout, { page: h(Page, Object.assign({}, props, { initProp })) })
-            h(Layout, Object.assign({ page: Page }, props, { initProp }))
+            h(Layout, Object.assign({ page: Page }, props))
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
 
@@ -84,8 +86,8 @@ async function createServer() {
             `<script type="module">
               import load from '/src/load';
               load('${key}', ${JSON.stringify(
-              Object.assign({}, props, { initProp })
-            )});
+              Object.assign({}, props)
+            )}, ${JSON.stringify(initProp)});
              </script></body>`
           );
         } else {
@@ -111,7 +113,7 @@ async function createServer() {
 
           const PageString = renderToString(
             h(layoutComponent, {
-              page: h(Page, Object.assign(props, { initProp })),
+              page: h(Page, Object.assign(props)),
             })
           );
 
@@ -122,8 +124,8 @@ async function createServer() {
               import load from '/${loadResourcePath}';
 
               load('${key}', ${JSON.stringify(
-              Object.assign(props, { initProp })
-            )});
+              Object.assign(props)
+            )}, ${JSON.stringify(initProp)});
               </script></body>`
           );
         }
