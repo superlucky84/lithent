@@ -18,7 +18,7 @@ export const addMountedQueue = (wDom: WDom) => {
   }
 };
 export const mountCallback = (effectAction: () => void) =>
-  componentRef.get(getComponentKey())!.mts.push(effectAction);
+  (componentRef.get(getComponentKey())?.mts || []).push(effectAction);
 
 export const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { compKey } = newWDom;
