@@ -69,7 +69,8 @@ async function createServer() {
           }
 
           const PageString = renderToString(
-            h(Layout, { page: h(Page, Object.assign({}, props, { initProp })) })
+            // h(Layout, { page: h(Page, Object.assign({}, props, { initProp })) })
+            h(Layout, Object.assign({ page: Page }, props, { initProp }))
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
 

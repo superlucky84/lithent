@@ -1,8 +1,13 @@
-import type { WDom } from 'lithent';
+import type { TagFunction } from 'lithent';
 import { h, mount } from 'lithent';
 
-const Layout = mount<{ page: WDom }>((_r, props) => {
-  return () => (
+const Layout = mount<{
+  page: TagFunction;
+  params: Record<string, string>;
+  query: Record<string, string>;
+  initProp: any;
+}>(_r => {
+  return ({ page: Page, params, query, initProp }) => (
     <html lang="en" class="light" style="color-scheme: light;">
       <head>
         <meta charset="UTF-8" />
@@ -15,7 +20,9 @@ const Layout = mount<{ page: WDom }>((_r, props) => {
         />
       </head>
       <body class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="w-3/4 h-[80vh] flex">{props.page}</div>
+        <div class="w-3/4 h-[80vh] flex">
+          <Page params={params} query={query} initProp={initProp} />
+        </div>
       </body>
     </html>
   );

@@ -11,11 +11,17 @@ export default async function load(key: string, props: Props) {
 
   const { pathname, search } = location;
 
-  // @ts-ignore
-  const Page = h(res!.default as TagFunction, props) as WDom;
-  const LayoutWDom = h(Layout as TagFunction, {
-    page: Page,
-  }) as WDom;
+  // const Page = h(res!.default as TagFunction, props) as WDom;
+  const LayoutWDom = h(
+    Layout as TagFunction,
+    Object.assign(
+      {
+        // @ts-ignore
+        page: res!.default,
+      },
+      props
+    )
+  ) as WDom;
   const renewRoot =
     (LayoutWDom.compKey && componentUpdate(LayoutWDom.compKey)) || (() => {});
 

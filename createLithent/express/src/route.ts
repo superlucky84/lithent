@@ -83,10 +83,14 @@ async function loadPage(dynamicPath: string) {
       initProp = await makeInitProp();
     }
     //@ts-ignore
-    const Page = h(res.default, { params, query, initProp });
+    // const Page = h(res.default, { params, query, initProp });
+    const Page = res.default;
     const rVDom = routeRef.rVDom;
     if (rVDom?.compProps) {
       rVDom.compProps.page = Page;
+      rVDom.compProps.query = query;
+      rVDom.compProps.params = params;
+      rVDom.compProps.initProp = initProp;
       routeRef.renew();
     }
   } else {
