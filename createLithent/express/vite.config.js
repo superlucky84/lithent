@@ -26,7 +26,13 @@ export default defineConfig(({ mode }) => ({
   build: {
     lib: {
       entry: cachedEntries,
-      formats: ['es'], // 원하는 포맷으로 설정 (ESM, UMD 등)
+      formats: ['es'],
+      fileName: format => `[name]-[hash].${format}.js`, // 파일 이름 패턴 지정
+    },
+    rollupOptions: {
+      output: {
+        assetFileNames: '[name]-[hash][extname]',
+      },
     },
   },
   test: {

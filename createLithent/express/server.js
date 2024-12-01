@@ -6,23 +6,30 @@ import { renderToString } from 'lithent/ssr';
 import { createServer as createViteServer } from 'vite';
 import fs from 'fs';
 import sortFiles from './sortFiles.js';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const isDev = process.env.NODE_ENV !== 'production';
 let vite;
-vite = await createViteServer({
-  server: { middlewareMode: 'ssr', hmr: true },
-  root: process.cwd(),
-  plugins: [],
-  resolve: {
-    alias: {
-      '@': '/src',
+if (isDev) {
+  vite = await createViteServer({
+    css: {
+      postcss: {
+        plugins: [tailwindcss, autoprefixer], // 미리 import한 플러그인 사용
+      },
     },
-  },
-});
-
-const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
+    server: { middlewareMode: 'ssr', hmr: true },
+    root: process.cwd(),
+    plugins: [],
+    resolve: {
+      alias: {
+        '@': '/src',
+      },
+    },
+  });
+}
 
 async function createServer() {
   const entries = getEntries();
@@ -59,6 +66,7 @@ async function createServer() {
         let finalHtml = '';
 
         if (isDev) {
+          const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
           const { default: Page, makeInitProp } = await vite.ssrLoadModule(
             `@/pages/${key}`
           );
@@ -92,6 +100,7 @@ async function createServer() {
           );
         } else {
           const loadResourcePath = getScriptPath('load.ts');
+          const cssResourcePath = getScriptPath('style');
 
           const resourcePath = getScriptPath(key);
           const modulePath = path.resolve(__dirname, resourcePath);
@@ -111,12 +120,18 @@ async function createServer() {
             initProp = await makeInitProp();
           }
 
+          globalThis.pagedata = initProp;
+
           const PageString = renderToString(
             h(layoutComponent, Object.assign({ page: Page }, props))
           );
 
           const appHtmlOrig = `<!doctype html>${PageString}`;
           finalHtml = appHtmlOrig.replace(
+            '</head>',
+            `<link rel="stylesheet" href="/${cssResourcePath}"></head>`
+          );
+          finalHtml = finalHtml.replace(
             '</body>',
             `<script type="module">
               import load from '/${loadResourcePath}';
@@ -157,9 +172,7 @@ createServer();
 function getScriptPath(routeString) {
   const directoryPath = path.resolve(__dirname, 'dist');
   const files = fs.readdirSync(directoryPath);
-  const targetFile = files.find(
-    file => file.startsWith(`${routeString}`) && file.endsWith('.js')
-  );
+  const targetFile = files.find(file => file.startsWith(`${routeString}`));
   return targetFile ? `dist/${targetFile}` : null;
 }
 

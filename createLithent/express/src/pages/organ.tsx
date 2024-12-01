@@ -48,7 +48,9 @@ const Organ = mount<PageProps<Organ>>((_renew, props) => {
         <UserList />
       </div>
       <div class="w-1/3 h-full bg-blue-500 flex items-center justify-center">
+        333333
         <UserItem />
+        333
       </div>
     </Fragment>
   );

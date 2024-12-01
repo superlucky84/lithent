@@ -9,14 +9,11 @@
   "module": "./dist/expressLithent.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:tailwind\"",
-    "dev:server": "node watch-and-restart.js",
-    "dev:tailwind": "npx tailwindcss -i ./src/main.css -o ./dist/style.css --watch",
-    "build:tailwind": "npx tailwindcss -i ./src/main.css -o ./dist/style.css --minify",
+    "dev": "node watch-and-restart.js",
     "start": "cross-env NODE_ENV=production node server.js",
     "test": "vitest run --reporter verbose",
     "watch": "vite build --watch --mode development",
-    "build": "vite build && pnpm build:tailwind"
+    "build": "vite build"
   },
   "author": "",
   "repository": {
@@ -42,6 +39,7 @@
     "caniuse-lite": "^1.0.30001683",
     "chokidar": "^4.0.1",
     "concurrently": "^9.1.0",
+    "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2"
   }
 }

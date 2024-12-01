@@ -1,19 +1,40 @@
 import { h, mount } from 'lithent';
 import { navigate } from '@/route';
+import { loadData } from '@/load';
 
 console.log('NVAI', navigate);
 
-export const makeInitProp = () => {
+export const makeInitProp = async () => {
+  const result = await fetch('https://pokeapi.co/api/v2/type/water')
+    .then(response => response.json())
+    .then(data => {
+      return data.pokemon
+        .map(
+          (pokemon: { pokemon: { name: string; url: string }[] }) =>
+            pokemon.pokemon
+        )
+        .filter(
+          (_item: { name: string; url: string }[], index: number) => index < 32
+        );
+    });
+
+  const data = result;
+
   return {
     layout: {
       title: 'INDEX',
     },
+    data,
   };
 };
 
 const Index = mount(_r => {
+  const data = loadData<{ data: { name: string; url: string }[] }>();
+
+  console.log('DATA', data);
+
   return () => (
-    <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
+    <div class="bg-red-500 container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
         {Array.from({ length: 3 }).map(() => (
           <div class="group cursor-pointer">
