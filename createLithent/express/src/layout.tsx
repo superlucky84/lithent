@@ -18,7 +18,7 @@ const Layout = mount<{
         <title>{initProp.layout.title}</title>
       </head>
       <body class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="w-3/4 h-[80vh] flex">
+        <div class="flex">
           <Page params={params} query={query} />
         </div>
       </body>

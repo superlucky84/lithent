@@ -25,7 +25,7 @@ const Index = mount(_r => {
   console.log('DATA', data);
 
   return () => (
-    <div class="bg-red-500 container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
+    <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
         {Array.from({ length: 3 }).map(() => (
           <div class="group cursor-pointer">
