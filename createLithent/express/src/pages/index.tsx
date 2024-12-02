@@ -5,20 +5,11 @@ import { loadData } from '@/helper/data';
 console.log('NVAI', navigate);
 
 export const makeInitProp = async () => {
-  const result = await fetch('https://pokeapi.co/api/v2/type/water')
-    .then(response => response.json())
-    .then(data => {
-      return data.pokemon
-        .map(
-          (pokemon: { pokemon: { name: string; url: string }[] }) =>
-            pokemon.pokemon
-        )
-        .filter(
-          (_item: { name: string; url: string }[], index: number) => index < 32
-        );
-    });
+  const result = await fetch('https://pokeapi.co/api/v2/type?limit=100').then(
+    response => response.json()
+  );
 
-  const data = result;
+  const data = result.results;
 
   return {
     layout: {
