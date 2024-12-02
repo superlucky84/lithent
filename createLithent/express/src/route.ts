@@ -79,7 +79,7 @@ async function loadPage(dynamicPath: string) {
     const makeInitProp = res.makeInitProp;
     let initProp = null;
     if (makeInitProp) {
-      initProp = await makeInitProp();
+      initProp = await makeInitProp({ query, params });
     }
     (globalThis as any).pagedata = initProp;
     //@ts-ignore

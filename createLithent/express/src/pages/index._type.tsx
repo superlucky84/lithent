@@ -1,13 +1,30 @@
 import { state } from 'lithent/helper';
 import { h, mount, Fragment } from 'lithent';
 import { PageProps } from '@/types';
+import { loadData } from '@/helper/data';
 
-export const makeInitProp = async () => {
-  const result = await fetch(
-    'https://pokeapi.co/api/v2/pokemon?limit=10&offset=0'
-  );
+export const makeInitProp = async ({ params }: any) => {
+  const result = await fetch(`https://pokeapi.co/api/v2/type/${params.type}`)
+    .then(response => response.json())
+    .then(data => {
+      return data.pokemon
+        .map(
+          (pokemon: { pokemon: { name: string; url: string }[] }) =>
+            pokemon.pokemon
+        )
+        .filter(
+          (_item: { name: string; url: string }[], index: number) => index < 32
+        );
+    });
 
-  return result.json();
+  const data = result;
+
+  return {
+    layout: {
+      title: 'INDEX',
+    },
+    data,
+  };
 };
 
 const Main = mount<
@@ -17,6 +34,7 @@ const Main = mount<
     results: { name: string; url: string }[];
   }>
 >((r, props) => {
+  const data = loadData<{ data: { name: string; url: string }[] }>();
   const params = props.params;
   const initProp = props.initProp;
   const num = state(1, r);
@@ -26,12 +44,12 @@ const Main = mount<
 
   console.log('PARAMS', params);
   console.log('INITPROP', initProp);
+  console.log(data);
 
   return () => (
     <Fragment>
       <div>!9!000</div>
-      <div>{initProp.count}</div>
-      <div>99999</div>
+      <div>{data.data[0].name}</div>
       <div>
         <span>{num.value}</span>
         index{' '}

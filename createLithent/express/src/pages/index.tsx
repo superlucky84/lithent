@@ -36,6 +36,10 @@ const Index = mount(_r => {
               <a
                 class="relative block aspect-square"
                 href="/post/14-architectural-design-ideas-for-spacious-interior"
+                onClick={(event: Event) => {
+                  event.preventDefault();
+                  navigate(`/${name}`);
+                }}
               >
                 <img
                   alt="Thumbnail"

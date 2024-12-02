@@ -73,7 +73,7 @@ async function createServer() {
 
           let initProp = null;
           if (makeInitProp) {
-            initProp = await makeInitProp();
+            initProp = await makeInitProp(props);
           }
 
           globalThis.pagedata = initProp;
