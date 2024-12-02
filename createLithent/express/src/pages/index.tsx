@@ -9,7 +9,10 @@ export const makeInitProp = async () => {
     response => response.json()
   );
 
-  const data = result.results;
+  const data = result.results.filter(
+    (item: { name: string; url: string }) =>
+      !['stellar', 'unknown', 'shadow'].includes(item.name)
+  );
 
   return {
     layout: {
@@ -27,7 +30,7 @@ const Index = mount(_r => {
   return () => (
     <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
-        {Array.from({ length: 3 }).map(() => (
+        {data.data.map(({ name }) => (
           <div class="group cursor-pointer">
             <div class=" overflow-hidden rounded-md bg-gray-100 transition-all hover:scale-105   dark:bg-gray-800">
               <a
@@ -42,7 +45,7 @@ const Index = mount(_r => {
                   class="object-cover transition-all"
                   style="position: absolute; height: 100%; width: 100%; inset: 0px; color: transparent;"
                   sizes="(max-width: 768px) 30vw, 33vw"
-                  src="/_next/image?url=https%3A%2F%2Fcdn.sanity.io%2Fimages%2Fcijrdavx%2Fproduction%2F12301f301772ed723724302aef7c70c5c1c0151f-4500x8000.jpg%3Frect%3D0%2C1080%2C4500%2C5330%26w%3D2000%26auto%3Dformat&amp;w=3840&amp;q=75"
+                  src={`/assets/${name}.svg`}
                 />
               </a>
             </div>
@@ -51,7 +54,7 @@ const Index = mount(_r => {
                 <div class="flex gap-3">
                   <a href="/category/design">
                     <span class="inline-block text-xs font-medium tracking-wider uppercase   mt-5 text-blue-600">
-                      Design
+                      {name}
                     </span>
                   </a>
                   <a href="/category/lifestyle">
