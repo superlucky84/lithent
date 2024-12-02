@@ -1,6 +1,6 @@
 import { h, mount } from 'lithent';
 import { navigate } from '@/route';
-import { loadData } from '@/load';
+import { loadData } from '@/helper/data';
 
 console.log('NVAI', navigate);
 
@@ -72,7 +72,7 @@ const Index = mount(_r => {
                 <h2 class="text-lg font-semibold leading-snug tracking-tight mt-2    dark:text-white">
                   <a href="/post/14-architectural-design-ideas-for-spacious-interior">
                     <span class="bg-gradient-to-r from-green-200 to-green-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px] dark:from-purple-800 dark:to-purple-900">
-                      14 Architectural Design Ideas for a Spacious Interior
+                      1433 Architectural Design Ideas for a Spacious Interior
                     </span>
                   </a>
                 </h2>

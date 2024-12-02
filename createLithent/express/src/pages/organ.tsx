@@ -5,7 +5,7 @@ import UserList from '@/components/UserList';
 import UserItem from '@/components/UserItem';
 import { allMemberRef, selectMemberRef } from '@/store';
 import type { Organ, PageProps } from '@/types';
-import { loadData } from '@/load';
+import { loadData } from '@/helper/data';
 
 export const makeInitProp = async () => {
   const result = await fetch(

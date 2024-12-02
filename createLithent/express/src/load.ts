@@ -32,7 +32,3 @@ export default async function load(key: string, props: Props, initProp: any) {
   routeRef.renew = renewRoot;
   routeRef.rVDom = LayoutWDom;
 }
-
-export function loadData<T>() {
-  return (globalThis as any).pagedata as T;
-}

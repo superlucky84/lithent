@@ -1,6 +1,6 @@
 import type { TagFunction } from 'lithent';
 import { h, mount } from 'lithent';
-import { loadData } from '@/load';
+import { loadData } from '@/helper/data';
 import '@/main.css';
 
 const Layout = mount<{
