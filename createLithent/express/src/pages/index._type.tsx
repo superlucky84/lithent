@@ -35,7 +35,6 @@ async function fetchPokemonInfo(
     return pokemon;
   });
 
-  // 모든 요청을 병렬로 처리하고, 결과를 기다림
   const updatedPokemonArray = await Promise.all(pokemonInfoPromises);
 
   return updatedPokemonArray;
@@ -51,7 +50,7 @@ export const preload = async ({ params }: any) => {
             pokemon.pokemon
         )
         .filter(
-          (_item: { name: string; url: string }[], index: number) => index < 32
+          (_item: { name: string; url: string }[], index: number) => index < 36
         );
     });
 
