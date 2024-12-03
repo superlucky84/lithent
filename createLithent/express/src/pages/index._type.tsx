@@ -2,6 +2,7 @@
 import { h, mount } from 'lithent';
 // import { PageProps } from '@/types';
 import { getPreloadData } from '@/helper';
+import { navigate } from '@/route';
 
 async function fetchPokemonInfo(
   pokemonArray: { name: string; url: string; info: any }[]
@@ -82,6 +83,10 @@ const Main = mount<{ params: Record<string, string> }>(() => {
               <a
                 class="relative block aspect-square"
                 href="/post/14-architectural-design-ideas-for-spacious-interior"
+                onClick={(event: Event) => {
+                  event.preventDefault();
+                  navigate(`/${params.type}/${name}`);
+                }}
               >
                 <img
                   alt="Thumbnail"

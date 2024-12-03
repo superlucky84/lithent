@@ -116,7 +116,6 @@ export const routeAssign = store<{
 const routeRef = routeAssign(
   state => {
     if (state && state.page !== initPage && state.rVDom) {
-      console.log('RUN LOAD PAGE');
       loadPage(state.page);
     }
     initPage = state.page;
@@ -158,9 +157,7 @@ function execRoute(urlA: URL, urlB: URL, isPush?: boolean) {
       }
     }
   } else {
-    console.log('0 - 0000000000000000', routeRef.page);
     routeRef.page = `${urlB.pathname}${urlB.search}`;
-    console.log('0 - 7777777777777777', routeRef.page);
   }
 
   if (isPush) {

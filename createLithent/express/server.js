@@ -73,12 +73,10 @@ async function createServer() {
         let finalHtml = '';
 
         if (isDev) {
-          console.log('KEY', key);
           const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
           const { default: Page, preload } = await vite.ssrLoadModule(
             `@/pages/${key}`
           );
-
           let initProp = null;
           if (preload) {
             initProp = await preload(props);
