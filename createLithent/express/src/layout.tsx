@@ -28,7 +28,7 @@ const Layout = mount<{
         class={clsx(
           params.type
             ? `bg-pokemon-${params.type}`
-            : 'h-64 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 via-violet-500 to-blue-500',
+            : 'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 via-violet-500 to-blue-500',
           'flex items-center justify-center min-h-screen'
         )}
       >
