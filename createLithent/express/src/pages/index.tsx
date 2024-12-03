@@ -32,7 +32,7 @@ const Index = mount(_r => {
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
         {preload.data.map(({ name }) => (
           <div class="group cursor-pointer">
-            <div class=" overflow-hidden rounded-md bg-gray-100 transition-all hover:scale-105   dark:bg-gray-800">
+            <div class="overflow-hidden rounded-[26px] bg-gray-100 transition-all hover:scale-105 dark:bg-gray-800">
               <a
                 class="relative block aspect-square"
                 href="/post/14-architectural-design-ideas-for-spacious-interior"

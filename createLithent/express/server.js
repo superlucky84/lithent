@@ -152,7 +152,11 @@ async function createServer() {
         console.log('---------------------------------------------------');
       } catch (e) {
         isDev && vite.ssrFixStacktrace(e);
-        res.status(500).send('Something broke!');
+        // res.status(500).end(e.message);
+        console.error(e.stack);
+        res
+          .status(500)
+          .send(e.message.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
       }
     });
   });
