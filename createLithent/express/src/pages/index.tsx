@@ -1,10 +1,10 @@
 import { h, mount } from 'lithent';
 import { navigate } from '@/route';
-import { loadData } from '@/helper/data';
+import { getPreloadData } from '@/helper';
 
 console.log('NVAI', navigate);
 
-export const makeInitProp = async () => {
+export const preload = async () => {
   const result = await fetch('https://pokeapi.co/api/v2/type?limit=100').then(
     response => response.json()
   );
@@ -23,14 +23,14 @@ export const makeInitProp = async () => {
 };
 
 const Index = mount(_r => {
-  const data = loadData<{ data: { name: string; url: string }[] }>();
+  const preload = getPreloadData<{ data: { name: string; url: string }[] }>();
 
-  console.log('DATA', data);
+  console.log('DATA', preload);
 
   return () => (
     <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
-        {data.data.map(({ name }) => (
+        {preload.data.map(({ name }) => (
           <div class="group cursor-pointer">
             <div class=" overflow-hidden rounded-md bg-gray-100 transition-all hover:scale-105   dark:bg-gray-800">
               <a

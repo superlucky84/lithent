@@ -76,10 +76,10 @@ async function loadPage(dynamicPath: string) {
   if (key && pageModules[key]) {
     const res = await pageModules[key]();
     //@ts-ignore
-    const makeInitProp = res.makeInitProp;
+    const preload = res.preload;
     let initProp = null;
-    if (makeInitProp) {
-      initProp = await makeInitProp({ query, params });
+    if (preload) {
+      initProp = await preload({ query, params });
     }
     (globalThis as any).pagedata = initProp;
     //@ts-ignore

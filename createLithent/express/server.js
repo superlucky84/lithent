@@ -41,7 +41,9 @@ async function createServer() {
 
   app.use('/assets', express.static(path.resolve(__dirname, 'assets')));
 
-  sortFiles(Object.keys(entries)).forEach(key => {
+  const sortedRouteList = sortFiles(Object.keys(entries));
+
+  sortedRouteList.forEach(key => {
     const pathSplit = key.split('.');
     const newPathSplit = pathSplit.slice(0, pathSplit.length - 1);
 
@@ -54,32 +56,37 @@ async function createServer() {
       if (
         req.originalUrl === '/@vite-plugin-checker-runtime' ||
         Object.values(req.params).includes('@vite-plugin-checker-runtime') ||
-        Object.values(req.params).includes('favicon.ico')
+        Object.values(req.params).includes('favicon.ico') ||
+        Object.values(req.params).includes('dist') ||
+        Object.values(req.params).includes('next') ||
+        Object.values(req.params).includes('src') ||
+        Object.values(req.params).includes('_next') ||
+        Object.values(req.params).includes('@vite') ||
+        Object.values(req.params).includes('assets')
       ) {
         next();
         return;
       }
-
       const props = { params: req.params, query: req.query };
 
       try {
         let finalHtml = '';
 
         if (isDev) {
+          console.log('KEY', key);
           const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
-          const { default: Page, makeInitProp } = await vite.ssrLoadModule(
+          const { default: Page, preload } = await vite.ssrLoadModule(
             `@/pages/${key}`
           );
 
           let initProp = null;
-          if (makeInitProp) {
-            initProp = await makeInitProp(props);
+          if (preload) {
+            initProp = await preload(props);
           }
 
           globalThis.pagedata = initProp;
 
           const PageString = renderToString(
-            // h(Layout, { page: h(Page, Object.assign({}, props, { initProp })) })
             h(Layout, Object.assign({ page: Page }, props))
           );
           const appHtmlOrig = `<!doctype html>${PageString}`;
@@ -110,14 +117,14 @@ async function createServer() {
 
           const module = await import(modulePath);
           const Page = module.default;
-          const makeInitProp = module.makeInitProp;
+          const preload = module.preload;
 
           const layoutModule = await import(layoutPath);
           const layoutComponent = layoutModule.default;
 
           let initProp = null;
-          if (makeInitProp) {
-            initProp = await makeInitProp();
+          if (preload) {
+            initProp = await preload(props);
           }
 
           globalThis.pagedata = initProp;
@@ -144,6 +151,7 @@ async function createServer() {
         }
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+        console.log('---------------------------------------------------');
       } catch (e) {
         isDev && vite.ssrFixStacktrace(e);
         console.error(e);
