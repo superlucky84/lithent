@@ -74,6 +74,7 @@ async function loadPage(dynamicPath: string) {
   );
 
   if (key && pageModules[key]) {
+    routeRef.loading = true;
     const res = await pageModules[key]();
     //@ts-ignore
     const preload = res.preload;
@@ -83,7 +84,6 @@ async function loadPage(dynamicPath: string) {
     }
     (globalThis as any).pagedata = initProp;
     //@ts-ignore
-    // const Page = h(res.default, { params, query, initProp });
     const Page = res.default;
     const rVDom = routeRef.rVDom;
     if (rVDom?.compProps) {
@@ -92,21 +92,25 @@ async function loadPage(dynamicPath: string) {
       rVDom.compProps.params = params;
       routeRef.renew();
     }
+
+    routeRef.loading = false;
   } else {
     location.href = comparePage;
   }
 }
 
-const routeAssign = store<{
+export const routeAssign = store<{
   page: string;
   destroy: (() => void) | string;
   renew: () => void;
   rVDom: WDom | null;
+  loading: boolean;
 }>({
   page: '',
   destroy: '',
   renew: () => {},
   rVDom: null,
+  loading: false,
 });
 
 const routeRef = routeAssign(

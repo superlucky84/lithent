@@ -154,10 +154,14 @@ async function createServer() {
         console.log('---------------------------------------------------');
       } catch (e) {
         isDev && vite.ssrFixStacktrace(e);
-        console.error(e);
-        res.status(500).end(e.message);
+        res.status(500).send('Something broke!');
       }
     });
+  });
+
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
   });
 
   // 404 핸들러
