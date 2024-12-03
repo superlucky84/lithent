@@ -1,5 +1,6 @@
 import type { TagFunction } from 'lithent';
 import { h, mount } from 'lithent';
+import LoadingText from '@/components/Loading';
 import { getPreloadData } from '@/helper';
 import clsx from '@/helper/clsx';
 import { routeAssign } from '@/route';
@@ -28,7 +29,7 @@ const Layout = mount<{
       >
         <div class="flex">
           {routeRef.loading ? (
-            'loading'
+            <LoadingText />
           ) : (
             <Page params={params} query={query} />
           )}
