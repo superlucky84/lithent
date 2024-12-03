@@ -1,20 +1,17 @@
 // import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
 // import { PageProps } from '@/types';
-import { getPreloadData } from '@/helper';
-import { navigate } from '@/route';
+import { getPreloadData } from '@/base/data';
+import { navigate } from '@/base/route';
 
 async function fetchPokemonInfo(
   pokemonArray: { name: string; url: string; info: any }[]
 ) {
-  // 모든 API 호출을 배열로 만듦
   const pokemonInfoPromises = pokemonArray.map(async pokemon => {
     try {
-      // Pokémon API 호출
       const response = await fetch(pokemon.url);
       const data = await response.json();
 
-      // 필요한 정보 추출
       pokemon.info = {
         id: data.id,
         name: data.name,
@@ -30,7 +27,7 @@ async function fetchPokemonInfo(
       };
     } catch (error) {
       console.error(`Error fetching data for ${pokemon.name}:`, error);
-      pokemon.info = null; // 정보가 없을 경우 null로 처리
+      pokemon.info = null;
     }
     return pokemon;
   });
@@ -58,7 +55,7 @@ export const preload = async ({ params }: any) => {
 
   return {
     layout: {
-      title: 'INDEX',
+      title: params.type,
     },
     data,
   };

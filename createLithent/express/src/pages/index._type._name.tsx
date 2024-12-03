@@ -1,7 +1,7 @@
 import { h, mount } from 'lithent';
-import { getPreloadData } from '@/helper';
-import { PageProps } from '@/types';
-import { navigate } from '@/route';
+import { getPreloadData } from '@/base/data';
+import { PageProps } from '@/base/types';
+import { navigate } from '@/base/route';
 
 export const preload = async ({ params }: any) => {
   const result = await fetch(`https://pokeapi.co/api/v2/pokemon/${params.name}`)
@@ -26,7 +26,7 @@ export const preload = async ({ params }: any) => {
 
   return {
     layout: {
-      title: 'INDEX',
+      title: params.name,
     },
     data,
   };

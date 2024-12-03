@@ -1,10 +1,8 @@
 import type { WDom } from 'lithent';
 import { store } from 'lithent/helper';
-import { selectMemberRef } from '@/store';
-// import Layout from '@/layout';
 
 let initPage = '';
-const pageModules = import.meta.glob('./pages/*.tsx');
+const pageModules = import.meta.glob('../pages/*.tsx');
 
 function compareArraysWithUnderscore(arr1: string[], arr2: string[]) {
   const params: Record<string, string> = {};
@@ -64,7 +62,7 @@ function parseQueryStringToMap(queryString: string) {
 }
 
 async function loadPage(dynamicPath: string) {
-  const orgPage = `./pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
+  const orgPage = `../pages${dynamicPath === '/' ? '/index' : dynamicPath}.tsx`;
   const comparePage = orgPage.replace(/\?[^\.]*/, '');
   const queryOrg = orgPage.replace(/.*(\?[^\.]*).tsx/, '$1');
   const query = /\?/.test(queryOrg) ? parseQueryStringToMap(queryOrg) : {};
@@ -146,17 +144,7 @@ export function navigate(pagePath: string) {
 }
 
 function execRoute(urlA: URL, urlB: URL, isPush?: boolean) {
-  if (urlA.pathname === urlB.pathname) {
-    if (!urlB.search || urlA.search === urlB.search) {
-      selectMemberRef.id = '';
-    } else if (urlA.search !== urlB.search) {
-      const userSearchParam = new URLSearchParams(urlB.search);
-      const userId = userSearchParam.get('userId');
-      if (userId) {
-        selectMemberRef.id = userId;
-      }
-    }
-  } else {
+  if (urlA.pathname !== urlB.pathname) {
     routeRef.page = `${urlB.pathname}${urlB.search}`;
   }
 

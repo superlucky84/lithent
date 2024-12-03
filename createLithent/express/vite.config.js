@@ -31,7 +31,28 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        assetFileNames: '[name]-[hash][extname]',
+        // 파일 구조를 유지하는 설정
+        entryFileNames: assetInfo => {
+          const relativePath = assetInfo.facadeModuleId.replace(
+            `${resolve(__dirname, 'src')}/`,
+            ''
+          );
+          const dir = relativePath.substring(0, relativePath.lastIndexOf('/'));
+          return dir ? `${dir}/[name]-[hash].js` : `[name]-[hash].js`;
+        },
+        assetFileNames: assetInfo => {
+          const relativePath = assetInfo.name.replace(
+            `${resolve(__dirname, 'src')}/`,
+            ''
+          );
+          const dir = relativePath.substring(0, relativePath.lastIndexOf('/'));
+          return dir
+            ? `${dir}/[name]-[hash][extname]`
+            : `[name]-[hash][extname]`;
+        },
+        chunkFileNames: assetInfo => {
+          return `[name]-[hash].js`;
+        },
       },
     },
   },
@@ -51,7 +72,7 @@ function getEntries() {
     return entries;
   }, {});
 
-  entries['load.ts'] = `${utilDir}/load.ts`;
+  entries['load.ts'] = `${utilDir}/base/load.ts`;
   entries['layout.tsx'] = `${utilDir}/layout.tsx`;
 
   return entries;

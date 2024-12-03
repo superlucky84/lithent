@@ -2,11 +2,9 @@
   "type": "module",
   "name": "express-lithent",
   "version": "0.0.1",
-  "description": "create-express-lithent",
+  "description": "express-lithent",
   "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/expressLithent.umd.js",
-  "module": "./dist/expressLithent.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "node watch-and-restart.js",
@@ -15,7 +13,7 @@
     "watch": "vite build --watch --mode development",
     "build": "vite build"
   },
-  "author": "",
+  "author": "superlucky84",
   "repository": {
     "type": "git",
     "url": "https@github.com:superlucky84/lithent.git"
@@ -35,10 +33,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
-    "browserslist": "^4.24.2",
-    "caniuse-lite": "^1.0.30001683",
     "chokidar": "^4.0.1",
-    "concurrently": "^9.1.0",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2"
   }

@@ -1,8 +1,6 @@
 import { h, mount } from 'lithent';
-import { navigate } from '@/route';
-import { getPreloadData } from '@/helper';
-
-console.log('NVAI', navigate);
+import { navigate } from '@/base/route';
+import { getPreloadData } from '@/base/data';
 
 export const preload = async () => {
   const result = await fetch('https://pokeapi.co/api/v2/type?limit=100').then(
@@ -16,7 +14,7 @@ export const preload = async () => {
 
   return {
     layout: {
-      title: 'INDEX',
+      title: 'EXPRESS-LITHENT',
     },
     data,
   };
@@ -32,7 +30,7 @@ const Index = mount(_r => {
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
         {preload.data.map(({ name }) => (
           <div class="group cursor-pointer">
-            <div class="overflow-hidden rounded-[26px] bg-gray-100 transition-all hover:scale-105 dark:bg-gray-800">
+            <div class="overflow-hidden rounded-[40px] bg-gray-100 transition-all hover:scale-105 dark:bg-gray-800">
               <a
                 class="relative block aspect-square"
                 href="/post/14-architectural-design-ideas-for-spacious-interior"
@@ -53,7 +51,7 @@ const Index = mount(_r => {
                 />
               </a>
             </div>
-            <div class="">
+            <div>
               <div>
                 <div class="flex gap-3">
                   <a href="/category/design">

@@ -97,17 +97,19 @@ async function createServer() {
           finalHtml = transformedHtml.replace(
             '</body>',
             `<script type="module">
-              import load from '/src/load';
+              import load from '/src/base/load';
               load('${key}', ${JSON.stringify(
               Object.assign({}, props)
             )}, ${JSON.stringify(initProp)});
              </script></body>`
           );
         } else {
-          const loadResourcePath = getScriptPath('load.ts');
+          const loadResourcePath = getScriptPath('base/load.ts');
           const cssResourcePath = getScriptPath('style');
 
-          const resourcePath = getScriptPath(key);
+          console.log('KEY', `pages/${key}`);
+          const resourcePath = getScriptPath(`pages/${key}`);
+          console.log('KEY', resourcePath);
           const modulePath = path.resolve(__dirname, resourcePath);
 
           const layoutResourcePath = getScriptPath('layout.ts');
@@ -185,9 +187,36 @@ createServer();
 
 function getScriptPath(routeString) {
   const directoryPath = path.resolve(__dirname, 'dist');
-  const files = fs.readdirSync(directoryPath);
-  const targetFile = files.find(file => file.startsWith(`${routeString}`));
-  return targetFile ? `dist/${targetFile}` : null;
+
+  const findFile = (dir, target) => {
+    const files = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const file of files) {
+      const fullPath = path.join(dir, file.name);
+
+      if (file.isDirectory()) {
+        const found = findFile(fullPath, target);
+        if (found) {
+          return found;
+        }
+      } else {
+        const relativePath = path.relative(directoryPath, fullPath);
+
+        if (relativePath.endsWith('.d.ts')) {
+          continue;
+        }
+
+        if (relativePath.includes(target)) {
+          console.log(`Matched: ${relativePath}`); // 일치한 파일 경로 로그
+          return relativePath;
+        }
+      }
+    }
+    return null;
+  };
+
+  const result = findFile(directoryPath, routeString);
+  return result ? `dist/${result}` : null;
 }
 
 function getEntries() {
