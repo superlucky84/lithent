@@ -11,8 +11,10 @@ export default async function load(
   initProp?: any
 ) {
   let res;
-  if (!key) {
+  if (key === 'oops') {
     res = await import('@/components/Oops');
+  } else if (key === 'notfound') {
+    res = await import('@/components/NotFound');
   } else {
     res = await pageModules[`../pages/${key}`]();
   }

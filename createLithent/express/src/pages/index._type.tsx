@@ -1,6 +1,4 @@
-// import { state } from 'lithent/helper';
 import { h, mount } from 'lithent';
-// import { PageProps } from '@/types';
 import { getPreloadData } from '@/base/data';
 import { navigate } from '@/base/route';
 

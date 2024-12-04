@@ -1,12 +1,10 @@
 // server.js
 import path, { resolve } from 'path';
 import express from 'express';
-import { h } from 'lithent';
-import { renderToString } from 'lithent/ssr';
 import { createServer as createViteServer } from 'vite';
 import sortFiles from './sortFiles.js';
 import createMakePage from './serverHelper/createMakePage.js';
-import { getEntries } from './serverHelper/helper.js';
+import { getEntries, excludeRoutePath } from './serverHelper/helper.js';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 
@@ -54,69 +52,49 @@ async function createServer() {
       .join('/');
 
     app.get(`/${expressPath.replace(/_/g, ':')}`, async (req, res, next) => {
-      if (
-        req.originalUrl === '/@vite-plugin-checker-runtime' ||
-        Object.values(req.params).includes('@vite-plugin-checker-runtime') ||
-        Object.values(req.params).includes('favicon.ico') ||
-        Object.values(req.params).includes('dist') ||
-        Object.values(req.params).includes('next') ||
-        Object.values(req.params).includes('src') ||
-        Object.values(req.params).includes('_next') ||
-        Object.values(req.params).includes('@vite') ||
-        Object.values(req.params).includes('assets')
-      ) {
+      if (excludeRoutePath(req.params)) {
         next();
         return;
       }
+
       const props = { params: req.params, query: req.query };
+      let finalHtml = '';
 
       try {
         const pageIns = createMakePage({ key, req, props, isDev, vite });
-        const finalHtml = await pageIns.run();
-
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
-        console.log('---------------------------------------------------');
+        finalHtml = await pageIns.run();
       } catch (e) {
         isDev && vite.ssrFixStacktrace(e);
-        // res.status(500).end(e.message);
         console.error(e.stack);
 
-        const { default: Oops } = await vite.ssrLoadModule(`@/components/Oops`);
-        const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
-
-        const OopsPageString = renderToString(
-          h(Layout, Object.assign({ page: Oops }, props))
-        );
-
-        const transformedHtml = await vite.transformIndexHtml(
-          req.originalUrl,
-          `<!doctype html>${OopsPageString}`
-        );
-
-        const finalHtml = transformedHtml.replace(
-          '</body>',
-          `<script type="module">
-            import load from '/src/base/load';
-            load();
-           </script></body>`
-        );
-
-        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+        const pageIns = createMakePage({
+          key: 'oops',
+          req,
+          props,
+          isDev,
+          vite,
+        });
+        finalHtml = await pageIns.runOops();
       }
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
     });
   });
 
-  app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
-  });
-
-  // 404 핸들러
   if (isDev) {
     app.use(vite.middlewares);
   } else {
-    app.use((_req, res, next) => {
-      res.status(404).set({ 'Content-Type': 'text/html' }).end('404 Not Found');
+    // 404 Handler
+    app.use(async (req, res, next) => {
+      const pageIns = createMakePage({
+        key: 'notfound',
+        req,
+        props: {},
+        isDev: false,
+      });
+      const finalHtml = await pageIns.run404();
+
+      res.status(404).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       next();
     });
   }

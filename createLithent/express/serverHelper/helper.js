@@ -50,3 +50,16 @@ export function getEntries() {
     return entries;
   }, {});
 }
+
+export function excludeRoutePath(praamsValue) {
+  return (
+    Object.values(praamsValue).includes('@vite-plugin-checker-runtime') ||
+    Object.values(praamsValue).includes('favicon.ico') ||
+    Object.values(praamsValue).includes('dist') ||
+    Object.values(praamsValue).includes('next') ||
+    Object.values(praamsValue).includes('src') ||
+    Object.values(praamsValue).includes('_next') ||
+    Object.values(praamsValue).includes('@vite') ||
+    Object.values(praamsValue).includes('assets')
+  );
+}

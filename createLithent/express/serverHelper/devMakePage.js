@@ -23,15 +23,30 @@ export default class DevMakePage extends MakePage {
     return await this.vite.transformIndexHtml(this.req.originalUrl, pageString);
   }
 
-  async makeComponents() {
+  async makeOopComponents() {
     const { default: Oops } = await this.vite.ssrLoadModule(
       `@/components/Oops`
     );
+    const { default: Layout } = await this.vite.ssrLoadModule(`@/layout`);
+
+    return { Oops, Layout };
+  }
+
+  async make404Components() {
+    const { default: Not } = await this.vite.ssrLoadModule(
+      `@/components/NotFound`
+    );
+    const { default: Layout } = await this.vite.ssrLoadModule(`@/layout`);
+
+    return { Not, Layout };
+  }
+
+  async makeComponents() {
     const { default: Layout } = await this.vite.ssrLoadModule(`@/layout`);
     const { default: Page, preload } = await this.vite.ssrLoadModule(
       `@/pages/${this.key}`
     );
 
-    return { Oops, Layout, Page, preload };
+    return { Layout, Page, preload };
   }
 }

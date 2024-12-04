@@ -1,6 +1,7 @@
 import type { WDom } from 'lithent';
 import { store } from 'lithent/helper';
 import Oops from '@/components/Oops';
+import NotFound from '@/components/NotFound';
 
 let initPage = '';
 const pageModules = import.meta.glob('../pages/*.tsx');
@@ -72,6 +73,8 @@ async function loadPage(dynamicPath: string) {
     comparePage
   );
 
+  const rVDom = routeRef.rVDom;
+
   if (key && pageModules[key]) {
     routeRef.loading = true;
     let Page;
@@ -89,7 +92,6 @@ async function loadPage(dynamicPath: string) {
     } catch {
       Page = Oops;
     }
-    const rVDom = routeRef.rVDom;
     if (rVDom?.compProps) {
       rVDom.compProps.page = Page;
       rVDom.compProps.query = query;
@@ -97,8 +99,11 @@ async function loadPage(dynamicPath: string) {
       routeRef.renew();
     }
     routeRef.loading = false;
-  } else {
-    location.href = comparePage;
+  } else if (rVDom?.compProps) {
+    rVDom.compProps.page = NotFound;
+    rVDom.compProps.query = query;
+    rVDom.compProps.params = params;
+    routeRef.renew();
   }
 }
 
