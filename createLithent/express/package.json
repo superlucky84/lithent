@@ -7,7 +7,7 @@
   "packageManager": "pnpm@7.6.0",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "node watch-and-restart.js",
+    "dev": "node watch-serve.js",
     "start": "cross-env NODE_ENV=production node server.js",
     "test": "vitest run --reporter verbose",
     "watch": "vite build --watch --mode development",
