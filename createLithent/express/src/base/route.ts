@@ -1,5 +1,6 @@
 import type { WDom } from 'lithent';
 import { store } from 'lithent/helper';
+import Oops from '@/components/Oops';
 
 let initPage = '';
 const pageModules = import.meta.glob('../pages/*.tsx');
@@ -73,16 +74,21 @@ async function loadPage(dynamicPath: string) {
 
   if (key && pageModules[key]) {
     routeRef.loading = true;
-    const res = await pageModules[key]();
-    //@ts-ignore
-    const preload = res.preload;
-    let initProp = null;
-    if (preload) {
-      initProp = await preload({ query, params });
+    let Page;
+    try {
+      const res = await pageModules[key]();
+      //@ts-ignore
+      const preload = res.preload;
+      let initProp = null;
+      if (preload) {
+        initProp = await preload({ query, params });
+      }
+      (globalThis as any).pagedata = initProp;
+      //@ts-ignore
+      Page = res.default;
+    } catch {
+      Page = Oops;
     }
-    (globalThis as any).pagedata = initProp;
-    //@ts-ignore
-    const Page = res.default;
     const rVDom = routeRef.rVDom;
     if (rVDom?.compProps) {
       rVDom.compProps.page = Page;
@@ -90,7 +96,6 @@ async function loadPage(dynamicPath: string) {
       rVDom.compProps.params = params;
       routeRef.renew();
     }
-
     routeRef.loading = false;
   } else {
     location.href = comparePage;

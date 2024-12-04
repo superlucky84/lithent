@@ -74,6 +74,7 @@ function getEntries() {
 
   entries['load.ts'] = `${utilDir}/base/load.ts`;
   entries['layout.tsx'] = `${utilDir}/layout.tsx`;
+  entries['Oops.tsx'] = `${utilDir}/components/Oops.tsx`;
 
   return entries;
 }

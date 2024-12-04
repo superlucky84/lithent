@@ -73,6 +73,9 @@ async function createServer() {
         let finalHtml = '';
 
         if (isDev) {
+          const { default: Oops } = await vite.ssrLoadModule(
+            `@/components/Oops`
+          );
           const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
           const { default: Page, preload } = await vite.ssrLoadModule(
             `@/pages/${key}`
@@ -107,20 +110,24 @@ async function createServer() {
           const loadResourcePath = getScriptPath('base/load.ts');
           const cssResourcePath = getScriptPath('style');
 
-          console.log('KEY', `pages/${key}`);
+          const oopsResourcePath = getScriptPath(`components/Oops.tsx`);
+          const oopsPath = path.resolve(__dirname, oopsResourcePath);
+
           const resourcePath = getScriptPath(`pages/${key}`);
-          console.log('KEY', resourcePath);
           const modulePath = path.resolve(__dirname, resourcePath);
 
           const layoutResourcePath = getScriptPath('layout.ts');
           const layoutPath = path.resolve(__dirname, layoutResourcePath);
 
           const module = await import(modulePath);
+          const oops = await import(oopsPath);
+          const Oops = oops.default;
+
           const Page = module.default;
           const preload = module.preload;
 
           const layoutModule = await import(layoutPath);
-          const layoutComponent = layoutModule.default;
+          const Layout = layoutModule.default;
 
           let initProp = null;
           if (preload) {
@@ -130,7 +137,7 @@ async function createServer() {
           globalThis.pagedata = initProp;
 
           const PageString = renderToString(
-            h(layoutComponent, Object.assign({ page: Page }, props))
+            h(Layout, Object.assign({ page: Page }, props))
           );
 
           const appHtmlOrig = `<!doctype html>${PageString}`;
@@ -156,9 +163,28 @@ async function createServer() {
         isDev && vite.ssrFixStacktrace(e);
         // res.status(500).end(e.message);
         console.error(e.stack);
-        res
-          .status(500)
-          .send(e.message.replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+
+        const { default: Oops } = await vite.ssrLoadModule(`@/components/Oops`);
+        const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
+
+        const OopsPageString = renderToString(
+          h(Layout, Object.assign({ page: Oops }, props))
+        );
+
+        const transformedHtml = await vite.transformIndexHtml(
+          req.originalUrl,
+          `<!doctype html>${OopsPageString}`
+        );
+
+        const finalHtml = transformedHtml.replace(
+          '</body>',
+          `<script type="module">
+            import load from '/src/base/load';
+            load();
+           </script></body>`
+        );
+
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
       }
     });
   });

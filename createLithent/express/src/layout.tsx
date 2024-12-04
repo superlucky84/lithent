@@ -13,7 +13,7 @@ const Layout = mount<{
   query: Record<string, string>;
 }>(r => {
   const preload = computed(
-    () => getPreloadData<{ layout: { title: string } }>().layout
+    () => getPreloadData<{ layout: { title: string } }>()?.layout
   );
   const routeRef = routeAssign(r, s => [s.loading]);
 
@@ -22,11 +22,11 @@ const Layout = mount<{
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{preload.value.title || ''}</title>
+        <title>{preload.value?.title || 'unknown'}</title>
       </head>
       <body
         class={clsx(
-          params.type
+          params?.type
             ? `bg-pokemon-${params.type}`
             : 'bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 via-violet-500 to-blue-500',
           'flex items-center justify-center min-h-screen'

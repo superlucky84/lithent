@@ -4,6 +4,8 @@ import { h, mount } from 'lithent';
 import { getPreloadData } from '@/base/data';
 import { navigate } from '@/base/route';
 
+console.log('NAVIGATE', navigate);
+
 async function fetchPokemonInfo(
   pokemonArray: { name: string; url: string; info: any }[]
 ) {
