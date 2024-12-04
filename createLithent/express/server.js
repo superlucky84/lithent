@@ -4,8 +4,9 @@ import express from 'express';
 import { h } from 'lithent';
 import { renderToString } from 'lithent/ssr';
 import { createServer as createViteServer } from 'vite';
-import fs from 'fs';
 import sortFiles from './sortFiles.js';
+import createMakePage from './serverHelper/createMakePage.js';
+import { getEntries } from './serverHelper/helper.js';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 
@@ -70,92 +71,8 @@ async function createServer() {
       const props = { params: req.params, query: req.query };
 
       try {
-        let finalHtml = '';
-
-        if (isDev) {
-          const { default: Oops } = await vite.ssrLoadModule(
-            `@/components/Oops`
-          );
-          const { default: Layout } = await vite.ssrLoadModule(`@/layout`);
-          const { default: Page, preload } = await vite.ssrLoadModule(
-            `@/pages/${key}`
-          );
-          let initProp = null;
-          if (preload) {
-            initProp = await preload(props);
-          }
-
-          globalThis.pagedata = initProp;
-
-          const PageString = renderToString(
-            h(Layout, Object.assign({ page: Page }, props))
-          );
-          const appHtmlOrig = `<!doctype html>${PageString}`;
-
-          const transformedHtml = await vite.transformIndexHtml(
-            req.originalUrl,
-            appHtmlOrig
-          );
-
-          finalHtml = transformedHtml.replace(
-            '</body>',
-            `<script type="module">
-              import load from '/src/base/load';
-              load('${key}', ${JSON.stringify(
-              Object.assign({}, props)
-            )}, ${JSON.stringify(initProp)});
-             </script></body>`
-          );
-        } else {
-          const loadResourcePath = getScriptPath('base/load.ts');
-          const cssResourcePath = getScriptPath('style');
-
-          const oopsResourcePath = getScriptPath(`components/Oops.tsx`);
-          const oopsPath = path.resolve(__dirname, oopsResourcePath);
-
-          const resourcePath = getScriptPath(`pages/${key}`);
-          const modulePath = path.resolve(__dirname, resourcePath);
-
-          const layoutResourcePath = getScriptPath('layout.ts');
-          const layoutPath = path.resolve(__dirname, layoutResourcePath);
-
-          const module = await import(modulePath);
-          const oops = await import(oopsPath);
-          const Oops = oops.default;
-
-          const Page = module.default;
-          const preload = module.preload;
-
-          const layoutModule = await import(layoutPath);
-          const Layout = layoutModule.default;
-
-          let initProp = null;
-          if (preload) {
-            initProp = await preload(props);
-          }
-
-          globalThis.pagedata = initProp;
-
-          const PageString = renderToString(
-            h(Layout, Object.assign({ page: Page }, props))
-          );
-
-          const appHtmlOrig = `<!doctype html>${PageString}`;
-          finalHtml = appHtmlOrig.replace(
-            '</head>',
-            `<link rel="stylesheet" href="/${cssResourcePath}"></head>`
-          );
-          finalHtml = finalHtml.replace(
-            '</body>',
-            `<script type="module">
-              import load from '/${loadResourcePath}';
-
-              load('${key}', ${JSON.stringify(
-              Object.assign({}, props)
-            )}, ${JSON.stringify(initProp)});
-              </script></body>`
-          );
-        }
+        const pageIns = createMakePage({ key, req, props, isDev, vite });
+        const finalHtml = await pageIns.run();
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
         console.log('---------------------------------------------------');
@@ -210,48 +127,3 @@ async function createServer() {
 }
 
 createServer();
-
-function getScriptPath(routeString) {
-  const directoryPath = path.resolve(__dirname, 'dist');
-
-  const findFile = (dir, target) => {
-    const files = fs.readdirSync(dir, { withFileTypes: true });
-
-    for (const file of files) {
-      const fullPath = path.join(dir, file.name);
-
-      if (file.isDirectory()) {
-        const found = findFile(fullPath, target);
-        if (found) {
-          return found;
-        }
-      } else {
-        const relativePath = path.relative(directoryPath, fullPath);
-
-        if (relativePath.endsWith('.d.ts')) {
-          continue;
-        }
-
-        if (relativePath.includes(target)) {
-          console.log(`Matched: ${relativePath}`); // 일치한 파일 경로 로그
-          return relativePath;
-        }
-      }
-    }
-    return null;
-  };
-
-  const result = findFile(directoryPath, routeString);
-  return result ? `dist/${result}` : null;
-}
-
-function getEntries() {
-  const entriesDir = resolve(__dirname, 'src/pages');
-  const files = fs.readdirSync(entriesDir);
-
-  return files.reduce((entries, file) => {
-    const name = file.replace(/\.js$/, ''); // 확장자 제거
-    entries[name] = resolve(entriesDir, file);
-    return entries;
-  }, {});
-}
