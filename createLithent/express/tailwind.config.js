@@ -5,9 +5,7 @@ export default {
   safelist: [
     {
       pattern:
-        /bg-pokemon-(normal|fighting|flying|poison|ground|rock|bug|ghost|steel|fire|water|grass|electric|psychic|ice|dragon|dark|fairy)/,
-      pattern:
-        /text-pokemon-(normal|fighting|flying|poison|ground|rock|bug|ghost|steel|fire|water|grass|electric|psychic|ice|dragon|dark|fairy)/,
+        /(bg|text)-pokemon-(normal|fighting|flying|poison|ground|rock|bug|ghost|steel|fire|water|grass|electric|psychic|ice|dragon|dark|fairy)/,
     },
   ],
   theme: {
