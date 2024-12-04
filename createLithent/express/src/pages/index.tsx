@@ -13,6 +13,11 @@ export const preload = async () => {
 const Index = mount(() => {
   const preload = getPreloadData<{ data: { name: string; url: string }[] }>();
 
+  const moveTypePage = (event: Event, name: string) => {
+    event.preventDefault();
+    navigate(`/${name}`);
+  };
+
   console.log('DATA', preload);
 
   return () => (
@@ -24,10 +29,7 @@ const Index = mount(() => {
               <a
                 class="relative block aspect-square"
                 href="#"
-                onClick={(event: Event) => {
-                  event.preventDefault();
-                  navigate(`/${name}`);
-                }}
+                onClick={(event: Event) => moveTypePage(event, name)}
               >
                 <img
                   alt="Thumbnail"
@@ -44,7 +46,10 @@ const Index = mount(() => {
             <div>
               <div>
                 <div class="flex gap-3">
-                  <a href="/category/design">
+                  <a
+                    href="#"
+                    onClick={(event: Event) => moveTypePage(event, name)}
+                  >
                     <span
                       class={`bg-pokemon-${name} inline-block text-sm font-bold tracking-wider uppercase mt-5 text-white px-2 py-1 rounded drop-shadow-md outline-2 outline-black outline-offset-1`}
                     >
@@ -53,7 +58,10 @@ const Index = mount(() => {
                   </a>
                 </div>
                 <h2 class="text-lg font-semibold leading-snug tracking-tight mt-2    dark:text-white">
-                  <a href="/post/14-architectural-design-ideas-for-spacious-interior">
+                  <a
+                    href="#"
+                    onClick={(event: Event) => moveTypePage(event, name)}
+                  >
                     <span class="bg-gradient-to-r from-red-200 to-blue-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px]">
                       {TYPE_DESCRIPT[name]}
                     </span>
