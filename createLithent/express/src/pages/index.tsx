@@ -18,14 +18,12 @@ const Index = mount(() => {
     navigate(`/${name}`);
   };
 
-  console.log('DATA', preload);
-
   return () => (
     <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
-      <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
+      <div class="mt-10 grid gap-10 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:gap-10 xl:grid-cols-3 ">
         {preload.data.map(({ name }) => (
           <div class="group cursor-pointer">
-            <div class="overflow-hidden rounded-[40px] bg-gray-100 transition-all hover:scale-105 dark:bg-gray-800">
+            <div class="overflow-hidden rounded-[40px] bg-gray-100 transition-all hover:scale-105">
               <a
                 class="relative block aspect-square"
                 href="#"
@@ -57,7 +55,7 @@ const Index = mount(() => {
                     </span>
                   </a>
                 </div>
-                <h2 class="text-lg font-semibold leading-snug tracking-tight mt-2    dark:text-white">
+                <h2 class="text-lg font-semibold leading-snug tracking-tight mt-2  text-gray-800 font-bold ">
                   <a
                     href="#"
                     onClick={(event: Event) => moveTypePage(event, name)}

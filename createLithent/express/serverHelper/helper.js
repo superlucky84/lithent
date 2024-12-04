@@ -28,7 +28,6 @@ export function getScriptPath(routeString) {
         }
 
         if (relativePath.includes(target)) {
-          console.log(`Matched: ${relativePath}`); // 일치한 파일 경로 로그
           return relativePath;
         }
       }
