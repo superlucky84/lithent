@@ -2,6 +2,7 @@ import { h, mount } from 'lithent';
 import { navigate } from '@/base/route';
 import { getPreloadData } from '@/base/data';
 import { fetchTypeList } from '@/helper/request';
+import { TYPE_DESCRIPT } from '@/helper/constants';
 
 export const preload = async () => {
   const data = await fetchTypeList();
@@ -56,13 +57,13 @@ const Index = mount(() => {
                 </div>
                 <h2 class="text-lg font-semibold leading-snug tracking-tight mt-2    dark:text-white">
                   <a href="/post/14-architectural-design-ideas-for-spacious-interior">
-                    <span class="bg-gradient-to-r from-green-200 to-green-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px] dark:from-purple-800 dark:to-purple-900">
-                      1433 Architectural Design Ideas for a Spacious Interior
+                    <span class="bg-gradient-to-r from-red-200 to-blue-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px]">
+                      {TYPE_DESCRIPT[name]}
                     </span>
                   </a>
                 </h2>
                 <div class="hidden">
-                  <p class="mt-2 line-clamp-3 text-sm text-gray-500 dark:text-gray-400">
+                  <p class="mt-2 line-clamp-3 text-sm text-gray-500">
                     <a href="/post/14-architectural-design-ideas-for-spacious-interior">
                       It is a cliche philosophical question, but it touches on
                       something fundamental about how humans relate to the world
