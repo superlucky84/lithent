@@ -1,57 +1,13 @@
 import { h, mount } from 'lithent';
 import { getPreloadData } from '@/base/data';
 import { navigate } from '@/base/route';
+import { fetchMonsterListByType } from '@/helper/request';
 
-console.log('NAVIGATE', navigate);
+import type { PageProps } from '@/base/types';
+import type { Info } from '@/helper/request';
 
-async function fetchPokemonInfo(
-  pokemonArray: { name: string; url: string; info: any }[]
-) {
-  const pokemonInfoPromises = pokemonArray.map(async pokemon => {
-    try {
-      const response = await fetch(pokemon.url);
-      const data = await response.json();
-
-      pokemon.info = {
-        id: data.id,
-        name: data.name,
-        types: data.types.map((typeInfo: any) => typeInfo.type.name),
-        abilities: data.abilities.map(
-          (abilityInfo: any) => abilityInfo.ability.name
-        ),
-        img:
-          data.sprites.other.dream_world.front_default ||
-          data.sprites.front_default,
-        height: data.height,
-        weight: data.weight,
-      };
-    } catch (error) {
-      console.error(`Error fetching data for ${pokemon.name}:`, error);
-      pokemon.info = null;
-    }
-    return pokemon;
-  });
-
-  const updatedPokemonArray = await Promise.all(pokemonInfoPromises);
-
-  return updatedPokemonArray;
-}
-
-export const preload = async ({ params }: any) => {
-  const result = await fetch(`https://pokeapi.co/api/v2/type/${params.type}`)
-    .then(response => response.json())
-    .then(data => {
-      return data.pokemon
-        .map(
-          (pokemon: { pokemon: { name: string; url: string }[] }) =>
-            pokemon.pokemon
-        )
-        .filter(
-          (_item: { name: string; url: string }[], index: number) => index < 36
-        );
-    });
-
-  const data = await fetchPokemonInfo(result);
+export const preload = async ({ params }: PageProps) => {
+  const data = await fetchMonsterListByType(params.type);
 
   return {
     layout: {
@@ -61,8 +17,8 @@ export const preload = async ({ params }: any) => {
   };
 };
 
-const Main = mount<{ params: Record<string, string> }>(() => {
-  const preload = getPreloadData<{ data: { name: string; url: string }[] }>();
+const Main = mount<PageProps>(() => {
+  const preload = getPreloadData<{ data: { name: string; info: Info }[] }>();
 
   console.log(preload);
 
@@ -71,7 +27,7 @@ const Main = mount<{ params: Record<string, string> }>(() => {
       class={`bg-pokemon-${params.type}  container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8`}
     >
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
-        {preload.data.map(({ name, info }: any) => (
+        {preload.data.map(({ name, info }: { name: string; info: Info }) => (
           <div class="group cursor-pointer">
             <div
               class={`overflow-hidden rounded-md bg-gray-100 p-2 transition-all hover:scale-105   dark:bg-gray-800`}

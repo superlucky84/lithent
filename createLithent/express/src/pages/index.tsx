@@ -1,26 +1,15 @@
 import { h, mount } from 'lithent';
 import { navigate } from '@/base/route';
 import { getPreloadData } from '@/base/data';
+import { fetchTypeList } from '@/helper/request';
 
 export const preload = async () => {
-  const result = await fetch('https://pokeapi.co/api/v2/type?limit=100').then(
-    response => response.json()
-  );
+  const data = await fetchTypeList();
 
-  const data = result.results.filter(
-    (item: { name: string; url: string }) =>
-      !['stellar', 'unknown', 'shadow'].includes(item.name)
-  );
-
-  return {
-    layout: {
-      title: 'EXPRESS-LITHENT',
-    },
-    data,
-  };
+  return { layout: { title: 'EXPRESS-LITHENT' }, data };
 };
 
-const Index = mount(_r => {
+const Index = mount(() => {
   const preload = getPreloadData<{ data: { name: string; url: string }[] }>();
 
   console.log('DATA', preload);

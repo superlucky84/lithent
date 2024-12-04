@@ -1,39 +1,19 @@
 import { h, mount } from 'lithent';
 import { getPreloadData } from '@/base/data';
-import { PageProps } from '@/base/types';
 import { navigate } from '@/base/route';
+import { fetchPokemonInfo } from '@/helper/request';
 
-export const preload = async ({ params }: any) => {
-  const result = await fetch(`https://pokeapi.co/api/v2/pokemon/${params.name}`)
-    .then(response => response.json())
-    .then(data => {
-      return {
-        id: data.id,
-        name: data.name,
-        types: data.types.map((typeInfo: any) => typeInfo.type.name),
-        abilities: data.abilities.map(
-          (abilityInfo: any) => abilityInfo.ability.name
-        ),
-        img:
-          data.sprites.other.dream_world.front_default ||
-          data.sprites.front_default,
-        height: data.height,
-        weight: data.weight,
-      };
-    });
+import type { PageProps } from '@/base/types';
+import type { Info } from '@/helper/request';
 
-  const data = result;
+export const preload = async ({ params }: PageProps) => {
+  const data = await fetchPokemonInfo(params.name);
 
-  return {
-    layout: {
-      title: params.name,
-    },
-    data,
-  };
+  return { layout: { title: params.name }, data };
 };
 
-const Main = mount<PageProps<{ data: { name: string; img: string } }>>(() => {
-  const info = getPreloadData<{ data: { name: string; img: string } }>().data;
+const Main = mount<PageProps>(() => {
+  const info = getPreloadData<{ data: Info }>().data;
 
   console.log(preload);
 
