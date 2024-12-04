@@ -17,12 +17,10 @@ const Main = mount<PageProps>(() => {
   }>().data;
 
   return () => (
-    <div class={`container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8`}>
+    <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
       <div class="mt-10 w-full">
         <div class="group">
-          <div
-            class={`overflow-hidden rounded-md bg-gray-100 p-2 transition-all hover:scale-105`}
-          >
+          <div class="overflow-hidden rounded-md bg-gray-100 p-2 transition-all hover:scale-105">
             <div class="relative block aspect-square">
               <img
                 alt="Thumbnail"
@@ -36,7 +34,7 @@ const Main = mount<PageProps>(() => {
               />
             </div>
           </div>
-          <div class="">
+          <div>
             <div>
               <div class="flex gap-3">
                 <span class="inline-block text-xl font-medium tracking-wider uppercase mt-5 text-gray-800">

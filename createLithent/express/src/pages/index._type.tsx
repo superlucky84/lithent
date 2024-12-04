@@ -27,16 +27,12 @@ const Main = mount<PageProps>((_r, { params: { type } }) => {
     navigate(`/${type}/${name}`);
   };
 
-  return ({ params }) => (
-    <div
-      class={`bg-pokemon-${params.type}  container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8`}
-    >
+  return () => (
+    <div class="bg-pokemon-${params.type} container px-8 mx-auto xl:px-5 max-w-screen-lg py-5 lg:py-8">
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
         {preload.data.map(({ name, info, infoString }) => (
           <div class="group cursor-pointer">
-            <div
-              class={`overflow-hidden rounded-md bg-gray-100 p-2 transition-all hover:scale-105`}
-            >
+            <div class="overflow-hidden rounded-md bg-gray-100 p-2 transition-all hover:scale-105">
               <a
                 class="relative block aspect-square"
                 href="#"
@@ -54,7 +50,7 @@ const Main = mount<PageProps>((_r, { params: { type } }) => {
                 />
               </a>
             </div>
-            <div class="">
+            <div>
               <div>
                 <div class="flex gap-3">
                   <a
