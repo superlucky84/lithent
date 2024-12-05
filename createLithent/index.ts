@@ -64,9 +64,8 @@ interface Context {
   overwrite?: boolean;
 }
 
-export async function createRemix(argv: string[]) {
+export async function createLithent(argv: string[]) {
   const ctx = await getContext(argv);
-  console.log('CLI', ctx);
   if (ctx.help) {
     printHelp(ctx);
     return;
@@ -174,15 +173,15 @@ function align(text: string, dir: 'start' | 'end' | 'center', len: number) {
 function printHelp(ctx: Context) {
   // prettier-ignore
   let output = `
-${title("create-remix")}
+${title("create-lithent-ssr")}
 
 ${color.heading("Usage")}:
 
-${color.dim("$")} ${color.greenBright("create-remix")} ${color.arg("<projectDir>")} ${color.arg("<...options>")}
+${color.dim("$")} ${color.greenBright("create-lithent-ssr")} ${color.arg("<projectDir>")} ${color.arg("<...options>")}
 
 ${color.heading("Values")}:
 
-${color.arg("projectDir")}          ${color.dim(`The Remix project directory`)}
+${color.arg("projectDir")}          ${color.dim(`The Lithent project directory`)}
 
 ${color.heading("Options")}:
 
@@ -195,14 +194,13 @@ ${color.arg("--template <name>")}   ${color.dim(`The project template to use`)}
 ${color.arg("--[no-]install")}      ${color.dim(`Whether or not to install dependencies after creation`)}
 ${color.arg("--package-manager")}   ${color.dim(`The package manager to use`)}
 ${color.arg("--show-install-output")}   ${color.dim(`Whether to show the output of the install process`)}
-${color.arg("--[no-]init-script")}  ${color.dim(`Whether or not to run the template's remix.init script, if present`)}
+${color.arg("--[no-]init-script")}  ${color.dim(`Whether or not to run the template's lithent.init script, if present`)}
 ${color.arg("--[no-]git-init")}     ${color.dim(`Whether or not to initialize a Git repository`)}
 ${color.arg("--yes, -y")}           ${color.dim(`Skip all option prompts and run setup`)}
-${color.arg("--remix-version, -v")}     ${color.dim(`The version of Remix to use`)}
 
 ${color.heading("Creating a new project")}:
 
-Remix projects are created from templates. A template can be:
+Lithent projects are created from templates. A template can be:
 
 - a GitHub repo shorthand, :username/:repo or :username/:repo/:directory
 - the URL of a GitHub repo (or directory within it)
@@ -210,20 +208,14 @@ Remix projects are created from templates. A template can be:
 - a file path to a directory of files
 - a file path to a tarball
 ${[
-  "remix-run/grunge-stack",
-  "remix-run/remix/templates/remix",
-  "remix-run/examples/basic",
   ":username/:repo",
   ":username/:repo/:directory",
   "https://github.com/:username/:repo",
   "https://github.com/:username/:repo/tree/:branch",
   "https://github.com/:username/:repo/tree/:branch/:directory",
   "https://github.com/:username/:repo/archive/refs/tags/:tag.tar.gz",
-  "https://example.com/remix-template.tar.gz",
-  "./path/to/remix-template",
-  "./path/to/remix-template.tar.gz",
 ].reduce((str, example) => {
-  return `${str}\n${color.dim("$")} ${color.greenBright("create-remix")} my-app ${color.arg(`--template ${example}`)}`;
+  return `${str}\n${color.dim("$")} ${color.greenBright("create-lithent-ssr")} my-app ${color.arg(`--template ${example}`)}`;
 }, "")}
 
 To create a new project from a template in a private GitHub repo,
@@ -232,12 +224,7 @@ to that repo.
 
 ${color.heading("Initialize a project")}:
 
-Remix project templates may contain a \`remix.init\` directory
-with a script that initializes the project. This script automatically
-runs during \`remix create\`, but if you ever need to run it manually
-you can run:
-
-${color.dim("$")} ${color.greenBright("remix")} init
+${color.dim("$")} ${color.greenBright("lithent")} init
 `;
 
   log(output);
@@ -337,16 +324,12 @@ async function copyTemplateToTempDirStep(ctx: Context) {
     info('Template:', ['Using ', color.reset(ctx.template), '...']);
   } else {
     log('');
-    info('Using basic template', [
-      'See https://lithent/guides/templates for more',
-    ]);
+    info('Using basic template', ['']);
   }
 
   let template =
     ctx.template ??
     'https://github.com/superlucky84/lithent/tree/createlithent/createLithent/express';
-
-  console.log('TEMPLATE', template, ctx.tempDir);
 
   await loadingIndicator({
     start: 'Template copying...',
@@ -365,7 +348,7 @@ async function copyTemplateToTempDirStep(ctx: Context) {
             'Oh no!',
             err instanceof CopyTemplateError
               ? err.message
-              : 'Something went wrong. Run `create-remix --debug` to see more info.\n\n' +
+              : 'Something went wrong. Run `create-lithent-ssr --debug` to see more info.\n\n' +
                   'Open an issue to report the problem at '
           );
           throw err;
@@ -469,7 +452,7 @@ async function copyTempDirToAppDirStep(ctx: Context) {
 }
 
 async function getInitScriptPath(cwd: string) {
-  let initScriptDir = path.join(cwd, 'remix.init');
+  let initScriptDir = path.join(cwd, 'lithent.init');
   let initScriptPath = path.resolve(initScriptDir, 'index.js');
   return (await fileExists(initScriptPath)) ? initScriptPath : null;
 }
@@ -480,7 +463,7 @@ async function updatePackageJSON(ctx: Context) {
     let relativePath = path.relative(process.cwd(), ctx.cwd);
     error(
       'Oh no!',
-      'The provided template must be a Remix project with a `package.json` ' +
+      'The provided template must be a lithent project with a `package.json` ' +
         `file, but that file does not exist in ${color.bold(relativePath)}.`
     );
     throw new Error(`package.json does not exist in ${ctx.cwd}`);
@@ -496,7 +479,7 @@ async function updatePackageJSON(ctx: Context) {
   } catch (err) {
     error(
       'Oh no!',
-      'The provided template must be a Remix project with a `package.json` ' +
+      'The provided template must be a lithent project with a `package.json` ' +
         `file, but that file is invalid.`
     );
     throw err;
@@ -509,7 +492,7 @@ async function updatePackageJSON(ctx: Context) {
     if (!isValidJsonObject(dependencies)) {
       error(
         'Oh no!',
-        'The provided template must be a Remix project with a `package.json` ' +
+        'The provided template must be a lithent project with a `package.json` ' +
           `file, but its ${pkgKey} value is invalid.`
       );
       throw new Error(`package.json ${pkgKey} are invalid`);
@@ -517,16 +500,7 @@ async function updatePackageJSON(ctx: Context) {
 
     for (let dependency in dependencies) {
       let version = dependencies[dependency];
-      if (
-        (dependency.startsWith('@remix-run/') || dependency === 'remix') &&
-        version === '*'
-      ) {
-        /*
-        dependencies[dependency] = semver.prerelease(ctx.remixVersion)
-          ? // Templates created from prereleases should pin to a specific version
-            ctx.remixVersion
-          : '^' + ctx.remixVersion;
-          */
+      if (dependency === 'lithent' && version === '*') {
       }
     }
   }

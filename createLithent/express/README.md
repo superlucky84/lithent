@@ -1,40 +1,39 @@
-# Welcome to Lithent!
+# Welcome to Lithent-Ssr-Boilerplate
 
-- 📖 [Lithent docs](https://superlucky84.github.io/lithent/)
+`Lithent-Ssr-Boilerplate` is a boilerplate designed for building server-side rendering (SSR) websites using the [Lithent](https://superlucky84.github.io/lithent/) UI library.
 
-## Development
 
-Run the dev server:
+## Warning
 
-```shellscript
+This project is still experimental and is currently tightly coupled with [Express](https://expressjs.com/ko/)
+
+## Usage
+
+### Create a Project
+
+```bash
+npx create-lithent-ssr
+cd project-name
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+
+### Run the Development Server
+
+```bash
 npm run dev
 ```
 
-## Deployment
+### Build and Run
 
-First, build your app for production:
+The build files will be generated in the `dist` directory.
 
-```sh
+```bash
 npm run build
+npm run start
 ```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `dist
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
-

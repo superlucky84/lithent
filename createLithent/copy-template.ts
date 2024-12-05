@@ -4,7 +4,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import stream from 'node:stream';
 import { promisify } from 'node:util';
-// import { fetch } from '@remix-run/web-fetch';
 import gunzip from 'gunzip-maybe';
 import tar from 'tar-fs';
 import { ProxyAgent } from 'proxy-agent';
@@ -187,7 +186,6 @@ async function downloadAndExtractRepoTarball(
   // If we have a direct file path we will also have the branch. We can skip the
   // redirect and get the tarball URL directly.
   if (repo.branch && repo.filePath) {
-    console.log('111');
     let tarballURL = `https://codeload.github.com/${repo.owner}/${repo.name}/tar.gz/${repo.branch}`;
     return await downloadAndExtractTarball(destPath, tarballURL, {
       ...options,
@@ -222,15 +220,10 @@ async function downloadAndExtractTarball(
   let resourceUrl = tarballUrl;
   let headers: HeadersInit = {};
   let isGithubUrl = new URL(tarballUrl).host.endsWith('github.com');
-  console.log('tarballUrl', tarballUrl);
-  console.log('token', token);
-  console.log('filePath', filePath);
   if (token && isGithubUrl) {
     headers.Authorization = `token ${token}`;
   }
-  console.log('kkk');
   if (isGithubReleaseAssetUrl(tarballUrl)) {
-    console.log('www');
     // We can download the asset via the GitHub api, but first we need to look
     // up the asset id
     let info = getGithubReleaseAssetInfo(tarballUrl);
@@ -240,8 +233,6 @@ async function downloadAndExtractTarball(
       info.tag === 'latest'
         ? `https://api.github.com/repos/${info.owner}/${info.name}/releases/latest`
         : `https://api.github.com/repos/${info.owner}/${info.name}/releases/tags/${info.tag}`;
-
-    console.log('RELEASEURL', releaseUrl);
 
     let response = await fetch(releaseUrl);
 
@@ -280,11 +271,8 @@ async function downloadAndExtractTarball(
     resourceUrl = `https://api.github.com/repos/${info.owner}/${info.name}/releases/assets/${assetId}`;
     headers.Accept = 'application/octet-stream';
   }
-  console.log('RESOURCEURL!!', resourceUrl);
 
   let response = await fetch(resourceUrl);
-
-  console.log('FILEPATH', filePath);
 
   if (!response.body || response.status !== 200) {
     if (token) {
