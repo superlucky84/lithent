@@ -329,7 +329,7 @@ async function copyTemplateToTempDirStep(ctx: Context) {
 
   let template =
     ctx.template ??
-    'https://github.com/superlucky84/lithent/tree/createlithent/createLithent/express';
+    'https://github.com/superlucky84/lithent/tree/master/createLithent/express';
 
   await loadingIndicator({
     start: 'Template copying...',
