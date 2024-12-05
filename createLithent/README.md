@@ -12,7 +12,7 @@ This project is still experimental and is currently tightly coupled with [Expres
 ### Create a Project
 
 ```bash
-npx create-lithent-ssr
+npx create-lithent-ssr@latest
 cd project-name
 ```
 

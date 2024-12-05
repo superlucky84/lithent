@@ -76,7 +76,7 @@ JavaScript users are used to using closures and love to develop with them.
 * [README](https://github.com/superlucky84/lithent/tree/master/createLithent#readme)
 
 ```bash
-npx create-lithent-ssr
+npx create-lithent-ssr@latest
 ```
 
 
