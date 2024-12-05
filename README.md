@@ -68,6 +68,15 @@ JavaScript users are used to using closures and love to develop with them.
 
 - https://superlucky84.github.io/lithent/
 
+## Lithent Ssr Boilerplate
+
+* [README](https://github.com/superlucky84/lithent/tree/master/createLithent#readme)
+
+```bash
+npx create-lithent-ssr
+```
+
+
 ## How To Install
 
 #### Use NPM
