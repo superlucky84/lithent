@@ -10,7 +10,7 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "express": "^4.21.1",
-    "lithent": "workspace:*"
+    "lithent": "^1.16.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
