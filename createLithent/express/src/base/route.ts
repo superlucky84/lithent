@@ -107,7 +107,7 @@ async function loadPage(dynamicPath: string) {
   }
 }
 
-export const routeAssign = store<{
+export const routeWatch = store<{
   page: string;
   destroy: (() => void) | string;
   renew: () => void;
@@ -121,7 +121,7 @@ export const routeAssign = store<{
   loading: false,
 });
 
-const routeRef = routeAssign(
+const routeRef = routeWatch(
   state => {
     if (state && state.page !== initPage && state.rVDom) {
       loadPage(state.page);

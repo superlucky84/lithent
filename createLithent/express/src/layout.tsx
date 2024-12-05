@@ -4,7 +4,7 @@ import { computed } from 'lithent/helper';
 import LoadingText from '@/components/Loading';
 import { getPreloadData } from '@/base/data';
 import clsx from '@/helper/clsx';
-import { routeAssign } from '@/base/route';
+import { routeWatch } from '@/base/route';
 import '@/main.css';
 
 const Layout = mount<{
@@ -15,7 +15,7 @@ const Layout = mount<{
   const preload = computed(
     () => getPreloadData<{ layout: { title: string } }>()?.layout
   );
-  const routeRef = routeAssign(r, s => [s.loading]);
+  const routeRef = routeWatch(r, s => [s.loading]);
 
   return ({ page: Page, params, query }) => (
     <html lang="en" class="light" style="color-scheme: light;">
