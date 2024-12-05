@@ -64,7 +64,7 @@ export async function copyTemplate(
 
     throw new CopyTemplateError(
       `"${color.bold(template)}" is an invalid template. Run ${color.bold(
-        'create-remix --help'
+        'create-lithent-ssr --help'
       )} to see supported template formats.`
     );
   } catch (error) {
@@ -311,9 +311,6 @@ async function downloadAndExtractTarball(
           header.name = header.name.replace(`${originalDirName}/`, '');
 
           if (filePath) {
-            // Include trailing slash on startsWith when filePath doesn't include
-            // it so something like `templates/remix` doesn't inadvertently
-            // include `templates/remix-javascript/*` files
             if (
               (filePath.endsWith(path.posix.sep) &&
                 header.name.startsWith(filePath)) ||
@@ -354,7 +351,6 @@ async function downloadAndExtractTarball(
   }
 }
 
-// Copied from remix-node/stream.ts
 async function writeReadableStreamToWritable(
   stream: ReadableStream,
   writable: stream.Writable
@@ -414,9 +410,6 @@ function isGithubRepoShorthand(value: string) {
     return false;
   }
   // This supports :owner/:repo and :owner/:repo/nested/path, e.g.
-  // remix-run/remix
-  // remix-run/remix/templates/express
-  // remix-run/examples/socket.io
   return /^[\w-]+\/[\w-.]+(\/[\w-.]+)*$/.test(value);
 }
 
