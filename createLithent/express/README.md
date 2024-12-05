@@ -37,3 +37,8 @@ The build files will be generated in the `dist` directory.
 npm run build
 npm run start
 ```
+
+
+### Styling
+
+This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience.
