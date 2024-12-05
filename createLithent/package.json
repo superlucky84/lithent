@@ -1,19 +1,14 @@
 {
   "type": "module",
   "name": "create-lithent-ssr",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "lithent-ssr-boilerplate",
-  "private": true,
   "packageManager": "pnpm@7.6.0",
-  "main": "./dist/expressLithent.umd.js",
-  "module": "./dist/expressLithent.mjs",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "pnpm build && pnpm start",
     "build": "tsc",
     "start": "node ./dist/cli.js"
   },
-  "author": "",
   "repository": {
     "type": "git",
     "url": "https@github.com:superlucky84/lithent.git"
@@ -54,5 +49,6 @@
   },
   "volta": {
     "node": "20.3.0"
-  }
+  },
+  "files": ["dist/", "CHANGELOG.md", "LICENSE.md", "README.md"]
 }
