@@ -48,7 +48,9 @@ const Index = mount(() => {
                     href="#"
                     onClick={(event: Event) => moveTypePage(event, name)}
                   >
-                    <span class="bg-pokemon-${name} inline-block text-sm font-bold tracking-wider uppercase mt-5 text-white px-2 py-1 rounded drop-shadow-md outline-2 outline-black outline-offset-1">
+                    <span
+                      class={`bg-pokemon-${name} inline-block text-sm font-bold tracking-wider uppercase mt-5 text-white px-2 py-1 rounded drop-shadow-md outline-2 outline-black outline-offset-1`}
+                    >
                       {name}
                     </span>
                   </a>
