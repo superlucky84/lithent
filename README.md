@@ -71,6 +71,8 @@ JavaScript users are used to using closures and love to develop with them.
 
 ## Lithent Ssr Boilerplate
 
+`Lithent-Ssr-Boilerplate` is a boilerplate designed for building server-side rendering (SSR) websites using the [Lithent](https://superlucky84.github.io/lithent/) UI library.
+
 * [README](https://github.com/superlucky84/lithent/tree/master/createLithent#readme)
 
 ```bash
