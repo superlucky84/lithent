@@ -28,6 +28,7 @@ used lightly in a variety of situations.
 - [Thanks for the introduction](#thanks-for-the-introduction)
 - [Why Use Lithent](#why-use-lithent)
 - [Basic Guide](#basic-guide)
+- [Lithent Ssr Boilerplate](#lithent-ssr-boilerplate)
 - [How To Install](#how-to-install)
   - [Use NPM](#use-npm)
   - [Use CDN](#or-use-cdn)
