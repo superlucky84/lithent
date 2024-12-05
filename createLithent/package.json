@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "lithent-ssr-boilerplate",
+  "name": "create-lithent-ssr",
   "version": "0.0.1",
   "description": "lithent-ssr-boilerplate",
   "private": true,
@@ -20,9 +20,12 @@
   },
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": [
-    "lithent"
-  ],
+  "typings": "dist/cli.d.ts",
+  "bin": {
+    "create-lithent-ssr": "dist/cli.js"
+  },
+
+  "keywords": ["lithent"],
   "dependencies": {
     "arg": "^5.0.1",
     "chalk": "^4.1.2",

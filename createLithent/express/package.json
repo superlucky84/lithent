@@ -3,16 +3,15 @@
   "name": "express-lithent",
   "version": "0.0.1",
   "description": "express-lithent",
-  "private": true,
-  "packageManager": "pnpm@7.6.0",
-  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "node watch-serve.js",
     "start": "cross-env NODE_ENV=production node server.js",
-    "test": "vitest run --reporter verbose",
-    "watch": "vite build --watch --mode development",
     "build": "vite build"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+
   "author": "superlucky84",
   "repository": {
     "type": "git",
@@ -20,9 +19,7 @@
   },
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": [
-    "lithent"
-  ],
+  "keywords": ["lithent", "ssr"],
   "dependencies": {
     "cross-env": "^7.0.3",
     "express": "^4.21.1",
