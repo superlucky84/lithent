@@ -27,12 +27,14 @@ srcWatcher.on('ready', () => {
 srcWatcher.on('add', path => {
   if (isSrcInitialScanComplete) {
     console.log(`File added in src: ${path}`);
+    restartServer();
   }
 });
 
 srcWatcher.on('unlink', path => {
   if (isSrcInitialScanComplete) {
     console.log(`File removed from src: ${path}`);
+    restartServer();
   }
 });
 
