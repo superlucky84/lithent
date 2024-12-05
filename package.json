@@ -106,12 +106,8 @@
     "@typescript-eslint/eslint-plugin": "^8.12.2",
     "@typescript-eslint/parser": "^8.12.2"
   },
-
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
-  },
   "volta": {
-    "node": "20.3.0"
+    "node": "20.3.0",
+    "pnpm": "9.12.3"
   }
 }
