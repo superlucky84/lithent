@@ -34,7 +34,7 @@ export const Fragment = (_props: Props, ...children: WDom[]) =>
     type: 'fragment',
     [wdomSymbol]: true,
     children,
-  } as WDom);
+  }) as WDom;
 
 /**
  * 엘리먼트 생성 (createElement)

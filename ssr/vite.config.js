@@ -8,6 +8,7 @@ export default defineConfig(({ mode }) => ({
     checker({
       typescript: true,
       eslint: {
+        useFlatConfig: true,
         lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
       },
     }),
