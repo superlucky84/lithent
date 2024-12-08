@@ -1,5 +1,7 @@
 import type { WDom } from 'lithent';
-import { store } from 'lithent/helper';
+import { createStore } from 'state-ref';
+import type { StateRefStore, Watch } from 'state-ref';
+
 import Oops from '@/components/Oops';
 import NotFound from '@/components/NotFound';
 
@@ -73,10 +75,10 @@ async function loadPage(dynamicPath: string) {
     comparePage
   );
 
-  const rVDom = routeRef.rVDom;
+  const rVDom = routeRef.rVDom.value;
 
   if (key && pageModules[key]) {
-    routeRef.loading = true;
+    routeRef.loading.value = true;
     let Page;
     try {
       const res = await pageModules[key]();
@@ -96,24 +98,26 @@ async function loadPage(dynamicPath: string) {
       rVDom.compProps.page = Page;
       rVDom.compProps.query = query;
       rVDom.compProps.params = params;
-      routeRef.renew();
+      routeRef.renew.value();
     }
-    routeRef.loading = false;
+    routeRef.loading.value = false;
   } else if (rVDom?.compProps) {
     rVDom.compProps.page = NotFound;
     rVDom.compProps.query = query;
     rVDom.compProps.params = params;
-    routeRef.renew();
+    routeRef.renew.value();
   }
 }
 
-export const routeWatch = store<{
+type RouteState = {
   page: string;
   destroy: (() => void) | string;
   renew: () => void;
   rVDom: WDom | null;
   loading: boolean;
-}>({
+};
+
+export const routeWatch: Watch<RouteState> = createStore<RouteState>({
   page: '',
   destroy: '',
   renew: () => {},
@@ -121,21 +125,20 @@ export const routeWatch = store<{
   loading: false,
 });
 
-const routeRef = routeWatch(
-  state => {
-    if (state && state.page !== initPage && state.rVDom) {
-      loadPage(state.page);
-    }
-    initPage = state.page;
-  },
-  store => [store.page]
-);
+routeWatch(state => {
+  if (initPage && initPage && state.page.value !== initPage && state.rVDom) {
+    loadPage(state.page.value);
+  }
+  initPage = state.page.value;
+});
 
-export function makeRoute() {
+export const routeRef: StateRefStore<RouteState> = routeWatch();
+
+export function makeRoute(): StateRefStore<RouteState> {
   window.addEventListener('popstate', _ => {
     const { pathname, search, origin } = window.location;
 
-    const urlA = new URL(routeRef.page, origin);
+    const urlA = new URL(routeRef.page.value, origin);
     const urlB = new URL(`${pathname}${search}`, origin);
 
     execRoute(urlA, urlB, false);
@@ -155,7 +158,7 @@ export function navigate(pagePath: string) {
 
 function execRoute(urlA: URL, urlB: URL, isPush?: boolean) {
   if (urlA.pathname !== urlB.pathname) {
-    routeRef.page = `${urlB.pathname}${urlB.search}`;
+    routeRef.page.value = `${urlB.pathname}${urlB.search}`;
   }
 
   if (isPush) {

@@ -38,8 +38,9 @@ export default async function load(
   const renewRoot =
     (LayoutWDom.compKey && componentUpdate(LayoutWDom.compKey)) || (() => {});
 
-  routeRef.page = `${pathname}${search}`;
-  routeRef.destroy = hydration(LayoutWDom, document.documentElement);
-  routeRef.renew = renewRoot;
-  routeRef.rVDom = LayoutWDom;
+  routeRef.page.value = `${pathname}${search}`;
+  routeRef.renew.value = renewRoot;
+  routeRef.rVDom.value = LayoutWDom;
+
+  hydration(LayoutWDom, document.documentElement);
 }

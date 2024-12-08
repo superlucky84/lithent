@@ -15,7 +15,7 @@ const Layout = mount<{
   const preload = computed(
     () => getPreloadData<{ layout: { title: string } }>()?.layout
   );
-  const routeRef = routeWatch(r, s => [s.loading]);
+  const routeRef = routeWatch(r);
 
   return ({ page: Page, params, query }) => (
     <html lang="en" class="light" style="color-scheme: light;">
@@ -33,7 +33,7 @@ const Layout = mount<{
         )}
       >
         <div class="flex">
-          {routeRef.loading ? (
+          {routeRef.loading.value ? (
             <LoadingText />
           ) : (
             <Page params={params} query={query} />
