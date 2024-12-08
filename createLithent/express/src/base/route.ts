@@ -1,6 +1,7 @@
 import type { WDom } from 'lithent';
-import { createStore } from 'state-ref';
 import type { StateRefStore, Watch } from 'state-ref';
+
+import { createStore } from 'state-ref';
 
 import Oops from '@/components/Oops';
 import NotFound from '@/components/NotFound';

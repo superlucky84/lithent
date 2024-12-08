@@ -3,6 +3,7 @@ import { state } from 'lithent/helper';
 import { getPreloadData } from '@/base/data';
 import { navigate } from '@/base/route';
 import { fetchMonsterListByType } from '@/helper/request';
+import { shuffleArray } from '@/helper/calculator';
 
 import type { PageProps } from '@/base/types';
 import type { Info } from '@/helper/request';
@@ -20,20 +21,11 @@ export const preload = async ({ params }: PageProps) => {
   };
 };
 
-function shuffleArray(array: DataItem[]) {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const randomIndex = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
-  }
-  return shuffled;
-}
-
-const Main = mount<PageProps>((r, { params: { type } }) => {
+const Main = mount<PageProps>((renew, { params: { type } }) => {
   const preload = getPreloadData<{
     data: { name: string; info: Info; infoString: string }[];
   }>();
-  const data = state<DataItem[]>(preload.data, r);
+  const data = state<DataItem[]>(preload.data, renew);
 
   const moveDetail = (event: Event, name: string) => {
     event.preventDefault();
