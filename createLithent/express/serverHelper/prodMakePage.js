@@ -18,12 +18,12 @@ export default class ProdMakePage extends MakePage {
     return appHtmlOrig.replace(
       '</body>',
       `<script type="module">
-                import load from '/${loadResourcePath}';
+        import load from '/${loadResourcePath}';
 
-                load('${this.key}', ${JSON.stringify(
-        Object.assign({}, this.props)
-      )}, ${JSON.stringify(initProp)});
-                </script></body>`
+        load('${this.key}', ${JSON.stringify(
+          Object.assign({}, this.props)
+        )}, ${JSON.stringify(initProp)});
+        </script></body>`
     );
   }
 

@@ -9,11 +9,11 @@ export default class DevMakePage extends MakePage {
     return appHtmlOrig.replace(
       '</body>',
       `<script type="module">
-                  import load from '/src/base/load';
-                  load('${this.key}', ${JSON.stringify(
-        Object.assign({}, this.props)
-      )}, ${JSON.stringify(initProp)});
-                 </script></body>`
+        import load from '/src/base/load';
+        load('${this.key}', ${JSON.stringify(
+          Object.assign({}, this.props)
+        )}, ${JSON.stringify(initProp)});
+       </script></body>`
     );
   }
 
@@ -24,9 +24,8 @@ export default class DevMakePage extends MakePage {
   }
 
   async makeOopComponents() {
-    const { default: Oops } = await this.vite.ssrLoadModule(
-      `@/components/Oops`
-    );
+    const { default: Oops } =
+      await this.vite.ssrLoadModule(`@/components/Oops`);
     const { default: Layout } = await this.vite.ssrLoadModule(`@/layout`);
 
     return { Oops, Layout };
