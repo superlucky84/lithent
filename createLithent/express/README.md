@@ -55,7 +55,10 @@ Routing is determined by the filenames under the `/src/pages/` directory. The ro
 
 These routing patterns allow you to create both static and dynamic URLs with flexibility in your project structure.
 
+### State Management
+
+This template includes [state-ref](https://github.com/superlucky84/state-ref), a lightweight state management library, already configured to simplify your development experience. It provides an intuitive API for managing and sharing state across components, making your application more predictable and maintainable.
+
 ### Styling
 
 This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience.
-
