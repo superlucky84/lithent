@@ -13,7 +13,7 @@ import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { assign, keys, entries } from '@/utils';
 
 /**
- * 원본 가상돔과 리랜더링을 위한 새로운 가상돔 diff 처리의 시작점
+ * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
  */
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
@@ -26,7 +26,7 @@ export const makeNewWDomTree = (
   );
 
 /**
- * 가상돔 비교후 새로운 가상돔 생성
+ * Create a new virtual DOM after comparing with the previous virtual DOM
  */
 const remakeNewWDom = (
   newWDom: WDom | TagFunctionResolver,
@@ -58,7 +58,7 @@ const remakeNewWDom = (
 };
 
 /**
- * 새로운 가상돔이 원본 가상돔으로부터 물려받아야 하거나 청산할 것을 처리
+ * Handle what the new virtual DOM should inherit or reconcile from the original virtual DOM.
  */
 const inheritPropForRender = (
   remakeWDom: WDom,
@@ -81,7 +81,7 @@ const inheritPropForRender = (
 };
 
 /**
- * 새로운 가상돔이 실제돔으로 반영하기 위한 상태 정보 표기
+ * Indicate the state information for the new virtual DOM to be reflected in the real DOM.
  */
 const addReRenderTypeProperty = (
   newWDom: WDom,
@@ -127,7 +127,7 @@ const addReRenderTypeProperty = (
 };
 
 /**
- * 재정렬하며 업데이트 해야 하는 타입일때 실제로 역순 위치 교환이 필요한지 체크
+ * Check if a reverse order swap is needed when updating types that require reordering.
  */
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
   const origChildren = [...(originalWDom?.children || [])];
@@ -149,7 +149,7 @@ const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
 };
 
 /**
- * 가상돔 속성 업데이트 처리
+ * Handling virtual DOM attribute updates.
  */
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
@@ -170,9 +170,9 @@ const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
 };
 
 /**
- * 가상돔이 새로운 종류로 완전 교체되지 않고 단순 업데이트 될때 처리 시작
- * (새로운 상태가 반영되도록 props나 children 상태 반영)
- * (새로운 상태를 반영하면서도 props 나 children의 실제 참조가 변경되지 않도록 처리)
+ * Start handling when the virtual DOM is updated rather than completely replaced with a new type.
+ * (Reflect the state of props or children to ensure the new state is applied)
+ * (Handle the reflection of the new state while ensuring that the actual references of props or children are not changed)
  */
 const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
   const { compProps: props, compChild: children } = vDom;
@@ -192,7 +192,7 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
 };
 
 /**
- * 비교가 끝난 가상돔을 새로운 가상돔으로 교체하거나, 그냥 업데이트 시켜줌
+ * Replace the compared virtual DOM with the new virtual DOM or simply update it.
  */
 const generalize = (
   newWDom: WDom | TagFunctionResolver,
@@ -221,7 +221,7 @@ const remakeChildrenForDiff = (
     : remakeChildrenForAdd(newWDom);
 
 /**
- * 새로운 가상돔 생을을 위한 재귀 처리
+ * Recursive handling for the creation of a new virtual DOM.
  */
 const remakeChildrenForAdd = (newWDom: WDom) =>
   (newWDom.children || []).map((item: WDom) =>
@@ -229,7 +229,7 @@ const remakeChildrenForAdd = (newWDom: WDom) =>
   );
 
 /**
- * 추가가 아닌 업데이트트 위한 재귀처리
+ * Recursive handling for updates, not additions.
  */
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
   newWDom.type === 'loop' && checkExisty(getKey((newWDom.children || [])[0]))
@@ -241,7 +241,7 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
       );
 
 /**
- * 반복문 타입의 가상돔 처리
+ * Handling virtual DOM of loop-type elements.
  */
 const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
   const [remakedChildren, unUsedChildren] = diffLoopChildren(
@@ -259,7 +259,7 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
 };
 
 /**
- * 반복문 타입의 가상돔의 재귀처리
+ * Recursive handling of loop-type virtual DOM elements.
  */
 const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
   const newChildren = [...(newWDom.children || [])];
@@ -281,7 +281,7 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
 };
 
 /**
- * 반복문 타입의 가상돔의 비교처리를 할때 키를 참고하여 비교판단
+ * When comparing loop-type virtual DOM elements, use the key to determine the comparison
  */
 const findSameKeyOriginalItem = (item: WDom, originalChildren: WDom[]) =>
   originalChildren.find(

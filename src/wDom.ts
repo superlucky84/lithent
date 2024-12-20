@@ -27,7 +27,7 @@ import {
 import { assign } from '@/utils';
 
 /**
- * 여러 요소를 그룹화 할수 있게 해준다.
+ * It allows grouping multiple elements together.
  */
 export const Fragment = (_props: Props, ...children: WDom[]) =>
   ({
@@ -37,7 +37,7 @@ export const Fragment = (_props: Props, ...children: WDom[]) =>
   }) as WDom;
 
 /**
- * 엘리먼트 생성 (createElement)
+ * Element creation
  */
 export const h = (
   tag: TagFunction | FragmentFunction | string,
@@ -57,14 +57,14 @@ export const h = (
 };
 
 /**
- * 포털을 가능하게 해준다.
+ * Enables portals
  */
 export const portal = (wDom: WDom, portal: HTMLElement) => {
   return h('portal', { portal }, wDom);
 };
 
 /**
- * 컴포넌트 생성을 도와준다
+ * It helps with component creation.
  */
 export const mount =
   <T>(component: Component<T>) =>
@@ -72,7 +72,7 @@ export const mount =
     component;
 
 /**
- * 특정 컴포넌트부터 새로 그려준다.
+ * It re-renders starting from a specific component.
  */
 const reRenderCustomComponent = (
   tag: TagFunction,
@@ -108,7 +108,7 @@ const reRenderCustomComponent = (
 };
 
 /**
- * 가상돔을 리랜더링 할때 기존 가상돔과 diff를 위한 중간단계 생성
+ * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
  */
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
@@ -135,7 +135,7 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
 };
 
 /**
- * 컴포넌트로 부터 실제 가상돔 노드를 만든다.
+ * Create the actual virtual DOM node from the component.
  */
 const makeCustomNode = (
   componentMaker: (props: Props) => WDom,
@@ -174,7 +174,7 @@ const makeCustomNode = (
 };
 
 /**
- * 컴포넌트로 부터 실제로 가상돔이 만들어질때, 추후 다시그리기 위한 리랜더 메서드 생성
+ * When the virtual DOM is actually created from the component, generate a re-render method for future redraws.
  */
 const makeReRender = (
   componentMaker: (props: Props) => WDom,
@@ -189,7 +189,7 @@ const makeReRender = (
 };
 
 /**
- * 리렌더 메서드로 부터 다시그리기 위한 시작점
+ * The starting point for redrawing from the re-render method
  */
 const wDomMaker = (
   componentMaker: (props: Props) => WDom,
@@ -210,7 +210,7 @@ const wDomMaker = (
 };
 
 /**
- * 커스텀 컴포넌트 노드를만들때 가상돔 객체에 기타 정보 속성을 붙여준다
+ * When creating a custom component node, attach additional information attributes to the virtual DOM object.
  */
 const addComponentProps = (
   wDom: WDom,
@@ -239,7 +239,7 @@ const addComponentProps = (
 };
 
 /**
- * h 함수로 부터 가상돔이 만들어지는 시작점
+ * The starting point where the virtual DOM is created from the h function.
  */
 const makeNode = (
   tag: TagFunction | FragmentFunction | string,
@@ -266,7 +266,7 @@ const makeNode = (
 };
 
 /**
- * 가상돔의 자식 가상돔들을 재귀 처리해주는 시작점
+ * The starting point for recursively processing the child virtual DOM elements.
  */
 const remakeChildren = (
   nodeParentPointer: NodePointer,
@@ -277,7 +277,7 @@ const remakeChildren = (
   );
 
 /**
- * 가상돔의 자식 가상돔들을 재귀 처리
+ * Recursively process the child virtual DOM elements.
  */
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || item === false) {
