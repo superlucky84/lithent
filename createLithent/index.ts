@@ -136,7 +136,7 @@ async function projectNameStep(ctx: Context) {
 async function introStep(ctx: Context) {
   log(
     `\n${color.bgWhite(` ${color.black('Lithent')} `)}  ${color.green(
-      color.bold(`v0.0.1`)
+      color.bold(`v0.0.2`)
     )} ${color.bold("➿ Let's build a better website...")}`
   );
 
