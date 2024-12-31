@@ -9,10 +9,10 @@ import type {
 function createWNode(
   type: TagFunction | FragmentFunction | string,
   orgProps: Props,
-  key: any,
+  key: unknown,
   _isStaticChildren: boolean,
-  _source: any,
-  _self: any
+  _source: unknown,
+  _self: unknown
 ) {
   const { children, ...props } = orgProps;
   const newChildren: MiddleStateWDomChildren = !Array.isArray(children)
