@@ -136,8 +136,8 @@ importers:
         specifier: ^1.16.0
         version: 1.16.0
       state-ref:
-        specifier: ^1.1.3
-        version: 1.1.3
+        specifier: ^1.1.4
+        version: 1.1.4
     devDependencies:
       '@testing-library/jest-dom':
         specifier: ^6.5.0
@@ -220,6 +220,12 @@ importers:
       lithent:
         specifier: workspace:*
         version: link:..
+
+  jsx-runtime:
+    dependencies:
+      lithent:
+        specifier: ^1.0.0
+        version: 1.16.0
 
   lithentDocs:
     devDependencies:
@@ -2676,8 +2682,8 @@ packages:
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
 
-  state-ref@1.1.3:
-    resolution: {integrity: sha512-/EqEpe583YdQ7mi4hUugRKupcaQIe+YL2hFh4KjraXiNvX8xN+fGWUlp5h1iUQpNmRjqc0Vj6b3kKj77vsGbcg==}
+  state-ref@1.1.4:
+    resolution: {integrity: sha512-WgU6cUNrmlRGRt5WWiswUyF7ZebIS6qMVG5ogpJ3JZXbbgzS88kwT3niEenMJEXeSAA3aVgUklXZmMVDPL25kQ==}
 
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
@@ -5605,7 +5611,7 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  state-ref@1.1.3: {}
+  state-ref@1.1.4: {}
 
   statuses@2.0.1: {}
 

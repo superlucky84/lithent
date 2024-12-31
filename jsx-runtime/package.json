@@ -1,0 +1,32 @@
+{
+  "type": "module",
+  "name": "jsx-runtime",
+  "version": "0.21.0",
+  "description": "Lithent JSX runtime",
+  "private": true,
+  "packageManager": "pnpm@7.6.0",
+  "main": "./dist/jsxRuntime.umd.js",
+  "module": "./dist/jsxRuntime.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest",
+    "watch": "vite build --watch",
+    "build": "vite build"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": ["lithent"],
+  "peerDependencies": {
+    "lithent": "^1.0.0"
+  },
+  "volta": {
+    "node": "20.3.0"
+  }
+}
