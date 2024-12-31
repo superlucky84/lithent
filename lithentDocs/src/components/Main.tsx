@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { Aside } from '@/components/aside';
 import { Mainbody } from '@/components/mainbody';
 import { assignSharedStore } from '@/store';

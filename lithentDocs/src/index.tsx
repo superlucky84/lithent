@@ -1,4 +1,4 @@
-import { h, render, mount, Fragment } from 'lithent';
+import { render, mount, Fragment } from 'lithent';
 import { HeaderNav } from '@/components/headernav';
 import { Main } from '@/components/Main';
 import '@/input.css';

@@ -1,4 +1,4 @@
-import { h, mount, ref } from 'lithent';
+import { mount, ref } from 'lithent';
 import { ContentHeader } from '@/components/contentHeader';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';

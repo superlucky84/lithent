@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { assignSharedStore } from '@/store';
 
 export const HeaderNav = mount(r => {

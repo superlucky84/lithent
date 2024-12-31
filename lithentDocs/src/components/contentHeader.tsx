@@ -1,4 +1,4 @@
-import { h, mount, ref } from 'lithent';
+import {  mount, ref } from 'lithent';
 
 export const ContentHeader = mount<{
   taregetRef?: { value: HTMLElement | null };

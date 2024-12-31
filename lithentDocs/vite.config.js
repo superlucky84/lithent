@@ -12,6 +12,11 @@ export default defineConfig({
       },
     }),
   ],
+  jsx: {
+    jsxImportSource: 'lithent',
+    jsxRuntime: 'automatic',
+  },
+
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
