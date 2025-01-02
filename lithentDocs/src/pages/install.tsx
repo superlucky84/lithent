@@ -3,9 +3,9 @@ import { ContentHeader } from '@/components/contentHeader';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
 
-const code10 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/ftags/dist/lithentFTags.umd.js"></script>
+const code10 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/ftags/dist/lithentFTags.umd.js"></script>
 
 <div id="root"></div>
 
@@ -40,10 +40,10 @@ render(
 </script>
 `;
 
-const code7 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/ftags/dist/lithentFTags.umd.js"></script-->
+const code7 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/tag/dist/lithentTag.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/ftags/dist/lithentFTags.umd.js"></script-->
 
 <div id="root"></div>
 
@@ -98,7 +98,7 @@ const Component = mount((r, _props) => {
 const destroy = render(lTag\`<\${Component} />\`, document.getElementById('root'));
 `;
 
-const code9 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.16.0/tag/dist/lithentTag.umd.js"></script>;
+const code9 = `<script src="https://cdn.jsdelivr.net/npm/lithent@1.17.0/tag/dist/lithentTag.umd.js"></script>;
 const { lTag } = lithentTag;
 const destroy = render(lTag\`<\${Component} />\`, document.getElementById('root'));
 `;
@@ -126,6 +126,17 @@ const code3 = `...
     "jsx": "react",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
+    //...
+  }
+}
+...
+`;
+
+const code4 = `...
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "lithent",
     //...
   }
 }
@@ -165,6 +176,10 @@ const exCode2 = hljs.highlight(code2, {
 }).value;
 
 const exCode3 = hljs.highlight(code3, {
+  language: 'javascript',
+}).value;
+
+const exCode4 = hljs.highlight(code4, {
   language: 'javascript',
 }).value;
 
@@ -246,27 +261,27 @@ export const Install = mount(() => {
       <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
         <p> </p>
         <p>## umd</p>
-        <p>https://cdn.jsdelivr.net/npm/lithent@1.16.0/dist/lithent.umd.js</p>
+        <p>https://cdn.jsdelivr.net/npm/lithent@1.17.0/dist/lithent.umd.js</p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.16.0/helper/dist/lithentHelper.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.17.0/helper/dist/lithentHelper.umd.js
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.16.0/ftags/dist/lithentFTags.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.17.0/ftags/dist/lithentFTags.umd.js
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.16.0/tag/dist/lithentTag.umd.js
+          https://cdn.jsdelivr.net/npm/lithent@1.17.0/tag/dist/lithentTag.umd.js
         </p>
         <p>&nbsp;</p>
         <p>## esm</p>
-        <p>https://cdn.jsdelivr.net/npm/lithent@1.16.0/dist/lithent.mjs</p>
+        <p>https://cdn.jsdelivr.net/npm/lithent@1.17.0/dist/lithent.mjs</p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.16.0/helper/dist/lithentHelper.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.17.0/helper/dist/lithentHelper.mjs
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.16.0/ftags/dist/lithentFTags.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.17.0/ftags/dist/lithentFTags.mjs
         </p>
         <p>
-          https://cdn.jsdelivr.net/npm/lithent@1.16.0/tag/dist/lithentTag.mjs
+          https://cdn.jsdelivr.net/npm/lithent@1.17.0/tag/dist/lithentTag.mjs
         </p>
       </div>
       <div class="py-2 mb-4 overflow-x-auto text-sm text-gray-50 ">
@@ -306,12 +321,23 @@ export const Install = mount(() => {
             />
           </div>
           <h3 class="text-slate-50 text-lg mb-2 mt-8">
-            Setting JSX - Typescript (jsx-runtime is not supported yet.)
+            Setting JSX - Typescript Classic Transform
           </h3>
           <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
             <div
               class="font-normal"
               innerHTML={exCode3}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+          <h3 class="text-slate-50 text-lg mb-2 mt-8">
+            Setting JSX - Typescript Automatic Transform, available in
+            TypeScript &gt;= 4.1.1
+          </h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode4}
               style={{ whiteSpace: 'pre' }}
             />
           </div>
