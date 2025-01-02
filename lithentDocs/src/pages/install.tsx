@@ -167,6 +167,18 @@ const code5 = `...
 ...
 `;
 
+// vite.config.js
+const code11 = `...
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  esbuild: {
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
+  },
+});
+`;
+
 const exCode1 = hljs.highlight(code, {
   language: 'javascript',
 }).value;
@@ -204,6 +216,10 @@ const exCode9 = hljs.highlight(code9, {
 }).value;
 
 const exCode10 = hljs.highlight(code10, {
+  language: 'javascript',
+}).value;
+
+const exCode11 = hljs.highlight(code11, {
   language: 'javascript',
 }).value;
 
@@ -317,6 +333,14 @@ export const Install = mount(() => {
             <div
               class="font-normal"
               innerHTML={exCode2}
+              style={{ whiteSpace: 'pre' }}
+            />
+          </div>
+          <h3 class="text-slate-50 text-lg mb-2 mt-8">Setting JSX - Vite</h3>
+          <div class="px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-black">
+            <div
+              class="font-normal"
+              innerHTML={exCode11}
               style={{ whiteSpace: 'pre' }}
             />
           </div>
