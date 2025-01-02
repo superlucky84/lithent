@@ -1,4 +1,4 @@
-import {  mount } from 'lithent';
+import { mount } from 'lithent';
 import { computed } from 'lithent/helper';
 
 export const Aside = mount<{ isHidden: boolean }>(() => {

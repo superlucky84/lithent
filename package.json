@@ -44,6 +44,11 @@
       "import": "./jsx-runtime/dist/jsxRuntime.mjs",
       "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
     },
+    "./jsx-dev-runtime": {
+      "types": "./jsx-runtime/dist/index.d.ts",
+      "import": "./jsx-runtime/dist/jsxRuntime.mjs",
+      "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
+    },
     "./helper": {
       "types": "./helper/dist/index.d.ts",
       "import": "./helper/dist/lithentHelper.mjs",

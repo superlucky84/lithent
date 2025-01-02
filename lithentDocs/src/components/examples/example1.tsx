@@ -1,4 +1,4 @@
-import { mount, Fragment } from 'lithent';
+import { mount } from 'lithent';
 import { state, computed } from 'lithent/helper';
 
 import hljs from 'highlight.js';

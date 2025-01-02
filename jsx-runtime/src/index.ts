@@ -15,11 +15,15 @@ function createWNode(
   _self: unknown
 ) {
   const { children, ...props } = orgProps;
-  const newChildren: MiddleStateWDomChildren = !Array.isArray(children)
-    ? [children]
-    : children;
+  if (children) {
+    const newChildren: MiddleStateWDomChildren = !Array.isArray(children)
+      ? [children]
+      : children;
 
-  return h(type, { ...props, key } as Props, ...newChildren);
+    return h(type, { ...props, key } as Props, ...newChildren);
+  }
+
+  return h(type, { ...props, key } as Props);
 }
 
 export {
