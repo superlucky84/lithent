@@ -222,10 +222,10 @@ importers:
         version: link:..
 
   jsx-runtime:
-    dependencies:
+    devDependencies:
       lithent:
-        specifier: ^1.0.0
-        version: 1.16.0
+        specifier: workspace:*
+        version: link:..
 
   lithentDocs:
     devDependencies:
