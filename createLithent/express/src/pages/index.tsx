@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { navigate } from '@/base/route';
 import { getPreloadData } from '@/base/data';
 import { fetchTypeList } from '@/helper/request';

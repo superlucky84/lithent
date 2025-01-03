@@ -1,5 +1,5 @@
 import type { TagFunction } from 'lithent';
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { computed } from 'lithent/helper';
 import LoadingText from '@/components/Loading';
 import { getPreloadData } from '@/base/data';

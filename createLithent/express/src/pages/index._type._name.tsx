@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { getPreloadData } from '@/base/data';
 import { fetchPokemonInfo } from '@/helper/request';
 

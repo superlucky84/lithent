@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 
 const LoadingText = mount(() => {
   return () => (
