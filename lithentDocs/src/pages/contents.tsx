@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { ContentHeader } from '@/components/contentHeader';
 
 export const Guide = mount(() => {

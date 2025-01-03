@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "lithent",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithent.umd.js",
@@ -15,13 +15,14 @@
     "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev",
     "build:core": "vite build",
     "build:helper": "pnpm --filter lithent-helper build",
+    "build:jsxruntime": "pnpm --filter jsx-runtime build",
     "build:ssr": "pnpm --filter lithent-ssr build",
     "build:tag": "pnpm --filter lithent-tag build",
     "build:ftags": "pnpm --filter lithent-ftags build",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
-    "build:sequence": "pnpm build:core && pnpm build:helper && pnpm build:ssr",
-    "build:parallel": "pnpm --filter '!lithent-helper' --filter '!lithent-ssr'  --filter '!create-lithent-ssr' build",
+    "build:sequence": "pnpm build:core && pnpm build:jsxruntime && pnpm build:helper && pnpm build:ssr",
+    "build:parallel": "pnpm --filter '!jsx-runtime' --filter '!lithent-helper' --filter '!lithent-ssr'  --filter '!create-lithent-ssr' build",
     "build": "pnpm run build:sequence && pnpm run build:parallel",
     "watch:core": "vite build --watch",
     "watch:helper": "pnpm --filter lithent-helper watch",
@@ -37,6 +38,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/lithent.mjs",
       "require": "./dist/lithent.umd.js"
+    },
+    "./jsx-runtime": {
+      "types": "./jsx-runtime/dist/index.d.ts",
+      "import": "./jsx-runtime/dist/jsxRuntime.mjs",
+      "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./jsx-runtime/dist/index.d.ts",
+      "import": "./jsx-runtime/dist/jsxRuntime.mjs",
+      "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
     },
     "./helper": {
       "types": "./helper/dist/index.d.ts",
@@ -63,6 +74,9 @@
   "files": [
     "src",
     "dist",
+    "jsx-runtime/dist",
+    "jsx-runtime/src",
+    "jsx-runtime/package.json",
     "helper/dist",
     "helper/src",
     "helper/package.json",

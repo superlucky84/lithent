@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { ContentHeader } from '@/components/contentHeader';
 import { Lesson1 } from '@/components/lesson/lesson1';
 import { Lesson2 } from '@/components/lesson/lesson2';

@@ -1,4 +1,4 @@
-import { h, mount, Fragment } from 'lithent';
+import { mount, Fragment } from 'lithent';
 import { cacheUpdate } from 'lithent/helper';
 
 import hljs from 'highlight.js';

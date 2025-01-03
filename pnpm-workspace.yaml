@@ -4,6 +4,7 @@ packages:
   - 'tag'
   - 'ftags'
   - 'examples'
+  - 'jsx-runtime'
   - 'lithentDocs'
   - 'createLithent'
   - 'createLithent/express'

@@ -1,4 +1,4 @@
-import { h, mount, render, ref, mountCallback } from 'lithent';
+import { mount, render, ref, mountCallback } from 'lithent';
 import { store } from 'lithent/helper';
 
 import hljs from 'highlight.js';

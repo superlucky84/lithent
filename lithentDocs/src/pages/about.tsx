@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { ContentHeader } from '@/components/contentHeader';
 
 // grid grid-cols-1 xl:grid-cols-2

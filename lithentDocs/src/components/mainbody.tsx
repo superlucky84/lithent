@@ -1,4 +1,4 @@
-import { h, mount } from 'lithent';
+import { mount } from 'lithent';
 import { computed } from 'lithent/helper';
 import { Guide } from '@/pages/guide';
 import { Install } from '@/pages/install';

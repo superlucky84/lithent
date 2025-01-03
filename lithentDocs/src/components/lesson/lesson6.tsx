@@ -1,4 +1,4 @@
-import { h, mount, Fragment, mountCallback, ref } from 'lithent';
+import { mount, mountCallback, ref } from 'lithent';
 
 import hljs from 'highlight.js';
 import 'highlight.js/styles/hybrid.css';
