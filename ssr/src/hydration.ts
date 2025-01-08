@@ -69,11 +69,11 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
           );
           index = nIndex;
           realDomItem!.parentElement!.replaceChild(tFragment, realDomItem);
-        } else if (
-          wDomItem.type === 'element' &&
-          realDomItem instanceof HTMLElement
-        ) {
-          if ((realDomItem.tagName || '').toLowerCase() !== wDomItem.tag) {
+        } else if (wDomItem.type === 'element' && nodeType === 1) {
+          if (
+            ((realDomItem as HTMLElement).tagName || '').toLowerCase() !==
+            wDomItem.tag
+          ) {
             // throw new Error('Hydration Error - not matched tagname');
             pass = true;
           } else {
