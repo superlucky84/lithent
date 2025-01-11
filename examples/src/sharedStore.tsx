@@ -1,5 +1,5 @@
 // example.jsx
-import { h, render, mount } from 'lithent';
+import { render, mount } from 'lithent';
 import { store } from 'lithent/helper';
 
 const assignShardStore = store<{ text: string; count: number }>({

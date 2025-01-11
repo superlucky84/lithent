@@ -1,5 +1,4 @@
 import {
-  h,
   Fragment,
   render,
   mount,

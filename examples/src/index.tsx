@@ -1,6 +1,5 @@
 // example.jsx
 import {
-  h,
   Fragment,
   render,
   ref,

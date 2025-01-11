@@ -24,6 +24,7 @@
     "lithent"
   ],
   "dependencies": {
+    "@mdx-js/rollup": "^3.1.0",
     "lithent": "workspace:*",
     "lithent-helper": "workspace:*",
     "lithent-tag": "workspace:*"
