@@ -133,8 +133,8 @@ importers:
         specifier: ^4.21.1
         version: 4.21.1
       lithent:
-        specifier: ^1.17.2
-        version: 1.17.2
+        specifier: ^1.17.3
+        version: 1.17.3
       state-ref:
         specifier: ^1.1.4
         version: 1.1.4
@@ -2011,8 +2011,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  lithent@1.17.2:
-    resolution: {integrity: sha512-U0QWfSDmcdxWNDCW4+cRfBywKCcU8V/B7zmYfNwKDC7659FkiZC/Ib5Lmkqj7OliDof8Q9n9+0yizc0teM35rw==}
+  lithent@1.17.3:
+    resolution: {integrity: sha512-CogMWut7RbeaFc+a4oHROrfqwZIk5gXD87cXeaOixdFbpP6r/SYmePExRy2X6M5fNvsVtBq/GD8MvEfXuTeYvQ==}
 
   locate-path@6.0.0:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
@@ -4872,7 +4872,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lithent@1.17.2: {}
+  lithent@1.17.3: {}
 
   locate-path@6.0.0:
     dependencies:
