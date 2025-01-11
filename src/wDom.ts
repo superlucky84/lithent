@@ -117,7 +117,11 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const resolve = (compKey = props) => {
     initMountHookState(compKey);
 
-    const component = tag(props, children);
+    const initialComponent = tag(props, children);
+    const component =
+      typeof initialComponent === 'function'
+        ? initialComponent
+        : () => () => initialComponent;
     const componentMaker = component(componentUpdate(compKey), props, children);
 
     const customNode = makeCustomNode(
