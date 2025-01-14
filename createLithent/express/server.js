@@ -57,7 +57,11 @@ async function createServer() {
         return;
       }
 
-      const props = { params: req.params, query: req.query };
+      const protocol = req.protocol;
+      const host = req.get('host');
+      const origin = `${protocol}://${host}`;
+
+      const props = { params: req.params, query: req.query, origin };
       let finalHtml = '';
 
       try {
