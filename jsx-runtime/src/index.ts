@@ -15,7 +15,7 @@ function createWNode(
   _self: unknown
 ) {
   const { children, ...props } = orgProps;
-  if (children) {
+  if (children !== null && children !== undefined) {
     const newChildren: MiddleStateWDomChildren = !Array.isArray(children)
       ? [children]
       : children;
