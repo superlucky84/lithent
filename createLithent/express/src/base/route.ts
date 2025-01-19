@@ -92,7 +92,7 @@ async function loadPage(dynamicPath: string) {
       const preload = res.preload;
       let initProp = null;
       if (preload) {
-        initProp = await preload({ query, params, origin });
+        initProp = await preload({ id, query, params, origin });
       }
       (globalThis as any).pagedata = initProp;
       //@ts-ignore
