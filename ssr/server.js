@@ -35,24 +35,12 @@ async function createServer() {
 
       const html = `
         <!DOCTYPE html>
-        <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Express with Vite and JSX</title>
-            <script src="/dist/lithentSsr.umd.js"></script>
-          </head>
-          <body>
-            <div id="app">
-              ${appHtml}
-            </div>
-            <script>
-              const { run } =  window.lithentSsr
+        ${appHtml}
+        <script>
+          const { run } =  window.lithentSsr
 
-              run(document.getElementById('app'));
-            </script>
-          </body>
-        </html>
+          run(document.documentElement);
+        </script>
       `;
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (e) {

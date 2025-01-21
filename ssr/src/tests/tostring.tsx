@@ -1,4 +1,13 @@
-import { h, mount, Fragment } from 'lithent';
+import { mount, Fragment } from 'lithent';
+
+const Meta = mount(_r => {
+  return () => (
+    <Fragment>
+      <meta name="twitter:card1" content="summary_large_image" />{' '}
+      <meta name="twitter:site2" content="@superlucky84" />
+    </Fragment>
+  );
+});
 
 const Children = mount(r => {
   let v = 1;
@@ -29,12 +38,18 @@ const Children = mount(r => {
 
 const Root = mount(_r => {
   return () => (
-    <Fragment>
-      {' '}
-      111{/* <!-- aa --> */}222{'    '}45
-      <Children />
-      <div>aaa</div>
-    </Fragment>
+    <html lang="en">
+      <head>
+        <title>Express with Vite and JSX</title>
+        <Meta />
+        <script src="/dist/lithentSsr.umd.js"></script>
+      </head>
+      <body>
+        <div id="app">
+          <Children />
+        </div>
+      </body>
+    </html>
   );
 });
 

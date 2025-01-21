@@ -29,6 +29,7 @@ function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
   const wDomList = flatFlagmentFromList(
     isVirtualType ? [...(wDomOrig.children || [])] : [wDomOrig]
   );
+
   const realDomList =
     wrapElement.tagName === 'HTML'
       ? [wrapElement]
@@ -53,7 +54,8 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
 
       if (
         wDomItem?.type === null ||
-        (wDomItem?.type === 'text' && wDomItem?.text === '\n')
+        (wDomItem?.type === 'text' && wDomItem?.text === '\n') ||
+        (wDomItem?.type === 'text' && nodeType === 1)
       ) {
         index += 1;
         wDomItem = wDomList[index];
