@@ -68,7 +68,7 @@ function parseQueryStringToMap(queryString: string) {
   return map;
 }
 
-export async function loadPage(dynamicPath: string) {
+async function loadPage(dynamicPath: string) {
   const orgPage = `../pages${dynamicPath === '/' ? '/index' : dynamicPath}`;
   const comparePage = orgPage.replace(/\?[^\.]*/, '');
   const queryOrg = orgPage.replace(/.*(\?[^\.]*)/, '$1');
