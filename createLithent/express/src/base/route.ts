@@ -1,10 +1,6 @@
-import type { WDom } from 'lithent';
-import type { StateRefStore, Watch } from 'state-ref';
-
-import { createStore } from 'state-ref';
-
 import Oops from '@/components/Oops';
 import NotFound from '@/components/NotFound';
+import { routeRef, routeWatch } from '@/base/routeStore';
 
 let initPage = '';
 const pageModules = import.meta.glob('../pages/*.(tsx|mdx)');
@@ -36,7 +32,6 @@ function findMatch(targetSegments: string[], pageModuleKeys: string[]) {
   const matchItem = pageModuleKeys.find(item => {
     const moduleSegmentList = item.split(/(?:\/|\.)/);
     moduleSegmentList.pop();
-
     const res = compareArraysWithUnderscore(targetSegments, moduleSegmentList);
 
     params = res[1] as Record<string, string>;
@@ -68,7 +63,7 @@ function parseQueryStringToMap(queryString: string) {
   return map;
 }
 
-async function loadPage(dynamicPath: string) {
+export async function loadPage(dynamicPath: string) {
   const orgPage = `../pages${dynamicPath === '/' ? '/index' : dynamicPath}`;
   const comparePage = orgPage.replace(/\?[^\.]*/, '');
   const queryOrg = orgPage.replace(/.*(\?[^\.]*)/, '$1');
@@ -80,11 +75,11 @@ async function loadPage(dynamicPath: string) {
     comparePage
   );
 
-  const rVDom = routeRef.rVDom.value;
+  const rVDom = routeRef.info.rVDom.value;
   const id = (key || 'index.tsx').split('/').at(-1);
 
   if (key && pageModules[key]) {
-    routeRef.loading.value = true;
+    routeRef.info.loading.value = true;
     let Page;
     try {
       const res = await pageModules[key]();
@@ -105,54 +100,38 @@ async function loadPage(dynamicPath: string) {
       rVDom.compProps.id = id;
       rVDom.compProps.query = query;
       rVDom.compProps.params = params;
-      routeRef.renew.value();
+      routeRef.info.renew.value();
     }
-    routeRef.loading.value = false;
+    routeRef.info.loading.value = false;
   } else if (rVDom?.compProps) {
     rVDom.compProps.page = NotFound;
     rVDom.compProps.id = id;
     rVDom.compProps.query = query;
     rVDom.compProps.params = params;
-    routeRef.renew.value();
+    routeRef.info.renew.value();
   }
 }
 
-type RouteState = {
-  page: string;
-  destroy: (() => void) | string;
-  renew: () => void;
-  rVDom: WDom | null;
-  loading: boolean;
-};
-
-export const routeWatch: Watch<RouteState> = createStore<RouteState>({
-  page: '',
-  destroy: '',
-  renew: () => {},
-  rVDom: null,
-  loading: false,
-});
-
+const ab = new AbortController();
+routeRef.abortList.push(ab);
 routeWatch(state => {
   if (initPage && initPage && state.page.value !== initPage && state.rVDom) {
     loadPage(state.page.value);
   }
   initPage = state.page.value;
+
+  return ab.signal;
 });
 
-export const routeRef: StateRefStore<RouteState> = routeWatch();
-
-export function makeRoute(): StateRefStore<RouteState> {
+export function makeRoute() {
   window.addEventListener('popstate', _ => {
     const { pathname, search, origin } = window.location;
 
-    const urlA = new URL(routeRef.page.value, origin);
+    const urlA = new URL(routeRef.info.page.value, origin);
     const urlB = new URL(`${pathname}${search}`, origin);
 
     execRoute(urlA, urlB, false);
   });
-
-  return routeRef;
 }
 
 export function navigate(pagePath: string) {
@@ -168,7 +147,7 @@ export function navigate(pagePath: string) {
 
 function execRoute(urlA: URL, urlB: URL, isPush?: boolean) {
   if (urlA.pathname !== urlB.pathname) {
-    routeRef.page.value = `${urlB.pathname}${urlB.search}`;
+    routeRef.info.page.value = `${urlB.pathname}${urlB.search}`;
   }
 
   if (isPush) {

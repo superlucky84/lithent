@@ -3,8 +3,43 @@ import { defineConfig, build } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 import fs from 'fs';
+import mdx from '@mdx-js/rollup';
 
 const cachedEntries = getEntries();
+
+function fixMdxExports() {
+  return {
+    name: 'fix-mdx-exports',
+    handleHotUpdate({ file, server }) {
+      if (file.includes('/pages/')) {
+        return;
+      }
+
+      console.log(`[Full Reload] Reloading due to changes in: ${file}`);
+      server.ws.send({ type: 'full-reload' });
+      return [];
+    },
+    transform(code, id) {
+      if (id.endsWith('.mdx')) {
+        const fixedCode = code
+          .replace(
+            /^(?!export )function\s+_createMdxContent/gm,
+            'export function _createMdxContent'
+          )
+          .replace(
+            /^(?!export )function\s+MDXContent/gm,
+            'export default function MDXContent'
+          );
+
+        return {
+          code: fixedCode,
+          map: null,
+        };
+      }
+      return null;
+    },
+  };
+}
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -18,6 +53,24 @@ export default defineConfig(({ mode }) => ({
     dts({
       outputDir: ['dist'],
     }),
+    mdx({
+      jsxImportSource: 'lithent', // Preact의 JSX pragma 사용
+      outputFormat: 'esm',
+    }),
+    {
+      name: 'custom-hmr-handler',
+      handleHotUpdate({ file, server }) {
+        if (file.includes('/pages/')) {
+          console.log(`[HMR] Hot updating: ${file}`);
+          return;
+        }
+
+        console.log(`[Full Reload] Reloading due to changes in: ${file}`);
+        server.ws.send({ type: 'full-reload' });
+        return [];
+      },
+    },
+    fixMdxExports(),
   ],
   resolve: {
     alias: {

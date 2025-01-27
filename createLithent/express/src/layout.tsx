@@ -4,7 +4,7 @@ import { computed } from 'lithent/helper';
 import LoadingText from '@/components/Loading';
 import { getPreloadData } from '@/base/data';
 import clsx from '@/helper/clsx';
-import { routeWatch } from '@/base/route';
+import { routeWatch } from '@/base/routeStore';
 import '@/main.css';
 
 const Layout = mount<{
