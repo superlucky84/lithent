@@ -2,7 +2,7 @@ import { h, componentUpdate } from 'lithent';
 import type { WDom, Props, TagFunction } from 'lithent';
 import { hydration } from 'lithent/ssr';
 const pageModules = import.meta.glob('../pages/*.tsx');
-import { makeRoute } from '@/base/route';
+import { makeRoute, routeRef, loadPage } from '@/base/route';
 import Layout from '@/layout';
 
 export default async function load(
@@ -18,7 +18,7 @@ export default async function load(
   } else {
     res = await pageModules[`../pages/${key}`]();
   }
-  const routeRef = makeRoute();
+  makeRoute();
 
   const { pathname, search } = location;
 
@@ -43,4 +43,16 @@ export default async function load(
   routeRef.rVDom.value = LayoutWDom;
 
   hydration(LayoutWDom, document.documentElement);
+
+  if (import.meta.hot) {
+    import.meta.hot.data.routeRef = routeRef;
+  }
+}
+
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    const orgRouteRef = import.meta.hot!.data!.routeRef;
+    routeRef.value = orgRouteRef.value;
+    loadPage(routeRef.page.value);
+  });
 }
