@@ -1,7 +1,7 @@
 import { WDom } from '@/types';
 import {
   compKeyRef,
-  componentRef,
+  componentMap,
   getComponentKey,
 } from '@/utils/universalRef';
 import { unmount } from '@/hook/unmount';
@@ -18,13 +18,13 @@ export const addMountedQueue = (wDom: WDom) => {
   }
 };
 export const mountCallback = (effectAction: () => void) =>
-  (componentRef.get(getComponentKey())?.mts || []).push(effectAction);
+  (componentMap.get(getComponentKey())?.mts || []).push(effectAction);
 
 export const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { compKey } = newWDom;
 
   if (compKey) {
-    const component = componentRef.get(compKey);
+    const component = componentMap.get(compKey);
     const queue = component?.mts;
     const sequence = component?.upS;
 

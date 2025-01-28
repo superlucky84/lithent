@@ -85,7 +85,7 @@ export type ComponentSubKey =
   | 'mts'
   | 'umts';
 
-export type ComponentRef = WeakMap<Props, ComponentInfo>;
+export type ComponentMap = WeakMap<Props, ComponentInfo>;
 
 export type ComponentInfo = {
   vd: { value: null | WDom };

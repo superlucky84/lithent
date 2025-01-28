@@ -7,7 +7,7 @@ import {
   hasAccessorMethods,
 } from '@/utils/predicator';
 
-import { componentRef, xmlnsRef } from '@/utils/universalRef';
+import { componentMap, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
@@ -48,7 +48,7 @@ export const render = (
   execMountedQueue();
 
   return () => {
-    const component = componentRef.get(wDom.compProps || {})?.vd.value;
+    const component = componentMap.get(wDom.compProps || {})?.vd.value;
 
     if (component) {
       runUnmountQueueFromWDom(component);

@@ -1,7 +1,7 @@
 import { WDom } from '@/types';
 import {
   compKeyRef,
-  componentRef,
+  componentMap,
   getComponentKey,
 } from '@/utils/universalRef';
 
@@ -9,7 +9,7 @@ export const useUpdated = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) => {
-  const component = componentRef.get(getComponentKey());
+  const component = componentMap.get(getComponentKey());
   const { upD, upS } = component!;
   const def = upD[upS.value];
 
@@ -28,7 +28,7 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
   const { compKey } = newWDom;
 
   if (compKey) {
-    const component = componentRef.get(compKey);
+    const component = componentMap.get(compKey);
     const queue = component?.upCB;
     const sequence = component?.upS;
 

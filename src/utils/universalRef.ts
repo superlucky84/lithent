@@ -1,13 +1,13 @@
-import { ComponentRef, ComponentSubKey, Props } from '@/types';
+import { ComponentMap, ComponentSubKey, Props } from '@/types';
 
 export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
-export const componentRef: ComponentRef = new WeakMap();
+export const componentMap: ComponentMap = new WeakMap();
 
 const setComponetRef = (compKey: Props) => {
-  componentRef.set(compKey, {
+  componentMap.set(compKey, {
     vd: { value: null },
     up: () => {},
     upR: [],
@@ -25,8 +25,8 @@ export const getComponentSubInfo = (
   compKey: Props,
   subKey: ComponentSubKey
 ) => {
-  if (componentRef.get(compKey)) {
-    return componentRef.get(compKey)![subKey];
+  if (componentMap.get(compKey)) {
+    return componentMap.get(compKey)![subKey];
   }
   return null;
 };
