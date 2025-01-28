@@ -18,10 +18,4 @@ export const routeWatch: Watch<RouteState> = createStore<RouteState>({
   loading: false,
 });
 
-export const routeRef: {
-  info: StateRefStore<RouteState>;
-  abortList: AbortController[];
-} = {
-  info: routeWatch(),
-  abortList: [],
-};
+export const routeRef: StateRefStore<RouteState> = routeWatch();

@@ -40,9 +40,9 @@ export default async function load(
   const renewRoot =
     (LayoutWDom.compKey && componentUpdate(LayoutWDom.compKey)) || (() => {});
 
-  routeRef.info.page.value = `${pathname}${search}`;
-  routeRef.info.renew.value = renewRoot;
-  routeRef.info.rVDom.value = LayoutWDom;
+  routeRef.page.value = `${pathname}${search}`;
+  routeRef.renew.value = renewRoot;
+  routeRef.rVDom.value = LayoutWDom;
 
   hydration(LayoutWDom, document.documentElement);
 }
@@ -50,14 +50,6 @@ export default async function load(
 if (import.meta.hot) {
   import.meta.hot.accept(() => {
     console.log('Accept up resources...');
-    loadPage(routeRef.info.page.value);
-  });
-
-  import.meta.hot.dispose(() => {
-    console.log('Cleaning up resources...');
-    routeRef.abortList.forEach(item => {
-      item.abort();
-    });
-    routeRef.abortList = [];
+    loadPage(routeRef.page.value);
   });
 }

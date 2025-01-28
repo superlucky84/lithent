@@ -75,11 +75,11 @@ export async function loadPage(dynamicPath: string) {
     comparePage
   );
 
-  const rVDom = routeRef.info.rVDom.value;
+  const rVDom = routeRef.rVDom.value;
   const id = (key || 'index.tsx').split('/').at(-1);
 
   if (key && pageModules[key]) {
-    routeRef.info.loading.value = true;
+    routeRef.loading.value = true;
     let Page;
     try {
       const res = await pageModules[key]();
@@ -100,34 +100,30 @@ export async function loadPage(dynamicPath: string) {
       rVDom.compProps.id = id;
       rVDom.compProps.query = query;
       rVDom.compProps.params = params;
-      routeRef.info.renew.value();
+      routeRef.renew.value();
     }
-    routeRef.info.loading.value = false;
+    routeRef.loading.value = false;
   } else if (rVDom?.compProps) {
     rVDom.compProps.page = NotFound;
     rVDom.compProps.id = id;
     rVDom.compProps.query = query;
     rVDom.compProps.params = params;
-    routeRef.info.renew.value();
+    routeRef.renew.value();
   }
 }
 
-const ab = new AbortController();
-routeRef.abortList.push(ab);
-routeWatch(state => {
-  if (initPage && initPage && state.page.value !== initPage && state.rVDom) {
-    loadPage(state.page.value);
-  }
-  initPage = state.page.value;
-
-  return ab.signal;
-});
-
 export function makeRoute() {
+  routeWatch(state => {
+    if (initPage && initPage && state.page.value !== initPage && state.rVDom) {
+      loadPage(state.page.value);
+    }
+    initPage = state.page.value;
+  });
+
   window.addEventListener('popstate', _ => {
     const { pathname, search, origin } = window.location;
 
-    const urlA = new URL(routeRef.info.page.value, origin);
+    const urlA = new URL(routeRef.page.value, origin);
     const urlB = new URL(`${pathname}${search}`, origin);
 
     execRoute(urlA, urlB, false);
@@ -147,7 +143,7 @@ export function navigate(pagePath: string) {
 
 function execRoute(urlA: URL, urlB: URL, isPush?: boolean) {
   if (urlA.pathname !== urlB.pathname) {
-    routeRef.info.page.value = `${urlB.pathname}${urlB.search}`;
+    routeRef.page.value = `${urlB.pathname}${urlB.search}`;
   }
 
   if (isPush) {
