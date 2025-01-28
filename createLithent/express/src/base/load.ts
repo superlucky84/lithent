@@ -2,7 +2,7 @@ import { h, componentUpdate } from 'lithent';
 import type { WDom, Props, TagFunction } from 'lithent';
 import { hydration } from 'lithent/ssr';
 const pageModules = import.meta.glob('../pages/*.(tsx|mdx)');
-import { makeRoute, loadPage } from '@/base/route';
+import { makeRoute } from '@/base/route';
 import { routeRef } from '@/base/routeStore';
 import Layout from '@/layout';
 
@@ -47,9 +47,11 @@ export default async function load(
   hydration(LayoutWDom, document.documentElement);
 }
 
+/*
 if (import.meta.hot) {
   import.meta.hot.accept(() => {
     console.log('Accept up resources...');
     loadPage(routeRef.page.value);
   });
 }
+*/
