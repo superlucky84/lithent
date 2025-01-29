@@ -1,4 +1,4 @@
-export { h, Fragment, portal, mount } from '@/wDom';
+export { h, Fragment, portal, mount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
 export { componentUpdate } from '@/utils/redraw';
 export { componentMap } from '@/utils/universalRef';

@@ -74,7 +74,7 @@ export const mount =
 /**
  * It re-renders starting from a specific component.
  */
-const reRenderCustomComponent = (
+export const replaceWDom = (
   tag: TagFunction,
   props: Props,
   children: WDom[],
@@ -233,9 +233,7 @@ const addComponentProps = (
     reRender,
   });
 
-  setRedrawAction(compKey, () =>
-    reRenderCustomComponent(tag, props, children, wDom)
-  );
+  setRedrawAction(compKey, () => replaceWDom(tag, props, children, wDom));
 
   if (getComponentSubInfo(compKey, 'vd')) {
     (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
