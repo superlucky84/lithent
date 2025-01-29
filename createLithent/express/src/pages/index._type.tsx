@@ -43,7 +43,7 @@ const Main = mount<PageProps>((renew, { params: { type } }) => {
         onClick={shuffle}
         class="bg-inherit text-gray-800 text-sm px-4 py-2 rounded shadow-md hover:shadow-lg transition-shadow"
       >
-        Shuffle
+        shuffle
       </button>
       <div class="mt-10 grid gap-10 md:grid-cols-2 lg:gap-10 xl:grid-cols-3 ">
         {data.value.map(({ name, info, infoString }) => (

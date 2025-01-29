@@ -1,9 +1,8 @@
-import { h, componentUpdate } from 'lithent';
+import { h, componentUpdate, componentMap, replaceWDom } from 'lithent';
 import type { WDom, Props, TagFunction } from 'lithent';
 import { hydration } from 'lithent/ssr';
-const pageModules = import.meta.glob('../pages/*.(tsx|mdx)');
-import { makeRoute } from '@/base/route';
-import { routeRef } from '@/base/routeStore';
+import { makeRoute, makePathToKey } from '@/base/route';
+import { routeRef, pageModules } from '@/base/routeStore';
 import Layout from '@/layout';
 
 export default async function load(
@@ -11,16 +10,16 @@ export default async function load(
   props?: Props,
   initProp?: any
 ) {
+  makeRoute();
+
   let res;
   if (key === 'oops') {
     res = await import('@/components/Oops');
   } else if (key === 'notfound') {
     res = await import('@/components/NotFound');
   } else {
-    res = await pageModules[`../pages/${key}`]();
+    res = await pageModules.v[`../pages/${key}`]();
   }
-
-  makeRoute();
 
   const { pathname, search } = location;
 
@@ -47,11 +46,34 @@ export default async function load(
   hydration(LayoutWDom, document.documentElement);
 }
 
-/*
 if (import.meta.hot) {
-  import.meta.hot.accept(() => {
+  pageModules.v = import.meta.glob('../pages/*.(tsx|mdx)');
+  import.meta.hot.accept(async () => {
     console.log('Accept up resources...');
-    loadPage(routeRef.page.value);
+
+    const dynamicPath = routeRef.page.value;
+    const rVDom = routeRef.rVDom.value;
+    const compKey = rVDom?.compKey;
+    const { key, id, query, params, origin } = makePathToKey(dynamicPath);
+
+    if (key && compKey) {
+      const currentVDom = componentMap.get(compKey)?.vd?.value;
+      const res = await pageModules.v[key]();
+      const preload = res.preload;
+
+      let initProp = null;
+      if (preload) {
+        initProp = await preload({ id, query, params, origin });
+      }
+      (globalThis as any).pagedata = initProp;
+
+      const props = { page: res.default, id, query, params };
+
+      try {
+        replaceWDom(Layout as TagFunction, props, [], currentVDom!);
+      } catch {
+        location.reload();
+      }
+    }
   });
 }
-*/

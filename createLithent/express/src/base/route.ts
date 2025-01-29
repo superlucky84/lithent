@@ -1,9 +1,8 @@
 import Oops from '@/components/Oops';
 import NotFound from '@/components/NotFound';
-import { routeRef, routeWatch } from '@/base/routeStore';
+import { routeRef, routeWatch, pageModules } from '@/base/routeStore';
 
 let initPage = '';
-const pageModules = import.meta.glob('../pages/*.(tsx|mdx)');
 
 function compareArraysWithUnderscore(arr1: string[], arr2: string[]) {
   const params: Record<string, string> = {};
@@ -63,7 +62,7 @@ function parseQueryStringToMap(queryString: string) {
   return map;
 }
 
-export async function loadPage(dynamicPath: string) {
+export function makePathToKey(dynamicPath: string) {
   const orgPage = `../pages${dynamicPath === '/' ? '/index' : dynamicPath}`;
   const comparePage = orgPage.replace(/\?[^\.]*/, '');
   const queryOrg = orgPage.replace(/.*(\?[^\.]*)/, '$1');
@@ -71,18 +70,24 @@ export async function loadPage(dynamicPath: string) {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
   const { key, params } = findPageModlueKey(
-    Object.keys(pageModules),
+    Object.keys(pageModules.v),
     comparePage
   );
-
-  const rVDom = routeRef.rVDom.value;
   const id = (key || 'index.tsx').split('/').at(-1);
 
-  if (key && pageModules[key]) {
+  return { key, id, query, params, origin };
+}
+
+export async function loadPage(dynamicPath: string) {
+  const { key, id, query, params, origin } = makePathToKey(dynamicPath);
+
+  const rVDom = routeRef.rVDom.value;
+
+  if (key && pageModules.v[key]) {
     routeRef.loading.value = true;
     let Page;
     try {
-      const res = await pageModules[key]();
+      const res = await pageModules.v[key]();
       //@ts-ignore
       const preload = res.preload;
       let initProp = null;
@@ -113,6 +118,7 @@ export async function loadPage(dynamicPath: string) {
 }
 
 export function makeRoute() {
+  pageModules.v = import.meta.glob('../pages/*.(tsx|mdx)');
   routeWatch(state => {
     if (initPage && initPage && state.page.value !== initPage && state.rVDom) {
       loadPage(state.page.value);

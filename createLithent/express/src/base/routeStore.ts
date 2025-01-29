@@ -19,3 +19,6 @@ export const routeWatch: Watch<RouteState> = createStore<RouteState>({
 });
 
 export const routeRef: StateRefStore<RouteState> = routeWatch();
+export const pageModules: { v: Record<string, () => Promise<any>> } = {
+  v: {},
+};
