@@ -56,7 +56,7 @@ export default async function load(
 
 /**
  * When comments are removed,
- * HMR can be selectively applied to directories under /pages/.
+ * HMR can be selectively applied only to components under /pages/ in the component tree structure.
  *
  * The following three APIs are required.
  * Please uncomment them at the top as well.
