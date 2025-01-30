@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "create-lithent-ssr",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "description": "lithent-ssr-boilerplate",
   "packageManager": "pnpm@7.6.0",
   "scripts": {
