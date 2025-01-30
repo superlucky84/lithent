@@ -5,7 +5,7 @@
 
 ## Warning
 
-This project is still experimental and is currently tightly coupled with [Express](https://expressjs.com/ko/)
+This project is still experimental and requires [Express](https://expressjs.com/) as a mandatory dependency.
 
 ## Usage
 
@@ -54,6 +54,14 @@ Routing is determined by the filenames under the `/src/pages/` directory. The ro
     * `src/pages/one._type._name.tsx` maps to `http://localhost:3000/one/:type/:name`.
 
 These routing patterns allow you to create both static and dynamic URLs with flexibility in your project structure.
+
+
+### HMR Usage Notice
+
+To enable HMR (Hot Module Replacement), make sure to uncomment the relevant comments in `/src/base/load.ts`.  
+
+This will allow selective HMR application to directories under `/pages/`.
+
 
 ### State Management
 
