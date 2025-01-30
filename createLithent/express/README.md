@@ -60,7 +60,7 @@ These routing patterns allow you to create both static and dynamic URLs with fle
 
 To enable HMR (Hot Module Replacement), make sure to uncomment the relevant comments in `/src/base/load.ts`.  
 
-This will allow selective HMR application to directories under `/pages/`.
+This will allow selective HMR application only to components under `/pages/` in the component tree.
 
 
 ### State Management
