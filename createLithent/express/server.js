@@ -1,18 +1,19 @@
 // server.js
 import path, { resolve } from 'path';
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import sortFiles from './sortFiles.js';
 import createMakePage from './serverHelper/createMakePage.js';
 import { getEntries, excludeRoutePath } from './serverHelper/helper.js';
-import tailwindcss from 'tailwindcss';
-import autoprefixer from 'autoprefixer';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 const isDev = process.env.NODE_ENV !== 'production';
 let vite;
 if (isDev) {
+  const { createServer: createViteServer } = await import('vite');
+  const tailwindcss = (await import('tailwindcss')).default;
+  const autoprefixer = (await import('autoprefixer')).default;
+
   vite = await createViteServer({
     css: {
       postcss: {
