@@ -63,8 +63,8 @@ function parseQueryStringToMap(queryString: string) {
 }
 
 export function makePathToKey(dynamicPath: string) {
-  const orgPage = `../pages${dynamicPath === '/' ? '/index' : dynamicPath}`;
-  const comparePage = orgPage.replace(/\?[^\.]*/, '');
+  const orgPage = `../pages${dynamicPath.replace(/\?.+$/, '') === '/' ? '/index' : dynamicPath}`;
+  const comparePage = orgPage.replace(/\?[^\.]*/, '').replace(/\/$/, '');
   const queryOrg = orgPage.replace(/.*(\?[^\.]*)/, '$1');
   const query = /\?/.test(queryOrg) ? parseQueryStringToMap(queryOrg) : {};
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -73,6 +73,7 @@ export function makePathToKey(dynamicPath: string) {
     Object.keys(pageModules.v),
     comparePage
   );
+
   const id = (key || 'index.tsx').split('/').at(-1);
 
   return { key, id, query, params, origin };
