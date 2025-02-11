@@ -34,6 +34,7 @@ if (isDev) {
 async function createServer() {
   const entries = getEntries();
   const app = express();
+  app.set('trust proxy', true);
 
   if (!isDev) {
     app.use('/dist', express.static(path.resolve(__dirname, 'dist')));

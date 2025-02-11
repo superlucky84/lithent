@@ -11,10 +11,10 @@
     "cross-env": "^7.0.3",
     "express": "^4.21.1",
     "lithent": "^1.18.5",
-    "state-ref": "^1.1.4",
-    "vite": "^5.4.8"
+    "state-ref": "^1.1.4"
   },
   "devDependencies": {
+    "vite": "^5.4.8",
     "@mdx-js/rollup": "^3.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "@testing-library/jest-dom": "^6.5.0",
