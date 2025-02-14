@@ -19,7 +19,7 @@ const Index = mount(() => {
   };
 
   return () => (
-    <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
+    <div class="container px-8 mx-auto xl:px-5  max-w-(--breakpoint-lg) py-5 lg:py-8">
       <div class="mt-10 grid gap-10 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:gap-10 xl:grid-cols-3 ">
         {preload.data.map(({ name }) => (
           <div class="group cursor-pointer">
@@ -49,7 +49,7 @@ const Index = mount(() => {
                     onClick={(event: Event) => moveTypePage(event, name)}
                   >
                     <span
-                      class={`bg-pokemon-${name} inline-block text-sm font-bold tracking-wider uppercase mt-5 text-white px-2 py-1 rounded drop-shadow-md outline-2 outline-black outline-offset-1`}
+                      class={`bg-pokemon-${name} inline-block text-sm font-bold tracking-wider uppercase mt-5 text-white px-2 py-1 rounded-sm drop-shadow-md`}
                     >
                       {name}
                     </span>
@@ -60,7 +60,7 @@ const Index = mount(() => {
                     href="#"
                     onClick={(event: Event) => moveTypePage(event, name)}
                   >
-                    <span class="bg-gradient-to-r from-red-200 to-blue-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px]">
+                    <span class="bg-linear-to-r from-red-200 to-blue-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px]">
                       {TYPE_DESCRIPT[name]}
                     </span>
                   </a>

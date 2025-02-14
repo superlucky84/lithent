@@ -37,11 +37,11 @@ const Main = mount<PageProps>((renew, { params: { type } }) => {
   };
 
   return () => (
-    <div class="bg-pokemon-${params.type} container px-8 mx-auto xl:px-5 max-w-screen-lg py-5 lg:py-8">
+    <div class="bg-pokemon-${params.type} container px-8 mx-auto xl:px-5 max-w-(--breakpoint-lg) py-5 lg:py-8">
       <button
         type="button"
         onClick={shuffle}
-        class="bg-inherit text-gray-800 text-sm px-4 py-2 rounded shadow-md hover:shadow-lg transition-shadow"
+        class="bg-inherit text-gray-800 text-sm px-4 py-2 rounded-sm shadow-md hover:shadow-lg transition-shadow"
       >
         shuffle
       </button>
@@ -84,7 +84,7 @@ const Main = mount<PageProps>((renew, { params: { type } }) => {
                     onClick={(event: Event) => moveDetail(event, name)}
                   >
                     <span
-                      class="whitespace-pre-wrap font-mono break-words overflow-auto bg-gradient-to-r from-red-200 to-blue-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px]"
+                      class="whitespace-pre-wrap font-mono break-words overflow-auto bg-linear-to-r from-red-200 to-blue-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px]"
                       innerHTML={infoString}
                     />
                   </a>

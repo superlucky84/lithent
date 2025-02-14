@@ -17,7 +17,7 @@ const Main = mount<PageProps>(() => {
   }>().data;
 
   return () => (
-    <div class="container px-8 mx-auto xl:px-5  max-w-screen-lg py-5 lg:py-8">
+    <div class="container px-8 mx-auto xl:px-5  max-w-(--breakpoint-lg) py-5 lg:py-8">
       <div class="mt-10 w-full">
         <div class="group">
           <div class="overflow-hidden rounded-md bg-gray-100 p-2 transition-all hover:scale-105">
