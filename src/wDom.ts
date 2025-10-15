@@ -26,6 +26,10 @@ import {
 } from '@/utils/predicator';
 import { assign } from '@/utils';
 
+// ============================================================================
+// Public API - Highest Level (사용자에게 노출되는 API)
+// ============================================================================
+
 /**
  * It allows grouping multiple elements together.
  */
@@ -107,138 +111,9 @@ export const replaceWDom = (
   wDomUpdate(newWDomTree);
 };
 
-/**
- * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
- */
-const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
-  const tagName = tag.name;
-  const ctor = tag;
-  // 리졸브는 컴포넌트를 새로 만든다.
-  const resolve = (compKey = props) => {
-    initMountHookState(compKey);
-
-    const initialComponent = tag(props, children);
-    const component =
-      typeof initialComponent === 'function'
-        ? initialComponent
-        : () => () => initialComponent;
-    const componentMaker = component(componentUpdate(compKey), props, children);
-
-    const customNode = makeCustomNode(
-      componentMaker,
-      compKey,
-      tag,
-      props,
-      children
-    );
-
-    return customNode;
-  };
-
-  return { tagName, ctor, props, children, resolve };
-};
-
-/**
- * Create the actual virtual DOM node from the component.
- */
-const makeCustomNode = (
-  componentMaker: (props: Props) => WDom,
-  compKey: Props,
-  tag: TagFunction,
-  props: Props,
-  children: WDom[]
-) => {
-  let newCustomComponentMaker = componentMaker;
-  let customNode = componentMaker(props);
-
-  if (customNode.reRender) {
-    newCustomComponentMaker = (newProps: Props): WDom => {
-      const customNode = componentMaker(newProps);
-      const newNode = Fragment({}, customNode);
-
-      customNode.getParent = () => newNode;
-
-      return newNode;
-    };
-
-    customNode = newCustomComponentMaker(props);
-  }
-
-  const reRender = makeReRender(
-    newCustomComponentMaker,
-    compKey,
-    tag,
-    props,
-    children
-  );
-
-  addComponentProps(customNode, compKey, tag, props, children, reRender);
-
-  return customNode;
-};
-
-/**
- * When the virtual DOM is actually created from the component, generate a re-render method for future redraws.
- */
-const makeReRender = (
-  componentMaker: (props: Props) => WDom,
-  compKey: Props,
-  tag: TagFunction,
-  props: Props,
-  children: WDom[]
-) => {
-  const reRender = () =>
-    wDomMaker(componentMaker, compKey, tag, props, children, reRender);
-  return reRender;
-};
-
-/**
- * The starting point for redrawing from the re-render method
- */
-const wDomMaker = (
-  componentMaker: (props: Props) => WDom,
-  compKey: Props,
-  tag: TagFunction,
-  props: Props,
-  children: WDom[],
-  reRender: () => WDom
-) => {
-  initUpdateHookState(compKey);
-  runUpdateCallback();
-
-  const customNode = componentMaker(props);
-
-  addComponentProps(customNode, compKey, tag, props, children, reRender);
-
-  return customNode;
-};
-
-/**
- * When creating a custom component node, attach additional information attributes to the virtual DOM object.
- */
-const addComponentProps = (
-  wDom: WDom,
-  compKey: Props,
-  tag: TagFunction,
-  props: Props,
-  children: WDom[],
-  reRender: () => WDom
-) => {
-  assign(wDom, {
-    compProps: props,
-    compChild: children,
-    ctor: tag,
-    tagName: tag.name,
-    compKey,
-    reRender,
-  });
-
-  setRedrawAction(compKey, () => replaceWDom(tag, props, children, wDom));
-
-  if (getComponentSubInfo(compKey, 'vd')) {
-    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
-  }
-};
+// ============================================================================
+// Mid-Level - Virtual DOM Node Creation (중간 추상화 레벨)
+// ============================================================================
 
 /**
  * The starting point where the virtual DOM is created from the h function.
@@ -300,4 +175,174 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   }
 
   return item;
+};
+
+// ============================================================================
+// Component Lifecycle - Component Creation & Re-rendering (컴포넌트 생명주기)
+// ============================================================================
+
+/**
+ * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
+ */
+const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
+  const tagName = tag.name;
+  const ctor = tag;
+  // 리졸브는 컴포넌트를 새로 만든다.
+  const resolve = (compKey = props) => {
+    initMountHookState(compKey);
+
+    const initialComponent = tag(props, children);
+    const component =
+      typeof initialComponent === 'function'
+        ? initialComponent
+        : () => () => initialComponent;
+    const componentMaker = component(componentUpdate(compKey), props, children);
+
+    const customNode = makeCustomNode(
+      componentMaker,
+      compKey,
+      tag,
+      props,
+      children
+    );
+
+    return customNode;
+  };
+
+  return { tagName, ctor, props, children, resolve };
+};
+
+/**
+ * Create the actual virtual DOM node from the component.
+ */
+const makeCustomNode = (
+  componentMaker: (props: Props) => WDom,
+  compKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[]
+) => {
+  const wrappedComponentMaker = wrapComponentMakerIfNeeded(componentMaker);
+  const reRender = makeReRender(
+    wrappedComponentMaker,
+    compKey,
+    tag,
+    props,
+    children
+  );
+
+  return createCustomNodeWithProps(
+    wrappedComponentMaker,
+    compKey,
+    tag,
+    props,
+    children,
+    reRender
+  );
+};
+
+/**
+ * When the virtual DOM is actually created from the component, generate a re-render method for future redraws.
+ */
+const makeReRender = (
+  componentMaker: (props: Props) => WDom,
+  compKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[]
+) => {
+  const reRender = () =>
+    wDomMaker(componentMaker, compKey, tag, props, children, reRender);
+  return reRender;
+};
+
+/**
+ * The starting point for redrawing from the re-render method
+ */
+const wDomMaker = (
+  componentMaker: (props: Props) => WDom,
+  compKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  reRender: () => WDom
+) => {
+  initUpdateHookState(compKey);
+  runUpdateCallback();
+
+  return createCustomNodeWithProps(
+    componentMaker,
+    compKey,
+    tag,
+    props,
+    children,
+    reRender
+  );
+};
+
+// ============================================================================
+// Low-Level Utilities - Component Node Manipulation (저수준 유틸리티)
+// ============================================================================
+
+/**
+ * Wraps a component maker to handle components that have a reRender property
+ */
+const wrapComponentMakerIfNeeded = (
+  componentMaker: (props: Props) => WDom
+): ((props: Props) => WDom) => {
+  const initialNode = componentMaker({});
+
+  if (!initialNode.reRender) {
+    return componentMaker;
+  }
+
+  return (newProps: Props): WDom => {
+    const customNode = componentMaker(newProps);
+    const newNode = Fragment({}, customNode);
+    customNode.getParent = () => newNode;
+    return newNode;
+  };
+};
+
+/**
+ * Creates a custom node with component properties attached
+ */
+const createCustomNodeWithProps = (
+  componentMaker: (props: Props) => WDom,
+  compKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  reRender: () => WDom
+): WDom => {
+  const customNode = componentMaker(props);
+  addComponentProps(customNode, compKey, tag, props, children, reRender);
+  return customNode;
+};
+
+/**
+ * When creating a custom component node, attach additional information attributes to the virtual DOM object.
+ */
+const addComponentProps = (
+  wDom: WDom,
+  compKey: Props,
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  reRender: () => WDom
+) => {
+  assign(wDom, {
+    compProps: props,
+    compChild: children,
+    ctor: tag,
+    tagName: tag.name,
+    compKey,
+    reRender,
+  });
+
+  setRedrawAction(compKey, () => replaceWDom(tag, props, children, wDom));
+
+  if (getComponentSubInfo(compKey, 'vd')) {
+    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
+  }
 };
