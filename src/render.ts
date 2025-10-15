@@ -8,9 +8,9 @@ import {
 } from '@/utils/predicator';
 
 import { componentMap, xmlnsRef } from '@/utils/universalRef';
-import { runUnmountQueueFromWDom } from '@/hook/unmount';
+import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
-import { runUpdatedQueueFromWDom } from '@/hook/useUpdate';
+import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import { getParent, entries, keys } from '@/utils';
 
 const getAttrKey = (keyName: string) =>

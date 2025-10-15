@@ -1,6 +1,6 @@
 import { componentMap, getComponentKey } from '@/utils/universalRef';
 
-import { useUpdated } from '@/hook/useUpdate';
+import { useUpdated } from '@/hook/internal/useUpdate';
 
 export const updateCallback = (
   effectAction: () => (() => void) | void,

@@ -4,7 +4,7 @@ import {
   componentMap,
   getComponentKey,
 } from '@/utils/universalRef';
-import { unmount } from '@/hook/unmount';
+import { unmount } from '@/hook/internal/unmount';
 
 let mountedQueue: WDom[] = [];
 

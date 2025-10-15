@@ -9,7 +9,7 @@ import {
   checkExisty,
 } from '@/utils/predicator';
 
-import { runUnmountQueueFromWDom } from '@/hook/unmount';
+import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { assign, keys, entries } from '@/utils';
 
 /**
