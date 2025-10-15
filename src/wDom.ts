@@ -27,7 +27,7 @@ import {
 import { assign } from '@/utils';
 
 // ============================================================================
-// Public API - Highest Level (사용자에게 노출되는 API)
+// Public API - Highest Level (User-facing API)
 // ============================================================================
 
 /**
@@ -112,7 +112,7 @@ export const replaceWDom = (
 };
 
 // ============================================================================
-// Mid-Level - Virtual DOM Node Creation (중간 추상화 레벨)
+// Mid-Level - Virtual DOM Node Creation (Intermediate abstraction level)
 // ============================================================================
 
 /**
@@ -178,7 +178,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 };
 
 // ============================================================================
-// Component Lifecycle - Component Creation & Re-rendering (컴포넌트 생명주기)
+// Component Lifecycle - Component Creation & Re-rendering
 // ============================================================================
 
 /**
@@ -187,7 +187,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
   const ctor = tag;
-  // 리졸브는 컴포넌트를 새로 만든다.
+  // Resolve creates a new component
   const resolve = (compKey = props) => {
     initMountHookState(compKey);
 
@@ -274,7 +274,7 @@ const wDomMaker = (
 };
 
 // ============================================================================
-// Low-Level Utilities - Component Node Manipulation (저수준 유틸리티)
+// Low-Level Utilities - Component Node Manipulation
 // ============================================================================
 
 /**
