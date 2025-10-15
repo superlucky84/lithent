@@ -222,7 +222,10 @@ const makeCustomNode = (
   props: Props,
   children: WDom[]
 ) => {
-  const wrappedComponentMaker = wrapComponentMakerIfNeeded(componentMaker);
+  const { wrappedComponentMaker, customNode } = wrapComponentMakerIfNeeded(
+    componentMaker,
+    props
+  );
   const reRender = makeReRender(
     wrappedComponentMaker,
     compKey,
@@ -231,14 +234,8 @@ const makeCustomNode = (
     children
   );
 
-  return createCustomNodeWithProps(
-    wrappedComponentMaker,
-    compKey,
-    tag,
-    props,
-    children,
-    reRender
-  );
+  addComponentProps(customNode, compKey, tag, props, children, reRender);
+  return customNode;
 };
 
 /**
@@ -270,14 +267,10 @@ const wDomMaker = (
   initUpdateHookState(compKey);
   runUpdateCallback();
 
-  return createCustomNodeWithProps(
-    componentMaker,
-    compKey,
-    tag,
-    props,
-    children,
-    reRender
-  );
+  const customNode = componentMaker(props);
+  addComponentProps(customNode, compKey, tag, props, children, reRender);
+
+  return customNode;
 };
 
 // ============================================================================
@@ -288,36 +281,25 @@ const wDomMaker = (
  * Wraps a component maker to handle components that have a reRender property
  */
 const wrapComponentMakerIfNeeded = (
-  componentMaker: (props: Props) => WDom
-): ((props: Props) => WDom) => {
-  const initialNode = componentMaker({});
+  componentMaker: (props: Props) => WDom,
+  props: Props
+): { wrappedComponentMaker: (props: Props) => WDom; customNode: WDom } => {
+  let customNode = componentMaker(props);
 
-  if (!initialNode.reRender) {
-    return componentMaker;
+  if (!customNode.reRender) {
+    return { wrappedComponentMaker: componentMaker, customNode };
   }
 
-  return (newProps: Props): WDom => {
+  const wrappedComponentMaker = (newProps: Props): WDom => {
     const customNode = componentMaker(newProps);
     const newNode = Fragment({}, customNode);
     customNode.getParent = () => newNode;
     return newNode;
   };
-};
 
-/**
- * Creates a custom node with component properties attached
- */
-const createCustomNodeWithProps = (
-  componentMaker: (props: Props) => WDom,
-  compKey: Props,
-  tag: TagFunction,
-  props: Props,
-  children: WDom[],
-  reRender: () => WDom
-): WDom => {
-  const customNode = componentMaker(props);
-  addComponentProps(customNode, compKey, tag, props, children, reRender);
-  return customNode;
+  customNode = wrappedComponentMaker(props);
+
+  return { wrappedComponentMaker, customNode };
 };
 
 /**
