@@ -1,7 +1,13 @@
 export { h, Fragment, portal, mount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
 export { componentUpdate } from '@/utils/redraw';
-export { componentMap } from '@/utils/universalRef';
+export {
+  getComponentKey,
+  componentMap,
+  compKeyRef,
+  getComponentSubInfo,
+  lastWDomPointer,
+} from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
 export { updateCallback } from '@/hook/updateCallback';

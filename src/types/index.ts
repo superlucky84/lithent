@@ -62,7 +62,7 @@ export interface WDom {
   el?: HTMLElement | DocumentFragment | Text;
   needRerender?: RenderType;
   isLegacy?: boolean;
-  [wdomSymbol]?: boolean;
+  [wdomSymbol]?: boolean | 'provider';
 }
 
 export type RenderType =

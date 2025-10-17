@@ -1,18 +1,35 @@
 import { h, Fragment, mount } from 'lithent';
-import type { WDom } from 'lithent';
+import type { WDom, Renew } from 'lithent';
+type ContextState<T> = { value: T };
 
-export function createContext() {
-  const Provider = mount((_renew, _props, children: WDom[]) => {
-    console.log('ProviDer');
+const providerSymbol = Symbol('Provider');
+
+type UseContextFn<T> = (context: any, renew: Renew) => ContextState<T>;
+
+export function createContext<T>() {
+  const Provider = mount<{
+    state: ContextState<T>;
+    [providerSymbol]?: boolean;
+  }>((_renew, props, children: WDom[]) => {
+    console.log('Provider');
+    props[providerSymbol] = true;
 
     return () => <Fragment>{children}</Fragment>;
   });
+
+  const useContext: UseContextFn<T> = (context, renew) => {
+    console.log(renew);
+    const cState = context.contextState;
+
+    return cState;
+  };
 
   const contextState = <T,>(
     value: T
   ): {
     value: T;
   } => {
+    // const renews: Renew[] = [];
     let result = value;
 
     return {
@@ -28,8 +45,24 @@ export function createContext() {
   return {
     Provider,
     contextState,
+    useContext,
   };
 }
+
+const findProviderInParents = (wdom: WDom | undefined): WDom | null => {
+  if (!wdom) return null;
+
+  // Check if current node has provider symbol in compProps
+  if (
+    wdom.compProps &&
+    (wdom.compProps as Record<symbol, unknown>)[providerSymbol]
+  ) {
+    return wdom;
+  }
+
+  const parent = wdom.getParent ? wdom.getParent() : undefined;
+  return findProviderInParents(parent);
+};
 
 /*
 export function createContext(defaultValue) {
