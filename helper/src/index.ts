@@ -4,3 +4,4 @@ export { effect } from '@/hook/effect';
 export { store } from '@/hook/store';
 export { cacheUpdate } from '@/hook/cacheUpdate';
 export { nextTickRender } from '@/hook/nextTickRender';
+export { createContext } from '@/hook/context';
