@@ -136,8 +136,8 @@ importers:
         specifier: ^1.18.5
         version: 1.18.5
       state-ref:
-        specifier: ^1.1.4
-        version: 1.1.4
+        specifier: ^2.0.0
+        version: 2.0.0
     devDependencies:
       '@mdx-js/rollup':
         specifier: ^3.1.0
@@ -3250,8 +3250,8 @@ packages:
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
 
-  state-ref@1.1.4:
-    resolution: {integrity: sha512-WgU6cUNrmlRGRt5WWiswUyF7ZebIS6qMVG5ogpJ3JZXbbgzS88kwT3niEenMJEXeSAA3aVgUklXZmMVDPL25kQ==}
+  state-ref@2.0.0:
+    resolution: {integrity: sha512-3HmfeAVDDtXBPSk+2Ye/qZYVXXQLLBIfMTTgjA1pX4Iz4mK6RA6m7Cg7RAnWcRVS9JKJjS1npUKaqjd27YNFfQ==}
 
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
@@ -7127,7 +7127,7 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  state-ref@1.1.4: {}
+  state-ref@2.0.0: {}
 
   statuses@2.0.1: {}
 

@@ -17,6 +17,7 @@ import {
   needDiffRef,
   getComponentSubInfo,
   wdomSymbol,
+  lastWDomPointer,
 } from '@/utils/universalRef';
 import { setRedrawAction, componentUpdate } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
@@ -205,6 +206,7 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
       props,
       children
     );
+    lastWDomPointer.value = customNode;
 
     return customNode;
   };
