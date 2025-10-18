@@ -1,5 +1,4 @@
 import { h, render, mount } from 'lithent';
-import type { WDom, Renew } from 'lithent';
 import { createContext } from '@/index';
 
 const testContext = createContext<number>();

@@ -26,8 +26,8 @@ export function createContext<T>() {
     astack.forEach(([setState, renew, setOriginalRef]) => {
       const wrapRenew = (newValue: T) => {
         setState(newValue);
-        renew();
-        return true;
+        const isAlive = renew();
+        return isAlive;
       };
       setState(props.state.value);
       setOriginalRef(props.state);
@@ -56,8 +56,8 @@ export function createContext<T>() {
     };
     const setOriginalRef = (originalRef: ContextState<T>) => {
       cState.addRenew((newValue: T) => {
-        originalRef.value = newValue;
-        return true;
+        const result = (originalRef.value = newValue);
+        return result !== undefined;
       });
     };
 
@@ -88,9 +88,7 @@ export function createContext<T>() {
         result = newValue;
 
         if (renewlist.length) {
-          renewlist.forEach(wrapRenew => {
-            wrapRenew(result);
-          });
+          renewlist = renewlist.filter(wrapRenew => wrapRenew(result));
         }
       },
       injectValue(newValue: T) {
