@@ -8,32 +8,77 @@ type ContextState<T> = {
 
 const providerSymbol = Symbol('Provider');
 
-type UseContextFn<T> = (context: any, renew: Renew) => ContextState<T>;
+type UseContextFn<T> = (
+  context: any,
+  renew: Renew,
+  subscribeKeys?: string[]
+) => T extends Record<string, any> ? T : ContextState<T>;
 
 export function createContext<T>() {
   const astack: any[] = [];
 
   /**
-   * 프로바이더 사용
+   * 프로바이더 사용 - 여러 state를 받을 수 있음
    */
   const Provider = mount<{
-    state: ContextState<T>;
+    [key: string]: ContextState<any>;
     [providerSymbol]?: boolean;
   }>((_renew, props, children: WDom[]) => {
     console.log('Provider');
     props[providerSymbol] = true;
 
-    astack.forEach(([setState, renew, setOriginalRef]) => {
-      const wrapRenew = (newValue: T) => {
-        setState(newValue);
-        const isAlive = renew();
-        return isAlive;
-      };
-      setState(props.state.value);
-      setOriginalRef(props.state);
+    // astack에 쌓인 각 구독자 처리
+    astack.forEach(
+      ([
+        setStateMap,
+        renew,
+        setOriginalRefMap,
+        subscribeKeys,
+        createStateForKey,
+      ]) => {
+        // subscribeKeys가 없으면 모든 키 구독 (providerSymbol 제외)
+        const keysToSubscribe =
+          subscribeKeys ||
+          Object.keys(props).filter(
+            k => typeof k === 'string' && k !== 'children'
+          );
 
-      props.state.addRenew(wrapRenew);
-    });
+        keysToSubscribe.forEach((key: string) => {
+          if (!props[key] || typeof props[key].addRenew !== 'function') {
+            return; // ContextState가 아니면 스킵
+          }
+
+          // subscribeKeys가 null이면 동적으로 state 생성
+          if (!setStateMap[key] && createStateForKey) {
+            console.log('Creating state for key:', key);
+            createStateForKey(key);
+            console.log('After create, setStateMap[key]:', !!setStateMap[key]);
+          }
+
+          const wrapRenew = (newValue: any) => {
+            if (setStateMap[key]) {
+              setStateMap[key](newValue);
+            }
+            const isAlive = renew();
+            return isAlive;
+          };
+
+          // 초기값 설정
+          if (setStateMap[key]) {
+            setStateMap[key](props[key].value);
+          }
+          if (setOriginalRefMap[key]) {
+            setOriginalRefMap[key](props[key]);
+          }
+
+          // Provider의 state에 구독 등록
+          props[key].addRenew(wrapRenew);
+        });
+
+        // 초기값이 설정되었으니 한 번 렌더링 트리거
+        renew();
+      }
+    );
     astack.splice(0);
 
     return () => <Fragment>{children}</Fragment>;
@@ -41,30 +86,62 @@ export function createContext<T>() {
 
   /**
    * 컨텍스트 값 사용
+   * @param subscribeKeys - 구독할 키 배열. 없으면 전체 구독
    */
-  const useContext: UseContextFn<T> = (context, renew) => {
+  const useContext: UseContextFn<T> = (context, renew, subscribeKeys?) => {
     const targetProvider = context.Provider;
-    let cState = context.contextState();
 
     if (targetProvider !== Provider) {
       console.warn('not match provider form context');
       return undefined;
     }
 
-    const setState = (injectState: T) => {
-      cState.injectValue(injectState);
-    };
-    const setOriginalRef = (originalRef: ContextState<T>) => {
-      cState.addRenew((newValue: T) => {
-        const result = (originalRef.value = newValue);
-        return result !== undefined;
-      });
+    // 다중 state 모드 (기본)
+    const cStateMap: Record<string, ContextState<any>> = {};
+    const setStateMap: Record<string, (v: any) => void> = {};
+    const setOriginalRefMap: Record<string, (ref: ContextState<any>) => void> =
+      {};
+
+    // 동적으로 state 생성하는 함수
+    const createStateForKey = (key: string) => {
+      console.log('createStateForKey called for:', key);
+      const cState = context.contextState();
+      cStateMap[key] = cState;
+      console.log('cStateMap after assignment:', cStateMap);
+
+      setStateMap[key] = (injectState: any) => {
+        console.log(
+          'setState called for key:',
+          key,
+          'with value:',
+          injectState
+        );
+        cState.injectValue(injectState);
+      };
+
+      setOriginalRefMap[key] = (originalRef: ContextState<any>) => {
+        cState.addRenew((newValue: any) => {
+          const result = (originalRef.value = newValue);
+          return result !== undefined;
+        });
+      };
     };
 
-    // 상태 업데이트 푸시
-    astack.push([setState, renew, setOriginalRef]);
+    // subscribeKeys가 지정되어 있으면 미리 생성
+    if (subscribeKeys) {
+      subscribeKeys.forEach(key => createStateForKey(key));
+    }
 
-    return cState;
+    // subscribeKeys를 null로 전달하면 Provider에서 모든 키 구독하며 동적 생성
+    astack.push([
+      setStateMap,
+      renew,
+      setOriginalRefMap,
+      subscribeKeys || null,
+      subscribeKeys ? null : createStateForKey,
+    ]);
+
+    return cStateMap as any;
   };
 
   /**
