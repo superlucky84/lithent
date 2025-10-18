@@ -5,7 +5,6 @@ import { createContext } from '@/index';
 const testContext = createContext<number>();
 const { Provider, contextState, useContext } = testContext;
 
-/*
 const Component = mount(() => {
   const contextRef = contextState(3);
   console.log('Component');
@@ -24,7 +23,7 @@ const Component = mount(() => {
     </div>
   );
 });
-*/
+/*
 const UserProvider = mount((_renew, _props, children: WDom[]) => {
   console.log('UserProvider');
   const contextRef = contextState(3);
@@ -39,6 +38,7 @@ const Component = mount(() => {
     </UserProvider>
   );
 });
+*/
 
 const Children = mount<{ jj: number }>(renew => {
   console.log('Children');
