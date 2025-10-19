@@ -9,7 +9,11 @@ import {
 
 import { componentMap, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
-import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
+import {
+  execMountedQueue,
+  execWDomCallbacks,
+  addMountedQueue,
+} from '@/hook/mountCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import { getParent, entries, keys } from '@/utils';
 
@@ -34,6 +38,9 @@ export const render = (
 
   const Dom = wDomToDom(wDom, isHydration);
 
+  // WDom 트리 완성 후, DOM 렌더링 전에 wdomCallback 실행
+  execWDomCallbacks();
+
   if (afterElement) {
     wDom.afterElement = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
@@ -45,6 +52,7 @@ export const render = (
     }
   }
 
+  // DOM 렌더링 후 mountCallback 실행
   execMountedQueue();
 
   return () => {
@@ -156,6 +164,9 @@ const typeAdd = (
     newElement = wDomToDom(newWDom) as HTMLElement;
   }
 
+  // WDom 트리 완성 후 wdomCallback 실행
+  execWDomCallbacks();
+
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
@@ -174,6 +185,7 @@ const typeAdd = (
         }
       }
 
+      // DOM 렌더링 후 mountCallback 실행
       execMountedQueue();
     }
   }
@@ -259,9 +271,14 @@ const typeReplace = (newWDom: WDom) => {
       const parentElement = findRealParentElement(parentWDom);
       const newElement = wDomToDom(newWDom);
 
+      // WDom 트리 완성 후 wdomCallback 실행
+      execWDomCallbacks();
+
       if (parentElement && newWDom.tag !== 'portal') {
         parentElement.replaceChild(newElement, orignalElement);
       }
+
+      // DOM 렌더링 후 mountCallback 실행
       execMountedQueue();
     }
   }

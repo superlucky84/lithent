@@ -83,7 +83,8 @@ export type ComponentSubKey =
   | 'upD'
   | 'upCB'
   | 'mts'
-  | 'umts';
+  | 'umts'
+  | 'wdomCB';
 
 export type ComponentMap = WeakMap<Props, ComponentInfo>;
 
@@ -96,6 +97,7 @@ export type ComponentInfo = {
   upCB: (() => void)[];
   mts: (() => void)[];
   umts: (() => void)[];
+  wdomCB: (() => void | (() => void))[];
 };
 
 export type Param<Updater, Member, Props> = {

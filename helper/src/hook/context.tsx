@@ -1,5 +1,13 @@
-import { h, Fragment, mount } from 'lithent';
+import {
+  h,
+  Fragment,
+  mount,
+  getComponentKey,
+  getComponentSubInfo,
+  wdomCallback,
+} from 'lithent';
 import type { WDom, Renew } from 'lithent';
+
 type ContextState<T> = {
   value: T;
   injectValue: (value: T) => void;
@@ -15,79 +23,16 @@ type UseContextFn<T> = (
 ) => T extends Record<string, any> ? T : ContextState<T>;
 
 export function createContext<T>() {
-  const astack: any[] = [];
-
-  /**
-   * 프로바이더 사용 - 여러 state를 받을 수 있음
-   */
   const Provider = mount<{
     [key: string]: ContextState<any>;
-    [providerSymbol]?: boolean;
+    [providerSymbol]?: any;
   }>((_renew, props, children: WDom[]) => {
-    console.log('Provider');
+    // Provider 식별자 저장
     props[providerSymbol] = true;
-
-    // astack에 쌓인 각 구독자 처리
-    astack.forEach(
-      ([
-        setStateMap,
-        renew,
-        setOriginalRefMap,
-        subscribeKeys,
-        createStateForKey,
-      ]) => {
-        // subscribeKeys가 없으면 모든 키 구독 (providerSymbol 제외)
-        const keysToSubscribe =
-          subscribeKeys ||
-          Object.keys(props).filter(
-            k => typeof k === 'string' && k !== 'children'
-          );
-
-        keysToSubscribe.forEach((key: string) => {
-          if (!props[key] || typeof props[key].addRenew !== 'function') {
-            return; // ContextState가 아니면 스킵
-          }
-
-          // subscribeKeys가 null이면 동적으로 state 생성
-          if (!setStateMap[key] && createStateForKey) {
-            console.log('Creating state for key:', key);
-            createStateForKey(key);
-            console.log('After create, setStateMap[key]:', !!setStateMap[key]);
-          }
-
-          const wrapRenew = (newValue: any) => {
-            if (setStateMap[key]) {
-              setStateMap[key](newValue);
-            }
-            const isAlive = renew();
-            return isAlive;
-          };
-
-          // 초기값 설정
-          if (setStateMap[key]) {
-            setStateMap[key](props[key].value);
-          }
-          if (setOriginalRefMap[key]) {
-            setOriginalRefMap[key](props[key]);
-          }
-
-          // Provider의 state에 구독 등록
-          props[key].addRenew(wrapRenew);
-        });
-
-        // 초기값이 설정되었으니 한 번 렌더링 트리거
-        renew();
-      }
-    );
-    astack.splice(0);
 
     return () => <Fragment>{children}</Fragment>;
   });
 
-  /**
-   * 컨텍스트 값 사용
-   * @param subscribeKeys - 구독할 키 배열. 없으면 전체 구독
-   */
   const useContext: UseContextFn<T> = (context, renew, subscribeKeys?) => {
     const targetProvider = context.Provider;
 
@@ -96,57 +41,134 @@ export function createContext<T>() {
       return undefined;
     }
 
-    // 다중 state 모드 (기본)
+    // useContext 호출 시점의 compKey 저장
+    const myCompKey = getComponentKey();
+
     const cStateMap: Record<string, ContextState<any>> = {};
-    const setStateMap: Record<string, (v: any) => void> = {};
-    const setOriginalRefMap: Record<string, (ref: ContextState<any>) => void> =
-      {};
+    const connectedKeys = new Set<string>();
 
-    // 동적으로 state 생성하는 함수
-    const createStateForKey = (key: string) => {
-      console.log('createStateForKey called for:', key);
-      const cState = context.contextState();
-      cStateMap[key] = cState;
-      console.log('cStateMap after assignment:', cStateMap);
+    // 트리에서 Provider 찾기 (부모 방향으로 탐색)
+    const findProviderInTree = (wdom?: WDom): any => {
+      if (!wdom) {
+        const vdRef = getComponentSubInfo(myCompKey, 'vd') as {
+          value: WDom;
+        } | null;
+        return vdRef?.value ? findProviderInTree(vdRef.value) : null;
+      }
 
-      setStateMap[key] = (injectState: any) => {
-        console.log(
-          'setState called for key:',
-          key,
-          'with value:',
-          injectState
-        );
-        cState.injectValue(injectState);
-      };
+      // Provider인지 확인
+      if (
+        wdom.compProps &&
+        (wdom.compProps as Record<symbol, unknown>)[providerSymbol]
+      ) {
+        return wdom.compProps;
+      }
 
-      setOriginalRefMap[key] = (originalRef: ContextState<any>) => {
-        cState.addRenew((newValue: any) => {
-          const result = (originalRef.value = newValue);
-          return result !== undefined;
-        });
-      };
+      // 부모로 이동
+      const parent = wdom.getParent?.();
+      return parent ? findProviderInTree(parent) : null;
     };
 
-    // subscribeKeys가 지정되어 있으면 미리 생성
+    const createStateForKey = (key: string) => {
+      let result: any;
+      let renewlist: any[] = [];
+
+      const cState = {
+        get value() {
+          return result;
+        },
+        set value(newValue: any) {
+          result = newValue;
+          if (renewlist.length) {
+            renewlist = renewlist.filter(wrapRenew => wrapRenew(result));
+          }
+        },
+        injectValue(newValue: any) {
+          result = newValue;
+        },
+        addRenew(wrapRenew: (value: any) => boolean) {
+          renewlist.push(wrapRenew);
+          return true;
+        },
+      };
+
+      cStateMap[key] = cState;
+    };
+
+    // WDom 트리 완성 후 Provider 찾아서 연결 (DOM 렌더링 전)
+    wdomCallback(() => {
+      const providerProps = findProviderInTree();
+
+      if (providerProps) {
+        const keysToConnect =
+          subscribeKeys ||
+          Object.keys(providerProps).filter(
+            k =>
+              typeof k === 'string' &&
+              k !== 'children' &&
+              providerProps[k] &&
+              typeof providerProps[k].addRenew === 'function'
+          );
+
+        keysToConnect.forEach((key: string) => {
+          if (!providerProps[key]) return;
+
+          // state가 아직 없으면 생성
+          if (!cStateMap[key]) {
+            createStateForKey(key);
+          }
+
+          const cState = cStateMap[key];
+          const originalState = providerProps[key];
+
+          // 초기값 설정
+          cState.injectValue(originalState.value);
+
+          // 1. Provider → Consumer 동기화
+          const wrapRenew = (newValue: any) => {
+            cState.injectValue(newValue);
+            return renew();
+          };
+
+          originalState.addRenew(wrapRenew);
+
+          // 2. Consumer → Provider 동기화
+          cState.addRenew((newValue: any) => {
+            originalState.value = newValue;
+            return true;
+          });
+
+          connectedKeys.add(key);
+        });
+
+        // 연결 후 renew 호출해서 초기값 표시
+        renew();
+      }
+    });
+
+    // subscribeKeys가 제공되면 해당 키만 state 생성
     if (subscribeKeys) {
       subscribeKeys.forEach(key => createStateForKey(key));
+      return cStateMap as any;
     }
 
-    // subscribeKeys를 null로 전달하면 Provider에서 모든 키 구독하며 동적 생성
-    astack.push([
-      setStateMap,
-      renew,
-      setOriginalRefMap,
-      subscribeKeys || null,
-      subscribeKeys ? null : createStateForKey,
-    ]);
+    // subscribeKeys가 없으면 Proxy로 동적 키 접근 처리
+    return new Proxy(cStateMap, {
+      get(target, prop: string) {
+        if (prop in target) {
+          return target[prop];
+        }
 
-    return cStateMap as any;
+        if (typeof prop === 'string') {
+          createStateForKey(prop);
+          return target[prop];
+        }
+
+        return undefined;
+      },
+    }) as any;
   };
 
-  /**
-   * 프로바이더에 사용할 컨텍스트 상태 생성
-   */
   const contextState = <T,>(
     value: T
   ): {

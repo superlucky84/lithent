@@ -1,4 +1,4 @@
-import { h, render, mount } from 'lithent';
+import { h, render, mount, type WDom } from 'lithent';
 import { createContext } from '@/index';
 
 // 다중 state를 위한 타입
@@ -15,8 +15,6 @@ const Component = mount(() => {
   const userState = contextState('Alice');
   const themeState = contextState('dark');
   const countState = contextState(0);
-
-  console.log('Component');
 
   // 3초마다 count 증가 (테스트용)
   setTimeout(() => {
@@ -98,10 +96,7 @@ const Component = mount(() => {
 
 // 전체 구독 (키 지정 안함)
 const ChildrenFullSubscribe = mount<{ jj: number }>(renew => {
-  console.log('ChildrenFullSubscribe - rendered');
   const ctx = useContext(testContext, renew); // 모든 키 구독
-
-  console.log(ctx);
 
   return () => (
     <div>
@@ -115,7 +110,6 @@ const ChildrenFullSubscribe = mount<{ jj: number }>(renew => {
 
 // user만 구독
 const ChildrenUserOnly = mount<{ jj: number }>(renew => {
-  console.log('ChildrenUserOnly - rendered');
   const ctx = useContext(testContext, renew, ['user']); // user만 구독
 
   return () => (
@@ -128,7 +122,6 @@ const ChildrenUserOnly = mount<{ jj: number }>(renew => {
 
 // theme + count 구독
 const ChildrenThemeCount = mount<{ jj: number }>(renew => {
-  console.log('ChildrenThemeCount - rendered');
   const ctx = useContext(testContext, renew, ['theme', 'count']); // theme, count만
 
   return () => (
@@ -142,17 +135,89 @@ const ChildrenThemeCount = mount<{ jj: number }>(renew => {
   );
 });
 
+// 단일 state 패턴 테스트 (UserProvider 패턴)
+const singleContext = createContext<{ state: { value: number } }>();
+const {
+  Provider: SingleProvider,
+  contextState: singleContextState,
+  useContext: useSingleContext,
+} = singleContext;
+
+const UserProvider = mount((_renew, _props, children: WDom[]) => {
+  const contextRef = singleContextState(42);
+  return () => <SingleProvider state={contextRef}>{children}</SingleProvider>;
+});
+
+const SingleChild = mount<{ jj: number }>(renew => {
+  const ctx = useSingleContext(singleContext, renew, ['state']);
+
+  return () => (
+    <div
+      style={{ border: '2px solid purple', padding: '10px', margin: '10px' }}
+    >
+      <h3>UserProvider Pattern Test</h3>
+      <p>Value: {ctx.state?.value ?? 'N/A'}</p>
+    </div>
+  );
+});
+
+const ComponentWithUserProvider = mount(() => {
+  return () => (
+    <div>
+      <h2>UserProvider Pattern (Nested Provider)</h2>
+      <UserProvider>
+        <SingleChild jj={9} />
+      </UserProvider>
+    </div>
+  );
+});
+
+// Provider 내부에서 state를 변경하는 컴포넌트
+const SingleChildWithButton = mount<{ jj: number }>(renew => {
+  const ctx = useSingleContext(singleContext, renew, ['state']);
+
+  return () => (
+    <div
+      style={{ border: '2px solid purple', padding: '10px', margin: '10px' }}
+    >
+      <h3>UserProvider Pattern Test</h3>
+      <p>Value: {ctx.state?.value ?? 'N/A'}</p>
+      <button
+        onClick={() => {
+          if (ctx.state) {
+            ctx.state.value = ctx.state.value + 1;
+          }
+        }}
+      >
+        Increase Value
+      </button>
+    </div>
+  );
+});
+
+const ComponentWithUserProviderAndButton = mount(() => {
+  return () => (
+    <div>
+      <h2>UserProvider Pattern (With Update Test)</h2>
+      <UserProvider>
+        <SingleChildWithButton jj={10} />
+      </UserProvider>
+    </div>
+  );
+});
+
 const testWrap = document.getElementById('root');
 
-console.log('=== Starting context test ===');
-console.log('testContext:', testContext);
-console.log('Provider:', Provider);
-console.log('useContext:', useContext);
-console.log('contextState:', contextState);
-
-render(<Component />, testWrap);
-
-console.log('=== Render completed ===');
+render(
+  <div>
+    <Component />
+    <hr />
+    <ComponentWithUserProvider />
+    <hr />
+    <ComponentWithUserProviderAndButton />
+  </div>,
+  testWrap
+);
 
 /*
 if (import.meta.vitest) {

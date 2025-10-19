@@ -19,6 +19,7 @@ const setComponetRef = (compKey: Props) => {
     upCB: [],
     mts: [],
     umts: [],
+    wdomCB: [], // WDom 생성 직후 실행될 콜백들
   });
 };
 

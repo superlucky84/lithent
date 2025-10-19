@@ -10,6 +10,7 @@ export {
 } from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
+export { wdomCallback } from '@/hook/wdomCallback';
 export { updateCallback } from '@/hook/updateCallback';
 export { ref, nextTick } from '@/hook/ref';
 
