@@ -4,13 +4,11 @@ export { componentUpdate } from '@/utils/redraw';
 export {
   getComponentKey,
   componentMap,
-  compKeyRef,
   getComponentSubInfo,
-  lastWDomPointer,
 } from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
-export { wdomCallback } from '@/hook/wdomCallback';
+export { mountReadyCallback } from '@/hook/mountReadyCallback';
 export { updateCallback } from '@/hook/updateCallback';
 export { ref, nextTick } from '@/hook/ref';
 

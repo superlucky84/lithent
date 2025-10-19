@@ -3,9 +3,9 @@ import { createContext } from '@/index';
 
 // 다중 state를 위한 타입
 type AppContext = {
-  user: { value: string };
-  theme: { value: string };
-  count: { value: number };
+  user: string;
+  theme: string;
+  count: number;
 };
 
 const testContext = createContext<AppContext>();
@@ -136,7 +136,7 @@ const ChildrenThemeCount = mount<{ jj: number }>(renew => {
 });
 
 // 단일 state 패턴 테스트 (UserProvider 패턴)
-const singleContext = createContext<{ state: { value: number } }>();
+const singleContext = createContext<{ state: number }>();
 const {
   Provider: SingleProvider,
   contextState: singleContextState,
@@ -206,6 +206,65 @@ const ComponentWithUserProviderAndButton = mount(() => {
   );
 });
 
+// children을 props로 받아서 바로 Provider 아래 렌더링하는 패턴
+const DirectChildrenProvider = mount((_renew, _props, children: WDom[]) => {
+  const contextRef = singleContextState(100);
+  return () => <SingleProvider state={contextRef}>{children}</SingleProvider>;
+});
+
+const DirectChild1 = mount<{ jj: number }>(renew => {
+  const ctx = useSingleContext(singleContext, renew, ['state']);
+
+  return () => (
+    <div style={{ border: '1px solid red', padding: '5px', margin: '5px' }}>
+      <p>DirectChild1 - Value: {ctx.state?.value ?? 'N/A'}</p>
+      <button
+        onClick={() => {
+          if (ctx.state) {
+            ctx.state.value = ctx.state.value + 10;
+          }
+        }}
+      >
+        +10
+      </button>
+    </div>
+  );
+});
+
+const DirectChild2 = mount<{ jj: number }>(renew => {
+  const ctx = useSingleContext(singleContext, renew, ['state']);
+
+  return () => (
+    <div style={{ border: '1px solid blue', padding: '5px', margin: '5px' }}>
+      <p>DirectChild2 - Value: {ctx.state?.value ?? 'N/A'}</p>
+      <button
+        onClick={() => {
+          if (ctx.state) {
+            ctx.state.value = ctx.state.value - 5;
+          }
+        }}
+      >
+        -5
+      </button>
+    </div>
+  );
+});
+
+const ComponentWithDirectChildren = mount(() => {
+  return () => (
+    <div>
+      <h2>Direct Children Pattern (Props로 전달된 children)</h2>
+      <p style={{ color: 'gray', fontSize: '0.9em' }}>
+        UserProvider가 props로 받은 children을 바로 Provider 아래에 렌더링
+      </p>
+      <DirectChildrenProvider>
+        <DirectChild1 jj={9} />
+        <DirectChild2 jj={10} />
+      </DirectChildrenProvider>
+    </div>
+  );
+});
+
 const testWrap = document.getElementById('root');
 
 render(
@@ -215,6 +274,8 @@ render(
     <ComponentWithUserProvider />
     <hr />
     <ComponentWithUserProviderAndButton />
+    <hr />
+    <ComponentWithDirectChildren />
   </div>,
   testWrap
 );

@@ -4,51 +4,78 @@ import {
   mount,
   getComponentKey,
   getComponentSubInfo,
-  wdomCallback,
+  mountReadyCallback,
 } from 'lithent';
 import type { WDom, Renew } from 'lithent';
 
 type ContextState<T> = {
   value: T;
   injectValue: (value: T) => void;
-  addRenew: (value: (newValue: T) => boolean) => boolean;
+  addRenew: (renewFn: (newValue: T) => boolean) => boolean;
+};
+
+type ProviderProps<T> =
+  T extends Record<string, unknown>
+    ? {
+        [K in keyof T]: ContextState<T[K]>;
+      }
+    : never;
+
+type Context<T> = {
+  Provider: ReturnType<typeof mount<ProviderProps<T>>>;
+  contextState: typeof createContextState;
+  useContext: (
+    context: Context<T>,
+    renew: Renew,
+    subscribeKeys?: string[]
+  ) => T extends Record<string, unknown> ? ProviderProps<T> : ContextState<T>;
 };
 
 const providerSymbol = Symbol('Provider');
 
-type UseContextFn<T> = (
-  context: any,
-  renew: Renew,
-  subscribeKeys?: string[]
-) => T extends Record<string, any> ? T : ContextState<T>;
+type ProviderPropsInternal<T> = ProviderProps<T> & {
+  [providerSymbol]?: boolean;
+};
 
-export function createContext<T>() {
-  const Provider = mount<{
-    [key: string]: ContextState<any>;
-    [providerSymbol]?: any;
-  }>((_renew, props, children: WDom[]) => {
-    // Provider 식별자 저장
-    props[providerSymbol] = true;
+export function createContext<T>(): Context<T> {
+  const Provider = mount<ProviderPropsInternal<T>>(
+    (_renew, props, children: WDom[]) => {
+      // Provider 식별자 저장
+      props[providerSymbol] = true;
 
-    return () => <Fragment>{children}</Fragment>;
-  });
+      return () => <Fragment>{children}</Fragment>;
+    }
+  );
 
-  const useContext: UseContextFn<T> = (context, renew, subscribeKeys?) => {
+  const useContext = (
+    context: Context<T>,
+    renew: Renew,
+    subscribeKeys?: string[]
+  ) => {
     const targetProvider = context.Provider;
 
     if (targetProvider !== Provider) {
-      console.warn('not match provider form context');
-      return undefined;
+      throw new Error('Context mismatch: Provider does not match');
     }
 
     // useContext 호출 시점의 compKey 저장
     const myCompKey = getComponentKey();
 
-    const cStateMap: Record<string, ContextState<any>> = {};
-    const connectedKeys = new Set<string>();
+    const cStateMap: Record<string, ContextState<unknown>> = {};
+
+    const createStateForKey = (key: string) => {
+      cStateMap[key] = createContextState();
+    };
+
+    // subscribeKeys가 제공되면 해당 키들에 대해 미리 state 생성
+    if (subscribeKeys) {
+      subscribeKeys.forEach(key => createStateForKey(key));
+    }
 
     // 트리에서 Provider 찾기 (부모 방향으로 탐색)
-    const findProviderInTree = (wdom?: WDom): any => {
+    const findProviderInTree = (
+      wdom?: WDom
+    ): ProviderPropsInternal<T> | null => {
       if (!wdom) {
         const vdRef = getComponentSubInfo(myCompKey, 'vd') as {
           value: WDom;
@@ -59,9 +86,9 @@ export function createContext<T>() {
       // Provider인지 확인
       if (
         wdom.compProps &&
-        (wdom.compProps as Record<symbol, unknown>)[providerSymbol]
+        (wdom.compProps as ProviderPropsInternal<T>)[providerSymbol]
       ) {
-        return wdom.compProps;
+        return wdom.compProps as ProviderPropsInternal<T>;
       }
 
       // 부모로 이동
@@ -69,34 +96,8 @@ export function createContext<T>() {
       return parent ? findProviderInTree(parent) : null;
     };
 
-    const createStateForKey = (key: string) => {
-      let result: any;
-      let renewlist: any[] = [];
-
-      const cState = {
-        get value() {
-          return result;
-        },
-        set value(newValue: any) {
-          result = newValue;
-          if (renewlist.length) {
-            renewlist = renewlist.filter(wrapRenew => wrapRenew(result));
-          }
-        },
-        injectValue(newValue: any) {
-          result = newValue;
-        },
-        addRenew(wrapRenew: (value: any) => boolean) {
-          renewlist.push(wrapRenew);
-          return true;
-        },
-      };
-
-      cStateMap[key] = cState;
-    };
-
     // WDom 트리 완성 후 Provider 찾아서 연결 (DOM 렌더링 전)
-    wdomCallback(() => {
+    mountReadyCallback(() => {
       const providerProps = findProviderInTree();
 
       if (providerProps) {
@@ -106,103 +107,84 @@ export function createContext<T>() {
             k =>
               typeof k === 'string' &&
               k !== 'children' &&
-              providerProps[k] &&
-              typeof providerProps[k].addRenew === 'function'
+              providerProps[k as keyof ProviderPropsInternal<T>] &&
+              typeof (
+                providerProps[
+                  k as keyof ProviderPropsInternal<T>
+                ] as ContextState<unknown>
+              ).addRenew === 'function'
           );
 
         keysToConnect.forEach((key: string) => {
-          if (!providerProps[key]) return;
-
           // state가 아직 없으면 생성
           if (!cStateMap[key]) {
             createStateForKey(key);
           }
 
+          const providerState = providerProps[
+            key as keyof ProviderPropsInternal<T>
+          ] as ContextState<unknown> | undefined;
+
+          // Provider에 해당 키가 없으면 건너뛰기
+          if (!providerState) return;
+
           const cState = cStateMap[key];
-          const originalState = providerProps[key];
 
           // 초기값 설정
-          cState.injectValue(originalState.value);
+          cState.injectValue(providerState.value);
 
           // 1. Provider → Consumer 동기화
-          const wrapRenew = (newValue: any) => {
+          const wrapRenew = (newValue: unknown) => {
             cState.injectValue(newValue);
             return renew();
           };
 
-          originalState.addRenew(wrapRenew);
+          providerState.addRenew(wrapRenew);
 
           // 2. Consumer → Provider 동기화
-          cState.addRenew((newValue: any) => {
-            originalState.value = newValue;
+          cState.addRenew((newValue: unknown) => {
+            providerState.value = newValue;
             return true;
           });
-
-          connectedKeys.add(key);
         });
 
-        // 연결 후 renew 호출해서 초기값 표시
+        // 초기값이 채워졌으므로 renew() 호출하여 화면에 반영
         renew();
       }
     });
 
-    // subscribeKeys가 제공되면 해당 키만 state 생성
-    if (subscribeKeys) {
-      subscribeKeys.forEach(key => createStateForKey(key));
-      return cStateMap as any;
-    }
-
-    // subscribeKeys가 없으면 Proxy로 동적 키 접근 처리
-    return new Proxy(cStateMap, {
-      get(target, prop: string) {
-        if (prop in target) {
-          return target[prop];
-        }
-
-        if (typeof prop === 'string') {
-          createStateForKey(prop);
-          return target[prop];
-        }
-
-        return undefined;
-      },
-    }) as any;
-  };
-
-  const contextState = <T,>(
-    value: T
-  ): {
-    value: T;
-    injectValue: (v: T) => void;
-    addRenew: (wrapRenew: (value: T) => boolean) => boolean;
-  } => {
-    let result = value;
-    let renewlist: any[] = [];
-
-    return {
-      get value() {
-        return result;
-      },
-      set value(newValue: T) {
-        result = newValue;
-
-        if (renewlist.length) {
-          renewlist = renewlist.filter(wrapRenew => wrapRenew(result));
-        }
-      },
-      injectValue(newValue: T) {
-        result = newValue;
-      },
-      addRenew(wrapRenew: (value: T) => boolean) {
-        renewlist.push(wrapRenew);
-        return true;
-      },
-    };
+    return cStateMap as T extends Record<string, unknown>
+      ? ProviderProps<T>
+      : ContextState<T>;
   };
 
   return {
     Provider,
-    contextState,
+    contextState: createContextState,
     useContext,
   };
 }
+
+const createContextState = <T,>(value?: T): ContextState<T> => {
+  let result = value as T;
+  let renewlist: Array<(value: T) => boolean> = [];
+
+  return {
+    get value() {
+      return result;
+    },
+    set value(newValue: T) {
+      result = newValue;
+      if (renewlist.length) {
+        renewlist = renewlist.filter(wrapRenew => wrapRenew(result));
+      }
+    },
+    injectValue(newValue: T) {
+      result = newValue;
+    },
+    addRenew(wrapRenew: (value: T) => boolean) {
+      renewlist.push(wrapRenew);
+      return true;
+    },
+  };
+};

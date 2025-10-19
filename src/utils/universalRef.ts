@@ -1,13 +1,10 @@
-import { ComponentMap, ComponentSubKey, Props, WDom } from '@/types';
+import { ComponentMap, ComponentSubKey, Props } from '@/types';
 
 export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: Props } = { value: {} };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentMap: ComponentMap = new WeakMap();
-export const lastWDomPointer: { value: WDom | undefined } = {
-  value: undefined,
-};
 
 const setComponetRef = (compKey: Props) => {
   componentMap.set(compKey, {
@@ -19,7 +16,7 @@ const setComponetRef = (compKey: Props) => {
     upCB: [],
     mts: [],
     umts: [],
-    wdomCB: [], // WDom 생성 직후 실행될 콜백들
+    wdCB: [], // WDom creation callback queue
   });
 };
 

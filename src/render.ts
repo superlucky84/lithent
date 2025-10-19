@@ -9,11 +9,8 @@ import {
 
 import { componentMap, xmlnsRef } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
-import {
-  execMountedQueue,
-  execWDomCallbacks,
-  addMountedQueue,
-} from '@/hook/mountCallback';
+import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
+import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import { getParent, entries, keys } from '@/utils';
 
@@ -37,9 +34,6 @@ export const render = (
   wDom.wrapElement = wrapElement;
 
   const Dom = wDomToDom(wDom, isHydration);
-
-  // WDom 트리 완성 후, DOM 렌더링 전에 wdomCallback 실행
-  execWDomCallbacks();
 
   if (afterElement) {
     wDom.afterElement = afterElement;
@@ -164,9 +158,6 @@ const typeAdd = (
     newElement = wDomToDom(newWDom) as HTMLElement;
   }
 
-  // WDom 트리 완성 후 wdomCallback 실행
-  execWDomCallbacks();
-
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
@@ -270,9 +261,6 @@ const typeReplace = (newWDom: WDom) => {
     } else {
       const parentElement = findRealParentElement(parentWDom);
       const newElement = wDomToDom(newWDom);
-
-      // WDom 트리 완성 후 wdomCallback 실행
-      execWDomCallbacks();
 
       if (parentElement && newWDom.tag !== 'portal') {
         parentElement.replaceChild(newElement, orignalElement);
@@ -405,6 +393,8 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
+
+  runWDomCallbacksFromWDom(wDom);
 
   if (tag === 'svg') {
     xmlnsRef.value = String(props?.xmlns);
