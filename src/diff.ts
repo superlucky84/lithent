@@ -81,7 +81,8 @@ const inheritPropForRender = (
 };
 
 /**
- * Indicate the state information for the new virtual DOM to be reflected in the real DOM.
+ * Determine the render operation type (Add/Delete/Replace/Update/etc)
+ * based on comparison between new and original WDom
  */
 const addReRenderTypeProperty = (
   newWDom: WDom,
@@ -94,9 +95,9 @@ const addReRenderTypeProperty = (
   const originalParentWDom = originalWDom && getParent(originalWDom);
   const origParentType = !isRoot && originalParentWDom?.type;
   const key = getKey(newWDom);
-  const isKeyCheckedWDom = origParentType === 'loop' && checkExisty(key);
+  const isKeyCheckedWDom = origParentType === 'l' && checkExisty(key); // 'l': loop
   const isSameText =
-    newWDom.type === 'text' &&
+    newWDom.type === 't' && // 't': text node
     isSameType &&
     newWDom.text === originalWDom?.text;
   const isSameWDom = newWDom === originalWDom;
@@ -115,7 +116,7 @@ const addReRenderTypeProperty = (
   }
 
   if (
-    newWDom.type === 'loop' &&
+    newWDom.type === 'l' && // 'l': loop
     result === 'U' &&
     originalWDom &&
     chkDiffLoopOrder(newWDom, originalWDom)
@@ -230,9 +231,10 @@ const remakeChildrenForAdd = (newWDom: WDom) =>
 
 /**
  * Recursive handling for updates, not additions.
+ * Uses key-based diffing for loops, index-based for others
  */
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
-  newWDom.type === 'loop' && checkExisty(getKey((newWDom.children || [])[0]))
+  newWDom.type === 'l' && checkExisty(getKey((newWDom.children || [])[0])) // 'l': loop
     ? remakeChildrenForLoopUpdate(newWDom, originalWDom)
     : (newWDom.children || []).map((item: WDom, index: number) =>
         assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {

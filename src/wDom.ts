@@ -35,7 +35,7 @@ import { assign } from '@/utils';
  */
 export const Fragment = (_props: Props, ...children: WDom[]) =>
   ({
-    type: 'fragment',
+    type: 'f', // fragment
     [wdomSymbol]: true,
     children,
   }) as WDom;
@@ -134,7 +134,7 @@ const makeNode = (
   }
 
   return {
-    type: 'element',
+    type: 'e', // element
     [wdomSymbol]: true,
     tag,
     props,
@@ -163,7 +163,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
     const node = {
-      type: 'loop',
+      type: 'l', // loop (array mapping)
       [wdomSymbol]: true,
       children,
     } as WDom;
@@ -171,7 +171,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 'text', [wdomSymbol]: true, text: item } as WDom;
+    return { type: 't', [wdomSymbol]: true, text: item } as WDom; // text node
   }
 
   return item;

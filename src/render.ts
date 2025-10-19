@@ -91,9 +91,8 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
   });
 };
 
-const rootDelete = (newWDom: WDom) => {
+const rootDelete = (newWDom: WDom) =>
   deleteRealDom(newWDom, newWDom.wrapElement as HTMLElement);
-};
 
 export const typeDelete = (newWDom: WDom) => {
   if (newWDom.oldProps && newWDom.el) {
@@ -161,7 +160,7 @@ const typeAdd = (
   const parentWDom = getParent(newWDom);
   if (parentWDom.type) {
     const parentEl = findRealParentElement(parentWDom);
-    const isLoop = parentWDom.type === 'loop';
+    const isLoop = parentWDom.type === 'l';
     const nextEl =
       isLoop && parentWDom.needRerender && parentWDom.needRerender !== 'CNSU'
         ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
@@ -289,7 +288,8 @@ const removeEvent = (
 const typeUpdate = (newWDom: WDom) => {
   const element = newWDom.el;
 
-  if (newWDom.type === 'text') {
+  if (newWDom.type === 't') {
+    // text node
     updateText(newWDom);
 
     return;
@@ -403,7 +403,8 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
   if (!isHydration) {
     if (isVirtualType) {
       element = DF();
-    } else if (type === 'element' && tag) {
+    } else if (type === 'e' && tag) {
+      // element
       if (tag === 'portal' && props?.portal) {
         element = props.portal as HTMLElement;
       } else {
@@ -411,7 +412,8 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
           ? document.createElementNS(xmlnsRef.value, tag)
           : CE(tag);
       }
-    } else if (type === 'text' && checkExisty(text)) {
+    } else if (type === 't' && checkExisty(text)) {
+      // text node
       element = document.createTextNode(String(text));
     } else {
       element = CE('e');
