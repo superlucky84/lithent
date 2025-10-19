@@ -34,16 +34,19 @@ const remakeNewWDom = (
   originalWDom?: WDom
 ) => {
   const remakeWDom = generalize(newWDom, isSameType, originalWDom);
-  const param: [newWDom: WDom, isSameType: boolean, originalWDom?: WDom] = [
+  const needRerender = addReRenderTypeProperty(
     remakeWDom,
     isSameType,
-    originalWDom,
-  ];
-  const needRerender = addReRenderTypeProperty(...param);
+    originalWDom
+  );
   const isNoting = needRerender === 'N';
 
   if (!isNoting) {
-    remakeWDom.children = remakeChildrenForDiff(...param);
+    remakeWDom.children = remakeChildrenForDiff(
+      remakeWDom,
+      isSameType,
+      originalWDom
+    );
   }
 
   remakeWDom.needRerender = needRerender;
@@ -89,34 +92,31 @@ const addReRenderTypeProperty = (
   isSameType: boolean,
   originalWDom?: WDom
 ): RenderType | undefined => {
-  const existOriginalWDom = originalWDom && originalWDom.type;
-  const isEmptyElement = checkEmptyElement(newWDom);
-  const isRoot = newWDom.isRoot;
-  const originalParentWDom = originalWDom && getParent(originalWDom);
-  const origParentType = !isRoot && originalParentWDom?.type;
-  const key = getKey(newWDom);
-  const isKeyCheckedWDom = origParentType === 'l' && checkExisty(key); // 'l': loop
-  const isSameText =
-    newWDom.type === 't' && // 't': text node
-    isSameType &&
-    newWDom.text === originalWDom?.text;
-  const isSameWDom = newWDom === originalWDom;
+  if (checkEmptyElement(newWDom)) return 'D';
 
-  let result: RenderType | undefined;
-  if (isEmptyElement) {
-    result = 'D';
-  } else if (isSameText || isSameWDom) {
-    result = 'N';
-  } else if (!existOriginalWDom) {
-    result = 'A';
-  } else if (isSameType) {
-    result = isKeyCheckedWDom ? 'SU' : 'U';
-  } else {
-    result = isKeyCheckedWDom ? 'SR' : 'R';
-  }
+  const isSameText =
+    newWDom.type === 't' && isSameType && newWDom.text === originalWDom?.text;
+  if (isSameText || newWDom === originalWDom) return 'N';
+
+  const existOriginalWDom = originalWDom?.type;
+  if (!existOriginalWDom) return 'A';
+
+  const key = getKey(newWDom);
+  const isKeyChecked =
+    !newWDom.isRoot &&
+    getParent(originalWDom)?.type === 'l' &&
+    checkExisty(key);
+
+  let result: RenderType = isSameType
+    ? isKeyChecked
+      ? 'SU'
+      : 'U'
+    : isKeyChecked
+      ? 'SR'
+      : 'R';
 
   if (
-    newWDom.type === 'l' && // 'l': loop
+    newWDom.type === 'l' &&
     result === 'U' &&
     originalWDom &&
     chkDiffLoopOrder(newWDom, originalWDom)
@@ -155,7 +155,6 @@ const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
     keys(props).forEach(key => delete props[key]);
-
     entries(infoProps || {}).forEach(([key, value]) => (props[key] = value));
   }
 };
@@ -199,15 +198,12 @@ const generalize = (
   newWDom: WDom | TagFunctionResolver,
   isSameType: boolean,
   originalWDom?: WDom
-): WDom => {
-  if (checkCustemComponentFunction(newWDom)) {
-    return isSameType && originalWDom
+): WDom =>
+  checkCustemComponentFunction(newWDom)
+    ? isSameType && originalWDom
       ? runUpdate(originalWDom, newWDom)
-      : newWDom.resolve();
-  }
-
-  return newWDom;
-};
+      : newWDom.resolve()
+    : newWDom;
 
 /**
  * 자식 가상돔들도 전부 재귀처리하며 똑같은 처리를 해준다.
@@ -264,22 +260,18 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
  * Recursive handling of loop-type virtual DOM elements.
  */
 const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
-  const newChildren = [...(newWDom.children || [])];
-  const originalChildren = [...(originalWDom.children || [])];
-  const remakedChildren = newChildren.map(item => {
-    const originalItem = findSameKeyOriginalItem(item, originalChildren);
-    const childItem = makeNewWDomTree(item, originalItem);
+  const origCh = [...(originalWDom.children || [])];
+  const remaked = (newWDom.children || []).map(item => {
+    const orig = findSameKeyOriginalItem(item, origCh);
+    const child = makeNewWDomTree(item, orig);
 
-    if (originalItem) {
-      originalChildren.splice(originalChildren.indexOf(originalItem), 1);
-    }
+    if (orig) origCh.splice(origCh.indexOf(orig), 1);
+    child.getParent = () => newWDom;
 
-    childItem.getParent = () => newWDom;
-
-    return childItem;
+    return child;
   });
 
-  return [remakedChildren, originalChildren];
+  return [remaked, origCh];
 };
 
 /**

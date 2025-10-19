@@ -14,11 +14,10 @@ import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import { getParent, entries, keys } from '@/utils';
 
-const getAttrKey = (keyName: string) =>
-  keyName === 'className' ? 'class' : keyName;
+const getAttrKey = (k: string) => (k === 'className' ? 'class' : k);
 
-const getEventName = (eventKey: string) =>
-  eventKey.replace(/^on(.*)/, (_match, p1) => p1.toLowerCase());
+const getEventName = (k: string) =>
+  k.replace(/^on(.*)/, (_, p) => p.toLowerCase());
 
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
@@ -50,14 +49,10 @@ export const render = (
   execMountedQueue();
 
   return () => {
-    const component = componentMap.get(wDom.compProps || {})?.vd.value;
-
-    if (component) {
-      runUnmountQueueFromWDom(component);
-    }
-
-    recursiveRemoveEvent(component || wDom);
-    rootDelete(component || wDom);
+    const comp = componentMap.get(wDom.compProps || {})?.vd.value || wDom;
+    if (comp !== wDom) runUnmountQueueFromWDom(comp);
+    recursiveRemoveEvent(comp);
+    rootDelete(comp);
   };
 };
 
@@ -107,10 +102,11 @@ export const typeDelete = (newWDom: WDom) => {
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
-    if ([1, 3].includes(newWDom.el?.nodeType)) {
+    const nt = newWDom.el.nodeType;
+    if ([1, 3].includes(nt)) {
       parent.removeChild(newWDom.el);
-    } else if (newWDom.el?.nodeType === 11) {
-      findChildWithRemoveElement(newWDom, parent as HTMLElement);
+    } else if (nt === 11) {
+      findChildWithRemoveElement(newWDom, parent);
     }
     delete newWDom.el;
   }
@@ -118,15 +114,12 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
   (newWDom?.oldChildren || newWDom?.children || []).forEach(item => {
-    const nodeType = item.el?.nodeType;
-    if (nodeType) {
-      if ([1, 3].includes(nodeType)) {
-        if ((item.el as HTMLElement).tagName === 'HTML') {
-          (item.el as HTMLElement).innerHTML = '';
-        } else {
-          (item.el as HTMLElement).remove();
-        }
-      } else if (nodeType === 11) {
+    const nt = item.el?.nodeType;
+    if (nt) {
+      if ([1, 3].includes(nt)) {
+        const el = item.el as HTMLElement;
+        el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
+      } else if (nt === 11) {
         findChildWithRemoveElement(item, parent);
       }
     }
@@ -168,14 +161,10 @@ const typeAdd = (
 
     if (newElement && parentEl) {
       if (newWDom.tag !== 'portal') {
-        if (nextEl) {
-          parentEl.insertBefore(newElement, nextEl);
-        } else {
-          parentEl.appendChild(newElement);
-        }
+        nextEl
+          ? parentEl.insertBefore(newElement, nextEl)
+          : parentEl.appendChild(newElement);
       }
-
-      // DOM 렌더링 후 mountCallback 실행
       execMountedQueue();
     }
   }
@@ -233,18 +222,11 @@ const findChildFragmentNextElement = (
       targetEl: HTMLElement | DocumentFragment | Text | undefined,
       bItem: WDom
     ) => {
-      const type = bItem.type;
-      const el = bItem.el;
-      const isFragment = type && checkVirtualType(type);
-
-      if (targetEl) {
-        return targetEl;
-      } else if (isFragment) {
+      if (targetEl) return targetEl;
+      const { type, el } = bItem;
+      if (type && checkVirtualType(type))
         return findChildFragmentNextElement(bItem.children || []);
-      } else if (el && el.nodeType !== 11) {
-        return el;
-      }
-
+      if (el && el.nodeType !== 11) return el;
       return targetEl;
     },
     undefined
@@ -264,8 +246,6 @@ const typeReplace = (newWDom: WDom) => {
       if (parentElement && newWDom.tag !== 'portal') {
         parentElement.replaceChild(newElement, orignalElement);
       }
-
-      // DOM 렌더링 후 mountCallback 실행
       execMountedQueue();
     }
   }
@@ -286,37 +266,28 @@ const removeEvent = (
 };
 
 const typeUpdate = (newWDom: WDom) => {
-  const element = newWDom.el;
-
   if (newWDom.type === 't') {
-    // text node
     updateText(newWDom);
-
     return;
   }
 
-  if (element) {
+  if (newWDom.el) {
     const { oldProps, props } = newWDom;
-
-    updateProps(props, element, oldProps);
-
+    updateProps(props, newWDom.el, oldProps);
     delete newWDom.oldProps;
 
     if (newWDom.tag === 'input') {
-      (element as HTMLInputElement).value = String(newWDom?.props?.value || '');
+      (newWDom.el as HTMLInputElement).value = String(props?.value || '');
     }
   }
 
-  (newWDom.children || []).forEach((childItem: WDom) => wDomUpdate(childItem));
-
+  (newWDom.children || []).forEach(childItem => wDomUpdate(childItem));
   runUpdatedQueueFromWDom(newWDom);
 };
 
 const updateText = (newWDom: WDom) => {
-  const element = newWDom.el;
-
-  if (element) {
-    element.nodeValue = String(newWDom.text);
+  if (newWDom.el) {
+    newWDom.el.nodeValue = String(newWDom.text);
   }
 };
 
@@ -381,13 +352,10 @@ const updateProps = (
   );
 };
 
-const setAttr = (dataKey: string, element: HTMLElement, dataValue: string) => {
-  if (xmlnsRef.value && dataKey !== 'xmlns') {
-    element.setAttributeNS(null, dataKey, dataValue);
-  } else {
-    element.setAttribute(dataKey, dataValue);
-  }
-};
+const setAttr = (k: string, el: HTMLElement, v: string) =>
+  xmlnsRef.value && k !== 'xmlns'
+    ? el.setAttributeNS(null, k, v)
+    : el.setAttribute(k, v);
 
 const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
   let element;
@@ -442,23 +410,18 @@ const wDomChildrenToDom = (
   parentElement?: HTMLElement | Element | DocumentFragment | Text,
   isHydration?: boolean
 ) => {
-  const elementChildren = children.reduce(
-    (acc: DocumentFragment, childItem: WDom) => {
-      if (childItem.type) {
-        const childElement = wDomToDom(childItem, isHydration);
-
-        if (childItem.tag !== 'portal' && !isHydration) {
-          acc.appendChild(childElement);
-        }
+  const frag = children.reduce((acc: DocumentFragment, childItem: WDom) => {
+    if (childItem.type) {
+      const childElement = wDomToDom(childItem, isHydration);
+      if (childItem.tag !== 'portal' && !isHydration) {
+        acc.appendChild(childElement);
       }
+    }
+    return acc;
+  }, DF());
 
-      return acc;
-    },
-    DF()
-  );
-
-  if (!isHydration && parentElement && elementChildren.hasChildNodes()) {
-    parentElement.appendChild(elementChildren);
+  if (!isHydration && parentElement && frag.hasChildNodes()) {
+    parentElement.appendChild(frag);
   }
 };
 
@@ -486,18 +449,15 @@ const updateStyle = (
   oldStyle: Record<string, string>,
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
-  const originalStyle = { ...oldStyle };
-  const elementStyle = (element as HTMLElement)?.style;
+  const orig = { ...oldStyle };
+  const es = (element as HTMLElement)?.style;
 
-  if (elementStyle) {
-    entries(style).forEach(([styleKey, dataValue]) => {
-      (elementStyle as any)[styleKey] = dataValue;
-      delete originalStyle[styleKey];
+  if (es) {
+    entries(style).forEach(([k, v]) => {
+      (es as any)[k] = v;
+      delete orig[k];
     });
-
-    entries(originalStyle).forEach(
-      ([styleKey]) => ((elementStyle as any)[styleKey] = '')
-    );
+    entries(orig).forEach(([k]) => ((es as any)[k] = ''));
   }
 };
 

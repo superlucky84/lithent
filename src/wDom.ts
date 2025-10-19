@@ -49,9 +49,8 @@ export const h = (
   ...children: MiddleStateWDomChildren
 ) => {
   const nodeParentPointer: NodePointer = { value: undefined };
-  const newProps = props || {};
   const newChildren = remakeChildren(nodeParentPointer, children);
-  const node = makeNode(tag, newProps, newChildren);
+  const node = makeNode(tag, props || {}, newChildren);
 
   if (!checkCustemComponentFunction(node)) {
     nodeParentPointer.value = node;
@@ -63,9 +62,8 @@ export const h = (
 /**
  * Enables portals
  */
-export const portal = (wDom: WDom, portal: HTMLElement) => {
-  return h('portal', { portal }, wDom);
-};
+export const portal = (wDom: WDom, portal: HTMLElement) =>
+  h('portal', { portal }, wDom);
 
 /**
  * It helps with component creation.
@@ -198,15 +196,7 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
         : () => () => initialComponent;
     const componentMaker = component(componentUpdate(compKey), props, children);
 
-    const customNode = makeCustomNode(
-      componentMaker,
-      compKey,
-      tag,
-      props,
-      children
-    );
-
-    return customNode;
+    return makeCustomNode(componentMaker, compKey, tag, props, children);
   };
 
   return { tagName, ctor, props, children, resolve };

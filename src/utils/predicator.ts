@@ -121,16 +121,16 @@ export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver
 ): WDomType =>
   checkCustemComponentFunction(wDom)
-    ? 'c' // component
+    ? 'c'
     : checkPlainType(wDom, 'f')
-      ? 'f' // fragment
+      ? 'f'
       : checkPlainType(wDom, 'e')
-        ? 'e' // element
+        ? 'e'
         : checkPlainType(wDom, 'l')
-          ? 'l' // loop
+          ? 'l'
           : checkPlainType(wDom, 't')
-            ? 't' // text
-            : 'et'; // empty/null
+            ? 't'
+            : 'et';
 
 export const checkSameWDomWithOriginal = {
   c: checkSameCustomComponent,
