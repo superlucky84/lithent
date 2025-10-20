@@ -181,26 +181,62 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 // ============================================================================
 
 /**
+ * Wrap component children in Fragment if they need parent reference integrity
+ */
+const wrapChildrenIfNeeded = (children: WDom[]): WDom[] => {
+  const hasComponentChildren =
+    children.length > 0 &&
+    children.some(child => child.reRender || child.ctor || child.tagName);
+
+  const needsWrapping =
+    hasComponentChildren &&
+    !(children.length === 1 && children[0].type === 'f');
+
+  if (needsWrapping) {
+    const fragmentNode = Fragment({}, ...children);
+    children.forEach(child => (child.getParent = () => fragmentNode));
+    return [fragmentNode];
+  }
+
+  return children;
+};
+
+/**
+ * Create component resolver function
+ */
+const createComponentResolver = (
+  tag: TagFunction,
+  props: Props,
+  wrappedChildren: WDom[]
+) => {
+  return (compKey = props) => {
+    initMountHookState(compKey);
+
+    const initialComponent = tag(props, wrappedChildren);
+    const component =
+      typeof initialComponent === 'function'
+        ? initialComponent
+        : () => () => initialComponent;
+    const componentMaker = component(
+      componentUpdate(compKey),
+      props,
+      wrappedChildren
+    );
+
+    return makeCustomNode(componentMaker, compKey, tag, props, wrappedChildren);
+  };
+};
+
+/**
  * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
  */
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
   const ctor = tag;
-  // Resolve creates a new component
-  const resolve = (compKey = props) => {
-    initMountHookState(compKey);
+  const wrappedChildren = wrapChildrenIfNeeded(children);
+  const resolve = createComponentResolver(tag, props, wrappedChildren);
 
-    const initialComponent = tag(props, children);
-    const component =
-      typeof initialComponent === 'function'
-        ? initialComponent
-        : () => () => initialComponent;
-    const componentMaker = component(componentUpdate(compKey), props, children);
-
-    return makeCustomNode(componentMaker, compKey, tag, props, children);
-  };
-
-  return { tagName, ctor, props, children, resolve };
+  return { tagName, ctor, props, children: wrappedChildren, resolve };
 };
 
 /**
