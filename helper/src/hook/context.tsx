@@ -11,20 +11,20 @@ import type { WDom, Renew } from 'lithent';
 const INJECT = Symbol('INJECT');
 const ADDRENEW = Symbol('ADDRENEW');
 
-type ContextState<T> = {
+export type ContextState<T> = {
   value: T;
   [INJECT]: (value: T) => void;
   [ADDRENEW]: (renewFn: (newValue: T) => boolean) => boolean;
 };
 
-type ProviderProps<T> =
+export type ProviderProps<T> =
   T extends Record<string, unknown>
     ? {
         [K in keyof T]: ContextState<T[K]>;
       }
     : never;
 
-type Context<T> = {
+export type Context<T> = {
   Provider: ReturnType<typeof mount<ProviderProps<T>>>;
   contextState: <V>(value?: V, renew?: Renew) => ContextState<V>;
   useContext: (

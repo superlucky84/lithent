@@ -1,9 +1,9 @@
-export const computed = <T>(
-  value: () => T
-): {
-  value: T;
-  v: T;
-} => {
+export type Computed<T> = {
+  readonly value: T;
+  readonly v: T;
+};
+
+export const computed = <T>(value: () => T): Computed<T> => {
   let result = value;
 
   return {

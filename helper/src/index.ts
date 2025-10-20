@@ -5,3 +5,13 @@ export { store } from '@/hook/store';
 export { cacheUpdate } from '@/hook/cacheUpdate';
 export { nextTickRender } from '@/hook/nextTickRender';
 export { createContext } from '@/hook/context';
+
+export type { State } from '@/hook/state';
+export type { Computed } from '@/hook/computed';
+export type {
+  StoreRenew,
+  StoreType,
+  StoreObserver,
+  StoreOptions,
+} from '@/hook/store';
+export type { Context, ContextState, ProviderProps } from '@/hook/context';

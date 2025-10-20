@@ -698,7 +698,7 @@ if (import.meta.vitest) {
     const container = document.createElement('div');
 
     // Test simple component without Provider first
-    const SimpleComp = mount((renew) => {
+    const SimpleComp = mount(renew => {
       const state = singleContextState(200, renew);
       return () => (
         <div>
