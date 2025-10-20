@@ -1,7 +1,7 @@
-import { h, render, mount, type WDom } from 'lithent';
+import { h, render, mount, nextTick, type WDom } from 'lithent';
 import { createContext } from '@/index';
 
-// 다중 state를 위한 타입
+// Type for multiple states
 type AppContext = {
   user: string;
   theme: string;
@@ -16,16 +16,11 @@ const Component = mount(() => {
   const themeState = contextState('dark');
   const countState = contextState(0);
 
-  // 3초마다 count 증가 (테스트용)
-  setTimeout(() => {
-    countState.value = countState.value + 1;
-  }, 3000);
-
   return () => (
     <div>
       <h2>Multiple State Context Example</h2>
 
-      {/* 모든 state 전달 */}
+      {/* Pass all states */}
       <Provider user={userState} theme={themeState} count={countState}>
         <div
           style={{ border: '2px solid blue', padding: '10px', margin: '10px' }}
@@ -77,26 +72,10 @@ const Component = mount(() => {
     </div>
   );
 });
-/*
-const UserProvider = mount((_renew, _props, children: WDom[]) => {
-  console.log('UserProvider');
-  const contextRef = contextState(3);
-  return () => <Provider state={contextRef}>{children}</Provider>;
-});
 
-const Component = mount(() => {
-  return () => (
-    <UserProvider>
-      <Children jj={9} />
-      <Children2 jj={9} />
-    </UserProvider>
-  );
-});
-*/
-
-// 전체 구독 (키 지정 안함)
+// Full subscription (no keys specified)
 const ChildrenFullSubscribe = mount<{ jj: number }>(renew => {
-  const ctx = useContext(testContext, renew); // 모든 키 구독
+  const ctx = useContext(testContext, renew); // Subscribe to all keys
 
   return () => (
     <div>
@@ -108,9 +87,9 @@ const ChildrenFullSubscribe = mount<{ jj: number }>(renew => {
   );
 });
 
-// user만 구독
+// Subscribe to user only
 const ChildrenUserOnly = mount<{ jj: number }>(renew => {
-  const ctx = useContext(testContext, renew, ['user']); // user만 구독
+  const ctx = useContext(testContext, renew, ['user']); // Subscribe to user only
 
   return () => (
     <div>
@@ -120,9 +99,9 @@ const ChildrenUserOnly = mount<{ jj: number }>(renew => {
   );
 });
 
-// theme + count 구독
+// Subscribe to theme + count
 const ChildrenThemeCount = mount<{ jj: number }>(renew => {
-  const ctx = useContext(testContext, renew, ['theme', 'count']); // theme, count만
+  const ctx = useContext(testContext, renew, ['theme', 'count']); // Subscribe to theme and count only
 
   return () => (
     <div>
@@ -135,7 +114,7 @@ const ChildrenThemeCount = mount<{ jj: number }>(renew => {
   );
 });
 
-// 단일 state 패턴 테스트 (UserProvider 패턴)
+// Single state pattern test (UserProvider pattern)
 const singleContext = createContext<{ state: number }>();
 const {
   Provider: SingleProvider,
@@ -172,7 +151,7 @@ const ComponentWithUserProvider = mount(() => {
   );
 });
 
-// Provider 내부에서 state를 변경하는 컴포넌트
+// Component that changes state inside Provider
 const SingleChildWithButton = mount<{ jj: number }>(renew => {
   const ctx = useSingleContext(singleContext, renew, ['state']);
 
@@ -206,7 +185,7 @@ const ComponentWithUserProviderAndButton = mount(() => {
   );
 });
 
-// children을 props로 받아서 바로 Provider 아래 렌더링하는 패턴
+// Pattern that receives children as props and renders them directly under Provider
 const DirectChildrenProvider = mount((_renew, _props, children: WDom[]) => {
   const contextRef = singleContextState(100);
   return () => <SingleProvider state={contextRef}>{children}</SingleProvider>;
@@ -253,9 +232,9 @@ const DirectChild2 = mount<{ jj: number }>(renew => {
 const ComponentWithDirectChildren = mount(() => {
   return () => (
     <div>
-      <h2>Direct Children Pattern (Props로 전달된 children)</h2>
+      <h2>Direct Children Pattern (children passed via props)</h2>
       <p style={{ color: 'gray', fontSize: '0.9em' }}>
-        UserProvider가 props로 받은 children을 바로 Provider 아래에 렌더링
+        UserProvider renders children received as props directly under Provider
       </p>
       <DirectChildrenProvider>
         <DirectChild1 jj={9} />
@@ -265,38 +244,570 @@ const ComponentWithDirectChildren = mount(() => {
   );
 });
 
+// Test auto-renew feature with contextState(value, renew)
+const AutoRenewProvider = mount((renew, _props, children: WDom[]) => {
+  const contextRef = singleContextState(200, renew); // Pass renew to auto-update
+  return () => (
+    <div>
+      <SingleProvider state={contextRef}>{children}</SingleProvider>
+      <button
+        onClick={() => {
+          contextRef.value = contextRef.value + 1;
+        }}
+      >
+        Increment (Auto Renew)
+      </button>
+    </div>
+  );
+});
+
+const AutoRenewChild = mount<{ jj: number }>(renew => {
+  const ctx = useSingleContext(singleContext, renew, ['state']);
+
+  return () => (
+    <div style={{ border: '2px solid teal', padding: '10px', margin: '10px' }}>
+      <h3>Auto Renew Pattern Test</h3>
+      <p>Value: {ctx.state?.value ?? 'N/A'}</p>
+      <small style={{ color: 'gray' }}>
+        (Provider has renew in contextState)
+      </small>
+    </div>
+  );
+});
+
+const ComponentWithAutoRenew = mount(() => {
+  return () => (
+    <div>
+      <h2>Auto Renew Pattern (contextState with renew)</h2>
+      <p style={{ color: 'gray', fontSize: '0.9em' }}>
+        Provider passes renew to contextState for automatic updates
+      </p>
+      <AutoRenewProvider>
+        <AutoRenewChild jj={11} />
+      </AutoRenewProvider>
+    </div>
+  );
+});
+
 const testWrap = document.getElementById('root');
 
-render(
-  <div>
-    <Component />
-    <hr />
-    <ComponentWithUserProvider />
-    <hr />
-    <ComponentWithUserProviderAndButton />
-    <hr />
-    <ComponentWithDirectChildren />
-  </div>,
-  testWrap
-);
+// Render all examples in dev mode
+if (testWrap) {
+  render(
+    <div>
+      <Component />
+      <hr />
+      <ComponentWithUserProvider />
+      <hr />
+      <ComponentWithUserProviderAndButton />
+      <hr />
+      <ComponentWithDirectChildren />
+      <hr />
+      <ComponentWithAutoRenew />
+    </div>,
+    testWrap
+  );
+}
 
-/*
+// Test component - tests pattern of receiving children as props and passing to Provider
+const testContainer = document.createElement('div');
+
+// Test if children passed via props correctly find the Provider
+const TestDirectProvider = mount((_renew, _props, children: WDom[]) => {
+  const stateRef = singleContextState(100);
+  return () => <SingleProvider state={stateRef}>{children}</SingleProvider>;
+});
+
+const TestDirectChild1 = mount<{ jj: number }>(renew => {
+  const ctx = useSingleContext(singleContext, renew, ['state']);
+
+  return () => (
+    <div id="test-child1">
+      <span id="value1-display">{ctx.state?.value ?? 'N/A'}</span>
+      <button
+        id="increase-btn1"
+        onClick={() => {
+          if (ctx.state) {
+            ctx.state.value = ctx.state.value + 10;
+          }
+        }}
+      >
+        +10
+      </button>
+    </div>
+  );
+});
+
+const TestDirectChild2 = mount<{ jj: number }>(renew => {
+  const ctx = useSingleContext(singleContext, renew, ['state']);
+
+  return () => (
+    <div id="test-child2">
+      <span id="value2-display">{ctx.state?.value ?? 'N/A'}</span>
+      <button
+        id="decrease-btn2"
+        onClick={() => {
+          if (ctx.state) {
+            ctx.state.value = ctx.state.value - 5;
+          }
+        }}
+      >
+        -5
+      </button>
+    </div>
+  );
+});
+
+const TestDirectComponent = mount(() => {
+  return () => (
+    <div>
+      <TestDirectProvider>
+        <TestDirectChild1 jj={9} />
+        <TestDirectChild2 jj={10} />
+      </TestDirectProvider>
+    </div>
+  );
+});
+
+// Render to actual DOM for manual testing in dev mode
+if (testWrap) {
+  render(<TestDirectComponent />, testContainer);
+}
+
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  it('Is renew working properly?', () => {
-    expect(testWrap.outerHTML).toBe(
-      '<div><button type="text">increase</button><span>computed: 25</span></div>'
-    );
-    if (testChangeRef.value) {
-      testChangeRef.value();
-      testChangeRef.value();
-      testChangeRef.value();
-    }
-    nextTick().then(() => {
-      expect(testWrap.outerHTML).toBe(
-        '<div><button type="text">increase</button><span>computed: 100</span></div>'
+
+  it('Children passed as props should find the correct Provider', async () => {
+    // Create independent test environment
+    const container = document.createElement('div');
+    const TestProvider = mount((_renew, _props, children: WDom[]) => {
+      const stateRef = singleContextState(100);
+      return () => <SingleProvider state={stateRef}>{children}</SingleProvider>;
+    });
+
+    const Child1 = mount<{ jj: number }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <div id="child1">
+          <span className="value1">{ctx.state?.value ?? 'N/A'}</span>
+        </div>
       );
     });
+
+    const Child2 = mount<{ jj: number }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <div id="child2">
+          <span className="value2">{ctx.state?.value ?? 'N/A'}</span>
+        </div>
+      );
+    });
+
+    const TestComp = mount(() => {
+      return () => (
+        <TestProvider>
+          <Child1 jj={1} />
+          <Child2 jj={2} />
+        </TestProvider>
+      );
+    });
+
+    render(<TestComp />, container);
+    await nextTick();
+
+    const value1 = container.querySelector('.value1');
+    const value2 = container.querySelector('.value2');
+
+    expect(value1?.textContent).toBe('100');
+    expect(value2?.textContent).toBe('100');
+  });
+
+  it('Children passed as props should share the same Provider state', async () => {
+    // Create independent test environment
+    const container = document.createElement('div');
+    const TestProvider = mount((_renew, _props, children: WDom[]) => {
+      const stateRef = singleContextState(100);
+      return () => <SingleProvider state={stateRef}>{children}</SingleProvider>;
+    });
+
+    const Child1 = mount<{ jj: number }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <div>
+          <span className="value1">{ctx.state?.value ?? 'N/A'}</span>
+          <button
+            className="btn1"
+            onClick={() => {
+              if (ctx.state) {
+                ctx.state.value = ctx.state.value + 10;
+              }
+            }}
+          >
+            +10
+          </button>
+        </div>
+      );
+    });
+
+    const Child2 = mount<{ jj: number }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <div>
+          <span className="value2">{ctx.state?.value ?? 'N/A'}</span>
+        </div>
+      );
+    });
+
+    const TestComp = mount(() => {
+      return () => (
+        <TestProvider>
+          <Child1 jj={1} />
+          <Child2 jj={2} />
+        </TestProvider>
+      );
+    });
+
+    render(<TestComp />, container);
+
+    const btn1 = container.querySelector('.btn1') as HTMLButtonElement;
+    btn1?.click();
+    await nextTick();
+
+    const value1 = container.querySelector('.value1');
+    const value2 = container.querySelector('.value2');
+
+    expect(value1?.textContent).toBe('110');
+    expect(value2?.textContent).toBe('110');
+  });
+
+  it('Multiple children should update together when Provider state changes', async () => {
+    // Create independent test environment
+    const container = document.createElement('div');
+    const TestProvider = mount((_renew, _props, children: WDom[]) => {
+      const stateRef = singleContextState(100);
+      return () => <SingleProvider state={stateRef}>{children}</SingleProvider>;
+    });
+
+    const Child1 = mount<{ jj: number }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <div>
+          <span className="value1">{ctx.state?.value ?? 'N/A'}</span>
+        </div>
+      );
+    });
+
+    const Child2 = mount<{ jj: number }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <div>
+          <span className="value2">{ctx.state?.value ?? 'N/A'}</span>
+          <button
+            className="btn2"
+            onClick={() => {
+              if (ctx.state) {
+                ctx.state.value = ctx.state.value - 5;
+              }
+            }}
+          >
+            -5
+          </button>
+        </div>
+      );
+    });
+
+    const TestComp = mount(() => {
+      return () => (
+        <TestProvider>
+          <Child1 jj={1} />
+          <Child2 jj={2} />
+        </TestProvider>
+      );
+    });
+
+    render(<TestComp />, container);
+
+    const btn2 = container.querySelector('.btn2') as HTMLButtonElement;
+    btn2?.click();
+    await nextTick();
+
+    const value1 = container.querySelector('.value1');
+    const value2 = container.querySelector('.value2');
+
+    expect(value1?.textContent).toBe('95');
+    expect(value2?.textContent).toBe('95');
+  });
+
+  it('Dynamically added children should find the Provider', async () => {
+    // Create independent test environment
+    const container = document.createElement('div');
+    const TestProvider = mount((_renew, _props, children: WDom[]) => {
+      const stateRef = singleContextState(100);
+      return () => <SingleProvider state={stateRef}>{children}</SingleProvider>;
+    });
+
+    const ConditionalChild = mount<{ id: string }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return props => (
+        <div className={`child-${props.id}`}>
+          <span className="value">{ctx.state?.value ?? 'N/A'}</span>
+        </div>
+      );
+    });
+
+    const TestComp = mount(renew => {
+      let showChild2 = false;
+
+      return () => (
+        <div>
+          <TestProvider>
+            <ConditionalChild id="1" />
+            {showChild2 && <ConditionalChild id="2" />}
+          </TestProvider>
+          <button
+            className="toggle"
+            onClick={() => {
+              showChild2 = !showChild2;
+              renew();
+            }}
+          >
+            Toggle
+          </button>
+        </div>
+      );
+    });
+
+    render(<TestComp />, container);
+
+    expect(container.querySelector('.child-1')).not.toBeNull();
+    expect(container.querySelector('.child-2')).toBeNull();
+
+    const toggleBtn = container.querySelector('.toggle') as HTMLButtonElement;
+    toggleBtn?.click();
+    await nextTick();
+
+    const child2 = container.querySelector('.child-2');
+    const child2Value = container.querySelector('.child-2 .value');
+
+    expect(child2).not.toBeNull();
+    expect(child2Value?.textContent).toBe('100');
+  });
+
+  it('Dynamically added children should share the same Provider state', async () => {
+    // Create independent test environment
+    const container = document.createElement('div');
+    const TestProvider = mount((_renew, _props, children: WDom[]) => {
+      const stateRef = singleContextState(100);
+      return () => <SingleProvider state={stateRef}>{children}</SingleProvider>;
+    });
+
+    const ConditionalChild = mount<{ id: string }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return props => (
+        <div className={`child-${props.id}`}>
+          <span className="value">{ctx.state?.value ?? 'N/A'}</span>
+        </div>
+      );
+    });
+
+    const StateUpdater = mount(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <button
+          className="updater"
+          onClick={() => {
+            if (ctx.state) {
+              ctx.state.value = ctx.state.value + 50;
+            }
+          }}
+        >
+          Update
+        </button>
+      );
+    });
+
+    const TestComp = mount(renew => {
+      let showChild2 = false;
+      let showChild3 = false;
+
+      return () => (
+        <div>
+          <TestProvider>
+            <ConditionalChild id="1" />
+            {showChild2 && <ConditionalChild id="2" />}
+            {showChild3 && <ConditionalChild id="3" />}
+            <StateUpdater />
+          </TestProvider>
+          <button
+            className="toggle2"
+            onClick={() => {
+              showChild2 = !showChild2;
+              renew();
+            }}
+          >
+            Toggle2
+          </button>
+          <button
+            className="toggle3"
+            onClick={() => {
+              showChild3 = !showChild3;
+              renew();
+            }}
+          >
+            Toggle3
+          </button>
+        </div>
+      );
+    });
+
+    render(<TestComp />, container);
+
+    const toggle2 = container.querySelector('.toggle2') as HTMLButtonElement;
+    const toggle3 = container.querySelector('.toggle3') as HTMLButtonElement;
+    const updater = container.querySelector('.updater') as HTMLButtonElement;
+
+    // Add child2 and child3
+    toggle2?.click();
+    await nextTick();
+    toggle3?.click();
+    await nextTick();
+
+    let value1 = container.querySelector('.child-1 .value');
+    let value2 = container.querySelector('.child-2 .value');
+    let value3 = container.querySelector('.child-3 .value');
+
+    expect(value1?.textContent).toBe('100');
+    expect(value2?.textContent).toBe('100');
+    expect(value3?.textContent).toBe('100');
+
+    // Update state
+    updater?.click();
+    await nextTick();
+
+    value1 = container.querySelector('.child-1 .value');
+    value2 = container.querySelector('.child-2 .value');
+    value3 = container.querySelector('.child-3 .value');
+
+    expect(value1?.textContent).toBe('150');
+    expect(value2?.textContent).toBe('150');
+    expect(value3?.textContent).toBe('150');
+  });
+
+  it('contextState with renew should auto-update component', async () => {
+    // Create independent test environment
+    const container = document.createElement('div');
+
+    // Test simple component without Provider first
+    const SimpleComp = mount((renew) => {
+      const state = singleContextState(200, renew);
+      return () => (
+        <div>
+          <span className="simple-display">{state.value}</span>
+          <button
+            className="simple-btn"
+            onClick={() => {
+              state.value = state.value + 1;
+            }}
+          >
+            Increment
+          </button>
+        </div>
+      );
+    });
+
+    render(<SimpleComp />, container);
+    await nextTick();
+
+    const display = container.querySelector('.simple-display');
+    const btn = container.querySelector('.simple-btn') as HTMLButtonElement;
+
+    expect(display?.textContent).toBe('200');
+
+    btn?.click();
+    await nextTick();
+
+    expect(display?.textContent).toBe('201');
+  });
+
+  it('Removed and re-added children should still work correctly', async () => {
+    // Create independent test environment
+    const container = document.createElement('div');
+    const TestProvider = mount((_renew, _props, children: WDom[]) => {
+      const stateRef = singleContextState(100);
+      return () => <SingleProvider state={stateRef}>{children}</SingleProvider>;
+    });
+
+    const ConditionalChild = mount<{ id: string }>(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return props => (
+        <div className={`child-${props.id}`}>
+          <span className="value">{ctx.state?.value ?? 'N/A'}</span>
+        </div>
+      );
+    });
+
+    const StateUpdater = mount(renew => {
+      const ctx = useSingleContext(singleContext, renew, ['state']);
+      return () => (
+        <button
+          className="updater"
+          onClick={() => {
+            if (ctx.state) {
+              ctx.state.value = ctx.state.value + 50;
+            }
+          }}
+        >
+          Update
+        </button>
+      );
+    });
+
+    const TestComp = mount(renew => {
+      let showChild2 = true;
+
+      return () => (
+        <div>
+          <TestProvider>
+            <ConditionalChild id="1" />
+            {showChild2 && <ConditionalChild id="2" />}
+            <StateUpdater />
+          </TestProvider>
+          <button
+            className="toggle2"
+            onClick={() => {
+              showChild2 = !showChild2;
+              renew();
+            }}
+          >
+            Toggle2
+          </button>
+        </div>
+      );
+    });
+
+    render(<TestComp />, container);
+
+    const toggle2 = container.querySelector('.toggle2') as HTMLButtonElement;
+    const updater = container.querySelector('.updater') as HTMLButtonElement;
+
+    // Remove child2
+    toggle2?.click();
+    await nextTick();
+
+    expect(container.querySelector('.child-2')).toBeNull();
+
+    // Update state (100 + 50 = 150)
+    updater?.click();
+    await nextTick();
+
+    // Add child2 again
+    toggle2?.click();
+    await nextTick();
+
+    const child2 = container.querySelector('.child-2');
+    const child2Value = container.querySelector('.child-2 .value');
+
+    expect(child2).not.toBeNull();
+    expect(child2Value?.textContent).toBe('150');
   });
 }
-  */

@@ -8,10 +8,13 @@ import {
 } from 'lithent';
 import type { WDom, Renew } from 'lithent';
 
+const INJECT = Symbol('INJECT');
+const ADDRENEW = Symbol('ADDRENEW');
+
 type ContextState<T> = {
   value: T;
-  injectValue: (value: T) => void;
-  addRenew: (renewFn: (newValue: T) => boolean) => boolean;
+  [INJECT]: (value: T) => void;
+  [ADDRENEW]: (renewFn: (newValue: T) => boolean) => boolean;
 };
 
 type ProviderProps<T> =
@@ -23,7 +26,7 @@ type ProviderProps<T> =
 
 type Context<T> = {
   Provider: ReturnType<typeof mount<ProviderProps<T>>>;
-  contextState: typeof createContextState;
+  contextState: <V>(value?: V, renew?: Renew) => ContextState<V>;
   useContext: (
     context: Context<T>,
     renew: Renew,
@@ -40,7 +43,7 @@ type ProviderPropsInternal<T> = ProviderProps<T> & {
 export function createContext<T>(): Context<T> {
   const Provider = mount<ProviderPropsInternal<T>>(
     (_renew, props, children: WDom[]) => {
-      // Provider 식별자 저장
+      // Store Provider identifier
       props[providerSymbol] = true;
 
       return () => <Fragment>{children}</Fragment>;
@@ -58,7 +61,7 @@ export function createContext<T>(): Context<T> {
       throw new Error('Context mismatch: Provider does not match');
     }
 
-    // useContext 호출 시점의 compKey 저장
+    // Store compKey at the time of useContext call
     const myCompKey = getComponentKey();
 
     const cStateMap: Record<string, ContextState<unknown>> = {};
@@ -67,12 +70,12 @@ export function createContext<T>(): Context<T> {
       cStateMap[key] = createContextState();
     };
 
-    // subscribeKeys가 제공되면 해당 키들에 대해 미리 state 생성
+    // If subscribeKeys are provided, create states for those keys in advance
     if (subscribeKeys) {
       subscribeKeys.forEach(key => createStateForKey(key));
     }
 
-    // 트리에서 Provider 찾기 (부모 방향으로 탐색)
+    // Find Provider in tree (search towards parent)
     const findProviderInTree = (
       wdom?: WDom
     ): ProviderPropsInternal<T> | null => {
@@ -83,7 +86,7 @@ export function createContext<T>(): Context<T> {
         return vdRef?.value ? findProviderInTree(vdRef.value) : null;
       }
 
-      // Provider인지 확인
+      // Check if it's a Provider
       if (
         wdom.compProps &&
         (wdom.compProps as ProviderPropsInternal<T>)[providerSymbol]
@@ -91,12 +94,12 @@ export function createContext<T>(): Context<T> {
         return wdom.compProps as ProviderPropsInternal<T>;
       }
 
-      // 부모로 이동
+      // Move to parent
       const parent = wdom.getParent?.();
       return parent ? findProviderInTree(parent) : null;
     };
 
-    // WDom 트리 완성 후 Provider 찾아서 연결 (DOM 렌더링 전)
+    // Find and connect to Provider after WDom tree is complete (before DOM rendering)
     mountReadyCallback(() => {
       const providerProps = findProviderInTree();
 
@@ -112,11 +115,11 @@ export function createContext<T>(): Context<T> {
                 providerProps[
                   k as keyof ProviderPropsInternal<T>
                 ] as ContextState<unknown>
-              ).addRenew === 'function'
+              )[ADDRENEW] === 'function'
           );
 
         keysToConnect.forEach((key: string) => {
-          // state가 아직 없으면 생성
+          // Create state if it doesn't exist yet
           if (!cStateMap[key]) {
             createStateForKey(key);
           }
@@ -125,30 +128,30 @@ export function createContext<T>(): Context<T> {
             key as keyof ProviderPropsInternal<T>
           ] as ContextState<unknown> | undefined;
 
-          // Provider에 해당 키가 없으면 건너뛰기
+          // Skip if Provider doesn't have this key
           if (!providerState) return;
 
           const cState = cStateMap[key];
 
-          // 초기값 설정
-          cState.injectValue(providerState.value);
+          // Set initial value
+          cState[INJECT](providerState.value);
 
-          // 1. Provider → Consumer 동기화
+          // 1. Synchronize Provider → Consumer
           const wrapRenew = (newValue: unknown) => {
-            cState.injectValue(newValue);
+            cState[INJECT](newValue);
             return renew();
           };
 
-          providerState.addRenew(wrapRenew);
+          providerState[ADDRENEW](wrapRenew);
 
-          // 2. Consumer → Provider 동기화
-          cState.addRenew((newValue: unknown) => {
+          // 2. Synchronize Consumer → Provider
+          cState[ADDRENEW]((newValue: unknown) => {
             providerState.value = newValue;
             return true;
           });
         });
 
-        // 초기값이 채워졌으므로 renew() 호출하여 화면에 반영
+        // Initial values are filled, so call renew() to reflect on screen
         renew();
       }
     });
@@ -165,9 +168,16 @@ export function createContext<T>(): Context<T> {
   };
 }
 
-const createContextState = <T,>(value?: T): ContextState<T> => {
+const createContextState = <T,>(value?: T, renew?: Renew): ContextState<T> => {
   let result = value as T;
   let renewlist: Array<(value: T) => boolean> = [];
+
+  // If renew is provided, add it to renewlist by default
+  if (renew) {
+    renewlist.push(() => {
+      return renew();
+    });
+  }
 
   return {
     get value() {
@@ -179,10 +189,10 @@ const createContextState = <T,>(value?: T): ContextState<T> => {
         renewlist = renewlist.filter(wrapRenew => wrapRenew(result));
       }
     },
-    injectValue(newValue: T) {
+    [INJECT](newValue: T) {
       result = newValue;
     },
-    addRenew(wrapRenew: (value: T) => boolean) {
+    [ADDRENEW](wrapRenew: (value: T) => boolean) {
       renewlist.push(wrapRenew);
       return true;
     },
