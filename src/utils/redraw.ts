@@ -18,7 +18,8 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
 };
 
 export const componentUpdate = (compKey: Props) => () => {
-  const up = componentMap.get(compKey)?.up;
+  const comp = componentMap.get(compKey);
+  const up = comp && comp.up;
   if (up) {
     up();
     return true;

@@ -20,9 +20,10 @@ export const runUpdateCallback = () => {
   const compKey = getComponentKey();
   if (!compKey) return;
 
-  const updateReqs = componentMap.get(compKey)?.upR;
+  const comp = componentMap.get(compKey);
+  const updateReqs = comp && comp.upR;
 
-  if (updateReqs?.length) {
+  if (updateReqs && updateReqs.length) {
     updateReqs.forEach(callback => callback());
   }
 };

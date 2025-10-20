@@ -12,7 +12,8 @@ import { unmount } from '@/hook/internal/unmount';
 export const mountReadyCallback = (effectAction: () => void | (() => void)) => {
   const compKey = getComponentKey();
   if (compKey) {
-    componentMap.get(compKey)?.wdCB.push(effectAction);
+    const comp = componentMap.get(compKey);
+    comp && comp.wdCB.push(effectAction);
   }
 };
 
@@ -25,7 +26,7 @@ export const runWDomCallbacksFromWDom = (newWDom: WDom) => {
 
   if (compKey) {
     const component = componentMap.get(compKey);
-    const wdCBQueue = component?.wdCB;
+    const wdCBQueue = component && component.wdCB;
 
     compKeyRef.value = compKey;
 

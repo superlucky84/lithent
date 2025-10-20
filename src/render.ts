@@ -29,7 +29,7 @@ export const render = (
   isHydration?: boolean
 ) => {
   wDom.isRoot = true;
-  wrapElement ??= document.body;
+  wrapElement = wrapElement || document.body;
   wDom.wrapElement = wrapElement;
 
   const Dom = wDomToDom(wDom, isHydration);
@@ -49,7 +49,8 @@ export const render = (
   execMountedQueue();
 
   return () => {
-    const comp = componentMap.get(wDom.compProps || {})?.vd.value || wDom;
+    const compData = componentMap.get(wDom.compProps || {});
+    const comp = (compData && compData.vd.value) || wDom;
     if (comp !== wDom) runUnmountQueueFromWDom(comp);
     recursiveRemoveEvent(comp);
     rootDelete(comp);
@@ -113,8 +114,12 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
 };
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
-  (newWDom?.oldChildren || newWDom?.children || []).forEach(item => {
-    const nt = item.el?.nodeType;
+  (
+    (newWDom && newWDom.oldChildren) ||
+    (newWDom && newWDom.children) ||
+    []
+  ).forEach(item => {
+    const nt = item.el && item.el.nodeType;
     if (nt) {
       if ([1, 3].includes(nt)) {
         const el = item.el as HTMLElement;
@@ -172,7 +177,7 @@ const typeAdd = (
 
 const getElementFromFragment = (newWDom: WDom) => {
   if (checkVirtualType(newWDom.type)) {
-    return (newWDom?.children || []).reduce((acc, item) => {
+    return ((newWDom && newWDom.children) || []).reduce((acc, item) => {
       const element = getElementFromFragment(item);
 
       if (element) {
@@ -277,7 +282,9 @@ const typeUpdate = (newWDom: WDom) => {
     delete newWDom.oldProps;
 
     if (newWDom.tag === 'input') {
-      (newWDom.el as HTMLInputElement).value = String(props?.value || '');
+      (newWDom.el as HTMLInputElement).value = String(
+        (props && props.value) || ''
+      );
     }
   }
 
@@ -365,7 +372,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
   runWDomCallbacksFromWDom(wDom);
 
   if (tag === 'svg') {
-    xmlnsRef.value = String(props?.xmlns);
+    xmlnsRef.value = String(props && props.xmlns);
   }
 
   if (!isHydration) {
@@ -373,7 +380,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
       element = DF();
     } else if (type === 'e' && tag) {
       // element
-      if (tag === 'portal' && props?.portal) {
+      if (tag === 'portal' && props && props.portal) {
         element = props.portal as HTMLElement;
       } else {
         element = xmlnsRef.value
@@ -450,7 +457,7 @@ const updateStyle = (
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const orig = { ...oldStyle };
-  const es = (element as HTMLElement)?.style;
+  const es = (element as HTMLElement) && (element as HTMLElement).style;
 
   if (es) {
     entries(style).forEach(([k, v]) => {

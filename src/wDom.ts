@@ -94,7 +94,8 @@ export const replaceWDom = (
   newWDomTree.getParent = getParent;
 
   if (!isRoot && getParent) {
-    const brothers = getParent()?.children || [];
+    const parent = getParent();
+    const brothers = (parent && parent.children) || [];
     const index = brothers.indexOf(originalWDom);
 
     brothers.splice(index, 1, newWDomTree);

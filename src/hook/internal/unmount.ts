@@ -4,7 +4,8 @@ import { componentMap, getComponentKey } from '@/utils/universalRef';
 export const unmount = (effectAction: () => void) => {
   const compKey = getComponentKey();
   if (compKey) {
-    componentMap.get(compKey)?.umts.push(effectAction);
+    const comp = componentMap.get(compKey);
+    comp && comp.umts.push(effectAction);
   }
 };
 

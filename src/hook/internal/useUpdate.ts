@@ -34,8 +34,8 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
 
   if (compKey) {
     const component = componentMap.get(compKey);
-    const queue = component?.upCB;
-    const sequence = component?.upS;
+    const queue = component && component.upCB;
+    const sequence = component && component.upS;
 
     compKeyRef.value = compKey;
 

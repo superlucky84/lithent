@@ -77,10 +77,10 @@ const inheritPropForRender = (
       runUnmountQueueFromWDom(originalWDom);
       recursiveRemoveEvent(originalWDom);
     }
-    remakeWDom.oldChildren = originalWDom?.children;
+    remakeWDom.oldChildren = originalWDom && originalWDom.children;
   }
 
-  remakeWDom.oldProps = originalWDom?.props;
+  remakeWDom.oldProps = originalWDom && originalWDom.props;
 };
 
 /**
@@ -95,17 +95,18 @@ const addReRenderTypeProperty = (
   if (checkEmptyElement(newWDom)) return 'D';
 
   const isSameText =
-    newWDom.type === 't' && isSameType && newWDom.text === originalWDom?.text;
+    newWDom.type === 't' &&
+    isSameType &&
+    newWDom.text === (originalWDom && originalWDom.text);
   if (isSameText || newWDom === originalWDom) return 'N';
 
-  const existOriginalWDom = originalWDom?.type;
+  const existOriginalWDom = originalWDom && originalWDom.type;
   if (!existOriginalWDom) return 'A';
 
   const key = getKey(newWDom);
+  const parent = getParent(originalWDom);
   const isKeyChecked =
-    !newWDom.isRoot &&
-    getParent(originalWDom)?.type === 'l' &&
-    checkExisty(key);
+    !newWDom.isRoot && parent && parent.type === 'l' && checkExisty(key);
 
   let result: RenderType = isSameType
     ? isKeyChecked
@@ -131,8 +132,8 @@ const addReRenderTypeProperty = (
  * Check if a reverse order swap is needed when updating types that require reordering.
  */
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
-  const origChildren = [...(originalWDom?.children || [])];
-  const newChildren = [...(newWDom?.children || [])].filter(item =>
+  const origChildren = [...((originalWDom && originalWDom.children) || [])];
+  const newChildren = [...((newWDom && newWDom.children) || [])].filter(item =>
     origChildren.find(newItem => getKey(item) === getKey(newItem))
   );
   const filteredChildren = origChildren.filter(item =>
