@@ -20,6 +20,8 @@ export type {
   Component,
   ComponentSubKey,
   ComponentMap,
+  ComponentInfo,
+  CompKey,
   Props,
   Renew,
   MiddleStateWDomChildren,

@@ -80,6 +80,7 @@ export function createContext<T>(): Context<T> {
       wdom?: WDom
     ): ProviderPropsInternal<T> | null => {
       if (!wdom) {
+        if (!myCompKey) return null;
         const vdRef = getComponentSubInfo(myCompKey, 'vd') as {
           value: WDom;
         } | null;

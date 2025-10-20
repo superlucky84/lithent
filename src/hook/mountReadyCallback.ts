@@ -9,8 +9,12 @@ import { unmount } from '@/hook/internal/unmount';
 /**
  * WDom이 생성된 직후(DOM 마운트 전)에 실행될 콜백 등록
  */
-export const mountReadyCallback = (effectAction: () => void | (() => void)) =>
-  (componentMap.get(getComponentKey())?.wdCB || []).push(effectAction);
+export const mountReadyCallback = (effectAction: () => void | (() => void)) => {
+  const compKey = getComponentKey();
+  if (compKey) {
+    componentMap.get(compKey)?.wdCB.push(effectAction);
+  }
+};
 
 /**
  * 특정 WDom의 wdomCallback 즉시 실행

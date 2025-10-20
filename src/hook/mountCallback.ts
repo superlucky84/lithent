@@ -28,8 +28,12 @@ export const execMountedQueue = () => {
 /**
  * mountCallback 등록
  */
-export const mountCallback = (effectAction: () => void) =>
-  (componentMap.get(getComponentKey())?.mts || []).push(effectAction);
+export const mountCallback = (effectAction: () => void) => {
+  const compKey = getComponentKey();
+  if (compKey) {
+    componentMap.get(compKey)?.mts.push(effectAction);
+  }
+};
 
 /**
  * mountCallback만 실행

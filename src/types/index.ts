@@ -4,6 +4,9 @@ export type UseDataStoreValue = { [key: string | symbol]: unknown };
 
 export type Props = { [key: string]: unknown };
 
+// Component Key type - unique object reference for each component instance
+export type CompKey = Props;
+
 export type TagFunction = (
   prop: Props,
   children?: MiddleStateWDomChildren
@@ -21,7 +24,7 @@ export type TagFunctionResolver = {
   ctor: Function;
   props: Props;
   children: WDom[];
-  resolve: (compKey?: Props) => WDom;
+  resolve: (compKey?: CompKey) => WDom;
 };
 
 export type FragmentFunction = (props: Props, children: WDom[]) => WDom;
@@ -53,7 +56,7 @@ export interface WDom {
   oldChildren?: WDom[];
   getParent?: () => WDom | undefined;
   text?: string | number;
-  compKey?: Props;
+  compKey?: CompKey;
   reRender?: () => WDom;
   compProps?: Props;
   compChild?: WDom[];
@@ -86,7 +89,7 @@ export type ComponentSubKey =
   | 'umts'
   | 'wdCB';
 
-export type ComponentMap = WeakMap<Props, ComponentInfo>;
+export type ComponentMap = WeakMap<CompKey, ComponentInfo>;
 
 export type ComponentInfo = {
   vd: { value: null | WDom };
@@ -108,7 +111,7 @@ export type Param<Updater, Member, Props> = {
 };
 
 export type RedrawQueueList = {
-  compKey: Props;
+  compKey: CompKey;
   exec: () => void;
 }[];
 
