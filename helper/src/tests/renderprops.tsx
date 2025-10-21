@@ -6,10 +6,14 @@ const DataProvider = mount((renew, _props, children: WDom[]) => {
   let count = 0;
 
   return () => {
-    const child = unwrapChildren(children);
+    const candidate = unwrapChildren(children) as unknown;
 
     // 함수인지 확인하고 호출
-    if (typeof child === 'function') {
+    if (typeof candidate === 'function') {
+      const renderChild = candidate as (data: {
+        count: number;
+        increment: () => void;
+      }) => WDom;
       const data = {
         count,
         increment: () => {
@@ -17,10 +21,10 @@ const DataProvider = mount((renew, _props, children: WDom[]) => {
           renew();
         },
       };
-      return (child as any)(data);
+      return renderChild(data);
     }
 
-    return <div className="data-provider">{children}</div>;
+    return <div className="data-provider">{candidate ?? children}</div>;
   };
 });
 

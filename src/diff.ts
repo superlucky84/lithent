@@ -183,19 +183,14 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
     updateProps(props, infoProps);
   }
 
-  // Only update children if they're different references
-  // If it's the same Fragment reference, the diff process will handle updating its children
+  /**
+   * Keep shared child array references intact (<= same slot array instance)
+   * When the reference changes, sync the stored compChild contents so reRender sees fresh nodes
+   * Only update children if they're different references
+   * If it's the same Fragment reference, the diff process will handle updating its children
+   */
   if (children && infoChidren && children !== infoChidren) {
-    // Check if both are wrapped in the same Fragment
-    const isSameFragment =
-      children.length === 1 &&
-      infoChidren.length === 1 &&
-      children[0].type === 'f' &&
-      children[0] === infoChidren[0];
-
-    if (!isSameFragment) {
-      updateChildren(children, infoChidren);
-    }
+    updateChildren(children, infoChidren);
   }
 
   const newVDom = vDom.reRender && vDom.reRender();

@@ -54,7 +54,6 @@ const TestComponent = mount(() => {
 
 const testWrap = document.getElementById('root');
 
-// 개발 모드에서 렌더링
 if (testWrap) {
   render(<TestComponent />, testWrap);
 }
@@ -85,7 +84,6 @@ if (import.meta.vitest) {
 
       console.log('[TEST] Step 1: Initial state - children visible');
 
-      // Step 1: Child A의 버튼 클릭 (v = 0 → v = 1)
       childABtn?.click();
       await nextTick();
 
@@ -168,7 +166,6 @@ if (import.meta.vitest) {
       providerBtn?.click();
       await nextTick();
 
-      // Children이 여전히 존재하고 상태도 유지되어야 함
       const childAFinal = container.querySelector('.child-A');
       const childBFinal = container.querySelector('.child-B');
       const childABtnFinal = container.querySelector(
@@ -185,7 +182,6 @@ if (import.meta.vitest) {
     });
 
     it('Direct slot children pattern should work correctly', async () => {
-      // 비교를 위해 slot 패턴도 테스트
       const SlotProvider = mount(renew => {
         let k = 0;
         return () => (

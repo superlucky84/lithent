@@ -78,22 +78,25 @@ const syncAncestorComponentChildren = (
   prevChild: WDom,
   nextChild: WDom
 ) => {
-  const visited = new Set<WDom>();
-  let current = parent;
+  const walk = (node: WDom | undefined, visited: Set<WDom>): void => {
+    if (!node || visited.has(node)) {
+      return;
+    }
 
-  while (current && !visited.has(current)) {
-    visited.add(current);
+    visited.add(node);
 
-    if (current.compChild) {
-      const childIndex = current.compChild.indexOf(prevChild);
+    if (node.compChild) {
+      const childIndex = node.compChild.indexOf(prevChild);
 
       if (childIndex !== -1) {
-        current.compChild.splice(childIndex, 1, nextChild);
+        node.compChild.splice(childIndex, 1, nextChild);
       }
     }
 
-    current = current.getParent ? current.getParent() : undefined;
-  }
+    walk(node.getParent ? node.getParent() : undefined, visited);
+  };
+
+  walk(parent, new Set<WDom>());
 };
 
 /**
@@ -206,27 +209,6 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 // ============================================================================
 // Component Lifecycle - Component Creation & Re-rendering
 // ============================================================================
-
-/**
- * Wrap component children in Fragment if they need parent reference integrity
- */
-const wrapChildrenIfNeeded = (children: WDom[]): WDom[] => {
-  const hasComponentChildren =
-    children.length > 0 &&
-    children.some(child => child.reRender || child.ctor || child.tagName);
-
-  const needsWrapping =
-    hasComponentChildren &&
-    !(children.length === 1 && children[0].type === 'f');
-
-  if (needsWrapping) {
-    const fragmentNode = Fragment({}, ...children);
-    children.forEach(child => (child.getParent = () => fragmentNode));
-    return [fragmentNode];
-  }
-
-  return children;
-};
 
 /**
  * Create component resolver function
