@@ -2,6 +2,7 @@ import { h, render, mount, nextTick, type WDom } from '@/index';
 
 // Provider 컴포넌트 - children을 props로 받아서 렌더링
 const Provider = mount((renew, _props, children: WDom[]) => {
+  console.log('CHILDREN', children);
   let k = 0;
   return () => (
     <div className="provider">
@@ -44,13 +45,10 @@ const Child = mount<{ id: string }>(renew => {
 // 테스트 컴포넌트 - Provider에 children을 props로 전달
 const TestComponent = mount(() => {
   return () => (
-    <div className="test-component">
-      <h2>Children Test</h2>
-      <Provider>
-        <Child id="A" />
-        <Child id="B" />
-      </Provider>
-    </div>
+    <Provider>
+      <Child id="A" />
+      <Child id="B" />
+    </Provider>
   );
 });
 

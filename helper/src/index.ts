@@ -5,6 +5,7 @@ export { store } from '@/hook/store';
 export { cacheUpdate } from '@/hook/cacheUpdate';
 export { nextTickRender } from '@/hook/nextTickRender';
 export { createContext } from '@/hook/context';
+export { unwrapChildren } from '@/utils/children';
 
 export type { State } from '@/hook/state';
 export type { Computed } from '@/hook/computed';

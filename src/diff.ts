@@ -161,7 +161,7 @@ const updateProps = (props: Props, infoProps: Props) => {
 };
 
 const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
-  if (children && infoChidren !== children) {
+  if (children) {
     children.splice(0, children.length);
 
     if (infoChidren) {
@@ -183,8 +183,19 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
     updateProps(props, infoProps);
   }
 
-  if (children) {
-    updateChildren(children, infoChidren);
+  // Only update children if they're different references
+  // If it's the same Fragment reference, the diff process will handle updating its children
+  if (children && infoChidren && children !== infoChidren) {
+    // Check if both are wrapped in the same Fragment
+    const isSameFragment =
+      children.length === 1 &&
+      infoChidren.length === 1 &&
+      children[0].type === 'f' &&
+      children[0] === infoChidren[0];
+
+    if (!isSameFragment) {
+      updateChildren(children, infoChidren);
+    }
   }
 
   const newVDom = vDom.reRender && vDom.reRender();
@@ -199,12 +210,13 @@ const generalize = (
   newWDom: WDom | TagFunctionResolver,
   isSameType: boolean,
   originalWDom?: WDom
-): WDom =>
-  checkCustemComponentFunction(newWDom)
+): WDom => {
+  return checkCustemComponentFunction(newWDom)
     ? isSameType && originalWDom
       ? runUpdate(originalWDom, newWDom)
       : newWDom.resolve()
     : newWDom;
+};
 
 /**
  * 자식 가상돔들도 전부 재귀처리하며 똑같은 처리를 해준다.

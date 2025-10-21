@@ -233,7 +233,9 @@ const createComponentResolver = (
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
   const ctor = tag;
+
   const wrappedChildren = wrapChildrenIfNeeded(children);
+
   const resolve = createComponentResolver(tag, props, wrappedChildren);
 
   return { tagName, ctor, props, children: wrappedChildren, resolve };
