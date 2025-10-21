@@ -73,6 +73,29 @@ export const mount =
   (_props: T, _children?: MiddleStateWDomChildren) =>
     component;
 
+const syncAncestorComponentChildren = (
+  parent: WDom | undefined,
+  prevChild: WDom,
+  nextChild: WDom
+) => {
+  const visited = new Set<WDom>();
+  let current = parent;
+
+  while (current && !visited.has(current)) {
+    visited.add(current);
+
+    if (current.compChild) {
+      const childIndex = current.compChild.indexOf(prevChild);
+
+      if (childIndex !== -1) {
+        current.compChild.splice(childIndex, 1, nextChild);
+      }
+    }
+
+    current = current.getParent ? current.getParent() : undefined;
+  }
+};
+
 /**
  * It re-renders starting from a specific component.
  */
@@ -98,7 +121,11 @@ export const replaceWDom = (
     const brothers = (parent && parent.children) || [];
     const index = brothers.indexOf(originalWDom);
 
-    brothers.splice(index, 1, newWDomTree);
+    if (index !== -1) {
+      brothers.splice(index, 1, newWDomTree);
+    }
+
+    syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
   } else {
     newWDomTree.isRoot = true;
     newWDomTree.wrapElement = wrapElement;
@@ -234,7 +261,7 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
   const ctor = tag;
 
-  const wrappedChildren = wrapChildrenIfNeeded(children);
+  const wrappedChildren = children;
 
   const resolve = createComponentResolver(tag, props, wrappedChildren);
 
