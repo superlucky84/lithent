@@ -45,7 +45,6 @@ export const render = (
     }
   }
 
-  // DOM 렌더링 후 mountCallback 실행
   execMountedQueue();
 
   return () => {
