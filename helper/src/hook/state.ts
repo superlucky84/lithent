@@ -1,10 +1,9 @@
-export const state = <T>(
-  value: T,
-  renew: () => boolean
-): {
+export type State<T> = {
   value: T;
   v: T;
-} => {
+};
+
+export const state = <T>(value: T, renew: () => boolean): State<T> => {
   let result = value;
 
   return {

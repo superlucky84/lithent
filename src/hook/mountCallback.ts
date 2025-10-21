@@ -8,25 +8,44 @@ import { unmount } from '@/hook/internal/unmount';
 
 let mountedQueue: WDom[] = [];
 
-export const execMountedQueue = () => {
-  mountedQueue.forEach(item => runMountedQueueFromWDom(item));
-  mountedQueue = [];
-};
+/**
+ * WDom을 mountedQueue에 추가
+ */
 export const addMountedQueue = (wDom: WDom) => {
   if (wDom.compKey) {
     mountedQueue.push(wDom);
   }
 };
-export const mountCallback = (effectAction: () => void) =>
-  (componentMap.get(getComponentKey())?.mts || []).push(effectAction);
 
-export const runMountedQueueFromWDom = (newWDom: WDom) => {
+/**
+ * DOM 렌더링 후 mountCallback 실행
+ */
+export const execMountedQueue = () => {
+  mountedQueue.forEach(item => runMountedQueueFromWDom(item));
+  mountedQueue = [];
+};
+
+/**
+ * mountCallback 등록
+ */
+export const mountCallback = (effectAction: () => void) => {
+  const compKey = getComponentKey();
+  if (compKey) {
+    const comp = componentMap.get(compKey);
+    comp && comp.mts.push(effectAction);
+  }
+};
+
+/**
+ * mountCallback만 실행
+ */
+const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { compKey } = newWDom;
 
   if (compKey) {
     const component = componentMap.get(compKey);
-    const queue = component?.mts;
-    const sequence = component?.upS;
+    const mountQueue = component && component.mts;
+    const sequence = component && component.upS;
 
     compKeyRef.value = compKey;
 
@@ -34,10 +53,10 @@ export const runMountedQueueFromWDom = (newWDom: WDom) => {
       sequence.value = 0;
     }
 
-    if (queue) {
+    if (mountQueue) {
       component.mts = [];
 
-      queue.forEach((effect: Function) => {
+      mountQueue.forEach((effect: Function) => {
         const callback = effect();
         if (callback) {
           unmount(callback);

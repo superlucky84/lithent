@@ -1,9 +1,14 @@
 export { h, Fragment, portal, mount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
 export { componentUpdate } from '@/utils/redraw';
-export { componentMap } from '@/utils/universalRef';
+export {
+  getComponentKey,
+  componentMap,
+  getComponentSubInfo,
+} from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
+export { mountReadyCallback } from '@/hook/mountReadyCallback';
 export { updateCallback } from '@/hook/updateCallback';
 export { ref, nextTick } from '@/hook/ref';
 
@@ -15,6 +20,8 @@ export type {
   Component,
   ComponentSubKey,
   ComponentMap,
+  ComponentInfo,
+  CompKey,
   Props,
   Renew,
   MiddleStateWDomChildren,

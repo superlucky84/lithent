@@ -1,8 +1,12 @@
-import { WDom, Props } from '@/types';
+import { WDom, CompKey } from '@/types';
 import { componentMap, getComponentKey } from '@/utils/universalRef';
 
 export const unmount = (effectAction: () => void) => {
-  componentMap.get(getComponentKey())!.umts.push(effectAction);
+  const compKey = getComponentKey();
+  if (compKey) {
+    const comp = componentMap.get(compKey);
+    comp && comp.umts.push(effectAction);
+  }
 };
 
 export const runUnmountQueueFromWDom = (newWDom: WDom) => {
@@ -25,11 +29,11 @@ const recursiveRunUnmount = (wDom: WDom) => {
   });
 };
 
-const removeItem = (compKey: Props) => {
+const removeItem = (compKey: CompKey) => {
   const subInfo = componentMap.get(compKey);
   if (subInfo) {
-    subInfo!.umts.forEach(effect => effect());
-    subInfo!.umts = [];
+    subInfo.umts.forEach(effect => effect());
+    subInfo.umts = [];
     componentMap.delete(compKey);
   }
 };

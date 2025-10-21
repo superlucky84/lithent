@@ -34,16 +34,19 @@ const remakeNewWDom = (
   originalWDom?: WDom
 ) => {
   const remakeWDom = generalize(newWDom, isSameType, originalWDom);
-  const param: [newWDom: WDom, isSameType: boolean, originalWDom?: WDom] = [
+  const needRerender = addReRenderTypeProperty(
     remakeWDom,
     isSameType,
-    originalWDom,
-  ];
-  const needRerender = addReRenderTypeProperty(...param);
+    originalWDom
+  );
   const isNoting = needRerender === 'N';
 
   if (!isNoting) {
-    remakeWDom.children = remakeChildrenForDiff(...param);
+    remakeWDom.children = remakeChildrenForDiff(
+      remakeWDom,
+      isSameType,
+      originalWDom
+    );
   }
 
   remakeWDom.needRerender = needRerender;
@@ -74,48 +77,47 @@ const inheritPropForRender = (
       runUnmountQueueFromWDom(originalWDom);
       recursiveRemoveEvent(originalWDom);
     }
-    remakeWDom.oldChildren = originalWDom?.children;
+    remakeWDom.oldChildren = originalWDom && originalWDom.children;
   }
 
-  remakeWDom.oldProps = originalWDom?.props;
+  remakeWDom.oldProps = originalWDom && originalWDom.props;
 };
 
 /**
- * Indicate the state information for the new virtual DOM to be reflected in the real DOM.
+ * Determine the render operation type (Add/Delete/Replace/Update/etc)
+ * based on comparison between new and original WDom
  */
 const addReRenderTypeProperty = (
   newWDom: WDom,
   isSameType: boolean,
   originalWDom?: WDom
 ): RenderType | undefined => {
-  const existOriginalWDom = originalWDom && originalWDom.type;
-  const isEmptyElement = checkEmptyElement(newWDom);
-  const isRoot = newWDom.isRoot;
-  const originalParentWDom = originalWDom && getParent(originalWDom);
-  const origParentType = !isRoot && originalParentWDom?.type;
-  const key = getKey(newWDom);
-  const isKeyCheckedWDom = origParentType === 'loop' && checkExisty(key);
-  const isSameText =
-    newWDom.type === 'text' &&
-    isSameType &&
-    newWDom.text === originalWDom?.text;
-  const isSameWDom = newWDom === originalWDom;
+  if (checkEmptyElement(newWDom)) return 'D';
 
-  let result: RenderType | undefined;
-  if (isEmptyElement) {
-    result = 'D';
-  } else if (isSameText || isSameWDom) {
-    result = 'N';
-  } else if (!existOriginalWDom) {
-    result = 'A';
-  } else if (isSameType) {
-    result = isKeyCheckedWDom ? 'SU' : 'U';
-  } else {
-    result = isKeyCheckedWDom ? 'SR' : 'R';
-  }
+  const isSameText =
+    newWDom.type === 't' &&
+    isSameType &&
+    newWDom.text === (originalWDom && originalWDom.text);
+  if (isSameText || newWDom === originalWDom) return 'N';
+
+  const existOriginalWDom = originalWDom && originalWDom.type;
+  if (!existOriginalWDom) return 'A';
+
+  const key = getKey(newWDom);
+  const parent = getParent(originalWDom);
+  const isKeyChecked =
+    !newWDom.isRoot && parent && parent.type === 'l' && checkExisty(key);
+
+  let result: RenderType = isSameType
+    ? isKeyChecked
+      ? 'SU'
+      : 'U'
+    : isKeyChecked
+      ? 'SR'
+      : 'R';
 
   if (
-    newWDom.type === 'loop' &&
+    newWDom.type === 'l' &&
     result === 'U' &&
     originalWDom &&
     chkDiffLoopOrder(newWDom, originalWDom)
@@ -130,8 +132,8 @@ const addReRenderTypeProperty = (
  * Check if a reverse order swap is needed when updating types that require reordering.
  */
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
-  const origChildren = [...(originalWDom?.children || [])];
-  const newChildren = [...(newWDom?.children || [])].filter(item =>
+  const origChildren = [...((originalWDom && originalWDom.children) || [])];
+  const newChildren = [...((newWDom && newWDom.children) || [])].filter(item =>
     origChildren.find(newItem => getKey(item) === getKey(newItem))
   );
   const filteredChildren = origChildren.filter(item =>
@@ -154,13 +156,12 @@ const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
 const updateProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
     keys(props).forEach(key => delete props[key]);
-
     entries(infoProps || {}).forEach(([key, value]) => (props[key] = value));
   }
 };
 
 const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
-  if (children && infoChidren !== children) {
+  if (children) {
     children.splice(0, children.length);
 
     if (infoChidren) {
@@ -182,7 +183,13 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
     updateProps(props, infoProps);
   }
 
-  if (children) {
+  /**
+   * Keep shared child array references intact (<= same slot array instance)
+   * When the reference changes, sync the stored compChild contents so reRender sees fresh nodes
+   * Only update children if they're different references
+   * If it's the same Fragment reference, the diff process will handle updating its children
+   */
+  if (children && infoChidren && children !== infoChidren) {
     updateChildren(children, infoChidren);
   }
 
@@ -199,13 +206,11 @@ const generalize = (
   isSameType: boolean,
   originalWDom?: WDom
 ): WDom => {
-  if (checkCustemComponentFunction(newWDom)) {
-    return isSameType && originalWDom
+  return checkCustemComponentFunction(newWDom)
+    ? isSameType && originalWDom
       ? runUpdate(originalWDom, newWDom)
-      : newWDom.resolve();
-  }
-
-  return newWDom;
+      : newWDom.resolve()
+    : newWDom;
 };
 
 /**
@@ -230,9 +235,10 @@ const remakeChildrenForAdd = (newWDom: WDom) =>
 
 /**
  * Recursive handling for updates, not additions.
+ * Uses key-based diffing for loops, index-based for others
  */
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
-  newWDom.type === 'loop' && checkExisty(getKey((newWDom.children || [])[0]))
+  newWDom.type === 'l' && checkExisty(getKey((newWDom.children || [])[0])) // 'l': loop
     ? remakeChildrenForLoopUpdate(newWDom, originalWDom)
     : (newWDom.children || []).map((item: WDom, index: number) =>
         assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {
@@ -262,22 +268,18 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
  * Recursive handling of loop-type virtual DOM elements.
  */
 const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
-  const newChildren = [...(newWDom.children || [])];
-  const originalChildren = [...(originalWDom.children || [])];
-  const remakedChildren = newChildren.map(item => {
-    const originalItem = findSameKeyOriginalItem(item, originalChildren);
-    const childItem = makeNewWDomTree(item, originalItem);
+  const origCh = [...(originalWDom.children || [])];
+  const remaked = (newWDom.children || []).map(item => {
+    const orig = findSameKeyOriginalItem(item, origCh);
+    const child = makeNewWDomTree(item, orig);
 
-    if (originalItem) {
-      originalChildren.splice(originalChildren.indexOf(originalItem), 1);
-    }
+    if (orig) origCh.splice(origCh.indexOf(orig), 1);
+    child.getParent = () => newWDom;
 
-    childItem.getParent = () => newWDom;
-
-    return childItem;
+    return child;
   });
 
-  return [remakedChildren, originalChildren];
+  return [remaked, origCh];
 };
 
 /**

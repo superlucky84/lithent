@@ -18,14 +18,13 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
 };
 
 export const componentUpdate = (compKey: Props) => () => {
-  const up = componentMap.get(compKey)?.up;
-  let result = false;
+  const comp = componentMap.get(compKey);
+  const up = comp && comp.up;
   if (up) {
     up();
-    result = true;
+    return true;
   }
-
-  return result;
+  return false;
 };
 
 const execRedrawQueue = () => {

@@ -35,7 +35,7 @@ import { assign } from '@/utils';
  */
 export const Fragment = (_props: Props, ...children: WDom[]) =>
   ({
-    type: 'fragment',
+    type: 'f', // fragment
     [wdomSymbol]: true,
     children,
   }) as WDom;
@@ -49,9 +49,8 @@ export const h = (
   ...children: MiddleStateWDomChildren
 ) => {
   const nodeParentPointer: NodePointer = { value: undefined };
-  const newProps = props || {};
   const newChildren = remakeChildren(nodeParentPointer, children);
-  const node = makeNode(tag, newProps, newChildren);
+  const node = makeNode(tag, props || {}, newChildren);
 
   if (!checkCustemComponentFunction(node)) {
     nodeParentPointer.value = node;
@@ -63,9 +62,8 @@ export const h = (
 /**
  * Enables portals
  */
-export const portal = (wDom: WDom, portal: HTMLElement) => {
-  return h('portal', { portal }, wDom);
-};
+export const portal = (wDom: WDom, portal: HTMLElement) =>
+  h('portal', { portal }, wDom);
 
 /**
  * It helps with component creation.
@@ -74,6 +72,32 @@ export const mount =
   <T>(component: Component<T>) =>
   (_props: T, _children?: MiddleStateWDomChildren) =>
     component;
+
+const syncAncestorComponentChildren = (
+  parent: WDom | undefined,
+  prevChild: WDom,
+  nextChild: WDom
+) => {
+  const walk = (node: WDom | undefined, visited: Set<WDom>): void => {
+    if (!node || visited.has(node)) {
+      return;
+    }
+
+    visited.add(node);
+
+    if (node.compChild) {
+      const childIndex = node.compChild.indexOf(prevChild);
+
+      if (childIndex !== -1) {
+        node.compChild.splice(childIndex, 1, nextChild);
+      }
+    }
+
+    walk(node.getParent ? node.getParent() : undefined, visited);
+  };
+
+  walk(parent, new Set<WDom>());
+};
 
 /**
  * It re-renders starting from a specific component.
@@ -96,10 +120,15 @@ export const replaceWDom = (
   newWDomTree.getParent = getParent;
 
   if (!isRoot && getParent) {
-    const brothers = getParent()?.children || [];
+    const parent = getParent();
+    const brothers = (parent && parent.children) || [];
     const index = brothers.indexOf(originalWDom);
 
-    brothers.splice(index, 1, newWDomTree);
+    if (index !== -1) {
+      brothers.splice(index, 1, newWDomTree);
+    }
+
+    syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
   } else {
     newWDomTree.isRoot = true;
     newWDomTree.wrapElement = wrapElement;
@@ -134,7 +163,7 @@ const makeNode = (
   }
 
   return {
-    type: 'element',
+    type: 'e', // element
     [wdomSymbol]: true,
     tag,
     props,
@@ -163,7 +192,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
     const node = {
-      type: 'loop',
+      type: 'l', // loop (array mapping)
       [wdomSymbol]: true,
       children,
     } as WDom;
@@ -171,7 +200,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 'text', [wdomSymbol]: true, text: item } as WDom;
+    return { type: 't', [wdomSymbol]: true, text: item } as WDom; // text node
   }
 
   return item;
@@ -182,34 +211,43 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 // ============================================================================
 
 /**
+ * Create component resolver function
+ */
+const createComponentResolver = (
+  tag: TagFunction,
+  props: Props,
+  wrappedChildren: WDom[]
+) => {
+  return (compKey = props) => {
+    initMountHookState(compKey);
+
+    const initialComponent = tag(props, wrappedChildren);
+    const component =
+      typeof initialComponent === 'function'
+        ? initialComponent
+        : () => () => initialComponent;
+    const componentMaker = component(
+      componentUpdate(compKey),
+      props,
+      wrappedChildren
+    );
+
+    return makeCustomNode(componentMaker, compKey, tag, props, wrappedChildren);
+  };
+};
+
+/**
  * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
  */
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
   const tagName = tag.name;
   const ctor = tag;
-  // Resolve creates a new component
-  const resolve = (compKey = props) => {
-    initMountHookState(compKey);
 
-    const initialComponent = tag(props, children);
-    const component =
-      typeof initialComponent === 'function'
-        ? initialComponent
-        : () => () => initialComponent;
-    const componentMaker = component(componentUpdate(compKey), props, children);
+  const wrappedChildren = children;
 
-    const customNode = makeCustomNode(
-      componentMaker,
-      compKey,
-      tag,
-      props,
-      children
-    );
+  const resolve = createComponentResolver(tag, props, wrappedChildren);
 
-    return customNode;
-  };
-
-  return { tagName, ctor, props, children, resolve };
+  return { tagName, ctor, props, children: wrappedChildren, resolve };
 };
 
 /**
