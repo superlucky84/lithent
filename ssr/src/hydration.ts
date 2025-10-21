@@ -20,8 +20,7 @@ export function hydration(wDom: WDom, wrapElement: HTMLElement) {
  * Attach the el property to wDom.
  */
 function addElement(wDomOrig: WDom, wrapElement: HTMLElement) {
-  const isVirtualType =
-    wDomOrig.type && ['fragment', 'loop'].includes(wDomOrig.type);
+  const isVirtualType = wDomOrig.type && ['f', 'l'].includes(wDomOrig.type);
 
   if (isVirtualType) {
     wDomOrig.el = new DocumentFragment();
@@ -54,8 +53,8 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
 
       if (
         wDomItem?.type === null ||
-        (wDomItem?.type === 'text' && wDomItem?.text === '\n') ||
-        (wDomItem?.type === 'text' && nodeType === 1)
+        (wDomItem?.type === 't' && wDomItem?.text === '\n') ||
+        (wDomItem?.type === 't' && nodeType === 1)
       ) {
         index += 1;
         wDomItem = wDomList[index];
@@ -65,16 +64,16 @@ function addElementProcessChildren(wDomList: WDom[], realDomList: ChildNode[]) {
         realDomItem &&
         wDomItem &&
         wDomItem.type &&
-        ['text', 'element'].includes(wDomItem.type)
+        ['t', 'e'].includes(wDomItem.type)
       ) {
-        if (wDomItem.type === 'text' && nodeType === 3) {
+        if (wDomItem.type === 't' && nodeType === 3) {
           const { tFragment, nIndex } = processConsecutiveTextNodes(
             wDomList,
             index
           );
           index = nIndex;
           realDomItem!.parentElement!.replaceChild(tFragment, realDomItem);
-        } else if (wDomItem.type === 'element' && nodeType === 1) {
+        } else if (wDomItem.type === 'e' && nodeType === 1) {
           if (
             ((realDomItem as HTMLElement).tagName || '').toLowerCase() !==
             wDomItem.tag
@@ -116,7 +115,7 @@ function filteredEmptyTextNode(item: HTMLElement | Text) {
  */
 function flatFlagmentFromList(wDomlist: WDom[]) {
   return wDomlist.reduce((acc: WDom[], item: WDom) => {
-    if (item.type && ['fragment', 'loop'].includes(item.type)) {
+    if (item.type && ['f', 'l'].includes(item.type)) {
       item.el = new DocumentFragment();
       acc.push(...flatFlagmentFromList(item?.children || []));
     } else {
@@ -152,7 +151,7 @@ function collectAdjacentTextNode(
   cIndex: number,
   acc: WDom[]
 ): WDom[] {
-  if (wDomList[cIndex] && wDomList[cIndex].type === 'text') {
+  if (wDomList[cIndex] && wDomList[cIndex].type === 't') {
     acc.push(wDomList[cIndex]);
 
     return collectAdjacentTextNode(wDomList, cIndex + 1, [...acc]);

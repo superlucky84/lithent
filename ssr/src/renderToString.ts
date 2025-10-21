@@ -25,7 +25,7 @@ function wDomToString(wDom: WDom) {
 
   if (isVirtualType) {
     element = wDomChildrenToDom(children, element);
-  } else if (type === 'element' && tag) {
+  } else if (type === 'e' && tag) {
     const innerHTML = props?.innerHTML;
 
     if (innerHTML) {
@@ -37,7 +37,7 @@ function wDomToString(wDom: WDom) {
       element = wDomChildrenToDom(children, element);
       element = `${element}</${tag}>`;
     }
-  } else if (type === 'text' && checkExisty(text)) {
+  } else if (type === 't' && checkExisty(text)) {
     element = String(text);
     element = wDomChildrenToDom(children, element);
   } else {

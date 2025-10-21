@@ -25,7 +25,7 @@ export function checkExisty(value: unknown) {
 }
 
 export function checkVirtualType(type?: string | null) {
-  return type && ['fragment', 'loop'].includes(type);
+  return type && ['f', 'l'].includes(type);
 }
 
 export function checkStyleData(
