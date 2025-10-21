@@ -9,14 +9,19 @@ export const useUpdated = (
   effectAction: () => (() => void) | void,
   dependencies: () => any[] = () => []
 ) => {
-  const component = componentMap.get(getComponentKey());
-  const { upD, upS } = component!;
+  const compKey = getComponentKey();
+  if (!compKey) return;
+
+  const component = componentMap.get(compKey);
+  if (!component) return;
+
+  const { upD, upS } = component;
   const def = upD[upS.value];
 
   if (def && checkNeedPushQueue(def, dependencies())) {
     const callback = effectAction();
     if (callback) {
-      component!.upCB.push(callback);
+      component.upCB.push(callback);
     }
   }
 
@@ -29,8 +34,8 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
 
   if (compKey) {
     const component = componentMap.get(compKey);
-    const queue = component?.upCB;
-    const sequence = component?.upS;
+    const queue = component && component.upCB;
+    const sequence = component && component.upS;
 
     compKeyRef.value = compKey;
 

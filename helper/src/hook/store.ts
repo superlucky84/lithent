@@ -1,9 +1,14 @@
 /**
  * DataStore
  */
-type Renew<T> = (store: T) => boolean | AbortSignal | void;
+export type StoreRenew<T> = (store: T) => boolean | AbortSignal | void;
+export type StoreType<V> = V extends { [key: string]: unknown }
+  ? V
+  : { value: V };
+export type StoreObserver<T> = (store: T) => unknown[];
+export type StoreOptions = { cache?: boolean };
+
 type Run = () => boolean | AbortSignal | void;
-type StoreType<V> = V extends { [key: string]: unknown } ? V : { value: V };
 type StoreValue = {
   [key: string | symbol]: Set<Run>;
 };
@@ -27,12 +32,12 @@ export function store<V>(initialValue: V) {
 
   const storeRenderList: Set<Run> = new Set();
   const storeRenderObserveList: StoreValue[] = [];
-  const cacheMap = new WeakMap<Renew<T>, T>();
+  const cacheMap = new WeakMap<StoreRenew<T>, T>();
 
   return (
-    renew?: Renew<T>,
-    makeObserver?: ((store: T) => unknown[]) | null,
-    userOption?: { cache?: boolean }
+    renew?: StoreRenew<T>,
+    makeObserver?: StoreObserver<T> | null,
+    userOption?: StoreOptions
   ) => {
     const { cache } = Object.assign({}, DEFAULT_OPTION, userOption || {});
 

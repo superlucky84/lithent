@@ -27,48 +27,73 @@ const checkPlainType = (wDom: WDomParam, typeName: string) =>
 const checkSameCustomComponent = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
-) =>
+): boolean =>
   'ctor' in newWDom
-    ? newWDom.ctor === originalWDom?.ctor
-    : newWDom === originalWDom?.ctor;
+    ? newWDom.ctor === (originalWDom && originalWDom.ctor)
+    : newWDom === (originalWDom && originalWDom.ctor);
 
 const checkSameFragment = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
-) =>
-  checkPlainWDomType(newWDom) &&
-  originalWDom?.type === 'fragment' &&
-  originalWDom?.children?.length === newWDom?.children?.length;
+): boolean =>
+  !!(
+    checkPlainWDomType(newWDom) &&
+    originalWDom &&
+    originalWDom.type === 'f' &&
+    originalWDom.children &&
+    originalWDom.children.length ===
+      (newWDom.children && newWDom.children.length)
+  );
 
 const checkSameTagElement = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
-) =>
-  checkPlainWDomType(newWDom) &&
-  originalWDom?.type === 'element' &&
-  originalWDom?.tag === newWDom.tag &&
-  originalWDom?.children?.length === newWDom?.children?.length;
+): boolean =>
+  !!(
+    checkPlainWDomType(newWDom) &&
+    originalWDom &&
+    originalWDom.type === 'e' &&
+    originalWDom.tag === newWDom.tag &&
+    originalWDom.children &&
+    originalWDom.children.length ===
+      (newWDom.children && newWDom.children.length)
+  );
 
 const checkNormalTypeElement = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
-) => checkPlainWDomType(newWDom) && originalWDom?.type === newWDom.type;
+): boolean =>
+  !!(
+    checkPlainWDomType(newWDom) &&
+    originalWDom &&
+    originalWDom.type === newWDom.type
+  );
 
 const checkLoopTypeElement = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
-) =>
-  checkPlainWDomType(newWDom) &&
-  originalWDom?.type === newWDom.type &&
-  ((checkExisty(getKey((newWDom.children || [])[0])) &&
-    checkExisty(getKey((originalWDom?.children || [])[0]))) ||
-    originalWDom?.children?.length === newWDom?.children?.length);
+): boolean =>
+  !!(
+    checkPlainWDomType(newWDom) &&
+    originalWDom &&
+    originalWDom.type === newWDom.type &&
+    ((checkExisty(getKey((newWDom.children || [])[0])) &&
+      checkExisty(getKey((originalWDom.children || [])[0]))) ||
+      (originalWDom.children &&
+        newWDom.children &&
+        originalWDom.children.length === newWDom.children.length))
+  );
 
 export const getKey = (target: WDom) =>
-  target?.compProps?.key ?? target?.props?.key;
+  (target && target.compProps && target.compProps.key) ||
+  (target && target.props && target.props.key);
 
+/**
+ * Check if the type is virtual (fragment or loop)
+ * Virtual types don't create real DOM elements themselves
+ */
 export const checkVirtualType = (type?: string | null) =>
-  type && ['fragment', 'loop'].includes(type);
+  type && ['f', 'l'].includes(type); // 'f': fragment, 'l': loop
 
 export const checkCustemComponentFunction = (
   target: WDomParam
@@ -109,27 +134,24 @@ export const hasAccessorMethods = (target: unknown, dataKey: string) => {
   return descriptor && descriptor.get && descriptor.set;
 };
 
+/**
+ * Get WDom type as a single character code
+ * 'c': component, 'f': fragment, 'e': element, 'l': loop, 't': text, 'et': empty/null
+ */
 export const getWDomType = (
   wDom: WDom | TagFunction | TagFunctionResolver
-): WDomType => {
-  let result: WDomType = 'et';
-
-  if (checkCustemComponentFunction(wDom)) {
-    result = 'c';
-  } else if (checkPlainType(wDom, 'fragment')) {
-    result = 'f';
-  } else if (checkPlainType(wDom, 'element')) {
-    result = 'e';
-  } else if (checkPlainType(wDom, 'loop')) {
-    result = 'l';
-  } else if (checkPlainType(wDom, 'text')) {
-    result = 't';
-  } else if (checkEmptyElement(wDom)) {
-    result = 'et';
-  }
-
-  return result;
-};
+): WDomType =>
+  checkCustemComponentFunction(wDom)
+    ? 'c'
+    : checkPlainType(wDom, 'f')
+      ? 'f'
+      : checkPlainType(wDom, 'e')
+        ? 'e'
+        : checkPlainType(wDom, 'l')
+          ? 'l'
+          : checkPlainType(wDom, 't')
+            ? 't'
+            : 'et';
 
 export const checkSameWDomWithOriginal = {
   c: checkSameCustomComponent,
