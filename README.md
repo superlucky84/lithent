@@ -38,6 +38,8 @@ used lightly in a variety of situations.
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
+- [Context API](#context-api)
+  - [Multi-value Provider Example](#multi-value-provider-example)
 - [Related Projects](#related-projects)
 - [Develop Guide](#develop-guide)
 - [Test](#test)
@@ -232,6 +234,68 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 </script>
 ```
 
+## Context API
+
+Lithent-helper ships a lightweight context system so you can share state without manual prop drilling. Providers stay isolated from consumer renews and you can subscribe to every key or only the slices you need.
+
+### Multi-value Provider Example
+
+```tsx
+import { h, mount } from 'lithent';
+import { createContext } from 'lithent-helper';
+
+type AppState = { user: string; theme: string; count: number };
+
+const AppContext = createContext<AppState>();
+const { Provider, contextState, useContext } = AppContext;
+
+const AppProvider = mount((_renew, _props, children) => {
+  // Provider owns the shared state; consumers cannot trigger its renew directly.
+  const user = contextState('Alice');
+  const theme = contextState('dark');
+  const count = contextState(0);
+
+  return () => (
+    <Provider user={user} theme={theme} count={count}>
+      {children}
+    </Provider>
+  );
+});
+
+const StatsPanel = mount(renew => {
+  // Omitting the subscribe list subscribes to every value exposed by the Provider.
+  const ctx = useContext(AppContext, renew);
+  return () => (
+    <section>
+      <p>User: {ctx.user?.value}</p>
+      <p>Theme: {ctx.theme?.value}</p>
+      <p>Count: {ctx.count?.value}</p>
+      <button onClick={() => ctx.count && (ctx.count.value += 1)}>
+        Increment
+      </button>
+      <button onClick={() => ctx.count && (ctx.count.value = 3)}>
+        Set count to 3
+      </button>
+    </section>
+  );
+});
+
+const ThemeBadge = mount(renew => {
+  // Subscribe only to the theme key; user/count updates will not rerender this component.
+  const ctx = useContext(AppContext, renew, ['theme']);
+  return () => <span>Theme: {ctx.theme?.value}</span>;
+});
+
+const App = mount(() => {
+  return () => (
+    <AppProvider>
+      <StatsPanel />
+      <ThemeBadge />
+    </AppProvider>
+  );
+});
+```
+
 ## Related Projects
 - [htm](https://www.npmjs.com/package/htm) - making **H**yperscript **T**agged **M**arkup possible
 
@@ -276,4 +340,3 @@ pnpm install
 pnpm build
 pnpm test
 ```
-
