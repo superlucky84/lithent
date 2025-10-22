@@ -171,9 +171,11 @@ const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
 };
 
 /**
- * Start handling when the virtual DOM is updated rather than completely replaced with a new type.
- * (Reflect the state of props or children to ensure the new state is applied)
- * (Handle the reflection of the new state while ensuring that the actual references of props or children are not changed)
+ * Keep the existing component node while injecting the props/children from the freshly computed TagFunctionResolver.
+ * originalWDom is the fully evaluated node from the previous render, whereas infoVdom is the intermediate resolver,
+ * so updating compProps/compChild in place lets reRender() evaluate with the latest slots and props.
+ * It is crucial that props and children references remain stable as nodes update—many ancestors/closures share these arrays,
+ * so mutate the existing arrays instead of replacing their references.
  */
 const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
   const { compProps: props, compChild: children } = vDom;
@@ -184,6 +186,8 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
   }
 
   /**
+   * In runUpdate, the original DOM (vDom) is already fully evaluated and completed, whereas infoVdom represents an intermediate state. Therefore, vdom.compChild and infoVdom.children are indeed the correct counterparts to compare.
+
    * Keep shared child array references intact (<= same slot array instance)
    * When the reference changes, sync the stored compChild contents so reRender sees fresh nodes
    * Only update children if they're different references

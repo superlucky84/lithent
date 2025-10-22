@@ -317,6 +317,7 @@ const wDomMaker = (
 
 /**
  * Wraps a component maker to handle components that have a reRender property
+ * TODO: Re-evaluate once coverage confirms no components depend on this wrapper.
  */
 const wrapComponentMakerIfNeeded = (
   componentMaker: (props: Props) => WDom,
