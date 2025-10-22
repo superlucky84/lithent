@@ -73,6 +73,13 @@ export const mount =
   (_props: T, _children?: MiddleStateWDomChildren) =>
     component;
 
+/**
+ * Maintain compChild references for upward updates (render props, slots, etc.).
+ * JSX always returns a fresh children array, so when a subtree re-renders
+ * bottom-up we must manually swap the old child instance out of each ancestor's
+ * compChild. Fragment-wrapping solved this by keeping a stable wrapper node,
+ * but that hides the actual child tree. We prefer this explicit sync for DX.
+ */
 const syncAncestorComponentChildren = (
   parent: WDom | undefined,
   prevChild: WDom,
