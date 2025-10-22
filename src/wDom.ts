@@ -316,8 +316,10 @@ const wDomMaker = (
 // ============================================================================
 
 /**
- * Wraps a component maker to handle components that have a reRender property
- * TODO: Re-evaluate once coverage confirms no components depend on this wrapper.
+ * Prevent parents and children from sharing the same WDom node when a component
+ * simply returns another component. Without this wrapper addComponentProps would
+ * overwrite the child's metadata (compProps, reRender, etc.) and break its
+ * update wiring.
  */
 const wrapComponentMakerIfNeeded = (
   componentMaker: (props: Props) => WDom,
