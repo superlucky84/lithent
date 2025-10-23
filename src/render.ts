@@ -339,7 +339,8 @@ const updateProps = (
         );
       } else if (dataKey) {
         if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
-          (element as { [key: string]: any })[dataKey] = dataValue;
+          (element as HTMLElement & Record<string, unknown>)[dataKey] =
+            dataValue;
         } else {
           setAttr(
             getAttrKey(dataKey),
@@ -456,15 +457,20 @@ const updateStyle = (
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const orig = { ...oldStyle };
-  const es = (element as HTMLElement) && (element as HTMLElement).style;
+  const htmlElement =
+    element instanceof HTMLElement ? element : (element as HTMLElement | null);
+  const cssStyle = htmlElement?.style;
 
-  if (es) {
-    entries(style).forEach(([k, v]) => {
-      (es as any)[k] = v;
-      delete orig[k];
-    });
-    entries(orig).forEach(([k]) => ((es as any)[k] = ''));
-  }
+  if (!cssStyle) return;
+
+  entries(style).forEach(([k, v]) => {
+    cssStyle.setProperty(k, v);
+    delete orig[k];
+  });
+
+  entries(orig).forEach(([k]) => {
+    cssStyle.removeProperty(k);
+  });
 };
 
 const findRealParentElement = (

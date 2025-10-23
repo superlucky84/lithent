@@ -5,9 +5,11 @@ import {
   getComponentKey,
 } from '@/utils/universalRef';
 
+type DependencyFactory = () => unknown[];
+
 export const useUpdated = (
   effectAction: () => (() => void) | void,
-  dependencies: () => any[] = () => []
+  dependencies: DependencyFactory = () => []
 ) => {
   const compKey = getComponentKey();
   if (!compKey) return;
@@ -18,14 +20,16 @@ export const useUpdated = (
   const { upD, upS } = component;
   const def = upD[upS.value];
 
-  if (def && checkNeedPushQueue(def, dependencies())) {
+  const nextDependencies = dependencies();
+
+  if (def && checkNeedPushQueue(def, nextDependencies)) {
     const callback = effectAction();
     if (callback) {
       component.upCB.push(callback);
     }
   }
 
-  upD[upS.value] = dependencies();
+  upD[upS.value] = nextDependencies;
   upS.value += 1;
 };
 

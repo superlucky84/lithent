@@ -1,3 +1,5 @@
+import type { Props } from '@/types';
+
 export { h, Fragment, portal, mount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
 export { componentUpdate } from '@/utils/redraw';
@@ -33,7 +35,7 @@ export type {
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      [name: string]: any;
+      [name: string]: Props;
     }
   }
 }

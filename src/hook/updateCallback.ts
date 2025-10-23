@@ -2,9 +2,11 @@ import { componentMap, getComponentKey } from '@/utils/universalRef';
 
 import { useUpdated } from '@/hook/internal/useUpdate';
 
+type DependencyFactory = () => unknown[];
+
 export const updateCallback = (
   effectAction: () => (() => void) | void,
-  dependencies: () => any[] = () => []
+  dependencies: DependencyFactory = () => []
 ) => {
   const compKey = getComponentKey();
   if (!compKey) return;

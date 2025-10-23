@@ -2,7 +2,6 @@ import { h, render, mount, nextTick, type WDom } from '@/index';
 
 // Provider 컴포넌트 - children을 props로 받아서 렌더링
 const Provider = mount((renew, _props, children: WDom[]) => {
-  console.log('CHILDREN', children);
   let k = 0;
   return () => (
     <div className="provider">
