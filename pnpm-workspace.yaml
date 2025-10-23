@@ -8,3 +8,4 @@ packages:
   - 'lithentDocs'
   - 'createLithent'
   - 'createLithent/express'
+  - 'packages/lithentVite'
