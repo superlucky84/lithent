@@ -77,8 +77,14 @@ export const mount =
  * Maintain compChild references for upward updates (render props, slots, etc.).
  * JSX always returns a fresh children array, so when a subtree re-renders
  * bottom-up we must manually swap the old child instance out of each ancestor's
- * compChild. Fragment-wrapping solved this by keeping a stable wrapper node,
+ * compChild.
+ *
+ * Fragment-wrapping solved this by keeping a stable wrapper node,
  * but that hides the actual child tree. We prefer this explicit sync for DX.
+ *
+ * In practice slot consumers rarely thread children more than a layer or two—
+ * usually shallow composed pieces like dropdowns or drag-and-drop shells—so the
+ * directed walk keeps DX high without introducing observable overhead.
  */
 const syncAncestorComponentChildren = (
   parent: WDom | undefined,
