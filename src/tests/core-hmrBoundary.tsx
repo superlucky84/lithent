@@ -25,16 +25,17 @@ declare global {
   }
 }
 
-let hotData: Record<string, unknown> | undefined;
-
-if (import.meta.hot) {
+const ensureHotData = (): Record<string, unknown> | undefined => {
+  if (!import.meta.hot) return undefined;
   try {
     import.meta.hot.data = import.meta.hot.data || {};
-    hotData = import.meta.hot.data;
+    return import.meta.hot.data;
   } catch {
-    hotData = undefined;
+    return undefined;
   }
-}
+};
+
+const hotData = ensureHotData();
 
 const counterBoundary: BoundaryController =
   (hotData?.counterBoundary as BoundaryController | undefined) ||
@@ -57,7 +58,7 @@ const Counter = mount<{ id: string }>((renew, props) => {
   }
 
   return ({ id }) => {
-    return <div id={`counter-${id}`}>original-20000-{id}</div>;
+    return <div id={`counter-${id}`}>original-{id}</div>;
   };
 });
 
@@ -157,7 +158,9 @@ if (!import.meta.vitest) {
   }
 }
 
-if (import.meta.hot) {
+const setupHmrHooks = () => {
+  if (!import.meta.hot) return;
+
   import.meta.hot.accept(mod => {
     const nextCounter = mod?.Counter as TagFunction | undefined;
 
@@ -191,4 +194,6 @@ if (import.meta.hot) {
       }
     }
   });
-}
+};
+
+setupHmrHooks();
