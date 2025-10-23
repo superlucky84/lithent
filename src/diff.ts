@@ -153,14 +153,14 @@ const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
 /**
  * Handling virtual DOM attribute updates.
  */
-const updateProps = (props: Props, infoProps: Props) => {
+const syncResolverProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
     keys(props).forEach(key => delete props[key]);
     entries(infoProps || {}).forEach(([key, value]) => (props[key] = value));
   }
 };
 
-const updateChildren = (children: WDom[], infoChidren: WDom[]) => {
+const syncResolverChildren = (children: WDom[], infoChidren: WDom[]) => {
   if (children) {
     children.splice(0, children.length);
 
@@ -182,7 +182,7 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
   const { props: infoProps, children: infoChidren } = infoVdom;
 
   if (props) {
-    updateProps(props, infoProps);
+    syncResolverProps(props, infoProps);
   }
 
   /**
@@ -194,7 +194,7 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
    * If it's the same Fragment reference, the diff process will handle updating its children
    */
   if (children && infoChidren && children !== infoChidren) {
-    updateChildren(children, infoChidren);
+    syncResolverChildren(children, infoChidren);
   }
 
   const newVDom = vDom.reRender && vDom.reRender();
