@@ -1,10 +1,15 @@
-import type { CompKey, TagFunction } from '@/types';
+import type { CompKey, TagFunction, WDom } from '@/types';
 import { replaceWDom } from '@/wDom';
 import { componentMap } from '@/utils/universalRef';
+import {
+  enableComponentMapManualMode,
+  disableComponentMapManualMode,
+  removeComponentEntry,
+} from './componentMapControl';
 
 type InstanceRegistry = {
   instances: Set<CompKey>;
-  domMap: Map<CompKey, unknown>;
+  domMap: Map<CompKey, WDom>;
   scheduled: boolean;
   pendingCtor?: TagFunction;
 };
@@ -37,7 +42,7 @@ export const registerBoundaryInstance = (
 
   queueMicrotask(() => {
     const entry = componentMap.get(compKey);
-    const currentWDom = entry?.vd?.value;
+    const currentWDom = entry?.vd?.value ?? null;
 
     if (currentWDom) {
       registry.domMap.set(compKey, currentWDom);
@@ -58,7 +63,16 @@ export const registerBoundaryInstance = (
 };
 
 export const disposeBoundary = (moduleId: string) => {
+  const registry = boundaryRegistry.get(moduleId);
+
+  if (registry) {
+    Array.from(registry.instances).forEach(compKey =>
+      removeComponentEntry(compKey)
+    );
+  }
+
   boundaryRegistry.delete(moduleId);
+  disableComponentMapManualMode();
 };
 
 export const applyBoundaryUpdate = (
@@ -97,13 +111,8 @@ const flushBoundary = (moduleId: string) => {
 
   registry.instances.forEach(compKey => {
     const entry = componentMap.get(compKey);
-    const currentWDom = (entry?.vd?.value || registry.domMap.get(compKey)) as
-      | {
-          el?: unknown;
-          compProps?: CompKey;
-          compChild?: unknown[];
-        }
-      | undefined;
+    const cached = registry.domMap.get(compKey);
+    const currentWDom = entry?.vd?.value || cached;
 
     if (!currentWDom || !currentWDom.el) {
       hasMissing = true;
@@ -117,13 +126,10 @@ const flushBoundary = (moduleId: string) => {
       return;
     }
 
-   try {
-      console.log('[hmr-boundary] replace call', moduleId, ctor.name, compKey.id);
+    try {
       replaceWDom(ctor, compProps, compChild, currentWDom as any);
-      registry.domMap.set(
-        compKey,
-        componentMap.get(compKey)?.vd?.value || currentWDom
-      );
+      const refreshed = componentMap.get(compKey)?.vd?.value || currentWDom;
+      registry.domMap.set(compKey, refreshed as WDom);
       updated = true;
     } catch (error) {
       console.warn(`[Lithent HMR] boundary update 실패: ${moduleId}`, error);
@@ -138,8 +144,12 @@ const flushBoundary = (moduleId: string) => {
   }
 };
 
-export const createBoundary = (moduleId: string) => ({
-  register: (compKey: CompKey) => registerBoundaryInstance(moduleId, compKey),
-  update: (nextCtor: TagFunction) => applyBoundaryUpdate(moduleId, nextCtor),
-  dispose: () => disposeBoundary(moduleId),
-});
+export const createBoundary = (moduleId: string) => {
+  enableComponentMapManualMode();
+
+  return {
+    register: (compKey: CompKey) => registerBoundaryInstance(moduleId, compKey),
+    update: (nextCtor: TagFunction) => applyBoundaryUpdate(moduleId, nextCtor),
+    dispose: () => disposeBoundary(moduleId),
+  } as const;
+};
