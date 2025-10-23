@@ -1,5 +1,6 @@
-import { h, render, mount, mountCallback } from '@/index';
+import { h, render, mount, mountCallback, nextTick } from '@/index';
 import { createBoundary } from '@/devmodetest/createBoundary';
+import type { TagFunction } from '@/types';
 
 const moduleId = new URL(import.meta.url).pathname;
 const BOUNDARY_STORE_KEY = `__lithent_hmr_boundary__${moduleId}`;
@@ -8,11 +9,6 @@ const globalStore =
   typeof globalThis === 'object'
     ? (globalThis as Record<string, unknown>)
     : undefined;
-
-if (import.meta.vitest && globalStore) {
-  delete globalStore[BOUNDARY_STORE_KEY];
-  delete globalStore[DISPOSE_STORE_KEY];
-}
 
 type BoundaryController = ReturnType<typeof createBoundary>;
 
@@ -23,14 +19,18 @@ type HotRuntime = {
   invalidate?: () => void;
 };
 
-const metaWithHot = import.meta as ImportMeta & { hot?: HotRuntime };
+declare global {
+  interface ImportMeta {
+    hot?: HotRuntime;
+  }
+}
 
 let hotData: Record<string, unknown> | undefined;
 
-if (metaWithHot.hot) {
+if (import.meta.hot) {
   try {
-    metaWithHot.hot.data = metaWithHot.hot.data || {};
-    hotData = metaWithHot.hot.data;
+    import.meta.hot.data = import.meta.hot.data || {};
+    hotData = import.meta.hot.data;
   } catch {
     hotData = undefined;
   }
@@ -57,7 +57,7 @@ const Counter = mount<{ id: string }>((renew, props) => {
   }
 
   return ({ id }) => {
-    return <div id={`counter-${id}`}>009990-{id}</div>;
+    return <div id={`counter-${id}`}>original-20000-{id}</div>;
   };
 });
 
@@ -69,6 +69,70 @@ const App = () => (
 );
 
 export { Counter };
+
+if (import.meta.vitest) {
+  const { it, expect } = import.meta.vitest;
+
+  it('updates all registered instances when boundary update runs', async () => {
+    const wrap = document.createElement('div');
+    render(<App />, wrap);
+
+    const readText = (id: string) =>
+      wrap.querySelector<HTMLDivElement>(`#counter-${id}`)?.textContent || '';
+
+    const waitForUpdate = async () => {
+      await nextTick();
+      await new Promise(resolve => setTimeout(resolve, 0));
+    };
+
+    await waitForUpdate();
+
+    expect(readText('first').startsWith('original')).toBe(true);
+    expect(readText('second').startsWith('original')).toBe(true);
+
+    const CounterNext = mount<{ id: string }>((renew, props) => {
+      void renew;
+      const unregister = counterBoundary.register(props);
+      if (unregister) {
+        mountCallback(() => () => unregister());
+      }
+
+      return ({ id }) => {
+        return <div id={`counter-${id}`}>updated-{id}</div>;
+      };
+    });
+
+    const updated = counterBoundary.update(
+      CounterNext as unknown as TagFunction
+    );
+
+    expect(updated).toBe(true);
+    await waitForUpdate();
+    expect(readText('first')).toContain('updated');
+    expect(readText('second')).toContain('updated');
+
+    const CounterNext2 = mount<{ id: string }>((renew, props) => {
+      void renew;
+      const unregister = counterBoundary.register(props);
+      if (unregister) {
+        mountCallback(() => () => unregister());
+      }
+
+      return ({ id }) => {
+        return <div id={`counter-${id}`}>latest-{id}</div>;
+      };
+    });
+
+    const updatedAgain = counterBoundary.update(
+      CounterNext2 as unknown as TagFunction
+    );
+
+    expect(updatedAgain).toBe(true);
+    await waitForUpdate();
+    expect(readText('first')).toContain('latest');
+    expect(readText('second')).toContain('latest');
+  });
+}
 
 let disposeApp =
   (hotData?.disposeApp as (() => void) | undefined) ||
@@ -93,34 +157,25 @@ if (!import.meta.vitest) {
   }
 }
 
-// @ts-ignore
 if (import.meta.hot) {
-  console.log('v');
-  // @ts-ignore
   import.meta.hot.accept(mod => {
-    const nextCounter = mod?.Counter as unknown;
+    const nextCounter = mod?.Counter as TagFunction | undefined;
 
-    console.log('111vv', nextCounter);
-
-    /*
-    if (typeof nextCounter !== 'function') {
-      metaWithHot.hot?.invalidate?.();
+    if (!nextCounter) {
+      import.meta.hot?.invalidate?.();
       return;
     }
-      */
 
-    // @ts-ignore
-    const applied = counterBoundary.update(nextCounter as TagFunction);
+    const applied = counterBoundary.update(nextCounter);
 
     if (!applied) {
       console.warn(
         '[Lithent HMR] 변경된 경계를 적용하지 못해 전체 리프레시합니다.'
       );
-      metaWithHot.hot?.invalidate?.();
+      import.meta.hot?.invalidate?.();
     }
   });
 
-  // @ts-ignore
   import.meta.hot.dispose(data => {
     data.counterBoundary = counterBoundary;
 
