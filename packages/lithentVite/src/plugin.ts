@@ -1,5 +1,9 @@
 import type { PluginOption } from 'vite';
-import { transformWithHmr, shouldSkipTransform, type MarkerTransformOptions } from './parser';
+import {
+  transformWithHmr,
+  shouldSkipTransform,
+  type MarkerTransformOptions,
+} from './parser';
 
 export interface LithentVitePluginOptions {
   include?: RegExp | RegExp[];
@@ -17,7 +21,8 @@ const toRegExpArray = (value: RegExp | RegExp[] | undefined): RegExp[] => {
   return Array.isArray(value) ? value : [value];
 };
 
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export const lithentVitePlugin = (
   options: LithentVitePluginOptions = {}
