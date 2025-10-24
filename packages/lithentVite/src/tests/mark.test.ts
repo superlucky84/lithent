@@ -99,8 +99,9 @@ if (import.meta.vitest) {
       const registerMatches =
         defaultResult.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
       const unregisterMatches =
-        defaultResult.code.match(/mountCallback\(\(\) => \(\) => unregister\(\)\)/g) ??
-        [];
+        defaultResult.code.match(
+          /mountCallback\(\(\) => \(\) => unregister\(\)\)/g
+        ) ?? [];
       expect(registerMatches).toHaveLength(2);
       expect(unregisterMatches).toHaveLength(2);
     });
@@ -118,8 +119,9 @@ if (import.meta.vitest) {
       const namedRegisters =
         namedResult.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
       const namedUnregisters =
-        namedResult.code.match(/mountCallback\(\(\) => \(\) => unregister\(\)\)/g) ??
-        [];
+        namedResult.code.match(
+          /mountCallback\(\(\) => \(\) => unregister\(\)\)/g
+        ) ?? [];
       expect(namedRegisters).toHaveLength(2);
       expect(namedUnregisters).toHaveLength(2);
     });

@@ -1,7 +1,5 @@
 import MagicString from 'magic-string';
 import type { File } from '@babel/types';
-import MagicString from 'magic-string';
-import type { File } from '@babel/types';
 import { collectComponentMounts } from '../../utils/ast/componentCollector';
 
 export const stitchComponentRegistration = (
@@ -27,14 +25,11 @@ export const stitchComponentRegistration = (
     }
 
     const joined = pieces.join(', ');
-    ms.appendLeft(
-      importInsertionPos,
-      `import { ${joined} } from 'lithent';\n`
-    );
+    ms.appendLeft(importInsertionPos, `import { ${joined} } from 'lithent';\n`);
   }
 
   for (const mount of mounts) {
-    const { insertPos, propsExpression } = mount;
+    const { insertPos } = mount;
     const unregisterBlock = `
     const compKey = getComponentKey();
     const unregister = compKey ? counterBoundary.register(compKey) : null;

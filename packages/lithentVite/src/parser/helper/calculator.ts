@@ -1,4 +1,8 @@
-import type { File, ImportDeclaration } from '@babel/types';
+import type {
+  File,
+  ImportDeclaration,
+  ExpressionStatement,
+} from '@babel/types';
 
 export const collectExportNames = (ast: File): string[] => {
   const names = new Set<string>();
@@ -23,10 +27,7 @@ export const collectExportNames = (ast: File): string[] => {
               names.add(declarator.id.name);
             }
           }
-        } else if (
-          declaration.type === 'ClassDeclaration' &&
-          declaration.id
-        ) {
+        } else if (declaration.type === 'ClassDeclaration' && declaration.id) {
           names.add(declaration.id.name);
         }
       }
@@ -124,11 +125,15 @@ export const collectHeaderInsert = (
 
     if (
       node.type === 'ExpressionStatement' &&
-      node.expression.type === 'StringLiteral' &&
-      typeof node.directive === 'string'
+      node.expression.type === 'StringLiteral'
     ) {
-      directiveEnd = node.end ?? directiveEnd;
-      continue;
+      const expressionStatement = node as ExpressionStatement & {
+        directive?: string;
+      };
+      if (typeof expressionStatement.directive === 'string') {
+        directiveEnd = expressionStatement.end ?? directiveEnd;
+        continue;
+      }
     }
 
     break;
@@ -138,7 +143,6 @@ export const collectHeaderInsert = (
     importsToPrepend.push(
       `import { createBoundary } from '${boundaryImportSpecifier}';`
     );
-    console.log('89811', importsToPrepend);
   }
 
   if (!hasTagImport) {
@@ -154,7 +158,8 @@ export const collectHeaderInsert = (
   if (importsToPrepend.length) {
     const precedingChar =
       importInsertionPos > 0 ? sourceCode[importInsertionPos - 1] : undefined;
-    const needsLeadingNewline = importInsertionPos > 0 && precedingChar !== '\n';
+    const needsLeadingNewline =
+      importInsertionPos > 0 && precedingChar !== '\n';
     snippet += needsLeadingNewline ? '\n' : '';
     snippet += importsToPrepend.join('\n');
     snippet += '\n';

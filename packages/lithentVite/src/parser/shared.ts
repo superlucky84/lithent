@@ -21,7 +21,7 @@ const analyzeBase = (
     sourceType: 'module',
     plugins: ['typescript', 'jsx'],
     ranges: true,
-  });
+  }) as File;
 
   const inferredExports = collectExportNames(ast);
   const targetExports =

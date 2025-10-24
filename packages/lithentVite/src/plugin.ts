@@ -1,9 +1,5 @@
 import type { PluginOption } from 'vite';
-import {
-  transformWithHmr,
-  shouldSkipTransform,
-  type HmrTransformOptions,
-} from './parser';
+import { transformWithHmr, shouldSkipTransform, type MarkerTransformOptions } from './parser';
 
 export interface LithentVitePluginOptions {
   include?: RegExp | RegExp[];
@@ -58,7 +54,7 @@ export const lithentVitePlugin = (
           markerRegex,
           boundaryImportSpecifier,
           tagFunctionImportSpecifier,
-        } satisfies HmrTransformOptions);
+        } satisfies MarkerTransformOptions);
       } catch (error) {
         this.warn(
           `[@lithent/lithent-vite] ${id} 파싱 실패: ${(error as Error).message}`
