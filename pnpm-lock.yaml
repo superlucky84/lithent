@@ -271,6 +271,9 @@ importers:
       '@babel/types':
         specifier: ^7.26.0
         version: 7.26.8
+      lithent-dev-helper:
+        specifier: workspace:*
+        version: link:../../devHelper
       magic-string:
         specifier: ^0.30.11
         version: 0.30.19
@@ -281,9 +284,6 @@ importers:
       lithent:
         specifier: workspace:*
         version: link:../..
-      lithent-dev-helper:
-        specifier: workspace:*
-        version: link:../../devHelper
 
   ssr:
     devDependencies:

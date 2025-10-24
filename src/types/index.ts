@@ -2,7 +2,7 @@ import { wdomSymbol } from '@/utils/universalRef';
 
 export type UseDataStoreValue = { [key: string | symbol]: unknown };
 
-export type Props = Record<string, unknown>;
+export type Props = Partial<Record<string, unknown>>;
 
 // Component Key type - unique object reference for each component instance
 export type CompKey = Props;
