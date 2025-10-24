@@ -1,5 +1,10 @@
 import { WDom, CompKey } from '@/types';
-import { componentMap, getComponentKey } from '@/utils/universalRef';
+import {
+  componentMap,
+  getComponentKey,
+  isComponentMapManualMode,
+  runUnmountEffects,
+} from '@/utils/universalRef';
 
 export const unmount = (effectAction: () => void) => {
   const compKey = getComponentKey();
@@ -30,10 +35,9 @@ const recursiveRunUnmount = (wDom: WDom) => {
 };
 
 const removeItem = (compKey: CompKey) => {
-  const subInfo = componentMap.get(compKey);
-  if (subInfo) {
-    subInfo.umts.forEach(effect => effect());
-    subInfo.umts = [];
+  runUnmountEffects(compKey);
+
+  if (!isComponentMapManualMode()) {
     componentMap.delete(compKey);
   }
 };

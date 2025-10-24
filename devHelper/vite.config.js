@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+
 export default defineConfig({
   plugins: [
     checker({
@@ -22,10 +23,20 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src'),
-      name: 'lithent',
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'lithentDevHelper',
       fileName: format => {
-        return format === 'umd' ? 'lithent.umd.js' : 'lithent.mjs';
+        return format === 'umd'
+          ? 'lithentDevHelper.umd.js'
+          : 'lithentDevHelper.mjs';
+      },
+    },
+    rollupOptions: {
+      external: ['lithent'],
+      output: {
+        globals: {
+          lithent: 'lithent',
+        },
       },
     },
   },
@@ -34,6 +45,6 @@ export default defineConfig({
     includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
   },
   server: {
-    open: '/html/insertExample.html',
+    open: '/html/hmr.html',
   },
 });

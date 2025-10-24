@@ -1,5 +1,6 @@
 packages:
   - 'helper'
+  - 'devHelper'
   - 'ssr'
   - 'tag'
   - 'ftags'
@@ -8,3 +9,4 @@ packages:
   - 'lithentDocs'
   - 'createLithent'
   - 'createLithent/express'
+  - 'packages/lithentVite'

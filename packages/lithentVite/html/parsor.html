@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lithent Vite Parser Dev</title>
+  </head>
+  <body>
+    <pre id="output"></pre>
+    <div id="app"></div>
+    <script type="module">
+      const params = new URLSearchParams(window.location.search);
+      const target = params.get('target') || 'nomark';
+      const moduleMap = {
+        nomark: '/src/tests/nomark.test.tsx',
+        mark: '/src/tests/mark.test.ts',
+        hmr: '/src/tests/hmr.example.tsx',
+      };
+      const entry = moduleMap[target] ?? moduleMap.nomark;
+      import(entry);
+    </script>
+  </body>
+</html>

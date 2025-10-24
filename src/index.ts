@@ -7,6 +7,8 @@ export {
   getComponentKey,
   componentMap,
   getComponentSubInfo,
+  setComponentMapManualMode,
+  disposeComponentEntry,
 } from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';

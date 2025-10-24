@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+
 export default defineConfig({
   plugins: [
     checker({
@@ -16,24 +17,30 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: [{ find: '@', replacement: resolve(__dirname, './src') }],
+    alias: {
+      '@': resolve(__dirname, './src'),
+    },
   },
   build: {
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src'),
-      name: 'lithent',
-      fileName: format => {
-        return format === 'umd' ? 'lithent.umd.js' : 'lithent.mjs';
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'lithentVite',
+      fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs'),
+    },
+    rollupOptions: {
+      external: ['vite', 'lithent'],
+      output: {
+        globals: {
+          vite: 'vite',
+          lithent: 'lithent',
+        },
       },
     },
   },
-  test: {
-    environment: 'jsdom',
-    includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
-  },
   server: {
-    open: '/html/insertExample.html',
+    port: 4000,
+    open: '/html/parsor.html',
   },
 });
