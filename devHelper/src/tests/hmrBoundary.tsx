@@ -9,10 +9,10 @@ import {
 import type { TagFunction } from 'lithent';
 import { createBoundary } from '@/index';
 
-const moduleId = new URL(import.meta.url).pathname;
-const BOUNDARY_STORE_KEY = `__lithent_hmr_boundary__${moduleId}`;
-const DISPOSE_STORE_KEY = `__lithent_hmr_dispose__${moduleId}`;
-const globalStore =
+const __lithentModuleId = new URL(import.meta.url).pathname;
+const __lithentBoundaryStoreKey = `__lithent_hmr_boundary__${__lithentModuleId}`;
+const __lithentDisposeStoreKey = `__lithent_hmr_dispose__${__lithentModuleId}`;
+const __lithentGlobalStore =
   typeof globalThis === 'object'
     ? (globalThis as Record<string, unknown>)
     : undefined;
@@ -32,7 +32,7 @@ declare global {
   }
 }
 
-const ensureHotData = (): Record<string, unknown> | undefined => {
+const __lithentEnsureHotData = (): Record<string, unknown> | undefined => {
   if (!import.meta.hot) return undefined;
   try {
     import.meta.hot.data = import.meta.hot.data || {};
@@ -42,20 +42,30 @@ const ensureHotData = (): Record<string, unknown> | undefined => {
   }
 };
 
-const hotData = ensureHotData();
+const __lithentHotData = __lithentEnsureHotData();
 
 const counterBoundary: BoundaryController =
-  (hotData?.counterBoundary as BoundaryController | undefined) ||
-  (globalStore?.[BOUNDARY_STORE_KEY] as BoundaryController | undefined) ||
-  createBoundary(moduleId);
+  (__lithentHotData?.counterBoundary as BoundaryController | undefined) ||
+  (__lithentGlobalStore?.[__lithentBoundaryStoreKey] as
+    | BoundaryController
+    | undefined) ||
+  createBoundary(__lithentModuleId);
 
-if (hotData) {
-  hotData.counterBoundary = counterBoundary;
+if (__lithentHotData) {
+  __lithentHotData.counterBoundary = counterBoundary;
 }
 
-if (globalStore) {
-  globalStore[BOUNDARY_STORE_KEY] = counterBoundary;
+if (__lithentGlobalStore) {
+  __lithentGlobalStore[__lithentBoundaryStoreKey] = counterBoundary;
 }
+
+let disposeApp =
+  (__lithentHotData?.disposeApp as (() => void) | undefined) ||
+  (__lithentGlobalStore?.[__lithentDisposeStoreKey] as
+    | (() => void)
+    | undefined);
+
+const __lithentHmrTargets = ['Counter'];
 
 const Counter = mount<{ id: string }>(renew => {
   void renew;
@@ -66,7 +76,7 @@ const Counter = mount<{ id: string }>(renew => {
   }
 
   return ({ id }) => {
-    return <div id={`counter-${id}`}>original-{id}</div>;
+    return <div id={`counter-${id}`}>original1999sadlgkjasldkg1-{id}</div>;
   };
 });
 
@@ -78,9 +88,29 @@ const App = () => (
 );
 
 export { Counter };
+export default App;
 
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
+
+  const waitForUpdate = async () => {
+    await nextTick();
+    await new Promise(resolve => setTimeout(resolve, 0));
+  };
+
+  const createCounterVersion = (label: string) =>
+    mount<{ id: string }>(renew => {
+      void renew;
+      const compKey = getComponentKey();
+      const unregister = compKey ? counterBoundary.register(compKey) : null;
+      if (unregister) {
+        mountCallback(() => () => unregister());
+      }
+
+      return ({ id }) => {
+        return <div id={`counter-${id}`}>{label}-{id}</div>;
+      };
+    });
 
   it('updates all registered instances when boundary update runs', async () => {
     const wrap = document.createElement('div');
@@ -89,27 +119,12 @@ if (import.meta.vitest) {
     const readText = (id: string) =>
       wrap.querySelector<HTMLDivElement>(`#counter-${id}`)?.textContent || '';
 
-    const waitForUpdate = async () => {
-      await nextTick();
-      await new Promise(resolve => setTimeout(resolve, 0));
-    };
-
     await waitForUpdate();
 
     expect(readText('first').startsWith('original')).toBe(true);
     expect(readText('second').startsWith('original')).toBe(true);
 
-    const CounterNext = mount<{ id: string }>((renew, props) => {
-      void renew;
-      const unregister = counterBoundary.register(props);
-      if (unregister) {
-        mountCallback(() => () => unregister());
-      }
-
-      return ({ id }) => {
-        return <div id={`counter-${id}`}>updated-{id}</div>;
-      };
-    });
+    const CounterNext = createCounterVersion('updated');
 
     const updated = counterBoundary.update(
       CounterNext as unknown as TagFunction
@@ -120,17 +135,7 @@ if (import.meta.vitest) {
     expect(readText('first')).toContain('updated');
     expect(readText('second')).toContain('updated');
 
-    const CounterNext2 = mount<{ id: string }>((renew, props) => {
-      void renew;
-      const unregister = counterBoundary.register(props);
-      if (unregister) {
-        mountCallback(() => () => unregister());
-      }
-
-      return ({ id }) => {
-        return <div id={`counter-${id}`}>latest-{id}</div>;
-      };
-    });
+    const CounterNext2 = createCounterVersion('latest');
 
     const updatedAgain = counterBoundary.update(
       CounterNext2 as unknown as TagFunction
@@ -143,10 +148,6 @@ if (import.meta.vitest) {
   });
 }
 
-let disposeApp =
-  (hotData?.disposeApp as (() => void) | undefined) ||
-  (globalStore?.[DISPOSE_STORE_KEY] as (() => void) | undefined);
-
 if (!import.meta.vitest) {
   const rootElement =
     typeof document !== 'undefined'
@@ -156,28 +157,37 @@ if (!import.meta.vitest) {
   if (!disposeApp && rootElement) {
     disposeApp = render(<App />, rootElement);
 
-    if (hotData) {
-      hotData.disposeApp = disposeApp;
+    if (__lithentHotData) {
+      __lithentHotData.disposeApp = disposeApp;
     }
 
-    if (globalStore && disposeApp) {
-      globalStore[DISPOSE_STORE_KEY] = disposeApp;
+    if (__lithentGlobalStore && disposeApp) {
+      __lithentGlobalStore[__lithentDisposeStoreKey] = disposeApp;
     }
   }
 }
 
-const setupHmrHooks = () => {
+const __lithentSetupHmrHooks = () => {
   if (!import.meta.hot) return;
 
   import.meta.hot.accept(mod => {
-    const nextCounter = mod?.Counter as TagFunction | undefined;
+    let applied = false;
 
-    if (!nextCounter) {
-      import.meta.hot?.invalidate?.();
-      return;
+    for (const name of __lithentHmrTargets) {
+      const nextCtor =
+        name === 'default'
+          ? (mod?.default as TagFunction | undefined)
+          : (mod?.[name] as TagFunction | undefined);
+
+      if (!nextCtor) {
+        import.meta.hot?.invalidate?.();
+        return;
+      }
+
+      if (counterBoundary.update(nextCtor)) {
+        applied = true;
+      }
     }
-
-    const applied = counterBoundary.update(nextCounter);
 
     if (!applied) {
       console.warn(
@@ -194,14 +204,14 @@ const setupHmrHooks = () => {
       data.disposeApp = disposeApp;
     }
 
-    if (globalStore) {
-      globalStore[BOUNDARY_STORE_KEY] = counterBoundary;
+    if (__lithentGlobalStore) {
+      __lithentGlobalStore[__lithentBoundaryStoreKey] = counterBoundary;
 
       if (disposeApp) {
-        globalStore[DISPOSE_STORE_KEY] = disposeApp;
+        __lithentGlobalStore[__lithentDisposeStoreKey] = disposeApp;
       }
     }
   });
 };
 
-setupHmrHooks();
+__lithentSetupHmrHooks();

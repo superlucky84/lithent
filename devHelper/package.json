@@ -23,6 +23,9 @@
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
   "keywords": ["lithent"],
+  "devDependencies": {
+    "lithent": "workspace:*"
+  },
   "peerDependencies": {
     "lithent": "workspace:*"
   },
