@@ -8,10 +8,15 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
+    "dev:plugin": "vite --config vite.config.plugin.ts",
     "build": "vite build",
     "watch": "vite build --watch",
     "test": "vitest run --reporter verbose",
     "test:dev": "vitest"
+  },
+  "devDependencies": {
+    "lithent": "workspace:*",
+    "lithent-dev-helper": "workspace:*"
   },
   "keywords": [
     "lithent",
