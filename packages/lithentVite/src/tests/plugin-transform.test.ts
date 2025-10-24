@@ -51,7 +51,7 @@ export default App;
       normalized.startsWith(`'use client';\nimport { createBoundary }`)
     ).toBe(true);
     expect(normalized).toContain(
-      "import { createBoundary } from 'lithent/devmodetest/createBoundary';"
+      "import { createBoundary } from 'lithent/devHelper';"
     );
     expect(normalized).toContain("import type { TagFunction } from 'lithent';");
     expect(normalized.indexOf('createBoundary')).toBeLessThan(
@@ -72,7 +72,7 @@ export default App;
     const source = `
 "use client";
 import type { TagFunction } from 'lithent';
-import { createBoundary } from 'lithent/devmodetest/createBoundary';
+import { createBoundary } from 'lithent/devHelper';
 import { render, mount } from 'lithent';
 
 /* lithent:hmr-boundary Counter */
@@ -90,7 +90,7 @@ export const Counter = mount((renew, props) => {
     const transformed = result.code;
     const normalized = transformed.trimStart();
     const importOccurrences = transformed.match(
-      /createBoundary\s+from\s+'lithent\/devmodetest\/createBoundary'/g
+      /createBoundary\s+from\s+'lithent\/devHelper'/g
     );
     const tagImportOccurrences = transformed.match(
       /TagFunction\s+}\s+from\s+'lithent'/g
@@ -129,7 +129,7 @@ export default App;
       normalized.startsWith(`'use client';\nimport { createBoundary }`)
     ).toBe(true);
     expect(normalized).toContain(
-      "import { createBoundary } from 'lithent/devmodetest/createBoundary';"
+      "import { createBoundary } from 'lithent/devHelper';"
     );
     expect(normalized).toContain("import type { TagFunction } from 'lithent';");
     expect(normalized).toContain('const __lithentHmrTargets = ["default"];');

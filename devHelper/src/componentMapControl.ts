@@ -1,8 +1,5 @@
-import type { CompKey } from '@/types';
-import {
-  setComponentMapManualMode,
-  disposeComponentEntry,
-} from '@/utils/universalRef';
+import type { CompKey } from 'lithent';
+import { setComponentMapManualMode, disposeComponentEntry } from 'lithent';
 
 let manualModeRefCount = 0;
 

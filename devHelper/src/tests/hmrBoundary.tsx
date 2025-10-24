@@ -6,8 +6,8 @@ import {
   nextTick,
   getComponentKey,
 } from 'lithent';
-import { createBoundary } from 'lithent/devHelper';
-import type { TagFunction } from '@/types';
+import type { TagFunction } from 'lithent';
+import { createBoundary } from '@/index';
 
 const moduleId = new URL(import.meta.url).pathname;
 const BOUNDARY_STORE_KEY = `__lithent_hmr_boundary__${moduleId}`;

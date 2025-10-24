@@ -29,7 +29,7 @@ export const lithentVitePlugin = (
   const includePatterns = toRegExpArray(options.include);
   const boundaryMarker = options.boundaryMarker ?? DEFAULT_BOUNDARY_MARKER;
   const boundaryImportSpecifier =
-    options.createBoundaryImport ?? 'lithent/devmodetest/createBoundary';
+    options.createBoundaryImport ?? 'lithent/devHelper';
   const tagFunctionImportSpecifier = options.tagFunctionImport ?? 'lithent';
 
   const markerPattern =

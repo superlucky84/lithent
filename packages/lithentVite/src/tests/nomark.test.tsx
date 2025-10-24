@@ -16,7 +16,7 @@ if (root) {
 
 const result = transformWithoutMarker({
   code: source,
-  boundaryImportSpecifier: 'lithent/devmodetest/createBoundary',
+  boundaryImportSpecifier: 'lithent/devHelper',
   tagFunctionImportSpecifier: 'lithent',
 });
 
@@ -42,7 +42,7 @@ if (import.meta.vitest) {
       expect(result.code.includes(expectedSnippet)).toBe(true);
       expect(
         result.code.includes(
-          "import { createBoundary } from 'lithent/devmodetest/createBoundary'"
+          "import { createBoundary } from 'lithent/devHelper'"
         )
       ).toBe(true);
       expect(

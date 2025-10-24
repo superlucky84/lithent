@@ -1,9 +1,8 @@
-import type { CompKey, TagFunction, WDom } from '@/types';
-import { replaceWDom } from '@/wDom';
-import { componentMap } from '@/utils/universalRef';
+import type { CompKey, TagFunction, WDom } from 'lithent';
+import { componentMap, replaceWDom } from 'lithent';
 import {
-  enableComponentMapManualMode,
   disableComponentMapManualMode,
+  enableComponentMapManualMode,
   removeComponentEntry,
 } from './componentMapControl';
 
@@ -30,6 +29,12 @@ const getRegistry = (moduleId: string): InstanceRegistry => {
   }
 
   return registry;
+};
+
+export type BoundaryController = {
+  register: (compKey: CompKey) => () => void;
+  update: (nextCtor: TagFunction) => boolean;
+  dispose: () => void;
 };
 
 export const registerBoundaryInstance = (
@@ -144,12 +149,12 @@ const flushBoundary = (moduleId: string) => {
   }
 };
 
-export const createBoundary = (moduleId: string) => {
+export const createBoundary = (moduleId: string): BoundaryController => {
   enableComponentMapManualMode();
 
   return {
     register: (compKey: CompKey) => registerBoundaryInstance(moduleId, compKey),
     update: (nextCtor: TagFunction) => applyBoundaryUpdate(moduleId, nextCtor),
     dispose: () => disposeBoundary(moduleId),
-  } as const;
+  };
 };
