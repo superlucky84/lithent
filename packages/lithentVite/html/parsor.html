@@ -6,6 +6,15 @@
   </head>
   <body>
     <pre id="output"></pre>
-    <script type="module" src="/src/tests/nomark.test.tsx"></script>
+    <script type="module">
+      const params = new URLSearchParams(window.location.search);
+      const target = params.get('target') || 'nomark';
+      const moduleMap = {
+        nomark: '/src/tests/nomark.test.tsx',
+        mark: '/src/tests/mark.test.ts',
+      };
+      const entry = moduleMap[target] ?? moduleMap.nomark;
+      import(entry);
+    </script>
   </body>
 </html>

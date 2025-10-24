@@ -15,6 +15,10 @@ const App = mount((renew, props: { title: string }) => {
   return () => <div>{props.title}</div>;
 });
 
+const Secondary = mount((renew, props: { subtitle: string }) => {
+  return () => <p>{props.subtitle}</p>;
+});
+
 export default App;
 `;
 
@@ -92,7 +96,13 @@ if (import.meta.vitest) {
       expect(defaultResult.code).toContain(
         'const __lithentHmrTargets = ["default"];'
       );
-      expect(defaultResult.code).toContain('counterBoundary.register(compKey)');
+      const registerMatches =
+        defaultResult.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
+      const unregisterMatches =
+        defaultResult.code.match(/mountCallback\(\(\) => \(\) => unregister\(\)\)/g) ??
+        [];
+      expect(registerMatches).toHaveLength(2);
+      expect(unregisterMatches).toHaveLength(2);
     });
 
     it('respects explicit export names declared in the marker', () => {
@@ -105,6 +115,13 @@ if (import.meta.vitest) {
       expect(namedResult.code).toContain(
         'const __lithentHmrTargets = ["Counter","Another"];'
       );
+      const namedRegisters =
+        namedResult.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
+      const namedUnregisters =
+        namedResult.code.match(/mountCallback\(\(\) => \(\) => unregister\(\)\)/g) ??
+        [];
+      expect(namedRegisters).toHaveLength(2);
+      expect(namedUnregisters).toHaveLength(2);
     });
   });
 }

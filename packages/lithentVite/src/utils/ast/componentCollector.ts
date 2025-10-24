@@ -42,18 +42,12 @@ const extractPropsExpression = (
   }
 };
 
-export const collectComponentMounts = (
-  ast: File,
-  code: string
-): MountInfo[] => {
+export const collectComponentMounts = (ast: File, code: string): MountInfo[] => {
   const results: MountInfo[] = [];
 
-  for (const statement of ast.program.body) {
-    if (
-      statement.type === 'VariableDeclaration' &&
-      statement.declarations.length === 1
-    ) {
-      const declaration = statement.declarations[0];
+  const inspectDeclaration = (node: any) => {
+    if (node.type === 'VariableDeclaration' && node.declarations.length === 1) {
+      const declaration = node.declarations[0];
       if (
         declaration.init &&
         isMountCall(declaration.init) &&
@@ -79,6 +73,21 @@ export const collectComponentMounts = (
           results.push({ insertPos, propsExpression });
         }
       }
+    }
+  };
+
+  for (const statement of ast.program.body) {
+    if (statement.type === 'VariableDeclaration') {
+      inspectDeclaration(statement);
+      continue;
+    }
+
+    if (
+      statement.type === 'ExportNamedDeclaration' &&
+      statement.declaration &&
+      statement.declaration.type === 'VariableDeclaration'
+    ) {
+      inspectDeclaration(statement.declaration);
     }
   }
 

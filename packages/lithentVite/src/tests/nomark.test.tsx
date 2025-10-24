@@ -8,9 +8,14 @@ const Demo = mount((_renew, props: { message: string }) => {
   return () => ({ type: 'div', props: {}, children: [props.message] } as any);
 });
 
+const Another = mount((_renew, props: { id: number }) => {
+  return () => ({ type: 'span', props: {}, children: [String(props.id)] } as any);
+});
+
 const root = document.getElementById('app');
 if (root) {
   render(Demo({ message: 'hello' }), root as any);
+  render(Another({ id: 1 }), root as any);
 }
 `;
 
@@ -53,12 +58,13 @@ if (import.meta.vitest) {
       expect(result.code.includes('const compKey = getComponentKey();')).toBe(
         true
       );
-      expect(result.code.includes('counterBoundary.register(compKey)')).toBe(
-        true
-      );
-      expect(
-        result.code.includes('mountCallback(() => () => unregister())')
-      ).toBe(true);
+      const registerMatches =
+        result.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
+      const unregisterMatches =
+        result.code.match(/mountCallback\(\(\) => \(\) => unregister\(\)\)/g) ??
+        [];
+      expect(registerMatches).toHaveLength(2);
+      expect(unregisterMatches).toHaveLength(2);
     });
   });
 }
