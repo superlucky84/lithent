@@ -122,6 +122,10 @@ export default App;
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
       );
+      expect(normalized).toContain('const __lithentRenderOnce = <');
+      expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(normalized)).toBe(
+        true
+      );
       expect(normalized).not.toContain('/* lithent:hmr-boundary');
       expect(normalized.indexOf('__lithentModuleId')).toBeGreaterThan(
         normalized.indexOf("import { render, mount } from 'lithent';")
@@ -217,6 +221,10 @@ export default App;
       );
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
+      );
+      expect(normalized).toContain('const __lithentRenderOnce = <');
+      expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(normalized)).toBe(
+        true
       );
       expect(normalized.indexOf('createBoundary')).toBeLessThan(
         normalized.indexOf("import { render, mount } from 'lithent';")

@@ -3,6 +3,7 @@ import { createHmrBootstrapBlock } from './strings';
 import type { BaseTransformOptions, HmrTransformResult } from './types';
 import { analyzeNoMarker } from './shared';
 import { stitchComponentRegistration } from './transform/componentRegister';
+import { wrapRenderCalls } from './transform/renderGuard';
 import { collectComponentMounts } from '../utils/ast/componentCollector';
 
 export const transformWithoutMarker = (
@@ -32,6 +33,7 @@ export const transformWithoutMarker = (
   );
 
   const ms = new MagicString(options.code);
+  wrapRenderCalls(ms, ast, options.code);
   const transformBlock = createHmrBootstrapBlock(
     targetExports,
     componentNames

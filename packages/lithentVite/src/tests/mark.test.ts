@@ -112,6 +112,7 @@ if (import.meta.vitest) {
       expect(defaultResult.code).toContain(
         '__lithentModuleHotStore["Secondary"] = __lithentHotComponent_Secondary;'
       );
+      expect(defaultResult.code).toContain('const __lithentRenderOnce = <');
       const registerMatches =
         defaultResult.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
       const unregisterMatches =

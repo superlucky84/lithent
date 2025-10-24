@@ -84,6 +84,10 @@ if (import.meta.vitest) {
           '__lithentModuleHotStore["Another"] = __lithentHotComponent_Another;'
         )
       ).toBe(true);
+      expect(result.code.includes('const __lithentRenderOnce = <')).toBe(true);
+      expect(
+        /__lithentRenderOnce\(\(\) =>\s*render\(/.test(result.code)
+      ).toBe(true);
       const registerMatches =
         result.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
       const unregisterMatches =

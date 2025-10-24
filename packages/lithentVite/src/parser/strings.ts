@@ -62,6 +62,28 @@ let disposeApp =
   (__lithentHotData?.disposeApp as (() => void) | undefined) ||
   (__lithentGlobalStore?.[__lithentDisposeStoreKey] as (() => void) | undefined);
 
+const __lithentRenderOnce = <T,>(factory: () => T) => {
+  if (disposeApp) {
+    return disposeApp as unknown as T;
+  }
+
+  const result = factory();
+
+  if (typeof result === 'function') {
+    disposeApp = result as unknown as () => void;
+
+    if (__lithentHotData) {
+      __lithentHotData.disposeApp = disposeApp;
+    }
+
+    if (__lithentGlobalStore && disposeApp) {
+      __lithentGlobalStore[__lithentDisposeStoreKey] = disposeApp;
+    }
+  }
+
+  return result;
+};
+
 const __lithentModuleHotStore =
   __lithentHotData
     ? ((__lithentHotData.components =
