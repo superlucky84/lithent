@@ -34,16 +34,31 @@ if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
 
   describe('transformWithoutMarker (integration)', () => {
-    it('should mark transform as successful and inject HMR bootstrap', () => {
-      const expectedSnippet = 'const __lithentModuleId = new URL(import.meta.url).pathname;';
+    it('should mark transform as successful and inject HMR bootstrap + boundary registration', () => {
+      const expectedSnippet =
+        'const __lithentModuleId = new URL(import.meta.url).pathname;';
 
       expect(result.transformed).toBe(true);
       expect(result.code.includes(expectedSnippet)).toBe(true);
-      expect(result.code.includes('import { createBoundary }')).toBe(true);
-      expect(result.code.includes("import { mountCallback } from 'lithent'"))
-        .toBe(true);
-      expect(result.code.includes('counterBoundary.register(props)')).toBe(true);
-      expect(result.code.includes('mountCallback(() => () => unregister())')).toBe(true);
+      expect(
+        result.code.includes(
+          "import { createBoundary } from 'lithent/devmodetest/createBoundary'"
+        )
+      ).toBe(true);
+      expect(
+        result.code.includes(
+          "import { mountCallback, getComponentKey } from 'lithent'"
+        )
+      ).toBe(true);
+      expect(result.code.includes('const compKey = getComponentKey();')).toBe(
+        true
+      );
+      expect(result.code.includes('counterBoundary.register(compKey)')).toBe(
+        true
+      );
+      expect(
+        result.code.includes('mountCallback(() => () => unregister())')
+      ).toBe(true);
     });
   });
 }
