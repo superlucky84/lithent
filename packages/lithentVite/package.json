@@ -15,8 +15,7 @@
     "test:dev": "vitest"
   },
   "devDependencies": {
-    "lithent": "workspace:*",
-    "lithent-dev-helper": "workspace:*"
+    "lithent": "workspace:*"
   },
   "keywords": [
     "lithent",
@@ -31,6 +30,7 @@
     "url": "https://github.com/superlucky84/lithent.git"
   },
   "dependencies": {
+    "lithent-dev-helper": "workspace:*",
     "@babel/parser": "^7.26.2",
     "@babel/types": "^7.26.0",
     "magic-string": "^0.30.11"
