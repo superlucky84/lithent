@@ -14,7 +14,7 @@ const Counter = mount<{ label: string }>(renew => {
     <div data-module-id={moduleId}>
       <h2>{label}</h2>
       <button id="hmr-counter-button" onClick={increment}>
-        increment!!!
+        increment
       </button>
       <p id="hmr-counter-value">count: {count}</p>
     </div>

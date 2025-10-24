@@ -3,6 +3,7 @@ import { createHmrBootstrapBlock } from './strings';
 import type { BaseTransformOptions, HmrTransformResult } from './types';
 import { analyzeNoMarker } from './shared';
 import { stitchComponentRegistration } from './transform/componentRegister';
+import { collectComponentMounts } from '../utils/ast/componentCollector';
 
 export const transformWithoutMarker = (
   options: BaseTransformOptions
@@ -21,8 +22,20 @@ export const transformWithoutMarker = (
     return { transformed: false, code: options.code, map: null };
   }
 
+  const mounts = collectComponentMounts(ast, options.code);
+  const componentNames = Array.from(
+    new Set(
+      mounts
+        .map(mount => mount.componentName)
+        .filter((name): name is string => !!name)
+    )
+  );
+
   const ms = new MagicString(options.code);
-  const transformBlock = createHmrBootstrapBlock(targetExports).trimStart();
+  const transformBlock = createHmrBootstrapBlock(
+    targetExports,
+    componentNames
+  ).trimStart();
 
   const blockPrecedingChar =
     blockInsertionPos > 0 ? options.code[blockInsertionPos - 1] : undefined;
@@ -45,7 +58,7 @@ export const transformWithoutMarker = (
     ms.appendLeft(blockInsertionPos, blockSnippet);
   }
 
-  stitchComponentRegistration(ms, ast, options.code, importInsertionPos);
+  stitchComponentRegistration(ms, mounts, options.code, importInsertionPos);
 
   return {
     transformed: true,

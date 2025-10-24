@@ -84,6 +84,7 @@ export const applyBoundaryUpdate = (
   moduleId: string,
   nextCtor: TagFunction
 ) => {
+  console.log(moduleId, nextCtor.toString());
   const registry = boundaryRegistry.get(moduleId);
 
   if (!registry) return false;

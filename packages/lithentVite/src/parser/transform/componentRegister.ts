@@ -1,15 +1,12 @@
 import MagicString from 'magic-string';
-import type { File } from '@babel/types';
-import { collectComponentMounts } from '../../utils/ast/componentCollector';
+import type { MountInfo } from '../../utils/ast/componentCollector';
 
 export const stitchComponentRegistration = (
   ms: MagicString,
-  ast: File,
+  mounts: MountInfo[],
   code: string,
   importInsertionPos: number
 ) => {
-  const mounts = collectComponentMounts(ast, code);
-
   if (!mounts.length) return;
 
   const needsMountCallback = !/import\s+{[^}]*mountCallback/.test(code);
@@ -29,7 +26,7 @@ export const stitchComponentRegistration = (
   }
 
   for (const mount of mounts) {
-    const { insertPos } = mount;
+    const { insertPos, componentName, declarationEnd } = mount;
     const unregisterBlock = `
     const compKey = getComponentKey();
     const unregister = compKey ? counterBoundary.register(compKey) : null;
@@ -38,5 +35,16 @@ export const stitchComponentRegistration = (
     }
 `;
     ms.appendLeft(insertPos, unregisterBlock);
+
+    if (componentName) {
+      const hotStoreVar = `__lithentHotComponent_${componentName}`;
+      const storeSnippet = `
+const ${hotStoreVar} = ${componentName} as unknown as TagFunction;
+if (__lithentModuleHotStore) {
+  __lithentModuleHotStore["${componentName}"] = ${hotStoreVar};
+}
+`;
+      ms.appendRight(declarationEnd, storeSnippet);
+    }
   }
 };

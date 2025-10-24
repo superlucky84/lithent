@@ -20,10 +20,11 @@ const __lithentGlobalStore =
 type BoundaryController = ReturnType<typeof createBoundary>;
 
 type HotRuntime = {
-  data: Record<string, unknown>;
+  data?: Record<string, unknown>;
   accept: (cb: (mod: Record<string, unknown>) => void) => void;
   dispose: (cb: (data: Record<string, unknown>) => void) => void;
   invalidate?: () => void;
+  __lithentData?: Record<string, unknown>;
 };
 
 declare global {
@@ -33,12 +34,20 @@ declare global {
 }
 
 const __lithentEnsureHotData = (): Record<string, unknown> | undefined => {
-  if (!import.meta.hot) return undefined;
+  const hot = import.meta.hot as HotRuntime | undefined;
+  if (!hot) return undefined;
+
+  if (hot.data && typeof hot.data === 'object') {
+    return hot.data;
+  }
+
   try {
-    import.meta.hot.data = import.meta.hot.data || {};
-    return import.meta.hot.data;
+    const target: Record<string, unknown> = {};
+    hot.data = target;
+    return target;
   } catch {
-    return undefined;
+    hot.__lithentData = hot.__lithentData || {};
+    return hot.__lithentData;
   }
 };
 
@@ -65,135 +74,199 @@ let disposeApp =
     | (() => void)
     | undefined);
 
-const __lithentHmrTargets = ['Counter'];
+const __lithentModuleHotStore = __lithentHotData
+  ? ((__lithentHotData.components =
+      (__lithentHotData.components as
+        | Record<string, TagFunction | undefined>
+        | undefined) ?? {}) as Record<string, TagFunction | undefined>)
+  : undefined;
 
-const Counter = mount<{ id: string }>(renew => {
-  void renew;
+const __lithentHmrTargets: string[] = ['Counter'];
+
+const moduleId = new URL(import.meta.url).pathname;
+
+const Counter = mount<{ label: string }>(renew => {
+  let count = 0;
+
+  const increment = () => {
+    count += 1;
+    renew();
+  };
+
   const compKey = getComponentKey();
   const unregister = compKey ? counterBoundary.register(compKey) : null;
   if (unregister) {
     mountCallback(() => () => unregister());
   }
 
-  return ({ id }) => {
-    return <div id={`counter-${id}`}>original1999sadlgkjasldkg1-{id}</div>;
-  };
+  return ({ label }) => (
+    <div data-module-id={moduleId}>
+      <h2>{label}</h2>
+      <button id="hmr-counter-button" onClick={increment}>
+        increment - jinwoosl@
+      </button>
+      <p id="hmr-counter-value">count: {count}</p>
+    </div>
+  );
 });
+
+const __lithentCounterTag = Counter as unknown as TagFunction;
+
+if (__lithentModuleHotStore) {
+  __lithentModuleHotStore['Counter'] = __lithentCounterTag;
+}
 
 const App = () => (
   <div>
-    <Counter id="first" />
-    <Counter id="second" />
+    <h1>Lithent HMR playground</h1>
+    <Counter label="Hot counter" />
   </div>
 );
 
-export { Counter };
+const root = document.getElementById('app');
+
+if (!import.meta.vitest && root && !disposeApp) {
+  disposeApp = render(<App />, root);
+
+  if (__lithentHotData) {
+    __lithentHotData.disposeApp = disposeApp;
+  }
+
+  if (__lithentGlobalStore && disposeApp) {
+    __lithentGlobalStore[__lithentDisposeStoreKey] = disposeApp;
+  }
+}
+
 export default App;
 
 if (import.meta.vitest) {
-  const { it, expect } = import.meta.vitest;
+  const { describe, it, expect } = import.meta.vitest;
 
   const waitForUpdate = async () => {
     await nextTick();
     await new Promise(resolve => setTimeout(resolve, 0));
   };
 
-  const createCounterVersion = (label: string) =>
-    mount<{ id: string }>(renew => {
-      void renew;
+  const createCounterVersion = (displayLabel: string) =>
+    mount<{ label: string }>(renew => {
+      let count = 0;
+
+      const increment = () => {
+        count += 1;
+        renew();
+      };
+
       const compKey = getComponentKey();
       const unregister = compKey ? counterBoundary.register(compKey) : null;
       if (unregister) {
         mountCallback(() => () => unregister());
       }
 
-      return ({ id }) => {
-        return <div id={`counter-${id}`}>{label}-{id}</div>;
-      };
+      return () => (
+        <div data-module-id={moduleId}>
+          <h2>{displayLabel}</h2>
+          <button id="hmr-counter-button" onClick={increment}>
+            increment!!!
+          </button>
+          <p id="hmr-counter-value">count: {count}</p>
+        </div>
+      );
     });
 
-  it('updates all registered instances when boundary update runs', async () => {
-    const wrap = document.createElement('div');
-    render(<App />, wrap);
+  describe('hmrBoundary parity with lithentVite hmr.example', () => {
+    it('updates through boundary when a new counter implementation is provided', async () => {
+      const wrap = document.createElement('div');
+      render(<App />, wrap);
 
-    const readText = (id: string) =>
-      wrap.querySelector<HTMLDivElement>(`#counter-${id}`)?.textContent || '';
+      const button = () =>
+        wrap.querySelector<HTMLButtonElement>('#hmr-counter-button');
+      const value = () =>
+        wrap.querySelector<HTMLParagraphElement>('#hmr-counter-value')
+          ?.textContent ?? '';
+      const label = () =>
+        wrap.querySelector<HTMLHeadingElement>('h2')?.textContent ?? '';
 
-    await waitForUpdate();
+      await waitForUpdate();
+      expect(label()).toBe('Hot counter');
+      expect(value()).toBe('count: 0');
 
-    expect(readText('first').startsWith('original')).toBe(true);
-    expect(readText('second').startsWith('original')).toBe(true);
+      button()?.dispatchEvent(new Event('click', { bubbles: true }));
+      button()?.dispatchEvent(new Event('click', { bubbles: true }));
+      await waitForUpdate();
+      expect(value()).toBe('count: 2');
 
-    const CounterNext = createCounterVersion('updated');
+      const CounterNext = createCounterVersion('Updated hot counter');
+      const updated = counterBoundary.update(
+        CounterNext as unknown as TagFunction
+      );
 
-    const updated = counterBoundary.update(
-      CounterNext as unknown as TagFunction
-    );
+      expect(updated).toBe(true);
+      await waitForUpdate();
+      expect(label()).toBe('Updated hot counter');
+      expect(value()).toBe('count: 0');
 
-    expect(updated).toBe(true);
-    await waitForUpdate();
-    expect(readText('first')).toContain('updated');
-    expect(readText('second')).toContain('updated');
-
-    const CounterNext2 = createCounterVersion('latest');
-
-    const updatedAgain = counterBoundary.update(
-      CounterNext2 as unknown as TagFunction
-    );
-
-    expect(updatedAgain).toBe(true);
-    await waitForUpdate();
-    expect(readText('first')).toContain('latest');
-    expect(readText('second')).toContain('latest');
+      button()?.dispatchEvent(new Event('click', { bubbles: true }));
+      await waitForUpdate();
+      expect(value()).toBe('count: 1');
+    });
   });
 }
-
-if (!import.meta.vitest) {
-  const rootElement =
-    typeof document !== 'undefined'
-      ? document.getElementById('root')
-      : undefined;
-
-  if (!disposeApp && rootElement) {
-    disposeApp = render(<App />, rootElement);
-
-    if (__lithentHotData) {
-      __lithentHotData.disposeApp = disposeApp;
-    }
-
-    if (__lithentGlobalStore && disposeApp) {
-      __lithentGlobalStore[__lithentDisposeStoreKey] = disposeApp;
-    }
-  }
-}
-
 const __lithentSetupHmrHooks = () => {
   if (!import.meta.hot) return;
 
   import.meta.hot.accept(mod => {
     let applied = false;
+    const missing: string[] = [];
+    const knownNames = new Set(['Counter', ...__lithentHmrTargets]);
 
-    for (const name of __lithentHmrTargets) {
+    const nextModule = (mod ?? {}) as Record<string, unknown>;
+
+    for (const name of knownNames) {
       const nextCtor =
         name === 'default'
-          ? (mod?.default as TagFunction | undefined)
-          : (mod?.[name] as TagFunction | undefined);
+          ? (nextModule.default as TagFunction | undefined)
+          : (nextModule[name] as TagFunction | undefined) ||
+            (__lithentModuleHotStore?.[name] as TagFunction | undefined);
+
+      console.log('___', __lithentModuleHotStore);
+      console.log('Name', name);
+      console.log('v', __lithentModuleHotStore?.[name]);
+      console.log('NEXTCTOR', nextCtor);
 
       if (!nextCtor) {
-        import.meta.hot?.invalidate?.();
-        return;
+        missing.push(name);
+        continue;
       }
 
       if (counterBoundary.update(nextCtor)) {
         applied = true;
       }
     }
-
     if (!applied) {
+      if (missing.length && __lithentModuleHotStore) {
+        queueMicrotask(() => {
+          let retried = false;
+          for (const name of missing) {
+            const retryCtor = __lithentModuleHotStore?.[name] as
+              | TagFunction
+              | undefined;
+            if (retryCtor && counterBoundary.update(retryCtor)) {
+              retried = true;
+            }
+          }
+          if (!retried) {
+            console.warn(
+              '[Lithent HMR] 변경된 경계를 적용하지 못해 전체 리프레시합니다.'
+            );
+            import.meta.hot?.invalidate?.();
+          }
+        });
+        return;
+      }
       console.warn(
         '[Lithent HMR] 변경된 경계를 적용하지 못해 전체 리프레시합니다.'
       );
-      import.meta.hot?.invalidate?.();
+      // import.meta.hot?.invalidate?.();
     }
   });
 

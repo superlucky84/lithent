@@ -87,6 +87,7 @@ if (import.meta.vitest) {
       expect(defaultResult.code).toContain(
         "import type { TagFunction } from 'lithent';"
       );
+      expect(defaultResult.code).toContain('import.meta.hot as');
       expect(defaultResult.code).toContain(
         "import { mountCallback, getComponentKey } from 'lithent';"
       );
@@ -94,7 +95,22 @@ if (import.meta.vitest) {
         'const __lithentModuleId = new URL(import.meta.url).pathname;'
       );
       expect(defaultResult.code).toContain(
-        'const __lithentHmrTargets = ["default"];'
+        'const __lithentHmrTargets = ["App","Secondary"];'
+      );
+      expect(defaultResult.code).toContain('const knownNames = new Set([');
+      expect(defaultResult.code).toContain('...["App","Secondary"]');
+      expect(defaultResult.code).toContain('...__lithentHmrTargets');
+      expect(defaultResult.code).toContain(
+        'const __lithentHotComponent_App = App as unknown as TagFunction;'
+      );
+      expect(defaultResult.code).toContain(
+        '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
+      );
+      expect(defaultResult.code).toContain(
+        'const __lithentHotComponent_Secondary = Secondary as unknown as TagFunction;'
+      );
+      expect(defaultResult.code).toContain(
+        '__lithentModuleHotStore["Secondary"] = __lithentHotComponent_Secondary;'
       );
       const registerMatches =
         defaultResult.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
@@ -115,6 +131,22 @@ if (import.meta.vitest) {
       ).toHaveLength(1);
       expect(namedResult.code).toContain(
         'const __lithentHmrTargets = ["Counter","Another"];'
+      );
+      expect(namedResult.code).toContain('import.meta.hot as');
+      expect(namedResult.code).toContain('const knownNames = new Set([');
+      expect(namedResult.code).toContain('...["Counter","Another"]');
+      expect(namedResult.code).toContain('...__lithentHmrTargets');
+      expect(namedResult.code).toContain(
+        'const __lithentHotComponent_Counter = Counter as unknown as TagFunction;'
+      );
+      expect(namedResult.code).toContain(
+        '__lithentModuleHotStore["Counter"] = __lithentHotComponent_Counter;'
+      );
+      expect(namedResult.code).toContain(
+        'const __lithentHotComponent_Another = Another as unknown as TagFunction;'
+      );
+      expect(namedResult.code).toContain(
+        '__lithentModuleHotStore["Another"] = __lithentHotComponent_Another;'
       );
       const namedRegisters =
         namedResult.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];

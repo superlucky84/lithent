@@ -16,7 +16,7 @@ export default defineConfig({
     },
   },
   server: {
-    open: '/html/parsor.html?target=nomark',
+    open: '/html/parsor.html?target=hmr',
   },
   optimizeDeps: {
     include: ['lithent', 'lithent/devHelper'],

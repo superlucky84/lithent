@@ -106,6 +106,7 @@ export default App;
       expect(normalized).toContain(
         "import type { TagFunction } from 'lithent';"
       );
+      expect(normalized).toContain('import.meta.hot as');
       expect(normalized.indexOf('createBoundary')).toBeLessThan(
         normalized.indexOf("import { render, mount } from 'lithent';")
       );
@@ -113,7 +114,14 @@ export default App;
         'const __lithentModuleId = new URL(import.meta.url).pathname;'
       );
       expect(normalized).toContain('__lithentSetupHmrHooks();');
-      expect(normalized).toContain('const __lithentHmrTargets = ["default"];');
+      expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
+      expect(normalized).toContain('const knownNames = new Set([');
+      expect(normalized).toContain(
+        'const __lithentHotComponent_App = App as unknown as TagFunction;'
+      );
+      expect(normalized).toContain(
+        '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
+      );
       expect(normalized).not.toContain('/* lithent:hmr-boundary');
       expect(normalized.indexOf('__lithentModuleId')).toBeGreaterThan(
         normalized.indexOf("import { render, mount } from 'lithent';")
@@ -158,6 +166,14 @@ export const Counter = mount((renew, props) => {
       expect(registerMatches.length).toBe(1);
       expect(unregisterMatches.length).toBe(1);
       expect(normalized).toContain('const __lithentHmrTargets = ["Counter"];');
+      expect(normalized).toContain('const knownNames = new Set([');
+      expect(normalized).toContain('import.meta.hot as');
+      expect(normalized).toContain(
+        'const __lithentHotComponent_Counter = Counter as unknown as TagFunction;'
+      );
+      expect(normalized).toContain(
+        '__lithentModuleHotStore["Counter"] = __lithentHotComponent_Counter;'
+      );
     });
 
     it('마커 없이도 Lithent 엔트리를 감지해 HMR 부트스트랩을 삽입한다', async () => {
@@ -193,7 +209,15 @@ export default App;
       expect(normalized).toContain(
         "import type { TagFunction } from 'lithent';"
       );
-      expect(normalized).toContain('const __lithentHmrTargets = ["default"];');
+      expect(normalized).toContain('import.meta.hot as');
+      expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
+      expect(normalized).toContain('const knownNames = new Set([');
+      expect(normalized).toContain(
+        'const __lithentHotComponent_App = App as unknown as TagFunction;'
+      );
+      expect(normalized).toContain(
+        '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
+      );
       expect(normalized.indexOf('createBoundary')).toBeLessThan(
         normalized.indexOf("import { render, mount } from 'lithent';")
       );

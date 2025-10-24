@@ -58,6 +58,32 @@ if (import.meta.vitest) {
       expect(result.code.includes('const compKey = getComponentKey();')).toBe(
         true
       );
+      expect(
+        result.code.includes('const __lithentHmrTargets = ["Demo","Another"];')
+      ).toBe(true);
+      expect(result.code.includes('const knownNames = new Set([')).toBe(true);
+      expect(result.code.includes('...["Demo","Another"]')).toBe(true);
+      expect(result.code.includes('...__lithentHmrTargets')).toBe(true);
+      expect(
+        result.code.includes(
+          'const __lithentHotComponent_Demo = Demo as unknown as TagFunction;'
+        )
+      ).toBe(true);
+      expect(
+        result.code.includes(
+          '__lithentModuleHotStore["Demo"] = __lithentHotComponent_Demo;'
+        )
+      ).toBe(true);
+      expect(
+        result.code.includes(
+          'const __lithentHotComponent_Another = Another as unknown as TagFunction;'
+        )
+      ).toBe(true);
+      expect(
+        result.code.includes(
+          '__lithentModuleHotStore["Another"] = __lithentHotComponent_Another;'
+        )
+      ).toBe(true);
       const registerMatches =
         result.code.match(/counterBoundary\.register\(compKey\)/g) ?? [];
       const unregisterMatches =
