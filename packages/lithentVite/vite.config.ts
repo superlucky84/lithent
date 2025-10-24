@@ -9,17 +9,17 @@ export default defineConfig({
       typescript: true,
       eslint: {
         useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"'
-      }
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+      },
     }),
     dts({
-      outputDir: ['dist']
-    })
+      outputDir: ['dist'],
+    }),
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
-    }
+      '@': resolve(__dirname, './src'),
+    },
   },
   build: {
     emptyOutDir: false,
@@ -27,16 +27,20 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentVite',
-      fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs')
+      fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs'),
     },
     rollupOptions: {
       external: ['vite', 'lithent'],
       output: {
         globals: {
           vite: 'vite',
-          lithent: 'lithent'
-        }
-      }
-    }
-  }
+          lithent: 'lithent',
+        },
+      },
+    },
+  },
+  server: {
+    port: 4000,
+    open: '/html/parsor.html',
+  },
 });
