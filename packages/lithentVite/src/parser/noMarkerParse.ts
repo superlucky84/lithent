@@ -2,6 +2,7 @@ import MagicString from 'magic-string';
 import { createHmrBootstrapBlock } from './strings';
 import type { BaseTransformOptions, HmrTransformResult } from './types';
 import { analyzeNoMarker } from './shared';
+import { stitchComponentRegistration } from './transform/componentRegister';
 
 export const transformWithoutMarker = (
   options: BaseTransformOptions
@@ -13,6 +14,7 @@ export const transformWithoutMarker = (
     importInsertionPos,
     blockInsertionPos,
     headerSnippet,
+    ast,
   } = analysis;
 
   if (!shouldTransform) {
@@ -42,6 +44,8 @@ export const transformWithoutMarker = (
   } else {
     ms.appendLeft(blockInsertionPos, blockSnippet);
   }
+
+  stitchComponentRegistration(ms, ast, options.code, importInsertionPos);
 
   return {
     transformed: true,

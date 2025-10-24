@@ -1,4 +1,5 @@
 import type MagicString from 'magic-string';
+import type { File } from '@babel/types';
 
 export interface BaseTransformOptions {
   code: string;
@@ -16,6 +17,7 @@ export interface BaseAnalysisResult {
   importInsertionPos: number;
   blockInsertionPos: number;
   headerSnippet: string;
+  ast: File;
 }
 
 export interface MarkerAnalysisResult extends BaseAnalysisResult {

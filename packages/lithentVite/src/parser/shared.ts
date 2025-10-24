@@ -24,9 +24,15 @@ const analyzeBase = (
   });
 
   const inferredExports = collectExportNames(ast);
-  const targetExports = inferredExports.length > 0 ? inferredExports : ['default'];
+  const targetExports =
+    inferredExports.length > 0 ? inferredExports : ['default'];
   const { importInsertionPos, blockInsertionPos, headerSnippet } =
-    collectHeaderInsert(ast, code, boundaryImportSpecifier, tagFunctionImportSpecifier);
+    collectHeaderInsert(
+      ast,
+      code,
+      boundaryImportSpecifier,
+      tagFunctionImportSpecifier
+    );
 
   return {
     ast,
@@ -40,10 +46,20 @@ const analyzeBase = (
 export const analyzeMarker = (
   options: MarkerTransformOptions
 ): MarkerAnalysisResult => {
-  const { code, markerRegex, boundaryImportSpecifier, tagFunctionImportSpecifier } = options;
+  const {
+    code,
+    markerRegex,
+    boundaryImportSpecifier,
+    tagFunctionImportSpecifier,
+  } = options;
 
-  const { ast, targetExports, importInsertionPos, blockInsertionPos, headerSnippet } =
-    analyzeBase(code, boundaryImportSpecifier, tagFunctionImportSpecifier);
+  const {
+    ast,
+    targetExports,
+    importInsertionPos,
+    blockInsertionPos,
+    headerSnippet,
+  } = analyzeBase(code, boundaryImportSpecifier, tagFunctionImportSpecifier);
 
   const match = markerRegex.exec(code);
   const rawNames = match?.[1]
@@ -61,6 +77,7 @@ export const analyzeMarker = (
     importInsertionPos,
     blockInsertionPos,
     headerSnippet,
+    ast,
     match: match ?? null,
   };
 };
@@ -70,8 +87,13 @@ export const analyzeNoMarker = (
 ): BaseAnalysisResult => {
   const { code, boundaryImportSpecifier, tagFunctionImportSpecifier } = options;
 
-  const { ast, targetExports, importInsertionPos, blockInsertionPos, headerSnippet } =
-    analyzeBase(code, boundaryImportSpecifier, tagFunctionImportSpecifier);
+  const {
+    ast,
+    targetExports,
+    importInsertionPos,
+    blockInsertionPos,
+    headerSnippet,
+  } = analyzeBase(code, boundaryImportSpecifier, tagFunctionImportSpecifier);
 
   return {
     targetExports,
@@ -79,6 +101,7 @@ export const analyzeNoMarker = (
     importInsertionPos,
     blockInsertionPos,
     headerSnippet,
+    ast,
   };
 };
 

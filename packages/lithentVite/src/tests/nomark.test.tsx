@@ -40,6 +40,10 @@ if (import.meta.vitest) {
       expect(result.transformed).toBe(true);
       expect(result.code.includes(expectedSnippet)).toBe(true);
       expect(result.code.includes('import { createBoundary }')).toBe(true);
+      expect(result.code.includes("import { mountCallback } from 'lithent'"))
+        .toBe(true);
+      expect(result.code.includes('counterBoundary.register(props)')).toBe(true);
+      expect(result.code.includes('mountCallback(() => () => unregister())')).toBe(true);
     });
   });
 }

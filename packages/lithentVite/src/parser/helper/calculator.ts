@@ -138,6 +138,7 @@ export const collectHeaderInsert = (
     importsToPrepend.push(
       `import { createBoundary } from '${boundaryImportSpecifier}';`
     );
+    console.log('89811', importsToPrepend);
   }
 
   if (!hasTagImport) {
@@ -159,5 +160,5 @@ export const collectHeaderInsert = (
     snippet += '\n';
   }
 
-  return { importInsertionPos, blockInsertionPos, snippet };
+  return { importInsertionPos, blockInsertionPos, headerSnippet: snippet };
 };

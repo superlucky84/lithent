@@ -1,4 +1,11 @@
-import { h, render, mount, mountCallback, nextTick } from '@/index';
+import {
+  h,
+  render,
+  mount,
+  mountCallback,
+  nextTick,
+  getComponentKey,
+} from '@/index';
 import { createBoundary } from '@/devmodetest/createBoundary';
 import type { TagFunction } from '@/types';
 
@@ -50,9 +57,10 @@ if (globalStore) {
   globalStore[BOUNDARY_STORE_KEY] = counterBoundary;
 }
 
-const Counter = mount<{ id: string }>((renew, props) => {
+const Counter = mount<{ id: string }>(renew => {
   void renew;
-  const unregister = counterBoundary.register(props);
+  const compKey = getComponentKey();
+  const unregister = compKey ? counterBoundary.register(compKey) : null;
   if (unregister) {
     mountCallback(() => () => unregister());
   }
