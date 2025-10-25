@@ -14,34 +14,32 @@ export default defineConfig({
     }),
     dts({
       outputDir: ['dist'],
-      skipDiagnostics: true,
     }),
   ],
   resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
-    },
+    alias: [{ find: '@', replacement: resolve(__dirname, './src') }],
   },
   build: {
     emptyOutDir: false,
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'lithentVite',
-      fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs'),
+      name: 'lithentHmrParser',
+      fileName: format => {
+        return format === 'umd'
+          ? 'lithentHmrParser.umd.js'
+          : 'lithentHmrParser.mjs';
+      },
     },
     rollupOptions: {
-      external: ['vite', 'lithent'],
+      external: [],
       output: {
-        globals: {
-          vite: 'vite',
-          lithent: 'lithent',
-        },
+        globals: {},
       },
     },
   },
-  server: {
-    port: 4000,
-    open: '/html/parsor.html',
+  test: {
+    environment: 'jsdom',
+    includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
   },
 });

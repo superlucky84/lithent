@@ -1,4 +1,4 @@
-import { transformWithoutMarker } from '../parser';
+import { transformWithoutMarker } from '../noMarkerParse';
 
 const source = `
 'use client';

@@ -1,5 +1,7 @@
 import { h, mount, render } from 'lithent';
 
+/* lithent:hmr-boundary Counter */
+
 const moduleId = new URL(import.meta.url).pathname;
 
 const Counter = mount<{ label: string }>(renew => {

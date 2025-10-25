@@ -4,7 +4,7 @@ import type { BaseTransformOptions, HmrTransformResult } from './types';
 import { analyzeNoMarker } from './shared';
 import { stitchComponentRegistration } from './transform/componentRegister';
 import { wrapRenderCalls } from './transform/renderGuard';
-import { collectComponentMounts } from '../utils/ast/componentCollector';
+import { collectComponentMounts } from './utils/ast/componentCollector';
 
 export const transformWithoutMarker = (
   options: BaseTransformOptions

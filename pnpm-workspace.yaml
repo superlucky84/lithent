@@ -9,4 +9,5 @@ packages:
   - 'lithentDocs'
   - 'createLithent'
   - 'createLithent/express'
+  - 'packages/hmrParser'
   - 'packages/lithentVite'

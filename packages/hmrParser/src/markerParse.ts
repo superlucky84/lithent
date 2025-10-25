@@ -4,7 +4,7 @@ import type { MarkerTransformOptions, HmrTransformResult } from './types';
 import { analyzeMarker } from './shared';
 import { stitchComponentRegistration } from './transform/componentRegister';
 import { wrapRenderCalls } from './transform/renderGuard';
-import { collectComponentMounts } from '../utils/ast/componentCollector';
+import { collectComponentMounts } from './utils/ast/componentCollector';
 
 export const transformWithMarker = (
   options: MarkerTransformOptions

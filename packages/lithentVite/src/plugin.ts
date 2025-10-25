@@ -3,7 +3,7 @@ import {
   transformWithHmr,
   shouldSkipTransform,
   type MarkerTransformOptions,
-} from './parser';
+} from '@lithent/hmr-parser';
 
 export interface LithentVitePluginOptions {
   include?: RegExp | RegExp[];

@@ -9,14 +9,12 @@
     <div id="app"></div>
     <script type="module">
       const params = new URLSearchParams(window.location.search);
-      const target = params.get('target') || 'nomark';
+      const target = params.get('target') || 'hmr';
       const moduleMap = {
-        nomark: '/src/tests/nomark.test.tsx',
-        mark: '/src/tests/mark.test.ts',
-        hmr: '/src/tests/hmr.example.tsx',
+        hmr: '/src/hmr.example.tsx',
       };
-      const entry = moduleMap[target] ?? moduleMap.nomark;
-      import(entry);
+      const entry = moduleMap[target] ?? moduleMap.hmr;
+      import(/* @vite-ignore */ entry);
     </script>
   </body>
 </html>

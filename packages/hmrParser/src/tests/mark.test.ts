@@ -1,4 +1,4 @@
-import { transformWithMarker } from '../parser';
+import { transformWithMarker } from '../markerParse';
 
 const createDefaultMarkerRegex = () =>
   new RegExp(

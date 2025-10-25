@@ -14,6 +14,9 @@
     "test": "vitest run --reporter verbose",
     "test:dev": "vitest"
   },
+  "dependencies": {
+    "@lithent/hmr-parser": "workspace:*"
+  },
   "devDependencies": {
     "lithent": "workspace:*"
   },
@@ -28,12 +31,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/superlucky84/lithent.git"
-  },
-  "dependencies": {
-    "lithent-dev-helper": "workspace:*",
-    "@babel/parser": "^7.26.2",
-    "@babel/types": "^7.26.0",
-    "magic-string": "^0.30.11"
   },
   "peerDependencies": {
     "lithent": "^1.19.1",

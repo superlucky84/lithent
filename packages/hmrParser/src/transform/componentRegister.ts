@@ -1,5 +1,5 @@
 import MagicString from 'magic-string';
-import type { MountInfo } from '../../utils/ast/componentCollector';
+import type { MountInfo } from '../utils/ast/componentCollector';
 
 export const stitchComponentRegistration = (
   ms: MagicString,
