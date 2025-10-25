@@ -18,7 +18,7 @@
     "@lithent/hmr-parser": "workspace:*"
   },
   "devDependencies": {
-    "lithent": "^1.20.0"
+    "lithent": "workspace:*"
   },
   "keywords": [
     "lithent",
