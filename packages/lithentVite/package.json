@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/lithent-vite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vite plugin that wires Lithent-specific HMR boundaries and utilities.",
   "main": "./dist/index.umd.js",
   "module": "./dist/index.mjs",
