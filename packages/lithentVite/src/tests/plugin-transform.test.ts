@@ -32,6 +32,20 @@ const runTransform = async (
     throw new Error('lithentVitePlugin did not provide a transform hook');
   }
 
+  // Call configResolved to simulate vite config resolution
+  if (plugin.configResolved) {
+    const configResolvedHook =
+      typeof plugin.configResolved === 'function'
+        ? plugin.configResolved
+        : plugin.configResolved.handler;
+    if (configResolvedHook) {
+      configResolvedHook({
+        isProduction: false,
+        // Add other necessary config properties
+      } as any);
+    }
+  }
+
   const warn = vi.fn();
   type TransformHook = (
     this: { warn: ReturnType<typeof vi.fn> },

@@ -1,4 +1,4 @@
-import type { PluginOption } from 'vite';
+import type { PluginOption, ResolvedConfig } from 'vite';
 import {
   transformWithHmr,
   shouldSkipTransform,
@@ -10,6 +10,8 @@ export interface LithentVitePluginOptions {
   boundaryMarker?: string;
   createBoundaryImport?: string;
   tagFunctionImport?: string;
+  devtoolsInProd?: boolean;
+  jsxImportSource?: string;
 }
 
 export const DEFAULT_BOUNDARY_MARKER = '/* lithent:hmr-boundary */';
@@ -32,6 +34,7 @@ export const lithentVitePlugin = (
   const boundaryImportSpecifier =
     options.createBoundaryImport ?? 'lithent/devHelper';
   const tagFunctionImportSpecifier = options.tagFunctionImport ?? 'lithent';
+  const jsxImportSource = options.jsxImportSource ?? 'lithent';
 
   const markerPattern =
     boundaryMarker === DEFAULT_BOUNDARY_MARKER
@@ -40,10 +43,64 @@ export const lithentVitePlugin = (
 
   const markerRegex = new RegExp(markerPattern);
 
+  let config: ResolvedConfig;
+  let devToolsEnabled: boolean | undefined = options.devtoolsInProd;
+
   return {
     name: 'lithent:hmr-boundary',
     enforce: 'pre',
+    config() {
+      return {
+        build: {
+          rollupOptions: {
+            onwarn(warning, warn) {
+              // Silence Rollup's module-level directive warnings re:"use client".
+              // They're likely to come from `node_modules` and won't be actionable.
+              if (
+                warning.code === 'MODULE_LEVEL_DIRECTIVE' &&
+                warning.message.includes('use client')
+              ) {
+                return;
+              }
+              // ESBuild seemingly doesn't include mappings for directives, causing
+              // Rollup to emit warnings about missing source locations. This too is
+              // likely to come from `node_modules` and won't be actionable.
+              // evanw/esbuild#3548
+              if (
+                warning.code === 'SOURCEMAP_ERROR' &&
+                warning.message.includes('resolve original location') &&
+                warning.pos === 0
+              ) {
+                return;
+              }
+              warn(warning);
+            },
+          },
+        },
+        esbuild: {
+          jsx: 'automatic',
+          jsxImportSource,
+        },
+        optimizeDeps: {
+          include: [
+            'lithent',
+            'lithent/jsx-runtime',
+            'lithent/jsx-dev-runtime',
+          ],
+        },
+      };
+    },
+    configResolved(resolvedConfig) {
+      config = resolvedConfig;
+      devToolsEnabled =
+        devToolsEnabled ?? (!config.isProduction || options.devtoolsInProd);
+    },
     transform(code, id) {
+      // Skip transform in production unless devtoolsInProd is enabled
+      if (!devToolsEnabled) {
+        return null;
+      }
+
       if (!includePatterns.some(pattern => pattern.test(id))) {
         return null;
       }
