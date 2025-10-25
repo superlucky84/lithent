@@ -4,7 +4,7 @@ export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: CompKey | null } = { value: null };
 export const needDiffRef: { value: boolean } = { value: false };
-export const componentMap: ComponentMap = new Map();
+export const componentMap: ComponentMap = new WeakMap();
 let componentMapManualMode = false;
 
 const setComponetRef = (compKey: CompKey): void => {
