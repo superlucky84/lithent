@@ -18,7 +18,9 @@
     "@lithent/hmr-parser": "workspace:*"
   },
   "devDependencies": {
-    "lithent": "workspace:*"
+    "lithent": "workspace:*",
+    "@mdx-js/rollup": "^3.1.0",
+    "magic-string": "^0.30.12"
   },
   "keywords": [
     "lithent",

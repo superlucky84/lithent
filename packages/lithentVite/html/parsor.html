@@ -11,10 +11,11 @@
       const params = new URLSearchParams(window.location.search);
       const target = params.get('target') || 'hmr';
       const moduleMap = {
-        hmr: '/src/hmr.example.tsx',
+        hmr: () => import('/src/hmr.example.tsx'),
+        mdx: () => import('/src/hmr-mdx.example.mdx'),
       };
-      const entry = moduleMap[target] ?? moduleMap.hmr;
-      import(/* @vite-ignore */ entry);
+      const load = moduleMap[target] ?? moduleMap.hmr;
+      load();
     </script>
   </body>
 </html>

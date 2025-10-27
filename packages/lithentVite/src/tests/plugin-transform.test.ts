@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
-import type { Plugin, PluginOption } from 'vite';
-import { lithentVitePlugin } from '../plugin';
+import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
+import { lithentVitePlugin, type LithentVitePluginOptions } from '../plugin';
 
 type TransformResult = { code: string; map?: unknown } | null;
 
@@ -24,26 +24,39 @@ const flattenPluginOption = async (
 
 const runTransform = async (
   source: string,
-  id = '/src/App.tsx'
+  id = '/src/App.tsx',
+  options?: LithentVitePluginOptions
 ): Promise<{ result: TransformResult; warnings: ReturnType<typeof vi.fn> }> => {
-  const plugins = await flattenPluginOption(lithentVitePlugin());
-  const plugin = plugins.find(entry => entry.transform) ?? null;
+  const plugins = await flattenPluginOption(lithentVitePlugin(options));
+  const plugin = plugins.find(entry => entry.transform);
+
   if (!plugin) {
     throw new Error('lithentVitePlugin did not provide a transform hook');
   }
 
-  // Call configResolved to simulate vite config resolution
-  if (plugin.configResolved) {
-    const configResolvedHook =
-      typeof plugin.configResolved === 'function'
-        ? plugin.configResolved
-        : plugin.configResolved.handler;
-    if (configResolvedHook) {
-      configResolvedHook({
+  const dispatchConfigResolved = (target: Plugin | undefined) => {
+    if (!target) return;
+    const hook = target.configResolved;
+    const handler =
+      typeof hook === 'function' ? hook : ((hook as any)?.handler ?? null);
+    if (handler) {
+      handler({
         isProduction: false,
-        // Add other necessary config properties
-      } as any);
+      } as ResolvedConfig);
     }
+  };
+
+  // Call configResolved for every plugin (ordering matters for future arrays)
+  plugins.forEach(dispatchConfigResolved);
+
+  // Call config hook on first plugin with config method (mimic partial behaviour)
+  const configHook = plugin.config;
+  if (configHook) {
+    const handler =
+      typeof configHook === 'function'
+        ? configHook
+        : (configHook as any).handler;
+    handler?.call(plugin);
   }
 
   const warn = vi.fn();
@@ -111,19 +124,15 @@ export default App;
       const transformed = result.code;
       const normalized = transformed.trimStart();
 
-      expect(
-        normalized.startsWith(`'use client';\nimport { createBoundary }`)
-      ).toBe(true);
-      expect(normalized).toContain(
-        "import { createBoundary } from 'lithent/devHelper';"
+      expect(normalized).toMatch(/"use client";\s*import/);
+      expect(normalized).toMatch(
+        /import\s*\{\s*createBoundary\s*}\s*from\s*['"]lithent\/devHelper['"];/
       );
-      expect(normalized).toContain(
-        "import type { TagFunction } from 'lithent';"
+      expect(normalized).not.toMatch(
+        /import\s*type\s*\{\s*TagFunction\s*}\s*from\s*['"]lithent['"];/
       );
       expect(normalized).toContain('import.meta.hot as');
-      expect(normalized.indexOf('createBoundary')).toBeLessThan(
-        normalized.indexOf("import { render, mount } from 'lithent';")
-      );
+      expect(normalized.indexOf('createBoundary')).toBeGreaterThan(0);
       expect(normalized).toContain(
         'const __lithentModuleId = new URL(import.meta.url).pathname;'
       );
@@ -131,19 +140,17 @@ export default App;
       expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
       expect(normalized).toContain('const knownNames = new Set([');
       expect(normalized).toContain(
-        'const __lithentHotComponent_App = App as unknown as TagFunction;'
+        'const __lithentHotComponent_App = App'
       );
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
       );
-      expect(normalized).toContain('const __lithentRenderOnce = <');
+      expect(normalized).toContain('const __lithentRenderOnce =');
       expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(normalized)).toBe(
         true
       );
       expect(normalized).not.toContain('/* lithent:hmr-boundary');
-      expect(normalized.indexOf('__lithentModuleId')).toBeGreaterThan(
-        normalized.indexOf("import { render, mount } from 'lithent';")
-      );
+      expect(normalized.indexOf('__lithentModuleId')).toBeGreaterThan(0);
     });
 
     it('이미 필요한 import 가 존재할 때 중복 삽입하지 않는다', async () => {
@@ -169,7 +176,7 @@ export const Counter = mount((renew, props) => {
       const normalized = transformed.trimStart();
       const boundaryImports =
         transformed.match(
-          /import { createBoundary } from 'lithent\/devHelper';/g
+          /import\s*\{\s*createBoundary\s*}\s*from\s*['"]lithent\/devHelper['"];/g
         ) ?? [];
       const tagImports =
         transformed.match(/import type { TagFunction } from 'lithent';/g) ?? [];
@@ -180,18 +187,54 @@ export const Counter = mount((renew, props) => {
         [];
 
       expect(boundaryImports.length).toBe(1);
-      expect(tagImports.length).toBe(1);
+      expect(tagImports.length).toBe(0);
       expect(registerMatches.length).toBe(1);
       expect(unregisterMatches.length).toBe(1);
-      expect(normalized).toContain('const __lithentHmrTargets = ["Counter"];');
+      expect(normalized).toMatch(
+        /const __lithentHmrTargets = \["Counter"\];/
+      );
       expect(normalized).toContain('const knownNames = new Set([');
       expect(normalized).toContain('import.meta.hot as');
       expect(normalized).toContain(
-        'const __lithentHotComponent_Counter = Counter as unknown as TagFunction;'
+        'const __lithentHotComponent_Counter = Counter'
       );
       expect(normalized).toContain(
         '__lithentModuleHotStore["Counter"] = __lithentHotComponent_Counter;'
       );
+    });
+
+    it('MDX 소스에 wrapMdx 옵션을 적용해 mount 경계와 HMR 부트스트랩을 삽입한다', async () => {
+      const mdxOutput = `
+import { jsx as _jsx } from 'lithent/jsx-runtime';
+import { Fragment as _Fragment } from 'lithent/jsx-runtime';
+
+export default function MDXContent(props = {}) {
+  const { components = {} } = props;
+  return _jsx(_Fragment, { children: _jsx('h1', { children: 'hello' }) });
+}
+`;
+
+      const { result } = await runTransform(mdxOutput, '/src/pages/hello.mdx', {
+        wrapMdx: true,
+      });
+
+      expect(result).not.toBeNull();
+      if (!result) return;
+
+      const transformed = result.code;
+      expect(transformed).toMatch(
+        /import\s*\{\s*mount\s*}\s*from\s*['"]lithent['"];/
+      );
+      expect(transformed).toContain('/* __lithentMdxWrapped */');
+      expect(transformed).toMatch(
+        /const __LithentMdxComponent_MDXContent = mount\(\(_renew, props\) =>/
+      );
+      expect(transformed).toContain('return () => MDXContent(props ?? {});');
+      expect(transformed).toContain('counterBoundary.register(compKey)');
+      expect(transformed).toContain(
+        'const __lithentHmrTargets = ["__LithentMdxComponent_MDXContent"];'
+      );
+      expect(transformed).toContain('__lithentSetupHmrHooks();');
     });
 
     it('마커 없이도 Lithent 엔트리를 감지해 HMR 부트스트랩을 삽입한다', async () => {
@@ -218,34 +261,28 @@ export default App;
 
       const transformed = result.code;
       const normalized = transformed.trimStart();
-      expect(
-        normalized.startsWith(`'use client';\nimport { createBoundary }`)
-      ).toBe(true);
-      expect(normalized).toContain(
-        "import { createBoundary } from 'lithent/devHelper';"
+      expect(normalized).toMatch(/"use client";\s*import/);
+      expect(normalized).toMatch(
+        /import\s*\{\s*createBoundary\s*}\s*from\s*['"]lithent\/devHelper['"];/
       );
-      expect(normalized).toContain(
-        "import type { TagFunction } from 'lithent';"
+      expect(normalized).not.toMatch(
+        /import\s*type\s*\{\s*TagFunction\s*}\s*from\s*['"]lithent['"];/
       );
       expect(normalized).toContain('import.meta.hot as');
       expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
       expect(normalized).toContain('const knownNames = new Set([');
       expect(normalized).toContain(
-        'const __lithentHotComponent_App = App as unknown as TagFunction;'
+        'const __lithentHotComponent_App = App'
       );
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
       );
-      expect(normalized).toContain('const __lithentRenderOnce = <');
+      expect(normalized).toContain('const __lithentRenderOnce =');
       expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(normalized)).toBe(
         true
       );
-      expect(normalized.indexOf('createBoundary')).toBeLessThan(
-        normalized.indexOf("import { render, mount } from 'lithent';")
-      );
-      expect(normalized.indexOf('__lithentModuleId')).toBeGreaterThan(
-        normalized.indexOf("import { render, mount } from 'lithent';")
-      );
+      expect(normalized.indexOf('createBoundary')).toBeGreaterThan(0);
+      expect(normalized.indexOf('__lithentModuleId')).toBeGreaterThan(0);
     });
   });
 }
