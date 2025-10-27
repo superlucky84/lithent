@@ -25,7 +25,7 @@ export default defineConfig({
     },
   },
   server: {
-    open: '/html/parsor.html?target=hmr',
+    open: '/html/parsor.html?target=mdx',
   },
   optimizeDeps: {
     include: ['lithent', 'lithent/devHelper'],

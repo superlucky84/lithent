@@ -12,7 +12,7 @@
       const target = params.get('target') || 'hmr';
       const moduleMap = {
         hmr: () => import('/src/hmr.example.tsx'),
-        mdx: () => import('/src/hmr-mdx.example.mdx'),
+        mdx: () => import('/src/hmr-mdx.entry.tsx'),
       };
       const load = moduleMap[target] ?? moduleMap.hmr;
       load();
