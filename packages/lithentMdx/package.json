@@ -1,29 +1,30 @@
 {
   "type": "module",
-  "name": "@lithent/lithent-vite",
+  "name": "@lithent/lithent-mdx",
   "version": "0.2.0",
-  "description": "Vite plugin that wires Lithent-specific HMR boundaries and utilities.",
+  "description": "Vite plugin for MDX support in Lithent applications",
   "main": "./dist/index.umd.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "vite",
-    "dev:plugin": "vite --config vite.config.plugin.ts",
+    "dev": "vite --config vite.config.dev.ts",
     "build": "vite build",
     "watch": "vite build --watch",
     "test": "vitest run --reporter verbose",
     "test:dev": "vitest"
   },
   "dependencies": {
-    "@lithent/hmr-parser": "workspace:*"
+    "@mdx-js/rollup": "^3.1.0"
   },
   "devDependencies": {
-    "lithent": "workspace:*"
+    "@lithent/hmr-parser": "workspace:*",
+    "lithent": "workspace:*",
+    "vite": "^5.4.8"
   },
   "keywords": [
     "lithent",
     "vite",
-    "hmr"
+    "mdx"
   ],
   "author": "superlucky84",
   "license": "MIT",

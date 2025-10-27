@@ -13,6 +13,7 @@ Official Vite plugin for Lithent with HMR support.
 - **Marker support**: Explicit HMR boundary control with comments
 - **Type-safe**: Full TypeScript support
 - **Zero config**: Works out of the box with sensible defaults
+- **MDX support**: Toggle `wrapMdx` to apply Lithent HMR boundaries to MDX routes
 
 ## Installation
 
@@ -54,8 +55,8 @@ import lithentVitePlugin from '@lithent/lithent-vite';
 export default defineConfig({
   plugins: [
     lithentVitePlugin({
-      // Include specific file patterns (default: [/\.([cm]?[tj]sx?)$/])
-      include: /\.tsx?$/,
+      // Include specific file patterns (default: [/\\.([cm]?[tj]sx?)$/])
+      include: /\\.tsx?$/,
 
       // Custom HMR boundary marker (default: '/* lithent:hmr-boundary */')
       boundaryMarker: '/* lithent:hmr-boundary */',
@@ -69,10 +70,23 @@ export default defineConfig({
 
       // JSX import source (default: 'lithent')
       jsxImportSource: 'lithent',
+
+      // Wrap MDX default exports with mount for Lithent HMR (default: false)
+      wrapMdx: true,
     }),
   ],
 });
 ```
+
+### MDX HMR playground
+
+Run the package-local dev server to try live MDX updates:
+
+```bash
+pnpm --filter @lithent/lithent-vite dev:plugin
+```
+
+Open `http://localhost:5173/html/parsor.html?target=mdx` and edit `src/hmr-mdx.example.mdx` to confirm that changes apply without a full refresh.
 
 ### SSR Setup (Express/Node.js)
 

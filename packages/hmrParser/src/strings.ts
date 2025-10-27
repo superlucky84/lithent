@@ -14,17 +14,11 @@ const __lithentBoundaryStoreKey = \`__lithent_hmr_boundary__\${__lithentModuleId
 const __lithentDisposeStoreKey = \`__lithent_hmr_dispose__\${__lithentModuleId}\`;
 const __lithentGlobalStore =
   typeof globalThis === 'object'
-    ? (globalThis as Record<string, unknown>)
+    ? globalThis
     : undefined;
 
-const __lithentEnsureHotData = (): Record<string, unknown> | undefined => {
-  const hot =
-    (import.meta.hot as
-      | {
-          data?: Record<string, unknown>;
-          __lithentData?: Record<string, unknown>;
-        }
-      | undefined) ?? undefined;
+const __lithentEnsureHotData = () => {
+  const hot = import.meta.hot ?? undefined;
   if (!hot) return undefined;
 
   const existing = hot.data;
@@ -33,7 +27,7 @@ const __lithentEnsureHotData = (): Record<string, unknown> | undefined => {
   }
 
   try {
-    const target: Record<string, unknown> = {};
+    const target = {};
     hot.data = target;
     return target;
   } catch {
@@ -43,11 +37,10 @@ const __lithentEnsureHotData = (): Record<string, unknown> | undefined => {
 };
 
 const __lithentHotData = __lithentEnsureHotData();
-type __LithentBoundaryController = ReturnType<typeof createBoundary>;
 
-const counterBoundary: __LithentBoundaryController =
-  (__lithentHotData?.counterBoundary as __LithentBoundaryController | undefined) ||
-  (__lithentGlobalStore?.[__lithentBoundaryStoreKey] as __LithentBoundaryController | undefined) ||
+const counterBoundary =
+  __lithentHotData?.counterBoundary ||
+  __lithentGlobalStore?.[__lithentBoundaryStoreKey] ||
   createBoundary(__lithentModuleId);
 
 if (__lithentHotData) {
@@ -59,18 +52,18 @@ if (__lithentGlobalStore) {
 }
 
 let disposeApp =
-  (__lithentHotData?.disposeApp as (() => void) | undefined) ||
-  (__lithentGlobalStore?.[__lithentDisposeStoreKey] as (() => void) | undefined);
+  __lithentHotData?.disposeApp ||
+  __lithentGlobalStore?.[__lithentDisposeStoreKey];
 
-const __lithentRenderOnce = <T,>(factory: () => T) => {
+const __lithentRenderOnce = (factory) => {
   if (disposeApp) {
-    return disposeApp as unknown as T;
+    return disposeApp;
   }
 
   const result = factory();
 
   if (typeof result === 'function') {
-    disposeApp = result as unknown as () => void;
+    disposeApp = result;
 
     if (__lithentHotData) {
       __lithentHotData.disposeApp = disposeApp;
@@ -87,10 +80,7 @@ const __lithentRenderOnce = <T,>(factory: () => T) => {
 const __lithentModuleHotStore =
   __lithentHotData
     ? ((__lithentHotData.components =
-        (__lithentHotData.components as Record<
-          string,
-          TagFunction | undefined
-        > | undefined) ?? {}) as Record<string, TagFunction | undefined>)
+        __lithentHotData.components ?? {}))
     : undefined;
 
 const __lithentHmrTargets = ${serializedTargets};
@@ -102,8 +92,8 @@ const __lithentSetupHmrHooks = () => {
 
   import.meta.hot.accept(mod => {
     let applied = false;
-    const nextModule = (mod ?? {}) as Record<string, unknown>;
-    const missing: string[] = [];
+    const nextModule = mod ?? {};
+    const missing = [];
     const knownNames = new Set([
       ...${JSON.stringify(Array.from(new Set(componentNames)))},
       ...__lithentHmrTargets,
@@ -112,9 +102,9 @@ const __lithentSetupHmrHooks = () => {
     for (const name of knownNames) {
       const nextCtor =
         name === 'default'
-          ? (nextModule.default as TagFunction | undefined)
-          : (nextModule[name] as TagFunction | undefined) ||
-            (__lithentModuleHotStore?.[name] as TagFunction | undefined);
+          ? nextModule.default
+          : nextModule[name] ||
+            __lithentModuleHotStore?.[name];
 
       if (!nextCtor) {
         missing.push(name);
@@ -131,9 +121,7 @@ const __lithentSetupHmrHooks = () => {
         queueMicrotask(() => {
           let retried = false;
           for (const name of missing) {
-            const retryCtor = __lithentModuleHotStore?.[name] as
-              | TagFunction
-              | undefined;
+            const retryCtor = __lithentModuleHotStore?.[name];
             if (retryCtor && counterBoundary.update(retryCtor)) {
               retried = true;
             }

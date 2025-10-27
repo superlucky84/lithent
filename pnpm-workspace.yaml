@@ -11,3 +11,4 @@ packages:
   - 'createLithent/express'
   - 'packages/hmrParser'
   - 'packages/lithentVite'
+  - 'packages/lithentMdx'

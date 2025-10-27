@@ -294,6 +294,22 @@ importers:
         specifier: ^2.1.5
         version: 2.1.9(@types/node@22.9.0)(happy-dom@9.20.3)(jsdom@25.0.1)(lightningcss@1.30.1)(terser@5.18.1)
 
+  packages/lithentMdx:
+    dependencies:
+      '@mdx-js/rollup':
+        specifier: ^3.1.0
+        version: 3.1.0(acorn@8.14.0)(rollup@4.24.0)
+    devDependencies:
+      '@lithent/hmr-parser':
+        specifier: workspace:*
+        version: link:../hmrParser
+      lithent:
+        specifier: workspace:*
+        version: link:../..
+      vite:
+        specifier: ^5.4.8
+        version: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
+
   packages/lithentVite:
     dependencies:
       '@lithent/hmr-parser':

@@ -1,4 +1,4 @@
-import type { PluginOption, ResolvedConfig } from 'vite';
+import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
 import {
   transformWithHmr,
   shouldSkipTransform,
@@ -18,7 +18,7 @@ export const DEFAULT_BOUNDARY_MARKER = '/* lithent:hmr-boundary */';
 
 const toRegExpArray = (value: RegExp | RegExp[] | undefined): RegExp[] => {
   if (!value) {
-    return [/\.([cm]?[tj]sx?)$/];
+    return [/\.([cm]?[tj]sx?|mdx)$/];
   }
   return Array.isArray(value) ? value : [value];
 };
@@ -46,9 +46,8 @@ export const lithentVitePlugin = (
   let config: ResolvedConfig;
   let devToolsEnabled: boolean | undefined = options.devtoolsInProd;
 
-  return {
+  const plugin: Plugin = {
     name: 'lithent:hmr-boundary',
-    enforce: 'pre',
     config() {
       return {
         build: {
@@ -95,7 +94,7 @@ export const lithentVitePlugin = (
       devToolsEnabled =
         devToolsEnabled ?? (!config.isProduction || options.devtoolsInProd);
     },
-    transform(code, id) {
+    async transform(code, id) {
       // Skip transform in production unless devtoolsInProd is enabled
       if (!devToolsEnabled) {
         return null;
@@ -128,12 +127,16 @@ export const lithentVitePlugin = (
         return null;
       }
 
+      // Since we're enforce: 'post', esbuild has already transformed the code.
+      // We just inject HMR code and return.
       return {
         code: result.code,
         map: result.map ?? undefined,
       };
     },
   };
+
+  return plugin;
 };
 
 export default lithentVitePlugin;
