@@ -1,5 +1,5 @@
 import { mount, render } from 'lithent';
-import MdxExample from './hmr-mdx.example.mdx';
+import MdxExample from './mdx.example.mdx';
 
 const Counter = mount(renew => {
   let count = 0;

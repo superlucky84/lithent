@@ -1,18 +1,19 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import lithentVitePlugin from './src/plugin';
+import lithentMdxPlugin from './src/plugin.ts';
+import { lithentVitePlugin } from '../lithentVite/src/plugin.ts';
 
 export default defineConfig({
   root: __dirname,
   publicDir: false,
-  plugins: [lithentVitePlugin()],
+  plugins: [lithentMdxPlugin(), lithentVitePlugin()],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
     },
   },
   server: {
-    open: '/html/parsor.html',
+    open: '/html/index.html',
   },
   optimizeDeps: {
     include: ['lithent', 'lithent/devHelper'],

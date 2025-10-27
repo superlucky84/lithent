@@ -1,9 +1,7 @@
 import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
-import { transformWithEsbuild } from 'vite';
 import {
   transformWithHmr,
   shouldSkipTransform,
-  wrapMdxModule,
   type MarkerTransformOptions,
 } from '@lithent/hmr-parser';
 
@@ -14,14 +12,13 @@ export interface LithentVitePluginOptions {
   tagFunctionImport?: string;
   devtoolsInProd?: boolean;
   jsxImportSource?: string;
-  wrapMdx?: boolean;
 }
 
 export const DEFAULT_BOUNDARY_MARKER = '/* lithent:hmr-boundary */';
 
 const toRegExpArray = (value: RegExp | RegExp[] | undefined): RegExp[] => {
   if (!value) {
-    return [/\.([cm]?[tj]sx?)$/];
+    return [/\.([cm]?[tj]sx?|mdx)$/];
   }
   return Array.isArray(value) ? value : [value];
 };
@@ -32,13 +29,7 @@ const escapeRegExp = (value: string) =>
 export const lithentVitePlugin = (
   options: LithentVitePluginOptions = {}
 ): PluginOption => {
-  const wrapMdx = options.wrapMdx ?? false;
-  const includePatterns = toRegExpArray(
-    options.include ??
-      (wrapMdx
-        ? [/\.([cm]?[tj]sx?)$/i, /\.mdx(?:$|\?)/i]
-        : [/\.([cm]?[tj]sx?)$/i])
-  );
+  const includePatterns = toRegExpArray(options.include);
   const boundaryMarker = options.boundaryMarker ?? DEFAULT_BOUNDARY_MARKER;
   const boundaryImportSpecifier =
     options.createBoundaryImport ?? 'lithent/devHelper';
@@ -57,7 +48,6 @@ export const lithentVitePlugin = (
 
   const plugin: Plugin = {
     name: 'lithent:hmr-boundary',
-    enforce: 'post',
     config() {
       return {
         build: {
@@ -105,37 +95,23 @@ export const lithentVitePlugin = (
         devToolsEnabled ?? (!config.isProduction || options.devtoolsInProd);
     },
     async transform(code, id) {
-      const [filepath] = id.split('?', 1);
-      const isMdxFile = wrapMdx && /\.mdx$/i.test(filepath);
-
-      let workingCode = code;
-      let modified = false;
-
-      if (isMdxFile) {
-        const wrapResult = wrapMdxModule(workingCode);
-        workingCode = wrapResult.code;
-        if (wrapResult.modified) {
-          modified = true;
-        }
-      }
-
       // Skip transform in production unless devtoolsInProd is enabled
       if (!devToolsEnabled) {
-        return modified ? { code: workingCode, map: null } : null;
+        return null;
       }
 
       if (!includePatterns.some(pattern => pattern.test(id))) {
-        return modified ? { code: workingCode, map: null } : null;
+        return null;
       }
 
-      if (shouldSkipTransform(workingCode)) {
-        return modified ? { code: workingCode, map: null } : null;
+      if (shouldSkipTransform(code)) {
+        return null;
       }
 
       let result;
       try {
         result = transformWithHmr({
-          code: workingCode,
+          code,
           markerRegex,
           boundaryImportSpecifier,
           tagFunctionImportSpecifier,
@@ -144,41 +120,18 @@ export const lithentVitePlugin = (
         this.warn(
           `[@lithent/lithent-vite] ${id} 파싱 실패: ${(error as Error).message}`
         );
-        return modified ? { code: workingCode, map: null } : null;
-      }
-
-      const shouldReturn = result.transformed || modified;
-      if (!shouldReturn) {
         return null;
       }
 
-      let outputCode = result.transformed ? result.code : workingCode;
-      let outputMap = result.map ?? null;
-
-      const isTsLike = /\.[cm]?tsx?$/i.test(filepath);
-      const isMdxFileForEsbuild = /\.mdx$/i.test(filepath);
-      if (isTsLike || isMdxFileForEsbuild) {
-        const loader =
-          filepath.endsWith('x') || isMdxFileForEsbuild ? 'tsx' : 'ts';
-        const buildTarget = config?.build?.target;
-        const normalizedTarget =
-          typeof buildTarget === 'string' || Array.isArray(buildTarget)
-            ? buildTarget
-            : undefined;
-        const esbuildResult = await transformWithEsbuild(outputCode, filepath, {
-          loader,
-          jsx: 'automatic',
-          jsxImportSource,
-          sourcemap: true,
-          target: normalizedTarget ?? 'esnext',
-        });
-        outputCode = esbuildResult.code;
-        outputMap = esbuildResult.map || outputMap;
+      if (!result.transformed) {
+        return null;
       }
 
+      // Since we're enforce: 'post', esbuild has already transformed the code.
+      // We just inject HMR code and return.
       return {
-        code: outputCode,
-        map: outputMap ?? undefined,
+        code: result.code,
+        map: result.map ?? undefined,
       };
     },
   };

@@ -65,9 +65,7 @@ if (import.meta.vitest) {
       expect(result.code.includes('...["Demo","Another"]')).toBe(true);
       expect(result.code.includes('...__lithentHmrTargets')).toBe(true);
       expect(
-        result.code.includes(
-          'const __lithentHotComponent_Demo = Demo as unknown as TagFunction;'
-        )
+        result.code.includes('const __lithentHotComponent_Demo = Demo;')
       ).toBe(true);
       expect(
         result.code.includes(
@@ -75,16 +73,16 @@ if (import.meta.vitest) {
         )
       ).toBe(true);
       expect(
-        result.code.includes(
-          'const __lithentHotComponent_Another = Another as unknown as TagFunction;'
-        )
+        result.code.includes('const __lithentHotComponent_Another = Another;')
       ).toBe(true);
       expect(
         result.code.includes(
           '__lithentModuleHotStore["Another"] = __lithentHotComponent_Another;'
         )
       ).toBe(true);
-      expect(result.code.includes('const __lithentRenderOnce = <')).toBe(true);
+      expect(result.code.includes('const __lithentRenderOnce = (factory)')).toBe(
+        true
+      );
       expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(result.code)).toBe(
         true
       );

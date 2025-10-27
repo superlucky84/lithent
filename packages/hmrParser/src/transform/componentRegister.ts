@@ -39,7 +39,7 @@ export const stitchComponentRegistration = (
     if (componentName) {
       const hotStoreVar = `__lithentHotComponent_${componentName}`;
       const storeSnippet = `
-const ${hotStoreVar} = ${componentName} as unknown as TagFunction;
+const ${hotStoreVar} = ${componentName};
 if (__lithentModuleHotStore) {
   __lithentModuleHotStore["${componentName}"] = ${hotStoreVar};
 }

@@ -15,7 +15,8 @@ Object.defineProperty(globalThis, 'TextDecoder', {
 const __lithentVerifyTextEncoding = () => {
   const encoded = new TextEncoder().encode('');
   if (!(encoded instanceof Uint8Array)) {
-    const ctor = encoded.constructor as typeof Uint8Array | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ctor = (encoded as any).constructor as typeof Uint8Array | undefined;
     if (ctor && ctor.name === 'Uint8Array') {
       Object.defineProperty(globalThis, 'Uint8Array', {
         value: ctor,
@@ -24,7 +25,8 @@ const __lithentVerifyTextEncoding = () => {
       });
     } else {
       throw new Error(
-        `TextEncoder polyfill failed: constructor=${encoded.constructor?.name}`
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        `TextEncoder polyfill failed: constructor=${(encoded as any).constructor?.name}`
       );
     }
   }

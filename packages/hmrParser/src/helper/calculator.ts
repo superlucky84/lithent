@@ -86,11 +86,10 @@ export const collectHeaderInsert = (
   ast: File,
   sourceCode: string,
   boundaryImportSpecifier: string,
-  tagFunctionImportSpecifier: string
+  _tagFunctionImportSpecifier: string
 ) => {
   const importsToPrepend: string[] = [];
   let hasBoundaryImport = false;
-  let hasTagImport = false;
   let lastImportEnd = 0;
   let directiveEnd = 0;
   let firstImportStart: number | null = null;
@@ -104,20 +103,6 @@ export const collectHeaderInsert = (
 
       if (node.source.value === boundaryImportSpecifier) {
         hasBoundaryImport = true;
-      }
-
-      if (node.source.value === tagFunctionImportSpecifier) {
-        const hasTag = node.specifiers.some(specifier => {
-          return (
-            specifier.type === 'ImportSpecifier' &&
-            specifier.imported.type === 'Identifier' &&
-            specifier.imported.name === 'TagFunction'
-          );
-        });
-
-        if (hasTag) {
-          hasTagImport = true;
-        }
       }
 
       continue;
@@ -145,11 +130,10 @@ export const collectHeaderInsert = (
     );
   }
 
-  if (!hasTagImport) {
-    importsToPrepend.push(
-      `import type { TagFunction } from '${tagFunctionImportSpecifier}';`
-    );
-  }
+  // Note: We don't add TagFunction import anymore since:
+  // 1. In enforce:'post', esbuild already removed type imports
+  // 2. The type is only used for TypeScript casting, not at runtime
+  // 3. Adding "import type" in post-transform breaks browser execution
 
   const importInsertionPos = firstImportStart ?? directiveEnd ?? 0;
   const blockInsertionPos = lastImportEnd || directiveEnd || 0;
