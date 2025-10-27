@@ -45,8 +45,4 @@ export default defineConfig({
     port: 4000,
     open: '/html/parsor.html',
   },
-  test: {
-    environment: 'jsdom',
-    setupFiles: resolve(__dirname, 'vitest.setup.ts'),
-  },
 });

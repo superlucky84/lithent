@@ -1,5 +1,3 @@
-import './polyfills';
-
 import { vi } from 'vitest';
 import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
 import { lithentVitePlugin, type LithentVitePluginOptions } from '../plugin';
