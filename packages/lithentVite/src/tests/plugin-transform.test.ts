@@ -139,9 +139,7 @@ export default App;
       expect(normalized).toContain('__lithentSetupHmrHooks();');
       expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
       expect(normalized).toContain('const knownNames = new Set([');
-      expect(normalized).toContain(
-        'const __lithentHotComponent_App = App'
-      );
+      expect(normalized).toContain('const __lithentHotComponent_App = App');
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
       );
@@ -190,9 +188,7 @@ export const Counter = mount((renew, props) => {
       expect(tagImports.length).toBe(0);
       expect(registerMatches.length).toBe(1);
       expect(unregisterMatches.length).toBe(1);
-      expect(normalized).toMatch(
-        /const __lithentHmrTargets = \["Counter"\];/
-      );
+      expect(normalized).toMatch(/const __lithentHmrTargets = \["Counter"\];/);
       expect(normalized).toContain('const knownNames = new Set([');
       expect(normalized).toContain('import.meta.hot as');
       expect(normalized).toContain(
@@ -271,9 +267,7 @@ export default App;
       expect(normalized).toContain('import.meta.hot as');
       expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
       expect(normalized).toContain('const knownNames = new Set([');
-      expect(normalized).toContain(
-        'const __lithentHotComponent_App = App'
-      );
+      expect(normalized).toContain('const __lithentHotComponent_App = App');
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
       );
