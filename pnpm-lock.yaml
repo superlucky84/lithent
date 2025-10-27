@@ -296,22 +296,16 @@ importers:
 
   packages/lithentMdx:
     dependencies:
-      '@lithent/hmr-parser':
-        specifier: workspace:*
-        version: link:../hmrParser
       '@mdx-js/rollup':
         specifier: ^3.1.0
         version: 3.1.0(acorn@8.14.0)(rollup@4.24.0)
     devDependencies:
-      '@lithent/lithent-vite':
+      '@lithent/hmr-parser':
         specifier: workspace:*
-        version: link:../lithentVite
+        version: link:../hmrParser
       lithent:
         specifier: workspace:*
         version: link:../..
-      magic-string:
-        specifier: ^0.30.12
-        version: 0.30.19
       vite:
         specifier: ^5.4.8
         version: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
@@ -325,15 +319,9 @@ importers:
         specifier: ^5.0.0
         version: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
     devDependencies:
-      '@mdx-js/rollup':
-        specifier: ^3.1.0
-        version: 3.1.0(acorn@8.14.0)(rollup@4.24.0)
       lithent:
         specifier: workspace:*
         version: link:../..
-      magic-string:
-        specifier: ^0.30.12
-        version: 0.30.19
 
   ssr:
     devDependencies:

@@ -80,9 +80,9 @@ if (import.meta.vitest) {
           '__lithentModuleHotStore["Another"] = __lithentHotComponent_Another;'
         )
       ).toBe(true);
-      expect(result.code.includes('const __lithentRenderOnce = (factory)')).toBe(
-        true
-      );
+      expect(
+        result.code.includes('const __lithentRenderOnce = (factory)')
+      ).toBe(true);
       expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(result.code)).toBe(
         true
       );

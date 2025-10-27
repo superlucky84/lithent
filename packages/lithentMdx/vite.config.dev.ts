@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import lithentMdxPlugin from './src/plugin.ts';
-import { lithentVitePlugin } from '../lithentVite/src/plugin.ts';
+import lithentMdxPlugin from './src/plugin';
+import { lithentVitePlugin } from '../lithentVite/src/plugin';
 
 export default defineConfig({
   root: __dirname,
