@@ -20,10 +20,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@lithent/hmr-parser': resolve(
-        __dirname,
-        '../hmrParser/src/index.ts'
-      ),
+      '@lithent/hmr-parser': resolve(__dirname, '../hmrParser/src/index.ts'),
     },
   },
   build: {
@@ -47,5 +44,9 @@ export default defineConfig({
   server: {
     port: 4000,
     open: '/html/parsor.html',
+  },
+  test: {
+    environment: 'jsdom',
+    setupFiles: resolve(__dirname, 'vitest.setup.ts'),
   },
 });

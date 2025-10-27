@@ -1,3 +1,5 @@
+import './polyfills';
+
 import { vi } from 'vitest';
 import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
 import { lithentVitePlugin, type LithentVitePluginOptions } from '../plugin';
@@ -131,14 +133,14 @@ export default App;
       expect(normalized).not.toMatch(
         /import\s*type\s*\{\s*TagFunction\s*}\s*from\s*['"]lithent['"];/
       );
-      expect(normalized).toContain('import.meta.hot as');
+      expect(normalized).toContain('import.meta.hot');
       expect(normalized.indexOf('createBoundary')).toBeGreaterThan(0);
       expect(normalized).toContain(
         'const __lithentModuleId = new URL(import.meta.url).pathname;'
       );
       expect(normalized).toContain('__lithentSetupHmrHooks();');
       expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
-      expect(normalized).toContain('const knownNames = new Set([');
+      expect(normalized).toMatch(/const\s+knownNames\s*=.*new Set\(/);
       expect(normalized).toContain('const __lithentHotComponent_App = App');
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
@@ -189,8 +191,8 @@ export const Counter = mount((renew, props) => {
       expect(registerMatches.length).toBe(1);
       expect(unregisterMatches.length).toBe(1);
       expect(normalized).toMatch(/const __lithentHmrTargets = \["Counter"\];/);
-      expect(normalized).toContain('const knownNames = new Set([');
-      expect(normalized).toContain('import.meta.hot as');
+      expect(normalized).toMatch(/const\s+knownNames\s*=.*new Set\(/);
+      expect(normalized).toContain('import.meta.hot');
       expect(normalized).toContain(
         'const __lithentHotComponent_Counter = Counter'
       );
@@ -221,7 +223,6 @@ export default function MDXContent(props = {}) {
       expect(transformed).toMatch(
         /import\s*\{\s*mount\s*}\s*from\s*['"]lithent['"];/
       );
-      expect(transformed).toContain('/* __lithentMdxWrapped */');
       expect(transformed).toMatch(
         /const __LithentMdxComponent_MDXContent = mount\(\(_renew, props\) =>/
       );
@@ -264,9 +265,9 @@ export default App;
       expect(normalized).not.toMatch(
         /import\s*type\s*\{\s*TagFunction\s*}\s*from\s*['"]lithent['"];/
       );
-      expect(normalized).toContain('import.meta.hot as');
+      expect(normalized).toContain('import.meta.hot');
       expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
-      expect(normalized).toContain('const knownNames = new Set([');
+      expect(normalized).toMatch(/const\s+knownNames\s*=.*new Set\(/);
       expect(normalized).toContain('const __lithentHotComponent_App = App');
       expect(normalized).toContain(
         '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'

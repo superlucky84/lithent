@@ -9,7 +9,6 @@ export default defineConfig({
   plugins: [
     mdx({
       jsxImportSource: 'lithent',
-      outputFormat: 'esm',
     }),
     lithentVitePlugin({
       wrapMdx: true,
@@ -18,10 +17,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
-      '@lithent/hmr-parser': resolve(
-        __dirname,
-        '../hmrParser/src/index.ts'
-      ),
     },
   },
   server: {
