@@ -41,6 +41,21 @@ describe('Parser', () => {
       expect(element.isSelfClosing).toBe(true);
     });
 
+    it('should parse fragment', () => {
+      const tokens = tokenize('<><div></div><span /></>');
+      const ast = parse(tokens);
+
+      expect(ast.children).toHaveLength(1);
+      const fragment = expectFragment(ast.children[0]);
+      expect(fragment.type).toBe(NodeType.FRAGMENT);
+      expect(fragment.children).toHaveLength(2);
+
+      const firstChild = expectElement(fragment.children[0]);
+      expect(firstChild.tag).toBe('div');
+      const secondChild = expectElement(fragment.children[1]);
+      expect(secondChild.tag).toBe('span');
+    });
+
     it('should parse component (PascalCase)', () => {
       const tokens = tokenize('<MyComponent></MyComponent>');
       const ast = parse(tokens);
@@ -426,6 +441,173 @@ describe('Parser', () => {
       // Should have template and p as children
       expect(card.children.length).toBeGreaterThan(0);
     });
+
+    it('should parse deeply nested structures', () => {
+      const template = `
+<>
+  <Card l-for={(section, sectionIndex) in sections} key={section.id}>
+    <Section.Header l-if={section.showHeader}>
+      <!-- header -->
+      <Title>{section.title ?? 'Untitled'}</Title>
+    </Section.Header>
+    <Section.Header l-else-if={sectionIndex === 0}>
+      <Title>First Section</Title>
+    </Section.Header>
+    <Section.Header l-else>
+      <Title>Hidden</Title>
+    </Section.Header>
+    <Section.Content>
+      <ul>
+        <li l-for={(item, itemIndex) in section.items}>
+          <span l-if={item.visible}>
+            <>
+              <Label>{itemIndex + 1}</Label>
+              <Text>{item.label}</Text>
+            </>
+          </span>
+          <span l-else>{item.fallback}</span>
+        </li>
+      </ul>
+    </Section.Content>
+  </Card>
+</>
+      `.trim();
+
+      const tokens = tokenize(template);
+      const ast = parse(tokens);
+
+      expect(ast.children).toHaveLength(1);
+      const fragment = expectFragment(ast.children[0]);
+      expect(fragment.children).toHaveLength(1);
+
+      const card = expectElement(fragment.children[0]);
+      expect(card.tag).toBe('Card');
+      const cardLoop = expectDirective(
+        card.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
+      expect(cardLoop.item).toBe('section');
+      expect(card.children).toHaveLength(4);
+
+      const headerIf = expectElement(card.children[0]);
+      expect(
+        expectDirective(headerIf.directives[0], isDirectiveIf, 'DirectiveIf')
+          .condition
+      ).toContain('section.showHeader');
+
+      const headerElseIf = expectElement(card.children[1]);
+      expect(
+        expectDirective(
+          headerElseIf.directives[0],
+          isDirectiveElseIf,
+          'DirectiveElseIf'
+        ).condition
+      ).toContain('sectionIndex === 0');
+
+      const headerElse = expectElement(card.children[2]);
+      expect(
+        expectDirective(
+          headerElse.directives[0],
+          isDirectiveElse,
+          'DirectiveElse'
+        )
+      ).toBeDefined();
+
+      const content = expectElement(card.children[3]);
+      const list = expectElement(content.children[0]);
+      const listItem = expectElement(list.children[0]);
+      const itemLoop = expectDirective(
+        listItem.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
+      expect(itemLoop.item).toBe('item');
+
+      const spanIf = expectElement(listItem.children[0]);
+      expect(
+        expectDirective(spanIf.directives[0], isDirectiveIf, 'DirectiveIf')
+          .condition
+      ).toContain('item.visible');
+      const spanFragment = expectFragment(spanIf.children[0]);
+      expect(spanFragment.children).toHaveLength(2);
+    });
+  });
+
+  describe('Compatibility fixtures', () => {
+    const fixtures = [
+      {
+        name: 'todo section with conditionals and loops',
+        template: `
+<section class="todo">
+  <header l-if={showHeader}>
+    <h2>{title}</h2>
+    <p l-if={description}>{description}</p>
+    <p l-else>No description</p>
+  </header>
+  <main>
+    <article l-for={(item, index) in items} key={item.id}>
+      <header>
+        <h3>{index + 1}. {item.name}</h3>
+        <span l-if={item.done}>✓</span>
+      </header>
+      <ul>
+        <li l-for={(tag, tagIndex) in item.tags}>
+          <span>{tagIndex}</span>
+          <span>{tag.label}</span>
+        </li>
+      </ul>
+    </article>
+  </main>
+  <footer l-else-if={items.length === 0}>
+    <p>No items</p>
+  </footer>
+</section>
+        `.trim(),
+      },
+      {
+        name: 'nested fragments with mixed content',
+        template: `
+<>
+  <div class="layout">
+    <aside l-if={sidebar}>
+      <nav>
+        <ul>
+          <li l-for={link in sidebar.links}>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <section>
+      <>
+        <header>
+          <h1>{page.title}</h1>
+          <p l-if={page.subtitle}>{page.subtitle}</p>
+        </header>
+        <article>
+          <slot-content />
+        </article>
+      </>
+    </section>
+  </div>
+  <footer l-else>
+    <p>Sidebar disabled</p>
+  </footer>
+</>
+        `.trim(),
+      },
+    ];
+
+    for (const { name, template } of fixtures) {
+      it(`should parse fixture: ${name}`, () => {
+        const tokens = tokenize(template);
+        const ast = parse(tokens);
+
+        expect(ast.type).toBe(NodeType.ROOT);
+        expect(ast.children.length).toBeGreaterThan(0);
+      });
+    }
   });
 
   describe('Error handling', () => {

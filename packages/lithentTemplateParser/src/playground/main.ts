@@ -166,6 +166,7 @@ const runCompilation = () => {
     let ast;
     try {
       ast = parse(tokens);
+      console.log('AST', ast);
     } catch (parseError) {
       astOutput.textContent = '{}';
       codeOutput.textContent = '// 파싱에 실패했습니다.';

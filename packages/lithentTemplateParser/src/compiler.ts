@@ -29,14 +29,15 @@ export function compile(
       errors: [],
     };
   } catch (error) {
+    const err = error as Error & { line?: number; column?: number };
     return {
       code: '',
       ast: null,
       errors: [
         {
           message: error instanceof Error ? error.message : String(error),
-          line: 0,
-          column: 0,
+          line: err.line ?? 0,
+          column: err.column ?? 0,
         },
       ],
     };

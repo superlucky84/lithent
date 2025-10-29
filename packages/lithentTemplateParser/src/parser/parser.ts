@@ -170,16 +170,22 @@ export class Parser {
 
       const closeTagToken = this.peek();
       if (closeTagToken.type !== TokenType.IDENTIFIER) {
-        throw new Error(
+        const error = new Error(
           `Expected closing tag name at line ${closeTagToken.start.line}, column ${closeTagToken.start.column}`
-        );
+        ) as Error & { line?: number; column?: number };
+        error.line = closeTagToken.start.line;
+        error.column = closeTagToken.start.column;
+        throw error;
       }
 
       const closeTag = closeTagToken.value;
       if (closeTag !== tag) {
-        throw new Error(
-          `Mismatched closing tag: expected </${tag}> but got </${closeTag}> at line ${closeTagToken.start.line}`
-        );
+        const error = new Error(
+          `Mismatched closing tag: expected </${tag}> but got </${closeTag}> at line ${closeTagToken.start.line}, column ${closeTagToken.start.column}`
+        ) as Error & { line?: number; column?: number };
+        error.line = closeTagToken.start.line;
+        error.column = closeTagToken.start.column;
+        throw error;
       }
 
       this.advance(); // consume tag name
@@ -479,9 +485,12 @@ export class Parser {
   private expect(type: TokenType): Token {
     const token = this.peek();
     if (token.type !== type) {
-      throw new Error(
+      const error = new Error(
         `Expected token ${type} but got ${token.type} at line ${token.start.line}, column ${token.start.column}`
-      );
+      ) as Error & { line?: number; column?: number };
+      error.line = token.start.line;
+      error.column = token.start.column;
+      throw error;
     }
     return this.advance();
   }

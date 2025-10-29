@@ -43,6 +43,47 @@ describe('Compiler', () => {
       expect(result.code).toContain('h(Fragment, null');
     });
 
+    it('should compile deeply nested structures', () => {
+      const template = `
+<>
+  <Card l-for={(section, sectionIndex) in sections} key={section.id}>
+    <Section.Header l-if={section.showHeader}>
+      <Title>{section.title ?? 'Untitled'}</Title>
+    </Section.Header>
+    <Section.Header l-else-if={sectionIndex === 0}>
+      <Title>First Section</Title>
+    </Section.Header>
+    <Section.Header l-else>
+      <Title>Hidden</Title>
+    </Section.Header>
+    <Section.Content>
+      <ul>
+        <li l-for={(item, itemIndex) in section.items}>
+          <span l-if={item.visible}>
+            <>
+              <Label>{itemIndex + 1}</Label>
+              <Text>{item.label}</Text>
+            </>
+          </span>
+          <span l-else>{item.fallback}</span>
+        </li>
+      </ul>
+    </Section.Content>
+  </Card>
+</>
+      `.trim();
+
+      const result = compile(template);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.code).toContain(
+        '(sections).map((section, sectionIndex) =>'
+      );
+      expect(result.code).toContain('(section.items).map((item, itemIndex) =>');
+      expect(result.code).toContain('(section.showHeader) ?');
+      expect(result.code).toContain('(item.visible) ?');
+    });
+
     it('should compile compound component reference', () => {
       const template = '<a.Children />';
       const result = compile(template);
@@ -177,6 +218,16 @@ describe('Compiler', () => {
       expect(result.errors.length).toBeGreaterThan(0);
       expect(result.code).toBe('');
     });
+
+    it('should report line and column for syntax errors', () => {
+      const template = '<div><span></div>';
+      const result = compile(template);
+
+      expect(result.errors.length).toBeGreaterThan(0);
+      const error = result.errors[0];
+      expect(error.line).toBeGreaterThan(0);
+      expect(error.column).toBeGreaterThan(0);
+    });
   });
 
   describe('Real-world examples', () => {
@@ -242,6 +293,81 @@ describe('Compiler', () => {
       expect(result.code).toContain('h(ErrorMessage');
       expect(result.code).toContain('h(DataGrid');
     });
+  });
+
+  describe('Compatibility fixtures', () => {
+    const fixtures = [
+      {
+        name: 'todo section with conditionals and loops',
+        template: `
+<section class="todo">
+  <header l-if={showHeader}>
+    <h2>{title}</h2>
+    <p l-if={description}>{description}</p>
+    <p l-else>No description</p>
+  </header>
+  <main>
+    <article l-for={(item, index) in items} key={item.id}>
+      <header>
+        <h3>{index + 1}. {item.name}</h3>
+        <span l-if={item.done}>✓</span>
+      </header>
+      <ul>
+        <li l-for={(tag, tagIndex) in item.tags}>
+          <span>{tagIndex}</span>
+          <span>{tag.label}</span>
+        </li>
+      </ul>
+    </article>
+  </main>
+  <footer l-else-if={items.length === 0}>
+    <p>No items</p>
+  </footer>
+</section>
+        `.trim(),
+      },
+      {
+        name: 'nested fragments with mixed content',
+        template: `
+<>
+  <div class="layout">
+    <aside l-if={sidebar}>
+      <nav>
+        <ul>
+          <li l-for={link in sidebar.links}>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    <section>
+      <>
+        <header>
+          <h1>{page.title}</h1>
+          <p l-if={page.subtitle}>{page.subtitle}</p>
+        </header>
+        <article>
+          <slot-content />
+        </article>
+      </>
+    </section>
+  </div>
+  <footer l-else>
+    <p>Sidebar disabled</p>
+  </footer>
+</>
+        `.trim(),
+      },
+    ];
+
+    for (const { name, template } of fixtures) {
+      it(`should compile fixture: ${name}`, () => {
+        const result = compile(template);
+
+        expect(result.errors).toHaveLength(0);
+        expect(result.code).toContain('h(');
+      });
+    }
   });
 
   describe('Options', () => {
