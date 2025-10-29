@@ -14,39 +14,19 @@ import { getConditionalGroup, getDirective } from '../transform/directives';
  */
 export function generate(ast: RootNode, options?: GenerateOptions): string {
   const opts: Required<GenerateOptions> = {
-    importH: true,
-    importFragment: false,
-    hFunctionName: 'h',
-    fragmentName: 'Fragment',
+    templateFactory: 'h',
+    templateFragmentFactory: 'Fragment',
     ...options,
   };
 
-  const imports: string[] = [];
-
-  if (opts.importH) {
-    imports.push(opts.hFunctionName);
-  }
-
-  if (opts.importFragment) {
-    imports.push(opts.fragmentName);
-  }
-
   const code = generateChildren(ast.children, opts);
 
-  // Return just the code if no imports needed
-  if (imports.length === 0) {
-    return code;
-  }
-
-  // Return with import statement
-  return `import { ${imports.join(', ')} } from 'lithent';\n\nreturn ${code};`;
+  return code;
 }
 
 export interface GenerateOptions {
-  importH?: boolean;
-  importFragment?: boolean;
-  hFunctionName?: string;
-  fragmentName?: string;
+  templateFactory?: string;
+  templateFragmentFactory?: string;
 }
 
 /**
@@ -127,7 +107,7 @@ function generateNormalElement(
   node: ElementNode,
   options: Required<GenerateOptions>
 ): string {
-  const { hFunctionName } = options;
+  const factory = options.templateFactory;
 
   // Tag name (component or string)
   const tag = node.isComponent ? node.tag : `'${node.tag}'`;
@@ -142,10 +122,10 @@ function generateNormalElement(
 
   // Build h() call
   if (children.length === 0) {
-    return `${hFunctionName}(${tag}, ${props})`;
+    return `${factory}(${tag}, ${props})`;
   }
 
-  return `${hFunctionName}(${tag}, ${props}, ${children.join(', ')})`;
+  return `${factory}(${tag}, ${props}, ${children.join(', ')})`;
 }
 
 /**

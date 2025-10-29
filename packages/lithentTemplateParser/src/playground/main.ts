@@ -172,6 +172,8 @@ const runCompilation = () => {
 
     const result = compile(template);
 
+    console.log(' - RESULT - ', result);
+
     if (result.errors.length > 0) {
       const [firstError] = result.errors;
       errorOutput.textContent = `⚠️ ${firstError.message}`;

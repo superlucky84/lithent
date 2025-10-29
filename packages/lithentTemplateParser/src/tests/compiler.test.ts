@@ -241,8 +241,7 @@ describe('Compiler', () => {
       const template = '<div></div>';
       const result = compile(template, {
         generate: {
-          importH: false,
-          hFunctionName: 'createElement',
+          templateFactory: 'createElement',
         },
       });
 

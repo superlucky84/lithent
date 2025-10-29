@@ -144,10 +144,8 @@ interface CompileOptions {
     };
   };
   generate?: {
-    importH?: boolean;
-    importFragment?: boolean;
-    hFunctionName?: string;
-    fragmentName?: string;
+    templateFactory?: string;
+    templateFragmentFactory?: string;
   };
 }
 
