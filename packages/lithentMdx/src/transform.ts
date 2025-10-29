@@ -51,10 +51,14 @@ const findDefaultMdxExportIndex = (source: string): number => {
   const target = 'export default function MDXContent';
   const length = source.length;
   let i = 0;
-  let state: 'code' | 'single' | 'double' | 'template' | 'lineComment' | 'blockComment' = 'code';
+  let state:
+    | 'code'
+    | 'single'
+    | 'double'
+    | 'template'
+    | 'lineComment'
+    | 'blockComment' = 'code';
   let templateDepth = 0;
-
-  const advance = () => source[++i];
 
   while (i < length) {
     const ch = source[i];
