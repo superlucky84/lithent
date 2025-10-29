@@ -11,18 +11,10 @@ const isDev = process.env.NODE_ENV !== 'production';
 let vite;
 if (isDev) {
   const { createServer: createViteServer } = await import('vite');
-  const tailwindcss = (await import('@tailwindcss/vite')).default;
 
   vite = await createViteServer({
-    plugins: [tailwindcss()],
-    server: { middlewareMode: 'ssr', hmr: true },
     root: process.cwd(),
-    plugins: [],
-    resolve: {
-      alias: {
-        '@': '/src',
-      },
-    },
+    server: { middlewareMode: 'ssr', hmr: true },
   });
 }
 

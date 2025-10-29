@@ -17,8 +17,9 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "lithent",
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
     "baseUrl": "./",
     "types": ["vite/client"],
     "paths": {
