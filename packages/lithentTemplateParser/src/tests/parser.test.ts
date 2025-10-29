@@ -4,6 +4,7 @@ import { parse } from '../parser/parser';
 import { NodeType, DirectiveNode } from '../parser/ast';
 import {
   expectElement,
+  expectFragment,
   expectText,
   expectInterpolation,
   expectComment,
@@ -48,6 +49,21 @@ describe('Parser', () => {
       expect(element.type).toBe(NodeType.ELEMENT);
       expect(element.tag).toBe('MyComponent');
       expect(element.isComponent).toBe(true);
+    });
+
+    it('should parse fragment', () => {
+      const tokens = tokenize('<><div></div><span /></>');
+      const ast = parse(tokens);
+
+      expect(ast.children).toHaveLength(1);
+      const fragment = expectFragment(ast.children[0]);
+      expect(fragment.type).toBe(NodeType.FRAGMENT);
+      expect(fragment.children).toHaveLength(2);
+
+      const firstChild = expectElement(fragment.children[0]);
+      expect(firstChild.tag).toBe('div');
+      const secondChild = expectElement(fragment.children[1]);
+      expect(secondChild.tag).toBe('span');
     });
 
     it('should parse compound component (namespaced)', () => {

@@ -2,6 +2,7 @@ import {
   RootNode,
   TemplateNode,
   ElementNode,
+  FragmentNode,
   TextNode,
   InterpolationNode,
   NodeType,
@@ -62,6 +63,8 @@ function generateNode(
   switch (node.type) {
     case NodeType.ELEMENT:
       return generateElement(node, options);
+    case NodeType.FRAGMENT:
+      return generateFragment(node, options);
     case NodeType.TEXT:
       return generateText(node);
     case NodeType.INTERPOLATION:
@@ -126,6 +129,27 @@ function generateNormalElement(
   }
 
   return `${factory}(${tag}, ${props}, ${children.join(', ')})`;
+}
+
+/**
+ * Generate code for a fragment node
+ */
+function generateFragment(
+  node: FragmentNode,
+  options: Required<GenerateOptions>
+): string {
+  const factory = options.templateFactory;
+  const fragment = options.templateFragmentFactory;
+
+  const children = node.children
+    .map(child => generateNode(child, options))
+    .filter(code => code !== '');
+
+  if (children.length === 0) {
+    return `${factory}(${fragment}, null)`;
+  }
+
+  return `${factory}(${fragment}, null, ${children.join(', ')})`;
 }
 
 /**

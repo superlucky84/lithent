@@ -14,6 +14,7 @@ import {
   createDirectiveElseIfNode,
   createDirectiveElseNode,
   createDirectiveForNode,
+  createFragmentNode,
 } from './ast';
 
 /**
@@ -63,6 +64,8 @@ export class Parser {
     switch (token.type) {
       case TokenType.TAG_OPEN_START:
         return this.parseElement();
+      case TokenType.FRAGMENT_OPEN:
+        return this.parseFragment();
       case TokenType.TEXT:
         return this.parseText();
       case TokenType.EXPRESSION_START:
@@ -73,12 +76,41 @@ export class Parser {
         // Unexpected closing tag - skip it
         this.advance();
         return null;
+      case TokenType.FRAGMENT_CLOSE:
+        this.advance();
+        return null;
       case TokenType.EOF:
         return null;
       default:
         this.advance();
         return null;
     }
+  }
+
+  /**
+   * Parse fragment node
+   */
+  private parseFragment(): TemplateNode | null {
+    const start = this.peek().start;
+    this.expect(TokenType.FRAGMENT_OPEN);
+
+    const children: TemplateNode[] = [];
+
+    while (!this.isEOF() && !this.check(TokenType.FRAGMENT_CLOSE)) {
+      const child = this.parseTemplateNode();
+      if (child) {
+        children.push(child);
+      }
+    }
+
+    if (this.check(TokenType.FRAGMENT_CLOSE)) {
+      const closeToken = this.expect(TokenType.FRAGMENT_CLOSE);
+      return createFragmentNode(children, start, closeToken.end);
+    }
+
+    throw new Error(
+      `Unclosed fragment starting at line ${start.line}, column ${start.column}`
+    );
   }
 
   /**

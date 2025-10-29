@@ -138,6 +138,27 @@ describe('Lexer', () => {
     });
   });
 
+  describe('Fragments', () => {
+    it('should tokenize empty fragment', () => {
+      const tokens = tokenize('<></>');
+      const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
+
+      expect(filtered[0].type).toBe(TokenType.FRAGMENT_OPEN);
+      expect(filtered[1].type).toBe(TokenType.FRAGMENT_CLOSE);
+    });
+
+    it('should tokenize fragment with children', () => {
+      const tokens = tokenize('<><span>Hi</span></>');
+      const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
+
+      expect(filtered[0].type).toBe(TokenType.FRAGMENT_OPEN);
+      expect(filtered[1].type).toBe(TokenType.TAG_OPEN_START);
+      expect(filtered.some(t => t.type === TokenType.FRAGMENT_CLOSE)).toBe(
+        true
+      );
+    });
+  });
+
   describe('Text and interpolation', () => {
     it('should tokenize plain text', () => {
       const tokens = tokenize('Hello World');

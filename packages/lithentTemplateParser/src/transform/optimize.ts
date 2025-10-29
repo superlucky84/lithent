@@ -2,6 +2,7 @@ import {
   RootNode,
   TemplateNode,
   ElementNode,
+  FragmentNode,
   TextNode,
   NodeType,
   createTextNode,
@@ -66,6 +67,10 @@ function optimizeNode(
     return optimizeElementNode(node, options);
   }
 
+  if (node.type === NodeType.FRAGMENT) {
+    return optimizeFragmentNode(node, options);
+  }
+
   if (node.type === NodeType.TEXT) {
     return optimizeTextNode(node, options);
   }
@@ -80,6 +85,19 @@ function optimizeElementNode(
   node: ElementNode,
   options: Required<OptimizeOptions>
 ): ElementNode {
+  return {
+    ...node,
+    children: optimizeNodeList(node.children, options),
+  };
+}
+
+/**
+ * Optimize a fragment node
+ */
+function optimizeFragmentNode(
+  node: FragmentNode,
+  options: Required<OptimizeOptions>
+): FragmentNode {
   return {
     ...node,
     children: optimizeNodeList(node.children, options),
@@ -172,7 +190,10 @@ export function countNodes(node: RootNode | TemplateNode): number {
     node.children.forEach(child => {
       count += countNodes(child);
     });
-  } else if (node.type === NodeType.ELEMENT) {
+  } else if (
+    node.type === NodeType.ELEMENT ||
+    node.type === NodeType.FRAGMENT
+  ) {
     node.children.forEach(child => {
       count += countNodes(child);
     });

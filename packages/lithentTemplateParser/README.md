@@ -6,9 +6,10 @@ Vue-like template parser for Lithent. Compiles template syntax into Lithent's `h
 
 - **Clean Template Syntax**: Write declarative templates instead of imperative `h()` calls
 - **Minimal Directives**: Only essential directives (l-if, l-else-if, l-else, l-for)
+- **Fragments**: JSX-style fragments `<></>` for grouping without wrappers
 - **Ref Support**: Direct DOM/component references
 - **Full TypeScript**: Complete type definitions for all APIs
-- **Well-Tested**: 68 tests covering all features
+- **Well-Tested**: 70+ tests covering all features
 
 ## Installation
 
@@ -33,9 +34,7 @@ const template = `
 const result = compile(template);
 console.log(result.code);
 // Output:
-// import { h } from 'lithent';
-//
-// return h('div', { class: 'container' },
+// h('div', { class: 'container' },
 //   h('h1', null, title),
 //   h('ul', null, (items).map(item => h('li', null, item.name)))
 // );
@@ -118,6 +117,17 @@ List rendering:
 </div>
 ```
 
+### Fragments
+
+JSX-style fragments allow grouping without introducing extra DOM nodes:
+
+```html
+<>
+  <div class="header">{title}</div>
+  <p>{content}</p>
+</>
+```
+
 ### Ref
 
 DOM/component references:
@@ -155,6 +165,9 @@ interface CompileResult {
   errors: CompileError[]; // Compilation errors
 }
 ```
+
+- `templateFactory`: identifier used for element creation calls (default: `h`)
+- `templateFragmentFactory`: identifier passed to the factory for fragment nodes (default: `Fragment`)
 
 ### Advanced APIs
 
@@ -204,6 +217,19 @@ const template = `
     <p>{user.email}</p>
     <button l-if={canEdit} onClick={handleEdit}>Edit</button>
   </div>
+`;
+
+const result = compile(template);
+```
+
+### Fragment Grouping
+
+```typescript
+const template = `
+  <>
+    <Header />
+    <Content />
+  </>
 `;
 
 const result = compile(template);

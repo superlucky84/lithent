@@ -1,6 +1,7 @@
 import {
   TemplateNode,
   ElementNode,
+  FragmentNode,
   TextNode,
   InterpolationNode,
   CommentNode,
@@ -10,6 +11,7 @@ import {
   DirectiveElseIfNode,
   DirectiveElseNode,
   isElementNode,
+  isFragmentNode,
   isTextNode,
   isInterpolationNode,
   isCommentNode,
@@ -19,6 +21,13 @@ import {
 export function expectElement(node: TemplateNode): ElementNode {
   if (!isElementNode(node)) {
     throw new Error(`Expected ElementNode but received ${node.type}`);
+  }
+  return node;
+}
+
+export function expectFragment(node: TemplateNode): FragmentNode {
+  if (!isFragmentNode(node)) {
+    throw new Error(`Expected FragmentNode but received ${node.type}`);
   }
   return node;
 }

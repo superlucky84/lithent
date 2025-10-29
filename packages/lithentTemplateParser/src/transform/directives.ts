@@ -104,6 +104,11 @@ function transformNodeList(nodes: TemplateNode[]): TemplateNode[] {
       }
 
       result.push(transformedElement);
+    } else if (node.type === NodeType.FRAGMENT) {
+      result.push({
+        ...node,
+        children: transformNodeList(node.children),
+      });
     } else {
       // Non-element nodes pass through
       result.push(node);

@@ -35,6 +35,14 @@ describe('Compiler', () => {
       expect(result.code).toContain('h(MyComponent, null)');
     });
 
+    it('should compile fragment', () => {
+      const template = '<><div>Hello</div><span>World</span></>';
+      const result = compile(template);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.code).toContain('h(Fragment, null');
+    });
+
     it('should compile compound component reference', () => {
       const template = '<a.Children />';
       const result = compile(template);

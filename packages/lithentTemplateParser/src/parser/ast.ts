@@ -15,6 +15,7 @@ export interface BaseNode {
 export enum NodeType {
   ROOT = 'Root',
   ELEMENT = 'Element',
+  FRAGMENT = 'Fragment',
   TEXT = 'Text',
   INTERPOLATION = 'Interpolation',
   COMMENT = 'Comment',
@@ -45,6 +46,14 @@ export interface ElementNode extends BaseNode {
   directives: DirectiveNode[];
   children: TemplateNode[];
   ref?: string; // ref attribute value
+}
+
+/**
+ * Fragment node - represents <></>
+ */
+export interface FragmentNode extends BaseNode {
+  type: NodeType.FRAGMENT;
+  children: TemplateNode[];
 }
 
 /**
@@ -144,6 +153,7 @@ export type DirectiveNode =
  */
 export type TemplateNode =
   | ElementNode
+  | FragmentNode
   | TextNode
   | InterpolationNode
   | CommentNode;
@@ -153,6 +163,13 @@ export type TemplateNode =
  */
 export function isElementNode(node: TemplateNode): node is ElementNode {
   return node.type === NodeType.ELEMENT;
+}
+
+/**
+ * Type guard for Fragment nodes
+ */
+export function isFragmentNode(node: TemplateNode): node is FragmentNode {
+  return node.type === NodeType.FRAGMENT;
 }
 
 /**
@@ -239,6 +256,22 @@ export function createElementNode(
     directives,
     children,
     ref,
+    start,
+    end,
+  };
+}
+
+/**
+ * Create a fragment node
+ */
+export function createFragmentNode(
+  children: TemplateNode[],
+  start: Position,
+  end: Position
+): FragmentNode {
+  return {
+    type: NodeType.FRAGMENT,
+    children,
     start,
     end,
   };
@@ -390,7 +423,10 @@ export function walk(
       visitor(child);
       walk(child, visitor);
     });
-  } else if (node.type === NodeType.ELEMENT) {
+  } else if (
+    node.type === NodeType.ELEMENT ||
+    node.type === NodeType.FRAGMENT
+  ) {
     node.children.forEach(child => {
       visitor(child);
       walk(child, visitor);
@@ -416,6 +452,18 @@ export function transformTree(
   } else if (node.type === NodeType.ELEMENT) {
     const transformed = transformer(node);
     if (transformed.type === NodeType.ELEMENT) {
+      return {
+        ...transformed,
+        children: transformed.children.map(child => {
+          const childTransformed = transformer(child);
+          return transformTree(childTransformed, transformer) as TemplateNode;
+        }),
+      };
+    }
+    return transformed;
+  } else if (node.type === NodeType.FRAGMENT) {
+    const transformed = transformer(node);
+    if (transformed.type === NodeType.FRAGMENT) {
       return {
         ...transformed,
         children: transformed.children.map(child => {

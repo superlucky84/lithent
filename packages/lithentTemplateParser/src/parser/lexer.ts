@@ -80,6 +80,18 @@ export class Lexer {
   private readToken(): void {
     const char = this.peek();
 
+    // Fragment open <>
+    if (char === '<' && this.peek(1) === '>') {
+      this.readFragmentOpen();
+      return;
+    }
+
+    // Fragment close </>
+    if (char === '<' && this.peek(1) === '/' && this.peek(2) === '>') {
+      this.readFragmentClose();
+      return;
+    }
+
     // Check for comments first
     if (
       char === '<' &&
@@ -338,6 +350,29 @@ export class Lexer {
 
     const end = this.getCurrentPosition();
     this.tokens.push(createToken(TokenType.STRING_LITERAL, value, start, end));
+  }
+
+  /**
+   * Read fragment open <>
+   */
+  private readFragmentOpen(): void {
+    const start = this.getCurrentPosition();
+    this.advance(); // <
+    this.advance(); // >
+    const end = this.getCurrentPosition();
+    this.tokens.push(createToken(TokenType.FRAGMENT_OPEN, '<>', start, end));
+  }
+
+  /**
+   * Read fragment close </>
+   */
+  private readFragmentClose(): void {
+    const start = this.getCurrentPosition();
+    this.advance(); // <
+    this.advance(); // /
+    this.advance(); // >
+    const end = this.getCurrentPosition();
+    this.tokens.push(createToken(TokenType.FRAGMENT_CLOSE, '</>', start, end));
   }
 
   /**

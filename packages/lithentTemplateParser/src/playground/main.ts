@@ -16,7 +16,9 @@ const defaultTemplate = `<div class="todo-list">
     <span l-if={todo.done}>✓</span>
     <span>{index + 1}. {todo.text}</span>
   </div>
-  <p l-else>No todos yet!</p>
+  <>
+    <p l-else>No todos yet!</p>
+  </>
 </div>`;
 
 const app = document.getElementById('app');

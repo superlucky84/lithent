@@ -24,6 +24,10 @@ export enum TokenType {
   DIRECTIVE_ELSE = 'DIRECTIVE_ELSE', // l-else
   DIRECTIVE_FOR = 'DIRECTIVE_FOR', // l-for
 
+  // Fragments
+  FRAGMENT_OPEN = 'FRAGMENT_OPEN', // <>
+  FRAGMENT_CLOSE = 'FRAGMENT_CLOSE', // </>
+
   KEYWORD_REF = 'KEYWORD_REF', // ref
 
   // Text and comments

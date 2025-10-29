@@ -158,10 +158,12 @@ HTML 주석:
 ## Grammar Rules (EBNF-like)
 
 ```
-Template      ::= (Element | Text | Interpolation | Comment)*
+Template      ::= (Element | Fragment | Text | Interpolation | Comment)*
 
 Element       ::= '<' TagName Attributes? '>' Children '</' TagName '>'
                 | '<' TagName Attributes? '/>'
+
+Fragment      ::= '<>' Children '</>'
 
 TagName       ::= Identifier
 
