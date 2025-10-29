@@ -165,6 +165,60 @@ describe('Parser', () => {
       expect(directive.index).toBe('index');
       expect(directive.list).toBe('items');
     });
+
+    it('should parse w-for directive with multiline expression', () => {
+      const template = `<div w-for={(item, index) in
+        itemsList}></div>`;
+      const tokens = tokenize(template);
+      const ast = parse(tokens);
+
+      const element = ast.children[0];
+      const directive = element.directives[0];
+      expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
+      expect(directive.item).toBe('item');
+      expect(directive.index).toBe('index');
+      expect(directive.list).toBe('itemsList');
+    });
+
+    it('should parse w-for directive with complex identifier names', () => {
+      const tokens = tokenize('<div w-for={($item, idx_1) in dataSets}></div>');
+      const ast = parse(tokens);
+
+      const element = ast.children[0];
+      const directive = element.directives[0];
+      expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
+      expect(directive.item).toBe('$item');
+      expect(directive.index).toBe('idx_1');
+      expect(directive.list).toBe('dataSets');
+    });
+
+    it('should parse w-for directive with ternary expression list', () => {
+      const template = '<div w-for={(item, idx) in items.length ? items : []}></div>';
+      const tokens = tokenize(template);
+      const ast = parse(tokens);
+
+      const element = ast.children[0];
+      const directive = element.directives[0];
+      expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
+      expect(directive.item).toBe('item');
+      expect(directive.index).toBe('idx');
+      expect(directive.list).toBe('items.length ? items : []');
+    });
+
+    it('should parse w-for directive with complex list expression', () => {
+      const template = `<div w-for={(item, idx) in data?.map(value => \`inner \${value}\`).filter(Boolean)}></div>`;
+      const tokens = tokenize(template);
+      const ast = parse(tokens);
+
+      const element = ast.children[0];
+      const directive = element.directives[0];
+      expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
+      expect(directive.item).toBe('item');
+      expect(directive.index).toBe('idx');
+      expect(directive.list).toBe(
+        'data?.map(value => `inner ${value}`).filter(Boolean)'
+      );
+    });
   });
 
   describe('Text and interpolation', () => {

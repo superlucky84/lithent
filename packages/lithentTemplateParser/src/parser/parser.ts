@@ -325,8 +325,16 @@ export class Parser {
     index?: string;
     list: string;
   } {
+    const identifier = '[A-Za-z_$][\\w$]*';
+    const withParenRegex = new RegExp(
+      `^\\s*\\(\\s*(${identifier})\\s*,\\s*(${identifier})\\s*\\)\\s+in\\s+([\\s\\S]+)$`
+    );
+    const simpleRegex = new RegExp(
+      `^\\s*(${identifier})\\s+in\\s+([\\s\\S]+)$`
+    );
+
     // Match pattern: "(item, index) in list" or "item in list"
-    const withParenMatch = expression.match(/^\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)\s+in\s+(.+)$/);
+    const withParenMatch = expression.match(withParenRegex);
     if (withParenMatch) {
       return {
         item: withParenMatch[1],
@@ -335,7 +343,7 @@ export class Parser {
       };
     }
 
-    const simpleMatch = expression.match(/^\s*(\w+)\s+in\s+(.+)$/);
+    const simpleMatch = expression.match(simpleRegex);
     if (simpleMatch) {
       return {
         item: simpleMatch[1],

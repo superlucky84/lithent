@@ -339,6 +339,22 @@ export class Lexer {
     let depth = 1;
     let inString: string | null = null;
     let escaped = false;
+    let contentStart: Position | null = null;
+    let contentEnd: Position = openEnd;
+
+    const consumeChar = (): string => {
+      const charStart = this.getCurrentPosition();
+      const char = this.advance();
+      const charEnd = this.getCurrentPosition();
+
+      value += char;
+      if (!contentStart) {
+        contentStart = charStart;
+      }
+      contentEnd = charEnd;
+
+      return char;
+    };
 
     while (!this.isEOF() && depth > 0) {
       const char = this.peek();
@@ -346,34 +362,34 @@ export class Lexer {
       // Handle string literals inside expressions
       if (inString) {
         if (escaped) {
-          value += this.advance();
+          consumeChar();
           escaped = false;
           continue;
         }
         if (char === '\\') {
           escaped = true;
-          value += this.advance();
+          consumeChar();
           continue;
         }
         if (char === inString) {
-          value += this.advance();
+          consumeChar();
           inString = null;
           continue;
         }
-        value += this.advance();
+        consumeChar();
         continue;
       }
 
       // Not in string
       if (char === '"' || char === "'" || char === '`') {
         inString = char;
-        value += this.advance();
+        consumeChar();
         continue;
       }
 
       if (char === '{') {
         depth++;
-        value += this.advance();
+        consumeChar();
         continue;
       }
 
@@ -382,10 +398,10 @@ export class Lexer {
         if (depth === 0) {
           // End of expression
           if (value.trim()) {
-            const contentStart = this.getCurrentPosition();
-            const contentEnd = this.getCurrentPosition();
+            const start = contentStart ?? openEnd;
+            const end = contentEnd;
             this.tokens.push(
-              createToken(TokenType.EXPRESSION_CONTENT, value, contentStart, contentEnd)
+              createToken(TokenType.EXPRESSION_CONTENT, value, start, end)
             );
           }
 
@@ -395,19 +411,20 @@ export class Lexer {
           this.tokens.push(createToken(TokenType.EXPRESSION_END, '}', closeStart, closeEnd));
           return;
         }
-        value += this.advance();
+        consumeChar();
         continue;
       }
 
-      value += this.advance();
+      consumeChar();
     }
 
     // If we get here, expression wasn't closed properly
     // Still add the content we have
     if (value.trim()) {
-      const contentPos = this.getCurrentPosition();
+      const start = contentStart ?? openEnd;
+      const end = contentStart ? contentEnd : this.getCurrentPosition();
       this.tokens.push(
-        createToken(TokenType.EXPRESSION_CONTENT, value, contentPos, contentPos)
+        createToken(TokenType.EXPRESSION_CONTENT, value, start, end)
       );
     }
   }

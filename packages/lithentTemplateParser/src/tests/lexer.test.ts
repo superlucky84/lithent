@@ -69,6 +69,25 @@ describe('Lexer', () => {
       expect(filtered[2].type).toBe(TokenType.KEYWORD_REF);
       expect(filtered[2].value).toBe('ref');
     });
+
+    it('should tokenize template literal expressions', () => {
+      const tokens = tokenize('<div class={`greet-${name}`} />');
+      const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
+
+      const exprContent = filtered.find(t => t.type === TokenType.EXPRESSION_CONTENT);
+      expect(exprContent?.value).toContain('greet-${name}');
+    });
+
+    it('should tokenize nested template literal expressions', () => {
+      const template = '<div data-text={`outer ${items.map(item => `inner ${item}`)} end`} />';
+      const tokens = tokenize(template);
+      const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
+
+      const exprContent = filtered.find(t => t.type === TokenType.EXPRESSION_CONTENT);
+      expect(exprContent?.value).toContain('items.map');
+      expect(exprContent?.value).toContain('inner ${item}');
+      expect(exprContent?.value.trim().endsWith('end`')).toBe(true);
+    });
   });
 
   describe('Directives', () => {

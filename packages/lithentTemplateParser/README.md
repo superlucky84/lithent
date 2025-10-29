@@ -304,6 +304,23 @@ pnpm test
 pnpm test:dev
 ```
 
+## Playground
+
+브라우저에서 바로 템플릿을 입력하고 결과를 확인하려면 패키지 루트에서 Vite 개발 서버를 실행하세요.
+
+```bash
+cd packages/lithentTemplateParser
+pnpm dev
+```
+
+기본적으로 `http://localhost:5173`에서 다음과 같은 정보를 실시간으로 확인할 수 있습니다.
+
+- 템플릿 입력에 대한 토큰 스트림
+- Transform까지 적용된 AST
+- 생성된 Lithent `h()` 코드
+
+개발자 도구 콘솔에는 `compile`, `parse`, `tokenize` 함수가 노출돼 있어 직접 호출하며 디버깅할 수 있습니다.
+
 ## License
 
 MIT
