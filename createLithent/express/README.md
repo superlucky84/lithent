@@ -55,12 +55,15 @@ Routing is determined by the filenames under the `/src/pages/` directory. The ro
 
 These routing patterns allow you to create both static and dynamic URLs with flexibility in your project structure.
 
+### MDX Support
+
+MDX is enabled by default through `@lithent/lithent-mdx` and `@lithent/lithent-vite`.  
+Simply drop an `.mdx` file under `src/pages/` (for example `src/pages/docs.mdx`) and it will be compiled into a Lithent page automatically.  
+Hot reload works the same as for `.tsx` files, so edits inside `.mdx` files refresh instantly during development.
 
 ### HMR Usage Notice
 
-To enable HMR (Hot Module Replacement), make sure to uncomment the relevant comments in `/src/base/load.ts`.  
-
-This will allow selective HMR application only to components under `/pages/` in the component tree.
+This starter wires `@lithent/lithent-vite`, so components and MDX pages participate in Hot Module Replacement out of the box.
 
 
 ### State Management
