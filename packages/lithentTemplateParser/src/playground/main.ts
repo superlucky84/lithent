@@ -82,14 +82,23 @@ app.innerHTML = `
   </div>
 `;
 
-const templateInput = document.getElementById('template-input') as HTMLTextAreaElement | null;
+const templateInput = document.getElementById(
+  'template-input'
+) as HTMLTextAreaElement | null;
 const tokenBadge = document.getElementById('token-count');
 const tokensOutput = document.getElementById('tokens-output');
 const astOutput = document.getElementById('ast-output');
 const codeOutput = document.getElementById('code-output');
 const errorOutput = document.getElementById('template-error');
 
-if (!templateInput || !tokenBadge || !tokensOutput || !astOutput || !codeOutput || !errorOutput) {
+if (
+  !templateInput ||
+  !tokenBadge ||
+  !tokensOutput ||
+  !astOutput ||
+  !codeOutput ||
+  !errorOutput
+) {
   throw new Error('Playground UI 초기화에 실패했습니다.');
 }
 
@@ -111,9 +120,12 @@ const circularReplacer = () => {
   };
 };
 
-const formatJSON = (value: unknown) => JSON.stringify(value, circularReplacer(), 2);
+const formatJSON = (value: unknown) =>
+  JSON.stringify(value, circularReplacer(), 2);
 
-const copyButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('button.copy'));
+const copyButtons = Array.from(
+  document.querySelectorAll<HTMLButtonElement>('button.copy')
+);
 copyButtons.forEach(button => {
   button.addEventListener('click', async () => {
     const targetId = button.dataset.target;

@@ -138,10 +138,6 @@ export function hasDirective(
 export function getDirective(
   element: ElementNode,
   directiveType: NodeType
-):
-  | DirectiveIfNode
-  | DirectiveElseIfNode
-  | DirectiveElseNode
-  | undefined {
+): DirectiveIfNode | DirectiveElseIfNode | DirectiveElseNode | undefined {
   return element.directives.find(d => d.type === directiveType) as any;
 }

@@ -81,7 +81,12 @@ export class Lexer {
     const char = this.peek();
 
     // Check for comments first
-    if (char === '<' && this.peek(1) === '!' && this.peek(2) === '-' && this.peek(3) === '-') {
+    if (
+      char === '<' &&
+      this.peek(1) === '!' &&
+      this.peek(2) === '-' &&
+      this.peek(3) === '-'
+    ) {
       this.readComment();
       return;
     }
@@ -193,7 +198,9 @@ export class Lexer {
         this.advance();
         this.advance();
         const end = this.getCurrentPosition();
-        this.tokens.push(createToken(TokenType.TAG_SELF_CLOSE, '/>', start, end));
+        this.tokens.push(
+          createToken(TokenType.TAG_SELF_CLOSE, '/>', start, end)
+        );
         return;
       }
 
@@ -225,7 +232,9 @@ export class Lexer {
       const start = this.getCurrentPosition();
       this.advance();
       const end = this.getCurrentPosition();
-      this.tokens.push(createToken(TokenType.ATTRIBUTE_EQUALS, '=', start, end));
+      this.tokens.push(
+        createToken(TokenType.ATTRIBUTE_EQUALS, '=', start, end)
+      );
 
       this.skipWhitespace();
 
@@ -333,7 +342,9 @@ export class Lexer {
     const startPos = this.getCurrentPosition();
     this.advance(); // consume {
     const openEnd = this.getCurrentPosition();
-    this.tokens.push(createToken(TokenType.EXPRESSION_START, '{', startPos, openEnd));
+    this.tokens.push(
+      createToken(TokenType.EXPRESSION_START, '{', startPos, openEnd)
+    );
 
     let value = '';
     let depth = 1;
@@ -408,7 +419,9 @@ export class Lexer {
           const closeStart = this.getCurrentPosition();
           this.advance(); // consume }
           const closeEnd = this.getCurrentPosition();
-          this.tokens.push(createToken(TokenType.EXPRESSION_END, '}', closeStart, closeEnd));
+          this.tokens.push(
+            createToken(TokenType.EXPRESSION_END, '}', closeStart, closeEnd)
+          );
           return;
         }
         consumeChar();

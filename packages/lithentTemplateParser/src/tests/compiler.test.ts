@@ -96,7 +96,8 @@ describe('Compiler', () => {
     });
 
     it('should compile w-for with index', () => {
-      const template = '<li w-for={(item, index) in items}>{index}: {item}</li>';
+      const template =
+        '<li w-for={(item, index) in items}>{index}: {item}</li>';
       const result = compile(template);
 
       expect(result.errors).toHaveLength(0);

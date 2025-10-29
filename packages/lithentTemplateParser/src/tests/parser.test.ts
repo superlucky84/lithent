@@ -1,7 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { tokenize } from '../parser/lexer';
 import { parse } from '../parser/parser';
-import { NodeType } from '../parser/ast';
+import { NodeType, DirectiveNode } from '../parser/ast';
+import {
+  expectElement,
+  expectText,
+  expectInterpolation,
+  expectComment,
+  expectDirective,
+  isDirectiveFor,
+  isDirectiveIf,
+  isDirectiveElseIf,
+  isDirectiveElse,
+} from './helpers';
 
 describe('Parser', () => {
   describe('Basic elements', () => {
@@ -12,7 +23,7 @@ describe('Parser', () => {
       expect(ast.type).toBe(NodeType.ROOT);
       expect(ast.children).toHaveLength(1);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.type).toBe(NodeType.ELEMENT);
       expect(element.tag).toBe('div');
       expect(element.isSelfClosing).toBe(false);
@@ -23,7 +34,7 @@ describe('Parser', () => {
       const ast = parse(tokens);
 
       expect(ast.children).toHaveLength(1);
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.type).toBe(NodeType.ELEMENT);
       expect(element.tag).toBe('img');
       expect(element.isSelfClosing).toBe(true);
@@ -33,7 +44,7 @@ describe('Parser', () => {
       const tokens = tokenize('<MyComponent></MyComponent>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.type).toBe(NodeType.ELEMENT);
       expect(element.tag).toBe('MyComponent');
       expect(element.isComponent).toBe(true);
@@ -43,12 +54,12 @@ describe('Parser', () => {
       const tokens = tokenize('<div><span></span></div>');
       const ast = parse(tokens);
 
-      const div = ast.children[0];
+      const div = expectElement(ast.children[0]);
       expect(div.type).toBe(NodeType.ELEMENT);
       expect(div.tag).toBe('div');
       expect(div.children).toHaveLength(1);
 
-      const span = div.children[0];
+      const span = expectElement(div.children[0]);
       expect(span.type).toBe(NodeType.ELEMENT);
       expect(span.tag).toBe('span');
     });
@@ -59,7 +70,7 @@ describe('Parser', () => {
       const tokens = tokenize('<div class="container"></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.type).toBe(NodeType.ELEMENT);
       expect(element.attributes).toHaveLength(1);
 
@@ -73,7 +84,7 @@ describe('Parser', () => {
       const tokens = tokenize('<div class={className}></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.attributes).toHaveLength(1);
 
       const attr = element.attributes[0];
@@ -83,10 +94,12 @@ describe('Parser', () => {
     });
 
     it('should parse multiple attributes', () => {
-      const tokens = tokenize('<div id="app" class={className} disabled></div>');
+      const tokens = tokenize(
+        '<div id="app" class={className} disabled></div>'
+      );
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.attributes).toHaveLength(3);
 
       expect(element.attributes[0].name).toBe('id');
@@ -103,7 +116,7 @@ describe('Parser', () => {
       const tokens = tokenize('<div ref={myRef}></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.type).toBe(NodeType.ELEMENT);
       expect(element.ref).toBe('myRef');
     });
@@ -114,11 +127,15 @@ describe('Parser', () => {
       const tokens = tokenize('<div w-if={count > 0}></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.type).toBe(NodeType.ELEMENT);
       expect(element.directives).toHaveLength(1);
 
-      const directive = element.directives[0];
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveIf,
+        'DirectiveIf'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_IF);
       expect(directive.condition).toBe('count > 0');
     });
@@ -127,8 +144,12 @@ describe('Parser', () => {
       const tokens = tokenize('<div w-else-if={count === 0}></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveElseIf,
+        'DirectiveElseIf'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_ELSE_IF);
       expect(directive.condition).toBe('count === 0');
     });
@@ -137,8 +158,12 @@ describe('Parser', () => {
       const tokens = tokenize('<div w-else></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveElse,
+        'DirectiveElse'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_ELSE);
     });
 
@@ -146,8 +171,12 @@ describe('Parser', () => {
       const tokens = tokenize('<div w-for={item in items}></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
       expect(directive.item).toBe('item');
       expect(directive.list).toBe('items');
@@ -158,8 +187,12 @@ describe('Parser', () => {
       const tokens = tokenize('<div w-for={(item, index) in items}></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
       expect(directive.item).toBe('item');
       expect(directive.index).toBe('index');
@@ -172,8 +205,12 @@ describe('Parser', () => {
       const tokens = tokenize(template);
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
       expect(directive.item).toBe('item');
       expect(directive.index).toBe('index');
@@ -184,8 +221,12 @@ describe('Parser', () => {
       const tokens = tokenize('<div w-for={($item, idx_1) in dataSets}></div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
       expect(directive.item).toBe('$item');
       expect(directive.index).toBe('idx_1');
@@ -193,12 +234,17 @@ describe('Parser', () => {
     });
 
     it('should parse w-for directive with ternary expression list', () => {
-      const template = '<div w-for={(item, idx) in items.length ? items : []}></div>';
+      const template =
+        '<div w-for={(item, idx) in items.length ? items : []}></div>';
       const tokens = tokenize(template);
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
       expect(directive.item).toBe('item');
       expect(directive.index).toBe('idx');
@@ -210,8 +256,12 @@ describe('Parser', () => {
       const tokens = tokenize(template);
       const ast = parse(tokens);
 
-      const element = ast.children[0];
-      const directive = element.directives[0];
+      const element = expectElement(ast.children[0]);
+      const directive = expectDirective(
+        element.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
       expect(directive.type).toBe(NodeType.DIRECTIVE_FOR);
       expect(directive.item).toBe('item');
       expect(directive.index).toBe('idx');
@@ -226,10 +276,10 @@ describe('Parser', () => {
       const tokens = tokenize('<div>Hello World</div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.children).toHaveLength(1);
 
-      const textNode = element.children[0];
+      const textNode = expectText(element.children[0]);
       expect(textNode.type).toBe(NodeType.TEXT);
       expect(textNode.content).toBe('Hello World');
     });
@@ -238,10 +288,10 @@ describe('Parser', () => {
       const tokens = tokenize('<div>{message}</div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.children).toHaveLength(1);
 
-      const interpolation = element.children[0];
+      const interpolation = expectInterpolation(element.children[0]);
       expect(interpolation.type).toBe(NodeType.INTERPOLATION);
       expect(interpolation.expression).toBe('message');
     });
@@ -250,17 +300,17 @@ describe('Parser', () => {
       const tokens = tokenize('<div>Hello {name}!</div>');
       const ast = parse(tokens);
 
-      const element = ast.children[0];
+      const element = expectElement(ast.children[0]);
       expect(element.children).toHaveLength(3);
 
-      expect(element.children[0].type).toBe(NodeType.TEXT);
-      expect(element.children[0].content).toBe('Hello ');
+      const firstChild = expectText(element.children[0]);
+      expect(firstChild.content).toBe('Hello ');
 
-      expect(element.children[1].type).toBe(NodeType.INTERPOLATION);
-      expect(element.children[1].expression).toBe('name');
+      const secondChild = expectInterpolation(element.children[1]);
+      expect(secondChild.expression).toBe('name');
 
-      expect(element.children[2].type).toBe(NodeType.TEXT);
-      expect(element.children[2].content).toBe('!');
+      const thirdChild = expectText(element.children[2]);
+      expect(thirdChild.content).toBe('!');
     });
   });
 
@@ -270,7 +320,7 @@ describe('Parser', () => {
       const ast = parse(tokens);
 
       expect(ast.children).toHaveLength(1);
-      const comment = ast.children[0];
+      const comment = expectComment(ast.children[0]);
       expect(comment.type).toBe(NodeType.COMMENT);
       expect(comment.content).toBe('This is a comment');
     });
@@ -282,7 +332,7 @@ describe('Parser', () => {
       const ast = parse(tokens);
 
       expect(ast.children).toHaveLength(1);
-      const slot = ast.children[0];
+      const slot = expectElement(ast.children[0]);
       expect(slot.type).toBe(NodeType.ELEMENT);
       expect(slot.tag).toBe('slot');
       expect(slot.isSelfClosing).toBe(true);
@@ -292,7 +342,7 @@ describe('Parser', () => {
       const tokens = tokenize('<slot name="header" />');
       const ast = parse(tokens);
 
-      const slot = ast.children[0];
+      const slot = expectElement(ast.children[0]);
       expect(slot.type).toBe(NodeType.ELEMENT);
       expect(slot.tag).toBe('slot');
       expect(slot.attributes).toHaveLength(1);
@@ -301,10 +351,12 @@ describe('Parser', () => {
     });
 
     it('should parse slotted content', () => {
-      const tokens = tokenize('<template slot="header"><h1>Title</h1></template>');
+      const tokens = tokenize(
+        '<template slot="header"><h1>Title</h1></template>'
+      );
       const ast = parse(tokens);
 
-      const template = ast.children[0];
+      const template = expectElement(ast.children[0]);
       expect(template.type).toBe(NodeType.ELEMENT);
       expect(template.tag).toBe('template');
       expect(template.slot).toBe('header');
@@ -330,7 +382,7 @@ describe('Parser', () => {
       expect(ast.type).toBe(NodeType.ROOT);
       expect(ast.children).toHaveLength(1);
 
-      const div = ast.children[0];
+      const div = expectElement(ast.children[0]);
       expect(div.type).toBe(NodeType.ELEMENT);
       expect(div.tag).toBe('div');
       expect(div.children.length).toBeGreaterThan(0);
@@ -348,9 +400,13 @@ describe('Parser', () => {
 
       expect(ast.children).toHaveLength(3);
 
-      expect(ast.children[0].directives[0].type).toBe(NodeType.DIRECTIVE_IF);
-      expect(ast.children[1].directives[0].type).toBe(NodeType.DIRECTIVE_ELSE_IF);
-      expect(ast.children[2].directives[0].type).toBe(NodeType.DIRECTIVE_ELSE);
+      const first = expectElement(ast.children[0]);
+      const second = expectElement(ast.children[1]);
+      const third = expectElement(ast.children[2]);
+
+      expect(first.directives[0].type).toBe(NodeType.DIRECTIVE_IF);
+      expect(second.directives[0].type).toBe(NodeType.DIRECTIVE_ELSE_IF);
+      expect(third.directives[0].type).toBe(NodeType.DIRECTIVE_ELSE);
     });
 
     it('should parse component with slots', () => {
@@ -366,7 +422,7 @@ describe('Parser', () => {
       const tokens = tokenize(template);
       const ast = parse(tokens);
 
-      const card = ast.children[0];
+      const card = expectElement(ast.children[0]);
       expect(card.type).toBe(NodeType.ELEMENT);
       expect(card.tag).toBe('Card');
       expect(card.isComponent).toBe(true);

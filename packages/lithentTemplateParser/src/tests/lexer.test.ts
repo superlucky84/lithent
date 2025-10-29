@@ -74,16 +74,21 @@ describe('Lexer', () => {
       const tokens = tokenize('<div class={`greet-${name}`} />');
       const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
 
-      const exprContent = filtered.find(t => t.type === TokenType.EXPRESSION_CONTENT);
+      const exprContent = filtered.find(
+        t => t.type === TokenType.EXPRESSION_CONTENT
+      );
       expect(exprContent?.value).toContain('greet-${name}');
     });
 
     it('should tokenize nested template literal expressions', () => {
-      const template = '<div data-text={`outer ${items.map(item => `inner ${item}`)} end`} />';
+      const template =
+        '<div data-text={`outer ${items.map(item => `inner ${item}`)} end`} />';
       const tokens = tokenize(template);
       const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
 
-      const exprContent = filtered.find(t => t.type === TokenType.EXPRESSION_CONTENT);
+      const exprContent = filtered.find(
+        t => t.type === TokenType.EXPRESSION_CONTENT
+      );
       expect(exprContent?.value).toContain('items.map');
       expect(exprContent?.value).toContain('inner ${item}');
       expect(exprContent?.value.trim().endsWith('end`')).toBe(true);
@@ -214,7 +219,12 @@ describe('Lexer', () => {
       // Should have proper structure
       expect(tokens[0].type).toBe(TokenType.TAG_OPEN_START);
       expect(tokens.some(t => t.type === TokenType.DIRECTIVE_FOR)).toBe(true);
-      expect(tokens.some(t => t.type === TokenType.EXPRESSION_CONTENT && t.value.includes('title'))).toBe(true);
+      expect(
+        tokens.some(
+          t =>
+            t.type === TokenType.EXPRESSION_CONTENT && t.value.includes('title')
+        )
+      ).toBe(true);
       expect(tokens[tokens.length - 1].type).toBe(TokenType.EOF);
     });
 
@@ -226,10 +236,11 @@ describe('Lexer', () => {
       `.trim();
 
       const tokens = tokenize(template);
-      const directives = tokens.filter(t =>
-        t.type === TokenType.DIRECTIVE_IF ||
-        t.type === TokenType.DIRECTIVE_ELSE_IF ||
-        t.type === TokenType.DIRECTIVE_ELSE
+      const directives = tokens.filter(
+        t =>
+          t.type === TokenType.DIRECTIVE_IF ||
+          t.type === TokenType.DIRECTIVE_ELSE_IF ||
+          t.type === TokenType.DIRECTIVE_ELSE
       );
 
       expect(directives).toHaveLength(3);

@@ -43,7 +43,9 @@ export class Parser {
     }
 
     const start =
-      children.length > 0 ? children[0].start : { line: 1, column: 1, offset: 0 };
+      children.length > 0
+        ? children[0].start
+        : { line: 1, column: 1, offset: 0 };
     const end =
       children.length > 0
         ? children[children.length - 1].end
@@ -109,7 +111,15 @@ export class Parser {
     if (this.check(TokenType.TAG_SELF_CLOSE)) {
       const end = this.peek().end;
       this.advance(); // consume />
-      return createElementNode(tag, attributes, directives, [], true, start, end);
+      return createElementNode(
+        tag,
+        attributes,
+        directives,
+        [],
+        true,
+        start,
+        end
+      );
     }
 
     // Consume >
@@ -151,12 +161,28 @@ export class Parser {
       const end = this.peek().end;
       this.expect(TokenType.TAG_OPEN_END); // consume >
 
-      return createElementNode(tag, attributes, directives, children, false, start, end);
+      return createElementNode(
+        tag,
+        attributes,
+        directives,
+        children,
+        false,
+        start,
+        end
+      );
     }
 
     // No closing tag found
     const end = children.length > 0 ? children[children.length - 1].end : start;
-    return createElementNode(tag, attributes, directives, children, false, start, end);
+    return createElementNode(
+      tag,
+      attributes,
+      directives,
+      children,
+      false,
+      start,
+      end
+    );
   }
 
   /**
@@ -439,7 +465,9 @@ export class Parser {
    * Check if we've reached EOF
    */
   private isEOF(): boolean {
-    return this.position >= this.tokens.length || this.peek().type === TokenType.EOF;
+    return (
+      this.position >= this.tokens.length || this.peek().type === TokenType.EOF
+    );
   }
 }
 

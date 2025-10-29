@@ -411,7 +411,7 @@ export function walk(
 /**
  * Transform AST by applying a transformer function to each node
  */
-export function transform(
+export function transformTree(
   node: RootNode | TemplateNode,
   transformer: (node: TemplateNode) => TemplateNode
 ): RootNode | TemplateNode {
@@ -420,7 +420,7 @@ export function transform(
       ...node,
       children: node.children.map(child => {
         const transformed = transformer(child);
-        return transform(transformed, transformer) as TemplateNode;
+        return transformTree(transformed, transformer) as TemplateNode;
       }),
     };
   } else if (node.type === NodeType.ELEMENT) {
@@ -430,7 +430,7 @@ export function transform(
         ...transformed,
         children: transformed.children.map(child => {
           const childTransformed = transformer(child);
-          return transform(childTransformed, transformer) as TemplateNode;
+          return transformTree(childTransformed, transformer) as TemplateNode;
         }),
       };
     }

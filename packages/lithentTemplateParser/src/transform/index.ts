@@ -5,10 +5,7 @@ import { optimize, OptimizeOptions } from './optimize';
 /**
  * Apply all transformations to the AST
  */
-export function transform(
-  ast: RootNode,
-  options?: TransformOptions
-): RootNode {
+export function transform(ast: RootNode, options?: TransformOptions): RootNode {
   let result = ast;
 
   // Transform directives (group conditionals)
