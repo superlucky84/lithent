@@ -34,6 +34,14 @@ describe('Compiler', () => {
       expect(result.errors).toHaveLength(0);
       expect(result.code).toContain('h(MyComponent, null)');
     });
+
+    it('should compile compound component reference', () => {
+      const template = '<a.Children />';
+      const result = compile(template);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.code).toContain('h(a.Children, null)');
+    });
   });
 
   describe('Attributes', () => {

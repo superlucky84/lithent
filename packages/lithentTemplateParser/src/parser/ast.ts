@@ -221,7 +221,7 @@ export function createElementNode(
   start: Position,
   end: Position
 ): ElementNode {
-  const isComponent = /^[A-Z]/.test(tag);
+  const isComponent = /^[A-Z]/.test(tag) || tag.includes('.');
 
   // Extract ref from attributes
   const refAttr = attributes.find(attr => attr.name === 'ref');

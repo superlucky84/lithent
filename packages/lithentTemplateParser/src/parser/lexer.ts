@@ -260,6 +260,13 @@ export class Lexer {
     if (this.isIdentifierStart(first)) {
       value += this.advance();
     } else {
+      // Consume unexpected character to avoid infinite loops
+      const unexpectedStart = this.getCurrentPosition();
+      const char = this.advance();
+      const unexpectedEnd = this.getCurrentPosition();
+      this.tokens.push(
+        createToken(TokenType.TEXT, char, unexpectedStart, unexpectedEnd)
+      );
       return '';
     }
 
@@ -508,7 +515,7 @@ export class Lexer {
    * Check if character can be part of an identifier
    */
   private isIdentifierPart(char: string): boolean {
-    return /[a-zA-Z0-9_$:-]/.test(char);
+    return /[a-zA-Z0-9_$:.-]/.test(char);
   }
 }
 

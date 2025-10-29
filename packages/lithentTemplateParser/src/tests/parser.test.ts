@@ -50,6 +50,25 @@ describe('Parser', () => {
       expect(element.isComponent).toBe(true);
     });
 
+    it('should parse compound component (namespaced)', () => {
+      const tokens = tokenize('<Card.Header></Card.Header>');
+      const ast = parse(tokens);
+
+      const element = expectElement(ast.children[0]);
+      expect(element.type).toBe(NodeType.ELEMENT);
+      expect(element.tag).toBe('Card.Header');
+      expect(element.isComponent).toBe(true);
+    });
+
+    it('should treat lowercase namespace member as component', () => {
+      const tokens = tokenize('<a.Children></a.Children>');
+      const ast = parse(tokens);
+
+      const element = expectElement(ast.children[0]);
+      expect(element.tag).toBe('a.Children');
+      expect(element.isComponent).toBe(true);
+    });
+
     it('should parse nested elements', () => {
       const tokens = tokenize('<div><span></span></div>');
       const ast = parse(tokens);

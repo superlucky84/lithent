@@ -35,6 +35,12 @@ describe('Lexer', () => {
       expect(tokens[1].type).toBe(TokenType.IDENTIFIER);
       expect(tokens[1].value).toBe('MyComponent');
     });
+
+    it('should tokenize compound component tag', () => {
+      const tokens = tokenize('<Card.Header>');
+      expect(tokens[1].type).toBe(TokenType.IDENTIFIER);
+      expect(tokens[1].value).toBe('Card.Header');
+    });
   });
 
   describe('Attributes', () => {
@@ -266,6 +272,13 @@ describe('Lexer', () => {
       const tokens = tokenize('<div title="Hello \\"World\\"">');
       const stringToken = tokens.find(t => t.type === TokenType.STRING_LITERAL);
       expect(stringToken?.value).toContain('Hello');
+    });
+
+    it('should recover from invalid attribute characters', () => {
+      const template = '<div foo?="bar"></div>';
+      const tokens = tokenize(template);
+
+      expect(tokens[tokens.length - 1].type).toBe(TokenType.EOF);
     });
   });
 });
