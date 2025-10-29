@@ -66,50 +66,50 @@ Lithent 템플릿은 Vue-like 문법을 사용하지만, 최소한의 디렉티�
 
 ### 4. Directives
 
-모든 디렉티브는 `w-` 접두사를 사용합니다.
+모든 디렉티브는 `l-` 접두사를 사용합니다.
 
-#### w-if / w-else-if / w-else
+#### l-if / l-else-if / l-else
 
 조건부 렌더링:
 ```html
-<div w-if={count > 0}>
+<div l-if={count > 0}>
   Has items
 </div>
-<div w-else-if={count === 0}>
+<div l-else-if={count === 0}>
   No items
 </div>
-<div w-else>
+<div l-else>
   Loading...
 </div>
 ```
 
 **규칙:**
-- `w-else-if`와 `w-else`는 반드시 `w-if` 또는 `w-else-if` 바로 다음에 와야 함
+- `l-else-if`와 `l-else`는 반드시 `l-if` 또는 `l-else-if` 바로 다음에 와야 함
 - 형제 요소 사이에 공백/주석 허용
 - 표현식은 중괄호 `{}` 안에 작성
 
-#### w-for
+#### l-for
 
 리스트 렌더링:
 ```html
 <!-- 기본 형식: item in list -->
-<div w-for={item in items}>
+<div l-for={item in items}>
   {item}
 </div>
 
 <!-- 인덱스 포함 -->
-<div w-for={(item, index) in items}>
+<div l-for={(item, index) in items}>
   {index}: {item}
 </div>
 
 <!-- 객체 순회 -->
-<div w-for={user in users}>
+<div l-for={user in users}>
   {user.name}
 </div>
 ```
 
 **규칙:**
-- 형식: `w-for={item in list}` or `w-for={(item, index) in list}`
+- 형식: `l-for={item in list}` or `l-for={(item, index) in list}`
 - `item`은 순회할 각 요소의 이름
 - `index`는 선택적 인덱스 변수
 - `list`는 배열 또는 이터러블 표현식
@@ -117,53 +117,6 @@ Lithent 템플릿은 Vue-like 문법을 사용하지만, 최소한의 디렉티�
 ### 5. Slots
 
 부모 컴포넌트에서 전달된 자식 콘텐츠를 렌더링:
-
-#### Default Slot
-```html
-<!-- 자식 컴포넌트 -->
-<div class="wrapper">
-  <slot />
-</div>
-
-<!-- 부모 컴포넌트 -->
-<MyComponent>
-  <p>This content goes into the slot</p>
-</MyComponent>
-```
-
-#### Named Slots
-```html
-<!-- 자식 컴포넌트 -->
-<div class="layout">
-  <header>
-    <slot name="header" />
-  </header>
-  <main>
-    <slot />
-  </main>
-  <footer>
-    <slot name="footer" />
-  </footer>
-</div>
-
-<!-- 부모 컴포넌트 -->
-<Layout>
-  <template slot="header">
-    <h1>Page Title</h1>
-  </template>
-
-  <p>Main content</p>
-
-  <template slot="footer">
-    <p>Footer content</p>
-  </template>
-</Layout>
-```
-
-**규칙:**
-- `<slot>` - 기본 슬롯
-- `<slot name="slotName">` - 이름있는 슬롯
-- 부모에서 `<template slot="slotName">` 또는 직접 `slot="slotName"` 속성 사용
 
 ### 6. Comments
 
@@ -220,16 +173,13 @@ AttrName      ::= Identifier ('-' Identifier)*
 
 AttrValue     ::= StringLiteral | '{' Expression '}'
 
-Directive     ::= 'w-if' '=' '{' Expression '}'
-                | 'w-else-if' '=' '{' Expression '}'
-                | 'w-else'
-                | 'w-for' '=' '{' ForExpression '}'
+Directive     ::= 'l-if' '=' '{' Expression '}'
+                | 'l-else-if' '=' '{' Expression '}'
+                | 'l-else'
+                | 'l-for' '=' '{' ForExpression '}'
 
 ForExpression ::= Identifier 'in' Expression
                 | '(' Identifier ',' Identifier ')' 'in' Expression
-
-Slot          ::= '<slot' ('name=' StringLiteral)? '/>'
-                | '<slot' ('name=' StringLiteral)? '>' Children '</slot>'
 
 Children      ::= (Element | Text | Interpolation | Comment)*
 
@@ -253,42 +203,43 @@ StringLiteral ::= '"' [^"]* '"' | "'" [^']* "'"
 ```html
 <div class="todo-list">
   <h2>Todos ({todos.length})</h2>
-  <div w-for={todo in todos} class="todo-item">
+  <div l-for={todo in todos} class="todo-item">
     <input type="checkbox" checked={todo.done} />
     <span>{todo.text}</span>
   </div>
-  <p w-if={todos.length === 0}>No todos yet</p>
+  <p l-if={todos.length === 0}>No todos yet</p>
 </div>
 ```
 
-### 컴포넌트와 슬롯
+### 컴포넌트와 중첩 콘텐츠
 ```html
 <Card title="User Profile">
-  <template slot="header">
+  <div class="card-header">
     <img src={user.avatar} />
-  </template>
-
-  <div class="user-info">
     <h3>{user.name}</h3>
-    <p>{user.email}</p>
   </div>
 
-  <template slot="footer">
+  <div class="user-info">
+    <p>{user.email}</p>
+    <p>{user.bio}</p>
+  </div>
+
+  <div class="card-footer">
     <button onClick={handleEdit}>Edit</button>
-  </template>
+  </div>
 </Card>
 ```
 
 ### 조건부 렌더링
 ```html
 <div class="status">
-  <div w-if={status === 'loading'}>
+  <div l-if={status === 'loading'}>
     <Spinner />
   </div>
-  <div w-else-if={status === 'error'}>
+  <div l-else-if={status === 'error'}>
     <ErrorMessage message={error} />
   </div>
-  <div w-else>
+  <div l-else>
     <UserList users={users} />
   </div>
 </div>
@@ -307,10 +258,10 @@ StringLiteral ::= '"' [^"]* '"' | "'" [^']* "'"
 - `STRING_LITERAL` - `"..."` or `'...'`
 - `EXPRESSION_START` - `{`
 - `EXPRESSION_END` - `}`
-- `DIRECTIVE_IF` - `w-if`
-- `DIRECTIVE_ELSE_IF` - `w-else-if`
-- `DIRECTIVE_ELSE` - `w-else`
-- `DIRECTIVE_FOR` - `w-for`
+- `DIRECTIVE_IF` - `l-if`
+- `DIRECTIVE_ELSE_IF` - `l-else-if`
+- `DIRECTIVE_ELSE` - `l-else`
+- `DIRECTIVE_FOR` - `l-for`
 - `TEXT` - 일반 텍스트
 - `COMMENT_START` - `<!--`
 - `COMMENT_END` - `-->`

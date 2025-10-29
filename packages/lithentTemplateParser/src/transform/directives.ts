@@ -9,7 +9,7 @@ import {
 } from '../parser/ast';
 
 /**
- * Group conditional elements (w-if/w-else-if/w-else chain)
+ * Group conditional elements (l-if/l-else-if/l-else chain)
  * This transform marks related conditional elements for easier codegen
  */
 export interface ConditionalGroup {
@@ -21,7 +21,7 @@ export interface ConditionalGroup {
 /**
  * Transform directives in the AST
  * Currently handles:
- * - Grouping w-if/w-else-if/w-else chains
+ * - Grouping l-if/l-else-if/l-else chains
  */
 export function transformDirectives(ast: RootNode): RootNode {
   return {

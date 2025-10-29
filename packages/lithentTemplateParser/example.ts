@@ -19,9 +19,9 @@ console.log();
 // Example 3: Conditional rendering
 console.log('=== Example 3: Conditional Rendering ===');
 const template3 = `
-<div w-if={isLoading}>Loading...</div>
-<div w-else-if={hasError}>Error: {error}</div>
-<div w-else>Content loaded!</div>
+<div l-if={isLoading}>Loading...</div>
+<div l-else-if={hasError}>Error: {error}</div>
+<div l-else>Content loaded!</div>
 `.trim();
 const result3 = compile(template3);
 console.log('Template:', template3);
@@ -32,7 +32,7 @@ console.log();
 console.log('=== Example 4: List Rendering ===');
 const template4 = `
 <ul>
-  <li w-for={item in items}>{item.name}</li>
+  <li l-for={item in items}>{item.name}</li>
 </ul>
 `.trim();
 const result4 = compile(template4);
@@ -45,11 +45,11 @@ console.log('=== Example 5: Todo List ===');
 const template5 = `
 <div class="todo-list">
   <h2>Todos ({todos.length})</h2>
-  <div w-for={(todo, index) in todos} class="todo-item">
+  <div l-for={(todo, index) in todos} class="todo-item">
     <input type="checkbox" checked={todo.done} />
     <span>{index + 1}. {todo.text}</span>
   </div>
-  <p w-if={todos.length === 0}>No todos yet!</p>
+  <p l-if={todos.length === 0}>No todos yet!</p>
 </div>
 `.trim();
 const result5 = compile(template5);
@@ -57,13 +57,13 @@ console.log('Template:', template5);
 console.log('Generated:', result5.code);
 console.log();
 
-// Example 6: Component with slots
-console.log('=== Example 6: Component with Slots ===');
+// Example 6: Component with nested content
+console.log('=== Example 6: Component with Nested Content ===');
 const template6 = `
 <Card title={cardTitle}>
-  <template slot="header">
+  <div class="card-header">
     <h3>{headerTitle}</h3>
-  </template>
+  </div>
   <p>{content}</p>
 </Card>
 `.trim();

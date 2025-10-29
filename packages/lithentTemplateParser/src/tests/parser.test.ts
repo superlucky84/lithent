@@ -142,8 +142,8 @@ describe('Parser', () => {
   });
 
   describe('Directives', () => {
-    it('should parse w-if directive', () => {
-      const tokens = tokenize('<div w-if={count > 0}></div>');
+    it('should parse l-if directive', () => {
+      const tokens = tokenize('<div l-if={count > 0}></div>');
       const ast = parse(tokens);
 
       const element = expectElement(ast.children[0]);
@@ -159,8 +159,8 @@ describe('Parser', () => {
       expect(directive.condition).toBe('count > 0');
     });
 
-    it('should parse w-else-if directive', () => {
-      const tokens = tokenize('<div w-else-if={count === 0}></div>');
+    it('should parse l-else-if directive', () => {
+      const tokens = tokenize('<div l-else-if={count === 0}></div>');
       const ast = parse(tokens);
 
       const element = expectElement(ast.children[0]);
@@ -173,8 +173,8 @@ describe('Parser', () => {
       expect(directive.condition).toBe('count === 0');
     });
 
-    it('should parse w-else directive', () => {
-      const tokens = tokenize('<div w-else></div>');
+    it('should parse l-else directive', () => {
+      const tokens = tokenize('<div l-else></div>');
       const ast = parse(tokens);
 
       const element = expectElement(ast.children[0]);
@@ -186,8 +186,8 @@ describe('Parser', () => {
       expect(directive.type).toBe(NodeType.DIRECTIVE_ELSE);
     });
 
-    it('should parse w-for directive (simple)', () => {
-      const tokens = tokenize('<div w-for={item in items}></div>');
+    it('should parse l-for directive (simple)', () => {
+      const tokens = tokenize('<div l-for={item in items}></div>');
       const ast = parse(tokens);
 
       const element = expectElement(ast.children[0]);
@@ -202,8 +202,8 @@ describe('Parser', () => {
       expect(directive.index).toBeUndefined();
     });
 
-    it('should parse w-for directive (with index)', () => {
-      const tokens = tokenize('<div w-for={(item, index) in items}></div>');
+    it('should parse l-for directive (with index)', () => {
+      const tokens = tokenize('<div l-for={(item, index) in items}></div>');
       const ast = parse(tokens);
 
       const element = expectElement(ast.children[0]);
@@ -218,8 +218,8 @@ describe('Parser', () => {
       expect(directive.list).toBe('items');
     });
 
-    it('should parse w-for directive with multiline expression', () => {
-      const template = `<div w-for={(item, index) in
+    it('should parse l-for directive with multiline expression', () => {
+      const template = `<div l-for={(item, index) in
         itemsList}></div>`;
       const tokens = tokenize(template);
       const ast = parse(tokens);
@@ -236,8 +236,8 @@ describe('Parser', () => {
       expect(directive.list).toBe('itemsList');
     });
 
-    it('should parse w-for directive with complex identifier names', () => {
-      const tokens = tokenize('<div w-for={($item, idx_1) in dataSets}></div>');
+    it('should parse l-for directive with complex identifier names', () => {
+      const tokens = tokenize('<div l-for={($item, idx_1) in dataSets}></div>');
       const ast = parse(tokens);
 
       const element = expectElement(ast.children[0]);
@@ -252,9 +252,9 @@ describe('Parser', () => {
       expect(directive.list).toBe('dataSets');
     });
 
-    it('should parse w-for directive with ternary expression list', () => {
+    it('should parse l-for directive with ternary expression list', () => {
       const template =
-        '<div w-for={(item, idx) in items.length ? items : []}></div>';
+        '<div l-for={(item, idx) in items.length ? items : []}></div>';
       const tokens = tokenize(template);
       const ast = parse(tokens);
 
@@ -270,8 +270,8 @@ describe('Parser', () => {
       expect(directive.list).toBe('items.length ? items : []');
     });
 
-    it('should parse w-for directive with complex list expression', () => {
-      const template = `<div w-for={(item, idx) in data?.map(value => \`inner \${value}\`).filter(Boolean)}></div>`;
+    it('should parse l-for directive with complex list expression', () => {
+      const template = `<div l-for={(item, idx) in data?.map(value => \`inner \${value}\`).filter(Boolean)}></div>`;
       const tokens = tokenize(template);
       const ast = parse(tokens);
 
@@ -345,50 +345,13 @@ describe('Parser', () => {
     });
   });
 
-  describe('Slot', () => {
-    it('should parse slot element', () => {
-      const tokens = tokenize('<slot />');
-      const ast = parse(tokens);
-
-      expect(ast.children).toHaveLength(1);
-      const slot = expectElement(ast.children[0]);
-      expect(slot.type).toBe(NodeType.ELEMENT);
-      expect(slot.tag).toBe('slot');
-      expect(slot.isSelfClosing).toBe(true);
-    });
-
-    it('should parse named slot', () => {
-      const tokens = tokenize('<slot name="header" />');
-      const ast = parse(tokens);
-
-      const slot = expectElement(ast.children[0]);
-      expect(slot.type).toBe(NodeType.ELEMENT);
-      expect(slot.tag).toBe('slot');
-      expect(slot.attributes).toHaveLength(1);
-      expect(slot.attributes[0].name).toBe('name');
-      expect(slot.attributes[0].value).toBe('header');
-    });
-
-    it('should parse slotted content', () => {
-      const tokens = tokenize(
-        '<template slot="header"><h1>Title</h1></template>'
-      );
-      const ast = parse(tokens);
-
-      const template = expectElement(ast.children[0]);
-      expect(template.type).toBe(NodeType.ELEMENT);
-      expect(template.tag).toBe('template');
-      expect(template.slot).toBe('header');
-    });
-  });
-
   describe('Complex templates', () => {
     it('should parse complete component', () => {
       const template = `
 <div class="container">
   <h1>{title}</h1>
   <ul>
-    <li w-for={item in items}>
+    <li l-for={item in items}>
       {item.name}
     </li>
   </ul>
@@ -409,9 +372,9 @@ describe('Parser', () => {
 
     it('should parse conditional rendering', () => {
       const template = `
-<div w-if={isLoading}>Loading...</div>
-<div w-else-if={hasError}>Error</div>
-<div w-else>Content</div>
+<div l-if={isLoading}>Loading...</div>
+<div l-else-if={hasError}>Error</div>
+<div l-else>Content</div>
       `.trim();
 
       const tokens = tokenize(template);
@@ -428,12 +391,10 @@ describe('Parser', () => {
       expect(third.directives[0].type).toBe(NodeType.DIRECTIVE_ELSE);
     });
 
-    it('should parse component with slots', () => {
+    it('should parse component with nested content', () => {
       const template = `
 <Card title="User">
-  <template slot="header">
-    <img src={avatar} />
-  </template>
+  <div class="header">{title}</div>
   <p>{content}</p>
 </Card>
       `.trim();

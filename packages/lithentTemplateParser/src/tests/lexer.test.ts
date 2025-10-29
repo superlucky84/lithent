@@ -102,38 +102,38 @@ describe('Lexer', () => {
   });
 
   describe('Directives', () => {
-    it('should tokenize w-if directive', () => {
-      const tokens = tokenize('<div w-if={count > 0}>');
+    it('should tokenize l-if directive', () => {
+      const tokens = tokenize('<div l-if={count > 0}>');
       const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
 
       expect(filtered[2].type).toBe(TokenType.DIRECTIVE_IF);
-      expect(filtered[2].value).toBe('w-if');
+      expect(filtered[2].value).toBe('l-if');
       expect(filtered[4].type).toBe(TokenType.EXPRESSION_START);
       expect(filtered[5].value.trim()).toBe('count > 0');
     });
 
-    it('should tokenize w-else-if directive', () => {
-      const tokens = tokenize('<div w-else-if={count === 0}>');
+    it('should tokenize l-else-if directive', () => {
+      const tokens = tokenize('<div l-else-if={count === 0}>');
       const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
 
       expect(filtered[2].type).toBe(TokenType.DIRECTIVE_ELSE_IF);
-      expect(filtered[2].value).toBe('w-else-if');
+      expect(filtered[2].value).toBe('l-else-if');
     });
 
-    it('should tokenize w-else directive', () => {
-      const tokens = tokenize('<div w-else>');
+    it('should tokenize l-else directive', () => {
+      const tokens = tokenize('<div l-else>');
       const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
 
       expect(filtered[2].type).toBe(TokenType.DIRECTIVE_ELSE);
-      expect(filtered[2].value).toBe('w-else');
+      expect(filtered[2].value).toBe('l-else');
     });
 
-    it('should tokenize w-for directive', () => {
-      const tokens = tokenize('<div w-for={item in items}>');
+    it('should tokenize l-for directive', () => {
+      const tokens = tokenize('<div l-for={item in items}>');
       const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
 
       expect(filtered[2].type).toBe(TokenType.DIRECTIVE_FOR);
-      expect(filtered[2].value).toBe('w-for');
+      expect(filtered[2].value).toBe('l-for');
       expect(filtered[5].value.trim()).toBe('item in items');
     });
   });
@@ -184,36 +184,13 @@ describe('Lexer', () => {
     });
   });
 
-  describe('Slot', () => {
-    it('should tokenize slot tag', () => {
-      const tokens = tokenize('<slot />');
-      const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
-
-      expect(filtered[0].type).toBe(TokenType.TAG_OPEN_START);
-      expect(filtered[1].type).toBe(TokenType.KEYWORD_SLOT);
-      expect(filtered[1].value).toBe('slot');
-      expect(filtered[2].type).toBe(TokenType.TAG_SELF_CLOSE);
-    });
-
-    it('should tokenize named slot', () => {
-      const tokens = tokenize('<slot name="header" />');
-      const filtered = tokens.filter(t => t.type !== TokenType.WHITESPACE);
-
-      expect(filtered[1].type).toBe(TokenType.KEYWORD_SLOT);
-      expect(filtered[2].type).toBe(TokenType.IDENTIFIER);
-      expect(filtered[2].value).toBe('name');
-      expect(filtered[4].type).toBe(TokenType.STRING_LITERAL);
-      expect(filtered[4].value).toBe('"header"');
-    });
-  });
-
   describe('Complex templates', () => {
     it('should tokenize complete component', () => {
       const template = `
 <div class="container">
   <h1>{title}</h1>
   <ul>
-    <li w-for={item in items}>
+    <li l-for={item in items}>
       {item.name}
     </li>
   </ul>
@@ -236,9 +213,9 @@ describe('Lexer', () => {
 
     it('should handle conditional rendering', () => {
       const template = `
-<div w-if={isLoading}>Loading...</div>
-<div w-else-if={hasError}>Error</div>
-<div w-else>Content</div>
+<div l-if={isLoading}>Loading...</div>
+<div l-else-if={hasError}>Error</div>
+<div l-else>Content</div>
       `.trim();
 
       const tokens = tokenize(template);

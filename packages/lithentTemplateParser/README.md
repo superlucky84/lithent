@@ -5,8 +5,7 @@ Vue-like template parser for Lithent. Compiles template syntax into Lithent's `h
 ## Features
 
 - **Clean Template Syntax**: Write declarative templates instead of imperative `h()` calls
-- **Minimal Directives**: Only essential directives (w-if, w-else-if, w-else, w-for)
-- **Slot Support**: Built-in slot mechanism for component composition
+- **Minimal Directives**: Only essential directives (l-if, l-else-if, l-else, l-for)
 - **Ref Support**: Direct DOM/component references
 - **Full TypeScript**: Complete type definitions for all APIs
 - **Well-Tested**: 68 tests covering all features
@@ -26,7 +25,7 @@ const template = `
   <div class="container">
     <h1>{title}</h1>
     <ul>
-      <li w-for={item in items}>{item.name}</li>
+      <li l-for={item in items}>{item.name}</li>
     </ul>
   </div>
 `;
@@ -82,65 +81,41 @@ console.log(result.code);
 
 ### Directives
 
-#### w-if / w-else-if / w-else
+#### l-if / l-else-if / l-else
 
 Conditional rendering:
 
 ```html
-<div w-if={count > 0}>
+<div l-if={count > 0}>
   Has items
 </div>
-<div w-else-if={count === 0}>
+<div l-else-if={count === 0}>
   No items
 </div>
-<div w-else>
+<div l-else>
   Loading...
 </div>
 ```
 
-#### w-for
+#### l-for
 
 List rendering:
 
 ```html
 <!-- Simple iteration -->
-<div w-for={item in items}>
+<div l-for={item in items}>
   {item}
 </div>
 
 <!-- With index -->
-<div w-for={(item, index) in items}>
+<div l-for={(item, index) in items}>
   {index}: {item}
 </div>
 
 <!-- Object iteration -->
-<div w-for={user in users}>
+<div l-for={user in users}>
   {user.name}
 </div>
-```
-
-### Slots
-
-Component composition with slots:
-
-```html
-<!-- Child component -->
-<div class="card">
-  <header>
-    <slot name="header" />
-  </header>
-  <main>
-    <slot />
-  </main>
-</div>
-
-<!-- Parent component -->
-<Card>
-  <template slot="header">
-    <h1>Title</h1>
-  </template>
-  <p>Main content</p>
-</Card>
 ```
 
 ### Ref
@@ -210,11 +185,11 @@ const code = generate(transformedAst);
 const template = `
   <div class="todo-list">
     <h2>Todos ({todos.length})</h2>
-    <div w-for={(todo, index) in todos} class="todo-item">
+    <div l-for={(todo, index) in todos} class="todo-item">
       <input type="checkbox" checked={todo.done} />
       <span>{index + 1}. {todo.text}</span>
     </div>
-    <p w-if={todos.length === 0}>No todos yet!</p>
+    <p l-if={todos.length === 0}>No todos yet!</p>
   </div>
 `;
 
@@ -229,7 +204,7 @@ const template = `
     <img src={user.avatar} />
     <h3>{user.name}</h3>
     <p>{user.email}</p>
-    <button w-if={canEdit} onClick={handleEdit}>Edit</button>
+    <button l-if={canEdit} onClick={handleEdit}>Edit</button>
   </div>
 `;
 
@@ -241,13 +216,13 @@ const result = compile(template);
 ```typescript
 const template = `
   <div class="dashboard">
-    <div w-if={isLoading}>
+    <div l-if={isLoading}>
       <Spinner />
     </div>
-    <div w-else-if={hasError}>
+    <div l-else-if={hasError}>
       <ErrorMessage message={error} />
     </div>
-    <div w-else>
+    <div l-else>
       <DataGrid data={data} />
     </div>
   </div>
@@ -289,9 +264,8 @@ Template String
 
 This parser follows Lithent's philosophy of **minimalism**:
 
-- **Limited Directives**: Only essential directives (w-if, w-for) - no bloat
+- **Limited Directives**: Only essential directives (l-if, l-for) - no bloat
 - **No Magic**: Explicit and predictable transformations
-- **Composable**: Use slots for component composition
 - **TypeScript First**: Full type safety throughout
 
 ## Testing

@@ -12,12 +12,11 @@ declare global {
 
 const defaultTemplate = `<div class="todo-list">
   <h2>Todos ({todos.length})</h2>
-  ><
-  <div w-for={(todo, index) in todos} class="todo-item">
-    <span w-if={todo.done}>✓</span>
+  <div l-for={(todo, index) in todos} class="todo-item">
+    <span l-if={todo.done}>✓</span>
     <span>{index + 1}. {todo.text}</span>
   </div>
-  <p w-else>No todos yet!</p>
+  <p l-else>No todos yet!</p>
 </div>`;
 
 const app = document.getElementById('app');
@@ -105,8 +104,6 @@ if (
 
 templateInput.value = defaultTemplate.trim();
 
-console.log('TEMPLATEINPUT', templateInput);
-
 const circularReplacer = () => {
   const seen = new WeakSet();
   return (key: string, value: unknown) => {
@@ -160,7 +157,6 @@ const runCompilation = () => {
   errorOutput.textContent = '';
 
   try {
-    console.log('RESULT', 'aa');
     const tokens = tokenize(template);
     tokenBadge.textContent = `${tokens.length} tokens`;
     tokensOutput.textContent = formatJSON(tokens);
@@ -175,7 +171,6 @@ const runCompilation = () => {
     }
 
     const result = compile(template);
-    console.log('RESULT', result);
 
     if (result.errors.length > 0) {
       const [firstError] = result.errors;

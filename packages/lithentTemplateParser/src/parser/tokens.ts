@@ -19,13 +19,11 @@ export enum TokenType {
   EXPRESSION_CONTENT = 'EXPRESSION_CONTENT', // JavaScript code inside {}
 
   // Directives
-  DIRECTIVE_IF = 'DIRECTIVE_IF', // w-if
-  DIRECTIVE_ELSE_IF = 'DIRECTIVE_ELSE_IF', // w-else-if
-  DIRECTIVE_ELSE = 'DIRECTIVE_ELSE', // w-else
-  DIRECTIVE_FOR = 'DIRECTIVE_FOR', // w-for
+  DIRECTIVE_IF = 'DIRECTIVE_IF', // l-if
+  DIRECTIVE_ELSE_IF = 'DIRECTIVE_ELSE_IF', // l-else-if
+  DIRECTIVE_ELSE = 'DIRECTIVE_ELSE', // l-else
+  DIRECTIVE_FOR = 'DIRECTIVE_FOR', // l-for
 
-  // Special keywords
-  KEYWORD_SLOT = 'KEYWORD_SLOT', // slot
   KEYWORD_REF = 'KEYWORD_REF', // ref
 
   // Text and comments

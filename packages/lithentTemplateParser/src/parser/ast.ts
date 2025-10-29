@@ -45,7 +45,6 @@ export interface ElementNode extends BaseNode {
   directives: DirectiveNode[];
   children: TemplateNode[];
   ref?: string; // ref attribute value
-  slot?: string; // slot attribute value (for slotted content)
 }
 
 /**
@@ -99,7 +98,7 @@ export interface BaseDirectiveNode extends BaseNode {
 }
 
 /**
- * w-if directive
+ * l-if directive
  */
 export interface DirectiveIfNode extends BaseDirectiveNode {
   type: NodeType.DIRECTIVE_IF;
@@ -107,7 +106,7 @@ export interface DirectiveIfNode extends BaseDirectiveNode {
 }
 
 /**
- * w-else-if directive
+ * l-else-if directive
  */
 export interface DirectiveElseIfNode extends BaseDirectiveNode {
   type: NodeType.DIRECTIVE_ELSE_IF;
@@ -115,14 +114,14 @@ export interface DirectiveElseIfNode extends BaseDirectiveNode {
 }
 
 /**
- * w-else directive
+ * l-else directive
  */
 export interface DirectiveElseNode extends BaseDirectiveNode {
   type: NodeType.DIRECTIVE_ELSE;
 }
 
 /**
- * w-for directive
+ * l-for directive
  */
 export interface DirectiveForNode extends BaseDirectiveNode {
   type: NodeType.DIRECTIVE_FOR;
@@ -231,14 +230,6 @@ export function createElementNode(
       : refAttr.value.expression
     : undefined;
 
-  // Extract slot from attributes
-  const slotAttr = attributes.find(attr => attr.name === 'slot');
-  const slot = slotAttr?.value
-    ? typeof slotAttr.value === 'string'
-      ? slotAttr.value
-      : slotAttr.value.expression
-    : undefined;
-
   return {
     type: NodeType.ELEMENT,
     tag,
@@ -248,7 +239,6 @@ export function createElementNode(
     directives,
     children,
     ref,
-    slot,
     start,
     end,
   };
@@ -323,7 +313,7 @@ export function createAttributeNode(
 }
 
 /**
- * Create a w-if directive node
+ * Create a l-if directive node
  */
 export function createDirectiveIfNode(
   condition: string,
@@ -339,7 +329,7 @@ export function createDirectiveIfNode(
 }
 
 /**
- * Create a w-else-if directive node
+ * Create a l-else-if directive node
  */
 export function createDirectiveElseIfNode(
   condition: string,
@@ -355,7 +345,7 @@ export function createDirectiveElseIfNode(
 }
 
 /**
- * Create a w-else directive node
+ * Create a l-else directive node
  */
 export function createDirectiveElseNode(
   start: Position,
@@ -369,7 +359,7 @@ export function createDirectiveElseNode(
 }
 
 /**
- * Create a w-for directive node
+ * Create a l-for directive node
  */
 export function createDirectiveForNode(
   item: string,

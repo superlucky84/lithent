@@ -107,7 +107,7 @@ function generateElement(
     return generateConditionalGroup(conditionalGroup, options);
   }
 
-  // Check if this element has w-for directive
+  // Check if this element has l-for directive
   const forDirective = node.directives.find(
     d => d.type === NodeType.DIRECTIVE_FOR
   ) as DirectiveForNode | undefined;
@@ -194,7 +194,7 @@ function generateInterpolation(node: InterpolationNode): string {
 }
 
 /**
- * Generate code for w-for loop
+ * Generate code for l-for loop
  */
 function generateForLoop(
   node: ElementNode,
@@ -220,7 +220,7 @@ function generateForLoop(
 }
 
 /**
- * Generate code for conditional group (w-if/w-else-if/w-else)
+ * Generate code for conditional group (l-if/l-else-if/l-else)
  */
 function generateConditionalGroup(
   group: any,

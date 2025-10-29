@@ -72,8 +72,8 @@ describe('Compiler', () => {
   });
 
   describe('Directives', () => {
-    it('should compile w-if directive', () => {
-      const template = '<div w-if={isActive}>Active</div>';
+    it('should compile l-if directive', () => {
+      const template = '<div l-if={isActive}>Active</div>';
       const result = compile(template);
 
       expect(result.errors).toHaveLength(0);
@@ -81,11 +81,11 @@ describe('Compiler', () => {
       expect(result.code).toContain("'Active'");
     });
 
-    it('should compile w-if/w-else-if/w-else chain', () => {
+    it('should compile l-if/l-else-if/l-else chain', () => {
       const template = `
-        <div w-if={status === 'loading'}>Loading</div>
-        <div w-else-if={status === 'error'}>Error</div>
-        <div w-else>Success</div>
+        <div l-if={status === 'loading'}>Loading</div>
+        <div l-else-if={status === 'error'}>Error</div>
+        <div l-else>Success</div>
       `;
       const result = compile(template);
 
@@ -95,17 +95,17 @@ describe('Compiler', () => {
       expect(result.code).toContain("'Success'");
     });
 
-    it('should compile w-for directive', () => {
-      const template = '<li w-for={item in items}>{item}</li>';
+    it('should compile l-for directive', () => {
+      const template = '<li l-for={item in items}>{item}</li>';
       const result = compile(template);
 
       expect(result.errors).toHaveLength(0);
       expect(result.code).toContain('(items).map(item =>');
     });
 
-    it('should compile w-for with index', () => {
+    it('should compile l-for with index', () => {
       const template =
-        '<li w-for={(item, index) in items}>{index}: {item}</li>';
+        '<li l-for={(item, index) in items}>{index}: {item}</li>';
       const result = compile(template);
 
       expect(result.errors).toHaveLength(0);
@@ -132,8 +132,8 @@ describe('Compiler', () => {
     it('should compile list with conditionals', () => {
       const template = `
         <ul>
-          <li w-for={item in items}>
-            <span w-if={item.done}>✓</span>
+          <li l-for={item in items}>
+            <span l-if={item.done}>✓</span>
             {item.text}
           </li>
         </ul>
@@ -176,11 +176,11 @@ describe('Compiler', () => {
       const template = `
         <div class="todo-list">
           <h2>Todos ({todos.length})</h2>
-          <div w-for={todo in todos} class="todo-item">
+          <div l-for={todo in todos} class="todo-item">
             <input type="checkbox" checked={todo.done} />
             <span>{todo.text}</span>
           </div>
-          <p w-if={todos.length === 0}>No todos yet</p>
+          <p l-if={todos.length === 0}>No todos yet</p>
         </div>
       `;
       const result = compile(template);
@@ -196,7 +196,7 @@ describe('Compiler', () => {
           <img src={user.avatar} />
           <h3>{user.name}</h3>
           <p>{user.email}</p>
-          <button w-if={canEdit} onClick={handleEdit}>Edit</button>
+          <button l-if={canEdit} onClick={handleEdit}>Edit</button>
         </div>
       `;
       const result = compile(template);
@@ -214,13 +214,13 @@ describe('Compiler', () => {
             <h1>{title}</h1>
           </header>
           <main>
-            <div w-if={isLoading}>
+            <div l-if={isLoading}>
               <Spinner />
             </div>
-            <div w-else-if={hasError}>
+            <div l-else-if={hasError}>
               <ErrorMessage message={error} />
             </div>
-            <div w-else>
+            <div l-else>
               <DataGrid data={data} />
             </div>
           </main>

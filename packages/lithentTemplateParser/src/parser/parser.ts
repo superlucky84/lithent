@@ -92,10 +92,7 @@ export class Parser {
 
     // Get tag name
     const tagToken = this.peek();
-    if (
-      tagToken.type !== TokenType.IDENTIFIER &&
-      tagToken.type !== TokenType.KEYWORD_SLOT
-    ) {
+    if (tagToken.type !== TokenType.IDENTIFIER) {
       throw new Error(
         `Expected tag name at line ${tagToken.start.line}, column ${tagToken.start.column}`
       );
@@ -140,10 +137,7 @@ export class Parser {
       this.advance(); // consume </
 
       const closeTagToken = this.peek();
-      if (
-        closeTagToken.type !== TokenType.IDENTIFIER &&
-        closeTagToken.type !== TokenType.KEYWORD_SLOT
-      ) {
+      if (closeTagToken.type !== TokenType.IDENTIFIER) {
         throw new Error(
           `Expected closing tag name at line ${closeTagToken.start.line}, column ${closeTagToken.start.column}`
         );
@@ -215,8 +209,7 @@ export class Parser {
         }
       } else if (
         token.type === TokenType.IDENTIFIER ||
-        token.type === TokenType.KEYWORD_REF ||
-        token.type === TokenType.KEYWORD_SLOT
+        token.type === TokenType.KEYWORD_REF
       ) {
         const attribute = this.parseAttribute();
         if (attribute) {
@@ -344,7 +337,7 @@ export class Parser {
   }
 
   /**
-   * Parse w-for expression
+   * Parse l-for expression
    */
   private parseForExpression(expression: string): {
     item: string;

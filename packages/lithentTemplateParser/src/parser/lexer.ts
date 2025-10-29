@@ -289,16 +289,14 @@ export class Lexer {
    */
   private getIdentifierTokenType(value: string): TokenType {
     switch (value) {
-      case 'w-if':
+      case 'l-if':
         return TokenType.DIRECTIVE_IF;
-      case 'w-else-if':
+      case 'l-else-if':
         return TokenType.DIRECTIVE_ELSE_IF;
-      case 'w-else':
+      case 'l-else':
         return TokenType.DIRECTIVE_ELSE;
-      case 'w-for':
+      case 'l-for':
         return TokenType.DIRECTIVE_FOR;
-      case 'slot':
-        return TokenType.KEYWORD_SLOT;
       case 'ref':
         return TokenType.KEYWORD_REF;
       default:
