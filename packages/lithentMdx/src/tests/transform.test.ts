@@ -79,4 +79,26 @@ export default function MDXContent(props) {
     expect(result.code).toContain('import { mount } from \'lithent\';');
     expect(result.code).toContain('export default __LithentMdxComponent_MDXContent');
   });
+
+  it('should ignore MDXContent pattern inside strings and templates', () => {
+    const example = `
+const exampleString = "export default function MDXContent() { return null; }";
+const exampleTemplate = \`/* export default function MDXContent() */\`;
+
+export function _createMdxContent(props) {
+  return <div>{props.children}</div>;
+}
+export default function MDXContent(props) {
+  return _createMdxContent(props);
+}
+`;
+
+    const result = wrapMdxModule(example);
+    const wrappedName = '__LithentMdxComponent_MDXContent';
+
+    expect(result.modified).toBe(true);
+    expect(result.code).toContain(`const ${wrappedName} = mount`);
+    expect(result.code).toContain(`export default ${wrappedName};`);
+    expect(result.code).not.toContain('__LithentMdxComponent__LithentMdxComponent_MDXContent');
+  });
 });

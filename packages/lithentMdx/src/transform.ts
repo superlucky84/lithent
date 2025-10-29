@@ -13,17 +13,16 @@ export const wrapMdxModule = (code: string): MdxWrapResult => {
     return { code: fixedExports, modified: exportsModified };
   }
 
-  const defaultExportRegex = /export\s+default\s+function\s+([A-Za-z0-9_]+)/m;
-  const defaultExportMatch = defaultExportRegex.exec(fixedExports);
+  const defaultExportIndex = findDefaultMdxExportIndex(fixedExports);
 
-  if (!defaultExportMatch || defaultExportMatch.index === undefined) {
+  if (defaultExportIndex < 0) {
     return { code: fixedExports, modified: exportsModified };
   }
 
-  const fnName = defaultExportMatch[1];
+  const fnName = 'MDXContent';
 
-  const start = defaultExportMatch.index;
-  const end = start + defaultExportMatch[0].length;
+  const start = defaultExportIndex;
+  const end = start + 'export default function MDXContent'.length;
   let updated = `${fixedExports.slice(0, start)}function ${fnName}${fixedExports.slice(end)}`;
 
   // Ensure mount import exists
@@ -46,6 +45,128 @@ export default ${wrapperVar};
   updated = `${updated}${wrapperSnippet}`;
 
   return { code: updated, modified: true };
+};
+
+const findDefaultMdxExportIndex = (source: string): number => {
+  const target = 'export default function MDXContent';
+  const length = source.length;
+  let i = 0;
+  let state: 'code' | 'single' | 'double' | 'template' | 'lineComment' | 'blockComment' = 'code';
+  let templateDepth = 0;
+
+  const advance = () => source[++i];
+
+  while (i < length) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    switch (state) {
+      case 'code':
+        if (ch === '/') {
+          if (next === '/') {
+            state = 'lineComment';
+            i += 2;
+            continue;
+          }
+          if (next === '*') {
+            state = 'blockComment';
+            i += 2;
+            continue;
+          }
+        }
+        if (ch === "'") {
+          state = 'single';
+          i++;
+          continue;
+        }
+        if (ch === '"') {
+          state = 'double';
+          i++;
+          continue;
+        }
+        if (ch === '`') {
+          state = 'template';
+          templateDepth = 0;
+          i++;
+          continue;
+        }
+        if (source.startsWith(target, i)) {
+          return i;
+        }
+        i++;
+        break;
+
+      case 'single':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === "'") {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'double':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === '"') {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'template':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === '`') {
+          if (templateDepth === 0) {
+            state = 'code';
+            i++;
+            break;
+          }
+          templateDepth--;
+          i++;
+          break;
+        }
+        if (ch === '$' && next === '{') {
+          templateDepth++;
+          i += 2;
+          break;
+        }
+        if (ch === '}') {
+          if (templateDepth > 0) {
+            templateDepth--;
+          }
+          i++;
+          break;
+        }
+        i++;
+        break;
+
+      case 'lineComment':
+        if (ch === '\n') {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'blockComment':
+        if (ch === '*' && next === '/') {
+          state = 'code';
+          i += 2;
+          break;
+        }
+        i++;
+        break;
+    }
+  }
+
+  return -1;
 };
 
 const wrapMdxExports = (code: string): string => {
