@@ -457,19 +457,20 @@ const updateStyle = (
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const orig = { ...oldStyle };
-  const htmlElement =
-    element instanceof HTMLElement ? element : (element as HTMLElement | null);
+  const htmlElement = element instanceof HTMLElement ? element : null;
   const cssStyle = htmlElement?.style;
 
   if (!cssStyle) return;
 
+  const styleProxy = cssStyle as unknown as Record<string, string>;
+
   entries(style).forEach(([k, v]) => {
-    cssStyle.setProperty(k, v);
+    styleProxy[k] = v;
     delete orig[k];
   });
 
   entries(orig).forEach(([k]) => {
-    cssStyle.removeProperty(k);
+    styleProxy[k] = '';
   });
 };
 
