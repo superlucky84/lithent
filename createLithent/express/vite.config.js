@@ -1,37 +1,13 @@
 import { resolve } from 'path';
-import { defineConfig, build } from 'vite';
+import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
 import fs from 'fs';
-import mdx from '@mdx-js/rollup';
 import tailwindcss from '@tailwindcss/vite';
+import lithentMdx from '@lithent/lithent-mdx';
+import lithentVitePlugin from '@lithent/lithent-vite';
 
 const cachedEntries = getEntries();
-
-function fixMdxExports() {
-  return {
-    name: 'fix-mdx-exports',
-    transform(code, id) {
-      if (id.endsWith('.mdx')) {
-        const fixedCode = code
-          .replace(
-            /^(?!export )function\s+_createMdxContent/gm,
-            'export function _createMdxContent'
-          )
-          .replace(
-            /^(?!export )function\s+MDXContent/gm,
-            'export default function MDXContent'
-          );
-
-        return {
-          code: fixedCode,
-          map: null,
-        };
-      }
-      return null;
-    },
-  };
-}
 
 export default defineConfig(({ mode }) => ({
   plugins: [
@@ -45,12 +21,9 @@ export default defineConfig(({ mode }) => ({
     dts({
       outputDir: ['dist'],
     }),
-    mdx({
-      jsxImportSource: 'lithent', // Preact의 JSX pragma 사용
-      outputFormat: 'esm',
-    }),
+    lithentMdx(),
+    lithentVitePlugin(),
     tailwindcss(),
-    fixMdxExports(),
   ],
   resolve: {
     alias: {
