@@ -1,9 +1,3 @@
-import '../shims/babel-env';
-import { parseExpression, type ParserPlugin } from '@babel/parser';
-import traverse from '@babel/traverse';
-import type { NodePath } from '@babel/traverse';
-import generateBabel from '@babel/generator';
-import * as t from '@babel/types';
 import {
   RootNode,
   TemplateNode,
@@ -304,90 +298,356 @@ export function formatCode(code: string): string {
   return code;
 }
 
-const BABEL_PARSER_PLUGINS: ParserPlugin[] = [
-  'jsx',
-  'typescript',
-  'classProperties',
-  'classPrivateProperties',
-  'classPrivateMethods',
-  'decorators-legacy',
-  'topLevelAwait',
-  'optionalChaining',
-  'nullishCoalescingOperator',
-  'objectRestSpread',
-];
+interface TemplateMatch {
+  start: number;
+  end: number;
+  snippet: string;
+}
+
+const isAlphaNumeric = (code: number): boolean => {
+  return (
+    (code >= 48 && code <= 57) || // 0-9
+    (code >= 65 && code <= 90) || // A-Z
+    (code >= 97 && code <= 122) || // a-z
+    code === 95 || // _
+    code === 36 // $
+  );
+};
+
+const shouldAttemptTemplate = (source: string, index: number): boolean => {
+  if (source[index] !== '<') {
+    return false;
+  }
+
+  const next = source.charCodeAt(index + 1);
+  if (Number.isNaN(next)) {
+    return false;
+  }
+
+  const isValidNext =
+    next === 47 || // /
+    next === 62 || // >
+    next === 33 || // !
+    isAlphaNumeric(next);
+
+  if (!isValidNext) {
+    return false;
+  }
+
+  let i = index - 1;
+  while (i >= 0) {
+    const code = source.charCodeAt(i);
+    if (code === 32 || code === 9 || code === 10 || code === 13) {
+      i--;
+      continue;
+    }
+
+    if (isAlphaNumeric(code)) {
+      return false;
+    }
+
+    break;
+  }
+
+  return true;
+};
+
+const skipQuoted = (source: string, index: number, quote: string): number => {
+  let i = index + 1;
+  while (i < source.length) {
+    const ch = source[i];
+    if (ch === '\\\\') {
+      i += 2;
+      continue;
+    }
+    if (ch === quote) {
+      return i + 1;
+    }
+    i++;
+  }
+  return source.length;
+};
+
+const skipTemplateLiteral = (source: string, index: number): number => {
+  let i = index + 1;
+  while (i < source.length) {
+    const ch = source[i];
+    if (ch === '\\\\') {
+      i += 2;
+      continue;
+    }
+    if (ch === '`') {
+      return i + 1;
+    }
+    if (ch === '$' && source[i + 1] === '{') {
+      i = skipJsExpression(source, i + 2);
+      continue;
+    }
+    i++;
+  }
+  return source.length;
+};
+
+const skipLineComment = (source: string, index: number): number => {
+  let i = index;
+  while (i < source.length && source[i] !== '\\n') {
+    i++;
+  }
+  return i;
+};
+
+const skipBlockComment = (source: string, index: number): number => {
+  const end = source.indexOf('*/', index);
+  return end === -1 ? source.length : end + 2;
+};
+
+const skipHtmlComment = (source: string, index: number): number => {
+  const end = source.indexOf('-->', index);
+  return end === -1 ? source.length : end + 3;
+};
+
+const skipJsExpression = (source: string, index: number): number => {
+  let depth = 1;
+  let i = index;
+
+  while (i < source.length) {
+    const ch = source[i];
+    if (ch === '\\\\') {
+      i += 2;
+      continue;
+    }
+    if (ch === "'" || ch === '"') {
+      i = skipQuoted(source, i, ch);
+      continue;
+    }
+    if (ch === '`') {
+      i = skipTemplateLiteral(source, i);
+      continue;
+    }
+    if (ch === '/' && source[i + 1] === '*') {
+      i = skipBlockComment(source, i + 2);
+      continue;
+    }
+    if (ch === '/' && source[i + 1] === '/') {
+      i = skipLineComment(source, i + 2);
+      continue;
+    }
+    if (ch === '{') {
+      depth++;
+      i++;
+      continue;
+    }
+    if (ch === '}') {
+      depth--;
+      i++;
+      if (depth === 0) {
+        return i;
+      }
+      continue;
+    }
+    i++;
+  }
+
+  return source.length;
+};
+
+interface SkipTagResult {
+  position: number;
+  selfClosing: boolean;
+}
+
+const skipTag = (
+  source: string,
+  index: number,
+  closing: boolean
+): SkipTagResult | null => {
+  let i = index;
+  while (i < source.length) {
+    const ch = source[i];
+    if (ch === "'" || ch === '"') {
+      i = skipQuoted(source, i, ch);
+      continue;
+    }
+    if (ch === '`') {
+      i = skipTemplateLiteral(source, i);
+      continue;
+    }
+    if (ch === '{') {
+      i = skipJsExpression(source, i + 1);
+      continue;
+    }
+    if (ch === '/' && source[i + 1] === '*') {
+      i = skipBlockComment(source, i + 2);
+      continue;
+    }
+    if (ch === '/' && source[i + 1] === '/') {
+      i = skipLineComment(source, i + 2);
+      continue;
+    }
+    if (ch === '>') {
+      const selfClosing = !closing && source[i - 1] === '/';
+      return { position: i + 1, selfClosing };
+    }
+    i++;
+  }
+  return null;
+};
+
+const extractTemplate = (
+  source: string,
+  start: number
+): TemplateMatch | null => {
+  const len = source.length;
+  let pos = start;
+  let depth = 0;
+
+  while (pos < len) {
+    const ch = source[pos];
+
+    if (ch === "'" || ch === '"') {
+      pos = skipQuoted(source, pos, ch);
+      continue;
+    }
+    if (ch === '`') {
+      pos = skipTemplateLiteral(source, pos);
+      continue;
+    }
+    if (ch === '/' && source[pos + 1] === '*') {
+      pos = skipBlockComment(source, pos + 2);
+      continue;
+    }
+    if (ch === '/' && source[pos + 1] === '/') {
+      pos = skipLineComment(source, pos + 2);
+      continue;
+    }
+
+    if (ch === '<') {
+      if (source.startsWith('<!--', pos)) {
+        pos = skipHtmlComment(source, pos + 4);
+        continue;
+      }
+
+      if (source[pos + 1] === '/') {
+        depth--;
+        const res = skipTag(source, pos + 2, true);
+        if (!res) {
+          return null;
+        }
+        pos = res.position;
+        if (depth === 0) {
+          return {
+            start,
+            end: pos,
+            snippet: source.slice(start, pos),
+          };
+        }
+        continue;
+      } else {
+        depth++;
+        const res = skipTag(source, pos + 1, false);
+        if (!res) {
+          return null;
+        }
+        pos = res.position;
+        if (res.selfClosing) {
+          depth--;
+          if (depth === 0) {
+            return {
+              start,
+              end: pos,
+              snippet: source.slice(start, pos),
+            };
+          }
+        }
+        continue;
+      }
+    }
+
+    pos++;
+  }
+
+  return null;
+};
+
+const scanTemplates = (code: string): TemplateMatch[] => {
+  const matches: TemplateMatch[] = [];
+  const len = code.length;
+  let index = 0;
+
+  while (index < len) {
+    const ch = code[index];
+
+    if (ch === "'" || ch === '"') {
+      index = skipQuoted(code, index, ch);
+      continue;
+    }
+    if (ch === '`') {
+      index = skipTemplateLiteral(code, index);
+      continue;
+    }
+    if (ch === '/' && code[index + 1] === '*') {
+      index = skipBlockComment(code, index + 2);
+      continue;
+    }
+    if (ch === '/' && code[index + 1] === '/') {
+      index = skipLineComment(code, index + 2);
+      continue;
+    }
+
+    if (ch === '<' && shouldAttemptTemplate(code, index)) {
+      const match = extractTemplate(code, index);
+      if (match) {
+        matches.push(match);
+        index = match.end;
+        continue;
+      }
+    }
+
+    index++;
+  }
+
+  return matches;
+};
 
 function transformExpression(
   expression: string,
   options: Required<GenerateOptions>
 ): string {
-  const original = expression;
-  const trimmed = expression.trim();
-  if (!trimmed) {
-    return original;
+  if (!expression.includes('<')) {
+    return expression;
   }
 
-  let exprAst: t.Expression;
-  try {
-    exprAst = parseExpression(trimmed, {
-      sourceType: 'module',
-      plugins: BABEL_PARSER_PLUGINS,
-    });
-  } catch (error) {
-    return original;
+  const matches = scanTemplates(expression);
+  if (matches.length === 0) {
+    return expression;
   }
 
+  let result = '';
+  let lastIndex = 0;
   let changed = false;
 
-  const programAst = t.file(
-    t.program([t.expressionStatement(exprAst)], [], 'module')
-  );
-
-  const replaceJsx = (path: NodePath<t.JSXElement | t.JSXFragment>) => {
-    const { code: jsxCode } = generateBabel(path.node, {
-      concise: true,
-      jsescOption: { minimal: true },
-    });
-
+  for (const match of matches) {
+    let replacement: string | null = null;
     try {
-      const compiled = compileEmbeddedTemplate(jsxCode, options);
-      const replacement = parseExpression(compiled, {
-        sourceType: 'module',
-        plugins: BABEL_PARSER_PLUGINS,
-      });
-      path.replaceWith(replacement as t.Expression);
-      changed = true;
+      replacement = compileEmbeddedTemplate(match.snippet, options);
     } catch {
-      // If compilation fails, leave the original JSX untouched
+      replacement = null;
     }
-  };
 
-  traverse(programAst, {
-    JSXElement(path) {
-      replaceJsx(path);
-      path.skip();
-    },
-    JSXFragment(path) {
-      replaceJsx(path);
-      path.skip();
-    },
-  });
+    if (!replacement) {
+      result += expression.slice(lastIndex, match.end);
+      lastIndex = match.end;
+      continue;
+    }
 
-  if (!changed) {
-    return original;
+    result += expression.slice(lastIndex, match.start) + replacement;
+    lastIndex = match.end;
+    changed = true;
   }
 
-  const expressionStatement = programAst.program.body[0];
-  if (!expressionStatement || !t.isExpressionStatement(expressionStatement)) {
-    return original;
-  }
+  result += expression.slice(lastIndex);
 
-  const { code } = generateBabel(expressionStatement.expression, {
-    concise: true,
-    jsescOption: { minimal: true },
-  });
-
-  return code;
+  return changed ? result : expression;
 }
 
 function compileEmbeddedTemplate(
