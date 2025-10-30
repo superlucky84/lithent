@@ -24,9 +24,15 @@
     "test:dev": "vitest"
   },
   "dependencies": {
+    "@babel/generator": "^7.25.6",
+    "@babel/parser": "^7.26.8",
+    "@babel/traverse": "^7.25.6",
+    "@babel/types": "^7.25.6",
     "@lithent/hmr-parser": "workspace:*"
   },
   "devDependencies": {
+    "@types/babel__generator": "^7.6.8",
+    "@types/babel__traverse": "^7.20.5",
     "lithent": "workspace:*"
   },
   "keywords": [

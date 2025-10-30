@@ -133,18 +133,18 @@ importers:
         specifier: ^4.21.1
         version: 4.21.1
       lithent:
-        specifier: ^1.20.0
-        version: 1.20.0
+        specifier: ^1.20.1
+        version: 1.20.1
       state-ref:
         specifier: ^2.0.0
         version: 2.0.0
     devDependencies:
       '@lithent/lithent-mdx':
-        specifier: ^0.2.1
-        version: 0.2.2(acorn@8.14.0)(lithent@1.20.0)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
+        specifier: ^0.2.3
+        version: 0.2.3(acorn@8.14.0)(lithent@1.20.1)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
       '@lithent/lithent-vite':
-        specifier: ^0.2.1
-        version: 0.2.1(lithent@1.20.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
+        specifier: ^0.2.3
+        version: 0.2.3(lithent@1.20.1)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.1.14
@@ -313,6 +313,37 @@ importers:
         specifier: ^5.4.8
         version: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
 
+  packages/lithentTemplateParser:
+    dependencies:
+      '@babel/generator':
+        specifier: ^7.25.6
+        version: 7.28.5
+      '@babel/parser':
+        specifier: ^7.26.8
+        version: 7.26.8
+      '@babel/traverse':
+        specifier: ^7.25.6
+        version: 7.28.5
+      '@babel/types':
+        specifier: ^7.25.6
+        version: 7.28.5
+      '@lithent/hmr-parser':
+        specifier: workspace:*
+        version: link:../hmrParser
+      vite:
+        specifier: ^5.0.0
+        version: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
+    devDependencies:
+      '@types/babel__generator':
+        specifier: ^7.6.8
+        version: 7.27.0
+      '@types/babel__traverse':
+        specifier: ^7.20.5
+        version: 7.28.0
+      lithent:
+        specifier: workspace:*
+        version: link:../..
+
   packages/lithentVite:
     dependencies:
       '@lithent/hmr-parser':
@@ -357,6 +388,18 @@ packages:
     resolution: {integrity: sha512-ZJhac6FkEd1yhG2AHOmfcXG4ceoLltoCVJjN5XsWN9BifBQr+cHJbWi0h68HZuSORq+3WtJ2z0hwF2NG1b5kcA==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/code-frame@7.27.1':
+    resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/generator@7.28.5':
+    resolution: {integrity: sha512-3EwLFhZ38J4VyIP6WNtt2kUdW9dokXA9Cr4IVIFHuCpZ3H8/YFOl5JjZHisrn1fATPBmKKqXzDFvh9fUwHz6CQ==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-globals@7.28.0':
+    resolution: {integrity: sha512-+W6cISkXFa1jXsDEdYA8HeevQT/FULhxzR99pxphltZcVaugps53THCeiWA8SguxxpSp3gKPiuYfSWopkLQ4hw==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/helper-string-parser@7.27.1':
     resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
     engines: {node: '>=6.9.0'}
@@ -373,6 +416,19 @@ packages:
     resolution: {integrity: sha512-TZIQ25pkSoaKEYYaHbbxkfL36GNsQ6iFiBbeuzAkLnXayKR1yP1zFe+NxuZWWsUyvt8icPU9CCq0sgWGXR1GEw==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  '@babel/parser@7.28.5':
+    resolution: {integrity: sha512-KKBU1VGYR7ORr3At5HAtUQ+TV3SzRCXmA/8OdDZiLDBIZxVyzXuztPjfLd3BV1PRAQGCMWWSHYhL0F8d5uHBDQ==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  '@babel/template@7.27.2':
+    resolution: {integrity: sha512-LPDZ85aEJyYSd18/DkjNh4/y1ntkE5KwUHWTiqgRxruuZL2F1yuHligVHLvcHY2vMHXttKFpJn6LwfI7cw7ODw==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/traverse@7.28.5':
+    resolution: {integrity: sha512-TCCj4t55U90khlYkVV/0TfkJkAkUg3jZFA3Neb7unZT8CPok7iiRfaX0F+WnqWqt7OxhOn0uBKXCw4lbL8W0aQ==}
+    engines: {node: '>=6.9.0'}
 
   '@babel/types@7.28.5':
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
@@ -718,6 +774,9 @@ packages:
     resolution: {integrity: sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==}
     engines: {node: '>=18.0.0'}
 
+  '@jridgewell/gen-mapping@0.3.13':
+    resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
+
   '@jridgewell/gen-mapping@0.3.5':
     resolution: {integrity: sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==}
     engines: {node: '>=6.0.0'}
@@ -742,22 +801,25 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
+  '@jridgewell/trace-mapping@0.3.31':
+    resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
   '@lithent/hmr-parser@0.2.0':
     resolution: {integrity: sha512-OWOvt+bubhlA+baQlWGieTEzY4MDykKruChFJYscHamlFhNmGqcmiDuUk/Le65B1oQGNw+GISjt5iz6gyOb+FQ==}
 
-  '@lithent/lithent-mdx@0.2.2':
-    resolution: {integrity: sha512-GSWcsyzPOiMoex/pp1owyUpiznUx2oWP1qSkDZxrNzlCp6n4DRsmpCmBYXdLGaBWRA3/jWmQniIXG5pITW5smQ==}
+  '@lithent/lithent-mdx@0.2.3':
+    resolution: {integrity: sha512-ftUU6Yhzvo/4HA39TchKMNGV+3igkt78dCXMudaLjhAtQFcpggQJ45R65Xjt6YJTzGNJIiDLQX10Y83TClAsKw==}
     peerDependencies:
-      lithent: ^1.20.0
+      lithent: ^1.20.1
       vite: ^5.0.0
 
-  '@lithent/lithent-vite@0.2.1':
-    resolution: {integrity: sha512-rRzE5GH/5zMojbpbjWSlABu+X54HzEHgMDkHsSS/h297gDXq23sXcp4LhNNY8350Y4IAq6xkWFDflrgVmLX8sw==}
+  '@lithent/lithent-vite@0.2.3':
+    resolution: {integrity: sha512-VNsI8DbDeEQTFCbDsa1YGKeuouJj0y+CbympiWBbevXPeZLMkS8aEbClJgL31JdkDajtGhZCRNmmw1E5LoHVVQ==}
     peerDependencies:
-      lithent: ^1.20.0
+      lithent: ^1.20.1
       vite: ^5.0.0
 
   '@mdx-js/mdx@3.1.0':
@@ -1100,6 +1162,9 @@ packages:
 
   '@types/argparse@1.0.38':
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
+
+  '@types/babel__generator@7.27.0':
+    resolution: {integrity: sha512-ufFd2Xi92OAVPYsy+P4n7/U7e68fex0+Ee8gSG9KX7eo084CWiQ4sdxktvdl0bOPupXtVJPY19zk6EwWqUQ8lg==}
 
   '@types/babel__traverse@7.28.0':
     resolution: {integrity: sha512-8PvcXf70gTDZBgt9ptxJ8elBeBjcLOAcOtoO/mPJjtji1+CdGbHgm77om1GrsPxsiE+uXIpNSK64UYaIwQXd4Q==}
@@ -2441,6 +2506,11 @@ packages:
       canvas:
         optional: true
 
+  jsesc@3.1.0:
+    resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
+    engines: {node: '>=6'}
+    hasBin: true
+
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
 
@@ -2544,8 +2614,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  lithent@1.20.0:
-    resolution: {integrity: sha512-SzvPYMQUYzyKgnMPafpK75uouWBtKypG/X/bLh+pLUFmPAA/rWaaJmeeAVvIiyYyPmk3b7diZB6MRYW4chPclw==}
+  lithent@1.20.1:
+    resolution: {integrity: sha512-9ArK5ME9nqrV2GLNS5552Ov0fm2LbHFeIN0/Sfh+5RfCgC1kG1NmBh6wIkLIV+74zKb89y6nuV5KPqkZBg1i0w==}
 
   local-pkg@0.5.1:
     resolution: {integrity: sha512-9rrA30MRRP3gBD3HTGnC6cDFpaE1kVDWxWgqWJUN0RvDNAo+Nz/9GxB+nHOH0ifbVFy0hSA1V6vFDvnx54lTEQ==}
@@ -2560,9 +2630,11 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
@@ -2989,6 +3061,9 @@ packages:
 
   picocolors@1.1.0:
     resolution: {integrity: sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==}
+
+  picocolors@1.1.1:
+    resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
@@ -3990,6 +4065,22 @@ snapshots:
       '@babel/highlight': 7.24.6
       picocolors: 1.1.0
 
+  '@babel/code-frame@7.27.1':
+    dependencies:
+      '@babel/helper-validator-identifier': 7.28.5
+      js-tokens: 4.0.0
+      picocolors: 1.1.1
+
+  '@babel/generator@7.28.5':
+    dependencies:
+      '@babel/parser': 7.28.5
+      '@babel/types': 7.28.5
+      '@jridgewell/gen-mapping': 0.3.13
+      '@jridgewell/trace-mapping': 0.3.31
+      jsesc: 3.1.0
+
+  '@babel/helper-globals@7.28.0': {}
+
   '@babel/helper-string-parser@7.27.1': {}
 
   '@babel/helper-validator-identifier@7.28.5': {}
@@ -4004,6 +4095,28 @@ snapshots:
   '@babel/parser@7.26.8':
     dependencies:
       '@babel/types': 7.28.5
+
+  '@babel/parser@7.28.5':
+    dependencies:
+      '@babel/types': 7.28.5
+
+  '@babel/template@7.27.2':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/parser': 7.28.5
+      '@babel/types': 7.28.5
+
+  '@babel/traverse@7.28.5':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/generator': 7.28.5
+      '@babel/helper-globals': 7.28.0
+      '@babel/parser': 7.28.5
+      '@babel/template': 7.27.2
+      '@babel/types': 7.28.5
+      debug: 4.4.0
+    transitivePeerDependencies:
+      - supports-color
 
   '@babel/types@7.28.5':
     dependencies:
@@ -4218,6 +4331,11 @@ snapshots:
     dependencies:
       minipass: 7.1.2
 
+  '@jridgewell/gen-mapping@0.3.13':
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/trace-mapping': 0.3.31
+
   '@jridgewell/gen-mapping@0.3.5':
     dependencies:
       '@jridgewell/set-array': 1.2.1
@@ -4245,6 +4363,11 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  '@jridgewell/trace-mapping@0.3.31':
+    dependencies:
+      '@jridgewell/resolve-uri': 3.1.2
+      '@jridgewell/sourcemap-codec': 1.5.5
+
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
@@ -4256,20 +4379,20 @@ snapshots:
       '@babel/types': 7.28.5
       magic-string: 0.30.19
 
-  '@lithent/lithent-mdx@0.2.2(acorn@8.14.0)(lithent@1.20.0)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
+  '@lithent/lithent-mdx@0.2.3(acorn@8.14.0)(lithent@1.20.1)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
     dependencies:
       '@mdx-js/rollup': 3.1.0(acorn@8.14.0)(rollup@4.24.0)
-      lithent: 1.20.0
+      lithent: 1.20.1
       vite: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
     transitivePeerDependencies:
       - acorn
       - rollup
       - supports-color
 
-  '@lithent/lithent-vite@0.2.1(lithent@1.20.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
+  '@lithent/lithent-vite@0.2.3(lithent@1.20.1)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
     dependencies:
       '@lithent/hmr-parser': 0.2.0
-      lithent: 1.20.0
+      lithent: 1.20.1
       vite: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
 
   '@mdx-js/mdx@3.1.0(acorn@8.14.0)':
@@ -4393,7 +4516,7 @@ snapshots:
       '@open-draft/until': 1.0.3
       '@types/debug': 4.1.12
       '@xmldom/xmldom': 0.8.10
-      debug: 4.3.7
+      debug: 4.4.0
       headers-polyfill: 3.2.5
       outvariant: 1.4.3
       strict-event-emitter: 0.2.8
@@ -4683,6 +4806,10 @@ snapshots:
       '@types/estree': 1.0.6
 
   '@types/argparse@1.0.38': {}
+
+  '@types/babel__generator@7.27.0':
+    dependencies:
+      '@babel/types': 7.28.5
 
   '@types/babel__traverse@7.28.0':
     dependencies:
@@ -4995,7 +5122,7 @@ snapshots:
 
   agent-base@7.1.1:
     dependencies:
-      debug: 4.3.7
+      debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
 
@@ -6001,14 +6128,14 @@ snapshots:
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.7
+      debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
 
   https-proxy-agent@7.0.5:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.7
+      debug: 4.4.0
     transitivePeerDependencies:
       - supports-color
 
@@ -6182,6 +6309,8 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  jsesc@3.1.0: {}
+
   json-buffer@3.0.1: {}
 
   json-schema-traverse@0.4.1: {}
@@ -6262,7 +6391,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lithent@1.20.0: {}
+  lithent@1.20.1: {}
 
   local-pkg@0.5.1:
     dependencies:
@@ -6815,7 +6944,7 @@ snapshots:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.1
-      debug: 4.3.7
+      debug: 4.4.0
       get-uri: 6.0.3
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.5
@@ -6883,6 +7012,8 @@ snapshots:
   picocolors@1.0.1: {}
 
   picocolors@1.1.0: {}
+
+  picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
 
@@ -7265,7 +7396,7 @@ snapshots:
   socks-proxy-agent@8.0.4:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.7
+      debug: 4.4.0
       socks: 2.8.3
     transitivePeerDependencies:
       - supports-color

@@ -1,3 +1,9 @@
+import '../shims/babel-env';
+import { parseExpression, type ParserPlugin } from '@babel/parser';
+import traverse from '@babel/traverse';
+import type { NodePath } from '@babel/traverse';
+import generateBabel from '@babel/generator';
+import * as t from '@babel/types';
 import {
   RootNode,
   TemplateNode,
@@ -8,7 +14,9 @@ import {
   NodeType,
   DirectiveForNode,
 } from '../parser/ast';
-import { getConditionalGroup, getDirective } from '../transform/directives';
+import { tokenize } from '../parser/lexer';
+import { parse } from '../parser/parser';
+import { getConditionalGroup, getDirective, transform } from '../transform';
 
 /**
  * Generate JavaScript code from AST
@@ -68,7 +76,7 @@ function generateNode(
     case NodeType.TEXT:
       return generateText(node);
     case NodeType.INTERPOLATION:
-      return generateInterpolation(node);
+      return generateInterpolation(node, options);
     case NodeType.COMMENT:
       // Comments are not rendered
       return '';
@@ -116,7 +124,7 @@ function generateNormalElement(
   const tag = node.isComponent ? node.tag : `'${node.tag}'`;
 
   // Props
-  const props = generateProps(node);
+  const props = generateProps(node, options);
 
   // Children
   const children = node.children
@@ -155,7 +163,10 @@ function generateFragment(
 /**
  * Generate props object
  */
-function generateProps(node: ElementNode): string {
+function generateProps(
+  node: ElementNode,
+  options: Required<GenerateOptions>
+): string {
   if (node.attributes.length === 0) {
     return 'null';
   }
@@ -172,7 +183,7 @@ function generateProps(node: ElementNode): string {
       value = `'${attr.value.replace(/'/g, "\\'")}'`;
     } else {
       // Dynamic expression
-      value = attr.value.expression;
+      value = transformExpression(attr.value.expression, options);
     }
 
     return `${key}: ${value}`;
@@ -193,8 +204,11 @@ function generateText(node: TextNode): string {
 /**
  * Generate code for interpolation node
  */
-function generateInterpolation(node: InterpolationNode): string {
-  return node.expression;
+function generateInterpolation(
+  node: InterpolationNode,
+  options: Required<GenerateOptions>
+): string {
+  return transformExpression(node.expression, options);
 }
 
 /**
@@ -280,11 +294,104 @@ function generateConditionalGroup(
   return code;
 }
 
-/**
- * Format generated code (basic formatting)
- */
 export function formatCode(code: string): string {
   // Basic formatting - this is a simple implementation
   // For production, you might want to use prettier or similar
   return code;
+}
+
+const BABEL_PARSER_PLUGINS: ParserPlugin[] = [
+  'jsx',
+  'typescript',
+  'classProperties',
+  'classPrivateProperties',
+  'classPrivateMethods',
+  'decorators-legacy',
+  'topLevelAwait',
+  'optionalChaining',
+  'nullishCoalescingOperator',
+  'objectRestSpread',
+];
+
+function transformExpression(
+  expression: string,
+  options: Required<GenerateOptions>
+): string {
+  const original = expression;
+  const trimmed = expression.trim();
+  if (!trimmed) {
+    return original;
+  }
+
+  let exprAst: t.Expression;
+  try {
+    exprAst = parseExpression(trimmed, {
+      sourceType: 'module',
+      plugins: BABEL_PARSER_PLUGINS,
+    });
+  } catch (error) {
+    return original;
+  }
+
+  let changed = false;
+
+  const programAst = t.file(
+    t.program([t.expressionStatement(exprAst)], [], 'module')
+  );
+
+  const replaceJsx = (path: NodePath<t.JSXElement | t.JSXFragment>) => {
+    const { code: jsxCode } = generateBabel(path.node, {
+      concise: true,
+      jsescOption: { minimal: true },
+    });
+
+    try {
+      const compiled = compileEmbeddedTemplate(jsxCode, options);
+      const replacement = parseExpression(compiled, {
+        sourceType: 'module',
+        plugins: BABEL_PARSER_PLUGINS,
+      });
+      path.replaceWith(replacement as t.Expression);
+      changed = true;
+    } catch {
+      // If compilation fails, leave the original JSX untouched
+    }
+  };
+
+  traverse(programAst, {
+    JSXElement(path) {
+      replaceJsx(path);
+      path.skip();
+    },
+    JSXFragment(path) {
+      replaceJsx(path);
+      path.skip();
+    },
+  });
+
+  if (!changed) {
+    return original;
+  }
+
+  const expressionStatement = programAst.program.body[0];
+  if (!expressionStatement || !t.isExpressionStatement(expressionStatement)) {
+    return original;
+  }
+
+  const { code } = generateBabel(expressionStatement.expression, {
+    concise: true,
+    jsescOption: { minimal: true },
+  });
+
+  return code;
+}
+
+function compileEmbeddedTemplate(
+  templateSource: string,
+  options: Required<GenerateOptions>
+): string {
+  const tokens = tokenize(templateSource);
+  const ast = parse(tokens);
+  const transformedAst = transform(ast);
+  return generate(transformedAst, options);
 }

@@ -225,6 +225,20 @@ describe('Compiler', () => {
       expect(result.code).toContain('active: isActive');
       expect(result.code).toContain("h('p'");
     });
+
+    it('should compile expressions containing nested templates', () => {
+      const template = `
+        <div>
+          {items.map(item => <span class={getClass(item)}>{item.value}</span>)}
+        </div>
+      `;
+      const result = compile(template);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.code).toContain("items.map(item => h('span'");
+      expect(result.code).toContain('getClass(item)');
+      expect(result.code).toContain('item.value');
+    });
   });
 
   describe('Error handling', () => {
