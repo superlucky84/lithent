@@ -532,6 +532,69 @@ describe('Parser', () => {
       const spanFragment = expectFragment(spanIf.children[0]);
       expect(spanFragment.children).toHaveLength(2);
     });
+
+    it('should parse nested conditionals and loops within l-if blocks', () => {
+      const template = `
+<div l-if={outer}><section l-if={middle}><span l-if={inner}>{value}</span><ul><li l-for={(item, index) in items}><span l-if={item.visible}>{item.label}</span><span l-else>{index}</span></li></ul></section></div>
+<div l-else>Fallback</div>
+      `.trim();
+
+      const tokens = tokenize(template);
+      const ast = parse(tokens);
+
+      expect(ast.children).toHaveLength(2);
+
+      const outerElement = expectElement(ast.children[0]);
+      const outerDirective = expectDirective(
+        outerElement.directives[0],
+        isDirectiveIf,
+        'DirectiveIf'
+      );
+      expect(outerDirective.condition).toBe('outer');
+
+      const innerSection = expectElement(outerElement.children[0]);
+      const sectionDirective = expectDirective(
+        innerSection.directives[0],
+        isDirectiveIf,
+        'DirectiveIf'
+      );
+      expect(sectionDirective.condition).toBe('middle');
+
+      const innerSpan = expectElement(innerSection.children[0]);
+      const innerDirective = expectDirective(
+        innerSpan.directives[0],
+        isDirectiveIf,
+        'DirectiveIf'
+      );
+      expect(innerDirective.condition).toBe('inner');
+
+      const innerList = expectElement(innerSection.children[1]);
+      const listItem = expectElement(innerList.children[0]);
+      const loopDirective = expectDirective(
+        listItem.directives[0],
+        isDirectiveFor,
+        'DirectiveFor'
+      );
+      expect(loopDirective.item).toBe('item');
+      expect(loopDirective.index).toBe('index');
+      expect(loopDirective.list).toBe('items');
+
+      const loopIf = expectElement(listItem.children[0]);
+      const loopIfDirective = expectDirective(
+        loopIf.directives[0],
+        isDirectiveIf,
+        'DirectiveIf'
+      );
+      expect(loopIfDirective.condition).toBe('item.visible');
+
+      const loopElse = expectElement(listItem.children[1]);
+      expectDirective(loopElse.directives[0], isDirectiveElse, 'DirectiveElse');
+
+      const fallback = expectElement(ast.children[1]);
+      expectDirective(fallback.directives[0], isDirectiveElse, 'DirectiveElse');
+      const fallbackText = expectText(fallback.children[0]);
+      expect(fallbackText.content).toBe('Fallback');
+    });
   });
 
   describe('Compatibility fixtures', () => {

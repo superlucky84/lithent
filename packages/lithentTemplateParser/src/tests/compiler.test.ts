@@ -160,6 +160,23 @@ describe('Compiler', () => {
       expect(result.errors).toHaveLength(0);
       expect(result.code).toContain('(items).map((item, index) =>');
     });
+
+    it('should compile nested l-if blocks with inner loops', () => {
+      const template = `
+<div l-if={outer}><section l-if={middle}><span l-if={inner}>{value}</span><ul><li l-for={(item, index) in items}><span l-if={item.visible}>{item.label}</span><span l-else>{index}</span></li></ul></section></div>
+<div l-else>Fallback</div>
+      `.trim();
+
+      const result = compile(template);
+
+      expect(result.errors).toHaveLength(0);
+      expect(result.code).toContain('(outer) ?');
+      expect(result.code).toContain('(middle) ?');
+      expect(result.code).toContain('(inner) ?');
+      expect(result.code).toContain('(items).map((item, index) =>');
+      expect(result.code).toContain('(item.visible) ?');
+      expect(result.code).toContain("'Fallback'");
+    });
   });
 
   describe('Complex templates', () => {
