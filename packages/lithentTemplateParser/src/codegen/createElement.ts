@@ -197,7 +197,11 @@ function generateProps(
  */
 function generateText(node: TextNode): string {
   // Escape single quotes in text
-  const escaped = node.content.replace(/'/g, "\\'");
+  const escaped = node.content
+    .replace(/\\/g, '\\\\')
+    .replace(/\r/g, '\\r')
+    .replace(/\n/g, '\\n')
+    .replace(/'/g, "\\'");
   return `'${escaped}'`;
 }
 

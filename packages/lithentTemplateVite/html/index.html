@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lithent Template Vite Playground</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 24px;
+        background: #f5f5f5;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      pre {
+        background: #111;
+        color: #e8e8e8;
+        padding: 20px;
+        border-radius: 8px;
+        overflow: auto;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>@lithent/lithent-template-vite</h1>
+    <p>
+      이 플러그인은 JSX 내부의 Lithent 템플릿을 빌드 타임에
+      <code>h()</code> 호출로 변환합니다. 아래 JSON은 변환된 템플릿이
+      런타임에서 어떤 구조를 갖는지 보여줍니다. 콘솔도 함께 확인해보세요!
+    </p>
+    <pre id="code-output">Loading code...</pre>
+    <pre id="ast-output">Loading AST...</pre>
+    <div id="preview"></div>
+    <script type="module" src="/src/dev/main.tsx"></script>
+  </body>
+</html>

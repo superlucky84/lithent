@@ -12,4 +12,5 @@ packages:
   - 'packages/hmrParser'
   - 'packages/lithentVite'
   - 'packages/lithentMdx'
+  - 'packages/lithentTemplateVite'
   - 'packages/lithentTemplateParser'
