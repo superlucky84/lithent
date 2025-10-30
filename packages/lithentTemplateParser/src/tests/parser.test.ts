@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { tokenize } from '../parser/lexer';
 import { parse } from '../parser/parser';
-import { NodeType, DirectiveNode } from '../parser/ast';
+import { NodeType } from '../parser/ast';
 import {
   expectElement,
   expectFragment,

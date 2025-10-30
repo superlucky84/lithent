@@ -24,12 +24,9 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'lithentTemplateParser',
-      fileName: format => {
-        return format === 'umd'
-          ? 'lithentTemplateParser.umd.js'
-          : 'lithentTemplateParser.mjs';
-      },
+      name: 'LithentTemplateParser',
+      formats: ['es', 'umd'],
+      fileName: format => (format === 'umd' ? 'index.umd.cjs' : 'index.mjs'),
     },
     rollupOptions: {
       external: [],

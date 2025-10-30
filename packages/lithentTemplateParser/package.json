@@ -3,9 +3,18 @@
   "name": "@lithent/lithent-template-parser",
   "version": "0.2.0",
   "description": "Lithent Template Parser",
-  "main": "./dist/index.umd.js",
+  "main": "./dist/index.umd.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "dev": "vite",
     "dev:plugin": "vite --config vite.config.plugin.ts",

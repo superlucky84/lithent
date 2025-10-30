@@ -142,6 +142,18 @@ export function hasDirective(
  */
 export function getDirective(
   element: ElementNode,
+  directiveType: NodeType.DIRECTIVE_IF
+): DirectiveIfNode | undefined;
+export function getDirective(
+  element: ElementNode,
+  directiveType: NodeType.DIRECTIVE_ELSE_IF
+): DirectiveElseIfNode | undefined;
+export function getDirective(
+  element: ElementNode,
+  directiveType: NodeType.DIRECTIVE_ELSE
+): DirectiveElseNode | undefined;
+export function getDirective(
+  element: ElementNode,
   directiveType: NodeType
 ): DirectiveIfNode | DirectiveElseIfNode | DirectiveElseNode | undefined {
   return element.directives.find(d => d.type === directiveType) as any;
