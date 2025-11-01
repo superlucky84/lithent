@@ -27,18 +27,18 @@ export function TemplateDemo() {
           <span class="todo-index">{index + 1}.</span>
           <span class="todo-text">{todo.text}</span>
           <strong l-if={todo.done} class="todo-status done">
-            Done
+            Done11
           </strong>
           <strong l-else class="todo-status pending">
-            Pending
+            asdglkj     a
           </strong>
         </li>
       </ul>
-      <div class="summary">
+      <ul class="summary">
         {todos.map(todo => (
-          <span class="summary-item">{todo.text.toUpperCase()}</span>
+          <li class="summary-item">{todo.text.toUpperCase()}</li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

@@ -13,3 +13,4 @@ export * from './parser/parser';
 export * from './parser/ast';
 export * from './transform';
 export * from './codegen';
+export * from './docPipe';
