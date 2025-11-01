@@ -356,7 +356,7 @@ const skipQuoted = (source: string, index: number, quote: string): number => {
   let i = index + 1;
   while (i < source.length) {
     const ch = source[i];
-    if (ch === '\\\\') {
+    if (ch === '\\') {
       i += 2;
       continue;
     }
@@ -372,7 +372,7 @@ const skipTemplateLiteral = (source: string, index: number): number => {
   let i = index + 1;
   while (i < source.length) {
     const ch = source[i];
-    if (ch === '\\\\') {
+    if (ch === '\\') {
       i += 2;
       continue;
     }
@@ -412,7 +412,7 @@ const skipJsExpression = (source: string, index: number): number => {
 
   while (i < source.length) {
     const ch = source[i];
-    if (ch === '\\\\') {
+    if (ch === '\\') {
       i += 2;
       continue;
     }
