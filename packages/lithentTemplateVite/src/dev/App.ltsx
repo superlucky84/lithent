@@ -21,7 +21,7 @@ export function TemplateDemo() {
 
   return (
     <section class="todo-demo">
-      <h2>Todos ({todos.length})</h2>
+      <h2>Todos ({(todos as any).length})</h2>
       <ul>
         <li l-for={(todo, index) in todos} class="todo-item">
           <span class="todo-index">{index + 1}.</span>

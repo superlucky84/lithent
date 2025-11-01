@@ -1,0 +1,12 @@
+export const View = (todos) => (
+  <li l-for={(todo, index) in todos} class="todo-item">
+    <span class="todo-index">{index + 1}.</span>
+    <span class="todo-text">{todo.text}</span>
+    <strong l-if={todo.done} class="todo-status done">
+      Completed
+    </strong>
+    <strong l-else class="todo-status pending">
+      Pending
+    </strong>
+  </li>
+);
