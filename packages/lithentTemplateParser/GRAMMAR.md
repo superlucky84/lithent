@@ -1,76 +1,82 @@
-# Lithent Template Grammar Specification
+# Lithent Template Grammar Specification (English Edition)
 
-## Overview
-Lithent 템플릿은 Vue-like 문법을 사용하지만, 최소한의 디렉티브만 제공하여 복잡도를 낮춥니다.
+Lithent templates provide a JSX-inspired but independent syntax that maps
+directly to `h()` calls. This document captures the canonical grammar and
+describes how the parser expects templates to be written.
 
-## Template Syntax
+> **Status:** Experimental. The surface may evolve as the Lithent ecosystem
+> grows.
 
-### 1. Elements
+---
 
-#### HTML Elements
+## 1. Elements
+
+### 1.1 HTML Elements
 ```html
 <div>content</div>
 <input />
 <img src="..." />
 ```
 
-#### Component Elements
-컴포넌트는 대문자로 시작합니다:
+### 1.2 Components (PascalCase)
 ```html
 <MyComponent />
 <UserCard name="John" />
 ```
 
-#### Self-closing Tags
+### 1.3 Self-closing Tags
 ```html
 <img src="..." />
 <MyComponent />
 ```
 
-### 2. Attributes
+---
 
-#### Static Attributes
+## 2. Attributes
+
+### 2.1 Static Attributes
 ```html
 <div class="container" id="app">
 ```
 
-#### Dynamic Attributes (JavaScript Expressions)
-중괄호를 사용하여 동적 값 바인딩:
+### 2.2 Dynamic Attributes
+Wrap the value in `{}` to bind a JavaScript expression.
 ```html
 <div class={className} id={elementId}>
 <button onClick={handleClick}>
-<input value={inputValue} />
+<input value={currentValue} />
 ```
 
-#### Special Attributes
-
-**ref** - DOM 또는 컴포넌트 참조:
+### 2.3 Special Attributes
+`ref` captures DOM or component references.
 ```html
-<div ref={myRef}>
-<input ref={inputRef} />
+<div ref={hostRef}>
+<InputField ref={inputRef} />
 ```
 
-### 3. Text Interpolation
+---
 
-중괄호 안에 JavaScript 표현식 사용:
+## 3. Text Interpolation
+
+Use `{}` anywhere inside element content to inject expressions.
 ```html
 <div>{message}</div>
 <span>Count: {count + 1}</span>
-<p>{user.name} - {user.email}</p>
+<p>{user.name} — {user.email}</p>
 ```
 
-텍스트와 표현식 혼합:
+Plain text and interpolations can mix freely:
 ```html
-<p>Hello {name}, you have {count} messages</p>
+<p>Hello {name}, you have {count} notifications.</p>
 ```
 
-### 4. Directives
+---
 
-모든 디렉티브는 `l-` 접두사를 사용합니다.
+## 4. Directives
 
-#### l-if / l-else-if / l-else
+All Lithent directives use the `l-` prefix.
 
-조건부 렌더링:
+### 4.1 `l-if` / `l-else-if` / `l-else`
 ```html
 <div l-if={count > 0}>
   Has items
@@ -83,189 +89,128 @@ Lithent 템플릿은 Vue-like 문법을 사용하지만, 최소한의 디렉티�
 </div>
 ```
 
-**규칙:**
-- `l-else-if`와 `l-else`는 반드시 `l-if` 또는 `l-else-if` 바로 다음에 와야 함
-- 형제 요소 사이에 공백/주석 허용
-- 표현식은 중괄호 `{}` 안에 작성
+Rules:
+- `l-else-if` and `l-else` must immediately follow a sibling `l-if` / `l-else-if`.
+- Whitespace or comments between siblings are allowed.
+- Expressions always appear inside `{}`.
 
-#### l-for
-
-리스트 렌더링:
+### 4.2 `l-for`
 ```html
-<!-- 기본 형식: item in list -->
+<!-- item in list -->
 <div l-for={item in items}>
   {item}
 </div>
 
-<!-- 인덱스 포함 -->
+<!-- iterate with index -->
 <div l-for={(item, index) in items}>
   {index}: {item}
 </div>
 
-<!-- 객체 순회 -->
+<!-- iterate object-like values -->
 <div l-for={user in users}>
   {user.name}
 </div>
 ```
 
-**규칙:**
-- 형식: `l-for={item in list}` or `l-for={(item, index) in list}`
-- `item`은 순회할 각 요소의 이름
-- `index`는 선택적 인덱스 변수
-- `list`는 배열 또는 이터러블 표현식
+Rules:
+- Syntax: `l-for={item in list}` or `l-for={(item, index) in list}`.
+- `item` receives each element, `index` is optional.
+- `list` can be any JavaScript expression that yields an iterable.
 
-### 5. Slots
+---
 
-부모 컴포넌트에서 전달된 자식 콘텐츠를 렌더링:
-
-### 6. Comments
-
-HTML 주석:
+## 5. Comments
+Standard HTML comments pass through:
 ```html
 <!-- This is a comment -->
 ```
 
-## Expression Syntax
+---
 
-중괄호 `{}` 안에서는 유효한 JavaScript 표현식 사용 가능:
+## 6. Expressions
+Inside `{}` you may use any JavaScript *expression* (no statements).
 
 ```html
-<!-- 변수 -->
 {message}
-
-<!-- 속성 접근 -->
 {user.name}
-{user['email']}
-
-<!-- 메서드 호출 -->
 {formatDate(date)}
-{items.map(i => i.name)}
-
-<!-- 연산자 -->
+{items.map(i => i.label)}
 {count + 1}
 {isActive ? 'active' : 'inactive'}
 {!isHidden && 'visible'}
-
-<!-- 배열/객체 리터럴 -->
 {[1, 2, 3]}
-{{ key: 'value' }}
+{{ id: todo.id, text: todo.text }}
 ```
 
-**제한사항:**
-- 구문(statement)은 사용 불가 (if, for, while 등)
-- 표현식(expression)만 사용 가능
+Disallowed: statements such as `if`, `for`, `while`, `return`, etc.
 
-## Grammar Rules (EBNF-like)
+---
 
-```
-Template      ::= (Element | Fragment | Text | Interpolation | Comment)*
-
-Element       ::= '<' TagName Attributes? '>' Children '</' TagName '>'
-                | '<' TagName Attributes? '/>'
-
-Fragment      ::= '<>' Children '</>'
-
-TagName       ::= Identifier
-
-Attributes    ::= (Attribute | Directive)*
-
-Attribute     ::= AttrName ('=' AttrValue)?
-
-AttrName      ::= Identifier ('-' Identifier)*
-
-AttrValue     ::= StringLiteral | '{' Expression '}'
-
-Directive     ::= 'l-if' '=' '{' Expression '}'
-                | 'l-else-if' '=' '{' Expression '}'
-                | 'l-else'
-                | 'l-for' '=' '{' ForExpression '}'
-
-ForExpression ::= Identifier 'in' Expression
-                | '(' Identifier ',' Identifier ')' 'in' Expression
-
-Children      ::= (Element | Text | Interpolation | Comment)*
-
-Text          ::= [^<{]+
-
-Interpolation ::= '{' Expression '}'
-
-Comment       ::= '<!--' .* '-->'
-
-Expression    ::= JavaScript Expression (no statements)
-
-Identifier    ::= [a-zA-Z_$][a-zA-Z0-9_$]*
-                | [A-Z][a-zA-Z0-9]*  // Component (PascalCase)
-
-StringLiteral ::= '"' [^"]* '"' | "'" [^']* "'"
-```
-
-## Example Templates
-
-### 간단한 리스트
+## 7. Fragments
+Use empty tags to group siblings without extra DOM nodes.
 ```html
-<div class="todo-list">
-  <h2>Todos ({todos.length})</h2>
-  <div l-for={todo in todos} class="todo-item">
-    <input type="checkbox" checked={todo.done} />
-    <span>{todo.text}</span>
-  </div>
-  <p l-if={todos.length === 0}>No todos yet</p>
-</div>
+<>
+  <Header />
+  <Content />
+</>
 ```
 
-### 컴포넌트와 중첩 콘텐츠
-```html
-<Card title="User Profile">
-  <div class="card-header">
-    <img src={user.avatar} />
-    <h3>{user.name}</h3>
-  </div>
+---
 
-  <div class="user-info">
-    <p>{user.email}</p>
-    <p>{user.bio}</p>
-  </div>
+## 8. EBNF Grammar
 
-  <div class="card-footer">
-    <button onClick={handleEdit}>Edit</button>
-  </div>
-</Card>
+```
+Template        ::= (Element | Fragment | Text | Interpolation | Comment)*
+
+Element         ::= '<' TagName Attributes? '>' Children '</' TagName '>'
+                  | '<' TagName Attributes? '/>'
+
+Fragment        ::= '<>' Children '</>'
+
+TagName         ::= Identifier
+
+Attributes      ::= (Attribute | Directive)*
+
+Attribute       ::= AttrName ('=' AttrValue)?
+AttrName        ::= Identifier ('-' Identifier)*
+AttrValue       ::= StringLiteral | '{' Expression '}'
+
+Directive       ::= 'l-if' '=' '{' Expression '}'
+                  | 'l-else-if' '=' '{' Expression '}'
+                  | 'l-else'
+                  | 'l-for' '=' '{' ForExpression '}'
+
+ForExpression   ::= Identifier 'in' Expression
+                  | '(' Identifier ',' Identifier ')' 'in' Expression
+
+Children        ::= (Element | Fragment | Text | Interpolation | Comment)*
+
+Text            ::= [^<{]+
+Interpolation   ::= '{' Expression '}'
+Comment         ::= '<!--' .* '-->'
+
+Expression      ::= JavaScript expression (statements disallowed)
+
+Identifier      ::= [A-Za-z_$][A-Za-z0-9_$]*
+StringLiteral   ::= '"' [^"]* '"' | '\'' [^']* '\''
 ```
 
-### 조건부 렌더링
-```html
-<div class="status">
-  <div l-if={status === 'loading'}>
-    <Spinner />
-  </div>
-  <div l-else-if={status === 'error'}>
-    <ErrorMessage message={error} />
-  </div>
-  <div l-else>
-    <UserList users={users} />
-  </div>
-</div>
-```
+Fragments appear in `Children`. Component names follow the same identifier rule;
+using PascalCase is conventional but not enforced at the grammar level.
 
-## Token Types (for Lexer)
+---
 
-다음 단계에서 구현할 토큰 타입들:
+## 9. Error Reporting
 
-- `TAG_OPEN_START` - `<`
-- `TAG_OPEN_END` - `>`
-- `TAG_CLOSE_START` - `</`
-- `TAG_SELF_CLOSE` - `/>`
-- `IDENTIFIER` - 태그명, 속성명
-- `ATTRIBUTE_EQUALS` - `=`
-- `STRING_LITERAL` - `"..."` or `'...'`
-- `EXPRESSION_START` - `{`
-- `EXPRESSION_END` - `}`
-- `DIRECTIVE_IF` - `l-if`
-- `DIRECTIVE_ELSE_IF` - `l-else-if`
-- `DIRECTIVE_ELSE` - `l-else`
-- `DIRECTIVE_FOR` - `l-for`
-- `TEXT` - 일반 텍스트
-- `COMMENT_START` - `<!--`
-- `COMMENT_END` - `-->`
-- `WHITESPACE` - 공백
-- `EOF` - 파일 끝
+The parser emits descriptive errors with line and column numbers for:
+- mismatched or unclosed tags,
+- invalid directive ordering,
+- unterminated interpolations,
+- malformed `l-for` expressions,
+- unexpected end-of-input.
+
+---
+
+This specification mirrors the behaviour implemented in the parser source
+(`packages/lithentTemplateParser/src`). Use it as a reference when extending the
+grammar or writing new tooling.
