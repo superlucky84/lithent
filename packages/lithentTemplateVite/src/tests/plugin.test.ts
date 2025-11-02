@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it, beforeEach } from 'vitest';
-import type { Plugin, ResolvedConfig, UserConfig } from 'vite';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { resolveConfig } from 'vite';
+import type { ConfigEnv, Plugin, PluginOption, ResolvedConfig } from 'vite';
 import { lithentTemplateVite } from '../plugin';
 
 interface TransformResult {
@@ -10,65 +11,105 @@ interface TransformResult {
   map: any;
 }
 
-const createPlugins = (opts?: Parameters<typeof lithentTemplateVite>[0]) => {
-  const plugin = lithentTemplateVite(opts);
-  const plugins = Array.isArray(plugin) ? plugin.filter(Boolean) : [plugin];
-  return plugins as Plugin[];
+const normalizePluginOption = (option: PluginOption): Plugin[] => {
+  if (Array.isArray(option)) {
+    return option.flatMap(item => normalizePluginOption(item));
+  }
+  if (!option) {
+    return [];
+  }
+  return [option as Plugin];
 };
 
-const setupPlugins = (
-  plugins: Plugin[],
-  command: 'serve' | 'build' = 'serve'
-) => {
-  const userConfig: UserConfig = {};
-  const env = {
-    command,
-    mode: command === 'serve' ? 'development' : 'production',
-    ssrBuild: false,
+const createPlugins = (opts?: Parameters<typeof lithentTemplateVite>[0]) => {
+  const option = lithentTemplateVite(opts);
+  return normalizePluginOption(option).filter(Boolean);
+};
+
+type MinimalPlugin = Pick<
+  Plugin,
+  'config' | 'configResolved' | 'resolveId' | 'load' | 'transform'
+>;
+
+const runHook = async (
+  plugin: MinimalPlugin,
+  hookName: keyof MinimalPlugin,
+  context: Record<string, unknown>,
+  ...args: unknown[]
+): Promise<unknown> => {
+  const hook = plugin[hookName];
+  if (!hook) {
+    return undefined;
+  }
+
+  const invoke = async (entry: unknown): Promise<unknown> => {
+    if (typeof entry === 'function') {
+      return await (entry as (...a: unknown[]) => unknown).apply(context, args);
+    }
+    if (
+      entry &&
+      typeof entry === 'object' &&
+      'handler' in entry &&
+      typeof (entry as { handler: unknown }).handler === 'function'
+    ) {
+      return await (
+        entry as { handler: (...a: unknown[]) => unknown }
+      ).handler.apply(context, args);
+    }
+    return undefined;
   };
 
+  if (Array.isArray(hook)) {
+    let last: unknown;
+    for (const entry of hook) {
+      last = await invoke(entry);
+    }
+    return last;
+  }
+
+  return await invoke(hook);
+};
+
+const createPluginContext = () => ({
+  warn: () => {},
+  addWatchFile: () => {},
+  getWatchFiles: () => [] as string[],
+  resolve: async () => null,
+  load: async () => null,
+  transform: async () => null,
+});
+
+const setupPlugins = async (
+  plugins: Plugin[],
+  command: 'serve' | 'build' = 'serve'
+): Promise<ResolvedConfig> => {
+  const context = createPluginContext();
+  const env: ConfigEnv = {
+    command,
+    mode: command === 'serve' ? 'development' : 'production',
+    isSsrBuild: command === 'build',
+  };
+
+  const userConfig = {} as Parameters<typeof resolveConfig>[0];
+
   for (const plugin of plugins) {
-    if (plugin.config) {
-      plugin.config.call(plugin, userConfig, env);
+    const result = await runHook(plugin, 'config', context, userConfig, env);
+    if (result && typeof result === 'object') {
+      Object.assign(userConfig, result as object);
     }
   }
 
-  const resolved: ResolvedConfig = {
-    configFile: null,
-    mode: env.mode,
-    root: process.cwd(),
-    define: {},
-    plugins: plugins as any,
-    build: {} as any,
-    optimizeDeps: {} as any,
-    server: {} as any,
-    resolve: {} as any,
-    css: {} as any,
-    publicDir: '',
-    cacheDir: '',
+  const resolved = (await resolveConfig(
+    userConfig,
     command,
-    assetsInclude: () => false,
-    logger: console as any,
-    base: '/',
-    cacheDirOutput: '',
-    experimental: {} as any,
-    env: {} as any,
-    isProduction: command === 'build',
-    preview: {} as any,
-    ssr: {} as any,
-    worker: {} as any,
-    appType: 'spa',
-    envDir: process.cwd(),
-    esbuild: {} as any,
-    extensions: [],
-    inlineConfig: {} as any,
-    json: {} as any,
-    legacy: {} as any,
-  };
+    env.mode
+  )) as ResolvedConfig;
 
-  for (const plugin of plugins) {
-    plugin.configResolved?.call(plugin, resolved);
-  }
+  await Promise.all(
+    plugins.map(plugin => runHook(plugin, 'configResolved', context, resolved))
+  );
+
+  return resolved;
 };
 
 const runTransforms = async (
@@ -76,17 +117,21 @@ const runTransforms = async (
   initial: string,
   id: string
 ): Promise<TransformResult> => {
-  const context = {
-    warn: () => {},
-    addWatchFile: () => {},
-  };
+  const context = createPluginContext();
 
-  let resolvedId: string = id;
+  let resolvedId = id;
   for (const plugin of plugins) {
     if (!plugin.resolveId) {
       continue;
     }
-    const resolution = await plugin.resolveId.call(context as any, resolvedId, undefined, {});
+    const resolution = await runHook(
+      plugin,
+      'resolveId',
+      context,
+      resolvedId,
+      undefined,
+      {}
+    );
     if (resolution == null) {
       continue;
     }
@@ -95,51 +140,58 @@ const runTransforms = async (
       break;
     }
     if (typeof resolution === 'object' && 'id' in resolution) {
-      resolvedId = resolution.id!;
+      resolvedId = (resolution as { id: string }).id;
       break;
     }
   }
 
-  let code: string | null = null;
+  let code = initial;
   let map: any = null;
 
   for (const plugin of plugins) {
     if (!plugin.load) {
       continue;
     }
-    const loaded = await plugin.load.call(context as any, resolvedId);
+    const loaded = await runHook(plugin, 'load', context, resolvedId);
     if (loaded == null) {
       continue;
     }
     if (typeof loaded === 'string') {
       code = loaded;
       map = null;
-    } else {
-      code = loaded.code;
-      map = loaded.map ?? null;
+    } else if (loaded && typeof loaded === 'object') {
+      const output = loaded as { code?: string; map?: unknown };
+      if (typeof output.code === 'string') {
+        code = output.code;
+      }
+      map = output.map ?? null;
     }
     break;
-  }
-
-  if (code === null) {
-    code = initial;
-    map = null;
   }
 
   for (const plugin of plugins) {
     if (!plugin.transform) {
       continue;
     }
-    const transformed = await plugin.transform.call(context as any, code, resolvedId);
+    const transformed = await runHook(
+      plugin,
+      'transform',
+      context,
+      code,
+      resolvedId
+    );
     if (transformed == null) {
       continue;
     }
     if (typeof transformed === 'string') {
       code = transformed;
       map = null;
-    } else {
-      code = transformed.code;
-      map = transformed.map ?? null;
+    } else if (transformed && typeof transformed === 'object') {
+      const output = transformed as { code?: string; map?: unknown };
+      if (typeof output.code === 'string') {
+        code = output.code;
+      }
+      map = output.map ?? null;
     }
   }
 
@@ -151,9 +203,9 @@ describe('lithentTemplateVite plugin', () => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
 
-  beforeEach(() => {
+  beforeEach(async () => {
     plugins = createPlugins();
-    setupPlugins(plugins);
+    await setupPlugins(plugins);
   });
 
   it('transforms l-for template with plain text content', async () => {
@@ -191,7 +243,7 @@ describe('lithentTemplateVite plugin', () => {
 
   it('allows configuring custom extensions', async () => {
     const customPlugins = createPlugins({ extensions: ['.foo'] });
-    setupPlugins(customPlugins);
+    await setupPlugins(customPlugins);
     const filePath = path.resolve(__dirname, './fixtures/view.foo');
     const code = await readFile(filePath, 'utf-8');
     const result = await runTransforms(customPlugins, code, filePath);
