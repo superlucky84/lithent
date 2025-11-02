@@ -10,8 +10,8 @@ interface TransformResult {
   map: any;
 }
 
-const createPlugin = () => {
-  const plugin = lithentTemplateVite();
+const createPlugins = (opts?: Parameters<typeof lithentTemplateVite>[0]) => {
+  const plugin = lithentTemplateVite(opts);
   const plugins = Array.isArray(plugin) ? plugin.filter(Boolean) : [plugin];
   return plugins as Plugin[];
 };
@@ -152,7 +152,7 @@ describe('lithentTemplateVite plugin', () => {
   const __dirname = path.dirname(__filename);
 
   beforeEach(() => {
-    plugins = createPlugin();
+    plugins = createPlugins();
     setupPlugins(plugins);
   });
 
@@ -187,5 +187,14 @@ describe('lithentTemplateVite plugin', () => {
     `;
     const result = await runTransforms(plugins, code, 'component.tsx');
     expect(result.code).toBe(code);
+  });
+
+  it('allows configuring custom extensions', async () => {
+    const customPlugins = createPlugins({ extensions: ['.foo'] });
+    setupPlugins(customPlugins);
+    const filePath = path.resolve(__dirname, './fixtures/view.foo');
+    const code = await readFile(filePath, 'utf-8');
+    const result = await runTransforms(customPlugins, code, filePath);
+    expect(result.code).toContain('todos.map((todo, index) =>');
   });
 });

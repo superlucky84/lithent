@@ -24,7 +24,6 @@
     "test:dev": "vitest"
   },
   "dependencies": {
-    "@lithent/hmr-parser": "workspace:*",
     "magic-string": "^0.30.11"
   },
   "devDependencies": {
@@ -42,10 +41,7 @@
     "type": "git",
     "url": "https://github.com/superlucky84/lithent.git"
   },
-  "peerDependencies": {
-    "lithent": "^1.20.0",
-    "vite": "^5.0.0"
-  },
+  "peerDependencies": {},
   "files": [
     "dist",
     "src"

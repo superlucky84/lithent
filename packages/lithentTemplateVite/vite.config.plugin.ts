@@ -11,10 +11,6 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'lithent',
-  },
   server: {
     open: '/html/index.html',
   },

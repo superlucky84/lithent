@@ -4,27 +4,80 @@ import type { Plugin, PluginOption, ResolvedConfig, UserConfig } from 'vite';
 import { normalizePath, transformWithEsbuild } from 'vite';
 import { transformDocument } from '@lithent/lithent-template-parser';
 
+type LoaderValue = 'js' | 'jsx' | 'ts' | 'tsx' | 'json' | 'css';
+type LoaderMap = Record<string, LoaderValue>;
+
 export interface LithentTemplateViteOptions {
   include?: RegExp | RegExp[];
+  extensions?: string[];
+  extensionLoaders?: Record<string, LoaderValue>;
 }
 
-const DEFAULT_INCLUDE = [/\.ljsx$/, /\.ltsx$/];
-const LITHENT_EXTENSIONS = ['.ljsx', '.ltsx'] as const;
-type LithentExtension = (typeof LITHENT_EXTENSIONS)[number];
+const DEFAULT_EXTENSIONS = ['.ljsx', '.ltsx'] as const;
 
-const toRegExpArray = (value?: RegExp | RegExp[]): RegExp[] => {
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const normalizeExtension = (ext: string): string =>
+  ext.startsWith('.') ? ext : `.${ext}`;
+
+const resolveExtensions = (extensions?: string[]): string[] => {
+  const base =
+    extensions && extensions.length > 0
+      ? extensions
+      : Array.from(DEFAULT_EXTENSIONS);
+  const normalized = base.map(normalizeExtension);
+  return Array.from(new Set(normalized));
+};
+
+const inferLoader = (ext: string): LoaderValue => {
+  if (ext.endsWith('tsx') || ext.endsWith('ts')) {
+    return 'ts';
+  }
+  if (ext.endsWith('jsx')) {
+    return 'js';
+  }
+  return 'js';
+};
+
+const toRegExpArray = (
+  value: RegExp | RegExp[] | undefined,
+  fallback: RegExp[]
+): RegExp[] => {
   if (!value) {
-    return DEFAULT_INCLUDE;
+    return fallback;
   }
   return Array.isArray(value) ? value : [value];
 };
 
-const EXTENSION_LOADERS: Record<LithentExtension, 'js' | 'ts'> = {
-  '.ljsx': 'js',
-  '.ltsx': 'ts',
+const shouldProcess = (patterns: RegExp[], filePath: string): boolean => {
+  return patterns.some(pattern => pattern.test(filePath));
 };
 
-const VIRTUAL_QUERY = 'lithent:original';
+const extractOriginalPath = (
+  id: string,
+  extensions: string[]
+): string | null => {
+  const [filepath, query] = id.split('?', 2);
+  if (query) {
+    const params = new URLSearchParams(query);
+    const original = params.get(VIRTUAL_QUERY);
+    if (original) {
+      return normalizePath(original);
+    }
+  }
+  if (filepath && matchExtension(filepath, extensions)) {
+    return normalizePath(filepath);
+  }
+  return null;
+};
+
+const matchExtension = (
+  filePath: string,
+  extensions: string[]
+): string | null => {
+  return extensions.find(ext => filePath.endsWith(ext)) ?? null;
+};
 
 const mergeExtensions = (
   original: string[] | undefined,
@@ -37,44 +90,31 @@ const mergeExtensions = (
   return Array.from(set);
 };
 
-type LoaderValue = 'js' | 'jsx' | 'ts' | 'tsx' | 'json' | 'css';
-type LoaderMap = Record<string, LoaderValue>;
-
-const mergeLoaderMap = (original?: LoaderMap): LoaderMap => {
+const mergeLoaderMap = (
+  original: LoaderMap | undefined,
+  additions: LoaderMap
+): LoaderMap => {
   return {
     ...(original ?? {}),
-    '.ljsx': 'js',
-    '.ltsx': 'ts',
+    ...additions,
   };
 };
 
-const toLithentExtension = (filePath: string): LithentExtension | null => {
-  return LITHENT_EXTENSIONS.find(ext => filePath.endsWith(ext)) ?? null;
-};
-
-const shouldProcess = (patterns: RegExp[], filePath: string): boolean => {
-  return patterns.some(pattern => pattern.test(filePath));
-};
-
-const extractOriginalPath = (id: string): string | null => {
-  const [filepath, query] = id.split('?', 2);
-  if (query) {
-    const params = new URLSearchParams(query);
-    const original = params.get(VIRTUAL_QUERY);
-    if (original) {
-      return normalizePath(original);
-    }
-  }
-  if (filepath && toLithentExtension(filepath)) {
-    return normalizePath(filepath);
-  }
-  return null;
-};
+const VIRTUAL_QUERY = 'lithent:original';
 
 export function lithentTemplateVite(
   options: LithentTemplateViteOptions = {}
 ): PluginOption {
-  const includePatterns = toRegExpArray(options.include);
+  const extensions = resolveExtensions(options.extensions);
+  const extensionLoaders: LoaderMap = extensions.reduce((acc, ext) => {
+    const loader = options.extensionLoaders?.[ext] ?? inferLoader(ext);
+    acc[ext] = loader;
+    return acc;
+  }, {} as LoaderMap);
+  const defaultInclude = extensions.map(
+    ext => new RegExp(`${escapeRegExp(ext)}$`)
+  );
+  const includePatterns = toRegExpArray(options.include, defaultInclude);
   let config: ResolvedConfig | undefined;
 
   const createVirtualId = (originalPath: string): string => {
@@ -92,18 +132,22 @@ export function lithentTemplateVite(
         resolve: {
           extensions: mergeExtensions(
             userConfig.resolve?.extensions,
-            LITHENT_EXTENSIONS
+            extensions
           ),
         },
         optimizeDeps: {
           extensions: mergeExtensions(
             userConfig.optimizeDeps?.extensions,
-            LITHENT_EXTENSIONS
+            extensions
           ),
           esbuildOptions: {
             ...(userConfig.optimizeDeps?.esbuildOptions ?? {}),
             loader: mergeLoaderMap(
-              userConfig.optimizeDeps?.esbuildOptions?.loader
+              typeof userConfig.optimizeDeps?.esbuildOptions?.loader ===
+                'object'
+                ? (userConfig.optimizeDeps?.esbuildOptions?.loader as LoaderMap)
+                : undefined,
+              extensionLoaders
             ),
           },
         },
@@ -113,7 +157,7 @@ export function lithentTemplateVite(
       config = resolved;
     },
     async resolveId(source, importer, options) {
-      const ext = toLithentExtension(source);
+      const ext = matchExtension(source, extensions);
       if (!ext) {
         return null;
       }
@@ -155,12 +199,12 @@ export function lithentTemplateVite(
       return createVirtualId(resolvedPath);
     },
     async load(id) {
-      const originalPath = extractOriginalPath(id);
+      const originalPath = extractOriginalPath(id, extensions);
       if (!originalPath) {
         return null;
       }
 
-      const ext = toLithentExtension(originalPath);
+      const ext = matchExtension(originalPath, extensions);
       if (!ext) {
         return null;
       }
@@ -186,7 +230,7 @@ export function lithentTemplateVite(
         }
       }
 
-      const loader = EXTENSION_LOADERS[ext];
+      const loader = extensionLoaders[ext] ?? inferLoader(ext);
       const transformedCode = result.transformed ? result.code : raw;
       const esbuildResult = await transformWithEsbuild(
         transformedCode,
