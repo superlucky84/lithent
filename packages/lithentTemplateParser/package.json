@@ -1,0 +1,54 @@
+{
+  "type": "module",
+  "name": "@lithent/lithent-template-parser",
+  "version": "0.1.0",
+  "description": "Lithent Template Parser",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:plugin": "vite --config vite.config.plugin.ts",
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest"
+  },
+  "dependencies": {
+    "magic-string": "^0.30.11"
+  },
+  "devDependencies": {
+    "lithent": "workspace:*"
+  },
+  "keywords": [
+    "lithent",
+    "vite",
+    "hmr"
+  ],
+  "author": "superlucky84",
+  "license": "MIT",
+  "homepage": "https://github.com/superlucky84/lithent",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superlucky84/lithent.git"
+  },
+  "peerDependencies": {},
+  "files": [
+    "dist",
+    "src"
+  ],
+  "packageManager": "pnpm@9.12.3",
+  "volta": {
+    "node": "20.3.0",
+    "pnpm": "9.12.3"
+  }
+}

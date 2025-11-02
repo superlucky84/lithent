@@ -1,0 +1,53 @@
+{
+  "type": "module",
+  "name": "@lithent/lithent-template-vite",
+  "version": "0.1.0",
+  "description": "Vite plugin that compiles Lithent’s JSX-like template syntax into h() calls.",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite --config vite.config.plugin.ts",
+    "dev:lib": "vite",
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest"
+  },
+  "dependencies": {
+    "@lithent/lithent-template-parser": "workspace:*"
+  },
+  "devDependencies": {
+    "lithent": "workspace:*"
+  },
+  "keywords": [
+    "lithent",
+    "vite",
+    "template"
+  ],
+  "author": "superlucky84",
+  "license": "MIT",
+  "homepage": "https://github.com/superlucky84/lithent",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superlucky84/lithent.git"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "packageManager": "pnpm@9.12.3",
+  "volta": {
+    "node": "20.3.0"
+  }
+}

@@ -1,0 +1,44 @@
+import { h, mount } from 'lithent';
+
+void h;
+
+interface TodoItem {
+  text: string;
+  done: boolean;
+}
+
+const todos: TodoItem[] = [
+  { text: 'Check plugin output', done: true },
+  { text: 'Verify l-for transformation', done: false },
+  { text: 'Ensure nested JSX works', done: false },
+];
+
+export function TemplateDemo() {
+  const todo = {} as TodoItem;
+  const index = 0;
+  void todo;
+  void index;
+
+  return (
+    <section class="todo-demo">
+      <h2>Todos ({(todos as any).length})</h2>
+      <ul>
+        <li l-for={(todo, index) in todos} class="todo-item">
+          <span class="todo-index">{index + 1}.</span>
+          <span class="todo-text">{todo.text}</span>
+          <strong l-if={todo.done} class="todo-status done">
+            Done11
+          </strong>
+          <strong l-else class="todo-status pending">
+            asdglkj     a
+          </strong>
+        </li>
+      </ul>
+      <ul class="summary">
+        {todos.map(todo => (
+          <li class="summary-item">{todo.text.toUpperCase()}</li>
+        ))}
+      </ul>
+    </section>
+  );
+}
