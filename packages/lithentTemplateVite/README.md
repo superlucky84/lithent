@@ -4,6 +4,13 @@ Vite plugin that compiles Lithent templates embedded inside JSX/TSX-like files.
 It is built on top of `@lithent/lithent-template-parser` and understands both
 inline template literals and full-document `.ljsx` / `.ltsx` modules.
 
+Lithent templates intentionally mimic JSX ergonomics, yet remain independent of
+the JSX transform. They give Lithent projects a declarative syntax for complex
+conditional and iterative markup while compiling straight to `h()` calls.
+
+> **Status:** Experimental. Behaviour and options may change as the tooling
+> evolves.
+
 ## Features
 
 - **Document pipeline** – scans entire source files, replaces Lithent markup

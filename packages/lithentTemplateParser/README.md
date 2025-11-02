@@ -5,6 +5,14 @@ JavaScript `h()` calls. The compiler powers both the standalone parser APIs and
 any tooling that needs to transform JSX-like markup into Lithent render
 functions.
 
+Lithent templates look familiar to JSX but are intentionally independent. They
+offer a concise declarative layer tuned for Lithent’s render pipeline—directives
+(`l-if`, `l-for`), fragments, and interpolation all compile away to predictable
+`h()` calls without relying on the JSX transform.
+
+> **Status:** Experimental. APIs may change without notice while the parser
+> ecosystem stabilises.
+
 ## Highlights
 
 - **End-to-end pipeline** – lexer → parser → transformer → code generator with
