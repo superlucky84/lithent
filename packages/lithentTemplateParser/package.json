@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/lithent-template-parser",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "description": "Lithent Template Parser",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.mjs",
