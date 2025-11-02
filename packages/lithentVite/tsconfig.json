@@ -23,7 +23,8 @@
     "baseUrl": "./",
     "types": ["vitest/importMeta"],
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@lithent/lithent-template-vite": ["../lithentTemplateVite/src"]
     }
   },
   "include": ["src"],

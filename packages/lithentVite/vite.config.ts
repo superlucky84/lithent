@@ -21,6 +21,10 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, './src'),
       '@lithent/hmr-parser': resolve(__dirname, '../hmrParser/src/index.ts'),
+      '@lithent/lithent-template-vite': resolve(
+        __dirname,
+        '../lithentTemplateVite/src/index.ts'
+      ),
     },
   },
   build: {
@@ -32,11 +36,13 @@ export default defineConfig({
       fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs'),
     },
     rollupOptions: {
-      external: ['vite', 'lithent'],
+      external: ['vite', 'lithent', '@lithent/hmr-parser', '@lithent/lithent-template-vite'],
       output: {
         globals: {
           vite: 'vite',
           lithent: 'lithent',
+          '@lithent/hmr-parser': 'lithentHmrParser',
+          '@lithent/lithent-template-vite': 'lithentTemplateVite',
         },
       },
     },

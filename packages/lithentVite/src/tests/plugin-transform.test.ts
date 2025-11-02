@@ -1,5 +1,13 @@
 import { vi } from 'vitest';
 import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
+vi.mock('@lithent/lithent-template-vite', () => {
+  const templatePlugin: Plugin = {
+    name: 'lithent:template-vite',
+  };
+  return {
+    default: () => templatePlugin,
+  };
+});
 import { lithentVitePlugin, type LithentVitePluginOptions } from '../plugin';
 
 type TransformResult = { code: string; map?: unknown } | null;
@@ -28,7 +36,9 @@ const runTransform = async (
   options?: LithentVitePluginOptions
 ): Promise<{ result: TransformResult; warnings: ReturnType<typeof vi.fn> }> => {
   const plugins = await flattenPluginOption(lithentVitePlugin(options));
-  const plugin = plugins.find(entry => entry.transform);
+  const plugin = plugins.find(
+    entry => entry.name === 'lithent:hmr-boundary' && entry.transform
+  );
 
   if (!plugin) {
     throw new Error('lithentVitePlugin did not provide a transform hook');
@@ -49,15 +59,17 @@ const runTransform = async (
   // Call configResolved for every plugin (ordering matters for future arrays)
   plugins.forEach(dispatchConfigResolved);
 
-  // Call config hook on first plugin with config method (mimic partial behaviour)
-  const configHook = plugin.config;
-  if (configHook) {
+  // Call config hook on every plugin in order to mimic Vite behaviour
+  plugins.forEach(current => {
+    const hook = current.config;
     const handler =
-      typeof configHook === 'function'
-        ? configHook
-        : (configHook as any).handler;
-    handler?.call(plugin);
-  }
+      typeof hook === 'function' ? hook : ((hook as any)?.handler ?? null);
+    handler?.call(
+      current,
+      {},
+      { command: 'serve', mode: 'development', isSsrBuild: false }
+    );
+  });
 
   const warn = vi.fn();
   type TransformHook = (
@@ -212,6 +224,41 @@ export default App;
       expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(normalized)).toBe(
         true
       );
+    });
+
+    it('템플릿 옵션을 활성화하면 템플릿 플러그인을 함께 리턴한다', async () => {
+      const option = lithentVitePlugin({ template: true });
+      const plugins = await flattenPluginOption(option);
+
+      expect(
+        plugins.some(plugin => plugin.name === 'lithent:template-vite')
+      ).toBe(true);
+
+      const hmrPlugin = plugins.find(
+        plugin => plugin.name === 'lithent:hmr-boundary'
+      );
+      expect(hmrPlugin).toBeDefined();
+
+      const configHook = hmrPlugin?.config;
+      const configResult =
+        typeof configHook === 'function'
+          ? configHook.call(
+              {} as any,
+              {},
+              { command: 'serve', mode: 'development', isSsrBuild: false }
+            )
+          : (configHook as any)?.handler?.call(
+              {} as any,
+              {},
+              { command: 'serve', mode: 'development', isSsrBuild: false }
+            );
+
+      expect(configResult).toBeDefined();
+      expect(
+        configResult &&
+          typeof configResult === 'object' &&
+          'esbuild' in (configResult as Record<string, unknown>)
+      ).toBe(false);
     });
   });
 }

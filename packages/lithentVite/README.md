@@ -71,8 +71,10 @@ export default defineConfig({
       // JSX import source (default: 'lithent')
       jsxImportSource: 'lithent',
 
-      // Wrap MDX default exports with mount for Lithent HMR (default: false)
-      wrapMdx: true,
+      // Use lithent-template-vite ahead of HMR transforms
+      template: {
+        extensions: ['.ltsx'],
+      },
     }),
   ],
 });
@@ -204,6 +206,12 @@ interface LithentVitePluginOptions {
    * @default 'lithent'
    */
   jsxImportSource?: string;
+
+  /**
+   * Enable lithent-template-vite preprocessing before HMR transforms.
+   * Pass `true` to use defaults or provide the underlying template plugin options.
+   */
+  template?: boolean | LithentTemplateViteOptions;
 }
 ```
 

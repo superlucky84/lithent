@@ -1,4 +1,7 @@
 import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
+import lithentTemplateVite, {
+  type LithentTemplateViteOptions,
+} from '@lithent/lithent-template-vite';
 import {
   transformWithHmr,
   shouldSkipTransform,
@@ -12,6 +15,7 @@ export interface LithentVitePluginOptions {
   tagFunctionImport?: string;
   devtoolsInProd?: boolean;
   jsxImportSource?: string;
+  template?: boolean | LithentTemplateViteOptions;
 }
 
 export const DEFAULT_BOUNDARY_MARKER = '/* lithent:hmr-boundary */';
@@ -29,6 +33,10 @@ const escapeRegExp = (value: string) =>
 export const lithentVitePlugin = (
   options: LithentVitePluginOptions = {}
 ): PluginOption => {
+  const templateEnabled =
+    options.template === true || typeof options.template === 'object';
+  const templateOptions =
+    typeof options.template === 'object' ? options.template : undefined;
   const includePatterns = toRegExpArray(options.include);
   const boundaryMarker = options.boundaryMarker ?? DEFAULT_BOUNDARY_MARKER;
   const boundaryImportSpecifier =
@@ -42,6 +50,9 @@ export const lithentVitePlugin = (
       : `${escapeRegExp(boundaryMarker)}(?:\\s+([A-Za-z0-9_,\\s]+))?`;
 
   const markerRegex = new RegExp(markerPattern);
+  const sharedOptimizeDeps = {
+    include: ['lithent', 'lithent/jsx-runtime', 'lithent/jsx-dev-runtime'],
+  };
 
   let config: ResolvedConfig;
   let devToolsEnabled: boolean | undefined = options.devtoolsInProd;
@@ -49,10 +60,21 @@ export const lithentVitePlugin = (
   const plugin: Plugin = {
     name: 'lithent:hmr-boundary',
     config() {
-      return {
+      const shared = {
         build: {
           rollupOptions: {
-            onwarn(warning, warn) {
+            onwarn(
+              warning: {
+                code?: string;
+                message: string;
+                pos?: number;
+              },
+              warn: (warning: {
+                code?: string;
+                message: string;
+                pos?: number;
+              }) => void
+            ) {
               // Silence Rollup's module-level directive warnings re:"use client".
               // They're likely to come from `node_modules` and won't be actionable.
               if (
@@ -76,16 +98,20 @@ export const lithentVitePlugin = (
             },
           },
         },
+        optimizeDeps: {
+          include: sharedOptimizeDeps.include,
+        },
+      };
+
+      if (templateEnabled) {
+        return shared;
+      }
+
+      return {
+        ...shared,
         esbuild: {
           jsx: 'automatic',
           jsxImportSource,
-        },
-        optimizeDeps: {
-          include: [
-            'lithent',
-            'lithent/jsx-runtime',
-            'lithent/jsx-dev-runtime',
-          ],
         },
       };
     },
@@ -136,7 +162,14 @@ export const lithentVitePlugin = (
     },
   };
 
-  return plugin;
+  if (!templateEnabled) {
+    return plugin;
+  }
+
+  const templatePluginOption = lithentTemplateVite(templateOptions);
+  return Array.isArray(templatePluginOption)
+    ? [...templatePluginOption, plugin]
+    : [templatePluginOption, plugin];
 };
 
 export default lithentVitePlugin;

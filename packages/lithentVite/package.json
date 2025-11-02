@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/lithent-vite",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Vite plugin that wires Lithent-specific HMR boundaries and utilities.",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
@@ -22,10 +22,13 @@
     "test:dev": "vitest"
   },
   "dependencies": {
-    "@lithent/hmr-parser": "workspace:*"
+    "@lithent/hmr-parser": "workspace:*",
+    "@lithent/lithent-template-vite": "workspace:*"
   },
   "devDependencies": {
-    "lithent": "workspace:*"
+    "lithent": "workspace:*",
+    "rollup": "^4.0.0",
+    "vite": "^5.0.0"
   },
   "keywords": [
     "lithent",
