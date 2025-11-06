@@ -1,8 +1,8 @@
 import { WDom } from '@/types';
 import {
-  compKeyRef,
   componentMap,
   getComponentKey,
+  setComponentKey,
 } from '@/utils/universalRef';
 import { unmount } from '@/hook/internal/unmount';
 
@@ -47,7 +47,7 @@ const runMountedQueueFromWDom = (newWDom: WDom) => {
     const mountQueue = component && component.mts;
     const sequence = component && component.upS;
 
-    compKeyRef.value = compKey;
+    setComponentKey(compKey);
 
     if (sequence) {
       sequence.value = 0;
