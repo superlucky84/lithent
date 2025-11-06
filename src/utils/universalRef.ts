@@ -26,19 +26,15 @@ let scheduler: WorkScheduler | null = null;
 
 // Create a new update session
 export const createUpdateSession = (
-  compKey?: CompKey,
-  scheduleWork?: (compKey: CompKey, work: () => void) => void
+  compKey: CompKey,
+  scheduleWork: (compKey: CompKey, work: () => void) => void
 ): UpdateSession => {
   return {
     id: Symbol('update-session'),
     compKeyRef: { value: null },
-    // Default strategy: delegate to provided scheduler or sync execution
+    // Execute using the provided scheduler
     execute: (work: () => void) => {
-      if (scheduleWork && compKey) {
-        scheduleWork(compKey, work);
-      } else {
-        work();
-      }
+      scheduleWork(compKey, work);
     },
   };
 };
