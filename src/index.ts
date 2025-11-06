@@ -9,6 +9,9 @@ export {
   getComponentSubInfo,
   setComponentMapManualMode,
   disposeComponentEntry,
+  setScheduler,
+  getScheduler,
+  createUpdateSession,
 } from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
@@ -33,6 +36,8 @@ export type {
   NodePointer,
   Param,
 } from '@/types';
+
+export type { WorkScheduler, UpdateSession } from '@/utils/universalRef';
 
 declare global {
   namespace JSX {
