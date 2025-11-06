@@ -9,16 +9,37 @@ export const needDiffRef: { value: boolean } = { value: false };
 export type UpdateSession = {
   id: symbol;
   compKeyRef: { value: CompKey | null };
+  // Execution strategy for this session (default: sync execution)
+  execute: (work: () => void) => void;
 };
 
 // Currently active session
 let activeSession: UpdateSession | null = null;
 
+// Scheduler interface for optional concurrent mode
+export type WorkScheduler = {
+  scheduleWork: (compKey: CompKey, work: () => void, priority: number) => void;
+};
+
+// Optional scheduler instance
+let scheduler: WorkScheduler | null = null;
+
 // Create a new update session
-export const createUpdateSession = (): UpdateSession => {
+export const createUpdateSession = (
+  compKey?: CompKey,
+  scheduleWork?: (compKey: CompKey, work: () => void) => void
+): UpdateSession => {
   return {
     id: Symbol('update-session'),
     compKeyRef: { value: null },
+    // Default strategy: delegate to provided scheduler or sync execution
+    execute: (work: () => void) => {
+      if (scheduleWork && compKey) {
+        scheduleWork(compKey, work);
+      } else {
+        work();
+      }
+    },
   };
 };
 
@@ -110,4 +131,12 @@ export const runUnmountEffects = (compKey: CompKey): void => {
 export const disposeComponentEntry = (compKey: CompKey): void => {
   runUnmountEffects(compKey);
   componentMap.delete(compKey);
+};
+
+export const setScheduler = (s: WorkScheduler | null): void => {
+  scheduler = s;
+};
+
+export const getScheduler = (): WorkScheduler | null => {
+  return scheduler;
 };
