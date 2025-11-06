@@ -1,8 +1,8 @@
 import { WDom } from '@/types';
 import {
-  compKeyRef,
   componentMap,
   getComponentKey,
+  setComponentKey,
 } from '@/utils/universalRef';
 import { unmount } from '@/hook/internal/unmount';
 
@@ -28,7 +28,7 @@ export const runWDomCallbacksFromWDom = (newWDom: WDom) => {
     const component = componentMap.get(compKey);
     const wdCBQueue = component && component.wdCB;
 
-    compKeyRef.value = compKey;
+    setComponentKey(compKey);
 
     if (wdCBQueue && wdCBQueue.length > 0) {
       component.wdCB = [];

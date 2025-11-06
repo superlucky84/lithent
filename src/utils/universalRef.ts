@@ -54,6 +54,15 @@ export const getComponentKey = (): CompKey | null => {
   return activeSession ? activeSession.compKeyRef.value : compKeyRef.value;
 };
 
+export const setComponentKey = (compKey: CompKey): void => {
+  // Use active session if available, otherwise fall back to global compKeyRef
+  if (activeSession) {
+    activeSession.compKeyRef.value = compKey;
+  } else {
+    compKeyRef.value = compKey;
+  }
+};
+
 export const getComponentSubInfo = <K extends ComponentSubKey>(
   compKey: CompKey,
   subKey: K
