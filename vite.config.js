@@ -32,6 +32,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/packages/lithentTemplateVite/**',
+    ],
   },
   server: {
     open: '/html/insertExample.html',

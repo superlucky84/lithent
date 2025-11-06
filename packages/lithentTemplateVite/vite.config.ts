@@ -27,8 +27,8 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'lithentTemplateVite',
-      fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs'),
+      formats: ['es'],
+      fileName: () => 'index.mjs',
     },
     rollupOptions: {
       external: [
@@ -38,12 +38,6 @@ export default defineConfig({
         'node:fs/promises',
         'node:path',
       ],
-      output: {
-        globals: {
-          vite: 'vite',
-          '@lithent/lithent-template-parser': 'lithentTemplateParser',
-        },
-      },
     },
   },
 });
