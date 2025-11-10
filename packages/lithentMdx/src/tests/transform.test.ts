@@ -101,4 +101,25 @@ export default function MDXContent(props) {
     expect(result.code).toContain(`export default ${wrappedName};`);
     expect(result.code).not.toContain('__LithentMdxComponent__LithentMdxComponent_MDXContent');
   });
+
+  it('should insert mount import after real imports, not inside template strings', () => {
+    const example = `
+import { jsx as _jsx } from 'lithent/jsx-runtime';
+
+const codeBlock = "import { h, mountCallback } from 'lithent';";
+
+export function _createMdxContent(props) {
+  return _jsx('pre', { children: codeBlock });
+}
+export default function MDXContent(props) {
+  return _createMdxContent(props);
+}
+`;
+
+    const result = wrapMdxModule(example);
+
+    expect(result.code).toMatch(
+      /import { jsx as _jsx } from 'lithent\/jsx-runtime';\s+import { mount } from 'lithent';/
+    );
+  });
 });

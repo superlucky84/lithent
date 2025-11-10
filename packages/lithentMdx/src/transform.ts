@@ -202,18 +202,276 @@ const wrapMdxExports = (code: string): string => {
 };
 
 const insertImportString = (source: string, statement: string): string => {
-  const importRegex = /^(import[\s\S]*?from\s+['"][^'"]+['"]\s*;[ \t]*\n?)/gm;
-  let lastMatch: RegExpExecArray | null = null;
-  let match: RegExpExecArray | null;
+  const insertPos = findImportInsertionIndex(source);
 
-  while ((match = importRegex.exec(source))) {
-    lastMatch = match;
-  }
-
-  if (lastMatch) {
-    const insertPos = lastMatch.index + lastMatch[0].length;
-    return `${source.slice(0, insertPos)}${statement}${source.slice(insertPos)}`;
+  if (insertPos >= 0) {
+    const needsLeadingNewline =
+      insertPos > 0 && source[insertPos - 1] !== '\n';
+    const snippet = needsLeadingNewline ? `\n${statement}` : statement;
+    return `${source.slice(0, insertPos)}${snippet}${source.slice(insertPos)}`;
   }
 
   return `${statement}${source}`;
+};
+
+type ScannerState =
+  | 'code'
+  | 'single'
+  | 'double'
+  | 'template'
+  | 'lineComment'
+  | 'blockComment';
+
+const findImportInsertionIndex = (source: string): number => {
+  let i = 0;
+  let lastImportEnd = -1;
+  let state: ScannerState = 'code';
+  let templateDepth = 0;
+
+  while (i < source.length) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    switch (state) {
+      case 'code':
+        if (ch === '/' && next === '/') {
+          state = 'lineComment';
+          i += 2;
+          continue;
+        }
+        if (ch === '/' && next === '*') {
+          state = 'blockComment';
+          i += 2;
+          continue;
+        }
+        if (ch === "'") {
+          state = 'single';
+          i++;
+          continue;
+        }
+        if (ch === '"') {
+          state = 'double';
+          i++;
+          continue;
+        }
+        if (ch === '`') {
+          state = 'template';
+          templateDepth = 0;
+          i++;
+          continue;
+        }
+        if (i === 0 && ch === '#' && next === '!') {
+          // shebang handling: treat as a line comment
+          state = 'lineComment';
+          i += 2;
+          continue;
+        }
+
+        if (
+          ch === 'i' &&
+          isImportKeyword(source, i) &&
+          !isDynamicImport(source, i)
+        ) {
+          const end = findImportStatementEnd(source, i);
+          lastImportEnd = end;
+          i = end;
+          continue;
+        }
+
+        i++;
+        break;
+
+      case 'single':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === "'") {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'double':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === '"') {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'template':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === '`') {
+          if (templateDepth === 0) {
+            state = 'code';
+            i++;
+            continue;
+          }
+          templateDepth--;
+          i++;
+          continue;
+        }
+        if (ch === '$' && next === '{') {
+          templateDepth++;
+          i += 2;
+          continue;
+        }
+        if (ch === '}' && templateDepth > 0) {
+          templateDepth--;
+        }
+        i++;
+        break;
+
+      case 'lineComment':
+        if (ch === '\n') {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'blockComment':
+        if (ch === '*' && next === '/') {
+          state = 'code';
+          i += 2;
+          continue;
+        }
+        i++;
+        break;
+    }
+  }
+
+  return lastImportEnd;
+};
+
+const isImportKeyword = (source: string, index: number): boolean => {
+  if (!source.startsWith('import', index)) {
+    return false;
+  }
+
+  const prev = source[index - 1];
+  if (prev && isIdentifierChar(prev)) {
+    return false;
+  }
+
+  const next = source[index + 'import'.length];
+  if (next && isIdentifierChar(next)) {
+    return false;
+  }
+
+  return true;
+};
+
+const isIdentifierChar = (ch: string): boolean => /[A-Za-z0-9_$]/.test(ch);
+
+const isDynamicImport = (source: string, index: number): boolean => {
+  const nextChar = source[index + 'import'.length];
+  if (!nextChar) {
+    return true;
+  }
+  if (nextChar === '(' || nextChar === '.') {
+    return true;
+  }
+  return false;
+};
+
+const findImportStatementEnd = (source: string, start: number): number => {
+  let i = start;
+  let state: ScannerState = 'code';
+
+  while (i < source.length) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    switch (state) {
+      case 'code':
+        if (ch === ';') {
+          return i + 1;
+        }
+        if (ch === '/' && next === '/') {
+          state = 'lineComment';
+          i += 2;
+          continue;
+        }
+        if (ch === '/' && next === '*') {
+          state = 'blockComment';
+          i += 2;
+          continue;
+        }
+        if (ch === "'") {
+          state = 'single';
+          i++;
+          continue;
+        }
+        if (ch === '"') {
+          state = 'double';
+          i++;
+          continue;
+        }
+        if (ch === '`') {
+          state = 'template';
+          i++;
+          continue;
+        }
+        i++;
+        break;
+
+      case 'single':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === "'") {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'double':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === '"') {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'template':
+        if (ch === '\\') {
+          i += 2;
+          continue;
+        }
+        if (ch === '`') {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'lineComment':
+        if (ch === '\n') {
+          state = 'code';
+        }
+        i++;
+        break;
+
+      case 'blockComment':
+        if (ch === '*' && next === '/') {
+          state = 'code';
+          i += 2;
+          continue;
+        }
+        i++;
+        break;
+    }
+  }
+
+  return source.length;
 };

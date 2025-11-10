@@ -157,5 +157,35 @@ if (import.meta.vitest) {
       expect(namedRegisters).toHaveLength(2);
       expect(namedUnregisters).toHaveLength(2);
     });
+
+    it('still injects helpers when code includes snippet text mentioning mountCallback', () => {
+      const sourceWithSnippet = [
+        "'use client';",
+        "import { mount } from 'lithent';",
+        '',
+        'const doc = "import { h, mountCallback } from \'lithent\';";',
+        '',
+        '/* lithent:hmr-boundary default */',
+        '',
+        'const Demo = mount(() => {',
+        '  return () => <div>demo</div>;',
+        '});',
+        '',
+        'export default Demo;',
+        '',
+      ].join('\n');
+
+      const snippetResult = transformWithMarker({
+        code: sourceWithSnippet,
+        markerRegex: createDefaultMarkerRegex(),
+        boundaryImportSpecifier: 'lithent/devHelper',
+        tagFunctionImportSpecifier: 'lithent',
+      });
+
+      expect(snippetResult.transformed).toBe(true);
+      expect(snippetResult.code).toContain(
+        "import { mountCallback, getComponentKey } from 'lithent';"
+      );
+    });
   });
 }
