@@ -106,7 +106,7 @@ export default function MDXContent(props) {
     const example = `
 import { jsx as _jsx } from 'lithent/jsx-runtime';
 
-const codeBlock = "import { h, mountCallback } from 'lithent';";
+const codeBlock = "import { h, mountCallback, mount } from 'lithent';";
 
 export function _createMdxContent(props) {
   return _jsx('pre', { children: codeBlock });

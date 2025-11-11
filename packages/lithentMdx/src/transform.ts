@@ -26,8 +26,7 @@ export const wrapMdxModule = (code: string): MdxWrapResult => {
   let updated = `${fixedExports.slice(0, start)}function ${fnName}${fixedExports.slice(end)}`;
 
   // Ensure mount import exists
-  const hasMountImport =
-    /import\s+{[^}]*\bmount\b[^}]*}\s+from\s+['"]lithent['"]/.test(updated);
+  const hasMountImport = hasNamedImportFrom(updated, 'lithent', 'mount');
 
   if (!hasMountImport) {
     updated = insertImportString(updated, `import { mount } from 'lithent';\n`);
@@ -222,9 +221,15 @@ type ScannerState =
   | 'lineComment'
   | 'blockComment';
 
-const findImportInsertionIndex = (source: string): number => {
+interface ImportStatement {
+  start: number;
+  end: number;
+  code: string;
+}
+
+const getImportStatements = (source: string): ImportStatement[] => {
+  const statements: ImportStatement[] = [];
   let i = 0;
-  let lastImportEnd = -1;
   let state: ScannerState = 'code';
   let templateDepth = 0;
 
@@ -233,7 +238,7 @@ const findImportInsertionIndex = (source: string): number => {
     const next = source[i + 1];
 
     switch (state) {
-      case 'code':
+      case 'code': {
         if (ch === '/' && next === '/') {
           state = 'lineComment';
           i += 2;
@@ -261,25 +266,27 @@ const findImportInsertionIndex = (source: string): number => {
           continue;
         }
         if (i === 0 && ch === '#' && next === '!') {
-          // shebang handling: treat as a line comment
           state = 'lineComment';
           i += 2;
           continue;
         }
-
         if (
           ch === 'i' &&
           isImportKeyword(source, i) &&
           !isDynamicImport(source, i)
         ) {
           const end = findImportStatementEnd(source, i);
-          lastImportEnd = end;
+          statements.push({
+            start: i,
+            end,
+            code: source.slice(i, end),
+          });
           i = end;
           continue;
         }
-
         i++;
         break;
+      }
 
       case 'single':
         if (ch === '\\') {
@@ -347,8 +354,43 @@ const findImportInsertionIndex = (source: string): number => {
     }
   }
 
-  return lastImportEnd;
+  return statements;
 };
+
+const findImportInsertionIndex = (source: string): number => {
+  const statements = getImportStatements(source);
+
+  if (!statements.length) {
+    return -1;
+  }
+
+  return statements[statements.length - 1].end;
+};
+
+const hasNamedImportFrom = (
+  source: string,
+  specifier: string,
+  name: string
+): boolean => {
+  const statements = getImportStatements(source);
+  const fromPattern = new RegExp(
+    `from\\s+['"]${escapeRegExp(specifier)}['"]`
+  );
+  const namePattern = new RegExp(`\\b${escapeRegExp(name)}\\b`);
+
+  return statements.some(statement => {
+    if (!fromPattern.test(statement.code)) {
+      return false;
+    }
+
+    const [clause] = statement.code.split(/from\s+/i);
+    return namePattern.test(clause);
+  });
+};
+
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 
 const isImportKeyword = (source: string, index: number): boolean => {
   if (!source.startsWith('import', index)) {
