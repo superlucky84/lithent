@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/lithent-mdx",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Vite plugin for MDX support in Lithent applications",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
@@ -41,7 +41,7 @@
     "url": "https://github.com/superlucky84/lithent.git"
   },
   "peerDependencies": {
-    "lithent": "^1.20.1",
+    "lithent": "^1.20.2",
     "vite": "^5.0.0"
   },
   "files": [

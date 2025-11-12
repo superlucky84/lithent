@@ -15,7 +15,7 @@ pnpm add -D @lithent/lithent-mdx @mdx-js/rollup
 ```
 
 Required peer dependencies:
-- `lithent` `^1.20.1`
+- `lithent` `^1.20.2`
 - `vite` `^5.0.0`
 - `@lithent/lithent-vite` `^0.2.3` for end-to-end HMR support
 
