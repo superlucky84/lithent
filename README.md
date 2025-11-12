@@ -38,8 +38,6 @@ used lightly in a variety of situations.
 - [Examples](#examples)
   - [With ESM](#with-esm)
   - [With UMD](#with-umd)
-- [Context API](#context-api)
-  - [Multi-value Provider Example](#multi-value-provider-example)
 - [Related Projects](#related-projects)
 - [Develop Guide](#develop-guide)
 - [Test](#test)
@@ -92,14 +90,14 @@ pnpm add lithent
 
 #### Or Use CDN
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.20.1/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.20.1/helper/dist/lithentHelper.umd.js
-* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.20.1/ftags/dist/lithentFTags.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.20.1/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.20.1/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.20.1/helper/dist/lithentHelper.mjs
-* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.20.1/ftags/dist/lithentFTags.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.20.1/tag/dist/lithentTag.mjs
+* UMD : https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.umd.js
+* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.umd.js
+* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.umd.js
+* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.20.2/tag/dist/lithentTag.umd.js
+* ESM : https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.mjs
+* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.mjs
+* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.mjs
+* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.20.2/tag/dist/lithentTag.mjs
 
 
 It's easier to use lithent with JSX or HTM.
@@ -124,9 +122,9 @@ import { fTags, fFragment, fMount } from 'lithent/ftags';
 const { section, div, p, br, strong } = fTags;
 
 /* UMD
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.1/dist/lithent.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.1/helper/dist/lithentHelper.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.1/ftags/dist/lithentFTags.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.umd.js"></script>
 
 const { render } = lithent;
 const { fTags, fMount, fFragment } = lithentFTags;
@@ -199,10 +197,10 @@ const destroy = render(lTag`<${Component} />`, document.getElementById('root'), 
 #### With UMD
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.1/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.20.1/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.1/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.20.1/ftags/dist/lithentFTags.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/tag/dist/lithentTag.umd.js"></script>
+<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.umd.js"></script-->
 
 <div id="root"></div>
 
@@ -232,68 +230,6 @@ const Component = mount(renew => {
 // The third argument is an optional value for insertBefore.
 const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
 </script>
-```
-
-## Context API
-
-Lithent-helper ships a lightweight context system so you can share state without manual prop drilling. Providers stay isolated from consumer renews and you can subscribe to every key or only the slices you need.
-
-### Multi-value Provider Example
-
-```tsx
-import { h, mount } from 'lithent';
-import { createContext } from 'lithent-helper';
-
-type AppState = { user: string; theme: string; count: number };
-
-const AppContext = createContext<AppState>();
-const { Provider, contextState, useContext } = AppContext;
-
-const AppProvider = mount((_renew, _props, children) => {
-  // Provider owns the shared state; consumers cannot trigger its renew directly.
-  const user = contextState('Alice');
-  const theme = contextState('dark');
-  const count = contextState(0);
-
-  return () => (
-    <Provider user={user} theme={theme} count={count}>
-      {children}
-    </Provider>
-  );
-});
-
-const StatsPanel = mount(renew => {
-  // Omitting the subscribe list subscribes to every value exposed by the Provider.
-  const ctx = useContext(AppContext, renew);
-  return () => (
-    <section>
-      <p>User: {ctx.user?.value}</p>
-      <p>Theme: {ctx.theme?.value}</p>
-      <p>Count: {ctx.count?.value}</p>
-      <button onClick={() => ctx.count && (ctx.count.value += 1)}>
-        Increment
-      </button>
-      <button onClick={() => ctx.count && (ctx.count.value = 3)}>
-        Set count to 3
-      </button>
-    </section>
-  );
-});
-
-const ThemeBadge = mount(renew => {
-  // Subscribe only to the theme key; user/count updates will not rerender this component.
-  const ctx = useContext(AppContext, renew, ['theme']);
-  return () => <span>Theme: {ctx.theme?.value}</span>;
-});
-
-const App = mount(() => {
-  return () => (
-    <AppProvider>
-      <StatsPanel />
-      <ThemeBadge />
-    </AppProvider>
-  );
-});
 ```
 
 ## Related Projects
