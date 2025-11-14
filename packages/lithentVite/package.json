@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/lithent-vite",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Vite plugin that wires Lithent-specific HMR boundaries and utilities.",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
@@ -43,7 +43,7 @@
     "url": "https://github.com/superlucky84/lithent.git"
   },
   "peerDependencies": {
-    "lithent": "^1.20.1",
+    "lithent": "^1.20.2",
     "vite": "^5.0.0"
   },
   "files": [
