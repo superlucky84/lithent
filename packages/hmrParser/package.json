@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/hmr-parser",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Lithent HMR parser utilities for build tools",
   "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithentHmrParser.umd.js",
