@@ -4,6 +4,51 @@ export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: CompKey | null } = { value: null };
 export const needDiffRef: { value: boolean } = { value: false };
+
+// Update session for concurrent/interruptible rendering
+export type UpdateSession = {
+  id: symbol;
+  compKeyRef: { value: CompKey | null };
+  // Execution strategy for this session (default: sync execution)
+  execute: (work: () => void) => void;
+};
+
+// Currently active session
+let activeSession: UpdateSession | null = null;
+
+// Scheduler interface for optional concurrent mode
+export type WorkScheduler = {
+  scheduleWork: (compKey: CompKey, work: () => void, priority: number) => void;
+};
+
+// Optional scheduler instance
+let scheduler: WorkScheduler | null = null;
+
+// Create a new update session
+export const createUpdateSession = (
+  compKey: CompKey,
+  scheduleWork: (compKey: CompKey, work: () => void) => void
+): UpdateSession => {
+  return {
+    id: Symbol('update-session'),
+    compKeyRef: { value: null },
+    // Execute using the provided scheduler
+    execute: (work: () => void) => {
+      scheduleWork(compKey, work);
+    },
+  };
+};
+
+// Activate a session (context switch)
+export const activateSession = (session: UpdateSession): void => {
+  activeSession = session;
+};
+
+// Deactivate current session
+export const deactivateSession = (): void => {
+  activeSession = null;
+};
+
 export const componentMap: ComponentMap = new WeakMap();
 let componentMapManualMode = false;
 
@@ -21,7 +66,19 @@ const setComponetRef = (compKey: CompKey): void => {
   });
 };
 
-export const getComponentKey = (): CompKey | null => compKeyRef.value;
+export const getComponentKey = (): CompKey | null => {
+  // Use active session if available, otherwise fall back to global compKeyRef
+  return activeSession ? activeSession.compKeyRef.value : compKeyRef.value;
+};
+
+export const setComponentKey = (compKey: CompKey): void => {
+  // Use active session if available, otherwise fall back to global compKeyRef
+  if (activeSession) {
+    activeSession.compKeyRef.value = compKey;
+  } else {
+    compKeyRef.value = compKey;
+  }
+};
 
 export const getComponentSubInfo = <K extends ComponentSubKey>(
   compKey: CompKey,
@@ -35,11 +92,21 @@ export const getComponentSubInfo = <K extends ComponentSubKey>(
 };
 
 export const initUpdateHookState = (compKey: CompKey): void => {
-  compKeyRef.value = compKey;
+  // Use active session if available, otherwise fall back to global compKeyRef
+  if (activeSession) {
+    activeSession.compKeyRef.value = compKey;
+  } else {
+    compKeyRef.value = compKey;
+  }
 };
 
 export const initMountHookState = (compKey: CompKey): void => {
-  compKeyRef.value = compKey;
+  // Use active session if available, otherwise fall back to global compKeyRef
+  if (activeSession) {
+    activeSession.compKeyRef.value = compKey;
+  } else {
+    compKeyRef.value = compKey;
+  }
   setComponetRef(compKey);
 };
 
@@ -60,4 +127,12 @@ export const runUnmountEffects = (compKey: CompKey): void => {
 export const disposeComponentEntry = (compKey: CompKey): void => {
   runUnmountEffects(compKey);
   componentMap.delete(compKey);
+};
+
+export const setScheduler = (s: WorkScheduler | null): void => {
+  scheduler = s;
+};
+
+export const getScheduler = (): WorkScheduler | null => {
+  return scheduler;
 };
