@@ -22,23 +22,28 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
   if (componentMap.get(compKey)) {
     // Create a new session for this update and capture it in closure
     // Pass scheduler that uses redrawQueue + microtask (default behavior)
-    const session = createUpdateSession(compKey, (key, work) => {
-      redrawQueue.set(key, work);
-      if (!redrawQueueTimeout) {
-        redrawQueueTimeout = true;
-        queueMicrotask(execRedrawQueue);
-      }
-    });
 
+    // 여기서 스캐줄러 세팅
+    const session = createUpdateSession(
+      compKey,
+      (key, work) => {
+        redrawQueue.set(key, work);
+        if (!redrawQueueTimeout) {
+          redrawQueueTimeout = true;
+          queueMicrotask(execRedrawQueue);
+        }
+      }
+      // shouldDefer strategy will be determined by scheduler or global config
+    );
+
+    // 여기서 실행전 세션 변경 및 세션 초기화
     componentMap.get(compKey)!.up = () => {
       // Wrap exec with session activation/deactivation
       const work = () => {
         activateSession(session);
-        try {
-          exec();
-        } finally {
-          deactivateSession();
-        }
+        session.depth = -1; // Start from -1 so root component becomes depth 0
+        exec();
+        deactivateSession();
       };
 
       // Execute using session's strategy (batched async by default, can be overridden)

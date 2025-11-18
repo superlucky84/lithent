@@ -9,8 +9,11 @@ export const needDiffRef: { value: boolean } = { value: false };
 export type UpdateSession = {
   id: symbol;
   compKeyRef: { value: CompKey | null };
+  depth: number; // Current component depth in the tree
   // Execution strategy for this session (default: sync execution)
   execute: (work: () => void) => void;
+  // Defer strategy: determines whether to defer child component updates
+  shouldDefer: () => boolean;
 };
 
 // Currently active session
@@ -27,16 +30,22 @@ let scheduler: WorkScheduler | null = null;
 // Create a new update session
 export const createUpdateSession = (
   compKey: CompKey,
-  scheduleWork: (compKey: CompKey, work: () => void) => void
+  scheduleWork: (compKey: CompKey, work: () => void) => void,
+  shouldDefer?: () => boolean
 ): UpdateSession => {
-  return {
+  const session: UpdateSession = {
     id: Symbol('update-session'),
     compKeyRef: { value: null },
+    depth: 0,
     // Execute using the provided scheduler
     execute: (work: () => void) => {
       scheduleWork(compKey, work);
     },
+    // Default: no deferring (synchronous execution of all children)
+    shouldDefer: shouldDefer || (() => false),
   };
+
+  return session;
 };
 
 // Activate a session (context switch)
@@ -47,6 +56,11 @@ export const activateSession = (session: UpdateSession): void => {
 // Deactivate current session
 export const deactivateSession = (): void => {
   activeSession = null;
+};
+
+// Get currently active session
+export const getActiveSession = (): UpdateSession | null => {
+  return activeSession;
 };
 
 export const componentMap: ComponentMap = new WeakMap();

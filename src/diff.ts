@@ -11,6 +11,7 @@ import {
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { assign, keys, entries } from '@/utils';
+import { getActiveSession } from '@/utils/universalRef';
 
 /**
  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
@@ -210,11 +211,30 @@ const generalize = (
   isSameType: boolean,
   originalWDom?: WDom
 ): WDom => {
-  return checkCustemComponentFunction(newWDom)
-    ? isSameType && originalWDom
-      ? runUpdate(originalWDom, newWDom)
-      : newWDom.resolve()
-    : newWDom;
+  if (!checkCustemComponentFunction(newWDom)) {
+    return newWDom;
+  }
+
+  // Check if we should defer this component's update
+  const session = getActiveSession();
+
+  // Increment depth when entering a component
+  if (session) {
+    session.depth++;
+  }
+
+  // Check defer condition (only for updates, not initial mounts)
+  if (session && isSameType && originalWDom && session.shouldDefer()) {
+    // Defer: return the original WDom unchanged
+    // This keeps the old state and skips re-rendering this subtree
+    session.depth--;
+    return originalWDom;
+  }
+
+  // Process component (depth stays incremented for child processing)
+  return isSameType && originalWDom
+    ? runUpdate(originalWDom, newWDom)
+    : newWDom.resolve();
 };
 
 /**

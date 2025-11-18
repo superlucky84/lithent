@@ -50,7 +50,11 @@ export const render = (
   return () => {
     const compData = componentMap.get(wDom.compProps || {});
     const comp = (compData && compData.vd.value) || wDom;
-    if (comp !== wDom) runUnmountQueueFromWDom(comp);
+
+    if (comp !== wDom) {
+      runUnmountQueueFromWDom(comp);
+    }
+
     recursiveRemoveEvent(comp);
     rootDelete(comp);
   };

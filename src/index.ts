@@ -2,7 +2,7 @@ import type { Props } from '@/types';
 
 export { h, Fragment, portal, mount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
-export { componentUpdate } from '@/utils/redraw';
+export { componentUpdate, setRedrawAction } from '@/utils/redraw';
 export {
   getComponentKey,
   componentMap,
@@ -12,6 +12,9 @@ export {
   setScheduler,
   getScheduler,
   createUpdateSession,
+  getActiveSession,
+  activateSession,
+  deactivateSession,
 } from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
