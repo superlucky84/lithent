@@ -3,6 +3,7 @@ import {
   compKeyRef,
   componentMap,
   getComponentKey,
+  setComponentKey,
 } from '@/utils/universalRef';
 
 type DependencyFactory = () => unknown[];
@@ -42,6 +43,7 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
     const sequence = component && component.upS;
 
     compKeyRef.value = compKey;
+    setComponentKey(compKey);
 
     if (sequence) {
       sequence.value = 0;
