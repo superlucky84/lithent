@@ -37,6 +37,14 @@ const executeSessionUpCBQueue = (
   session.upCBQueue = [];
 };
 
+const basicScheduler = (key: Props, work: () => void) => {
+  redrawQueue.set(key, work);
+  if (!redrawQueueTimeout) {
+    redrawQueueTimeout = true;
+    queueMicrotask(execRedrawQueue);
+  }
+};
+
 export const setRedrawAction = (compKey: Props, exec: () => void) => {
   if (componentMap.get(compKey)) {
     // Create a new session for this update and capture it in closure
@@ -45,13 +53,7 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
     // 여기서 스캐줄러 세팅
     const session = createUpdateSession(
       compKey,
-      (key, work) => {
-        redrawQueue.set(key, work);
-        if (!redrawQueueTimeout) {
-          redrawQueueTimeout = true;
-          queueMicrotask(execRedrawQueue);
-        }
-      }
+      basicScheduler
       // shouldDefer strategy will be determined by scheduler or global config
     );
 
