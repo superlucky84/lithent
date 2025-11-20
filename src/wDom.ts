@@ -16,8 +16,8 @@ import {
   initMountHookState,
   needDiffRef,
   getComponentSubInfo,
-  wdomSymbol,
 } from '@/utils/universalRef';
+import { wdomSymbol } from '@/utils/wdomSymbol';
 import { setRedrawAction, componentUpdate } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {

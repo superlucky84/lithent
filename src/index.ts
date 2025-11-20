@@ -40,7 +40,7 @@ export type {
   Param,
 } from '@/types';
 
-export type { WorkScheduler, UpdateSession } from '@/utils/universalRef';
+export type { WorkScheduler, UpdateSession } from '@/types/session';
 
 declare global {
   namespace JSX {

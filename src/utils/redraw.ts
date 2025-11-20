@@ -8,6 +8,7 @@ import {
   sessionWorkComplete,
 } from '@/utils/universalRef';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
+import type { UpdateSession } from '@/types/session';
 
 const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
@@ -23,9 +24,7 @@ const execRedrawQueue = () => {
 
 // Execute all pending upCB callbacks after session completes
 // Executes in reverse depth order (leaf → root) to ensure child DOM is ready
-const executeSessionUpCBQueue = (
-  session: import('@/utils/universalRef').UpdateSession
-) => {
+const executeSessionUpCBQueue = (session: UpdateSession) => {
   // Sort by depth in descending order (deeper components first)
   session.upCBQueue
     .sort((a, b) => b.depth - a.depth)

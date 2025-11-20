@@ -1,37 +1,11 @@
 import { ComponentMap, ComponentSubKey, CompKey, ComponentInfo } from '@/types';
-
-export const wdomSymbol = Symbol.for('lithentWDomSymbol');
+import type { UpdateSession, WorkScheduler } from '@/types/session';
 export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: CompKey | null } = { value: null };
 export const needDiffRef: { value: boolean } = { value: false };
 
-// Update session for concurrent/interruptible rendering
-export type UpdateSession = {
-  id: symbol;
-  compKeyRef: { value: CompKey | null };
-  depth: number; // Current component depth in the tree
-  // Execution strategy for this session (default: sync execution)
-  execute: (work: () => void) => void;
-  // Defer strategy: determines whether to defer child component updates
-  shouldDefer: () => boolean;
-  // Concurrent mode flag: distinguishes between default scheduler and concurrent scheduler
-  isConcurrentMode: boolean;
-  // Pending work counter: tracks number of incomplete deferred tasks
-  pendingWorkCount: number;
-  // Update callback queue: stores upCB executions until session completes
-  upCBQueue: Array<{
-    wDom: import('@/types').WDom;
-    depth: number;
-  }>;
-};
-
 // Currently active session
 let activeSession: UpdateSession | null = null;
-
-// Scheduler interface for optional concurrent mode
-export type WorkScheduler = {
-  scheduleWork: (compKey: CompKey, work: () => void, priority: number) => void;
-};
 
 // Optional scheduler instance
 let scheduler: WorkScheduler | null = null;
