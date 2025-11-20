@@ -11,7 +11,11 @@ import {
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { assign, keys, entries } from '@/utils';
-import { getActiveSession, componentMap } from '@/utils/universalRef';
+import {
+  getActiveSession,
+  componentMap,
+  sessionWorkStart,
+} from '@/utils/universalRef';
 
 /**
  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
@@ -229,6 +233,7 @@ const generalize = (
     if (originalWDom.compKey) {
       const comp = componentMap.get(originalWDom.compKey);
       if (comp?.up) {
+        sessionWorkStart(session); // Increment pending work count
         comp.up(); // This will call session.execute() internally to schedule the work
       }
     }

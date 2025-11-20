@@ -14,6 +14,15 @@ export type UpdateSession = {
   execute: (work: () => void) => void;
   // Defer strategy: determines whether to defer child component updates
   shouldDefer: () => boolean;
+  // Concurrent mode flag: distinguishes between default scheduler and concurrent scheduler
+  isConcurrentMode: boolean;
+  // Pending work counter: tracks number of incomplete deferred tasks
+  pendingWorkCount: number;
+  // Update callback queue: stores upCB executions until session completes
+  upCBQueue: Array<{
+    wDom: import('@/types').WDom;
+    depth: number;
+  }>;
 };
 
 // Currently active session
@@ -43,6 +52,12 @@ export const createUpdateSession = (
     },
     // Default: no deferring (synchronous execution of all children)
     shouldDefer: shouldDefer || (() => false),
+    // Concurrent mode is enabled when shouldDefer is provided
+    isConcurrentMode: !!shouldDefer,
+    // Initialize work counter to 0
+    pendingWorkCount: 0,
+    // Initialize empty upCB queue
+    upCBQueue: [],
   };
 
   return session;
@@ -61,6 +76,30 @@ export const deactivateSession = (): void => {
 // Get currently active session
 export const getActiveSession = (): UpdateSession | null => {
   return activeSession;
+};
+
+// Increment pending work counter when a deferred task starts
+export const sessionWorkStart = (session: UpdateSession): void => {
+  session.pendingWorkCount++;
+};
+
+// Decrement pending work counter and execute callback when all work completes
+export const sessionWorkComplete = (
+  session: UpdateSession,
+  onAllComplete: () => void
+): void => {
+  session.pendingWorkCount--;
+  if (session.pendingWorkCount === 0) {
+    onAllComplete();
+  }
+};
+
+// Schedule upCB execution for after session completes
+export const scheduleUpCBExecution = (
+  session: UpdateSession,
+  wDom: import('@/types').WDom
+): void => {
+  session.upCBQueue.push({ wDom, depth: session.depth });
 };
 
 export const componentMap: ComponentMap = new WeakMap();

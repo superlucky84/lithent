@@ -4,7 +4,10 @@ import {
   createUpdateSession,
   activateSession,
   deactivateSession,
+  sessionWorkStart,
+  sessionWorkComplete,
 } from '@/utils/universalRef';
+import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 
 const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
@@ -16,6 +19,22 @@ const execRedrawQueue = () => {
 
   redrawQueue.clear();
   redrawQueueTimeout = false;
+};
+
+// Execute all pending upCB callbacks after session completes
+// Executes in reverse depth order (leaf → root) to ensure child DOM is ready
+const executeSessionUpCBQueue = (
+  session: import('@/utils/universalRef').UpdateSession
+) => {
+  // Sort by depth in descending order (deeper components first)
+  session.upCBQueue
+    .sort((a, b) => b.depth - a.depth)
+    .forEach(({ wDom }) => {
+      runUpdatedQueueFromWDom(wDom);
+    });
+
+  // Clear queue after execution
+  session.upCBQueue = [];
 };
 
 export const setRedrawAction = (compKey: Props, exec: () => void) => {
@@ -42,7 +61,20 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
       const work = () => {
         activateSession(session);
         session.depth = -1; // Start from -1 so root component becomes depth 0
+
+        // Start tracking root component work
+        sessionWorkStart(session);
+
         exec();
+
+        // Complete root component work and execute upCB queue if all work done
+        sessionWorkComplete(session, () => {
+          // All deferred work complete - execute pending upCB callbacks
+          if (session.isConcurrentMode) {
+            executeSessionUpCBQueue(session);
+          }
+        });
+
         deactivateSession();
       };
 
