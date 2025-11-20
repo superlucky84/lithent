@@ -62,18 +62,20 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
         activateSession(session);
         session.depth = -1; // Start from -1 so root component becomes depth 0
 
-        // Start tracking root component work
-        sessionWorkStart(session);
+        // Track work and execute upCB queue only in concurrent mode
+        if (session.isConcurrentMode) {
+          sessionWorkStart(session);
+        }
 
         exec();
 
-        // Complete root component work and execute upCB queue if all work done
-        sessionWorkComplete(session, () => {
-          // All deferred work complete - execute pending upCB callbacks
-          if (session.isConcurrentMode) {
+        // Complete work tracking and execute upCB queue in concurrent mode
+        if (session.isConcurrentMode) {
+          sessionWorkComplete(session, () => {
+            // All deferred work complete - execute pending upCB callbacks
             executeSessionUpCBQueue(session);
-          }
-        });
+          });
+        }
 
         deactivateSession();
       };
