@@ -46,17 +46,32 @@ export const createUpdateSession = (
     id: Symbol('update-session'),
     compKeyRef: { value: null },
     depth: 0,
-    // Execute using the provided scheduler
+
+    /**
+     * Execute using the provided scheduler
+     */
     execute: (work: () => void) => {
       scheduleWork(compKey, work);
     },
-    // Default: no deferring (synchronous execution of all children)
+
+    /**
+     * Default: no deferring (synchronous execution of all children)
+     */
     shouldDefer: shouldDefer || (() => false),
-    // Concurrent mode is enabled when shouldDefer is provided
+
+    /**
+     * Concurrent mode is enabled when shouldDefer is provided
+     */
     isConcurrentMode: !!shouldDefer,
-    // Initialize work counter to 0
+
+    /**
+     * Initialize work counter to 0
+     */
     pendingWorkCount: 0,
-    // Initialize empty upCB queue
+
+    /**
+     * Initialize empty upCB queue
+     */
     upCBQueue: [],
   };
 

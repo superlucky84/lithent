@@ -233,7 +233,7 @@ const generalize = (
     if (originalWDom.compKey) {
       const comp = componentMap.get(originalWDom.compKey);
       if (comp?.up) {
-        sessionWorkStart(session); // Increment pending work count
+        sessionWorkStart(session);
         comp.up(); // This will call session.execute() internally to schedule the work
       }
     }

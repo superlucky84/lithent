@@ -45,36 +45,35 @@ const basicScheduler = (key: Props, work: () => void) => {
   }
 };
 
-export const setRedrawAction = (compKey: Props, exec: () => void) => {
+export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
   if (componentMap.get(compKey)) {
     // Create a new session for this update and capture it in closure
     // Pass scheduler that uses redrawQueue + microtask (default behavior)
 
-    // 여기서 스캐줄러 세팅
+    // Setting Scheduler
     const session = createUpdateSession(
       compKey,
       basicScheduler
       // shouldDefer strategy will be determined by scheduler or global config
     );
 
-    // 여기서 실행전 세션 변경 및 세션 초기화
     componentMap.get(compKey)!.up = () => {
-      // Wrap exec with session activation/deactivation
-      const work = () => {
+      // Wrap domUpdator with session activation/deactivation
+      const scheduleRun = () => {
         activateSession(session);
         session.depth = -1; // Start from -1 so root component becomes depth 0
 
-        // Track work and execute upCB queue only in concurrent mode
+        // Track scheduleRun and execute upCB queue only in concurrent mode
         if (session.isConcurrentMode) {
           sessionWorkStart(session);
         }
 
-        exec();
+        domUpdate();
 
-        // Complete work tracking and execute upCB queue in concurrent mode
+        // Complete scheduleRun tracking and execute upCB queue in concurrent mode
         if (session.isConcurrentMode) {
           sessionWorkComplete(session, () => {
-            // All deferred work complete - execute pending upCB callbacks
+            // All deferred scheduleRun complete - execute pending upCB callbacks
             executeSessionUpCBQueue(session);
           });
         }
@@ -83,7 +82,7 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
       };
 
       // Execute using session's strategy (batched async by default, can be overridden)
-      session.execute(work);
+      session.execute(scheduleRun);
     };
   }
 };
