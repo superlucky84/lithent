@@ -9,10 +9,14 @@ export const updateCallback = (
   dependencies: DependencyFactory = () => []
 ) => {
   const compKey = getComponentKey();
-  if (!compKey) return;
+  if (!compKey) {
+    return;
+  }
 
   const component = componentMap.get(compKey);
-  if (!component) return;
+  if (!component) {
+    return;
+  }
 
   component.upR.push(() => useUpdated(effectAction, dependencies));
   useUpdated(effectAction, dependencies);

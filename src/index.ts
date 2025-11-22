@@ -2,13 +2,19 @@ import type { Props } from '@/types';
 
 export { h, Fragment, portal, mount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
-export { componentUpdate } from '@/utils/redraw';
+export { componentUpdate, setRedrawAction } from '@/scheduler';
 export {
   getComponentKey,
   componentMap,
   getComponentSubInfo,
   setComponentMapManualMode,
   disposeComponentEntry,
+  setScheduler,
+  getScheduler,
+  createUpdateSession,
+  getActiveSession,
+  activateSession,
+  deactivateSession,
 } from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
@@ -33,6 +39,8 @@ export type {
   NodePointer,
   Param,
 } from '@/types';
+
+export type { WorkScheduler, UpdateSession } from '@/types/session';
 
 declare global {
   namespace JSX {

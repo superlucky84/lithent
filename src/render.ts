@@ -7,7 +7,12 @@ import {
   hasAccessorMethods,
 } from '@/utils/predicator';
 
-import { componentMap, xmlnsRef } from '@/utils/universalRef';
+import {
+  componentMap,
+  xmlnsRef,
+  getActiveSession,
+  scheduleUpCBExecution,
+} from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
@@ -50,7 +55,11 @@ export const render = (
   return () => {
     const compData = componentMap.get(wDom.compProps || {});
     const comp = (compData && compData.vd.value) || wDom;
-    if (comp !== wDom) runUnmountQueueFromWDom(comp);
+
+    if (comp !== wDom) {
+      runUnmountQueueFromWDom(comp);
+    }
+
     recursiveRemoveEvent(comp);
     rootDelete(comp);
   };
@@ -288,7 +297,15 @@ const typeUpdate = (newWDom: WDom) => {
   }
 
   (newWDom.children || []).forEach(childItem => wDomUpdate(childItem));
-  runUpdatedQueueFromWDom(newWDom);
+
+  // In concurrent mode, defer upCB execution until session completes
+  // In default mode, execute upCB immediately (existing behavior)
+  const session = getActiveSession();
+  if (session && session.isConcurrentMode) {
+    scheduleUpCBExecution(session, newWDom);
+  } else {
+    runUpdatedQueueFromWDom(newWDom);
+  }
 };
 
 const updateText = (newWDom: WDom) => {

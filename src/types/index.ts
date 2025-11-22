@@ -1,4 +1,4 @@
-import { wdomSymbol } from '@/utils/universalRef';
+import { wdomSymbol } from '@/utils/wdomSymbol';
 
 export type UseDataStoreValue = { [key: string | symbol]: unknown };
 
