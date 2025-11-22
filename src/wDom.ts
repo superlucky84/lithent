@@ -18,7 +18,7 @@ import {
   getComponentSubInfo,
 } from '@/utils/universalRef';
 import { wdomSymbol } from '@/utils/wdomSymbol';
-import { setRedrawAction, componentUpdate } from '@/utils/redraw';
+import { setRedrawAction, componentUpdate } from '@/scheduler';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,

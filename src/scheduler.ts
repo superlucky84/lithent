@@ -1,4 +1,4 @@
-import { Props } from '@/types';
+import { CompKey, Props, Renew } from '@/types';
 import {
   componentMap,
   createUpdateSession,
@@ -6,9 +6,11 @@ import {
   deactivateSession,
   sessionWorkStart,
   sessionWorkComplete,
+  setScheduler,
+  getScheduler,
 } from '@/utils/universalRef';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import type { UpdateSession } from '@/types/session';
+import type { UpdateSession, WorkScheduler } from '@/types/session';
 
 const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
@@ -44,19 +46,43 @@ const basicScheduler = (key: Props, work: () => void) => {
   }
 };
 
+export const createScheduler = (scheduler: WorkScheduler) => {
+  const bindRenewScheduler = (renew: Renew) => {
+    setScheduler(scheduler);
+    renew();
+  };
+
+  const runWithScheduler = (
+    compKey: CompKey,
+    work: () => void,
+    priority = 0
+  ) => {
+    scheduler.scheduleWork(compKey, work, priority);
+  };
+
+  return { bindRenewScheduler, runWithScheduler };
+};
+
 export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
   if (componentMap.get(compKey)) {
     // Create a new session for this update and capture it in closure
     // Pass scheduler that uses redrawQueue + microtask (default behavior)
 
-    // Setting Scheduler
-    const session = createUpdateSession(
-      compKey,
-      basicScheduler
-      // shouldDefer strategy will be determined by scheduler or global config
-    );
-
     componentMap.get(compKey)!.up = () => {
+      let session: UpdateSession;
+      const customScheduler = getScheduler();
+      const shouldDefer = customScheduler ? () => session.depth > 0 : undefined;
+
+      session = createUpdateSession(
+        compKey,
+        customScheduler
+          ? (key: Props, work: () => void) =>
+              customScheduler.scheduleWork(key, work, 0)
+          : basicScheduler,
+        shouldDefer
+      );
+      setScheduler(null);
+
       // Wrap domUpdator with session activation/deactivation
       const scheduleRun = () => {
         activateSession(session);

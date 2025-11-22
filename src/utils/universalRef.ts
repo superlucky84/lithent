@@ -14,7 +14,7 @@ let scheduler: WorkScheduler | null = null;
 export const createUpdateSession = (
   compKey: CompKey,
   scheduleWork: (compKey: CompKey, work: () => void) => void,
-  shouldDefer?: () => boolean
+  shouldDefer?: (() => boolean) | null
 ): UpdateSession => {
   const session: UpdateSession = {
     id: Symbol('update-session'),
