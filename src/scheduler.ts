@@ -8,6 +8,7 @@ import {
   sessionWorkComplete,
   setScheduler,
   getScheduler,
+  getActiveSession,
 } from '@/utils/universalRef';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import type { UpdateSession, WorkScheduler } from '@/types/session';
@@ -27,12 +28,9 @@ const execRedrawQueue = () => {
 // Execute all pending upCB callbacks after session completes
 // Executes in reverse depth order (leaf → root) to ensure child DOM is ready
 const executeSessionUpCBQueue = (session: UpdateSession) => {
-  // Sort by depth in descending order (deeper components first)
-  session.upCBQueue
-    .sort((a, b) => b.depth - a.depth)
-    .forEach(({ wDom }) => {
-      runUpdatedQueueFromWDom(wDom);
-    });
+  session.upCBQueue.forEach(({ wDom }) => {
+    runUpdatedQueueFromWDom(wDom);
+  });
 
   // Clear queue after execution
   session.upCBQueue = [];
@@ -47,6 +45,27 @@ const basicScheduler = (key: Props, work: () => void) => {
 };
 
 const basicShouldDefer = () => false;
+
+const createSessionForRun = (
+  compKey: Props,
+  scheduler: WorkScheduler | null
+): UpdateSession => {
+  const scheduleWork = scheduler
+    ? (key: Props, work: () => void) => scheduler.scheduleWork(key, work, 0)
+    : basicScheduler;
+
+  const session = createUpdateSession(compKey, scheduleWork, basicShouldDefer);
+
+  if (scheduler) {
+    session.shouldDefer = () => session.depth > 0;
+    session.isConcurrentMode = true;
+  } else {
+    session.shouldDefer = basicShouldDefer;
+    session.isConcurrentMode = false;
+  }
+
+  return session;
+};
 
 export const createScheduler = (scheduler: WorkScheduler) => {
   const bindRenewScheduler = (renew: Renew) => {
@@ -69,45 +88,16 @@ export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
   const comp = componentMap.get(compKey);
   if (!comp) return;
 
-  let currentScheduler: (key: Props, work: () => void) => void = basicScheduler;
+  comp.up = (sessionOverride?: UpdateSession | null) => {
+    const session = sessionOverride ?? createSessionForRun(compKey, null);
 
-  const session = createUpdateSession(
-    compKey,
-    (key: Props, work: () => void) => currentScheduler(key, work),
-    basicShouldDefer
-  );
-
-  const concurrentShouldDefer = () => session.depth > 0;
-
-  comp.up = () => {
-    const customScheduler = getScheduler();
-
-    if (customScheduler) {
-      currentScheduler = (key: Props, work: () => void) =>
-        customScheduler.scheduleWork(key, work, 0);
-      session.shouldDefer = concurrentShouldDefer;
-      session.isConcurrentMode = true;
-    } else {
-      currentScheduler = basicScheduler;
-      session.shouldDefer = basicShouldDefer;
-      session.isConcurrentMode = false;
-    }
-
-    setScheduler(null);
-
-    // Wrap domUpdator with session activation/deactivation
     const scheduleRun = () => {
       activateSession(session);
       session.depth = -1; // Start from -1 so root component becomes depth 0
 
-      // Track scheduleRun and execute upCB queue only in concurrent mode
-      if (session.isConcurrentMode) {
-        sessionWorkStart(session);
-      }
-
       domUpdate();
 
-      // Complete scheduleRun tracking and execute upCB queue in concurrent mode
+      // Complete scheduleRun tracking and execute upCB queue only in concurrent mode
       if (session.isConcurrentMode) {
         sessionWorkComplete(session, () => {
           // All deferred scheduleRun complete - execute pending upCB callbacks
@@ -126,9 +116,27 @@ export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
 export const componentUpdate = (compKey: Props) => () => {
   const comp = componentMap.get(compKey);
   const up = comp && comp.up;
-  if (up) {
-    up();
+
+  if (!up) {
+    setScheduler(null);
+    return false;
+  }
+
+  const activeSession = getActiveSession();
+
+  if (activeSession) {
+    up(activeSession);
     return true;
   }
-  return false;
+
+  const customScheduler = getScheduler();
+  const session = createSessionForRun(compKey, customScheduler);
+  setScheduler(null);
+
+  if (session.isConcurrentMode) {
+    sessionWorkStart(session);
+  }
+
+  up(session);
+  return true;
 };

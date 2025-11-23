@@ -93,7 +93,7 @@ export type ComponentMap = WeakMap<CompKey, ComponentInfo>;
 
 export type ComponentInfo = {
   vd: { value: null | WDom };
-  up: () => void;
+  up: (session?: import('@/types/session').UpdateSession | null) => void;
   upR: (() => void)[];
   upS: { value: number };
   upD: unknown[][];
