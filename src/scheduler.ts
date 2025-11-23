@@ -46,6 +46,8 @@ const basicScheduler = (key: Props, work: () => void) => {
   }
 };
 
+const basicShouldDefer = () => false;
+
 export const createScheduler = (scheduler: WorkScheduler) => {
   const bindRenewScheduler = (renew: Renew) => {
     setScheduler(scheduler);
@@ -64,52 +66,61 @@ export const createScheduler = (scheduler: WorkScheduler) => {
 };
 
 export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
-  if (componentMap.get(compKey)) {
-    // Create a new session for this update and capture it in closure
-    // Pass scheduler that uses redrawQueue + microtask (default behavior)
+  const comp = componentMap.get(compKey);
+  if (!comp) return;
 
-    componentMap.get(compKey)!.up = () => {
-      let session: UpdateSession;
-      const customScheduler = getScheduler();
-      const shouldDefer = customScheduler ? () => session.depth > 0 : undefined;
+  let currentScheduler: (key: Props, work: () => void) => void = basicScheduler;
 
-      session = createUpdateSession(
-        compKey,
-        customScheduler
-          ? (key: Props, work: () => void) =>
-              customScheduler.scheduleWork(key, work, 0)
-          : basicScheduler,
-        shouldDefer
-      );
-      setScheduler(null);
+  const session = createUpdateSession(
+    compKey,
+    (key: Props, work: () => void) => currentScheduler(key, work),
+    basicShouldDefer
+  );
 
-      // Wrap domUpdator with session activation/deactivation
-      const scheduleRun = () => {
-        activateSession(session);
-        session.depth = -1; // Start from -1 so root component becomes depth 0
+  const concurrentShouldDefer = () => session.depth > 0;
 
-        // Track scheduleRun and execute upCB queue only in concurrent mode
-        if (session.isConcurrentMode) {
-          sessionWorkStart(session);
-        }
+  comp.up = () => {
+    const customScheduler = getScheduler();
 
-        domUpdate();
+    if (customScheduler) {
+      currentScheduler = (key: Props, work: () => void) =>
+        customScheduler.scheduleWork(key, work, 0);
+      session.shouldDefer = concurrentShouldDefer;
+      session.isConcurrentMode = true;
+    } else {
+      currentScheduler = basicScheduler;
+      session.shouldDefer = basicShouldDefer;
+      session.isConcurrentMode = false;
+    }
 
-        // Complete scheduleRun tracking and execute upCB queue in concurrent mode
-        if (session.isConcurrentMode) {
-          sessionWorkComplete(session, () => {
-            // All deferred scheduleRun complete - execute pending upCB callbacks
-            executeSessionUpCBQueue(session);
-          });
-        }
+    setScheduler(null);
 
-        deactivateSession();
-      };
+    // Wrap domUpdator with session activation/deactivation
+    const scheduleRun = () => {
+      activateSession(session);
+      session.depth = -1; // Start from -1 so root component becomes depth 0
 
-      // Execute using session's strategy (batched async by default, can be overridden)
-      session.execute(scheduleRun);
+      // Track scheduleRun and execute upCB queue only in concurrent mode
+      if (session.isConcurrentMode) {
+        sessionWorkStart(session);
+      }
+
+      domUpdate();
+
+      // Complete scheduleRun tracking and execute upCB queue in concurrent mode
+      if (session.isConcurrentMode) {
+        sessionWorkComplete(session, () => {
+          // All deferred scheduleRun complete - execute pending upCB callbacks
+          executeSessionUpCBQueue(session);
+        });
+      }
+
+      deactivateSession();
     };
-  }
+
+    // Execute using session's strategy (batched async by default, can be overridden)
+    session.execute(scheduleRun);
+  };
 };
 
 export const componentUpdate = (compKey: Props) => () => {
