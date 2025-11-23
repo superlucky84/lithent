@@ -1,44 +1,112 @@
-// example.jsx
-import type { Renew } from '@/index';
-import { h, Fragment, render, mount, ref, updateCallback } from '@/index';
-const testChangeRef = ref<null | (() => void)>(null);
+import { describe, expect, it, vi } from 'vitest';
+import type { WorkScheduler } from '@/types/session';
+import { Fragment, createScheduler, h, mount, ref, render } from '@/index';
 
-const Renew = mount((renew, _props) => {
-  let count1 = 0;
-  const el = ref<null | HTMLElement>(null);
+const renderLog: string[] = [];
+const updateTrigger = ref<null | (() => void)>(null);
 
-  const change = () => {
-    count1 += 1;
-    renew();
-  };
-  testChangeRef.value = change;
-  updateCallback(() => {
-    console.log('UPDATE');
+const createLevel = (label: string, Child?: ReturnType<typeof mount>) =>
+  mount((_renew, _props) => {
     return () => {
-      console.log('UPDATED');
+      renderLog.push(label);
+      return (
+        <Fragment>
+          <span>{label}</span>
+          {Child ? <Child /> : null}
+        </Fragment>
+      );
     };
   });
 
-  return () => (
-    <Fragment>
-      <li>count1: {count1}</li>
-      <button ref={el} onClick={change}>
-        change
-      </button>
-      <Child />
-      <button disabled={count1 % 2 === 0}>change</button>
-    </Fragment>
-  );
+const Level5 = createLevel('Level5');
+const Level4 = createLevel('Level4', Level5);
+const Level3 = createLevel('Level3', Level4);
+const Level2 = createLevel('Level2', Level3);
+const Level1 = createLevel('Level1', Level2);
+
+const App = mount((renew, _props) => {
+  const { bindRenewScheduler } = createScheduler(createDelayedScheduler());
+  const renewWithScheduler = bindRenewScheduler(renew);
+  let updates = 0;
+
+  const trigger = () => {
+    updates += 1;
+    renewWithScheduler();
+  };
+
+  updateTrigger.value = trigger;
+
+  return () => {
+    renderLog.push('App');
+    return (
+      <Fragment>
+        <div>updates: {updates}</div>
+        <Level1 />
+      </Fragment>
+    );
+  };
 });
 
-const Child = mount((_renew, _props) => {
-  return () => <div>child</div>;
-});
+const createDelayedScheduler = (): WorkScheduler => {
+  const queue: Array<() => void> = [];
+  let draining = false;
 
-const testWrap =
-  document.getElementById('root') || document.createElement('div');
+  const runNext = () => {
+    if (!queue.length) {
+      draining = false;
+      return;
+    }
 
-render(<Renew />, testWrap);
+    setTimeout(() => {
+      const job = queue.shift();
+      job && job();
+      runNext();
+    }, 2000);
+  };
+
+  return {
+    scheduleWork(_key, work) {
+      queue.push(work);
+      if (!draining) {
+        draining = true;
+        runNext();
+      }
+    },
+  };
+};
 
 if (import.meta.vitest) {
+  describe('core scheduler', () => {
+    it('runs deferred children through the provided scheduler every 2 seconds', () => {
+      vi.useFakeTimers();
+
+      const container = document.createElement('div');
+      render(<App />, container);
+
+      expect(updateTrigger.value).toBeTypeOf('function');
+
+      renderLog.length = 0;
+      updateTrigger.value?.();
+
+      const expectedOrder = [
+        'App',
+        'Level1',
+        'Level2',
+        'Level3',
+        'Level4',
+        'Level5',
+      ];
+
+      expectedOrder.forEach((label, index) => {
+        expect(renderLog).toHaveLength(index);
+        vi.advanceTimersByTime(1999);
+        expect(renderLog).toHaveLength(index);
+        vi.advanceTimersByTime(1);
+        expect(renderLog).toHaveLength(index + 1);
+        expect(renderLog[index]).toBe(label);
+      });
+
+      vi.useRealTimers();
+    });
+  });
 }

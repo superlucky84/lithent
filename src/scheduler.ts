@@ -68,9 +68,11 @@ const createSessionForRun = (
 };
 
 export const createScheduler = (scheduler: WorkScheduler) => {
-  const bindRenewScheduler = (renew: Renew) => {
-    setScheduler(scheduler);
-    renew();
+  const bindRenewScheduler = (renew: Renew): Renew => {
+    return () => {
+      setScheduler(scheduler);
+      return renew();
+    };
   };
 
   const runWithScheduler = (
