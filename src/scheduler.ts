@@ -123,8 +123,11 @@ export const componentUpdate = (compKey: Props) => () => {
   }
 
   const activeSession = getActiveSession();
+  const shouldReuseActiveSession =
+    activeSession && activeSession.isConcurrentMode;
 
-  if (activeSession) {
+  if (shouldReuseActiveSession && activeSession) {
+    sessionWorkStart(activeSession);
     up(activeSession);
     return true;
   }
