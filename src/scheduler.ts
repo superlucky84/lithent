@@ -84,7 +84,11 @@ export const createScheduler = (scheduler: WorkScheduler) => {
     scheduler.scheduleWork(compKey, work, priority);
   };
 
-  return { bindRenewScheduler, runWithScheduler };
+  const cancelScheduledWork = (compKey: CompKey) => {
+    scheduler.cancelWork?.(compKey);
+  };
+
+  return { bindRenewScheduler, runWithScheduler, cancelScheduledWork };
 };
 
 export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {

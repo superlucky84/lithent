@@ -20,4 +20,5 @@ export type UpdateSession = {
 
 export type WorkScheduler = {
   scheduleWork: (compKey: CompKey, work: () => void, priority: number) => void;
+  cancelWork?: (compKey: CompKey) => void;
 };

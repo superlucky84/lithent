@@ -1,8 +1,9 @@
-import type { Component, MiddleStateWDomChildren } from '@/types';
+import type { Component, MiddleStateWDomChildren, CompKey } from '@/types';
 import type { WorkScheduler } from '@/types/session';
 import {
   Fragment,
   createScheduler,
+  getComponentKey,
   h,
   mount,
   ref,
@@ -12,6 +13,7 @@ import {
 
 const renderLog: string[] = [];
 const updateTrigger = ref<null | (() => void)>(null);
+const immediateUpdateTrigger = ref<null | (() => void)>(null);
 
 type LevelProps = { updates: number };
 type LevelComponent = (
@@ -22,6 +24,7 @@ type LevelComponent = (
 const createLevel = (label: string, Child?: LevelComponent) =>
   mount<LevelProps>(() => {
     updateCallback(() => {
+      console.log('claenup', label);
       return () => {
         console.log('UPDATED', label);
       };
@@ -47,7 +50,7 @@ const Level2 = createLevel('Level2', Level3);
 const Level1 = createLevel('Level1', Level2);
 
 const createDelayedScheduler = (): WorkScheduler => {
-  const queue: Array<() => void> = [];
+  const queue: Array<{ key: CompKey; work: () => void }> = [];
   let draining = false;
 
   const runNext = () => {
@@ -58,26 +61,40 @@ const createDelayedScheduler = (): WorkScheduler => {
 
     setTimeout(() => {
       const job = queue.shift();
-      job && job();
+      job && job.work();
       runNext();
     }, 1000);
   };
 
   return {
-    scheduleWork(_key, work) {
-      queue.push(work);
+    scheduleWork(key, work) {
+      queue.push({ key, work });
       if (!draining) {
         draining = true;
         runNext();
       }
     },
+    cancelWork(key) {
+      for (let i = queue.length - 1; i >= 0; i -= 1) {
+        if (queue[i].key === key) {
+          queue.splice(i, 1);
+        }
+      }
+
+      if (!queue.length) {
+        draining = false;
+      }
+    },
   };
 };
 
-const { bindRenewScheduler } = createScheduler(createDelayedScheduler());
+const { bindRenewScheduler, cancelScheduledWork } = createScheduler(
+  createDelayedScheduler()
+);
 
 const App = mount((renew, _props) => {
   const renewWithScheduler = bindRenewScheduler(renew);
+  const compKey = getComponentKey();
   let updates = 0;
 
   const trigger = () => {
@@ -90,11 +107,15 @@ const App = mount((renew, _props) => {
     trigger();
   };
   const runUpdate = () => {
+    if (compKey) {
+      cancelScheduledWork(compKey);
+    }
     updates += 1;
     renew();
   };
 
   updateTrigger.value = trigger;
+  immediateUpdateTrigger.value = runUpdate;
 
   return () => {
     renderLog.push('App');
@@ -162,6 +183,22 @@ if (import.meta.vitest) {
           expect(text).toBe(`${label} (updates: 1)`);
         }
       });
+
+      vi.useRealTimers();
+    });
+
+    it('cancels pending deferred work when a synchronous renew runs first', () => {
+      vi.useFakeTimers();
+
+      renderLog.length = 0;
+      updateTrigger.value?.(); // schedule deferred run
+
+      // run synchronous update which should cancel queued work
+      immediateUpdateTrigger.value?.();
+      const lengthAfterSync = renderLog.length;
+
+      vi.advanceTimersByTime(4000);
+      expect(renderLog).toHaveLength(lengthAfterSync);
 
       vi.useRealTimers();
     });
