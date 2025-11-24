@@ -9,6 +9,7 @@ import {
   setScheduler,
   getScheduler,
   getActiveSession,
+  getComponentKey,
 } from '@/utils/universalRef';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import type { UpdateSession, WorkScheduler } from '@/types/session';
@@ -69,8 +70,16 @@ const createSessionForRun = (
 };
 
 export const createScheduler = (scheduler: WorkScheduler) => {
+  const cancelPendingWork = () => {
+    const compKey = getComponentKey();
+    if (compKey) {
+      scheduler.cancelWork?.(compKey);
+    }
+  };
+
   const bindRenewScheduler = (renew: Renew): Renew => {
     return () => {
+      cancelPendingWork();
       setScheduler(scheduler);
       return renew();
     };
@@ -84,11 +93,7 @@ export const createScheduler = (scheduler: WorkScheduler) => {
     scheduler.scheduleWork(compKey, work, priority);
   };
 
-  const cancelScheduledWork = (compKey: CompKey) => {
-    scheduler.cancelWork?.(compKey);
-  };
-
-  return { bindRenewScheduler, runWithScheduler, cancelScheduledWork };
+  return { bindRenewScheduler, runWithScheduler, cancelPendingWork };
 };
 
 export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {

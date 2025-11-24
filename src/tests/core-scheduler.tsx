@@ -3,7 +3,6 @@ import type { WorkScheduler } from '@/types/session';
 import {
   Fragment,
   createScheduler,
-  getComponentKey,
   h,
   mount,
   ref,
@@ -52,18 +51,38 @@ const Level1 = createLevel('Level1', Level2);
 const createDelayedScheduler = (): WorkScheduler => {
   const queue: Array<{ key: CompKey; work: () => void }> = [];
   let draining = false;
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+
+  const scheduleTimer = () => {
+    if (timerId || !queue.length) {
+      return;
+    }
+
+    timerId = setTimeout(() => {
+      const job = queue.shift();
+      if (job) {
+        job.work();
+      }
+      timerId = null;
+      if (queue.length) {
+        scheduleTimer();
+      } else {
+        draining = false;
+      }
+    }, 1000);
+  };
 
   const runNext = () => {
     if (!queue.length) {
       draining = false;
+      if (timerId) {
+        clearTimeout(timerId);
+        timerId = null;
+      }
       return;
     }
 
-    setTimeout(() => {
-      const job = queue.shift();
-      job && job.work();
-      runNext();
-    }, 1000);
+    scheduleTimer();
   };
 
   return {
@@ -88,13 +107,12 @@ const createDelayedScheduler = (): WorkScheduler => {
   };
 };
 
-const { bindRenewScheduler, cancelScheduledWork } = createScheduler(
+const { bindRenewScheduler, cancelPendingWork } = createScheduler(
   createDelayedScheduler()
 );
 
 const App = mount((renew, _props) => {
   const renewWithScheduler = bindRenewScheduler(renew);
-  const compKey = getComponentKey();
   let updates = 0;
 
   const trigger = () => {
@@ -107,9 +125,7 @@ const App = mount((renew, _props) => {
     trigger();
   };
   const runUpdate = () => {
-    if (compKey) {
-      cancelScheduledWork(compKey);
-    }
+    cancelPendingWork();
     updates += 1;
     renew();
   };
