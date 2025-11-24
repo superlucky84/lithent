@@ -28,9 +28,10 @@ const execRedrawQueue = () => {
 // Execute all pending upCB callbacks after session completes
 // Executes in reverse depth order (leaf → root) to ensure child DOM is ready
 const executeSessionUpCBQueue = (session: UpdateSession) => {
-  session.upCBQueue.forEach(({ wDom }) => {
-    runUpdatedQueueFromWDom(wDom);
-  });
+  for (let i = session.upCBQueue.length - 1; i >= 0; i--) {
+    const { wDom } = session.upCBQueue[i];
+    runUpdatedQueueFromWDom(wDom, session.id);
+  }
 
   // Clear queue after execution
   session.upCBQueue = [];

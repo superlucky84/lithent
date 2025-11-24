@@ -229,6 +229,20 @@ const generalize = (
 
   // Check defer condition (only for updates, not initial mounts)
   if (session && isSameType && originalWDom && session.shouldDefer()) {
+    if (checkCustemComponentFunction(newWDom)) {
+      const { compProps: props, compChild: children } = originalWDom;
+      const { props: infoProps, children: infoChildren } =
+        newWDom as TagFunctionResolver;
+
+      if (props) {
+        syncResolverProps(props, infoProps);
+      }
+
+      if (children && infoChildren && children !== infoChildren) {
+        syncResolverChildren(children, infoChildren);
+      }
+    }
+
     // Defer: schedule this component for later execution
     if (originalWDom.compKey) {
       const comp = componentMap.get(originalWDom.compKey);

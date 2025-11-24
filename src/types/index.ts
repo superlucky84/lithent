@@ -91,13 +91,18 @@ export type ComponentSubKey =
 
 export type ComponentMap = WeakMap<CompKey, ComponentInfo>;
 
+type PendingUpEffect = {
+  effect: () => void;
+  sessionId?: symbol | null;
+};
+
 export type ComponentInfo = {
   vd: { value: null | WDom };
   up: (session?: import('@/types/session').UpdateSession | null) => void;
   upR: (() => void)[];
   upS: { value: number };
   upD: unknown[][];
-  upCB: (() => void)[];
+  upCB: PendingUpEffect[];
   mts: (() => void)[];
   umts: (() => void)[];
   wdCB: (() => void | (() => void))[];

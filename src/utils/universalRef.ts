@@ -140,6 +140,11 @@ export const initUpdateHookState = (compKey: CompKey): void => {
   } else {
     compKeyRef.value = compKey;
   }
+
+  const component = componentMap.get(compKey);
+  if (component && component.upS) {
+    component.upS.value = 0;
+  }
 };
 
 export const initMountHookState = (compKey: CompKey): void => {

@@ -301,10 +301,12 @@ const typeUpdate = (newWDom: WDom) => {
   // In concurrent mode, defer upCB execution until session completes
   // In default mode, execute upCB immediately (existing behavior)
   const session = getActiveSession();
-  if (session && session.isConcurrentMode) {
-    scheduleUpCBExecution(session, newWDom);
-  } else {
-    runUpdatedQueueFromWDom(newWDom);
+  if (newWDom.compKey) {
+    if (session && session.isConcurrentMode) {
+      scheduleUpCBExecution(session, newWDom);
+    } else {
+      runUpdatedQueueFromWDom(newWDom);
+    }
   }
 };
 
