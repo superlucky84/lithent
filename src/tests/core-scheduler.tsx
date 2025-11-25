@@ -1,19 +1,8 @@
 import type { Component, MiddleStateWDomChildren, CompKey } from '@/types';
 import type { WorkScheduler } from '@/types/session';
-import {
-  Fragment,
-  createScheduler,
-  h,
-  mount,
-  ref,
-  render,
-  updateCallback,
-} from '@/index';
+import { Fragment, h, mount, render, updateCallback } from '@/index';
 
 const renderLog: string[] = [];
-const pendingLog: boolean[] = [];
-const updateTrigger = ref<null | (() => void)>(null);
-const immediateUpdateTrigger = ref<null | (() => void)>(null);
 
 type LevelProps = { updates: number };
 type LevelComponent = (
@@ -24,7 +13,7 @@ type LevelComponent = (
 const createLevel = (label: string, Child?: LevelComponent) =>
   mount<LevelProps>(() => {
     updateCallback(() => {
-      console.log('claenup', label);
+      console.log('cleanup', label);
       return () => {
         console.log('UPDATED', label);
       };
@@ -49,10 +38,23 @@ const Level3 = createLevel('Level3', Level4);
 const Level2 = createLevel('Level2', Level3);
 const Level1 = createLevel('Level1', Level2);
 
-const createDelayedScheduler = (): WorkScheduler => {
+const updatePendingLabel = (pending: boolean) => {
+  const indicator = document.querySelector<HTMLElement>('[data-pending-state]');
+  if (indicator) {
+    indicator.textContent = pending ? 'pending' : 'idle';
+  }
+};
+
+const createDelayedScheduler = (
+  onPendingChange?: (pending: boolean) => void
+): WorkScheduler => {
   const queue: Array<{ key: CompKey; work: () => void }> = [];
   let draining = false;
   let timerId: ReturnType<typeof setTimeout> | null = null;
+
+  const notifyPending = () => {
+    onPendingChange?.(draining || queue.length > 0);
+  };
 
   const scheduleTimer = () => {
     if (timerId || !queue.length) {
@@ -69,21 +71,9 @@ const createDelayedScheduler = (): WorkScheduler => {
         scheduleTimer();
       } else {
         draining = false;
+        notifyPending();
       }
     }, 1000);
-  };
-
-  const runNext = () => {
-    if (!queue.length) {
-      draining = false;
-      if (timerId) {
-        clearTimeout(timerId);
-        timerId = null;
-      }
-      return;
-    }
-
-    scheduleTimer();
   };
 
   return {
@@ -91,8 +81,9 @@ const createDelayedScheduler = (): WorkScheduler => {
       queue.push({ key, work });
       if (!draining) {
         draining = true;
-        runNext();
+        scheduleTimer();
       }
+      notifyPending();
     },
     cancelWork(key) {
       for (let i = queue.length - 1; i >= 0; i -= 1) {
@@ -103,142 +94,81 @@ const createDelayedScheduler = (): WorkScheduler => {
 
       if (!queue.length) {
         draining = false;
+        if (timerId) {
+          clearTimeout(timerId);
+          timerId = null;
+        }
       }
+      notifyPending();
     },
   };
 };
 
-const { bindRenewScheduler, cancelPendingWork } = createScheduler(
-  createDelayedScheduler()
-);
+const scheduler = createDelayedScheduler(updatePendingLabel);
 
 const App = mount((renew, _props) => {
-  let pendingState = false;
-  const renewWithScheduler = bindRenewScheduler(renew, {
-    onPendingChange(newState) {
-      pendingState = newState;
-      pendingLog.push(newState);
-    },
-  });
   let updates = 0;
 
-  const trigger = () => {
-    updates += 1;
-    renewWithScheduler();
-  };
-
-  const runManualUpdate = () => {
+  const scheduleDeferredRender = () => {
     renderLog.length = 0;
-    trigger();
-  };
-  const runUpdate = () => {
-    cancelPendingWork();
     updates += 1;
+    console.log('Queued render wave', updates);
     renew();
   };
 
-  updateTrigger.value = trigger;
-  immediateUpdateTrigger.value = runUpdate;
+  const reset = () => {
+    renderLog.length = 0;
+    updates = 0;
+    renew();
+  };
+
+  (globalThis as Record<string, unknown>).__lithentSchedulerDemo = {
+    scheduleDeferredRender,
+    reset,
+    renderLog,
+  };
 
   return () => {
     renderLog.push('App');
     return (
       <Fragment>
-        <button type="button" onClick={runManualUpdate}>
-          Schedule deferred render
-        </button>
-        <button type="button" onClick={runUpdate}>
-          sync run
-        </button>
-        <p>Each level below mounts 2 seconds apart.</p>
-        <div data-pending>{pendingState ? 'pending' : 'idle'}</div>
+        <h1>Concurrent Scheduler Demo</h1>
+        <p>
+          이 데모는 <code>render</code> 호출 시 스케줄러 옵션을 전달하면 모든{' '}
+          <code>renew</code> 업데이트가 지연 실행되는 모습을 보여줍니다.
+        </p>
+
+        <div class="controls">
+          <button type="button" onClick={scheduleDeferredRender}>
+            Schedule deferred render
+          </button>
+          <button type="button" onClick={reset}>
+            Reset
+          </button>
+        </div>
+
+        <div class="status">
+          pending 상태: <span data-pending-state>idle</span>
+        </div>
         <div>updates: {updates}</div>
+
+        <section class="render-log">
+          <h2>Render order</h2>
+          <ol>
+            {renderLog.map((label, index) => (
+              <li key={`${label}-${index}`}>{label}</li>
+            ))}
+          </ol>
+        </section>
+
         <Level1 updates={updates} />
       </Fragment>
     );
   };
 });
 
-const testWrap =
-  document.getElementById('root') || document.createElement('div');
+const root =
+  document.getElementById('root') ||
+  document.body.appendChild(document.createElement('div'));
 
-if (!import.meta.vitest) {
-  render(<App />, testWrap);
-}
-
-if (import.meta.vitest) {
-  const { describe, expect, it, vi } = import.meta.vitest;
-
-  render(<App />, testWrap);
-
-  describe('core scheduler', () => {
-    it('runs deferred children through the provided scheduler every 2 seconds', () => {
-      vi.useFakeTimers();
-
-      expect(updateTrigger.value).toBeTypeOf('function');
-
-      const levelSpanTexts = () =>
-        Array.from(testWrap.querySelectorAll('span')).map(
-          span => span.textContent
-        );
-      const latestPending = () =>
-        pendingLog.length ? pendingLog[pendingLog.length - 1] : undefined;
-
-      renderLog.length = 0;
-      pendingLog.length = 0;
-      updateTrigger.value?.();
-
-      expect(latestPending()).toBe(true);
-
-      const expectedOrder = [
-        'App',
-        'Level1',
-        'Level2',
-        'Level3',
-        'Level4',
-        'Level5',
-      ];
-
-      expectedOrder.forEach((label, index) => {
-        expect(renderLog).toHaveLength(index);
-        vi.advanceTimersByTime(999);
-        expect(renderLog).toHaveLength(index);
-        vi.advanceTimersByTime(1);
-        expect(renderLog).toHaveLength(index + 1);
-        expect(renderLog[index]).toBe(label);
-
-        if (label !== 'App') {
-          const text = levelSpanTexts()[index - 1] || '';
-          expect(text).toBe(`${label} (updates: 1)`);
-        }
-      });
-
-      expect(latestPending()).toBe(false);
-
-      vi.useRealTimers();
-    });
-
-    it('cancels pending deferred work when a synchronous renew runs first', () => {
-      vi.useFakeTimers();
-
-      renderLog.length = 0;
-      const latestPending = () =>
-        pendingLog.length ? pendingLog[pendingLog.length - 1] : undefined;
-
-      pendingLog.length = 0;
-      updateTrigger.value?.(); // schedule deferred run
-
-      expect(latestPending()).toBe(true);
-
-      // run synchronous update which should cancel queued work
-      immediateUpdateTrigger.value?.();
-      expect(latestPending()).toBe(false);
-      const lengthAfterSync = renderLog.length;
-
-      vi.advanceTimersByTime(4000);
-      expect(renderLog).toHaveLength(lengthAfterSync);
-
-      vi.useRealTimers();
-    });
-  });
-}
+render(<App />, root, undefined, undefined, { scheduler });

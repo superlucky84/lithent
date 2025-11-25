@@ -11,6 +11,11 @@ import {
   getSchedulerContext,
   getActiveSession,
   getComponentKey,
+  registerComponentScheduler,
+  getRegisteredComponentScheduler,
+  pushSchedulerContext,
+  popSchedulerContext,
+  peekSchedulerContext,
 } from '@/utils/universalRef';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import type { UpdateSession, WorkScheduler } from '@/types/session';
@@ -189,6 +194,11 @@ export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
   const comp = componentMap.get(compKey);
   if (!comp) return;
 
+  const inheritedScheduler = peekSchedulerContext();
+  if (inheritedScheduler) {
+    registerComponentScheduler(compKey, inheritedScheduler);
+  }
+
   comp.up = (sessionOverride?: UpdateSession | null) => {
     const session = sessionOverride ?? createSessionForRun(compKey, null);
 
@@ -236,13 +246,26 @@ export const componentUpdate = (compKey: Props) => () => {
   }
 
   const customScheduler = getScheduler();
-  const session = createSessionForRun(compKey, customScheduler);
+  const registeredScheduler =
+    customScheduler ?? getRegisteredComponentScheduler(compKey);
+  const session = createSessionForRun(compKey, registeredScheduler);
   setScheduler(null);
 
   if (session.isConcurrentMode) {
     sessionWorkStart(session);
   }
 
-  up(session);
+  const shouldPushSchedulerContext = !!registeredScheduler;
+  if (shouldPushSchedulerContext) {
+    pushSchedulerContext(registeredScheduler);
+  }
+
+  try {
+    up(session);
+  } finally {
+    if (shouldPushSchedulerContext) {
+      popSchedulerContext();
+    }
+  }
   return true;
 };

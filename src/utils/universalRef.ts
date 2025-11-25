@@ -9,6 +9,8 @@ let activeSession: UpdateSession | null = null;
 
 // Optional scheduler instance
 let scheduler: WorkScheduler | null = null;
+const componentSchedulerMap = new WeakMap<CompKey, WorkScheduler>();
+const schedulerContextStack: Array<WorkScheduler | null> = [];
 type SchedulerContext = {
   onPendingChange?: (pending: boolean) => void;
   attachSession?: (session: UpdateSession, compKey: CompKey) => void;
@@ -181,6 +183,7 @@ export const runUnmountEffects = (compKey: CompKey): void => {
 export const disposeComponentEntry = (compKey: CompKey): void => {
   runUnmountEffects(compKey);
   componentMap.delete(compKey);
+  componentSchedulerMap.delete(compKey);
 };
 
 export const setScheduler = (
@@ -197,4 +200,37 @@ export const getScheduler = (): WorkScheduler | null => {
 
 export const getSchedulerContext = (): SchedulerContext => {
   return schedulerContext;
+};
+
+export const registerComponentScheduler = (
+  compKey: CompKey,
+  inheritedScheduler: WorkScheduler | null
+): void => {
+  if (!inheritedScheduler) {
+    return;
+  }
+  componentSchedulerMap.set(compKey, inheritedScheduler);
+};
+
+export const getRegisteredComponentScheduler = (
+  compKey: CompKey
+): WorkScheduler | null => {
+  return componentSchedulerMap.get(compKey) ?? null;
+};
+
+export const pushSchedulerContext = (
+  schedulerForChildren: WorkScheduler | null
+): void => {
+  schedulerContextStack.push(schedulerForChildren ?? null);
+};
+
+export const popSchedulerContext = (): void => {
+  schedulerContextStack.pop();
+};
+
+export const peekSchedulerContext = (): WorkScheduler | null => {
+  if (!schedulerContextStack.length) {
+    return null;
+  }
+  return schedulerContextStack[schedulerContextStack.length - 1];
 };

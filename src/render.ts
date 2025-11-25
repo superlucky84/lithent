@@ -12,12 +12,16 @@ import {
   xmlnsRef,
   getActiveSession,
   scheduleUpCBExecution,
+  pushSchedulerContext,
+  popSchedulerContext,
+  registerComponentScheduler,
 } from '@/utils/universalRef';
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import { getParent, entries, keys } from '@/utils';
+import type { WorkScheduler } from '@/types/session';
 
 const getAttrKey = (k: string) => (k === 'className' ? 'class' : k);
 
@@ -27,17 +31,39 @@ const getEventName = (k: string) =>
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
 
+export type RenderOptions = {
+  scheduler?: WorkScheduler | null;
+};
+
 export const render = (
   wDom: WDom,
   wrapElement: HTMLElement | null,
   afterElement?: HTMLElement | null,
-  isHydration?: boolean
+  isHydration?: boolean,
+  options?: RenderOptions
 ) => {
   wDom.isRoot = true;
   wrapElement = wrapElement || document.body;
   wDom.wrapElement = wrapElement;
 
-  const Dom = wDomToDom(wDom, isHydration);
+  const renderScheduler = options?.scheduler ?? null;
+  let shouldPopScheduler = false;
+  if (renderScheduler) {
+    if (wDom.compKey) {
+      registerComponentScheduler(wDom.compKey, renderScheduler);
+    }
+    pushSchedulerContext(renderScheduler);
+    shouldPopScheduler = true;
+  }
+
+  let Dom: HTMLElement | DocumentFragment;
+  try {
+    Dom = wDomToDom(wDom, isHydration);
+  } finally {
+    if (shouldPopScheduler) {
+      popSchedulerContext();
+    }
+  }
 
   if (afterElement) {
     wDom.afterElement = afterElement;
