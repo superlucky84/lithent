@@ -1,4 +1,4 @@
-import { CompKey, Props, Renew } from '@/types';
+import { Props } from '@/types';
 import {
   componentMap,
   createUpdateSession,
@@ -6,11 +6,7 @@ import {
   deactivateSession,
   sessionWorkStart,
   sessionWorkComplete,
-  setScheduler,
-  getScheduler,
-  getSchedulerContext,
   getActiveSession,
-  getComponentKey,
   registerComponentScheduler,
   getRegisteredComponentScheduler,
   pushSchedulerContext,
@@ -19,10 +15,6 @@ import {
 } from '@/utils/universalRef';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import type { UpdateSession, WorkScheduler } from '@/types/session';
-
-export type RenewSchedulerOptions = {
-  onPendingChange?: (pending: boolean) => void;
-};
 
 const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
@@ -71,123 +63,12 @@ const createSessionForRun = (
   if (scheduler) {
     session.shouldDefer = () => session.depth > 0;
     session.isConcurrentMode = true;
-    const schedulerContext = getSchedulerContext();
-    schedulerContext?.attachSession?.(session, compKey);
   } else {
     session.shouldDefer = basicShouldDefer;
     session.isConcurrentMode = false;
   }
 
   return session;
-};
-
-export const createScheduler = (scheduler: WorkScheduler) => {
-  const pendingFinalizers = new Map<CompKey, Map<symbol, () => void>>();
-  let lastKnownCompKey: CompKey | null = null;
-
-  const resolveCompKey = (): CompKey | null => {
-    const compKey = getComponentKey();
-    if (compKey) {
-      lastKnownCompKey = compKey;
-      return compKey;
-    }
-    return lastKnownCompKey;
-  };
-
-  const flushFinalizersForKey = (
-    compKey: CompKey | null,
-    shouldRunCallbacks: boolean
-  ) => {
-    if (!compKey) {
-      return;
-    }
-
-    const finalizers = pendingFinalizers.get(compKey);
-    if (!finalizers) {
-      return;
-    }
-
-    if (shouldRunCallbacks) {
-      finalizers.forEach(finalize => finalize());
-    }
-    pendingFinalizers.delete(compKey);
-  };
-
-  const flushAllFinalizers = (shouldRunCallbacks: boolean) => {
-    Array.from(pendingFinalizers.keys()).forEach(key =>
-      flushFinalizersForKey(key, shouldRunCallbacks)
-    );
-  };
-
-  const cancelPendingWork = (options?: {
-    runFinalizers?: boolean;
-    compKey?: CompKey | null;
-  }) => {
-    const shouldRun = options?.runFinalizers ?? true;
-    const compKey = options?.compKey ?? resolveCompKey();
-    if (compKey) {
-      scheduler.cancelWork?.(compKey);
-      flushFinalizersForKey(compKey, shouldRun);
-      return;
-    }
-    flushAllFinalizers(shouldRun);
-  };
-
-  const bindRenewScheduler = (
-    renew: Renew,
-    options?: RenewSchedulerOptions
-  ): Renew => {
-    return () => {
-      const compKey = resolveCompKey();
-      cancelPendingWork({ runFinalizers: false, compKey });
-
-      if (options?.onPendingChange) {
-        const pendingChange = options.onPendingChange;
-        setScheduler(scheduler, {
-          onPendingChange: pendingChange,
-          attachSession: (session, compKey) => {
-            lastKnownCompKey = compKey;
-            const finalize = () => {
-              const finalizers = pendingFinalizers.get(compKey);
-              if (!finalizers?.has(session.id)) {
-                return;
-              }
-              finalizers.delete(session.id);
-              if (!finalizers.size) {
-                pendingFinalizers.delete(compKey);
-              }
-              pendingChange(false);
-              renew();
-            };
-
-            let finalizers = pendingFinalizers.get(compKey);
-            if (!finalizers) {
-              finalizers = new Map();
-              pendingFinalizers.set(compKey, finalizers);
-            }
-
-            finalizers.set(session.id, finalize);
-            session.onConcurrentComplete = finalize;
-          },
-        });
-        pendingChange(true);
-      } else {
-        setScheduler(scheduler);
-      }
-
-      return renew();
-    };
-  };
-
-  const runWithScheduler = (
-    compKey: CompKey,
-    work: () => void,
-    priority = 0
-  ) => {
-    scheduler.scheduleWork(compKey, work, priority);
-  };
-
-  return { bindRenewScheduler, runWithScheduler, cancelPendingWork };
 };
 
 export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
@@ -211,10 +92,7 @@ export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
       // Complete scheduleRun tracking and execute upCB queue only in concurrent mode
       if (session.isConcurrentMode) {
         sessionWorkComplete(session, () => {
-          // All deferred scheduleRun complete - execute pending upCB callbacks
           executeSessionUpCBQueue(session);
-          session.onConcurrentComplete?.();
-          session.onConcurrentComplete = null;
         });
       }
 
@@ -231,7 +109,6 @@ export const componentUpdate = (compKey: Props) => () => {
   const up = comp && comp.up;
 
   if (!up) {
-    setScheduler(null);
     return false;
   }
 
@@ -245,11 +122,8 @@ export const componentUpdate = (compKey: Props) => () => {
     return true;
   }
 
-  const customScheduler = getScheduler();
-  const registeredScheduler =
-    customScheduler ?? getRegisteredComponentScheduler(compKey);
+  const registeredScheduler = getRegisteredComponentScheduler(compKey);
   const session = createSessionForRun(compKey, registeredScheduler);
-  setScheduler(null);
 
   if (session.isConcurrentMode) {
     sessionWorkStart(session);

@@ -2,16 +2,13 @@ import type { Props } from '@/types';
 
 export { h, Fragment, portal, mount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
-export { componentUpdate, setRedrawAction, createScheduler } from '@/scheduler';
+export { componentUpdate, setRedrawAction } from '@/scheduler';
 export {
   getComponentKey,
   componentMap,
   getComponentSubInfo,
   setComponentMapManualMode,
   disposeComponentEntry,
-  setScheduler,
-  getScheduler,
-  getSchedulerContext,
   registerComponentScheduler,
   getRegisteredComponentScheduler,
   pushSchedulerContext,

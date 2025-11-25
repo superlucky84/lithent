@@ -1,19 +1,9 @@
 import type { Component, MiddleStateWDomChildren, CompKey } from '@/types';
 import type { WorkScheduler } from '@/types/session';
-import {
-  Fragment,
-  createScheduler,
-  h,
-  mount,
-  ref,
-  render,
-  updateCallback,
-} from '@/index';
+import { Fragment, h, mount, ref, render, updateCallback } from '@/index';
 
 const renderLog: string[] = [];
-const pendingLog: boolean[] = [];
 const updateTrigger = ref<null | (() => void)>(null);
-const immediateUpdateTrigger = ref<null | (() => void)>(null);
 
 type LevelProps = { updates: number };
 type LevelComponent = (
@@ -24,10 +14,7 @@ type LevelComponent = (
 const createLevel = (label: string, Child?: LevelComponent) =>
   mount<LevelProps>(() => {
     updateCallback(() => {
-      console.log('claenup', label);
-      return () => {
-        console.log('UPDATED', label);
-      };
+      return () => {};
     });
 
     return ({ updates }) => {
@@ -73,25 +60,12 @@ const createDelayedScheduler = (): WorkScheduler => {
     }, 1000);
   };
 
-  const runNext = () => {
-    if (!queue.length) {
-      draining = false;
-      if (timerId) {
-        clearTimeout(timerId);
-        timerId = null;
-      }
-      return;
-    }
-
-    scheduleTimer();
-  };
-
   return {
     scheduleWork(key, work) {
       queue.push({ key, work });
       if (!draining) {
         draining = true;
-        runNext();
+        scheduleTimer();
       }
     },
     cancelWork(key) {
@@ -103,55 +77,35 @@ const createDelayedScheduler = (): WorkScheduler => {
 
       if (!queue.length) {
         draining = false;
+        if (timerId) {
+          clearTimeout(timerId);
+          timerId = null;
+        }
       }
     },
   };
 };
 
-const { bindRenewScheduler, cancelPendingWork } = createScheduler(
-  createDelayedScheduler()
-);
+const scheduler = createDelayedScheduler();
 
 const App = mount((renew, _props) => {
-  let pendingState = false;
-  const renewWithScheduler = bindRenewScheduler(renew, {
-    onPendingChange(newState) {
-      pendingState = newState;
-      pendingLog.push(newState);
-    },
-  });
   let updates = 0;
 
   const trigger = () => {
-    updates += 1;
-    renewWithScheduler();
-  };
-
-  const runManualUpdate = () => {
-    renderLog.length = 0;
-    trigger();
-  };
-  const runUpdate = () => {
-    cancelPendingWork();
     updates += 1;
     renew();
   };
 
   updateTrigger.value = trigger;
-  immediateUpdateTrigger.value = runUpdate;
 
   return () => {
     renderLog.push('App');
     return (
       <Fragment>
-        <button type="button" onClick={runManualUpdate}>
+        <button type="button" onClick={trigger}>
           Schedule deferred render
         </button>
-        <button type="button" onClick={runUpdate}>
-          sync run
-        </button>
-        <p>Each level below mounts 2 seconds apart.</p>
-        <div data-pending>{pendingState ? 'pending' : 'idle'}</div>
+        <p>Each level below mounts 1 second apart.</p>
         <div>updates: {updates}</div>
         <Level1 updates={updates} />
       </Fragment>
@@ -162,33 +116,42 @@ const App = mount((renew, _props) => {
 const testWrap =
   document.getElementById('root') || document.createElement('div');
 
+const mountAppWithScheduler = () =>
+  render(<App />, testWrap, undefined, undefined, { scheduler });
+
 if (!import.meta.vitest) {
-  render(<App />, testWrap);
+  mountAppWithScheduler();
 }
 
 if (import.meta.vitest) {
-  const { describe, expect, it, vi } = import.meta.vitest;
+  const { describe, expect, it, vi, beforeEach, afterEach } = import.meta
+    .vitest;
+  let destroy: (() => void) | undefined;
 
-  render(<App />, testWrap);
+  beforeEach(() => {
+    renderLog.length = 0;
+    destroy = mountAppWithScheduler();
+  });
+
+  afterEach(() => {
+    destroy?.();
+    destroy = undefined;
+    renderLog.length = 0;
+  });
 
   describe('core scheduler', () => {
-    it('runs deferred children through the provided scheduler every 2 seconds', () => {
+    it('runs deferred children through the provided scheduler every second', () => {
       vi.useFakeTimers();
 
       expect(updateTrigger.value).toBeTypeOf('function');
+
+      renderLog.length = 0;
+      updateTrigger.value?.();
 
       const levelSpanTexts = () =>
         Array.from(testWrap.querySelectorAll('span')).map(
           span => span.textContent
         );
-      const latestPending = () =>
-        pendingLog.length ? pendingLog[pendingLog.length - 1] : undefined;
-
-      renderLog.length = 0;
-      pendingLog.length = 0;
-      updateTrigger.value?.();
-
-      expect(latestPending()).toBe(true);
 
       const expectedOrder = [
         'App',
@@ -213,36 +176,9 @@ if (import.meta.vitest) {
         }
       });
 
-      expect(latestPending()).toBe(false);
-
       vi.useRealTimers();
     });
 
-    it('cancels pending deferred work when a synchronous renew runs first', () => {
-      vi.useFakeTimers();
-
-      renderLog.length = 0;
-      const latestPending = () =>
-        pendingLog.length ? pendingLog[pendingLog.length - 1] : undefined;
-
-      pendingLog.length = 0;
-      updateTrigger.value?.(); // schedule deferred run
-
-      expect(latestPending()).toBe(true);
-
-      // run synchronous update which should cancel queued work
-      immediateUpdateTrigger.value?.();
-      expect(latestPending()).toBe(false);
-      const lengthAfterSync = renderLog.length;
-
-      vi.advanceTimersByTime(4000);
-      expect(renderLog).toHaveLength(lengthAfterSync);
-
-      vi.useRealTimers();
-    });
-  });
-
-  describe('render-level scheduler integration', () => {
     it('defers renew calls when scheduler is provided via render options', () => {
       vi.useFakeTimers();
 
@@ -265,9 +201,13 @@ if (import.meta.vitest) {
         };
       });
 
-      const destroy = render(<LocalApp />, testWrap, undefined, undefined, {
-        scheduler: delayedScheduler,
-      });
+      const destroyLocal = render(
+        <LocalApp />,
+        testWrap,
+        undefined,
+        undefined,
+        { scheduler: delayedScheduler }
+      );
 
       localRenderLog.length = 0;
       localTrigger.value?.();
@@ -278,48 +218,7 @@ if (import.meta.vitest) {
       expect(localRenderLog).toHaveLength(1);
       expect(localRenderLog[0]).toBe(1);
 
-      destroy?.();
-      vi.useRealTimers();
-    });
-  });
-
-  describe('render-level scheduler integration', () => {
-    it('defers renew calls when scheduler is provided via render options', () => {
-      vi.useFakeTimers();
-
-      const delayedScheduler = createDelayedScheduler();
-      const localRenderLog: number[] = [];
-      const localTrigger = ref<null | (() => void)>(null);
-
-      const LocalApp = mount((renew, _props) => {
-        let updates = 0;
-
-        const trigger = () => {
-          updates += 1;
-          renew();
-        };
-
-        return () => {
-          localRenderLog.push(updates);
-          localTrigger.value = trigger;
-          return <div>updates: {updates}</div>;
-        };
-      });
-
-      const destroy = render(<LocalApp />, testWrap, undefined, undefined, {
-        scheduler: delayedScheduler,
-      });
-
-      localRenderLog.length = 0;
-      localTrigger.value?.();
-
-      expect(localRenderLog).toHaveLength(0);
-
-      vi.advanceTimersByTime(1000);
-      expect(localRenderLog).toHaveLength(1);
-      expect(localRenderLog[0]).toBe(1);
-
-      destroy?.();
+      destroyLocal?.();
       vi.useRealTimers();
     });
   });
