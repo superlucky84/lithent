@@ -16,6 +16,8 @@ export type UpdateSession = {
     wDom: WDom;
     depth: number;
   }>;
+  onConcurrentComplete?: (() => void) | null;
+  onPendingChange?: ((pending: boolean) => void) | null;
 };
 
 export type WorkScheduler = {

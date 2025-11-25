@@ -11,6 +11,7 @@ import {
 } from '@/index';
 
 const renderLog: string[] = [];
+const pendingLog: boolean[] = [];
 const updateTrigger = ref<null | (() => void)>(null);
 const immediateUpdateTrigger = ref<null | (() => void)>(null);
 
@@ -112,7 +113,13 @@ const { bindRenewScheduler, cancelPendingWork } = createScheduler(
 );
 
 const App = mount((renew, _props) => {
-  const renewWithScheduler = bindRenewScheduler(renew);
+  let pendingState = false;
+  const renewWithScheduler = bindRenewScheduler(renew, {
+    onPendingChange(newState) {
+      pendingState = newState;
+      pendingLog.push(newState);
+    },
+  });
   let updates = 0;
 
   const trigger = () => {
@@ -144,6 +151,7 @@ const App = mount((renew, _props) => {
           sync run
         </button>
         <p>Each level below mounts 2 seconds apart.</p>
+        <div data-pending>{pendingState ? 'pending' : 'idle'}</div>
         <div>updates: {updates}</div>
         <Level1 updates={updates} />
       </Fragment>
@@ -169,13 +177,18 @@ if (import.meta.vitest) {
 
       expect(updateTrigger.value).toBeTypeOf('function');
 
-      renderLog.length = 0;
-      updateTrigger.value?.();
-
       const levelSpanTexts = () =>
         Array.from(testWrap.querySelectorAll('span')).map(
           span => span.textContent
         );
+      const latestPending = () =>
+        pendingLog.length ? pendingLog[pendingLog.length - 1] : undefined;
+
+      renderLog.length = 0;
+      pendingLog.length = 0;
+      updateTrigger.value?.();
+
+      expect(latestPending()).toBe(true);
 
       const expectedOrder = [
         'App',
@@ -200,6 +213,8 @@ if (import.meta.vitest) {
         }
       });
 
+      expect(latestPending()).toBe(false);
+
       vi.useRealTimers();
     });
 
@@ -207,10 +222,17 @@ if (import.meta.vitest) {
       vi.useFakeTimers();
 
       renderLog.length = 0;
+      const latestPending = () =>
+        pendingLog.length ? pendingLog[pendingLog.length - 1] : undefined;
+
+      pendingLog.length = 0;
       updateTrigger.value?.(); // schedule deferred run
+
+      expect(latestPending()).toBe(true);
 
       // run synchronous update which should cancel queued work
       immediateUpdateTrigger.value?.();
+      expect(latestPending()).toBe(false);
       const lengthAfterSync = renderLog.length;
 
       vi.advanceTimersByTime(4000);

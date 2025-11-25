@@ -9,6 +9,11 @@ let activeSession: UpdateSession | null = null;
 
 // Optional scheduler instance
 let scheduler: WorkScheduler | null = null;
+type SchedulerContext = {
+  onPendingChange?: (pending: boolean) => void;
+  attachSession?: (session: UpdateSession, compKey: CompKey) => void;
+} | null;
+let schedulerContext: SchedulerContext = null;
 
 // Create a new update session
 export const createUpdateSession = (
@@ -47,6 +52,8 @@ export const createUpdateSession = (
      * Initialize empty upCB queue
      */
     upCBQueue: [],
+
+    onConcurrentComplete: null,
   };
 
   return session;
@@ -176,10 +183,18 @@ export const disposeComponentEntry = (compKey: CompKey): void => {
   componentMap.delete(compKey);
 };
 
-export const setScheduler = (s: WorkScheduler | null): void => {
+export const setScheduler = (
+  s: WorkScheduler | null,
+  context?: SchedulerContext
+): void => {
   scheduler = s;
+  schedulerContext = context ?? null;
 };
 
 export const getScheduler = (): WorkScheduler | null => {
   return scheduler;
+};
+
+export const getSchedulerContext = (): SchedulerContext => {
+  return schedulerContext;
 };

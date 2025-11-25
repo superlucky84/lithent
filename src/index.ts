@@ -11,6 +11,7 @@ export {
   disposeComponentEntry,
   setScheduler,
   getScheduler,
+  getSchedulerContext,
   createUpdateSession,
   getActiveSession,
   activateSession,

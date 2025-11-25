@@ -8,11 +8,16 @@ import {
   sessionWorkComplete,
   setScheduler,
   getScheduler,
+  getSchedulerContext,
   getActiveSession,
   getComponentKey,
 } from '@/utils/universalRef';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import type { UpdateSession, WorkScheduler } from '@/types/session';
+
+export type RenewSchedulerOptions = {
+  onPendingChange?: (pending: boolean) => void;
+};
 
 const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
@@ -61,6 +66,8 @@ const createSessionForRun = (
   if (scheduler) {
     session.shouldDefer = () => session.depth > 0;
     session.isConcurrentMode = true;
+    const schedulerContext = getSchedulerContext();
+    schedulerContext?.attachSession?.(session, compKey);
   } else {
     session.shouldDefer = basicShouldDefer;
     session.isConcurrentMode = false;
@@ -70,17 +77,99 @@ const createSessionForRun = (
 };
 
 export const createScheduler = (scheduler: WorkScheduler) => {
-  const cancelPendingWork = () => {
+  const pendingFinalizers = new Map<CompKey, Map<symbol, () => void>>();
+  let lastKnownCompKey: CompKey | null = null;
+
+  const resolveCompKey = (): CompKey | null => {
     const compKey = getComponentKey();
     if (compKey) {
-      scheduler.cancelWork?.(compKey);
+      lastKnownCompKey = compKey;
+      return compKey;
     }
+    return lastKnownCompKey;
   };
 
-  const bindRenewScheduler = (renew: Renew): Renew => {
+  const flushFinalizersForKey = (
+    compKey: CompKey | null,
+    shouldRunCallbacks: boolean
+  ) => {
+    if (!compKey) {
+      return;
+    }
+
+    const finalizers = pendingFinalizers.get(compKey);
+    if (!finalizers) {
+      return;
+    }
+
+    if (shouldRunCallbacks) {
+      finalizers.forEach(finalize => finalize());
+    }
+    pendingFinalizers.delete(compKey);
+  };
+
+  const flushAllFinalizers = (shouldRunCallbacks: boolean) => {
+    Array.from(pendingFinalizers.keys()).forEach(key =>
+      flushFinalizersForKey(key, shouldRunCallbacks)
+    );
+  };
+
+  const cancelPendingWork = (options?: {
+    runFinalizers?: boolean;
+    compKey?: CompKey | null;
+  }) => {
+    const shouldRun = options?.runFinalizers ?? true;
+    const compKey = options?.compKey ?? resolveCompKey();
+    if (compKey) {
+      scheduler.cancelWork?.(compKey);
+      flushFinalizersForKey(compKey, shouldRun);
+      return;
+    }
+    flushAllFinalizers(shouldRun);
+  };
+
+  const bindRenewScheduler = (
+    renew: Renew,
+    options?: RenewSchedulerOptions
+  ): Renew => {
     return () => {
-      cancelPendingWork();
-      setScheduler(scheduler);
+      const compKey = resolveCompKey();
+      cancelPendingWork({ runFinalizers: false, compKey });
+
+      if (options?.onPendingChange) {
+        const pendingChange = options.onPendingChange;
+        setScheduler(scheduler, {
+          onPendingChange: pendingChange,
+          attachSession: (session, compKey) => {
+            lastKnownCompKey = compKey;
+            const finalize = () => {
+              const finalizers = pendingFinalizers.get(compKey);
+              if (!finalizers?.has(session.id)) {
+                return;
+              }
+              finalizers.delete(session.id);
+              if (!finalizers.size) {
+                pendingFinalizers.delete(compKey);
+              }
+              pendingChange(false);
+              renew();
+            };
+
+            let finalizers = pendingFinalizers.get(compKey);
+            if (!finalizers) {
+              finalizers = new Map();
+              pendingFinalizers.set(compKey, finalizers);
+            }
+
+            finalizers.set(session.id, finalize);
+            session.onConcurrentComplete = finalize;
+          },
+        });
+        pendingChange(true);
+      } else {
+        setScheduler(scheduler);
+      }
+
       return renew();
     };
   };
@@ -114,6 +203,8 @@ export const setRedrawAction = (compKey: Props, domUpdate: () => void) => {
         sessionWorkComplete(session, () => {
           // All deferred scheduleRun complete - execute pending upCB callbacks
           executeSessionUpCBQueue(session);
+          session.onConcurrentComplete?.();
+          session.onConcurrentComplete = null;
         });
       }
 
