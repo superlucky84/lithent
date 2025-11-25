@@ -123,6 +123,7 @@ export const componentUpdate = (compKey: Props) => () => {
   }
 
   const registeredScheduler = getRegisteredComponentScheduler(compKey);
+  registeredScheduler?.cancelWork?.(compKey);
   const session = createSessionForRun(compKey, registeredScheduler);
 
   if (session.isConcurrentMode) {
