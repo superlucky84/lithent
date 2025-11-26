@@ -1,278 +1,166 @@
 
-## ➿ lithent
-> An extensible JSX-based virtual DOM library for lightweight use in a variety of environments.
+# 📘 **Lithent**
+
+[![npm version](https://img.shields.io/npm/v/lithent.svg)](https://www.npmjs.com/package/lithent)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 
-![lithent-text](https://github.com/user-attachments/assets/a8848484-d315-4f81-be3b-61490d2be2b9)
+# **Lithent**
 
-![npm](https://img.shields.io/npm/v/lithent)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/lithent)
-![npm](https://img.shields.io/npm/dt/lithent)
-![NPM](https://img.shields.io/npm/l/lithent)
+**Lithent는 미니멀리즘 철학을 기반으로, 작고 예측 가능한 UI 구성 요소를 만들기 위한 JavaScript 라이브러리입니다.**
+불필요한 마법이나 번잡한 API를 걷어내고, 단순하고 예측 가능한 방식으로 동작하는 lightweight UI 엔진을 목표로 합니다.
+ㅓ
+Lithent의 핵심 의도는 과한 구조 없이 필요한 만큼만 동작하는 UI 엔진을 제공하는 것입니다.
+가벼운 DOM 조작이 필요한, 용량에 민감한 라이브러리에서도 부담 없이 사용할 수 있으며, 상황에 따라 선언형 패턴을 선택적으로 적용할 수도 있습니다.
 
+이런 목적을 위해 Lithent는 다음의 두 가지 방식을 제공합니다.
+두 방식은 충돌 없이 함께 사용할 수 있으며, 프로젝트 성격에 따라 자연스럽게 혼합해 적용할 수 있습니다.
 
+## **수동 제어 기반 (Manual Mode)**
 
+명시적 갱신을 기반으로 동작하는 방식입니다.
+상태는 클로저에 자연스럽게 저장되며, 사용자가 api를 통해 컴포넌트의 갱신 시점을 직접 제어할 수 있습니다.
 
-- [Manual](https://medium.com/p/13d6fe6d3330)
-- [Korean Manual](https://medium.com/@superlucky84/lithent-전체-기능-설명서-3cfab04c0722)
-- [Home Page](https://superlucky84.github.io/lithent) - (This page is written in lithent.)
+## **선언형 기반 (Light API Mode)**
 
-Lithent were developed to make it easy to insert Virtual DOM component
-fragments into pages already drawn with SSR, and are intended to be
-used lightly in a variety of situations.
+상태 변화가 자동으로 UI에 반영되는 단순한 선언형 패턴입니다.
+코어와 낮게 결합된 helper를 통해 제공되며, 필요할 때만 가볍게 가져다 쓸 수 있습니다.
+상태, 컨텍스트 등 추가 기능을 원할 때 선택적으로 활용할 수 있습니다.
 
-`(lithent.mjs  14.25 kB │ gzip: 4.49 kB │ map: 59.74 kB)`
-`(lithent.umd.js  10.39 kB │ gzip: 4.03 kB │ map: 58.16 kB)`
+---
 
-## 🚩 Table of Contents
-- [Thanks for the introduction](#thanks-for-the-introduction)
-- [Why Use Lithent](#why-use-lithent)
-- [Basic Guide](#basic-guide)
-- [Lithent Ssr Boilerplate](#lithent-ssr-boilerplate)
-- [How To Install](#how-to-install)
-  - [Use NPM](#use-npm)
-  - [Use CDN](#or-use-cdn)
-  - [With JSX](#with-jsx)
-  - [With FTAGS](#with-ftags)
-  - [With HTM](#with-htm)
-- [Examples](#examples)
-  - [With ESM](#with-esm)
-  - [With UMD](#with-umd)
-- [Related Projects](#related-projects)
-- [Develop Guide](#develop-guide)
-- [Test](#test)
+## Installation
 
-## Thanks for the introduction
-- [unsuckjs](https://unsuckjs.com/)
-- [jster](https://jster.net/blog/jster-198/)
-- [webtoolsweekly](https://webtoolsweekly.com/archives/issue-531/)
-
-## Why use Lithent?
-
-### Lithent have the bare minimum of necessary functionality, with no unnecessary features.
-
-In a real-world development environment, you may want to use Virtual DOM lightly, with only the bare minimum of core functionality.
-
-"Lithent" makes it easy to add, remove, and update virtual DOM to specific parts of a pre-drawn SSR page.
-
-"Lithent" has implemented the bare minimum functionality needed to create and update virtual DOM in general (we only need to know 'render', 'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
-
-We provide code in the form of 'helpers' that extend the basic functionality, but using the helpers is only optional and users can extend and develop custom helpers for their own projects.
-
-### Approach with the developer-friendly concept of closures between "component mounter" and "renderer"
-
-JavaScript users are used to using closures and love to develop with them.
-
-"Lithent" provides a familiar approach to my JavaScript development, as it leverages the properties of higher-order functions and closures to define and recycle the state of a component.
-
-## Basic Guide
-
-- https://superlucky84.github.io/lithent/
-
-## Lithent Ssr Boilerplate
-
-`Lithent-Ssr-Boilerplate` is a boilerplate designed for building server-side rendering (SSR) websites using the [Lithent](https://superlucky84.github.io/lithent/) UI library.
-
-* [README](https://github.com/superlucky84/lithent/tree/master/createLithent#readme)
-
-```bash
-npx create-lithent-ssr@latest
-```
+* 간단 사용법 설명
+* 설치
+* create lithent app 사용하기
 
 
-## How To Install
+---
 
-#### Use NPM
+## Documentation
 
-```bash
-pnpm add lithent
-```
+* 수동 제어 기반 설명
 
-#### Or Use CDN
+* 선언형 기반 설명
 
-* UMD : https://cdn.jsdelivr.net/npm/lithent@2.0.0/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@2.0.0/helper/dist/lithentHelper.umd.js
-* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@2.0.0/ftags/dist/lithentFTags.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@2.0.0/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@2.0.0/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@2.0.0/helper/dist/lithentHelper.mjs
-* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@2.0.0/ftags/dist/lithentFTags.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@2.0.0/tag/dist/lithentTag.mjs
+* 기본 훅 설명
+    * useRenew
+    * mountCallback
+    * updateCallback
+    * mountReadyCallback
 
+* 헬퍼 기반 훅 설명
+    * state
+    * store
+    * computed
+    * effect
+    * context
 
-It's easier to use lithent with JSX or HTM.
+* 템플릿 (jsx)
+    * jsx
+    * ftags
+    * tags
+    * lithent template
 
-#### With JSX
+---
 
-* Lithent is built on top of JSX.
-  * [Setting Guide](https://superlucky84.github.io/lithent/#install)
+## Example
 
+가장 기본적인 카운터 예제입니다.
 
-#### With FTAGS
+### **lmount + lstate (자동 갱신)**
 
-You don't need to use h functions or JSX, you can call functions to mark them up.
-When creating a component, use `fMount` instead of `mount`.
-When creating a fragment, use `fFragment` instead of `Fragment`.
+```jsx
+import { lmount } from 'lithent';
+import { lstate } from 'lithent/helper';
 
-```ts
-/* ESM */
-import { render, h } from 'lithent';
-import { fTags, fFragment, fMount } from 'lithent/ftags';
+const Counter = lmount(() => {
+  const count = lstate(0);
 
-const { section, div, p, br, strong } = fTags;
-
-/* UMD
-<script src="https://cdn.jsdelivr.net/npm/lithent@2.0.0/dist/lithent.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@2.0.0/helper/dist/lithentHelper.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@2.0.0/ftags/dist/lithentFTags.umd.js"></script>
-
-const { render } = lithent;
-const { fTags, fMount, fFragment } = lithentFTags;
-const { section, div, p, br, strong } = fTags;
-*/
-
-const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
-  return () =>
-    fFragment(
-      'first inner',
-      div({ style: { border: '1px solid red' } }, 'second inner'),
-      div('The props argument can be omitted.'),
-      props.firstProp,
-      ...children
-    );
-});
-
-render(
-  fTagComponent(
-    { firstProp: 3 }, // The props argument can be omitted.
-    div({ style: { border: '1px solid green' } }, `Fchildren1`),
-    'Fchildren2',
-    br()
-  ),
-  document.getElementById('root')
-);
-```
-
-#### With HTM
-
-- [Htm Github](https://github.com/developit/htm)
-
-```js
-import { lTag } from 'lithent/tag';
-const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
-```
-
-
-## Examples
-
-- [More Examples](https://superlucky84.github.io/lithent/#examples)
-
-#### With ESM
-```js
-import { h, render, mount, Fragment } from 'lithent';
-import { lTag } from 'lithent/tag';
-import { state } from 'lithent/helper';
-
-const Component = mount((renew, _props) => {
-  const count = state(0, renew);
-
-  const change = () => {
+  const inc = () => {
     count.value += 1;
   };
 
-  // Updater
-  return () => lTag`
-    <${Fragment}>
-      <li>count: ${count.value}</li>
-      <button onClick=${change}>increase</button>
-    <//>
-  `;
+  return () => (
+    <div>
+      <p>{count.value}</p>
+      <button onClick={inc}>+</button>
+    </div>
+  );
 });
-
-// appendChild or insertBefore
-// The third argument is an optional value for insertBefore.
-const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
 ```
 
-#### With UMD
+### **mount (수동 갱신)**
 
-```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@2.0.0/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@2.0.0/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@2.0.0/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@2.0.0/ftags/dist/lithentFTags.umd.js"></script-->
+```jsx
+import { mount } from 'lithent';
 
-<div id="root"></div>
+const App = mount((renew) => {
+  let count = 0;
 
-<script>
-const { h, Fragment, render, mount } = lithent;
-const { lTag } = lithentTag;
-// const { state } = lithentHelper;
-
-const Component = mount(renew => {
-  count = 0;
-
-  const change = () => {
+  const inc = () => {
     count += 1;
     renew();
   };
 
-  // Updater
-  return () => lTag`
-    <${Fragment}>
-      <li>count: ${count}</li>
-      <button onClick=${change}>increase</button>
-    <//>
-  `;
+  return () => (
+    <div>
+      <p>{count}</p>
+      <button onClick={inc}>+</button>
+    </div>
+  );
 });
-
-// appendChild or insertBefore
-// The third argument is an optional value for insertBefore.
-const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
-</script>
 ```
 
-## Related Projects
-- [htm](https://www.npmjs.com/package/htm) - making **H**yperscript **T**agged **M**arkup possible
+---
 
-## Develop Guide
+## Contributing
 
-It's open source, so you can develop and contribute together.
+Lithent는 오픈 소스 프로젝트로, 누구나 개선에 참여할 수 있습니다.
 
-### pnpm install (this project was created using pnpm.)
+* 이슈 제기
+* 버그 리포트
+* 문서 수정
+* 코드 기여(PR)
 
-```bash
-npm install -g pnpm
+자세한 내용은 `CONTRIBUTING.md`를 참고하세요(준비 중).
+
+---
+
+## License
+
+[MIT](LICENSE)
+
+---
+
+# 🧩 특징
+
+README는 심플해야 하니 위에는 넣지 않았지만, React README처럼 아래 footer 정도로 “특징"을 간단히 정리할 수도 있음:
+
+```
+Lithent는 클로저 기반의 컴포넌트 모델을 기반으로 하며, mount(수동)와 l-시리즈(자동) 두 가지 갱신 방식을 제공합니다.
 ```
 
-### project install
+---
 
-```bash
-git clone https://github.com/superlucky84/lithent.git
+# ✔ 이 README의 특징
 
-cd lithent
+* 광고 문구 없음
+* 짧고 담백함
+* React/Svelte 스타일 그대로
+* 필요한 핵심 요소만 포함
+* 나중에 영어로 번역하기 쉬움
+* GitHub README로 바로 붙여도 깔끔한 레이아웃
 
-pnpm install
-```
+---
 
-### project build
+원하면 여기에:
 
-```bash
-pnpm build
-```
+* 배지(badge) 몇 개 더 추가
+* 로고/배너 추가
+* 문서 페이지 링크를 미리 만들어둠
+* examples/ 폴더 구조 추천
 
-### Running the development environment
+같은 것도 정리해줄게!
 
-```bash
-pnpm dev // or pnpm dev:core
-```
-
-## Test
-
-> To fully test everything, including plugins like helper and ftags, a build is required.
-
-```bash
-pnpm install
-pnpm build
-pnpm test
-```
