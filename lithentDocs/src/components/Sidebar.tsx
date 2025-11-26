@@ -1,0 +1,94 @@
+import { mount } from 'lithent';
+import { appStore, navigateTo } from '@/store';
+
+interface MenuItem {
+  text: string;
+  link: string;
+}
+
+interface MenuSection {
+  text: string;
+  items: MenuItem[];
+}
+
+const menuData: MenuSection[] = [
+  {
+    text: 'Getting Started',
+    items: [
+      { text: 'Introduction', link: '/guide/introduction' },
+      { text: 'Quick Start', link: '/guide/quick-start' },
+    ],
+  },
+  // Add more sections here later
+];
+
+export const Sidebar = mount(renew => {
+  const store = appStore.watch(renew);
+
+  const handleClick = (link: string) => {
+    navigateTo(link);
+  };
+
+  return () => (
+    <>
+      {/* Mobile overlay */}
+      {store.sidebarOpen && (
+        <div
+          class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => {
+            store.sidebarOpen = false;
+          }}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        class={`
+          fixed lg:sticky top-16 left-0 z-40
+          w-64 h-[calc(100vh-4rem)] flex-shrink-0
+          bg-white dark:bg-[#1b1b1f]
+          border-r border-gray-200 dark:border-gray-800
+          overflow-y-auto
+          transition-transform duration-300
+          ${store.sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        <nav class="px-6 md:px-12 py-6">
+          {menuData.map(section => (
+            <div class="mb-6">
+              <h5 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
+                {section.text}
+              </h5>
+              <ul class="space-y-2">
+                {section.items.map(item => {
+                  const isActive = store.route === item.link;
+                  return (
+                    <li>
+                      <a
+                        href={item.link}
+                        onClick={(e: Event) => {
+                          e.preventDefault();
+                          handleClick(item.link);
+                        }}
+                        class={`
+                          block px-3 py-2 rounded-md text-sm font-medium transition-colors
+                          ${
+                            isActive
+                              ? 'text-[#42b883] bg-[#42b883] bg-opacity-10'
+                              : 'text-gray-700 dark:text-gray-300 hover:text-[#42b883] dark:hover:text-[#42b883] hover:bg-gray-100 dark:hover:bg-gray-800'
+                          }
+                        `}
+                      >
+                        {item.text}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </aside>
+    </>
+  );
+});

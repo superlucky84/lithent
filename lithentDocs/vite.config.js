@@ -22,6 +22,7 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    open: '/index.html',
+    open: '/guide/introduction',
+    historyApiFallback: true,
   },
 });

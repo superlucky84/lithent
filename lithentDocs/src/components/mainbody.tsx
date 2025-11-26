@@ -4,27 +4,27 @@ import { Guide } from '@/pages/guide';
 import { Install } from '@/pages/install';
 import { Examples } from '@/pages/examples';
 import { About } from '@/pages/about';
-import { assignSharedStore } from '@/store';
+import { appStore } from '@/store';
 
-export const Mainbody = mount(r => {
-  const shardStore = assignSharedStore(r);
-  let hashState = location.hash;
-  window.addEventListener('hashchange', () => {
-    hashState = location.hash;
-    shardStore.showHiddenMenu = false;
-    shardStore.hashState = hashState;
+export const Mainbody = mount(renew => {
+  const store = appStore.watch(renew);
+
+  window.addEventListener('popstate', () => {
+    store.sidebarOpen = false;
+    store.route = location.pathname;
     window.scrollTo(0, 0);
   });
-  const matchHash = computed<string>(() => {
-    if ('#examples' === hashState) {
+
+  const matchPath = computed<string>(() => {
+    if ('/examples' === store.route) {
       return <Examples />;
-    } else if ('#install' === hashState) {
+    } else if ('/install' === store.route) {
       return <Install />;
-    } else if ('#about' === hashState) {
+    } else if ('/about' === store.route) {
       return <About />;
     }
     return <Guide />;
   });
 
-  return () => <main class="h-full">{matchHash.v}</main>;
+  return () => <main class="h-full">{matchPath.v}</main>;
 });

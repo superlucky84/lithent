@@ -1,14 +1,14 @@
 import { mount } from 'lithent';
 import { Aside } from '@/components/aside';
 import { Mainbody } from '@/components/mainbody';
-import { assignSharedStore } from '@/store';
+import { appStore } from '@/store';
 
-export const Main = mount(r => {
-  const shardStore = assignSharedStore(r);
+export const Main = mount(renew => {
+  const store = appStore.watch(renew);
 
   return () => (
     <div class="flex pt-16 overflow-hidden bg-gray-900">
-      <Aside isHidden={!shardStore.showHiddenMenu} />
+      <Aside isHidden={!store.sidebarOpen} />
       <div
         class="fixed inset-0 z-10 hidden bg-gray-900/90"
         id="sidebarBackdrop"
