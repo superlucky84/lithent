@@ -7,6 +7,7 @@ import {
   MiddleStateWDom,
   NodePointer,
   Component,
+  LComponent,
 } from '@/types';
 
 import { makeNewWDomTree } from '@/diff';
@@ -17,6 +18,7 @@ import {
   needDiffRef,
   getComponentSubInfo,
   wdomSymbol,
+  lmountComponentSet,
 } from '@/utils/universalRef';
 import { setRedrawAction, componentUpdate } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
@@ -72,6 +74,17 @@ export const mount =
   <T>(component: Component<T>) =>
   (_props: T, _children?: MiddleStateWDomChildren) =>
     component;
+
+/**
+ * It helps with component creation without renew parameter.
+ * Use useRenew() hook to get renew function if needed.
+ */
+export const lmount =
+  <T>(component: LComponent<T>) =>
+  (_props: T, _children?: MiddleStateWDomChildren) => {
+    lmountComponentSet.add(component);
+    return component;
+  };
 
 /**
  * Maintain compChild references for upward updates (render props, slots, etc.).
@@ -239,11 +252,14 @@ const createComponentResolver = (
       typeof initialComponent === 'function'
         ? initialComponent
         : () => () => initialComponent;
-    const componentMaker = component(
-      componentUpdate(compKey),
-      props,
-      wrappedChildren
-    );
+
+    // Check if component is created with lmount (no renew parameter)
+    // TypeScript cannot infer that component is LComponent when has() returns true,
+    // because WeakSet.has() is a runtime check that doesn't narrow types.
+    // We use 'as any' since the runtime check guarantees type safety.
+    const componentMaker = lmountComponentSet.has(component)
+      ? (component as any)(props, wrappedChildren)
+      : component(componentUpdate(compKey), props, wrappedChildren);
 
     return makeCustomNode(componentMaker, compKey, tag, props, wrappedChildren);
   };
