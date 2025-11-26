@@ -5,6 +5,7 @@ export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: CompKey | null } = { value: null };
 export const needDiffRef: { value: boolean } = { value: false };
 export const componentMap: ComponentMap = new WeakMap();
+export const lmountComponentSet: WeakSet<Function> = new WeakSet();
 let componentMapManualMode = false;
 
 const setComponetRef = (compKey: CompKey): void => {

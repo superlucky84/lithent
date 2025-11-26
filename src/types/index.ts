@@ -19,6 +19,8 @@ export type Component<T> = (
   childen: WDom[]
 ) => (props: T) => WDom;
 
+export type LComponent<T> = (props: T, childen: WDom[]) => (props: T) => WDom;
+
 export type TagFunctionResolver = {
   tagName: string;
   ctor: Function;
