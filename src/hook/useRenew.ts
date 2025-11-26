@@ -10,7 +10,7 @@ export const useRenew = (): Renew => {
   const compKey = getComponentKey();
 
   if (!compKey) {
-    throw new Error('useRenew must be called inside a component');
+    return () => false;
   }
 
   return componentUpdate(compKey);

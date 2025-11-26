@@ -1,10 +1,13 @@
+import { useRenew } from 'lithent';
+
 export type State<T> = {
   value: T;
   v: T;
 };
 
-export const state = <T>(value: T, renew: () => boolean): State<T> => {
+export const lstate = <T>(value: T): State<T> => {
   let result = value;
+  const renew = useRenew();
 
   return {
     get value() {
