@@ -4,15 +4,15 @@ import { Guide } from '@/pages/guide';
 import { Install } from '@/pages/install';
 import { Examples } from '@/pages/examples';
 import { About } from '@/pages/about';
-import { assignSharedStore } from '@/store';
+import { appStore } from '@/store';
 
-export const Mainbody = mount(r => {
-  const shardStore = assignSharedStore(r);
+export const Mainbody = mount(renew => {
+  const store = appStore.watch(renew);
   let hashState = location.hash;
   window.addEventListener('hashchange', () => {
     hashState = location.hash;
-    shardStore.showHiddenMenu = false;
-    shardStore.hashState = hashState;
+    store.sidebarOpen = false;
+    store.route = hashState;
     window.scrollTo(0, 0);
   });
   const matchHash = computed<string>(() => {

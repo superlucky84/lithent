@@ -1,10 +1,10 @@
 import { mount } from 'lithent';
-import { assignSharedStore } from '@/store';
+import { appStore } from '@/store';
 
-export const HeaderNav = mount(r => {
-  const shardStore = assignSharedStore(r);
+export const HeaderNav = mount(renew => {
+  const store = appStore.watch(renew);
   const changeSideBar = () => {
-    shardStore.showHiddenMenu = !shardStore.showHiddenMenu;
+    store.sidebarOpen = !store.sidebarOpen;
   };
 
   return () => (
@@ -21,7 +21,7 @@ export const HeaderNav = mount(r => {
             >
               <svg
                 id="toggleSidebarMobileHamburger"
-                class={`w-6 h-6 ${shardStore.showHiddenMenu ? 'hidden' : ''}`}
+                class={`w-6 h-6 ${store.sidebarOpen ? 'hidden' : ''}`}
                 fill="gray"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +34,7 @@ export const HeaderNav = mount(r => {
               </svg>
               <svg
                 id="toggleSidebarMobileClose"
-                class={`w-6 h-6 ${shardStore.showHiddenMenu ? '' : 'hidden'}`}
+                class={`w-6 h-6 ${store.sidebarOpen ? '' : 'hidden'}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
