@@ -23,15 +23,18 @@ export const Layout = mount(renew => {
       <div class="min-h-screen bg-white dark:bg-[#1b1b1f] transition-colors">
         <Header />
 
-        <div class="flex">
-          <Sidebar />
+        {/* Main Container - centered with max-width */}
+        <div class="mx-auto max-w-[1440px]">
+          <div class="flex">
+            <Sidebar />
 
-          {/* Main Content */}
-          <main class="flex-1 lg:ml-64">
-            <div class="container mx-auto px-6 py-8 max-w-4xl">
-              <CurrentPage />
-            </div>
-          </main>
+            {/* Main Content */}
+            <main class="flex-1 w-full min-w-0 px-6 md:px-12 py-8">
+              <div class="max-w-full md:max-w-[48rem]">
+                <CurrentPage />
+              </div>
+            </main>
+          </div>
         </div>
       </div>
     );

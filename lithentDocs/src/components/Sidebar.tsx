@@ -45,7 +45,7 @@ export const Sidebar = mount(renew => {
       <aside
         class={`
           fixed lg:sticky top-16 left-0 z-40
-          w-64 h-[calc(100vh-4rem)]
+          w-64 h-[calc(100vh-4rem)] flex-shrink-0
           bg-white dark:bg-[#1b1b1f]
           border-r border-gray-200 dark:border-gray-800
           overflow-y-auto
