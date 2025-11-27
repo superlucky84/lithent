@@ -8,30 +8,8 @@ export const Header = mount(renew => {
     <header class="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1b1b1f]">
       <div class="mx-auto max-w-[1440px]">
         <div class="flex h-16">
-          {/* Left Area - Sidebar Width (256px = w-64) */}
-          <div class="w-64 flex-shrink-0 flex items-center px-6 md:px-12">
-            {/* Mobile menu toggle */}
-            <button
-              class="lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
-              onClick={() => {
-                store.sidebarOpen = !store.sidebarOpen;
-              }}
-            >
-              <svg
-                class="w-6 h-6 text-gray-600 dark:text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-
+          {/* Left Area - Responsive Width */}
+          <div class="w-auto sm:w-48 lg:w-64 flex-shrink-0 flex items-center px-6 md:px-12">
             {/* Logo and Title */}
             <a href="#/guide/introduction" class="flex items-center gap-3">
               <img src="/lithent.png" alt="Lithent" class="w-8 h-8" />
@@ -62,10 +40,10 @@ export const Header = mount(renew => {
                 </a>
               </nav>
 
-              {/* Dark Mode Toggle Switch - Vue Style */}
+              {/* Dark Mode Toggle Switch - Vue Style - Hidden on very small screens */}
               <button
                 onClick={toggleTheme}
-                class="ml-6 relative inline-flex items-center h-9 w-16 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#42b883] focus:ring-offset-2 bg-gray-200 dark:bg-gray-700"
+                class="hidden sm:inline-flex ml-6 relative items-center h-9 w-16 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#42b883] focus:ring-offset-2 bg-gray-200 dark:bg-gray-700"
                 aria-label="Toggle dark mode"
                 title={
                   store.theme === 'light'
@@ -114,6 +92,30 @@ export const Header = mount(renew => {
                     )}
                   </span>
                 </span>
+              </button>
+
+              {/* Mobile menu toggle - Only show on mobile/tablet */}
+              <button
+                class="lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md p-2 ml-4"
+                onClick={() => {
+                  store.sidebarOpen = !store.sidebarOpen;
+                }}
+                aria-label="Toggle sidebar"
+              >
+                <svg
+                  class="w-6 h-6 text-gray-600 dark:text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
               </button>
             </div>
           </div>
