@@ -9,10 +9,10 @@ export const Header = mount(renew => {
       <div class="mx-auto max-w-[1440px]">
         <div class="flex h-16">
           {/* Left Area - Sidebar Width (256px = w-64) */}
-          <div class="w-64 flex-shrink-0 flex items-center px-6">
+          <div class="w-64 flex-shrink-0 flex items-center px-6 md:px-12">
             {/* Mobile menu toggle */}
             <button
-              class="lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md mr-3"
+              class="lg:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md"
               onClick={() => {
                 store.sidebarOpen = !store.sidebarOpen;
               }}

@@ -53,7 +53,7 @@ export const Sidebar = mount(renew => {
           ${store.sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        <nav class="p-6">
+        <nav class="px-6 md:px-12 py-6">
           {menuData.map(section => (
             <div class="mb-6">
               <h5 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
