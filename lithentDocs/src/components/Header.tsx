@@ -6,8 +6,8 @@ export const Header = mount(renew => {
 
   return () => (
     <header class="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1b1b1f]">
-      <div class="mx-auto max-w-[1440px] px-6 md:px-12">
-        <div class="flex h-16 items-center justify-between">
+      <div class="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-0">
+        <div class="flex h-16 items-center justify-between lg:pl-6 lg:pr-12">
           {/* Left: Logo and Title */}
           <div class="flex items-center">
             {/* Mobile menu toggle */}

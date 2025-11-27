@@ -1,15 +1,18 @@
 export const Introduction = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
-    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">
-      What is Lithent?
-    </h1>
+    <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">소개</h1>
 
     <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent is a lightweight, extensible JSX-based virtual DOM library
-      designed for flexible integration into SSR pages and various environments.
-      With a minimal footprint of just <strong>14.25 kB</strong> (4.49 kB
-      gzipped), Lithent emphasizes minimal core functionality with optional
-      helpers for extension.
+      Lithent는 작고 예측 가능한 UI 구성 요소를 만들기 위한 JavaScript
+      라이브러리입니다.
+      <br />
+      불필요한 마법이나 번잡한 API를 걷어내고, 단순하고 예측 가능한 방식으로
+      동작하는 lightweight UI 엔진을 목표로 합니다.
+    </p>
+
+    <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      가벼운 DOM 조작이 필요한, 용량에 민감한 라이브러리에서도 부담 없이 사용할
+      수 있으며, 상황에 따라 선언형 패턴을 선택적으로 적용할 수도 있습니다.
     </p>
 
     <h2 class="text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-4">
