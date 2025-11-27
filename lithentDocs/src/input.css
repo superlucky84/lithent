@@ -30,6 +30,11 @@
   }
 
   .prose pre code {
-    @apply p-0 bg-transparent;
+    @apply p-0 bg-transparent dark:bg-transparent;
+  }
+
+  /* highlight.js code blocks */
+  .prose pre code.hljs {
+    @apply bg-transparent dark:bg-transparent p-0;
   }
 }
