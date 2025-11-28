@@ -4,7 +4,6 @@ import typescript from 'highlight.js/lib/languages/typescript';
 import xml from 'highlight.js/lib/languages/xml';
 import bash from 'highlight.js/lib/languages/bash';
 import json from 'highlight.js/lib/languages/json';
-import 'highlight.js/styles/atom-one-dark.css';
 
 // Register languages
 hljs.registerLanguage('typescript', typescript);
@@ -39,7 +38,7 @@ export const CodeBlock = lmount<CodeBlockProps>(() => {
   });
 
   return ({ code, language }) => (
-    <pre class="bg-gray-900 dark:bg-gray-950 p-6 rounded-lg overflow-x-auto mb-6 text-xs md:text-sm">
+    <pre class="code-block bg-gray-100 dark:bg-[#1e1e1e] p-6 rounded-lg overflow-x-auto mb-6 text-xs md:text-sm border border-gray-200 dark:border-gray-800">
       <code ref={codeRef} class={`language-${language || 'typescript'}`}>
         {code}
       </code>
