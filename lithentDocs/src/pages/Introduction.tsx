@@ -2,7 +2,9 @@ import { CodeBlock } from '@/components/CodeBlock';
 
 export const Introduction = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">소개</h1>
+    <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
+      소개
+    </h1>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       Lithent는 작고 예측 가능한 UI 구성 요소를 만들기 위한 JavaScript
@@ -39,7 +41,7 @@ export const Introduction = () => (
       무관합니다.
     </p>
 
-    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-4">
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       수동 제어 기반 (Manual Mode)
     </h2>
 
@@ -82,7 +84,7 @@ const App = mount((renew) => {
 });`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-4">
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       선언형 기반 (Light API Mode)
     </h2>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -113,7 +115,7 @@ const Counter = lmount(() => {
 });`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-4">
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       <button>무상태 기반 (None State Mode)</button>
     </h2>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -130,13 +132,13 @@ const Counter = lmount(() => {
 );`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-4">
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       Key Features
     </h2>
 
     <div class="grid gap-6 mt-6">
       <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-semibold text-[#42b883] mb-2">
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
           Lightweight & Fast
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
@@ -146,7 +148,7 @@ const Counter = lmount(() => {
       </div>
 
       <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-semibold text-[#42b883] mb-2">
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
           Closure-based State Management
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
@@ -160,7 +162,7 @@ const Counter = lmount(() => {
       </div>
 
       <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-semibold text-[#42b883] mb-2">
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
           Flexible & Extensible
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
@@ -170,7 +172,9 @@ const Counter = lmount(() => {
       </div>
 
       <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-semibold text-[#42b883] mb-2">SSR Ready</h3>
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          SSR Ready
+        </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
           Built-in server-side rendering support with{' '}
           <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">
@@ -181,7 +185,7 @@ const Counter = lmount(() => {
       </div>
     </div>
 
-    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-4">
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       The Lithent Difference
     </h2>
 
@@ -212,7 +216,7 @@ const Counter = lmount(() => {
       updates.
     </p>
 
-    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-10 mb-4">
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       Ready to get started?
     </h2>
 
