@@ -1,9 +1,5 @@
 import { mount } from 'lithent';
 import { computed } from 'lithent/helper';
-import { Guide } from '@/pages/guide';
-import { Install } from '@/pages/install';
-import { Examples } from '@/pages/examples';
-import { About } from '@/pages/about';
 import { PokemonMain } from '@/pages/pokemon';
 import { PokemonType } from '@/pages/pokemonType';
 import { PokemonDetail } from '@/pages/pokemonDetail';
@@ -26,7 +22,7 @@ export const Mainbody = mount(r => {
     const [, base, segment, detail] = path.split('/');
 
     if (base !== 'main') {
-      return <Guide />;
+      return <PokemonMain />;
     }
 
     if (!segment) {
@@ -37,16 +33,7 @@ export const Mainbody = mount(r => {
       return <PokemonDetail name={detail} />;
     }
 
-    switch (segment) {
-      case 'install':
-        return <Install />;
-      case 'examples':
-        return <Examples />;
-      case 'about':
-        return <About />;
-      default:
-        return <PokemonType type={segment} />;
-    }
+    return <PokemonType type={segment} />;
   });
 
   return () => <main class="h-full">{matchRoute.v}</main>;

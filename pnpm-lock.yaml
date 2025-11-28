@@ -126,6 +126,9 @@ importers:
 
   createLithent/basic:
     devDependencies:
+      '@lithent/lithent-vite':
+        specifier: ^0.3.2
+        version: 0.3.2(lithent@1.20.2)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.1.14
@@ -135,9 +138,6 @@ importers:
       autoprefixer:
         specifier: ^10.4.14
         version: 10.4.14(postcss@8.4.47)
-      highlight.js:
-        specifier: ^11.8.0
-        version: 11.8.0
       lithent:
         specifier: ^1.20.2
         version: 1.20.2

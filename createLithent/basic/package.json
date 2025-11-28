@@ -15,7 +15,8 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "author": "superlucky84",
   "license": "MIT",
@@ -31,7 +32,7 @@
     "@tailwindcss/postcss": "^4.0.0",
     "@tailwindcss/vite": "^4.0.6",
     "autoprefixer": "^10.4.14",
-    "highlight.js": "^11.8.0",
+    "@lithent/lithent-vite": "^0.3.2",
     "lithent": "^1.20.2",
     "postcss": "^8.4.24",
     "tailwindcss": "^4.0.0"

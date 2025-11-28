@@ -9,10 +9,7 @@ export const Main = mount(renew => {
   const backgroundClass = computed(() => {
     const [, base, type] = normalizePath(sharedStore.path).split('/');
 
-    const isTypePage =
-      base === 'main' &&
-      type &&
-      !['install', 'examples', 'about'].includes(type);
+    const isTypePage = base === 'main' && type;
 
     return isTypePage
       ? `bg-pokemon-${type}`
