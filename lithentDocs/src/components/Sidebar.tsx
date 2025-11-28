@@ -19,7 +19,36 @@ const menuData: MenuSection[] = [
       { text: 'Quick Start', link: '/guide/quick-start' },
     ],
   },
-  // Add more sections here later
+  {
+    text: 'Essential Features',
+    items: [
+      { text: 'Mounter', link: '/guide/mounter' },
+      { text: 'Updater', link: '/guide/updater' },
+      { text: 'Props', link: '/guide/props' },
+      { text: 'Renewer', link: '/guide/renewer' },
+      { text: 'Render', link: '/guide/render' },
+      { text: 'Portal', link: '/guide/portal' },
+      { text: 'Mount Hooks', link: '/guide/mount-hooks' },
+      { text: 'Update Hooks', link: '/guide/update-hooks' },
+      { text: 'Mount Ready Hooks', link: '/guide/mount-ready-hooks' },
+      { text: 'useRenew Hooks', link: '/guide/use-renew-hooks' },
+    ],
+  },
+  {
+    text: 'Helper Features',
+    items: [
+      { text: 'State', link: '/guide/state' },
+      { text: 'Lstate', link: '/guide/lstate' },
+      { text: 'Computed', link: '/guide/computed' },
+      { text: 'Effect', link: '/guide/effect' },
+      { text: 'Store', link: '/guide/store' },
+      { text: 'Lstore', link: '/guide/lstore' },
+      { text: 'Context', link: '/guide/context' },
+      { text: 'LContext', link: '/guide/lcontext' },
+      { text: 'CacheUpdate', link: '/guide/cache-update' },
+      { text: 'NextTick', link: '/guide/next-tick' },
+    ],
+  },
 ];
 
 export const Sidebar = mount(renew => {
@@ -53,7 +82,7 @@ export const Sidebar = mount(renew => {
           ${store.sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
-        <nav class="px-6 md:px-12 py-6">
+        <nav class="pl-6 md:pl-12 pr-3 md:pr-4 py-6">
           {menuData.map(section => (
             <div class="mb-6">
               <h5 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">

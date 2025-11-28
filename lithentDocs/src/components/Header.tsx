@@ -28,7 +28,7 @@ export const Header = mount(renew => {
 
           {/* Right Area - Main Content Area */}
           <div class="flex-1 w-full min-w-0 px-6 md:px-12">
-            <div class="max-w-full md:max-w-[48rem] flex items-center justify-end h-16">
+            <div class="max-w-full md:max-w-[43rem] flex items-center justify-end h-16">
               {/* Main Navigation */}
               <nav class="hidden md:flex items-center gap-6">
                 <a
