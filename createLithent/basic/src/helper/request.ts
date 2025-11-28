@@ -55,7 +55,7 @@ function makeInfoData(data: {
   name: string;
   id: number;
   abilities: { ability: { name: string } }[];
-  types: { name: string }[];
+  types: { type: { name: string } }[];
   sprites: {
     other: { dream_world: { front_default: string } };
     front_default: string;
@@ -66,10 +66,8 @@ function makeInfoData(data: {
   return {
     id: data.id,
     name: data.name,
-    types: data.types.map((typeInfo: any) => typeInfo.type.name),
-    abilities: data.abilities.map(
-      (abilityInfo: any) => abilityInfo.ability.name
-    ),
+    types: data.types.map(typeInfo => typeInfo.type.name),
+    abilities: data.abilities.map(abilityInfo => abilityInfo.ability.name),
     img:
       data.sprites.other.dream_world.front_default ||
       data.sprites.front_default,

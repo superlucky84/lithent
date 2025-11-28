@@ -12,7 +12,7 @@ export default defineConfig({
       typescript: true,
       eslint: {
         useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        lintCommand: 'eslint "src/**/*.{ts,tsx}"',
       },
     }),
   ],
