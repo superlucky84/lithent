@@ -44,11 +44,13 @@ export const navigateTo = (path: string) => {
   store.route = path;
   window.history.pushState({}, '', path);
   store.sidebarOpen = false;
+  window.scrollTo(0, 0);
 };
 
 // Listen to popstate (browser back/forward)
 window.addEventListener('popstate', () => {
   store.route = location.pathname || '/guide/introduction';
+  window.scrollTo(0, 0);
 });
 
 // Initialize theme on load

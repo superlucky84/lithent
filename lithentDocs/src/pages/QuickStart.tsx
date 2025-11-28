@@ -6,18 +6,20 @@ export const QuickStart = () => (
       빠르게 시작하기
     </h1>
 
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       Lithent 애플리케이션 생성하기
     </h2>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
-      <p class="text-sm md:text-base font-semibold text-gray-900 dark:text-white mb-3">
+      <p class="text-xs md:text-sm font-semibold text-gray-900 dark:text-white mb-3">
         📋 사전 준비사항
       </p>
-      <ul class="space-y-2.5 text-sm md:text-base text-gray-700 dark:text-gray-300">
+      <ul class="space-y-2.5 text-xs md:text-sm text-gray-700 dark:text-gray-300">
         <li class="flex items-start">
           <svg
-            class="w-5 h-5 text-[#42b883] mr-3 mt-0.5 flex-shrink-0"
+            class="w-4 h-4 text-[#42b883] mr-2.5 mt-0.5 flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -34,7 +36,7 @@ export const QuickStart = () => (
         </li>
         <li class="flex items-start">
           <svg
-            class="w-5 h-5 text-[#42b883] mr-3 mt-0.5 flex-shrink-0"
+            class="w-4 h-4 text-[#42b883] mr-2.5 mt-0.5 flex-shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -56,20 +58,39 @@ export const QuickStart = () => (
         </li>
       </ul>
     </div>
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      이 섹션에서는 로컬 컴퓨터에서 Lithent의 애플리케이션을 스캐폴딩하는 방법을
+      소개합니다. 생성된 프로젝트는 Vite를 기반으로 한 빌드 환경을 사용합니다.
+    </p>
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      최신 버전의 Node.js가 설치되어 있는지 확인하고, 현재 작업 디렉터리가
+      프로젝트를 생성하려는 위치인지 확인하세요. 커맨드 라인에서 다음 명령어를
+      실행하세요($ 기호는 입력하지 않습니다):
+    </p>
+
+    <CodeBlock language="bash" code={`$ npx create-lithent@latest`} />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Get started with Lithent in minutes. This guide will help you create your
-      first Lithent application.
+      이 명령어는 공식 Lithent 프로젝트 스캐폴딩 도구인 create-lithent를
+      설치하고 실행합니다.
+      <br />
+      프로젝트가 생성되면, 의존성 설치 및 개발 서버 실행을 위한 안내에 따라
+      진행하세요:
     </p>
+
+    <CodeBlock
+      language="bash"
+      code={`$ cd <your-project-name>
+$ npm install
+$ npm run dev`}
+    />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       Installation
     </h2>
-
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
       Install Lithent using npm, yarn, or pnpm:
     </p>
-
     <CodeBlock
       language="bash"
       code={`npm install lithent

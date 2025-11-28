@@ -42,7 +42,9 @@ export const Introduction = () => (
       무관합니다.
     </p>
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
       수동 제어 기반 (Manual Mode)
     </h2>
 
@@ -85,7 +87,9 @@ const App = mount((renew, _props) => {
 });`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
       선언형 기반 (Light API Mode)
     </h2>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -116,7 +120,9 @@ const Counter = lmount((_props) => {
 });`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
       무상태 기반 (None State Mode)
     </h2>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -146,7 +152,9 @@ const Counter = lmount((_props) => {
       </p>
     </div>
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
       점진적 적용
     </h2>
 
@@ -159,7 +167,9 @@ const Counter = lmount((_props) => {
       <li>서버 사이드 렌더링(SSR)</li>
     </ul>
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
       다음단계
     </h2>
 

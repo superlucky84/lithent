@@ -25,6 +25,16 @@ export const CodeBlock = lmount<CodeBlockProps>(() => {
   mountCallback(() => {
     if (codeRef.value) {
       hljs.highlightElement(codeRef.value);
+
+      // For bash, highlight the $ prompt
+      const lang = codeRef.value.className.match(/language-(\w+)/)?.[1];
+      if (lang === 'bash' && codeRef.value.innerHTML) {
+        // Replace $ at the start of lines with colored span
+        codeRef.value.innerHTML = codeRef.value.innerHTML.replace(
+          /^(\s*)\$(\s)/gm,
+          '$1<span class="bash-prompt">$</span>$2'
+        );
+      }
     }
   });
 

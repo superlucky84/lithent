@@ -37,4 +37,9 @@
   .prose pre code.hljs {
     @apply bg-transparent dark:bg-transparent p-0;
   }
+
+  /* Bash prompt styling */
+  .bash-prompt {
+    @apply text-[#42b883] font-semibold;
+  }
 }
