@@ -116,7 +116,7 @@ const Counter = lmount((_props) => {
     />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      <button>무상태 기반 (None State Mode)</button>
+      무상태 기반 (None State Mode)
     </h2>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       상태가 전혀 필요없는 경우는 lmount 나 mount를 사용할 필요가 없습니다.
@@ -132,103 +132,50 @@ const Counter = lmount((_props) => {
 );`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Key Features
-    </h2>
-
-    <div class="grid gap-6 mt-6">
-      <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Lightweight & Fast
-        </h3>
-        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Only 4.49 kB gzipped - minimal bundle size for maximum performance.
-          Perfect for projects where every byte counts.
-        </p>
-      </div>
-
-      <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Closure-based State Management
-        </h3>
-        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Unique approach using closures instead of hooks. The{' '}
-          <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">
-            mount
-          </code>{' '}
-          function creates a component "mounter" that runs once, returning an
-          updater function for efficient re-renders.
-        </p>
-      </div>
-
-      <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Flexible & Extensible
-        </h3>
-        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Core library provides only essentials. Optional helpers for state
-          management, computed values, effects, and more can be added as needed.
-        </p>
-      </div>
-
-      <div class="p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          SSR Ready
-        </h3>
-        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Built-in server-side rendering support with{' '}
-          <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">
-            renderToString
-          </code>{' '}
-          and hydration capabilities for seamless SSR integration.
-        </p>
-      </div>
+    <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
+      <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+        <span class="font-medium text-gray-700 dark:text-gray-300">
+          💡 참고:
+        </span>{' '}
+        <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+          @lithent/lithent-vite
+        </code>
+        와 같은 개발편의 모드에서 무상태기반 컴포넌트는 HMR을 아직 잘 지원하지
+        않습니다. 하지만 큰 문제는 아닙니다.
+      </p>
     </div>
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      The Lithent Difference
+      점진적 적용
     </h2>
 
-    <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-      Unlike traditional virtual DOM libraries, Lithent uses a distinctive{' '}
-      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        closure-based pattern
-      </strong>{' '}
-      for component state:
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+      Lithent는 다양한 형태의 웹 환경에서 사용 가능합니다:
     </p>
-
-    <CodeBlock
-      language="tsx"
-      code={`const Component = mount((renew, props) => {
-  // Component "mounter" - runs once
-  const count = state(0, renew);
-
-  // Updater function - returns new virtual DOM on each update
-  return () => <div>{count.value}</div>;
-});`}
-    />
-
-    <p class="text-gray-700 dark:text-gray-300 mb-6">
-      The{' '}
-      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">renew</code>{' '}
-      function is the key to updates - calling it re-runs the updater and diffs
-      the result against the previous virtual DOM for efficient minimal DOM
-      updates.
-    </p>
+    <ul class="list-disc list-inside space-y-2 mb-6 ml-4 text-sm md:text-base text-gray-700 dark:text-gray-300">
+      <li>빌드 단계없이 정적 HTML을 강화</li>
+      <li>싱글 페이지 애플리케이션(SPA)</li>
+      <li>서버 사이드 렌더링(SSR)</li>
+    </ul>
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Ready to get started?
+      다음단계
     </h2>
 
-    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Check out the{' '}
+    <div class="grid gap-6 mt-6">
       <a
         href="#/guide/quick-start"
-        class="text-[#42b883] hover:underline font-medium"
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
-        Quick Start
-      </a>{' '}
-      guide to begin building with Lithent.
-    </p>
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          빠르게 시작하기 →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          이제 Lithent에 대한 기본적인 철학을 알았습니다!
+          <br />
+          빠르게 시작하기에서 쉽게 Lithent를 시작하는 방법을 알아봐요.
+        </p>
+      </a>
+    </div>
   </div>
 );
