@@ -6,6 +6,57 @@ export const QuickStart = () => (
       빠르게 시작하기
     </h1>
 
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+      Lithent 애플리케이션 생성하기
+    </h2>
+
+    <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
+      <p class="text-sm md:text-base font-semibold text-gray-900 dark:text-white mb-3">
+        📋 사전 준비사항
+      </p>
+      <ul class="space-y-2.5 text-sm md:text-base text-gray-700 dark:text-gray-300">
+        <li class="flex items-start">
+          <svg
+            class="w-5 h-5 text-[#42b883] mr-3 mt-0.5 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>커맨드 라인 사용에 익숙할 것</span>
+        </li>
+        <li class="flex items-start">
+          <svg
+            class="w-5 h-5 text-[#42b883] mr-3 mt-0.5 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span>
+            <strong class="font-medium text-gray-900 dark:text-white">
+              Node.js 18.12
+            </strong>{' '}
+            이상 버전 설치
+          </span>
+        </li>
+      </ul>
+    </div>
+
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       Get started with Lithent in minutes. This guide will help you create your
       first Lithent application.
