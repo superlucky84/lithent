@@ -66,7 +66,7 @@ export const Introduction = () => (
       language="tsx"
       code={`import { mount } from 'lithent';
 
-const App = mount((renew) => {
+const App = mount((renew, _props) => {
   let count = 0;
 
   const inc = () => {
@@ -98,7 +98,7 @@ const App = mount((renew) => {
       code={`import { lmount } from 'lithent';
 import { lstate } from 'lithent/helper';
 
-const Counter = lmount(() => {
+const Counter = lmount((_props) => {
   const count = lstate(0);
 
   const inc = () => {
