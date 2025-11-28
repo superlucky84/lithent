@@ -25,7 +25,7 @@ export const CodeBlock = lmount<CodeBlockProps>(() => {
   });
 
   return ({ code, language }) => (
-    <pre class="bg-gray-900 dark:bg-gray-950 p-6 rounded-lg overflow-x-auto mb-6">
+    <pre class="bg-gray-900 dark:bg-gray-950 p-6 rounded-lg overflow-x-auto mb-6 text-xs md:text-sm">
       <code ref={codeRef} class={`language-${language || 'typescript'}`}>
         {code}
       </code>
