@@ -130,67 +130,101 @@ $ npm run dev`}
 
     <CodeBlock
       language="html"
-      code={`<script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
+      code={`<!DOCTYPE html>
+<html>
+<head>
+  <title>Lithent Counter Example</title>
+</head>
+<body>
+  <div id="root"></div>
 
-<div id="root"></div>
+  <script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
 
-<script>
-const { render } = lithent;
-const { fTags, fMount, fFragment } = lithentFTags;
-const { section, div, p, br, strong } = fTags;
+  <script>
+    const { render } = lithent;
+    const { lstate } = lithentHelper;
+    const { fTags, flMount } = lithentFTags;
+    const { div, h1, button } = fTags;
 
-const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
-  return () =>
-    fFragment(
-      'first inner',
-      div({ style: { border: '1px solid red' } }, 'second inner'),
-      div('The props argument can be omitted.'),
-      props.firstProp,
-      ...children
-    );
-});
+    const Counter = flMount(() => {
+      const count = lstate(0);
 
-render(
-  fTagComponent(
-    { firstProp: 3 }, // The props argument can be omitted.
-    div({ style: { border: '1px solid green' } }, \`Fchildren1\`),
-    'Fchildren2',
-    br()
-  ),
-  document.getElementById('root')
-);
-</script>
-      `}
+      const increment = () => {
+        count.value++;
+      };
+
+      return () =>
+        div(
+          h1('Count: ' + count.value),
+          button({ onClick: increment }, 'Increment')
+        );
+    });
+
+    render(Counter(), document.getElementById('root'));
+  </script>
+</body>
+</html>`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Your First Component
-    </h2>
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      예제에서는 flMount를 사용하였지만 fMount를 사용할수도 있습니다.
+      <br />
+      <br />
+      fMount를 사용하면 lState와 같은 확장 코드가 필요하지 않기때문에 helper에
+      해당하는 리소스를 별도로 로드하지 않아도 되므로 더 적은 네트워크 비용으로
+      사용할 수 있습니다.
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      브라우저에서 직접 로드하는 방식으로 사용할때 특히 ftags 가 매우
+      유용합니다.
+      <br />
+      <br />
+      ftags외에도 htm을 이용하여 사용하는 방법이 있습니다. 이 방법은 다른
+      섹션에서 더 자세히 설명하겠습니다.
+    </p>
+
+    <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+      ES 모듈 빌드 사용하기
+    </h3>
 
     <CodeBlock
-      language="tsx"
-      code={`import { h, mount, render } from 'lithent';
-import { state } from 'lithent/helper';
+      language="html"
+      code={`<!DOCTYPE html>
+<html>
+<head>
+  <title>Lithent Counter Example (ES Module)</title>
+</head>
+<body>
+  <div id="root"></div>
 
-const Counter = mount((renew) => {
-  const count = state(0);
+  <script type="module">
+    import { render } from 'https://cdn.jsdelivr.net/npm/lithent/dist/lithent.mjs';
+    import { lstate } from 'https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.mjs';
+    import { fTags, flMount } from 'https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.mjs';
 
-  const increment = () => {
-    count.value++;
-    renew();
-  };
+    const { div, h1, button } = fTags;
 
-  return () => (
-    <div>
-      <h1>Count: {count.value}</h1>
-      <button onClick={increment}>Increment</button>
-    </div>
-  );
-});
+    const Counter = flMount(() => {
+      const count = lstate(0);
 
-render(<Counter />, document.getElementById('root'));`}
+      const increment = () => {
+        count.value++;
+      };
+
+      return () =>
+        div(
+          h1('Count: ' + count.value),
+          button({ onClick: increment }, 'Increment')
+        );
+    });
+
+    render(Counter(), document.getElementById('root'));
+  </script>
+</body>
+</html>`}
     />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
