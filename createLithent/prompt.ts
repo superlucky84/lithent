@@ -111,6 +111,10 @@ type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
 
 interface BasePromptType {
   name: string;
+  label?: string;
+  message?: string;
+  hint?: string;
+  initial?: unknown;
 }
 
 interface TextPromptType extends BasePromptType {
