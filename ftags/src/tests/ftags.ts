@@ -1,5 +1,5 @@
 import { render } from 'lithent';
-import { fMount, fTags, fFragment } from '@/index';
+import { fMount, flMount, fTags, fFragment } from '@/index';
 
 const { section, div, p, br, strong, article } = fTags;
 
@@ -128,6 +128,41 @@ if (import.meta.vitest) {
 
       expect(testWrap.outerHTML).toBe(
         '<div><div style="border: 1px solid red;" id="normal">inner text9aaa</div></div>'
+      );
+    });
+
+    it('flMount component should output normally (Light API mode).', () => {
+      const flTagComponent = flMount((_props, children) => {
+        return () => fFragment('inner text', ...children);
+      });
+
+      destroy = render(flTagComponent(), testWrap);
+
+      expect(testWrap.outerHTML).toBe('<div>inner text</div>');
+    });
+
+    it('flMount component with props should output normally.', () => {
+      const flTagComponent = flMount<{ a: number }>((props, children) => {
+        return () => fFragment('inner text', props.a, ...children);
+      });
+
+      destroy = render(flTagComponent({ a: 7 }), testWrap);
+
+      expect(testWrap.outerHTML).toBe('<div>inner text7</div>');
+    });
+
+    it('flMount component with slots should output normally.', () => {
+      const flTagComponent = flMount((_props, children) => {
+        return () => fFragment('inner text', ...children);
+      });
+
+      destroy = render(
+        flTagComponent(article('div1'), article('div2')),
+        testWrap
+      );
+
+      expect(testWrap.outerHTML).toBe(
+        '<div>inner text<article>div1</article><article>div2</article></div>'
       );
     });
   });
