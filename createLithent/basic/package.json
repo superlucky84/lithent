@@ -1,0 +1,39 @@
+{
+  "type": "module",
+  "private": true,
+  "name": "lithent-docs",
+  "version": "0.5.0",
+  "description": "lithent-docs",
+  "main": "./dist/lithentDocs.umd.js",
+  "module": "./dist/lithentDocs.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/lithentDocs.mjs",
+      "require": "./dist/lithentDocs.umd.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "author": "superlucky84",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git",
+    "directory": "lithentDocs"
+  },
+  "keywords": [
+    "lithent"
+  ],
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/vite": "^4.0.6",
+    "autoprefixer": "^10.4.14",
+    "highlight.js": "^11.8.0",
+    "lithent": "^1.20.2",
+    "postcss": "^8.4.24",
+    "tailwindcss": "^4.0.0"
+  }
+}
