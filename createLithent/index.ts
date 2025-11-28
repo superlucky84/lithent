@@ -175,11 +175,11 @@ function align(text: string, dir: 'start' | 'end' | 'center', len: number) {
 function printHelp(ctx: Context) {
   // prettier-ignore
   let output = `
-${title("create-lithent-ssr")}
+${title("create-lithent")}
 
 ${color.heading("Usage")}:
 
-${color.dim("$")} ${color.greenBright("create-lithent-ssr")} ${color.arg("<projectDir>")} ${color.arg("<...options>")}
+${color.dim("$")} ${color.greenBright("create-lithent")} ${color.arg("<projectDir>")} ${color.arg("<...options>")}
 
 ${color.heading("Values")}:
 
@@ -217,7 +217,7 @@ ${[
   "https://github.com/:username/:repo/tree/:branch/:directory",
   "https://github.com/:username/:repo/archive/refs/tags/:tag.tar.gz",
 ].reduce((str, example) => {
-  return `${str}\n${color.dim("$")} ${color.greenBright("create-lithent-ssr")} my-app ${color.arg(`--template ${example}`)}`;
+  return `${str}\n${color.dim("$")} ${color.greenBright("create-lithent")} my-app ${color.arg(`--template ${example}`)}`;
 }, "")}
 
 To create a new project from a template in a private GitHub repo,
@@ -389,7 +389,7 @@ async function copyTemplateToTempDirStep(ctx: Context) {
             'Oh no!',
             err instanceof CopyTemplateError
               ? err.message
-              : 'Something went wrong. Run `create-lithent-ssr --debug` to see more info.\n\n' +
+              : 'Something went wrong. Run `create-lithent --debug` to see more info.\n\n' +
                   'Open an issue to report the problem at '
           );
           throw err;

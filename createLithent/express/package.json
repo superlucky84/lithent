@@ -1,5 +1,5 @@
 {
-  "name": "j1",
+  "name": "boilerplate-ssr-lithent",
   "private": true,
   "sideEffects": false,
   "type": "module",

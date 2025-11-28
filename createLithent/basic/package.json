@@ -1,7 +1,7 @@
 {
   "type": "module",
   "private": true,
-  "name": "lithent-docs",
+  "name": "boilerplate-spa-lithent",
   "version": "0.5.0",
   "description": "lithent-docs",
   "main": "./dist/lithentDocs.umd.js",
