@@ -9,7 +9,7 @@ export const QuickStart = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Lithent 싱글 페이지 애플리케이션 애플리케이션 생성하기
+      Lithent 애플리케이션 생성하기
     </h2>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
@@ -190,6 +190,11 @@ $ npm run dev`}
       ES 모듈 빌드 사용하기
     </h3>
 
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      esm으로 빌드된 버전을, 사용하면 ES 모듈 문법으로 사용할 수 있습니다.
+      대부분의 최신 브라우저는 ES 모듈을 기본적으로 지원하므로, 다음과 같이
+      CDN에서 네이티브 ES 모듈로 Lithent를 사용할 수 있습니다
+    </p>
     <CodeBlock
       language="html"
       code={`<!DOCTYPE html>
@@ -227,104 +232,37 @@ $ npm run dev`}
 </html>`}
     />
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      JSX Configuration
-    </h2>
-
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      Configure your{' '}
-      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">
-        tsconfig.json
-      </code>{' '}
-      for JSX support:
+      보안상의 이유로, ES 모듈은 http:// 프로토콜에서만 동작합니다. 즉,
+      브라우저가 웹에서 페이지를 열 때 사용하는 프로토콜입니다. 로컬 컴퓨터에서
+      ES 모듈을 사용하려면, 반드시 index.html을 http:// 프로토콜로 제공해야
+      하며, 이를 위해 로컬 HTTP 서버가 필요합니다.
     </p>
 
-    <CodeBlock
-      language="json"
-      code={`{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "lithent"
-  }
-}`}
-    />
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Component with Props
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      다음단계
     </h2>
 
-    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      Create components that accept props:
-    </p>
-
-    <CodeBlock
-      language="tsx"
-      code={`const Greeting = mount<{ name: string }>((renew, props) => {
-  return () => (
-    <div>
-      <h1>Hello, {props.name}!</h1>
-    </div>
-  );
-});
-
-render(<Greeting name="World" />, document.getElementById('root'));`}
-    />
-
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Using Lifecycle Hooks
-    </h2>
-
-    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      Lithent provides lifecycle hooks for side effects:
-    </p>
-
-    <CodeBlock
-      language="tsx"
-      code={`import { mountCallback } from 'lithent';
-
-const Component = mount((renew) => {
-  mountCallback(() => {
-    console.log('Component mounted!');
-
-    // Cleanup function
-    return () => {
-      console.log('Component unmounted!');
-    };
-  });
-
-  return () => <div>Hello!</div>;
-});`}
-    />
-
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      SSR Setup
-    </h2>
-
-    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      Use the SSR boilerplate generator for server-side rendering:
-    </p>
-
-    <CodeBlock
-      language="bash"
-      code={`npx create-lithent-ssr@latest my-app
-cd my-app
-pnpm install
-pnpm dev`}
-    />
-
-    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Next Steps
-    </h2>
-
-    <div class="bg-[#42b883] bg-opacity-10 border border-[#42b883] rounded-lg p-6 mb-6">
-      <p class="text-sm md:text-base text-gray-900 dark:text-white font-medium mb-3">
-        You're now ready to build with Lithent!
-      </p>
-      <ul class="space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
-        <li>Explore more examples in the documentation</li>
-        <li>Learn about state management with helpers</li>
-        <li>Check out the GitHub repository for more resources</li>
-      </ul>
+    <div class="grid gap-6 mt-6">
+      <a
+        href="/guide/quick-start"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          // navigateTo('/guide/quick-start');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          빠르게 시작하기 →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          이제 Lithent에 대한 기본적인 철학을 알았습니다!
+          <br />
+          빠르게 시작하기에서 쉽게 Lithent를 시작하는 방법을 알아봐요.
+        </p>
+      </a>
     </div>
   </div>
 );
