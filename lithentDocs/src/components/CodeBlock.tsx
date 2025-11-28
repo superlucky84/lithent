@@ -1,6 +1,7 @@
 import { lmount, mountCallback, ref } from 'lithent';
 import hljs from 'highlight.js/lib/core';
 import typescript from 'highlight.js/lib/languages/typescript';
+import javascript from 'highlight.js/lib/languages/javascript';
 import xml from 'highlight.js/lib/languages/xml';
 import bash from 'highlight.js/lib/languages/bash';
 import json from 'highlight.js/lib/languages/json';
@@ -8,7 +9,10 @@ import json from 'highlight.js/lib/languages/json';
 // Register languages
 hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('tsx', typescript); // TSX uses TypeScript highlighting
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('js', javascript);
 hljs.registerLanguage('xml', xml);
+hljs.registerLanguage('html', xml); // HTML uses XML highlighting
 hljs.registerLanguage('jsx', typescript);
 hljs.registerLanguage('bash', bash);
 hljs.registerLanguage('json', json);

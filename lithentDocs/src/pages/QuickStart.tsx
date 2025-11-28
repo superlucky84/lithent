@@ -115,13 +115,59 @@ $ npm run dev`}
       code={`<script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>`}
     />
 
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      CDN에서 Lithent를 사용할 때는 "빌드 단계"가 필요하지 않습니다. 이로 인해
+      설정이 훨씬 간단해지며, 정적 HTML을 보강하거나 백엔드 프레임워크와 통합할
+      때 적합합니다.
+      <br />
+      <br />
+      하지만 싱글 파일 컴포넌트(JSX) 문법은 사용할 수 없습니다. 대신 함수형으로
+      템플릿을 만드는 ftags방식을 사용하거나 htm을 사용할 수 있습니다.
+    </p>
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      아래는 ftags를 사용한 예시입니다.
+    </p>
+
+    <CodeBlock
+      language="html"
+      code={`<script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
+
+<div id="root"></div>
+
+<script>
+const { render } = lithent;
+const { fTags, fMount, fFragment } = lithentFTags;
+const { section, div, p, br, strong } = fTags;
+
+const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
+  return () =>
+    fFragment(
+      'first inner',
+      div({ style: { border: '1px solid red' } }, 'second inner'),
+      div('The props argument can be omitted.'),
+      props.firstProp,
+      ...children
+    );
+});
+
+render(
+  fTagComponent(
+    { firstProp: 3 }, // The props argument can be omitted.
+    div({ style: { border: '1px solid green' } }, \`Fchildren1\`),
+    'Fchildren2',
+    br()
+  ),
+  document.getElementById('root')
+);
+</script>
+      `}
+    />
+
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
       Your First Component
     </h2>
-
-    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      Create a simple counter component using Lithent's closure-based pattern:
-    </p>
 
     <CodeBlock
       language="tsx"
