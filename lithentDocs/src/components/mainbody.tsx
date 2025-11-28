@@ -8,23 +8,23 @@ import { appStore } from '@/store';
 
 export const Mainbody = mount(renew => {
   const store = appStore.watch(renew);
-  let hashState = location.hash;
-  window.addEventListener('hashchange', () => {
-    hashState = location.hash;
+
+  window.addEventListener('popstate', () => {
     store.sidebarOpen = false;
-    store.route = hashState;
+    store.route = location.pathname;
     window.scrollTo(0, 0);
   });
-  const matchHash = computed<string>(() => {
-    if ('#examples' === hashState) {
+
+  const matchPath = computed<string>(() => {
+    if ('/examples' === store.route) {
       return <Examples />;
-    } else if ('#install' === hashState) {
+    } else if ('/install' === store.route) {
       return <Install />;
-    } else if ('#about' === hashState) {
+    } else if ('/about' === store.route) {
       return <About />;
     }
     return <Guide />;
   });
 
-  return () => <main class="h-full">{matchHash.v}</main>;
+  return () => <main class="h-full">{matchPath.v}</main>;
 });

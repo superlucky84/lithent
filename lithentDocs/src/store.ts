@@ -15,7 +15,7 @@ export const appStore = lstore<{
   sidebarOpen: boolean;
 }>({
   theme: getInitialTheme(),
-  route: location.hash.slice(1) || '/guide/introduction',
+  route: location.pathname || '/guide/introduction',
   sidebarOpen: false,
 });
 
@@ -42,14 +42,13 @@ export const toggleTheme = () => {
 // Navigate to route
 export const navigateTo = (path: string) => {
   store.route = path;
-  window.location.hash = path;
+  window.history.pushState({}, '', path);
   store.sidebarOpen = false;
 };
 
-// Listen to hash changes
-window.addEventListener('hashchange', () => {
-  const newPath = location.hash.slice(1) || '/guide/introduction';
-  store.route = newPath;
+// Listen to popstate (browser back/forward)
+window.addEventListener('popstate', () => {
+  store.route = location.pathname || '/guide/introduction';
 });
 
 // Initialize theme on load

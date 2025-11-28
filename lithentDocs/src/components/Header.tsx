@@ -1,5 +1,5 @@
 import { mount } from 'lithent';
-import { appStore, toggleTheme } from '@/store';
+import { appStore, toggleTheme, navigateTo } from '@/store';
 
 export const Header = mount(renew => {
   const store = appStore.watch(renew);
@@ -11,7 +11,14 @@ export const Header = mount(renew => {
           {/* Left Area - Responsive Width */}
           <div class="w-auto sm:w-48 lg:w-64 flex-shrink-0 flex items-center px-6 md:px-12">
             {/* Logo and Title */}
-            <a href="#/guide/introduction" class="flex items-center gap-3">
+            <a
+              href="/guide/introduction"
+              onClick={(e: Event) => {
+                e.preventDefault();
+                navigateTo('/guide/introduction');
+              }}
+              class="flex items-center gap-3"
+            >
               <img src="/lithent.png" alt="Lithent" class="w-8 h-8" />
               <span class="font-semibold text-xl text-gray-900 dark:text-white">
                 Lithent
@@ -25,7 +32,11 @@ export const Header = mount(renew => {
               {/* Main Navigation */}
               <nav class="hidden md:flex items-center gap-6">
                 <a
-                  href="#/guide/introduction"
+                  href="/guide/introduction"
+                  onClick={(e: Event) => {
+                    e.preventDefault();
+                    navigateTo('/guide/introduction');
+                  }}
                   class="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-[#42b883] dark:hover:text-[#42b883] transition-colors"
                 >
                   Guide

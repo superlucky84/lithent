@@ -65,7 +65,7 @@ export const Sidebar = mount(renew => {
                   return (
                     <li>
                       <a
-                        href={`#${item.link}`}
+                        href={item.link}
                         onClick={(e: Event) => {
                           e.preventDefault();
                           handleClick(item.link);
