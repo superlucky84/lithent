@@ -9,7 +9,7 @@ export const QuickStart = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Lithent 애플리케이션 생성하기
+      Lithent 싱글 페이지 애플리케이션 애플리케이션 생성하기
     </h2>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
@@ -85,19 +85,34 @@ $ npm install
 $ npm run dev`}
     />
 
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      이제 첫 번째 Lithent 프로젝트가 실행되고 있을 것입니다!
+      <br />
+      Lithent는 여러가지 템플릿 스타일을 지원하지만, 애플리케이션은 jsx를
+      사용하여 생성됩니다.
+      <br />
+      <br />
+      앱을 프로덕션에 배포할 준비가 되면 다음 명령어를 실행하세요:
+    </p>
+
+    <CodeBlock language="bash" code={`$ npm run build`} />
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      이 명령어는 프로젝트의 ./dist 디렉터리에 프로덕션용 빌드를 생성합니다.
+    </p>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Installation
+      CDN에서 Lithent 사용하기
     </h2>
+
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      Install Lithent using npm, yarn, or pnpm:
+      스크립트 태그를 통해 CDN에서 직접 Lithent를 사용할 수 있습니다:
     </p>
     <CodeBlock
       language="bash"
-      code={`npm install lithent
-# or
-yarn add lithent
-# or
-pnpm add lithent`}
+      code={`<script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>`}
     />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
