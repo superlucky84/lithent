@@ -1,8 +1,8 @@
 {
   "type": "module",
-  "name": "create-lithent-ssr",
-  "version": "0.2.0",
-  "description": "lithent-ssr-boilerplate",
+  "name": "create-lithent",
+  "version": "0.3.0",
+  "description": "lithent-boilerplate",
   "packageManager": "pnpm@7.6.0",
   "scripts": {
     "test": "pnpm build && pnpm start",

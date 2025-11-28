@@ -1,0 +1,132 @@
+@import 'tailwindcss';
+
+@config '../tailwind.config.js';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer utilities {
+  .bg-pokemon-normal {
+    @apply bg-[#A8A77A];
+  }
+  .bg-pokemon-fighting {
+    @apply bg-[#C22E28];
+  }
+  .bg-pokemon-flying {
+    @apply bg-[#A98FF3];
+  }
+  .bg-pokemon-poison {
+    @apply bg-[#A33EA1];
+  }
+  .bg-pokemon-ground {
+    @apply bg-[#E2BF65];
+  }
+  .bg-pokemon-rock {
+    @apply bg-[#B6A136];
+  }
+  .bg-pokemon-bug {
+    @apply bg-[#A6B91A];
+  }
+  .bg-pokemon-ghost {
+    @apply bg-[#735797];
+  }
+  .bg-pokemon-steel {
+    @apply bg-[#B7B7CE];
+  }
+  .bg-pokemon-fire {
+    @apply bg-[#EE8130];
+  }
+  .bg-pokemon-water {
+    @apply bg-[#6390F0];
+  }
+  .bg-pokemon-grass {
+    @apply bg-[#7AC74C];
+  }
+  .bg-pokemon-electric {
+    @apply bg-[#F7D02C];
+  }
+  .bg-pokemon-psychic {
+    @apply bg-[#F95587];
+  }
+  .bg-pokemon-ice {
+    @apply bg-[#96D9D6];
+  }
+  .bg-pokemon-dragon {
+    @apply bg-[#6F35FC];
+  }
+  .bg-pokemon-dark {
+    @apply bg-[#705746];
+  }
+  .bg-pokemon-fairy {
+    @apply bg-[#D685AD];
+  }
+  .text-pokemon-normal {
+    @apply text-[#A8A77A];
+  }
+  .text-pokemon-fighting {
+    @apply text-[#C22E28];
+  }
+  .text-pokemon-flying {
+    @apply text-[#A98FF3];
+  }
+  .text-pokemon-poison {
+    @apply text-[#A33EA1];
+  }
+  .text-pokemon-ground {
+    @apply text-[#E2BF65];
+  }
+  .text-pokemon-rock {
+    @apply text-[#B6A136];
+  }
+  .text-pokemon-bug {
+    @apply text-[#A6B91A];
+  }
+  .text-pokemon-ghost {
+    @apply text-[#735797];
+  }
+  .text-pokemon-steel {
+    @apply text-[#B7B7CE];
+  }
+  .text-pokemon-fire {
+    @apply text-[#EE8130];
+  }
+  .text-pokemon-water {
+    @apply text-[#6390F0];
+  }
+  .text-pokemon-grass {
+    @apply text-[#7AC74C];
+  }
+  .text-pokemon-electric {
+    @apply text-[#F7D02C];
+  }
+  .text-pokemon-psychic {
+    @apply text-[#F95587];
+  }
+  .text-pokemon-ice {
+    @apply text-[#96D9D6];
+  }
+  .text-pokemon-dragon {
+    @apply text-[#6F35FC];
+  }
+  .text-pokemon-dark {
+    @apply text-[#705746];
+  }
+  .text-pokemon-fairy {
+    @apply text-[#D685AD];
+  }
+}

@@ -53,6 +53,7 @@ interface Context {
   install?: boolean;
   showInstallOutput: boolean;
   noMotion?: boolean;
+  templateLabel?: string;
   pkgManager: PackageManager;
   projectName?: string;
   prompt: typeof prompt;
@@ -74,6 +75,7 @@ export async function createLithent(argv: string[]) {
   let steps = [
     introStep,
     projectNameStep,
+    templateSelectionStep,
     copyTemplateToTempDirStep,
     copyTempDirToAppDirStep,
     installDependenciesQuestionStep,
@@ -173,11 +175,11 @@ function align(text: string, dir: 'start' | 'end' | 'center', len: number) {
 function printHelp(ctx: Context) {
   // prettier-ignore
   let output = `
-${title("create-lithent-ssr")}
+${title("create-lithent")}
 
 ${color.heading("Usage")}:
 
-${color.dim("$")} ${color.greenBright("create-lithent-ssr")} ${color.arg("<projectDir>")} ${color.arg("<...options>")}
+${color.dim("$")} ${color.greenBright("create-lithent")} ${color.arg("<projectDir>")} ${color.arg("<...options>")}
 
 ${color.heading("Values")}:
 
@@ -215,7 +217,7 @@ ${[
   "https://github.com/:username/:repo/tree/:branch/:directory",
   "https://github.com/:username/:repo/archive/refs/tags/:tag.tar.gz",
 ].reduce((str, example) => {
-  return `${str}\n${color.dim("$")} ${color.greenBright("create-lithent-ssr")} my-app ${color.arg(`--template ${example}`)}`;
+  return `${str}\n${color.dim("$")} ${color.greenBright("create-lithent")} my-app ${color.arg(`--template ${example}`)}`;
 }, "")}
 
 To create a new project from a template in a private GitHub repo,
@@ -318,10 +320,49 @@ function validatePackageManager(pkgManager: string): PackageManager {
     : 'npm';
 }
 
+const TEMPLATE_URLS: Record<'ssr' | 'spa', string> = {
+  ssr: 'https://github.com/superlucky84/lithent/tree/master/createLithent/express',
+  spa: 'https://github.com/superlucky84/lithent/tree/master/createLithent/basic',
+};
+
+async function templateSelectionStep(ctx: Context) {
+  if (ctx.template) {
+    return;
+  }
+
+  if (!ctx.interactive) {
+    ctx.template = TEMPLATE_URLS.ssr;
+    ctx.templateLabel = 'SSR (Express)';
+    return;
+  }
+
+  const { templateChoice } = await ctx.prompt({
+    name: 'templateChoice',
+    type: 'select',
+    label: title('template'),
+    message: 'Which template do you want to install?',
+    initial: 'ssr',
+    choices: [
+      { label: 'SSR (Express)', value: 'ssr' },
+      { label: 'SPA (Vite)', value: 'spa' },
+    ],
+  });
+
+  const choice = templateChoice as 'ssr' | 'spa';
+  ctx.template = TEMPLATE_URLS[choice];
+  ctx.templateLabel =
+    choice === 'spa' ? 'SPA (Vite)' : 'SSR (Express)';
+}
+
 async function copyTemplateToTempDirStep(ctx: Context) {
   if (ctx.template) {
     log('');
-    info('Template:', ['Using ', color.reset(ctx.template), '...']);
+    info(
+      'Template:',
+      ctx.templateLabel
+        ? ['Using ', color.reset(ctx.templateLabel), '...']
+        : ['Using ', color.reset(ctx.template), '...']
+    );
   } else {
     log('');
     info('Using basic template', ['']);
@@ -348,7 +389,7 @@ async function copyTemplateToTempDirStep(ctx: Context) {
             'Oh no!',
             err instanceof CopyTemplateError
               ? err.message
-              : 'Something went wrong. Run `create-lithent-ssr --debug` to see more info.\n\n' +
+              : 'Something went wrong. Run `create-lithent --debug` to see more info.\n\n' +
                   'Open an issue to report the problem at '
           );
           throw err;
