@@ -226,8 +226,8 @@ const UserProfile = mount((renew, _props) => {
     </div>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      이 과정을 통해 Lithent는 효율적으로 화면을 업데이트합니다. 전체 DOM을
-      다시 그리는 것이 아니라, 변경된 부분만 업데이트하므로 성능이 최적화됩니다.
+      이 과정을 통해 Lithent는 효율적으로 화면을 업데이트합니다. 전체 DOM을 다시
+      그리는 것이 아니라, 변경된 부분만 업데이트하므로 성능이 최적화됩니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
@@ -320,9 +320,9 @@ const Counter = lmount((_props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstate를 사용하면 개발이 편리하지만, renew() 호출 시점을 명시적으로
-      제어할 수 없다는 trade-off가 있습니다. 프로젝트의 요구사항에 따라 mount와
-      lmount 중 적합한 방식을 선택하세요.
+      lstate를 사용하면 개발이 편리하지만, renew() 호출 시점을 명시적으로 제어할
+      수 없다는 trade-off가 있습니다. 프로젝트의 요구사항에 따라 mount와 lmount
+      중 적합한 방식을 선택하세요.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
