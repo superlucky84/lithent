@@ -6,6 +6,7 @@ import { Introduction } from '@/pages/Introduction';
 import { QuickStart } from '@/pages/QuickStart';
 import { Mounter } from '@/pages/Mounter';
 import { Updater } from '@/pages/Updater';
+import { Props } from '@/pages/Props';
 import { Renewer } from '@/pages/Renewer';
 import { Render } from '@/pages/Render';
 import { Portal } from '@/pages/Portal';
@@ -21,6 +22,7 @@ const routes: Record<string, PageComponent> = {
   '/guide/quick-start': QuickStart,
   '/guide/mounter': Mounter,
   '/guide/updater': Updater,
+  '/guide/props': Props,
   '/guide/renewer': Renewer,
   '/guide/render': Render,
   '/guide/portal': Portal,

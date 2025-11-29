@@ -1,6 +1,6 @@
 import { CodeBlock } from '@/components/CodeBlock';
 
-export const Mounter = () => (
+export const Props = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Mounter
@@ -9,7 +9,7 @@ export const Mounter = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      mount
+      mount 함수
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -66,73 +66,38 @@ const App = mount((renew, _props) => {
       업데이터라고 합니다. 업데이터는 다음 단계에서 더 자세히 다루겠습니다.
     </p>
 
-    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
-
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      lmount
+      props
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent는 네이티브 클로저 기반의 상태관리를 컨셉으로 하기 때문에, 일반적인
-      변수 정의를 상태값으로 활용하고 renew api를 이용해 갱신하는것이 기본
-      컨셉입니다.
+      mount 함수의 제네릭으로 props의 타입을 정의 가능합니다. props는 이
+      컴포넌트의 생명 주기내내 같은 참조를 유지합니다.
       <br />
       <br />
-      하지만 보통 상태변경이 즉각적으로 ui에 반영되는 React-like 방식에 익숙하기
-      때문에 어색할 수 있으며, 상황에따라 renew api를 이용하는 방식이 쓸대없이
-      불편할 수 있습니다.
+      props는 외부에서부터의 값을 컴포넌트에서 사용할수 있습니다. 아래 예제는
+      appVersion 이라는 문자열을 props로 넘겨받는 예입니다.
       <br />
       <br />
-      mount 대신
-      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        lmount
-      </strong>
-      와
-      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        lstate
-      </strong>
-      를 함께 사용하면 를 사용하면 상태변경이 즉각적으로 ui변경을 트리거 할수
-      있습니다.
     </p>
 
     <CodeBlock
       language="tsx"
-      code={`import { lmount } from 'lithent';
-import { lstate } from 'lithent/helper';
+      code={`import { mount } from 'lithent';
 
-const App = lmount((_props) => {
-  const countRef = lstate(0);
-
-  const increase = () => {
-    countRef.value += 1;
-  };
-
+const App = mount<{ appVersion: string }>((_renew, props) => {
   // Updater
   // jsx를 리턴하는 부분을 함수로 한번 감싸주는 이유는 클로저로 상태를 가두기 위한 방법입니다.
   return () => (
     <div>
-      <p>{countRef.count}</p>
+      <p>{count}</p>
+      <p>{props.appVersion}</p>
       <button onClick={increase}>+</button>
     </div>
   );
-});`}
-    />
+});
 
-    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      위 예제를 보면 lstate를 사용하여 상태를 저장하고, lstate의 value 속성이
-      변경되면 즉각적으로 ui에 반영됩니다.
-      <br />
-      <br />
-      lstate 덕분에 renew api의 필요성이 없어졌으므로 renew를 제공하지 않는
-      lmount를 사용하여 더 간결하게 컴포넌트를 정의하여 사용 가능합니다.
-      <br />
-      <br />
-      lstate를 사용하므로서 core모듈 외에 별도의 helper 모듈을 추가로 사용해야
-      하므로 번들사이즈가 약간 늘어날 수 있는 단점이 있지만 유용합니다.
-      <br />
-      <br />이 모드도 여전히 클로저를 이용한 상태관리인 점은 마찬가지지만
-      lstate에서 값 변경시 renew 호출을 대신해주므로 사용자는 클로저기반으로
-      동작한다는 Lithent의 멘탈 모델 인지가 약해지는 단점이 있습니다.
-    </p>
+render(<App appVersion="2.0.0">, document.getElementById('root'));`}
+    />
   </div>
 );

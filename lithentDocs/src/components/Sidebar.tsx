@@ -24,6 +24,7 @@ const menuData: MenuSection[] = [
     items: [
       { text: 'Mounter', link: '/guide/mounter' },
       { text: 'Updater', link: '/guide/updater' },
+      { text: 'Props', link: '/guide/props' },
       { text: 'Renewer', link: '/guide/renewer' },
       { text: 'Render', link: '/guide/render' },
       { text: 'Portal', link: '/guide/portal' },

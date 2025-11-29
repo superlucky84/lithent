@@ -50,14 +50,26 @@ export const Introduction = () => (
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       명시적 갱신(explicit renewal)을 기반으로 동작하는 방식입니다. 상태는
-      자바스크립트 개발자에게 익숙한 클로저에 자연스럽게 저장되며, 사용자는
-      renew API를 통해 컴포넌트의 갱신 시점을 직접 제어할 수 있습니다.
+      자바스크립트 개발자에게 익숙한
+      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
+        클로저
+      </strong>
+      에 자연스럽게 저장되며, 사용자는
+      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
+        renew API
+      </strong>
+      를 통해 컴포넌트의 갱신 시점을 직접 제어할 수 있습니다.
       <br />
       <br />
       이 접근 방식은 상태 변경 시 자동으로 발생하는 암묵적 부작용을 줄이고, 언제
-      어떤 갱신이 일어나는지 명확하게 예측하고 통제할 수 있도록 돕습니다. 명령적
-      패러다임을 따르지만, 클로저 기반이라는 특성 덕분에 사용 흐름은 자연스럽고
-      직관적입니다.
+      어떤 갱신이 일어나는지 명확하게 예측하고 통제할 수 있도록 돕습니다.
+      <br />
+      <br />
+      명령적 패러다임을 따르지만,
+      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
+        클로저 기반
+      </strong>
+      이라는 특성 덕분에 사용 흐름은 자연스럽고 직관적입니다.
       <br />
       <br />
       또한 별도의 상태 관리 메커니즘을 구현하기 위한 추가 코드가 필요하지 않기

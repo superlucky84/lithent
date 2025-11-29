@@ -1,4 +1,5 @@
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const QuickStart = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
@@ -247,20 +248,20 @@ $ npm run dev`}
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/quick-start"
+        href="/guide/mounter"
         onClick={(e: Event) => {
           e.preventDefault();
-          // navigateTo('/guide/quick-start');
+          navigateTo('/guide/mounter');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          빠르게 시작하기 →
+          기본 기능: Mounter →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          이제 Lithent에 대한 기본적인 철학을 알았습니다!
+          Lithent의 핵심 개념인 Mounter에 대해 알아보세요.
           <br />
-          빠르게 시작하기에서 쉽게 Lithent를 시작하는 방법을 알아봐요.
+          컴포넌트를 생성하고 초기화하는 방법을 배워봅시다.
         </p>
       </a>
     </div>
