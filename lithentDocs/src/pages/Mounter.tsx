@@ -261,9 +261,11 @@ const PokemonDetail = lmount<Props>(({ name }) => {
           기본 기능: Updater →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          마운터가 단 한 번 실행된다면, Updater는 상태가 변경될 때마다 호출됩니다.
+          마운터가 단 한 번 실행된다면, Updater는 상태가 변경될 때마다
+          호출됩니다.
           <br />
-          새로운 Virtual DOM을 생성하고 화면을 업데이트하는 Updater의 동작 원리를 알아보세요.
+          새로운 Virtual DOM을 생성하고 화면을 업데이트하는 Updater의 동작
+          원리를 알아보세요.
         </p>
       </a>
     </div>
