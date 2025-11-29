@@ -1,36 +1,102 @@
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const Props = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Mounter
+      Props
     </h1>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      mount 함수
+      Props란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      마운터는 mount 함수의 인자로서 포함되는 함수입니다.
+      Props는 부모 컴포넌트에서 자식 컴포넌트로 데이터를 전달하는 방법입니다.
       <br />
-      컴포넌트가 처음 그려질 때{' '}
+      <br />
+      Props는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        단 한 번 호출
+        마운터의 두 번째 인자
       </strong>
-      됩니다. 컴포넌트의 상태와 메서드를 정의합니다.
-      <br />
-      <br />
-      아래 예제는 초기값 0을 갖는 count 라는 상태와, 값을 1씩 증가시키는
-      increase라는 메서드를 정의되어 있습니다.
+      로 제공되며,{' '}
+      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
+        Updater의 첫 번째 인자
+      </strong>
+      로도 제공됩니다. 컴포넌트의 생명주기 동안 동일한 참조를 유지합니다.
+    </p>
+
+    <CodeBlock
+      language="tsx"
+      code={`import { mount, render } from 'lithent';
+
+type Props = { name: string; age: number };
+
+const UserCard = mount<Props>((renew, props) => {
+  // props는 마운터의 두 번째 인자
+
+  return (propsFromUpdater) => (
+    // props는 Updater의 첫 번째 인자로도 제공됨
+    <div>
+      <h2>{props.name}</h2>
+      <p>Age: {props.age}</p>
+    </div>
+  );
+});
+
+render(
+  <UserCard name="Alice" age={25} />,
+  document.getElementById('root')
+);`}
+    />
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      TypeScript를 사용할 때는 mount 함수의 제네릭으로 Props 타입을 정의할 수
+      있습니다. 이를 통해 타입 안정성을 확보할 수 있습니다.
+    </p>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      Props 접근 방법과 주의사항
+    </h2>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Props는 컴포넌트의 생명주기 동안 동일한{' '}
+      <strong class="font-semibold text-gray-900 dark:text-white">
+        참조(reference)
+      </strong>
+      를 유지합니다. 이는 매우 중요한 특성으로, Props에 접근하는 방식에 따라
+      다른 결과를 얻을 수 있습니다.
     </p>
 
     <CodeBlock
       language="tsx"
       code={`import { mount } from 'lithent';
 
-const App = mount((renew, _props) => {
+type Props = { count: number };
+
+const Counter = mount<Props>((renew, props) => {
+  // ⚠️ 주의: 마운터에서 구조분해 할당
+  const { count: countFromMounter } = props;
+
+  return ({ count: countFromUpdater }) => (
+    <>
+      {/* ✅ 항상 최신 값 - props 객체를 직접 참조 */}
+      <div>count: {props.count}</div>
+
+      {/* ❌ 고정된 값 - 마운터에서 분해한 primitive 값 */}
+      <div>count: {countFromMounter} (업데이트 안 됨)</div>
+
+      {/* ✅ 항상 최신 값 - Updater에서 받은 props */}
+      <div>count: {countFromUpdater}</div>
+    </>
+  );
+});
+
+const Parent = mount(renew => {
   let count = 0;
 
   const increase = () => {
@@ -38,66 +104,253 @@ const App = mount((renew, _props) => {
     renew();
   };
 
-  // Updater
-  // jsx를 리턴하는 부분을 함수로 한번 감싸주는 이유는 클로저로 상태를 가두기 위한 방법입니다.
   return () => (
-    <div>
-      <p>{count}</p>
-      <button onClick={increase}>+</button>
-    </div>
+    <>
+      <Counter count={count} />
+      <button onClick={increase}>Increase</button>
+    </>
   );
 });`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      mount 함수의 첫번째 인자로서 꺼내어 사용할수 있는
-      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        renew
-      </strong>
-      는 컴포넌트 갱신 함수입니다.
-      <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        Renewer
-      </strong>
-      섹션에서 더 자세히 다룹니다.
+      위 예제에서 버튼을 클릭하면:
+      <br />
+      <br />•{' '}
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        props.count
+      </code>{' '}
+      - ✅ 1, 2, 3... 정상적으로 증가
+      <br />•{' '}
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        countFromMounter
+      </code>{' '}
+      - ❌ 0으로 고정 (primitive 값 복사)
+      <br />•{' '}
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        countFromUpdater
+      </code>{' '}
+      - ✅ 1, 2, 3... 정상적으로 증가
     </p>
 
-    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      저 마운트 함수는 jsx 표현식이 있는 또 다른 함수를 리턴하고 있는데,
-      업데이터라고 합니다. 업데이터는 다음 단계에서 더 자세히 다루겠습니다.
-    </p>
+    <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
+      <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
+        <span class="font-medium">⚠️ 중요:</span> 마운터에서 props를 구조분해
+        할당하면 그 시점의 값이 <strong>복사</strong>됩니다. Primitive
+        타입(number, string, boolean)의 경우 "call by value"로 동작하므로, 이후
+        props가 업데이트되어도 마운터에서 분해한 변수는 업데이트되지 않습니다.
+        <br />
+        <br />
+        항상 최신 값을 얻으려면{' '}
+        <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
+          props.속성명
+        </code>
+        으로 직접 접근하거나, Updater에서 받은 props를 사용하세요.
+      </p>
+    </div>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      props
+      함수를 Props로 전달하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      mount 함수의 제네릭으로 props의 타입을 정의 가능합니다. props는 이
-      컴포넌트의 생명 주기내내 같은 참조를 유지합니다.
-      <br />
-      <br />
-      props는 외부에서부터의 값을 컴포넌트에서 사용할수 있습니다. 아래 예제는
-      appVersion 이라는 문자열을 props로 넘겨받는 예입니다.
-      <br />
-      <br />
+      Props를 통해 데이터뿐만 아니라 함수도 전달할 수 있습니다. 이를 통해 자식
+      컴포넌트에서 부모 컴포넌트의 상태를 변경할 수 있습니다.
     </p>
 
     <CodeBlock
       language="tsx"
       code={`import { mount } from 'lithent';
 
-const App = mount<{ appVersion: string }>((_renew, props) => {
-  // Updater
-  // jsx를 리턴하는 부분을 함수로 한번 감싸주는 이유는 클로저로 상태를 가두기 위한 방법입니다.
+type ChildProps = {
+  count: number;
+  onIncrement: () => void;
+  onDecrement: () => void;
+};
+
+const CounterDisplay = mount<ChildProps>((renew, props) => {
   return () => (
     <div>
-      <p>{count}</p>
-      <p>{props.appVersion}</p>
-      <button onClick={increase}>+</button>
+      <h2>Count: {props.count}</h2>
+      <button onClick={props.onIncrement}>+</button>
+      <button onClick={props.onDecrement}>-</button>
     </div>
   );
 });
 
-render(<App appVersion="2.0.0">, document.getElementById('root'));`}
+const Parent = mount(renew => {
+  let count = 0;
+
+  const increment = () => {
+    count += 1;
+    renew();
+  };
+
+  const decrement = () => {
+    count -= 1;
+    renew();
+  };
+
+  return () => (
+    <CounterDisplay
+      count={count}
+      onIncrement={increment}
+      onDecrement={decrement}
     />
+  );
+});`}
+    />
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      함수는 참조 타입이므로, props를 통해 전달된 함수는 항상 부모 컴포넌트의
+      클로저를 유지합니다. 따라서 자식 컴포넌트에서 부모의 상태를 안전하게
+      변경할 수 있습니다.
+    </p>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      객체와 배열 Props
+    </h2>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      객체나 배열을 props로 전달할 때는 참조가 전달되므로, 마운터에서 구조분해
+      할당을 해도 객체/배열 내부의 속성은 최신 상태를 유지합니다.
+    </p>
+
+    <CodeBlock
+      language="tsx"
+      code={`import { mount } from 'lithent';
+
+type User = { name: string; age: number };
+type Props = { user: User };
+
+const UserCard = mount<Props>((renew, props) => {
+  // 객체는 참조 타입이므로 구조분해 해도 OK
+  const { user } = props;
+
+  return () => (
+    <div>
+      <h2>{user.name}</h2>
+      <p>Age: {user.age}</p>
+      {/* props.user로 접근해도 동일한 결과 */}
+      <p>Age: {props.user.age}</p>
+    </div>
+  );
+});
+
+const Parent = mount(renew => {
+  const user = { name: 'Alice', age: 25 };
+
+  const increaseAge = () => {
+    user.age += 1;
+    renew();
+  };
+
+  return () => (
+    <>
+      <UserCard user={user} />
+      <button onClick={increaseAge}>Increase Age</button>
+    </>
+  );
+});`}
+    />
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      객체나 배열은 참조 타입이므로, 마운터에서 구조분해 할당을 하더라도 그
+      참조를 복사하는 것입니다. 따라서 객체/배열 내부의 값이 변경되면 정상적으로
+      업데이트됩니다.
+    </p>
+
+    <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
+      <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+        <span class="font-medium text-gray-700 dark:text-gray-300">
+          💡 참고:
+        </span>{' '}
+        객체나 배열을 props로 전달할 때는 불변성(immutability)을 유지하는 것이
+        좋습니다. 객체의 속성을 직접 변경하는 대신, 새로운 객체를 생성하여
+        전달하면 예측 가능한 상태 관리가 가능합니다.
+      </p>
+    </div>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      lmount에서의 Props
+    </h2>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      lmount를 사용할 때도 Props의 동작 방식은 동일합니다. renew가 없을 뿐,
+      props 접근 방법과 주의사항은 mount와 같습니다.
+    </p>
+
+    <CodeBlock
+      language="tsx"
+      code={`import { lmount } from 'lithent';
+import { lstate } from 'lithent/helper';
+
+type ChildProps = {
+  title: string;
+  onClose: () => void;
+};
+
+const Modal = lmount<ChildProps>((props) => {
+  return () => (
+    <div>
+      <h2>{props.title}</h2>
+      <button onClick={props.onClose}>Close</button>
+    </div>
+  );
+});
+
+const Parent = lmount(() => {
+  const isOpen = lstate(false);
+
+  const openModal = () => {
+    isOpen.value = true;
+  };
+
+  const closeModal = () => {
+    isOpen.value = false;
+  };
+
+  return () => (
+    <>
+      <button onClick={openModal}>Open Modal</button>
+      {isOpen.value && (
+        <Modal title="Hello Modal" onClose={closeModal} />
+      )}
+    </>
+  );
+});`}
+    />
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      다음단계
+    </h2>
+
+    <div class="grid gap-6 mt-6">
+      <a
+        href="/guide/renewer"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/renewer');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          기본 기능: Renewer →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          컴포넌트를 업데이트하는 핵심 함수 renew()에 대해 알아보세요.
+          <br />
+          언제 어떻게 renew를 호출해야 하는지, 그리고 최적화 방법을 배워봅시다.
+        </p>
+      </a>
+    </div>
   </div>
 );
