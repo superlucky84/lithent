@@ -48,7 +48,7 @@ export const Layout = mount(renew => {
 
             {/* Main Content */}
             <main class="flex-1 w-full min-w-0 px-6 md:px-12 py-8">
-              <div class="max-w-full md:max-w-[48rem]">
+              <div class="max-w-full md:max-w-[43rem]">
                 <CurrentPage />
               </div>
             </main>
