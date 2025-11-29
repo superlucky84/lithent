@@ -30,6 +30,7 @@ const menuData: MenuSection[] = [
       { text: 'Mount Hooks', link: '/guide/mount-hooks' },
       { text: 'Update Hooks', link: '/guide/update-hooks' },
       { text: 'Mount Ready Hooks', link: '/guide/mount-ready-hooks' },
+      { text: 'useRenew Hooks', link: '/guide/use-renew-hooks' },
     ],
   },
 ];

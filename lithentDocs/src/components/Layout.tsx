@@ -4,6 +4,14 @@ import { Sidebar } from './Sidebar';
 import { appStore } from '@/store';
 import { Introduction } from '@/pages/Introduction';
 import { QuickStart } from '@/pages/QuickStart';
+import { Mounter } from '@/pages/Mounter';
+import { Updater } from '@/pages/Updater';
+import { Renewer } from '@/pages/Renewer';
+import { Render } from '@/pages/Render';
+import { Portal } from '@/pages/Portal';
+import { MountHooks } from '@/pages/MountHooks';
+import { UpdateHooks } from '@/pages/UpdateHooks';
+import { MountReadyHooks } from '@/pages/MountReadyHooks';
 
 type PageComponent = () => ReturnType<typeof Introduction>;
 
@@ -11,6 +19,14 @@ type PageComponent = () => ReturnType<typeof Introduction>;
 const routes: Record<string, PageComponent> = {
   '/guide/introduction': Introduction,
   '/guide/quick-start': QuickStart,
+  '/guide/mounter': Mounter,
+  '/guide/updater': Updater,
+  '/guide/renewer': Renewer,
+  '/guide/render': Render,
+  '/guide/portal': Portal,
+  '/guide/mount-hooks': MountHooks,
+  '/guide/update-hooks': UpdateHooks,
+  '/guide/mount-ready-hooks': MountReadyHooks,
 };
 
 export const Layout = mount(renew => {
