@@ -134,14 +134,15 @@ export const replaceWDom = (
   children: WDom[],
   originalWDom: WDom
 ) => {
-  if (originalWDom.isLegacy) {
+  if (originalWDom.il) {
     return;
   }
   needDiffRef.value = true;
 
   const newWDom = makeWDomResolver(tag, props, children);
   const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
-  const { isRoot, getParent, wrapElement, afterElement } = originalWDom;
+  // NOTE: we/ae are short for wrapElement/afterElement
+  const { isRoot, getParent, we, ae } = originalWDom;
 
   newWDomTree.getParent = getParent;
 
@@ -157,8 +158,8 @@ export const replaceWDom = (
     syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
   } else {
     newWDomTree.isRoot = true;
-    newWDomTree.wrapElement = wrapElement;
-    newWDomTree.afterElement = afterElement;
+    newWDomTree.we = we;
+    newWDomTree.ae = ae;
   }
 
   needDiffRef.value = false;

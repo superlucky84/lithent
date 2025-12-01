@@ -30,12 +30,12 @@ export const render = (
 ) => {
   wDom.isRoot = true;
   wrapElement = wrapElement || document.body;
-  wDom.wrapElement = wrapElement;
+  wDom.we = wrapElement;
 
   const Dom = wDomToDom(wDom, isHydration);
 
   if (afterElement) {
-    wDom.afterElement = afterElement;
+    wDom.ae = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else if (!isHydration) {
     if (wrapElement.tagName === 'HTML') {
@@ -67,11 +67,11 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
 };
 
 const rootDelete = (newWDom: WDom) =>
-  deleteRealDom(newWDom, newWDom.wrapElement as HTMLElement);
+  deleteRealDom(newWDom, newWDom.we as HTMLElement);
 
 export const typeDelete = (newWDom: WDom) => {
-  if (newWDom.oldProps && newWDom.el) {
-    removeEvent(newWDom.oldProps, newWDom.el);
+  if (newWDom.op && newWDom.el) {
+    removeEvent(newWDom.op, newWDom.el);
   }
 
   deleteRealDom(
@@ -93,21 +93,19 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
 };
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
-  (
-    (newWDom && newWDom.oldChildren) ||
-    (newWDom && newWDom.children) ||
-    []
-  ).forEach(item => {
-    const nt = item.el && item.el.nodeType;
-    if (nt) {
-      if ([1, 3].includes(nt)) {
-        const el = item.el as HTMLElement;
-        el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
-      } else if (nt === 11) {
-        findChildWithRemoveElement(item, parent);
+  ((newWDom && newWDom.oc) || (newWDom && newWDom.children) || []).forEach(
+    item => {
+      const nt = item.el && item.el.nodeType;
+      if (nt) {
+        if ([1, 3].includes(nt)) {
+          const el = item.el as HTMLElement;
+          el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
+        } else if (nt === 11) {
+          findChildWithRemoveElement(item, parent);
+        }
       }
     }
-  });
+  );
 };
 
 const typeSortedReplace = (newWDom: WDom) => {
@@ -119,7 +117,7 @@ const typeSortedUpdate = (newWDom: WDom) => {
   typeUpdate(newWDom);
 
   const parentWDom = getParent(newWDom);
-  if (parentWDom.needRerender !== 'L') {
+  if (parentWDom.nr !== 'L') {
     const newElement = getElementFromFragment(newWDom);
 
     typeAdd(newWDom, newElement);
@@ -139,7 +137,7 @@ const typeAdd = (
     const parentEl = findRealParentElement(parentWDom);
     const isLoop = parentWDom.type === 'l';
     const nextEl =
-      isLoop && parentWDom.needRerender && parentWDom.needRerender !== 'L'
+      isLoop && parentWDom.nr && parentWDom.nr !== 'L'
         ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
         : startFindNextBrotherElement(newWDom, parentWDom);
 
@@ -190,9 +188,9 @@ const startFindNextBrotherElement = (
   } else if (
     parentWDom.isRoot &&
     checkVirtualType(parentType) &&
-    parentWDom.afterElement
+    parentWDom.ae
   ) {
-    return parentWDom.afterElement;
+    return parentWDom.ae;
   }
 
   return undefined;
@@ -256,9 +254,9 @@ const typeUpdate = (newWDom: WDom) => {
   }
 
   if (newWDom.el) {
-    const { oldProps, props } = newWDom;
+    const { op: oldProps, props } = newWDom;
     updateProps(props, newWDom.el, oldProps);
-    delete newWDom.oldProps;
+    delete newWDom.op;
 
     if (newWDom.tag === 'input') {
       (newWDom.el as HTMLInputElement).value = String(
@@ -282,14 +280,14 @@ const renderHandlers = {
 } as const;
 
 export const wDomUpdate = (newWDomTree: WDom) => {
-  const { needRerender } = newWDomTree;
+  const { nr: needRerender } = newWDomTree;
 
   if (needRerender !== undefined && needRerender !== 'N') {
     renderHandlers[needRerender](newWDomTree);
 
-    delete newWDomTree.needRerender;
-    delete newWDomTree.oldChildren;
-    delete newWDomTree.oldProps;
+    delete newWDomTree.nr;
+    delete newWDomTree.oc;
+    delete newWDomTree.op;
   }
 };
 
@@ -481,7 +479,7 @@ const findRealParentElement = (
 ): HTMLElement | DocumentFragment | Text | undefined => {
   const isVirtualType = checkVirtualType(vDom.type);
   if (vDom.isRoot && isVirtualType) {
-    return vDom.wrapElement;
+    return vDom.we;
   }
 
   if (!isVirtualType) {

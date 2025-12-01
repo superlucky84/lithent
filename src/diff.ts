@@ -49,11 +49,12 @@ const remakeNewWDom = (
     );
   }
 
-  remakeWDom.needRerender = needRerender;
+  // NOTE: short-key metadata (nr = needRerender) keeps bundle size down
+  remakeWDom.nr = needRerender;
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
   if (!isNoting && originalWDom) {
-    originalWDom.isLegacy = true;
+    originalWDom.il = true;
     delete originalWDom.children;
   }
 
@@ -77,10 +78,10 @@ const inheritPropForRender = (
       runUnmountQueueFromWDom(originalWDom);
       recursiveRemoveEvent(originalWDom);
     }
-    remakeWDom.oldChildren = originalWDom && originalWDom.children;
+    remakeWDom.oc = originalWDom && originalWDom.children;
   }
 
-  remakeWDom.oldProps = originalWDom && originalWDom.props;
+  remakeWDom.op = originalWDom && originalWDom.props;
 };
 
 /**

@@ -46,27 +46,30 @@ export type MiddleStateWDomChildren = MiddleStateWDom[];
 // component, fragment, element, loop, text, none
 export type WDomType = 'c' | 'f' | 'e' | 'l' | 't' | 'et';
 
+// Internal metadata uses short keys to keep bundle size down.
+// we: wrapElement, ae: afterElement, op: oldProps, oc: oldChildren
+// nr: needRerender, il: isLegacy
 export interface WDom {
   type?: string | null;
   isRoot?: boolean;
   tag?: string;
   props?: Props;
-  oldProps?: Props;
+  op?: Props; // oldProps (previous props)
   tagName?: string;
   ctor?: Function;
   children?: WDom[];
-  oldChildren?: WDom[];
+  oc?: WDom[]; // oldChildren (previous children)
   getParent?: () => WDom | undefined;
   text?: string | number;
   compKey?: CompKey;
   reRender?: () => WDom;
   compProps?: Props;
   compChild?: WDom[];
-  wrapElement?: HTMLElement;
-  afterElement?: HTMLElement;
+  we?: HTMLElement; // wrapElement (root wrapper)
+  ae?: HTMLElement; // afterElement (insert before)
   el?: HTMLElement | DocumentFragment | Text;
-  needRerender?: RenderType;
-  isLegacy?: boolean;
+  nr?: RenderType; // needRerender
+  il?: boolean; // isLegacy
   [wdomSymbol]?: boolean | 'provider';
 }
 
