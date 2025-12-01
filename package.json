@@ -29,7 +29,7 @@
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
     "build:sequence": "pnpm build:core && pnpm build:jsxruntime && pnpm build:helper && pnpm build:devHelper && pnpm build:hmrParser && pnpm build:lithentTemplateParser && pnpm build:lithentTemplateVite && pnpm build:lithentMdx && pnpm build:lithentVite && pnpm build:ssr",
-    "build:parallel": "pnpm --filter '!jsx-runtime' --filter '!lithent-helper' --filter '!lithent-dev-helper' --filter '!@lithent/hmr-parser' --filter '!@lithent/lithent-template-parser' --filter '!@lithent/lithent-template-vite' --filter '!@lithent/lithent-mdx' --filter '!@lithent/lithent-vite' --filter '!lithent-ssr' --filter '!create-lithent-ssr' build",
+    "build:parallel": "pnpm --filter '!jsx-runtime' --filter '!lithent-helper' --filter '!lithent-dev-helper' --filter '!@lithent/hmr-parser' --filter '!@lithent/lithent-template-parser' --filter '!@lithent/lithent-template-vite' --filter '!@lithent/lithent-mdx' --filter '!@lithent/lithent-vite' --filter '!lithent-ssr' --filter '!create-lithent' build",
     "build": "pnpm run build:sequence && pnpm run build:parallel",
     "watch:core": "vite build --watch",
     "watch:helper": "pnpm --filter lithent-helper watch",
