@@ -117,14 +117,16 @@ const addReRenderTypeProperty = (
       ? 'S'
       : 'R';
 
-  if (
-    newWDom.type === 'l' &&
-    originalWDom &&
-    isKeyChecked &&
-    result === 'T' &&
-    chkDiffLoopOrder(newWDom, originalWDom)
-  ) {
-    result = 'L';
+  if (newWDom.type === 'l' && originalWDom) {
+    if (result === 'U') {
+      result = 'L';
+    } else if (
+      isKeyChecked &&
+      result === 'T' &&
+      chkDiffLoopOrder(newWDom, originalWDom)
+    ) {
+      result = 'L';
+    }
   }
 
   return result;
