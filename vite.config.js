@@ -22,10 +22,17 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithent',
       fileName: format => {
         return format === 'umd' ? 'lithent.umd.js' : 'lithent.mjs';
+      },
+    },
+    rollupOptions: {
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false,
       },
     },
   },
