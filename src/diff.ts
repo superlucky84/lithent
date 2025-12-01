@@ -119,8 +119,9 @@ const addReRenderTypeProperty = (
 
   if (
     newWDom.type === 'l' &&
-    result === 'U' &&
     originalWDom &&
+    isKeyChecked &&
+    result === 'T' &&
     chkDiffLoopOrder(newWDom, originalWDom)
   ) {
     result = 'L';
@@ -130,7 +131,7 @@ const addReRenderTypeProperty = (
 };
 
 /**
- * Check if a reverse order swap is needed when updating types that require reordering.
+ * Check if a reverse order swap is needed when updating keyed loop-type elements.
  */
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
   const origChildren = [...((originalWDom && originalWDom.children) || [])];
