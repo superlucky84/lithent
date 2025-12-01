@@ -270,14 +270,13 @@ const createComponentResolver = (
  * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
  */
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
-  const tagName = tag.name;
   const ctor = tag;
 
   const wrappedChildren = children;
 
   const resolve = createComponentResolver(tag, props, wrappedChildren);
 
-  return { tagName, ctor, props, children: wrappedChildren, resolve };
+  return { ctor, props, children: wrappedChildren, resolve };
 };
 
 /**
@@ -388,7 +387,6 @@ const addComponentProps = (
     compProps: props,
     compChild: children,
     ctor: tag,
-    tagName: tag.name,
     compKey,
     reRender,
   });

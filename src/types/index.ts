@@ -22,7 +22,6 @@ export type Component<T> = (
 export type LComponent<T> = (props: T, childen: WDom[]) => (props: T) => WDom;
 
 export type TagFunctionResolver = {
-  tagName: string;
   ctor: Function;
   props: Props;
   children: WDom[];
@@ -55,7 +54,6 @@ export interface WDom {
   tag?: string;
   props?: Props;
   op?: Props; // oldProps (previous props)
-  tagName?: string;
   ctor?: Function;
   children?: WDom[];
   oc?: WDom[]; // oldChildren (previous children)

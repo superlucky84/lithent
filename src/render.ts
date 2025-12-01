@@ -14,11 +14,6 @@ import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import { getParent, entries, keys } from '@/utils';
 
-const getAttrKey = (k: string) => (k === 'className' ? 'class' : k);
-
-const getEventName = (k: string) =>
-  k.replace(/^on(.*)/, (_, p) => p.toLowerCase());
-
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
 
@@ -240,7 +235,7 @@ const removeEvent = (
   entries(oldProps || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
     if (dataKey.match(/^on/)) {
       element.removeEventListener(
-        getEventName(dataKey),
+        dataKey.slice(2).toLowerCase(),
         dataValue as (e: Event) => void
       );
     }
@@ -269,16 +264,6 @@ const typeUpdate = (newWDom: WDom) => {
   runUpdatedQueueFromWDom(newWDom);
 };
 
-const renderHandlers = {
-  A: typeAdd,
-  D: typeDelete,
-  R: typeReplace,
-  U: typeUpdate,
-  S: typeSortedReplace,
-  T: typeSortedUpdate,
-  L: typeUpdate,
-} as const;
-
 export const wDomUpdate = (newWDomTree: WDom) => {
   const { nr: needRerender } = newWDomTree;
 
@@ -290,6 +275,16 @@ export const wDomUpdate = (newWDomTree: WDom) => {
     delete newWDomTree.op;
   }
 };
+
+const renderHandlers = {
+  A: typeAdd,
+  D: typeDelete,
+  R: typeReplace,
+  U: typeUpdate,
+  S: typeSortedReplace,
+  T: typeSortedUpdate,
+  L: typeUpdate,
+} as const;
 
 const updateText = (newWDom: WDom) => {
   if (newWDom.el) {
@@ -343,7 +338,7 @@ const updateProps = (
             dataValue;
         } else {
           setAttr(
-            getAttrKey(dataKey),
+            dataKey === 'className' ? 'class' : dataKey,
             element as HTMLElement,
             dataValue as string
           );
@@ -438,7 +433,7 @@ const updateEvent = (
   newEventHandler: (e: Event) => void,
   oldEventHandler: (e: Event) => void
 ) => {
-  const eventName = getEventName(eventKey);
+  const eventName = eventKey.slice(2).toLowerCase();
 
   if (oldEventHandler !== newEventHandler) {
     if (oldEventHandler) {
