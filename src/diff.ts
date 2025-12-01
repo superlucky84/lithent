@@ -117,16 +117,13 @@ const addReRenderTypeProperty = (
       ? 'S'
       : 'R';
 
-  if (newWDom.type === 'l' && originalWDom) {
-    if (result === 'U') {
-      result = 'L';
-    } else if (
-      isKeyChecked &&
-      result === 'T' &&
-      chkDiffLoopOrder(newWDom, originalWDom)
-    ) {
-      result = 'L';
-    }
+  if (
+    newWDom.type === 'l' &&
+    result === 'U' &&
+    originalWDom &&
+    chkDiffLoopOrder(newWDom, originalWDom)
+  ) {
+    result = 'L';
   }
 
   return result;
@@ -136,6 +133,14 @@ const addReRenderTypeProperty = (
  * Check if a reverse order swap is needed when updating keyed loop-type elements.
  */
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
+  // Fast exit: no keys to compare
+  if (
+    !getKey((newWDom.children || [])[0]) ||
+    !getKey((originalWDom.children || [])[0])
+  ) {
+    return false;
+  }
+
   const origChildren = [...((originalWDom && originalWDom.children) || [])];
   const newChildren = [...((newWDom && newWDom.children) || [])].filter(item =>
     origChildren.find(newItem => getKey(item) === getKey(newItem))
