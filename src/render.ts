@@ -298,9 +298,14 @@ const updateProps = (
   oldProps?: Props | null,
   isHydration?: boolean
 ) => {
-  const originalProps = { ...oldProps };
+  const originalProps = oldProps || {};
 
   entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
+    if (dataValue === originalProps[dataKey]) {
+      delete originalProps[dataKey];
+      return;
+    }
+
     if (isHydration && dataKey.match(/^on/)) {
       updateEvent(
         element as HTMLElement,
