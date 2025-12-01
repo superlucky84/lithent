@@ -194,15 +194,14 @@ const startFindNextBrotherElement = (
 const findChildFragmentNextElement = (
   candidiateBrothers: WDom[]
 ): HTMLElement | DocumentFragment | Text | undefined =>
-  candidiateBrothers.reduce(
-    (
-      targetEl: HTMLElement | DocumentFragment | Text | undefined,
-      bItem: WDom
-    ) => {
+  candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
+    (targetEl, bItem) => {
       if (targetEl) return targetEl;
       const { type, el } = bItem;
-      if (type && checkVirtualType(type))
-        return findChildFragmentNextElement(bItem.children || []);
+      if (type && checkVirtualType(type)) {
+        const found = findChildFragmentNextElement(bItem.children || []);
+        if (found) return found;
+      }
       if (el && el.nodeType !== 11) return el;
       return targetEl;
     },
