@@ -117,10 +117,11 @@ const addReRenderTypeProperty = (
       ? 'S'
       : 'R';
 
+  // For keyed loops, downgrade to plain update when order is unchanged
   if (
     newWDom.type === 'l' &&
-    result === 'U' &&
     originalWDom &&
+    (result === 'T' || result === 'U') &&
     chkDiffLoopOrder(newWDom, originalWDom)
   ) {
     result = 'L';
