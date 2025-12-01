@@ -56,26 +56,6 @@ export const render = (
   };
 };
 
-export const wDomUpdate = (newWDomTree: WDom) => {
-  const { needRerender } = newWDomTree;
-
-  if (needRerender && needRerender !== 'N') {
-    ({
-      A: typeAdd,
-      D: typeDelete,
-      R: typeReplace,
-      U: typeUpdate,
-      CNSU: typeUpdate,
-      SR: typeSortedReplace,
-      SU: typeSortedUpdate,
-    })[needRerender](newWDomTree);
-
-    delete newWDomTree.needRerender;
-    delete newWDomTree.oldChildren;
-    delete newWDomTree.oldProps;
-  }
-};
-
 export const recursiveRemoveEvent = (originalWDom: WDom) => {
   if (originalWDom.props && originalWDom.el) {
     removeEvent(originalWDom.props, originalWDom.el);
@@ -139,7 +119,7 @@ const typeSortedUpdate = (newWDom: WDom) => {
   typeUpdate(newWDom);
 
   const parentWDom = getParent(newWDom);
-  if (parentWDom.needRerender !== 'CNSU') {
+  if (parentWDom.needRerender !== 'L') {
     const newElement = getElementFromFragment(newWDom);
 
     typeAdd(newWDom, newElement);
@@ -159,7 +139,7 @@ const typeAdd = (
     const parentEl = findRealParentElement(parentWDom);
     const isLoop = parentWDom.type === 'l';
     const nextEl =
-      isLoop && parentWDom.needRerender && parentWDom.needRerender !== 'CNSU'
+      isLoop && parentWDom.needRerender && parentWDom.needRerender !== 'L'
         ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
         : startFindNextBrotherElement(newWDom, parentWDom);
 
@@ -289,6 +269,28 @@ const typeUpdate = (newWDom: WDom) => {
 
   (newWDom.children || []).forEach(childItem => wDomUpdate(childItem));
   runUpdatedQueueFromWDom(newWDom);
+};
+
+const renderHandlers = {
+  A: typeAdd,
+  D: typeDelete,
+  R: typeReplace,
+  U: typeUpdate,
+  S: typeSortedReplace,
+  T: typeSortedUpdate,
+  L: typeUpdate,
+} as const;
+
+export const wDomUpdate = (newWDomTree: WDom) => {
+  const { needRerender } = newWDomTree;
+
+  if (needRerender !== undefined && needRerender !== 'N') {
+    renderHandlers[needRerender](newWDomTree);
+
+    delete newWDomTree.needRerender;
+    delete newWDomTree.oldChildren;
+    delete newWDomTree.oldProps;
+  }
 };
 
 const updateText = (newWDom: WDom) => {

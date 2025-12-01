@@ -72,7 +72,7 @@ const inheritPropForRender = (
     remakeWDom.el = originalWDom.el;
   }
 
-  if (needRerender && ['D', 'R', 'SR'].includes(needRerender)) {
+  if (needRerender === 'D' || needRerender === 'R' || needRerender === 'S') {
     if (originalWDom) {
       runUnmountQueueFromWDom(originalWDom);
       recursiveRemoveEvent(originalWDom);
@@ -110,10 +110,10 @@ const addReRenderTypeProperty = (
 
   let result: RenderType = isSameType
     ? isKeyChecked
-      ? 'SU'
+      ? 'T'
       : 'U'
     : isKeyChecked
-      ? 'SR'
+      ? 'S'
       : 'R';
 
   if (
@@ -122,7 +122,7 @@ const addReRenderTypeProperty = (
     originalWDom &&
     chkDiffLoopOrder(newWDom, originalWDom)
   ) {
-    result = 'CNSU';
+    result = 'L';
   }
 
   return result;

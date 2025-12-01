@@ -75,9 +75,9 @@ export type RenderType =
   | 'D' // DELETE
   | 'R' // REPLACE
   | 'U' // UPDATE
-  | 'SR' // S_REPLACE
-  | 'SU' // S_UPDATE
-  | 'CNSU' // CHILD NOT SORTED AT LOOP
+  | 'S' // SORTED_REPLACE (was SR)
+  | 'T' // SORTED_UPDATE (was SU)
+  | 'L' // LOOP_CHILDREN_NOT_SORTED_UPDATE (was CNSU)
   | 'N'; // NONE
 
 export type ComponentSubKey =
