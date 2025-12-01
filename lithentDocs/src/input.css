@@ -43,6 +43,52 @@
     @apply text-[#42b883] font-semibold;
   }
 
+  /* Aside sidebar scrollbar styling - Light theme */
+  aside.overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #ffffff;
+  }
+
+  aside.overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  aside.overflow-y-auto::-webkit-scrollbar-track {
+    background: #ffffff;
+  }
+
+  aside.overflow-y-auto::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 4px;
+  }
+
+  aside.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
+
+  /* Aside sidebar scrollbar styling - Dark theme */
+  :is(.dark aside.overflow-y-auto) {
+    scrollbar-width: thin;
+    scrollbar-color: #374151 #1b1b1f;
+  }
+
+  :is(.dark aside.overflow-y-auto)::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  :is(.dark aside.overflow-y-auto)::-webkit-scrollbar-track {
+    background: #1b1b1f;
+  }
+
+  :is(.dark aside.overflow-y-auto)::-webkit-scrollbar-thumb {
+    background-color: #374151;
+    border-radius: 4px;
+  }
+
+  :is(.dark aside.overflow-y-auto)::-webkit-scrollbar-thumb:hover {
+    background-color: #4b5563;
+  }
+
   /* Code block scrollbar styling */
   .code-block {
     scrollbar-width: thin;
