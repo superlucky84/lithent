@@ -25,6 +25,7 @@ const menuData: MenuSection[] = [
       { text: 'Mounter', link: '/guide/mounter' },
       { text: 'Updater', link: '/guide/updater' },
       { text: 'Props', link: '/guide/props' },
+      { text: 'Children', link: '/guide/children' },
       { text: 'Renewer', link: '/guide/renewer' },
       { text: 'Render', link: '/guide/render' },
       { text: 'Portal', link: '/guide/portal' },
@@ -47,6 +48,7 @@ const menuData: MenuSection[] = [
       { text: 'LContext', link: '/guide/lcontext' },
       { text: 'CacheUpdate', link: '/guide/cache-update' },
       { text: 'NextTick', link: '/guide/next-tick' },
+      { text: 'State-Ref', link: '/guide/state-ref' },
     ],
   },
 ];

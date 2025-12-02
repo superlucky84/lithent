@@ -7,6 +7,7 @@ import { QuickStart } from '@/pages/QuickStart';
 import { Mounter } from '@/pages/Mounter';
 import { Updater } from '@/pages/Updater';
 import { Props } from '@/pages/Props';
+import { Children } from '@/pages/Children';
 import { Renewer } from '@/pages/Renewer';
 import { Render } from '@/pages/Render';
 import { Portal } from '@/pages/Portal';
@@ -18,6 +19,10 @@ import { State } from '@/pages/State';
 import { Lstate } from '@/pages/Lstate';
 import { Computed } from '@/pages/Computed';
 import { Effect } from '@/pages/Effect';
+import { Store } from '@/pages/Store';
+import { Lstore } from '@/pages/Lstore';
+import { StateRef } from '@/pages/StateRef';
+import { Context } from '@/pages/Context';
 
 type PageComponent = () => ReturnType<typeof Introduction>;
 
@@ -28,6 +33,7 @@ const routes: Record<string, PageComponent> = {
   '/guide/mounter': Mounter,
   '/guide/updater': Updater,
   '/guide/props': Props,
+  '/guide/children': Children,
   '/guide/renewer': Renewer,
   '/guide/render': Render,
   '/guide/portal': Portal,
@@ -39,6 +45,10 @@ const routes: Record<string, PageComponent> = {
   '/guide/lstate': Lstate,
   '/guide/computed': Computed,
   '/guide/effect': Effect,
+  '/guide/store': Store,
+  '/guide/lstore': Lstore,
+  '/guide/state-ref': StateRef,
+  '/guide/context': Context,
 };
 
 export const Layout = mount(renew => {

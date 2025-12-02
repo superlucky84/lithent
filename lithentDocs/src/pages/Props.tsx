@@ -335,20 +335,20 @@ const Parent = lmount(() => {
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/renewer"
+        href="/guide/children"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/renewer');
+          navigateTo('/guide/children');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          기본 기능: Renewer →
+          Core: Children →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          컴포넌트를 업데이트하는 핵심 함수 renew()에 대해 알아보세요.
+          컴포넌트가 감싸는 자식 요소들인 Children에 대해 알아보세요.
           <br />
-          언제 어떻게 renew를 호출해야 하는지, 그리고 최적화 방법을 배워봅시다.
+          Lithent에서 children이 props와 별도로 관리되는 방식을 배워봅시다.
         </p>
       </a>
     </div>
