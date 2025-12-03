@@ -338,6 +338,28 @@ const ThemeToggle = mount(renew => {
       사용됩니다.
     </p>
 
+    <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
+      <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
+        <span class="font-medium">💡 왜 함수로 설계되었나요?</span>
+        <br />
+        <br />
+        Lithent는 <strong class="font-semibold">클로저 기반 상태 관리</strong>를
+        사용합니다. 컴포넌트의 상태(count, isRunning 등)는 클로저 변수로
+        존재하며, 매 업데이트 시점마다 변경 여부를 확인하려면{' '}
+        <strong class="font-semibold">그 시점의 최신 값</strong>을 읽어야
+        합니다.
+        <br />
+        <br />
+        <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-sm">
+          () =&gt; [count, isRunning]
+        </code>
+        처럼 함수로 설계하면, 의존성을 확인할 때마다 이 함수를 호출하여{' '}
+        <strong class="font-semibold">항상 최신 클로저 값</strong>을 가져올 수
+        있습니다. 함수 호출 시점에 count와 isRunning의 현재 값을 읽어 배열로
+        반환하므로, 이전 값과 비교하여 변경 여부를 정확히 감지할 수 있습니다.
+      </p>
+    </div>
+
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
       빈 배열: 마운트 시에만 실행
     </h3>
@@ -514,10 +536,9 @@ const App = lmount(() => {
         <br />
         <br />
         <span class="font-medium">⚠️ 의존성은 함수로 전달:</span> dependencies는
-        배열 자체가 아니라 배열을 반환하는 함수여야 합니다. Lithent는 클로저
-        기반으로 동작하므로, React와 달리 모든 외부 값을 의존성에 포함하지
-        않아도 안전합니다. 의존성 배열은 effect를 재실행할 시점을 결정하는
-        용도로만 사용됩니다.
+        배열이 아닌 <strong>배열을 반환하는 함수</strong>여야 합니다. Lithent의
+        클로저 기반 상태 관리 방식 때문입니다. 자세한 내용은 위의 "의존성 배열
+        동작" 섹션을 참고하세요.
         <br />
         <br />
         <span class="font-medium">⚠️ 비동기 처리:</span> async/await를 사용할

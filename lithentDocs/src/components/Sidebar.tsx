@@ -33,6 +33,7 @@ const menuData: MenuSection[] = [
       { text: 'Update Hooks', link: '/guide/update-hooks' },
       { text: 'Mount Ready Hooks', link: '/guide/mount-ready-hooks' },
       { text: 'useRenew Hooks', link: '/guide/use-renew-hooks' },
+      { text: 'NextTick', link: '/guide/next-tick' },
     ],
   },
   {
@@ -47,8 +48,17 @@ const menuData: MenuSection[] = [
       { text: 'Context', link: '/guide/context' },
       { text: 'LContext', link: '/guide/lcontext' },
       { text: 'CacheUpdate', link: '/guide/cache-update' },
-      { text: 'NextTick', link: '/guide/next-tick' },
       { text: 'State-Ref', link: '/guide/state-ref' },
+    ],
+  },
+  {
+    text: 'JSX & Templates',
+    items: [
+      { text: 'Vite Plugin', link: '/guide/vite-plugin' },
+      { text: 'Manual JSX Setup', link: '/guide/jsx-manual' },
+      { text: 'FTags', link: '/guide/ftags' },
+      { text: 'HTM Tags', link: '/guide/htm-tags' },
+      { text: 'Template Strings', link: '/guide/template-strings' },
     ],
   },
 ];

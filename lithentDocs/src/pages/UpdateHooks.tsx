@@ -380,6 +380,95 @@ const Dashboard = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      의존성 배열 동작
+    </h2>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      dependencies는{' '}
+      <strong class="font-semibold text-gray-900 dark:text-white">
+        배열을 반환하는 함수
+      </strong>
+      여야 합니다. 이 함수가 반환하는 배열의 값이 변경되었을 때만
+      updateCallback이 실행됩니다.
+      <br />
+      <br />
+      Lithent는 클로저 기반으로 동작하므로, updateCallback 내부에서 외부 변수를
+      자유롭게 참조할 수 있습니다. 의존성 배열은 React와 달리 모든 외부 값을
+      포함할 필요가 없으며, 단순히 콜백을 재실행할 시점을 결정하는 조건으로만
+      사용됩니다.
+    </p>
+
+    <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
+      <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
+        <span class="font-medium">💡 왜 함수로 설계되었나요?</span>
+        <br />
+        <br />
+        Lithent는 <strong class="font-semibold">클로저 기반 상태 관리</strong>를
+        사용합니다. 컴포넌트의 상태(userId, status 등)는 클로저 변수로 존재하며,
+        매 업데이트 시점마다 변경 여부를 확인하려면{' '}
+        <strong class="font-semibold">그 시점의 최신 값</strong>을 읽어야
+        합니다.
+        <br />
+        <br />
+        <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-sm">
+          () =&gt; [userId, status]
+        </code>
+        처럼 함수로 설계하면, 의존성을 확인할 때마다 이 함수를 호출하여{' '}
+        <strong class="font-semibold">항상 최신 클로저 값</strong>을 가져올 수
+        있습니다. 함수 호출 시점에 userId와 status의 현재 값을 읽어 배열로
+        반환하므로, 이전 값과 비교하여 변경 여부를 정확히 감지할 수 있습니다.
+      </p>
+    </div>
+
+    <CodeBlock
+      language="tsx"
+      code={`import { mount, updateCallback } from 'lithent';
+
+const UserProfile = mount<{ userId: number }>((renew, props) => {
+  // 클로저 변수로 상태 관리
+  let userName = 'John';
+  let userAge = 25;
+
+  updateCallback(() => {
+    console.log('User or age changed!');
+  }, () => [userName, userAge]);
+  // ☝️ 함수를 호출하여 [userName, userAge]를 반환
+  //    매 업데이트 시점의 최신 값으로 배열 생성
+
+  const updateName = () => {
+    userName = 'Jane';
+    renew();
+    // renew 호출 → 업데이트 시작
+    // → () => [userName, userAge] 함수 실행
+    // → ['Jane', 25] 반환
+    // → 이전 값 ['John', 25]와 비교
+    // → 변경 감지! updateCallback 실행
+  };
+
+  return () => (
+    <div>
+      <h1>User: {userName}</h1>
+      <p>Age: {userAge}</p>
+      <button onClick={updateName}>Change Name</button>
+    </div>
+  );
+});`}
+    />
+
+    <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
+      <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+        <span class="font-medium text-gray-700 dark:text-gray-300">
+          💡 참고:
+        </span>{' '}
+        React의 useEffect와 달리, Lithent의 updateCallback은 클로저를 통해 항상
+        최신 값을 참조합니다. 의존성 배열은 단순히 "언제 재실행할지"만
+        결정합니다.
+      </p>
+    </div>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
       mountCallback vs updateCallback
     </h2>
 
@@ -556,10 +645,8 @@ updateCallback(() => {
         <br />
         <span class="font-medium">⚠️ dependencies는 함수로 전달:</span>{' '}
         dependencies는 배열이 아닌 <strong>배열을 반환하는 함수</strong>로
-        전달해야 합니다.{' '}
-        <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
-          () =&gt; [count]
-        </code>
+        전달해야 합니다. Lithent의 클로저 기반 상태 관리 방식 때문입니다. 자세한
+        내용은 위의 "의존성 배열 동작" 섹션을 참고하세요.
         <br />
         <br />
         <span class="font-medium">⚠️ 무한 루프 주의:</span> 반환 함수에서

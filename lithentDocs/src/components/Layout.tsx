@@ -23,6 +23,12 @@ import { Store } from '@/pages/Store';
 import { Lstore } from '@/pages/Lstore';
 import { StateRef } from '@/pages/StateRef';
 import { Context } from '@/pages/Context';
+import { LContext } from '@/pages/LContext';
+import { CacheUpdate } from '@/pages/CacheUpdate';
+import { NextTick } from '@/pages/NextTick';
+import { VitePlugin } from '@/pages/VitePlugin';
+import { ManualJSX } from '@/pages/ManualJSX';
+import { FTags } from '@/pages/FTags';
 
 type PageComponent = () => ReturnType<typeof Introduction>;
 
@@ -37,6 +43,7 @@ const routes: Record<string, PageComponent> = {
   '/guide/renewer': Renewer,
   '/guide/render': Render,
   '/guide/portal': Portal,
+  '/guide/next-tick': NextTick,
   '/guide/mount-hooks': MountHooks,
   '/guide/update-hooks': UpdateHooks,
   '/guide/mount-ready-hooks': MountReadyHooks,
@@ -49,6 +56,11 @@ const routes: Record<string, PageComponent> = {
   '/guide/lstore': Lstore,
   '/guide/state-ref': StateRef,
   '/guide/context': Context,
+  '/guide/lcontext': LContext,
+  '/guide/cache-update': CacheUpdate,
+  '/guide/vite-plugin': VitePlugin,
+  '/guide/jsx-manual': ManualJSX,
+  '/guide/ftags': FTags,
 };
 
 export const Layout = mount(renew => {
