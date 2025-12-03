@@ -63,7 +63,11 @@ const menuData: MenuSection[] = [
   },
   {
     text: 'Examples',
-    items: [{ text: 'Example 1', link: '/examples/1' }],
+    items: [
+      { text: 'Computed Counter (helper)', link: '/examples/1' },
+      { text: 'Shared Store (helper)', link: '/examples/2' },
+      { text: 'Render Props (Mouse tracker)', link: '/examples/3' },
+    ],
   },
 ];
 

@@ -1,4 +1,3 @@
-import type { LComponent } from 'lithent';
 import { mount } from 'lithent';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
@@ -33,12 +32,18 @@ import { FTags } from '@/pages/FTags';
 import { HtmTags } from '@/pages/HtmTags';
 import { TemplateStrings } from '@/pages/TemplateStrings';
 import { Example1Page } from '@/pages/Example1';
+import { Example2Page } from '@/pages/Example2';
+import { Example3Page } from '@/pages/Example3';
 
 const normalizeRoute = (path: string) =>
   path.replace(/\/+$/, '') || '/guide/introduction';
 
+type PageComponent =
+  | ((...args: any[]) => ReturnType<typeof Introduction>)
+  | ((...args: any[]) => any);
+
 // Route configuration
-const routes: Record<string, LComponent<any>> = {
+const routes: Record<string, PageComponent> = {
   '/guide/introduction': Introduction,
   '/guide/quick-start': QuickStart,
   '/guide/mounter': Mounter,
@@ -69,6 +74,8 @@ const routes: Record<string, LComponent<any>> = {
   '/guide/htm-tags': HtmTags,
   '/guide/template-strings': TemplateStrings,
   '/examples/1': Example1Page,
+  '/examples/2': Example2Page,
+  '/examples/3': Example3Page,
 };
 
 export const Layout = mount(renew => {
@@ -77,8 +84,6 @@ export const Layout = mount(renew => {
   return () => {
     const normalized = normalizeRoute(store.route);
     const CurrentPage = routes[normalized] || Introduction;
-
-    console.log('CurrentPage', CurrentPage);
 
     return (
       <div class="min-h-screen bg-white dark:bg-[#1b1b1f] transition-colors">
