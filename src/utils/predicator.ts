@@ -6,6 +6,7 @@ import {
   FragmentFunction,
   WDomType,
 } from '@/types';
+import { isObject } from '@/utils';
 
 type WDomParam =
   | string
@@ -19,7 +20,7 @@ type WDomParam =
  */
 
 const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
-  typeof wDom === 'object' && !('resolve' in wDom);
+  isObject(wDom) && !('resolve' in wDom);
 
 const checkPlainType = (wDom: WDomParam, typeName: string) =>
   checkPlainWDomType(wDom) && wDom.type === typeName;
@@ -116,14 +117,14 @@ export const checkStyleData = (
   dataKey: string,
   dataValue: unknown
 ): dataValue is Record<string, string> =>
-  dataKey === 'style' && typeof dataValue === 'object';
+  dataKey === 'style' && isObject(dataValue);
 
 export const checkRefData = (
   dataKey: string,
   dataValue: unknown
 ): dataValue is {
   value: HTMLElement | Element | DocumentFragment | Text | undefined;
-} => dataKey === 'ref' && typeof dataValue === 'object';
+} => dataKey === 'ref' && isObject(dataValue);
 
 export const hasAccessorMethods = (target: unknown, dataKey: string) => {
   const descriptor = Object.getOwnPropertyDescriptor(
