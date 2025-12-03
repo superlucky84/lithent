@@ -45,6 +45,7 @@ const { Provider, contextState, useContext } = appContext;
 
 // 2. Provider 컴포넌트 (데이터 제공)
 const App = mount(renew => {
+  // renew 없이 생성 (권장)
   const userState = contextState('John');
   const themeState = contextState('light');
 
@@ -56,14 +57,21 @@ const App = mount(renew => {
   );
 });
 
-// 3. Consumer 컴포넌트 (데이터 사용)
+// 3. Consumer 컴포넌트 (데이터 사용 및 변경)
 const Header = mount(renew => {
+  // Consumer에서 renew로 구독
   const ctx = useContext(appContext, renew);
+
+  const changeUser = () => {
+    // Consumer에서 값 변경
+    ctx.user.value = 'Jane';
+  };
 
   return () => (
     <div>
       <p>User: {ctx.user.value}</p>
       <p>Theme: {ctx.theme.value}</p>
+      <button onClick={changeUser}>Change User</button>
     </div>
   );
 });`}
@@ -114,6 +122,13 @@ const { Provider, contextState, useContext } = userContext;`}
         contextState
       </code>
       로 생성합니다. 초기값을 인자로 전달합니다.
+      <br />
+      <br />
+      <strong class="font-semibold text-gray-900 dark:text-white">
+        일반적으로 renew를 전달하지 않습니다.
+      </strong>{' '}
+      Provider는 초기값을 제공하는 역할만 하고, Consumer에서 값을 구독하고
+      변경합니다.
     </p>
 
     <CodeBlock
@@ -121,7 +136,7 @@ const { Provider, contextState, useContext } = userContext;`}
       code={`import { mount } from 'lithent';
 
 const App = mount(renew => {
-  // contextState로 상태 생성
+  // contextState로 상태 생성 (renew 없이)
   const nameState = contextState('John');
   const ageState = contextState(25);
 
@@ -139,18 +154,21 @@ const App = mount(renew => {
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Provider 컴포넌트로 하위 컴포넌트들에게 Context를 제공합니다. Context 타입에
-      정의된 키들을 props로 전달합니다.
+      Provider 컴포넌트로 하위 컴포넌트들에게 Context를 제공합니다. Context
+      타입에 정의된 키들을 props로 전달합니다.
     </p>
 
     <CodeBlock
       language="tsx"
       code={`const App = mount(renew => {
+  // renew 없이 생성 (권장)
   const nameState = contextState('John');
   const ageState = contextState(25);
 
   const updateName = () => {
+    // 값 변경은 가능하지만, Provider는 리렌더링 안 됨
     nameState.value = 'Jane';
+    // Consumer들은 이 변경사항을 받아서 리렌더링됨
   };
 
   return () => (
@@ -189,7 +207,7 @@ const App = mount(renew => {
   const ctx = useContext(userContext, renew);
 
   const changeName = () => {
-    // Consumer에서도 값 변경 가능 (양방향 동기화)
+    // Consumer에서 값 변경 가능
     ctx.name.value = 'Alice';
   };
 
@@ -229,6 +247,7 @@ const appContext = createContext<AppContext>();
 const { Provider, contextState, useContext } = appContext;
 
 const App = mount(renew => {
+  // renew 없이 생성
   const userState = contextState('John');
   const themeState = contextState('light');
   const countState = contextState(0);
@@ -295,13 +314,23 @@ const ThemeAndCount = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      양방향 동기화
+      Context 값 변경
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Context는 Provider와 Consumer 사이에 양방향 동기화를 지원합니다. Provider나
-      Consumer 어디서든 값을 변경할 수 있으며, 변경사항이 양쪽에 자동으로
-      반영됩니다.
+      기본적으로{' '}
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        contextState
+      </code>
+      로 생성한 상태는 Provider와 Consumer 어디서든 값을 변경할 수 있습니다.
+      <br />
+      <br />
+      하지만{' '}
+      <strong class="font-semibold text-gray-900 dark:text-white">
+        renew 없이 생성하면 Consumer에서만 구독
+      </strong>
+      되므로, Provider에서 값을 변경해도 Provider 자체는 리렌더링되지 않습니다.
+      실질적으로는 단방향처럼 동작합니다.
     </p>
 
     <CodeBlock
@@ -317,11 +346,13 @@ const counterContext = createContext<CounterContext>();
 const { Provider, contextState, useContext } = counterContext;
 
 const App = mount(renew => {
+  // ⚠️ renew 없이 생성 - Provider는 구독하지 않음
   const countState = contextState(0);
 
   const incrementFromProvider = () => {
-    // ✅ Provider에서 값 변경
+    // ⚠️ 값은 변경되지만 Provider는 리렌더링 안 됨
     countState.value += 1;
+    // Consumer는 이 변경사항을 받아서 리렌더링됨
   };
 
   return () => (
@@ -335,22 +366,24 @@ const App = mount(renew => {
         Increment from Provider
       </button>
 
-      {/* Provider에서 현재 값 확인 */}
+      {/* ⚠️ Provider는 리렌더링 안 되므로 이 값은 갱신 안 됨 */}
       <p>Provider count: {countState.value}</p>
     </div>
   );
 });
 
 const Counter = mount(renew => {
+  // ✅ Consumer는 renew로 구독함
   const ctx = useContext(counterContext, renew);
 
   const incrementFromConsumer = () => {
-    // ✅ Consumer에서 값 변경
+    // ✅ Consumer에서 값 변경 - Consumer만 리렌더링
     ctx.count.value += 1;
   };
 
   return () => (
     <div>
+      {/* ✅ Consumer는 변경사항을 항상 반영 */}
       <p>Consumer count: {ctx.count.value}</p>
       <button onClick={incrementFromConsumer}>
         Increment from Consumer
@@ -362,9 +395,55 @@ const Counter = mount(renew => {
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 동기화 특성:</span> Provider에서 변경하든
-        Consumer에서 변경하든 상관없이 모든 구독자가 즉시 업데이트됩니다. 이는
-        상태 관리를 유연하게 만들어줍니다.
+        <span class="font-medium">💡 권장 패턴:</span> 일반적으로{' '}
+        <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-sm">
+          contextState
+        </code>
+        는 renew 없이 생성하고, Consumer에서만 값을 읽고 변경하는 것이 좋습니다.
+        Provider는 초기값만 제공하는 역할로 사용하세요.
+      </p>
+    </div>
+
+    <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
+      양방향 동기화 (권장하지 않음)
+    </h3>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        contextState
+      </code>
+      의 두 번째 인자로 renew를 전달하면 진짜 양방향 동기화가 가능하지만,{' '}
+      <strong class="font-semibold text-gray-900 dark:text-white">
+        권장하지 않습니다.
+      </strong>
+    </p>
+
+    <div class="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 p-4 mb-6 rounded-r">
+      <p class="text-sm md:text-base text-red-800 dark:text-red-200 leading-relaxed">
+        <span class="font-medium">⚠️ 양방향 동기화 문제:</span>
+        <br />
+        <br />
+        <code class="px-2 py-1 bg-red-200 dark:bg-red-800 rounded text-sm">
+          contextState(initialValue, renew)
+        </code>
+        <br />
+        <br />
+        위처럼 renew를 전달하면 Provider에서 값 변경 시 Provider가 리렌더링되어
+        양방향 동기화가 가능합니다. 하지만{' '}
+        <strong class="font-semibold">
+          Provider 하위 트리 전체가 리렌더링
+        </strong>
+        되는 부작용이 발생합니다.
+        <br />
+        <br />
+        Consumer는 선택적 구독으로 필요한 컴포넌트만 리렌더링하지만, Provider에
+        renew를 전달하면 모든 하위 컴포넌트가 영향을 받아 성능 문제가 발생할 수
+        있습니다.
+        <br />
+        <br />
+        <strong class="font-semibold">
+          권장: renew를 전달하지 말고 Consumer에서만 값을 관리하세요.
+        </strong>
       </p>
     </div>
 
@@ -392,6 +471,7 @@ const themeContext = createContext<ThemeContext>();
 const { Provider, contextState, useContext } = themeContext;
 
 const App = mount(renew => {
+  // renew 없이 생성
   const blueTheme = contextState('blue');
   const redTheme = contextState('red');
 
@@ -441,6 +521,7 @@ const userContext = createContext<UserContext>();
 const themeContext = createContext<ThemeContext>();
 
 const App = mount(renew => {
+  // renew 없이 생성
   const userName = userContext.contextState('John');
   const themeMode = themeContext.contextState('dark');
 
@@ -612,9 +693,9 @@ const Content = mount(renew => {
         를 사용하세요.
         <br />
         <br />
-        <span class="font-medium">⚠️ Provider 필수:</span> useContext를 사용하려면
-        상위에 Provider가 반드시 있어야 합니다. Provider가 없으면 Context를 찾을
-        수 없습니다.
+        <span class="font-medium">⚠️ Provider 필수:</span> useContext를
+        사용하려면 상위에 Provider가 반드시 있어야 합니다. Provider가 없으면
+        Context를 찾을 수 없습니다.
         <br />
         <br />
         <span class="font-medium">⚠️ .value 접근:</span> contextState로 생성한

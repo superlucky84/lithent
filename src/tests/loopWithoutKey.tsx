@@ -3,10 +3,7 @@ import { Fragment, h, mount, render } from '@/index';
 type Item = { label: string };
 
 const LoopWithoutKeyDemo = mount(function (renew) {
-  let list: Item[] = [
-    { label: 'A' },
-    { label: 'B' },
-  ];
+  let list: Item[] = [{ label: 'A' }, { label: 'B' }];
 
   const updateList = (next: Item[]) => {
     list = next;
