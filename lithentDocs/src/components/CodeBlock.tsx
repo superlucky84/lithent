@@ -22,23 +22,41 @@ interface CodeBlockProps {
   language?: string;
 }
 
+const isTaggedTemplate = (code: string) => code.includes('lTag`');
+
+const swapLTagToHtml = (code: string) => code.replace(/lTag`/g, 'html`');
+const swapHtmlToLTag = (html: string) => html.replace(/html`/g, 'lTag`');
+
 export const CodeBlock = lmount<CodeBlockProps>(() => {
   const codeRef = ref<HTMLElement | null>(null);
 
   mountCallback(() => {
-    if (codeRef.value) {
-      hljs.highlightElement(codeRef.value);
+    if (!codeRef.value) return;
 
-      // For bash, highlight the $ prompt
-      const lang = codeRef.value.className.match(/language-(\w+)/)?.[1];
-      if (lang === 'bash' && codeRef.value.innerHTML) {
-        // Replace $ at the start of lines with colored span
+    const lang =
+      codeRef.value.className.match(/language-(\w+)/)?.[1] || 'typescript';
+
+    // Bash는 별도 처리
+    if (lang === 'bash') {
+      hljs.highlightElement(codeRef.value);
+      if (codeRef.value.innerHTML) {
         codeRef.value.innerHTML = codeRef.value.innerHTML.replace(
           /^(\s*)\$(\s)/gm,
           '$1<span class="bash-prompt">$</span>$2'
         );
       }
+      return;
     }
+
+    // lTag 템플릿을 html 템플릿처럼 하이라이트하기 위해 임시 치환
+    const original = codeRef.value.textContent || '';
+    const needsSwap = isTaggedTemplate(original);
+    const targetCode = needsSwap ? swapLTagToHtml(original) : original;
+
+    const highlighted = hljs.highlight(targetCode, { language: lang }).value;
+    codeRef.value.innerHTML = needsSwap
+      ? swapHtmlToLTag(highlighted)
+      : highlighted;
   });
 
   return ({ code, language }) => (

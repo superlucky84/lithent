@@ -15,7 +15,7 @@ export const FTags = () => (
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-        lithent-ftags
+        lithent/ftags
       </code>
       는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
@@ -82,11 +82,19 @@ export const FTags = () => (
       NPM
     </h3>
 
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Lithent를 설치하면{' '}
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        lithent/ftags
+      </code>
+      를 바로 사용할 수 있습니다. 별도의 설치가 필요하지 않습니다.
+    </p>
+
     <CodeBlock
       language="bash"
-      code={`npm install lithent lithent-ftags
+      code={`npm install lithent
 # or
-pnpm add lithent lithent-ftags`}
+pnpm add lithent`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
@@ -95,8 +103,9 @@ pnpm add lithent lithent-ftags`}
 
     <CodeBlock
       language="html"
-      code={`<script src="https://cdn.jsdelivr.net/npm/lithent@latest/dist/lithent.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent-ftags@latest/dist/lithentFTags.umd.js"></script>
+      code={`<script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js
+"></script>
 
 <script>
   const { render } = lithent;
@@ -127,7 +136,7 @@ pnpm add lithent lithent-ftags`}
     <CodeBlock
       language="typescript"
       code={`import { render } from 'lithent';
-import { fTags } from 'lithent-ftags';
+import { fTags } from 'lithent/ftags';
 
 // 필요한 태그만 구조 분해
 const { div, p, span, button, input } = fTags;
@@ -296,7 +305,7 @@ render(page, document.getElementById('root'));`}
 
     <CodeBlock
       language="typescript"
-      code={`import { fTags, fFragment } from 'lithent-ftags';
+      code={`import { fTags, fFragment } from 'lithent/ㅏftags';
 
 const { div, p, span } = fTags;
 
@@ -357,7 +366,7 @@ const MultiElement = fMount(() => {
     <CodeBlock
       language="typescript"
       code={`import { render } from 'lithent';
-import { fMount, fTags } from 'lithent-ftags';
+import { fMount, fTags } from 'lithent/ftags';
 
 const { div, button } = fTags;
 
@@ -388,7 +397,7 @@ render(Counter(), document.getElementById('root'));`}
     <CodeBlock
       language="typescript"
       code={`import { render } from 'lithent';
-import { fMount, fTags } from 'lithent-ftags';
+import { fMount, fTags } from 'lithent/ftags';
 
 const { div, p } = fTags;
 
@@ -422,7 +431,7 @@ render(
     <CodeBlock
       language="typescript"
       code={`import { render } from 'lithent';
-import { fMount, fTags } from 'lithent-ftags';
+import { fMount, fTags } from 'lithent/ftags';
 
 const { div, p } = fTags;
 
@@ -452,7 +461,7 @@ render(
     <CodeBlock
       language="typescript"
       code={`import { render } from 'lithent';
-import { fMount, fTags } from 'lithent-ftags';
+import { fMount, fTags } from 'lithent/ftags';
 
 const { div, h2, p } = fTags;
 
@@ -540,7 +549,7 @@ render(
     <CodeBlock
       language="typescript"
       code={`import { render, useRenew } from 'lithent';
-import { flMount, fTags } from 'lithent-ftags';
+import { flMount, fTags } from 'lithent/ftags';
 
 const { div, button } = fTags;
 
@@ -584,7 +593,7 @@ render(Counter(), document.getElementById('root'));`}
       language="typescript"
       code={`import { render } from 'lithent';
 import { lstate } from 'lithent/helper';
-import { flMount, fTags } from 'lithent-ftags';
+import { flMount, fTags } from 'lithent/ftags';
 
 const { div, button } = fTags;
 
@@ -618,7 +627,7 @@ render(Counter(), document.getElementById('root'));`}
       language="typescript"
       code={`import { render } from 'lithent';
 import { lstate } from 'lithent/helper';
-import { flMount, fTags } from 'lithent-ftags';
+import { flMount, fTags } from 'lithent/ftags';
 
 const { div, input, button, ul, li } = fTags;
 
@@ -761,7 +770,7 @@ render(TodoApp(), document.getElementById('root'));`}
     <CodeBlock
       language="typescript"
       code={`import { render } from 'lithent';
-import { fMount, fTags } from 'lithent-ftags';
+import { fMount, fTags } from 'lithent/ftags';
 
 const { div, input, button, ul, li } = fTags;
 
@@ -834,7 +843,7 @@ render(TodoApp(), document.getElementById('root'));`}
     <CodeBlock
       language="typescript"
       code={`import { render } from 'lithent';
-import { fMount, fTags } from 'lithent-ftags';
+import { fMount, fTags } from 'lithent/ftags';
 
 const { div, button, p } = fTags;
 
@@ -955,27 +964,29 @@ const App = mount((renew) => {
         <CodeBlock
           language="typescript"
           code={`import { mount } from 'lithent';
-import { fMount, fTags } from 'lithent-ftags';
+import { fMount, fTags } from 'lithent/ftags';
 
 const { div, h1, button } = fTags;
 
-const App = mount((renew) => {
+const App = mount(renew => {
   let count = 0;
 
-  return () => div(
-    { className: 'app' },
-    h1(\`Count: \${count}\`),
-    button(
-      {
-        onClick: () => {
-          count++;
-          renew();
-        }
-      },
-      'Increment'
-    )
-  );
-});`}
+  return () =>
+    div(
+      { className: 'app' },
+      h1(\`Count: \${count}\`),
+      button(
+        {
+          onClick: () => {
+            count++;
+            renew();
+          },
+        },
+        'Increment'
+      )
+    );
+});
+          `}
         />
       </div>
     </div>

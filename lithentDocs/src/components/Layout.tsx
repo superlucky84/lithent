@@ -1,3 +1,4 @@
+import type { LComponent } from 'lithent';
 import { mount } from 'lithent';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
@@ -29,11 +30,15 @@ import { NextTick } from '@/pages/NextTick';
 import { VitePlugin } from '@/pages/VitePlugin';
 import { ManualJSX } from '@/pages/ManualJSX';
 import { FTags } from '@/pages/FTags';
+import { HtmTags } from '@/pages/HtmTags';
+import { TemplateStrings } from '@/pages/TemplateStrings';
+import { Example1Page } from '@/pages/Example1';
 
-type PageComponent = () => ReturnType<typeof Introduction>;
+const normalizeRoute = (path: string) =>
+  path.replace(/\/+$/, '') || '/guide/introduction';
 
 // Route configuration
-const routes: Record<string, PageComponent> = {
+const routes: Record<string, LComponent<any>> = {
   '/guide/introduction': Introduction,
   '/guide/quick-start': QuickStart,
   '/guide/mounter': Mounter,
@@ -61,13 +66,19 @@ const routes: Record<string, PageComponent> = {
   '/guide/vite-plugin': VitePlugin,
   '/guide/jsx-manual': ManualJSX,
   '/guide/ftags': FTags,
+  '/guide/htm-tags': HtmTags,
+  '/guide/template-strings': TemplateStrings,
+  '/examples/1': Example1Page,
 };
 
 export const Layout = mount(renew => {
   const store = appStore.watch(renew);
 
   return () => {
-    const CurrentPage = routes[store.route] || Introduction;
+    const normalized = normalizeRoute(store.route);
+    const CurrentPage = routes[normalized] || Introduction;
+
+    console.log('CurrentPage', CurrentPage);
 
     return (
       <div class="min-h-screen bg-white dark:bg-[#1b1b1f] transition-colors">

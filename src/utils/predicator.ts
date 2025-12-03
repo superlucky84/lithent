@@ -100,7 +100,7 @@ export const checkCustemComponentFunction = (
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver =>
   (typeof target === 'function' && !checkFragmentFunction(target)) ||
-  (typeof target === 'object' && 'resolve' in target);
+  (isObject(target) && 'resolve' in target);
 
 export const checkFragmentFunction = (
   target: unknown

@@ -12,7 +12,7 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import { getParent, entries, keys } from '@/utils';
+import { getParent, entries, keys, isObject } from '@/utils';
 
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
@@ -315,7 +315,7 @@ const updateProps = (
     } else {
       if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
         // Do nothing
-      } else if (dataKey === 'portal' && typeof dataValue === 'object') {
+      } else if (dataKey === 'portal' && isObject(dataValue)) {
         // Do nothing
       } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
         (element as HTMLElement).innerHTML = dataValue;

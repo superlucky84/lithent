@@ -61,75 +61,125 @@ const menuData: MenuSection[] = [
       { text: 'Template Strings', link: '/guide/template-strings' },
     ],
   },
+  {
+    text: 'Examples',
+    items: [{ text: 'Example 1', link: '/examples/1' }],
+  },
 ];
+
+const normalizePath = (path: string) => path.replace(/\/+$/, '') || '/';
 
 export const Sidebar = mount(renew => {
   const store = appStore.watch(renew);
+  const expanded: Record<string, boolean> = Object.fromEntries(
+    menuData.map(section => [section.text, true])
+  );
+  let prevRoute = store.route;
 
   const handleClick = (link: string) => {
     navigateTo(link);
   };
 
-  return () => (
-    <>
-      {/* Mobile overlay */}
-      {store.sidebarOpen && (
-        <div
-          class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => {
-            store.sidebarOpen = false;
-          }}
-        />
-      )}
+  const toggleSection = (title: string) => {
+    expanded[title] = !expanded[title];
+    renew();
+  };
 
-      {/* Sidebar */}
-      <aside
-        class={`
-          fixed lg:sticky top-16 left-0 z-40
-          w-64 h-[calc(100vh-4rem)] flex-shrink-0
-          bg-white dark:bg-[#1b1b1f]
-          border-r border-gray-200 dark:border-gray-800
-          overflow-y-auto
-          transition-transform duration-300
-          ${store.sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
-      >
-        <nav class="pl-6 md:pl-12 pr-3 md:pr-4 py-6">
-          {menuData.map(section => (
-            <div class="mb-6">
-              <h5 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
-                {section.text}
-              </h5>
-              <ul class="space-y-2">
-                {section.items.map(item => {
-                  const isActive = store.route === item.link;
-                  return (
-                    <li>
-                      <a
-                        href={item.link}
-                        onClick={(e: Event) => {
-                          e.preventDefault();
-                          handleClick(item.link);
-                        }}
-                        class={`
-                          block px-3 py-2 rounded-md text-sm font-medium transition-colors
-                          ${
-                            isActive
-                              ? 'text-[#42b883] bg-[#42b883] bg-opacity-10'
-                              : 'text-gray-700 dark:text-gray-300 hover:text-[#42b883] dark:hover:text-[#42b883] hover:bg-gray-100 dark:hover:bg-gray-800'
-                          }
-                        `}
-                      >
-                        {item.text}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </nav>
-      </aside>
-    </>
-  );
+  return () => {
+    const routeChanged = store.route !== prevRoute;
+
+    const view = (
+      <>
+        {/* Mobile overlay */}
+        {store.sidebarOpen && (
+          <div
+            class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+            onClick={() => {
+              store.sidebarOpen = false;
+            }}
+          />
+        )}
+
+        {/* Sidebar */}
+        <aside
+          class={`
+            fixed lg:sticky top-16 left-0 z-40
+            w-64 h-[calc(100vh-4rem)] flex-shrink-0
+            bg-white dark:bg-[#1b1b1f]
+            border-r border-gray-200 dark:border-gray-800
+            overflow-y-auto
+            transition-transform duration-300
+            ${store.sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}
+        >
+          <nav class="pl-6 md:pl-12 pr-3 md:pr-4 py-6">
+            {menuData.map(section => {
+              const normalizedRoute = normalizePath(store.route);
+
+              if (routeChanged) {
+                const hasActive = section.items.some(
+                  item => normalizePath(item.link) === normalizedRoute
+                );
+                if (hasActive) {
+                  expanded[section.text] = true;
+                }
+              }
+
+              const isExpanded = expanded[section.text];
+
+              return (
+                <div class="mb-3">
+                  <button
+                    class="mb-1 w-full flex items-center justify-between text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider"
+                    onClick={() => toggleSection(section.text)}
+                  >
+                    <span>{section.text}</span>
+                    <span class="text-base leading-none">
+                      {isExpanded ? '▾' : '▸'}
+                    </span>
+                  </button>
+                  <ul
+                    class={`
+                      space-y-0 overflow-hidden transition-all duration-200 ease-in-out
+                      ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
+                    `}
+                    aria-hidden={!isExpanded}
+                  >
+                    {section.items.map(item => {
+                      const isActive =
+                        normalizePath(store.route) === normalizePath(item.link);
+                      return (
+                        <li>
+                          <a
+                            href={item.link}
+                            onClick={(e: Event) => {
+                              e.preventDefault();
+                              handleClick(item.link);
+                            }}
+                            class={`
+                              block px-2 py-1.5 rounded-md text-sm font-normal transition-colors
+                              ${
+                                isActive
+                                  ? 'text-[#42b883] bg-[#42b883] bg-opacity-10'
+                                  : 'text-gray-700 dark:text-gray-300 hover:text-[#42b883] dark:hover:text-[#42b883] hover:bg-gray-100 dark:hover:bg-gray-800'
+                              }
+                            `}
+                          >
+                            {item.text}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })}
+          </nav>
+        </aside>
+      </>
+    );
+
+    prevRoute = store.route;
+    return view;
+  };
 });
