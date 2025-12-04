@@ -67,6 +67,11 @@ const menuData: MenuSection[] = [
       { text: 'Computed Counter (helper)', link: '/examples/1' },
       { text: 'Shared Store (helper)', link: '/examples/2' },
       { text: 'Render Props (Mouse tracker)', link: '/examples/3' },
+      { text: 'Effect Lifecycle (helper)', link: '/examples/4' },
+      { text: 'Nested Fragments (Notifications)', link: '/examples/5' },
+      { text: 'Key-based Lists (Playlist)', link: '/examples/6' },
+      { text: 'innerHTML (Markdown Editor)', link: '/examples/7' },
+      { text: 'Select Controls (Character)', link: '/examples/8' },
     ],
   },
 ];

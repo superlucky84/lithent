@@ -11,7 +11,7 @@ interface MouseTrackerProps {
 }
 
 // Render Prop 패턴: 마우스 위치를 추적하고 render prop에 전달
-const MouseTracker = mount<MouseTrackerProps>((renew, props) => {
+const MouseTracker = mount<MouseTrackerProps>(renew => {
   const position = state<MousePosition>({ x: 0, y: 0 }, renew);
   const containerRef = ref<HTMLDivElement | null>(null);
 
@@ -25,13 +25,13 @@ const MouseTracker = mount<MouseTrackerProps>((renew, props) => {
     }
   };
 
-  return () => (
+  return ({ render }) => (
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
       class="relative w-full h-64 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden cursor-crosshair"
     >
-      {props.render(position.v)}
+      {render(position.v)}
     </div>
   );
 });

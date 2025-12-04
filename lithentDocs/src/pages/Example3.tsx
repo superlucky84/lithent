@@ -5,15 +5,15 @@ import type { Introduction } from '@/pages/Introduction';
 const example3Code = `import { mount, ref } from 'lithent';
 import { state } from 'lithent/helper';
 
-const MouseTracker = mount(({ render }, renew) => {
+const MouseTracker = mount((renew) => {
   const pos = state({ x: 0, y: 0 }, renew);
   const refEl = ref<HTMLDivElement | null>(null);
   const onMove = (e: MouseEvent) => {
-    const rect = refEl.value?.getBoundingClientRect();
-    if (!rect) return;
-    pos.v = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    if (refEl.value) {
+      pos.v = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
   };
-  return () => (
+  return ({ render }) => (
     <div ref={refEl} onMouseMove={onMove} class="tracker">
       {render(pos.v)}
     </div>
