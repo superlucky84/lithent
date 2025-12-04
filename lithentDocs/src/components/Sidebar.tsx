@@ -152,7 +152,7 @@ export const Sidebar = mount(renew => {
                   <ul
                     class={`
                       space-y-0 overflow-hidden transition-all duration-200 ease-in-out
-                      ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
+                      ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
                     `}
                     aria-hidden={!isExpanded}
                   >
