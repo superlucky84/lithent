@@ -25,11 +25,14 @@ render(<Writer />, document.getElementById('slot-2'));
 export const Example2Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Example 2 - Helper (store)
+      Store Helper
     </h1>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">store</code>
-      훅으로 여러 컴포넌트가 값을 공유하는 방법을 보여주는 예제입니다. 아래에서 코드와 라이브 데모를 함께 확인하세요.
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        store
+      </code>
+      훅으로 여러 컴포넌트가 값을 공유하는 방법을 보여주는 예제입니다. 아래에서
+      코드와 라이브 데모를 함께 확인하세요.
     </p>
 
     <CodeBlock language="typescript" code={example2Code} />

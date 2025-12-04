@@ -37,20 +37,24 @@ const MouseTracker = mount<MouseTrackerProps>((renew, props) => {
 });
 
 // 마우스를 따라다니는 이모지
-const FollowerEmoji = mount(_r => {
-  return ({ emoji, pos }: { emoji: string; pos: MousePosition }) => (
-    <div
-      class="absolute text-4xl pointer-events-none transition-transform duration-100"
-      style={{
-        left: `${pos.x}px`,
-        top: `${pos.y}px`,
-        transform: 'translate(-50%, -50%)',
-      }}
-    >
-      {emoji}
-    </div>
-  );
-});
+const FollowerEmoji = ({
+  emoji,
+  pos,
+}: {
+  emoji: string;
+  pos: MousePosition;
+}) => (
+  <div
+    class="absolute text-4xl pointer-events-none transition-transform duration-100"
+    style={{
+      left: `${pos.x}px`,
+      top: `${pos.y}px`,
+      transform: 'translate(-50%, -50%)',
+    }}
+  >
+    {emoji}
+  </div>
+);
 
 // 좌표 정보 표시
 const CoordinateDisplay = mount(_r => {

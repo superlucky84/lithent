@@ -61,11 +61,14 @@ const Example1Preview = mount(renew => {
 export const Example1Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Example 1 - Helper (computed)
+      Computed Helper
     </h1>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">computed</code>
-      훅으로 의존값이 바뀔 때만 재계산되는 값을 사용하는 예제입니다. 코드와 실행 결과를 함께 확인해 보세요.
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        computed
+      </code>
+      훅으로 의존값이 바뀔 때만 재계산되는 값을 사용하는 예제입니다. 코드와 실행
+      결과를 함께 확인해 보세요.
     </p>
 
     <CodeBlock language="typescript" code={example1Code} />

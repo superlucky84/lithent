@@ -31,7 +31,7 @@ const MouseTracker = mount(({ render }, renew) => {
 export const Example3Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Example 3 - Render Props (Mouse tracker)
+      Render Props (Mouse tracker)
     </h1>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       마우스 위치를 추적하는 로직을 <strong>render prop</strong>으로 노출해
