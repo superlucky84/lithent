@@ -45,6 +45,10 @@ import { Example12Page } from '@/pages/Example12';
 import { Example13Page } from '@/pages/Example13';
 import { Example14Page } from '@/pages/Example14';
 import { Example15Page } from '@/pages/Example15';
+import { Example16Page } from '@/pages/Example16';
+import { Example17Page } from '@/pages/Example17';
+import { Example18Page } from '@/pages/Example18';
+import { Example19Page } from '@/pages/Example19';
 
 const normalizeRoute = (path: string) =>
   path.replace(/\/+$/, '') || '/guide/introduction';
@@ -98,6 +102,10 @@ const routes: Record<string, PageComponent> = {
   '/examples/13': Example13Page,
   '/examples/14': Example14Page,
   '/examples/15': Example15Page,
+  '/examples/16': Example16Page,
+  '/examples/17': Example17Page,
+  '/examples/18': Example18Page,
+  '/examples/19': Example19Page,
 };
 
 export const Layout = mount(renew => {

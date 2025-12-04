@@ -78,6 +78,10 @@ const menuData: MenuSection[] = [
       { text: 'Mixed DOM + Loop (Waitlist)', link: '/examples/13' },
       { text: 'Nested Unmount (Game Inventory)', link: '/examples/14' },
       { text: 'Nested Props (Volume Controller)', link: '/examples/15' },
+      { text: 'insertBefore + Destroy (Music Library)', link: '/examples/16' },
+      { text: 'SVG Rendering (Traffic Light)', link: '/examples/17' },
+      { text: 'CacheUpdate (Product Filter)', link: '/examples/18' },
+      { text: 'FTags CDN (Smart Todo List)', link: '/examples/19' },
     ],
   },
 ];
