@@ -74,6 +74,8 @@ const menuData: MenuSection[] = [
       { text: 'Select Controls (Character)', link: '/examples/8' },
       { text: 'Input Controls (Business Card)', link: '/examples/9' },
       { text: 'Checkbox & Radio (Pizza Builder)', link: '/examples/10' },
+      { text: 'Mixed DOM (Social Timeline)', link: '/examples/12' },
+      { text: 'Mixed DOM + Loop (Waitlist)', link: '/examples/13' },
     ],
   },
 ];
