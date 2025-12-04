@@ -76,6 +76,8 @@ const menuData: MenuSection[] = [
       { text: 'Checkbox & Radio (Pizza Builder)', link: '/examples/10' },
       { text: 'Mixed DOM (Social Timeline)', link: '/examples/12' },
       { text: 'Mixed DOM + Loop (Waitlist)', link: '/examples/13' },
+      { text: 'Nested Unmount (Game Inventory)', link: '/examples/14' },
+      { text: 'Nested Props (Volume Controller)', link: '/examples/15' },
     ],
   },
 ];
