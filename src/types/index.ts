@@ -10,7 +10,9 @@ export type CompKey = Props;
 export type TagFunction = (
   prop: Props,
   children?: MiddleStateWDomChildren
-) => (renew: Renew, prop: Props, children: WDom[]) => (props: Props) => WDom;
+) =>
+  | ((renew: Renew, prop: Props, children: WDom[]) => (props: Props) => WDom)
+  | WDom;
 
 export type Renew = () => boolean;
 export type Component<T> = (

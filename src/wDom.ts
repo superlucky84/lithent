@@ -249,18 +249,23 @@ const createComponentResolver = (
     initMountHookState(compKey);
 
     const initialComponent = tag(props, wrappedChildren);
-    const component =
-      typeof initialComponent === 'function'
-        ? initialComponent
-        : () => () => initialComponent;
 
-    // Check if component is created with lmount (no renew parameter)
-    // TypeScript cannot infer that component is LComponent when has() returns true,
-    // because WeakSet.has() is a runtime check that doesn't narrow types.
-    // We use 'as any' since the runtime check guarantees type safety.
-    const componentMaker = lmountComponentSet.has(component)
-      ? (component as any)(props, wrappedChildren)
-      : component(componentUpdate(compKey), props, wrappedChildren);
+    let componentMaker: (nextProps: Props) => WDom;
+
+    if (typeof initialComponent === 'function') {
+      const component = initialComponent;
+      // Check if component is created with lmount (no renew parameter)
+      // TypeScript cannot infer that component is LComponent when has() returns true,
+      // because WeakSet.has() is a runtime check that doesn't narrow types.
+      // We use 'as any' since the runtime check guarantees type safety.
+      componentMaker = lmountComponentSet.has(component)
+        ? (component as any)(props, wrappedChildren)
+        : component(componentUpdate(compKey), props, wrappedChildren);
+    } else {
+      // For components that directly return a VDom, recreate it each render.
+      componentMaker = (nextProps: Props) =>
+        tag(nextProps, wrappedChildren) as WDom;
+    }
 
     return makeCustomNode(componentMaker, compKey, tag, props, wrappedChildren);
   };
