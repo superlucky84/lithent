@@ -72,6 +72,8 @@ const menuData: MenuSection[] = [
       { text: 'Key-based Lists (Playlist)', link: '/examples/6' },
       { text: 'innerHTML (Markdown Editor)', link: '/examples/7' },
       { text: 'Select Controls (Character)', link: '/examples/8' },
+      { text: 'Input Controls (Business Card)', link: '/examples/9' },
+      { text: 'Checkbox & Radio (Pizza Builder)', link: '/examples/10' },
     ],
   },
 ];
