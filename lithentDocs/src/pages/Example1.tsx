@@ -1,85 +1,90 @@
 import { CodeBlock } from '@/components/CodeBlock';
-import { mount } from 'lithent';
-import { state, computed } from 'lithent/helper';
 import type { Introduction } from '@/pages/Introduction';
-
-const example1Code = `import { mount, render } from 'lithent';
-import { state, computed } from 'lithent/helper';
-
-const Counter = mount(renew => {
-  const count = state<number>(1, renew);
-  const sum = computed(() =>
-    [1, 3, 5, 7, 9].reduce((acc, n) => acc + n * count.v, 0)
-  );
-
-  const increment = () => {
-    count.v += 1;
-  };
-
-  return () => (
-    <div class="card">
-      <p>computed: {sum.v}</p>
-      <button onClick={increment}>+1</button>
-    </div>
-  );
-});
-
-render(<Counter />, document.getElementById('root'));
-`;
-
-const Example1Preview = mount(renew => {
-  const count = state<number>(1, renew);
-  const sum = computed(() =>
-    [1, 3, 5, 7, 9].reduce((acc, n) => acc + n * count.v, 0)
-  );
-
-  const increment = () => {
-    count.v += 1;
-  };
-
-  return () => (
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={increment}
-          class="px-3 py-2 rounded-md text-sm font-medium text-white bg-[#42b883] hover:bg-[#36996b] transition-colors"
-        >
-          +1
-        </button>
-        <span class="text-sm text-gray-800 dark:text-gray-200">
-          computed: <strong class="text-[#42b883]">{sum.v}</strong>
-        </span>
-      </div>
-      <p class="text-xs text-gray-500 dark:text-gray-400">
-        1,3,5,7,9의 합을 count 배로 계산합니다.
-      </p>
-    </div>
-  );
-});
+import { Example1 } from '@/components/examples/example1';
 
 export const Example1Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Computed Helper
+      Example 1 - computed로 바나나 칼로리 계산
     </h1>
+
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         computed
-      </code>
-      훅으로 의존값이 바뀔 때만 재계산되는 값을 사용하는 예제입니다. 코드와 실행
-      결과를 함께 확인해 보세요.
+      </code>{' '}
+      훅을 사용해 바나나 스무디 잔 수에서 예상 칼로리를 계산하는 아주 작은
+      예제입니다. 수량 state가 바뀔 때마다 파생 값인 칼로리가 자동으로 다시
+      계산됩니다.
     </p>
 
-    <CodeBlock language="typescript" code={example1Code} />
+    <CodeBlock
+      language="tsx"
+      code={`import { mount } from 'lithent';
+import { state, computed } from 'lithent/helper';
 
-    <div class="not-prose mt-6">
+// 1잔당 95 kcal 기준 바나나 스무디 칼로리 계산기
+export const BananaSmoothie = mount(renew => {
+  const cups = state(1, renew);
+  const calories = computed(() => cups.v * 95);
+
+  const inc = () => (cups.v += 1);
+  const dec = () => (cups.v = Math.max(0, cups.v - 1));
+
+  return () => (
+    <div>
+      <p>🍌 스무디 {cups.v}잔</p>
+      <p>예상 칼로리: {calories.v} kcal</p>
+      <button onClick={dec} disabled={cups.v === 0}>-1</button>
+      <button onClick={inc}>+1</button>
+    </div>
+  );
+});`}
+    />
+
+    <div class="not-prose mt-6 mb-10">
       <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 shadow-sm">
         <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">
           Live demo
         </h3>
-        <Example1Preview />
+        <Example1 />
       </div>
     </div>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      관련 문서
+    </h2>
+
+    <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 space-y-2">
+      <li>
+        <a
+          href="/guide/computed"
+          class="text-[#42b883] hover:underline"
+          onClick={(e: Event) => {
+            e.preventDefault();
+            window.history.pushState({}, '', '/guide/computed');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }}
+        >
+          Computed 가이드
+        </a>{' '}
+        - computed 훅의 전체 동작과 API를 자세히 설명합니다.
+      </li>
+      <li>
+        <a
+          href="/guide/state"
+          class="text-[#42b883] hover:underline"
+          onClick={(e: Event) => {
+            e.preventDefault();
+            window.history.pushState({}, '', '/guide/state');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }}
+        >
+          State 가이드
+        </a>{' '}
+        - 기본 state 훅과 .v 패턴에 대해 소개합니다.
+      </li>
+    </ul>
   </div>
 );

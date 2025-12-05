@@ -34,6 +34,7 @@ const menuData: MenuSection[] = [
       { text: 'Mount Ready Hooks', link: '/guide/mount-ready-hooks' },
       { text: 'useRenew Hooks', link: '/guide/use-renew-hooks' },
       { text: 'NextTick', link: '/guide/next-tick' },
+      { text: 'Stateless Components', link: '/guide/stateless' },
     ],
   },
   {
@@ -64,7 +65,7 @@ const menuData: MenuSection[] = [
   {
     text: 'Examples',
     items: [
-      { text: 'Computed Counter (helper)', link: '/examples/1' },
+      { text: 'Computed (바나나 칼로리)', link: '/examples/1' },
       { text: 'Shared Store (helper)', link: '/examples/2' },
       { text: 'Render Props (Mouse tracker)', link: '/examples/3' },
       { text: 'Effect Lifecycle (helper)', link: '/examples/4' },
@@ -74,6 +75,7 @@ const menuData: MenuSection[] = [
       { text: 'Select Controls (Character)', link: '/examples/8' },
       { text: 'Input Controls (Business Card)', link: '/examples/9' },
       { text: 'Checkbox & Radio (Pizza Builder)', link: '/examples/10' },
+      { text: 'Context (Theme & User)', link: '/examples/11' },
       { text: 'Mixed DOM (Social Timeline)', link: '/examples/12' },
       { text: 'Mixed DOM + Loop (Waitlist)', link: '/examples/13' },
       { text: 'Nested Unmount (Game Inventory)', link: '/examples/14' },
@@ -92,7 +94,7 @@ const normalizePath = (path: string) => path.replace(/\/+$/, '') || '/';
 export const Sidebar = mount(renew => {
   const store = appStore.watch(renew);
   const expanded: Record<string, boolean> = Object.fromEntries(
-    menuData.map(section => [section.text, true])
+    menuData.map(section => [section.text, false])
   );
   let prevRoute = store.route;
 
@@ -107,6 +109,14 @@ export const Sidebar = mount(renew => {
 
   return () => {
     const routeChanged = store.route !== prevRoute;
+    const normalizedRoute = normalizePath(store.route);
+
+    // 메인페이지로 이동하면 모든 섹션 닫기
+    if (routeChanged && normalizedRoute === '/') {
+      menuData.forEach(section => {
+        expanded[section.text] = false;
+      });
+    }
 
     const view = (
       <>
@@ -134,9 +144,7 @@ export const Sidebar = mount(renew => {
         >
           <nav class="pl-6 md:pl-12 pr-3 md:pr-4 py-6">
             {menuData.map(section => {
-              const normalizedRoute = normalizePath(store.route);
-
-              if (routeChanged) {
+              if (routeChanged && normalizedRoute !== '/') {
                 const hasActive = section.items.some(
                   item => normalizePath(item.link) === normalizedRoute
                 );
@@ -161,7 +169,7 @@ export const Sidebar = mount(renew => {
                   <ul
                     class={`
                       space-y-0 overflow-hidden transition-all duration-200 ease-in-out
-                      ${isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
+                      ${isExpanded ? 'max-h-[1200px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
                     `}
                     aria-hidden={!isExpanded}
                   >

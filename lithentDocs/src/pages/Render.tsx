@@ -333,7 +333,7 @@ const destroyContent = render(<Content />, document.getElementById('content'));
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음단계
+      다음 단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -352,6 +352,23 @@ const destroyContent = render(<Content />, document.getElementById('content'));
           컴포넌트를 부모 DOM 계층 외부로 렌더링하는 Portal 기능을 알아보세요.
           <br />
           모달, 툴팁 등을 구현할 때 유용한 Portal의 사용법을 배워봅시다.
+        </p>
+      </a>
+
+      <a
+        href="/examples/16"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/examples/16');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          예제: insertBefore + Destroy →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          기존 실제 DOM 사이에 Lithent 컴포넌트를 insertBefore 모드로 삽입하고,
+          destroy 함수로 정리하는 실전 예제를 확인해 보세요.
         </p>
       </a>
     </div>

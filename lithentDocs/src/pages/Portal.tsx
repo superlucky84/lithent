@@ -386,7 +386,7 @@ const App = mount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음단계
+      다음 단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -406,6 +406,23 @@ const App = mount(() => {
           훅에 대해 알아보세요.
           <br />
           컴포넌트 생명주기를 제어하는 방법을 배워봅시다.
+        </p>
+      </a>
+
+      <a
+        href="/examples/20"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/examples/20');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          예제: 이미지 갤러리 라이트박스 →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          overflow:hidden 갤러리 밖으로 Portal을 사용해 전체 화면 라이트박스를
+          띄우는 예제를 직접 실행해 보세요.
         </p>
       </a>
     </div>

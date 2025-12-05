@@ -2,12 +2,22 @@ import { CodeBlock } from '@/components/CodeBlock';
 import { Example12 } from '@/components/examples/example12';
 import type { Introduction } from '@/pages/Introduction';
 
-const example12Code = `import { mount, Fragment, render, ref, mountCallback } from 'lithent';
+const ssrHtmlCode = `<!-- 서버에서 렌더링된 초기 HTML (실제 DOM) -->
+<div id="feed">
+  <article>📌 Pinned Post (실제 DOM)</article>
+  <article>👤 Older Post (실제 DOM)</article>
+
+  <!-- 이 지점 위/아래는 서버가 렌더링한 실제 DOM 입니다 -->
+  <article id="sponsored-slot">📢 Sponsored (실제 DOM)</article>
+  <article>📜 Archive (실제 DOM)</article>
+</div>`;
+
+const clientCode = `import { Fragment, render } from 'lithent';
 import { state } from 'lithent/helper';
 
 // 동적 포스트 컴포넌트 (가상 DOM)
-const DynamicPosts = mount(r => {
-  const visiblePosts = state<boolean[]>([true, true, true], r);
+const DynamicPosts = mount(renew => {
+  const visiblePosts = state([true, true, true], renew);
 
   const togglePost = (index: number) => {
     visiblePosts.v = visiblePosts.v.map((v, i) => (i === index ? !v : v));
@@ -15,10 +25,7 @@ const DynamicPosts = mount(r => {
 
   return () => (
     <Fragment>
-      {/* 컨트롤 패널 */}
       <div>Controls...</div>
-
-      {/* 조건부 포스트들 */}
       {visiblePosts.v[0] && <article>Post 1 (가상 DOM)</article>}
       {visiblePosts.v[1] && <article>Post 2 (가상 DOM)</article>}
       {visiblePosts.v[2] && <article>Post 3 (가상 DOM)</article>}
@@ -26,31 +33,13 @@ const DynamicPosts = mount(r => {
   );
 });
 
-// 메인 컴포넌트
-const Timeline = mount(() => {
-  const feedContainer = ref<null | HTMLElement>(null);
-  const insertionPoint = ref<null | HTMLElement>(null);
+// 기존 실제 DOM 사이에 가상 DOM 삽입
+const feedContainer = document.getElementById('feed');
+const insertionPoint = document.getElementById('sponsored-slot');
 
-  mountCallback(() => {
-    // 가상 DOM을 실제 DOM 사이에 삽입
-    render(<DynamicPosts />, feedContainer.value, insertionPoint.value);
-  });
-
-  return () => (
-    <div ref={feedContainer}>
-      {/* 상단: 실제 DOM */}
-      <article>Pinned Post (실제 DOM)</article>
-      <article>Older Post (실제 DOM)</article>
-
-      {/* 중간: 가상 DOM이 여기 삽입됨 */}
-
-      {/* 하단: 실제 DOM */}
-      <article ref={insertionPoint}>Sponsored (실제 DOM)</article>
-      <article>Archive (실제 DOM)</article>
-    </div>
-  );
-});
-`;
+if (feedContainer && insertionPoint) {
+  render(<DynamicPosts />, feedContainer, insertionPoint as HTMLElement);
+}`;
 
 export const Example12Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
@@ -79,7 +68,15 @@ export const Example12Page = (): ReturnType<typeof Introduction> => (
       않는지 확인하세요!
     </p>
 
-    <CodeBlock language="typescript" code={example12Code} />
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-3">
+      1. 서버에서 내려온 초기 HTML (실제 DOM)
+    </h2>
+    <CodeBlock language="html" code={ssrHtmlCode} />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-8 mb-3">
+      2. 클라이언트에서 실행되는 Lithent 코드 (가상 DOM)
+    </h2>
+    <CodeBlock language="typescript" code={clientCode} />
 
     <div class="not-prose mt-6">
       <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 shadow-sm">
@@ -259,6 +256,44 @@ export const Example12Page = (): ReturnType<typeof Introduction> => (
         <li>• ref 값은 mountCallback 이후에만 사용 가능합니다</li>
         <li>
           • 같은 위치에 여러 번 render()를 호출하면 이전 가상 DOM이 교체됩니다
+        </li>
+      </ul>
+    </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 space-y-2 mb-6">
+        <li>
+          <a
+            href="/guide/render"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/render');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Render 가이드
+          </a>{' '}
+          - render(wDom, wrapElement, afterElement) 시그니처와 insertBefore
+          모드를 정식 문서로 정리해 둔 페이지입니다.
+        </li>
+        <li>
+          <a
+            href="/examples/13"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/examples/13');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Example 13: Mixed DOM + Loop
+          </a>{' '}
+          - 같은 패턴을 key 기반 리스트와 함께 사용하는 확장 예제를 함께 보면
+          이해가 더 잘 됩니다.
         </li>
       </ul>
     </div>

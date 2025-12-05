@@ -378,20 +378,31 @@ const TodoList = mount(renew => {
           state-ref의 전체 API 문서와 더 많은 예제를 확인하세요.
         </p>
       </a>
+    </div>
 
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      다음단계
+    </h2>
+
+    <div class="grid gap-6 mt-6">
       <a
-        href="/guide/store"
+        href="/guide/vite-plugin"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/store');
+          navigateTo('/guide/vite-plugin');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          ← Store Helper
+          템플릿: Vite Plugin →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Lithent 내장 store의 사용법을 다시 확인하세요.
+          JSX나 다양한 템플릿 방식을 사용하기 위한 Vite 플러그인 설정 방법을
+          알아보세요.
+          <br />
+          프로젝트에 맞는 템플릿 방식을 선택할 수 있습니다.
         </p>
       </a>
     </div>

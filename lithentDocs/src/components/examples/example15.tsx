@@ -112,7 +112,7 @@ export const Example15 = mount(renew => {
           </button>
           <input
             type="range"
-            min="0"
+            min="1"
             max="100"
             value={volume.v}
             onInput={setVolume}

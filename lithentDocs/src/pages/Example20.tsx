@@ -75,16 +75,6 @@ export const Example20Page = mount(() => {
           </p>
         </div>
 
-        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-          <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100 mb-2">
-            ref
-          </h3>
-          <p class="text-sm text-blue-800 dark:text-blue-200">
-            라이트박스 컨테이너 DOM 엘리먼트를 참조합니다. Portal의 렌더링
-            대상으로 사용됩니다.
-          </p>
-        </div>
-
         <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
           <h3 class="text-base font-semibold text-green-900 dark:text-green-100 mb-2">
             state (helper)
@@ -92,15 +82,6 @@ export const Example20Page = mount(() => {
           <p class="text-sm text-green-800 dark:text-green-200">
             선택된 사진 상태를 관리합니다. .v로 접근하고 자동으로
             리렌더링됩니다.
-          </p>
-        </div>
-
-        <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
-          <h3 class="text-base font-semibold text-orange-900 dark:text-orange-100 mb-2">
-            mountCallback
-          </h3>
-          <p class="text-sm text-orange-800 dark:text-orange-200">
-            첫 렌더링 후 ref가 설정되면 다시 렌더링하여 Portal을 활성화합니다.
           </p>
         </div>
       </div>
@@ -120,7 +101,8 @@ export const Example20Page = mount(() => {
         </h3>
         <p class="text-xs text-gray-700 dark:text-gray-300">
           서버에서 HTML에 라이트박스 컨테이너를 미리 렌더링하고, 클라이언트에서
-          Portal을 사용해 해당 영역에 라이트박스를 렌더링합니다.
+          Portal을 사용해 해당 영역(예: <code>document.body</code> 또는 별도의{' '}
+          <code>lightbox-root</code>)에 라이트박스를 렌더링합니다.
         </p>
       </div>
 
@@ -142,27 +124,11 @@ export const Example20Page = mount(() => {
       <CodeBlock
         language="tsx"
         code={`// app.tsx (클라이언트 코드)
-import { mount, mountCallback, portal, ref } from 'lithent';
+import { mount, portal } from 'lithent';
 import { state } from 'lithent/helper';
 
-interface Photo {
-  id: number;
-  title: string;
-  thumbnail: string;
-  full: string;
-}
-
-const photos: Photo[] = [
-  { id: 1, title: '산 풍경', thumbnail: '🏔️', full: '🏔️' },
-  { id: 2, title: '바다 풍경', thumbnail: '🌊', full: '🌊' },
-  { id: 3, title: '도시 야경', thumbnail: '🌃', full: '🌃' },
-];
-
-export const Gallery = mount(r => {
-  const selectedPhoto = state<Photo | null>(null, r);
-
-  // 첫 렌더링 후 lightbox-root DOM이 준비되면 리렌더
-  mountCallback(() => r());
+export const Gallery = mount(renew => {
+  const selectedPhoto = state<Photo | null>(null, renew);
 
   const openLightbox = (photo: Photo) => {
     selectedPhoto.v = photo;
@@ -172,72 +138,89 @@ export const Gallery = mount(r => {
     selectedPhoto.v = null;
   };
 
-  // 라이트박스 렌더링
-  const renderLightbox = () => {
-    const lightboxRoot = document.getElementById('lightbox-root');
-    return lightboxRoot && selectedPhoto.v
-      ? portal(Lightbox, lightboxRoot)
-      : null;
-  };
-
   return () => (
     <div>
       {/* 갤러리 (overflow:hidden 컨테이너) */}
       <div class="gallery-container" style="overflow: hidden;">
         {photos.map(photo => (
-          <button
-            key={photo.id}
-            onClick={() => openLightbox(photo)}
-          >
+          <button key={photo.id} onClick={() => openLightbox(photo)}>
             <span>{photo.thumbnail}</span>
             <span>{photo.title}</span>
           </button>
         ))}
       </div>
 
-      {/* Portal 렌더링 */}
-      {renderLightbox()}
+      {/* Portal 렌더링 - document.body 또는 SSR로 정의된 lightbox-root 등 */}
+      {selectedPhoto.v &&
+        portal(
+          <Lightbox photo={selectedPhoto.v} onClose={closeLightbox} />,
+          document.body
+        )}
     </div>
   );
 });`}
       />
 
       <p class="text-sm text-gray-700 dark:text-gray-300 mt-4 mb-2">
-        <strong>라이트박스 컨테이너에 Portal로 렌더링되는 HTML:</strong>
+        <strong>라이트박스 컴포넌트 (Portal로 렌더링되는 내용):</strong>
       </p>
 
       <CodeBlock
-        language="html"
-        code={`<!-- lightbox-root 영역에 Portal로 렌더링되는 내용 -->
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
-  <!-- 닫기 버튼 -->
-  <button class="absolute top-4 right-4 text-white text-3xl">
-    ✕
-  </button>
-
-  <!-- 라이트박스 본체 -->
-  <div class="bg-white rounded-lg shadow-2xl p-6 max-w-2xl">
-    <div class="flex flex-col items-center">
-      <!-- 큰 이미지 -->
-      <span class="text-9xl mb-4">🏔️</span>
-
-      <!-- 제목 -->
-      <h3 class="text-2xl font-bold mb-2">
-        산 풍경
-      </h3>
-
-      <!-- ID -->
-      <p class="text-sm text-gray-600 mb-4">
-        ID: 1
-      </p>
-
-      <!-- 닫기 버튼 -->
-      <button class="px-6 py-2 bg-blue-600 text-white rounded-lg">
-        닫기
+        language="tsx"
+        code={`// Lightbox.tsx (Portal로 렌더링되는 컴포넌트)
+const Lightbox = mount<{
+  photo: Photo;
+  onClose: () => void;
+}>((r, props) => {
+  return () => (
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 animate-fadeIn">
+      {/* 닫기 버튼 */}
+      <button
+        onClick={props.onClose}
+        class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 transition-colors"
+      >
+        ✕
       </button>
+
+      {/* 라이트박스 본체 */}
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 max-w-2xl w-full mx-4">
+        <div class="flex flex-col items-center">
+          {/* 큰 이미지 */}
+          <span class="text-9xl mb-4">{props.photo.full}</span>
+
+          {/* 제목 */}
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            {props.photo.title}
+          </h3>
+
+          {/* ID */}
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            ID: {props.photo.id}
+          </p>
+
+          {/* 닫기 버튼 */}
+          <button
+            onClick={props.onClose}
+            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            닫기
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>`}
+  );
+});
+
+// Gallery 컴포넌트에서 사용
+const renderLightbox = () => {
+  const lightboxRoot = document.getElementById('lightbox-root');
+  return lightboxRoot && selectedPhoto.v
+    ? portal(
+        <Lightbox photo={selectedPhoto.v} onClose={closeLightbox} />,
+        lightboxRoot
+      )
+    : null;
+};`}
       />
 
       <div class="my-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
@@ -254,12 +237,12 @@ export const Gallery = mount(r => {
             요소를 직접 참조합니다.
           </li>
           <li>
-            <strong>3. portal() 함수:</strong> portal(Lightbox, lightboxRoot)로
-            라이트박스를 렌더링합니다.
+            <strong>3. portal() 함수:</strong> portal(&lt;Lightbox /&gt;,
+            lightboxRoot)로 라이트박스 컴포넌트를 렌더링합니다.
           </li>
           <li>
-            <strong>4. 분리된 HTML:</strong> 라이트박스 HTML은 별도로 표시되어
-            Portal이 렌더링하는 실제 내용을 명확히 보여줍니다.
+            <strong>4. 재사용 가능한 컴포넌트:</strong> Lightbox를 독립적인
+            컴포넌트로 분리하여 props로 데이터를 전달합니다.
           </li>
           <li>
             <strong>5. overflow 해결:</strong> 갤러리는 overflow:hidden이지만

@@ -712,18 +712,21 @@ render(html\`<\${App} />\`, document.getElementById('root'));`}
       </a>
 
       <a
-        href="/guide/ftags"
+        href="/guide/template-strings"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/ftags');
+          navigateTo('/guide/template-strings');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          FTags →
+          Template Strings →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Lithent의 또 다른 JSX 대안인 FTags를 알아보세요.
+          강력한 지시자(l-if, l-for)를 제공하는 Lithent의 템플릿 시스템을
+          알아보세요.
+          <br />
+          JSX와 유사하면서도 더 선언적인 문법을 제공합니다.
         </p>
       </a>
     </div>

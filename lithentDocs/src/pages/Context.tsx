@@ -715,6 +715,24 @@ const Content = mount(renew => {
 
     <div class="grid gap-6 mt-6">
       <a
+        href="/examples/11"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/examples/11');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          예제: Context로 테마 &amp; 사용자 공유 →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          여러 컴포넌트가 같은 Context(AppContext)를 구독하고,
+          <br />
+          user / theme / accent 값을 함께 공유하는 실제 예제를 실행해 보세요.
+        </p>
+      </a>
+
+      <a
         href="/guide/lcontext"
         onClick={(e: Event) => {
           e.preventDefault();

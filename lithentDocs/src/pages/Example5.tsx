@@ -133,5 +133,43 @@ export const Example5Page = (): ReturnType<typeof Introduction> => (
         </li>
       </ul>
     </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
+        <li>
+          <a
+            href="/guide/children"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/children');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Children 가이드
+          </a>{' '}
+          - Fragment와 children이 어떻게 렌더 트리를 구성하는지 기본 개념을
+          정리합니다.
+        </li>
+        <li>
+          <a
+            href="/guide/updater"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/updater');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Updater 가이드
+          </a>{' '}
+          - 필터 변경 시 Fragment 그룹이 어떻게 갱신되는지, 업데이트 흐름
+          관점에서 이해할 수 있습니다.
+        </li>
+      </ul>
+    </div>
   </div>
 );

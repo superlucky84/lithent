@@ -2,6 +2,7 @@ import { mount } from 'lithent';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { appStore } from '@/store';
+import { Home } from '@/pages/Home';
 import { Introduction } from '@/pages/Introduction';
 import { QuickStart } from '@/pages/QuickStart';
 import { Mounter } from '@/pages/Mounter';
@@ -31,6 +32,7 @@ import { ManualJSX } from '@/pages/ManualJSX';
 import { FTags } from '@/pages/FTags';
 import { HtmTags } from '@/pages/HtmTags';
 import { TemplateStrings } from '@/pages/TemplateStrings';
+import { Stateless } from '@/pages/Stateless';
 import { Example1Page } from '@/pages/Example1';
 import { Example2Page } from '@/pages/Example2';
 import { Example3Page } from '@/pages/Example3';
@@ -41,6 +43,7 @@ import { Example7Page } from '@/pages/Example7';
 import { Example8Page } from '@/pages/Example8';
 import { Example9Page } from '@/pages/Example9';
 import { Example10Page } from '@/pages/Example10';
+import { Example11Page } from '@/pages/Example11';
 import { Example12Page } from '@/pages/Example12';
 import { Example13Page } from '@/pages/Example13';
 import { Example14Page } from '@/pages/Example14';
@@ -51,8 +54,10 @@ import { Example18Page } from '@/pages/Example18';
 import { Example19Page } from '@/pages/Example19';
 import { Example20Page } from '@/pages/Example20';
 
-const normalizeRoute = (path: string) =>
-  path.replace(/\/+$/, '') || '/guide/introduction';
+const normalizeRoute = (path: string) => {
+  const cleaned = path.replace(/\/+$/, '');
+  return cleaned || '/';
+};
 
 type PageComponent =
   | ((...args: any[]) => ReturnType<typeof Introduction>)
@@ -60,6 +65,7 @@ type PageComponent =
 
 // Route configuration
 const routes: Record<string, PageComponent> = {
+  '/': Home,
   '/guide/introduction': Introduction,
   '/guide/quick-start': QuickStart,
   '/guide/mounter': Mounter,
@@ -89,6 +95,7 @@ const routes: Record<string, PageComponent> = {
   '/guide/ftags': FTags,
   '/guide/htm-tags': HtmTags,
   '/guide/template-strings': TemplateStrings,
+  '/guide/stateless': Stateless,
   '/examples/1': Example1Page,
   '/examples/2': Example2Page,
   '/examples/3': Example3Page,
@@ -99,6 +106,7 @@ const routes: Record<string, PageComponent> = {
   '/examples/8': Example8Page,
   '/examples/9': Example9Page,
   '/examples/10': Example10Page,
+  '/examples/11': Example11Page,
   '/examples/12': Example12Page,
   '/examples/13': Example13Page,
   '/examples/14': Example14Page,
@@ -127,8 +135,8 @@ export const Layout = mount(renew => {
             <Sidebar />
 
             {/* Main Content */}
-            <main class="flex-1 w-full min-w-0 px-6 md:px-12 py-8">
-              <div class="max-w-full md:max-w-[43rem]">
+            <main class="flex-1 w-full min-w-0 px-6 md:px-12 py-8 max-w-full">
+              <div class="max-w-full md:max-w-[43rem] page-shell">
                 <CurrentPage />
               </div>
             </main>

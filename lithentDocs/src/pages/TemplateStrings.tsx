@@ -1003,39 +1003,41 @@ export default defineConfig({
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음 단계
+      다음단계
     </h2>
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/vite-plugin"
+        href="/examples/1"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/vite-plugin');
+          navigateTo('/examples/1');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Vite Plugin →
+          실전 예제 보기 →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Lithent Vite 플러그인의 HMR 기능과 설정 옵션을 알아보세요.
+          20개 이상의 실용적인 예제를 통해 Lithent의 다양한 기능을 경험해보세요.
+          <br />
+          computed, store, portal 등의 실제 활용 방법을 배울 수 있습니다.
         </p>
       </a>
 
       <a
-        href="/guide/htm-tags"
+        href="/"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/htm-tags');
+          navigateTo('/');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          HTM Tags →
+          ← 홈으로 돌아가기
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          빌드 도구 없이 사용 가능한 HTM 템플릿 문법을 알아보세요.
+          Lithent의 전체 문서 구조를 확인하고 원하는 주제를 찾아보세요.
         </p>
       </a>
     </div>

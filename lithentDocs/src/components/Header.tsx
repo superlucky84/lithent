@@ -12,10 +12,10 @@ export const Header = mount(renew => {
           <div class="w-auto sm:w-48 lg:w-64 flex-shrink-0 flex items-center px-6 md:px-12">
             {/* Logo and Title */}
             <a
-              href="/guide/introduction"
+              href="/"
               onClick={(e: Event) => {
                 e.preventDefault();
-                navigateTo('/guide/introduction');
+                navigateTo('/');
               }}
               class="flex items-center gap-3"
             >

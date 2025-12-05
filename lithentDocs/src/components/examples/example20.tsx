@@ -1,4 +1,4 @@
-import { mount, mountCallback, portal, ref } from 'lithent';
+import { mount, portal } from 'lithent';
 import { state } from 'lithent/helper';
 
 interface Photo {
@@ -47,14 +47,8 @@ const photos: Photo[] = [
   },
 ];
 
-export const Example20 = mount(r => {
-  const selectedPhoto = state<Photo | null>(null, r);
-  const lightboxRef = ref<HTMLElement | null>(null);
-
-  // 첫 렌더링 후 lightbox DOM이 준비되면 리렌더
-  mountCallback(() => {
-    r();
-  });
+export const Example20 = mount(renew => {
+  const selectedPhoto = state<Photo | null>(null, renew);
 
   const openLightbox = (photo: Photo) => {
     selectedPhoto.v = photo;
@@ -96,12 +90,8 @@ export const Example20 = mount(r => {
         </div>
       </div>
 
-      {/* Lightbox를 렌더링할 대상 영역 */}
-      <div ref={lightboxRef} id="lightbox-container" />
-
       {/* Portal로 라이트박스 렌더링 */}
-      {lightboxRef.value &&
-        selectedPhoto.v &&
+      {selectedPhoto.v &&
         portal(
           <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 animate-fadeIn">
             <button
@@ -129,7 +119,7 @@ export const Example20 = mount(r => {
               </div>
             </div>
           </div>,
-          lightboxRef.value as HTMLElement
+          document.body as HTMLElement
         )}
 
       {/* 설명 */}

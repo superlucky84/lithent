@@ -174,5 +174,43 @@ export const Example4Page = (): ReturnType<typeof Introduction> => (
         <Example4Preview />
       </div>
     </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 space-y-2">
+        <li>
+          <a
+            href="/guide/effect"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/effect');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Effect 가이드
+          </a>{' '}
+          - effect 헬퍼의 forward/backward/dependencies 설계와 생명주기 연동
+          방식을 자세히 설명합니다.
+        </li>
+        <li>
+          <a
+            href="/guide/mount-hooks"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/mount-hooks');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Mount Hooks 가이드
+          </a>{' '}
+          - effect의 내부 구현에 사용되는 mountCallback/mountReadyCallback
+          흐름을 함께 이해할 수 있습니다.
+        </li>
+      </ul>
+    </div>
   </div>
 );

@@ -49,5 +49,43 @@ export const Example3Page = (): ReturnType<typeof Introduction> => (
         <Example3 />
       </div>
     </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 space-y-2">
+        <li>
+          <a
+            href="/guide/children"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/children');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Children 가이드
+          </a>{' '}
+          - render prop처럼 함수 형태의 children을 다루는 패턴과 차이를
+          정리합니다.
+        </li>
+        <li>
+          <a
+            href="/guide/state"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/state');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            State 가이드
+          </a>{' '}
+          - 마우스 위치를 추적하는 state 업데이트 흐름을 다시 한 번 살펴볼 수
+          있습니다.
+        </li>
+      </ul>
+    </div>
   </div>
 );

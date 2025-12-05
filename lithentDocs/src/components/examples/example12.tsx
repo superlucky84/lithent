@@ -63,7 +63,7 @@ const DynamicPosts = mount(r => {
   return () => (
     <Fragment>
       {/* 컨트롤 패널 */}
-      <div class="sticky top-0 z-10 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 mb-3">
+      <div class="sticky top-0 z-10 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-3 mb-3">
         <div class="flex items-center gap-2 mb-2">
           <span class="text-xs font-semibold text-blue-800 dark:text-blue-200">
             🔄 실시간 포스트 (가상 DOM)

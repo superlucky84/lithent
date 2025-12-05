@@ -11,8 +11,8 @@ export const Example18Page = mount(() => {
 
       <p class="text-gray-600 dark:text-gray-400 mb-8">
         이 예제는 <code>cacheUpdate</code> helper 함수를 사용한 선택적 리렌더링
-        최적화를 보여줍니다. React의 <code>memo</code>와 유사하게 의존성 배열의
-        값이 변경될 때만 컴포넌트를 리렌더링합니다.
+        최적화를 보여줍니다. React의 <code>memo</code>처럼 의존성 배열의 값이
+        변경될 때만 특정 컴포넌트를 다시 그립니다.
       </p>
 
       {/* 테스트 포커스 */}
@@ -26,8 +26,9 @@ export const Example18Page = mount(() => {
             변경되지 않으면 두 번째 인자(updater)의 실행을 스킵합니다
           </li>
           <li>
-            <strong>선택적 리렌더링</strong>: 특정 props 변경만 추적하고
-            나머지는 무시하여 성능을 최적화합니다
+            <strong>선택적 리렌더링</strong>: 가격 슬라이더처럼 비싼 연산이
+            필요한 부분만 추적하고, 나머지 UI 상태는 무시하여 성능을
+            최적화합니다
           </li>
           <li>
             <strong>렌더링 카운터</strong>: Root와 ProductList의 렌더링 횟수를
@@ -55,14 +56,15 @@ export const Example18Page = mount(() => {
               배열에 포함)
             </li>
             <li>
-              <code>sortOption</code>: 정렬 옵션 (추적 안 됨 - 의존성 배열에
-              미포함)
+              <code>sortOption</code>: 정렬 보기 모드 (UI 전용 상태, 의존성
+              배열에는 포함되지 않음)
             </li>
           </ul>
         </li>
         <li>
-          <strong>ProductList Component</strong>: 두 props를 받지만 priceRange가
-          변경될 때만 리렌더링됩니다
+          <strong>CachedProductList Tag</strong>: <code>cacheUpdate</code>로
+          감싼 TagFunction으로, 가격 범위가 변경될 때만 내부 상품 리스트를 다시
+          렌더링합니다
         </li>
         <li>
           <strong>렌더링 카운터</strong>: Root와 ProductList의 렌더링 횟수를
@@ -77,7 +79,7 @@ export const Example18Page = mount(() => {
 
       <CodeBlock
         language="typescript"
-        code={`import { mount, Fragment } from 'lithent';
+        code={`import { mount } from 'lithent';
 import { state, cacheUpdate } from 'lithent/helper';
 
 interface Product {
@@ -90,81 +92,71 @@ interface Product {
 const products: Product[] = [
   { id: 1, name: 'Laptop Pro', price: 1200, emoji: '💻' },
   { id: 2, name: 'Wireless Mouse', price: 30, emoji: '🖱️' },
-  // ... more products
+  // ...
 ];
 
-// ProductList는 cacheUpdate로 최적화되지 않음 (일반 컴포넌트)
-const ProductList = mount<{
-  priceRange: number;
-  sortOption: string;
-  renderCount: number;
-}>(renew => {
-  let localRenderCount = 0;
-
-  return ({ priceRange, sortOption, renderCount }) => {
-    localRenderCount += 1;
-    const filteredProducts = products.filter(p => p.price <= priceRange);
-
-    return (
-      <div>
-        <h4>📦 Product List</h4>
-        <div>ProductList 렌더링: {localRenderCount}회</div>
-        {/* ... product list UI ... */}
-      </div>
-    );
-  };
-});
-
-// Root Component는 cacheUpdate 사용
 export const Example18 = mount(renew => {
   const priceRange = state(500, renew);
-  const sortOption = state('name', renew);
+  const sortOption = state<'name' | 'price-low' | 'price-high'>('name', renew);
+
   let rootRenderCount = 0;
+  let listRenderCount = 0;
+
+  // 가격 범위가 바뀔 때만 상품 리스트를 다시 만드는 TagFunction
+  const CachedProductList = cacheUpdate(
+    () => [priceRange.v],
+    () => {
+      listRenderCount += 1;
+      const filteredProducts = products.filter(p => p.price <= priceRange.v);
+
+      return (
+        <div>
+          <h4>📦 Product List</h4>
+          <div>ProductList 렌더링: {listRenderCount}회</div>
+          {/* ... filteredProducts UI ... */}
+        </div>
+      );
+    }
+  );
 
   const updatePriceRange = (value: number) => {
     priceRange.v = value;
   };
 
-  const changeSortOption = (value: string) => {
+  const changeSortOption = (value: typeof sortOption.v) => {
     sortOption.v = value;
   };
 
-  return cacheUpdate(
-    () => [priceRange.v],  // 의존성 배열: priceRange만 추적
-    () => {
-      rootRenderCount += 1;
+  return () => {
+    rootRenderCount += 1;
 
-      return () => (
-        <div>
-          <h3>🛍️ Product Filter Dashboard</h3>
+    return (
+      <div>
+        <h3>🛍️ Product Filter Dashboard</h3>
 
-          {/* 렌더링 카운터 */}
-          <div>Root 렌더링: {rootRenderCount}회</div>
+        {/* 렌더링 카운터 */}
+        <div>Root 렌더링: {rootRenderCount}회</div>
+        <div>ProductList 렌더링: {listRenderCount}회</div>
 
-          {/* 가격 범위 슬라이더 (추적됨) */}
-          <input
-            type="range"
-            min="0"
-            max="1500"
-            value={priceRange.v}
-            onInput={(e) => updatePriceRange(Number(e.target.value))}
-          />
+        {/* 가격 범위 슬라이더 (추적됨) */}
+        <input
+          type="range"
+          min="0"
+          max="1500"
+          value={priceRange.v}
+          onInput={e => updatePriceRange(Number((e.target as HTMLInputElement).value))}
+        />
 
-          {/* 정렬 옵션 (추적 안 됨) */}
-          <button onClick={() => changeSortOption('name')}>Name</button>
-          <button onClick={() => changeSortOption('price-low')}>Price: Low</button>
-          <button onClick={() => changeSortOption('price-high')}>Price: High</button>
+        {/* 정렬 옵션 (UI 전용 상태) */}
+        <button onClick={() => changeSortOption('name')}>Name</button>
+        <button onClick={() => changeSortOption('price-low')}>Price: Low</button>
+        <button onClick={() => changeSortOption('price-high')}>Price: High</button>
 
-          {/* ProductList에 두 props 모두 전달 */}
-          <ProductList
-            priceRange={priceRange.v}
-            sortOption={sortOption.v}
-            renderCount={rootRenderCount}
-          />
-        </div>
-      );
-    }
-  );
+        {/* cacheUpdate로 최적화된 상품 리스트 */}
+        <CachedProductList />
+      </div>
+    );
+  };
 });`}
       />
 
@@ -407,6 +399,44 @@ export const Example18 = mount(renew => {
           클릭할 때 렌더링 카운터가 어떻게 변하는지 비교해보세요. ProductList는
           priceRange가 변경될 때만 리렌더링됩니다!
         </p>
+      </div>
+
+      <div class="mt-10">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+          관련 문서
+        </h2>
+        <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 mb-6 space-y-2">
+          <li>
+            <a
+              href="/guide/cache-update"
+              class="text-[#42b883] hover:underline"
+              onClick={(e: Event) => {
+                e.preventDefault();
+                window.history.pushState({}, '', '/guide/cache-update');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+            >
+              CacheUpdate 가이드
+            </a>{' '}
+            - cacheUpdate(checkFunction, updater) API와 의존성 배열 설계를
+            상세히 설명합니다.
+          </li>
+          <li>
+            <a
+              href="/guide/computed"
+              class="text-[#42b883] hover:underline"
+              onClick={(e: Event) => {
+                e.preventDefault();
+                window.history.pushState({}, '', '/guide/computed');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }}
+            >
+              Computed 가이드
+            </a>{' '}
+            - 계산 비용이 큰 파생 값을 캐싱하는 또 다른 도구인 computed와의
+            차이를 비교해볼 수 있습니다.
+          </li>
+        </ul>
       </div>
     </div>
   );

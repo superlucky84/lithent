@@ -543,34 +543,39 @@ const Dashboard = mount(renew => {
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/computed"
+        href="/examples/18"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/computed');
+          navigateTo('/examples/18');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          ← Helper: Computed
+          예제: cacheUpdate로 리스트 최적화 →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          자동으로 의존성을 추적하는 Computed에 대해 알아보세요.
+          cacheUpdate로 리스트 렌더링 횟수를 줄이고,
+          <br />
+          루트 렌더와 부분 렌더 카운트를 눈으로 확인하는 예제를 실행해 보세요.
         </p>
       </a>
 
       <a
-        href="/guide/next-tick"
+        href="/guide/state-ref"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/next-tick');
+          navigateTo('/guide/state-ref');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Helper: NextTick →
+          Helper: State-Ref →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          렌더링 타이밍을 제어하는 NextTickRender에 대해 알아보세요.
+          깊은 중첩 객체에 대한 반응성을 제공하는 외부 라이브러리인 state-ref를
+          알아보세요.
+          <br />
+          복잡한 데이터 구조를 다룰 때 매우 유용합니다.
         </p>
       </a>
     </div>

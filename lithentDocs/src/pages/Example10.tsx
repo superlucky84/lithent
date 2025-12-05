@@ -245,5 +245,43 @@ export const Example10Page = (): ReturnType<typeof Introduction> => (
         </div>
       </div>
     </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
+        <li>
+          <a
+            href="/guide/state"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/state');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            State 가이드
+          </a>{' '}
+          - 체크박스/라디오 선택을 배열·단일 값 상태로 관리하는 패턴을
+          설명합니다.
+        </li>
+        <li>
+          <a
+            href="/guide/props"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/props');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Props 가이드
+          </a>{' '}
+          - checked/value/name 같은 폼 관련 props를 어떻게 다루는지 정리한
+          문서입니다.
+        </li>
+      </ul>
+    </div>
   </div>
 );

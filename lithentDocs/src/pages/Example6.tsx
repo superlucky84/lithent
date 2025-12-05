@@ -148,5 +148,43 @@ export const Example6Page = (): ReturnType<typeof Introduction> => (
         있습니다.
       </p>
     </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
+        <li>
+          <a
+            href="/guide/updater"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/updater');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Updater 가이드
+          </a>{' '}
+          - 리스트 재정렬 시 Updater가 어떻게 diff를 수행하고 DOM을 최소
+          변경하는지 설명합니다.
+        </li>
+        <li>
+          <a
+            href="/guide/state"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/state');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            State 가이드
+          </a>{' '}
+          - 배열 상태를 불변성 있게 갱신하는 패턴(새 배열 생성 등)을 다시 확인할
+          수 있습니다.
+        </li>
+      </ul>
+    </div>
   </div>
 );

@@ -2,6 +2,84 @@ import { mount } from 'lithent';
 import { Example16 } from '@/components/examples/example16';
 import { CodeBlock } from '@/components/CodeBlock';
 
+const ssrHtmlCode = `<!-- 서버에서 렌더링된 초기 HTML (실제 DOM) -->
+<div id="music-library">
+  <!-- 상단: 실제 DOM -->
+  <div>🔔 System Sounds (실제 DOM)</div>
+
+  <!-- 중간: 여기 사이에 가상 DOM 플레이리스트가 삽입됩니다 -->
+
+  <!-- 하단: 실제 DOM (삽입 기준점) -->
+  <div id="downloaded-music">💾 Downloaded Music (실제 DOM)</div>
+</div>`;
+
+const clientCode = `import { Fragment, render } from 'lithent';
+import { state } from 'lithent/helper';
+
+interface Song {
+  id: number;
+  emoji: string;
+  title: string;
+  artist: string;
+}
+
+// 동적 플레이리스트 컴포넌트 (가상 DOM)
+const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
+  const currentIndex = state(0, renew);
+
+  const playNext = () => {
+    if (currentIndex.v < songs.length - 1) currentIndex.v += 1;
+  };
+
+  const playPrev = () => {
+    if (currentIndex.v > 0) currentIndex.v -= 1;
+  };
+
+  return () => (
+    <Fragment>
+      <div>Current Playlist (가상 DOM)</div>
+      <button onClick={playPrev} disabled={currentIndex.v === 0}>
+        ⏮ Prev
+      </button>
+      <button
+        onClick={playNext}
+        disabled={currentIndex.v === songs.length - 1}
+      >
+        Next ⏭
+      </button>
+
+      {songs.map((song, idx) => (
+        <div key={song.id}>
+          #{idx + 1} {song.emoji} {song.title} – {song.artist}
+        </div>
+      ))}
+    </Fragment>
+  );
+});
+
+// 기존 실제 DOM 사이에 가상 DOM(loop)을 삽입하고 destroy로 제거
+const playlist: Song[] = [
+  { id: 1, emoji: '🎸', title: 'Rock Anthem', artist: 'The Rockers' },
+  { id: 2, emoji: '🎹', title: 'Jazz Night', artist: 'Smooth Jazz Band' },
+  { id: 3, emoji: '🎤', title: 'Pop Star', artist: 'Chart Toppers' },
+  { id: 4, emoji: '🎻', title: 'Classical Suite', artist: 'Symphony Orchestra' },
+];
+
+const container = document.getElementById('music-library');
+const insertionPoint = document.getElementById('downloaded-music');
+
+let destroyPlaylist: (() => void) | null = null;
+
+if (container && insertionPoint) {
+  destroyPlaylist = render(
+    <DynamicPlaylist songs={playlist} />,
+    container,
+    insertionPoint as HTMLElement
+  );
+}
+
+// 나중에 필요하면 destroyPlaylist?.() 로 가상 DOM만 제거`;
+
 export const Example16Page = mount(() => {
   return () => (
     <div>
@@ -77,133 +155,15 @@ export const Example16Page = mount(() => {
         코드 예제
       </h2>
 
-      <CodeBlock
-        code={`import { mount, Fragment, render, ref, mountCallback } from 'lithent';
-import { state } from 'lithent/helper';
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+        1. 서버에서 내려온 초기 HTML (실제 DOM)
+      </h3>
+      <CodeBlock language="html" code={ssrHtmlCode} />
 
-interface Song {
-  id: number;
-  emoji: string;
-  title: string;
-  artist: string;
-}
-
-// 동적 플레이리스트 컴포넌트 (가상 DOM)
-const DynamicPlaylist = mount<{ songs: Song[] }>(
-  (renew, { songs }) => {
-    const currentIndex = state(0, renew);
-
-    const playNext = () => {
-      if (currentIndex.v < songs.length - 1) {
-        currentIndex.v += 1;
-      }
-    };
-
-    const playPrev = () => {
-      if (currentIndex.v > 0) {
-        currentIndex.v -= 1;
-      }
-    };
-
-    return () => (
-      <Fragment>
-        {/* 플레이어 컨트롤 */}
-        <div class="player-controls">
-          <span>Current Playlist (가상 DOM)</span>
-          <span>{currentIndex.v + 1} / {songs.length}</span>
-          <button onClick={playPrev} disabled={currentIndex.v === 0}>
-            ⏮ Prev
-          </button>
-          <button
-            onClick={playNext}
-            disabled={currentIndex.v === songs.length - 1}
-          >
-            Next ⏭
-          </button>
-        </div>
-
-        {/* 플레이리스트 아이템들 (Loop with keys) */}
-        {songs.map((song, idx) => (
-          <div
-            key={song.id}
-            class={idx === currentIndex.v ? 'active' : ''}
-          >
-            <div>{song.emoji} {song.title}</div>
-            <div>{song.artist}</div>
-            {idx === currentIndex.v && <div>▶</div>}
-          </div>
-        ))}
-      </Fragment>
-    );
-  }
-);
-
-// 메인 컴포넌트
-const MusicLibrary = mount(renew => {
-  const playlistContainer = ref<HTMLElement>(null);
-  const insertionPoint = ref<HTMLElement>(null);
-  const isPlaylistActive = state(true, renew);
-
-  let destroyPlaylist: (() => void) | null = null;
-
-  const playlist: Song[] = [
-    { id: 1, emoji: '🎸', title: 'Rock Anthem', artist: 'The Rockers' },
-    { id: 2, emoji: '🎹', title: 'Jazz Night', artist: 'Smooth Jazz Band' },
-    // ...
-  ];
-
-  mountCallback(() => {
-    // insertBefore 모드로 렌더링
-    destroyPlaylist = render(
-      <DynamicPlaylist songs={playlist} />,
-      playlistContainer.value,  // 부모 요소
-      insertionPoint.value       // 이 요소 앞에 삽입
-    );
-  });
-
-  const clearPlaylist = () => {
-    if (destroyPlaylist) {
-      destroyPlaylist();  // 가상 DOM 제거
-      isPlaylistActive.v = false;
-    }
-  };
-
-  const restorePlaylist = () => {
-    destroyPlaylist = render(
-      <DynamicPlaylist songs={playlist} />,
-      playlistContainer.value,
-      insertionPoint.value
-    );
-    isPlaylistActive.v = true;
-  };
-
-  return () => (
-    <div>
-      {/* Title과 설명 */}
-      <h3>Music Library Manager</h3>
-
-      {/* 컨트롤 패널 - playlistContainer 밖에 위치 */}
-      <div class="control-panel">
-        <button onClick={clearPlaylist}>Clear Playlist (destroy)</button>
-        <button onClick={restorePlaylist}>Restore Playlist (render)</button>
-        <div>Status: {isPlaylistActive.v ? 'Active' : 'Destroyed'}</div>
-      </div>
-
-      {/* Music Library Container */}
-      <div ref={playlistContainer}>
-        {/* 실제 DOM - 상단 */}
-        <div>System Sounds (실제 DOM)</div>
-
-        {/* 가상 DOM이 여기 삽입됨 (mountCallback에서 render 호출) */}
-
-        {/* 실제 DOM - 하단 (insertionPoint) */}
-        <div ref={insertionPoint}>Downloaded Music (실제 DOM)</div>
-      </div>
-    </div>
-  );
-});`}
-        language="tsx"
-      />
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-3">
+        2. 클라이언트에서 실행되는 Lithent 코드 (가상 DOM)
+      </h3>
+      <CodeBlock language="tsx" code={clientCode} />
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
         render() 함수의 insertBefore 모드

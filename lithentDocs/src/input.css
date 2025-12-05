@@ -165,4 +165,34 @@
   .code-block .hljs-punctuation {
     @apply text-gray-600 dark:text-gray-400;
   }
+
+  /* Page transition - slide + fade */
+  .page-shell {
+    perspective: 1200px;
+  }
+
+  .page-sheet {
+    position: relative;
+    animation: pageSlideIn 180ms cubic-bezier(0.25, 0.7, 0.35, 1);
+    will-change: transform, opacity;
+  }
+
+  @keyframes pageSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(12px) translateY(6px);
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.08));
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) translateY(0);
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.04));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-sheet {
+      animation: none;
+    }
+  }
 }

@@ -169,5 +169,43 @@ export const Example7Page = (): ReturnType<typeof Introduction> => (
         같은 검증된 라이브러리를 사용하세요. 정규식은 항상 우리를 배신합니다.
       </p>
     </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
+        <li>
+          <a
+            href="/guide/props"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/props');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Props 가이드
+          </a>{' '}
+          - innerHTML처럼 DOM 속성을 props로 다루는 기본 규칙과 주의사항을
+          정리합니다.
+        </li>
+        <li>
+          <a
+            href="/guide/htm-tags"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/htm-tags');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            HTM Tags 가이드
+          </a>{' '}
+          - innerHTML 대신 템플릿 태그로 마크업을 구성하는 대안적인 방법을
+          소개합니다.
+        </li>
+      </ul>
+    </div>
   </div>
 );

@@ -753,36 +753,19 @@ const Content = lmount((props, children) => {
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/context"
+        href="/guide/cache-update"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/context');
+          navigateTo('/guide/cache-update');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          ← Helper: Context
+          Helper: CacheUpdate →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          mount 컴포넌트에서 사용하는 Context에 대해 알아보세요.
-          <br />
-          명시적 renew 관리 방식을 배워봅시다.
-        </p>
-      </a>
-
-      <a
-        href="/guide/store"
-        onClick={(e: Event) => {
-          e.preventDefault();
-          navigateTo('/guide/store');
-        }}
-        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
-      >
-        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Helper: Store →
-        </h3>
-        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          전역 상태 관리를 위한 Store Helper에 대해 알아보세요.
+          Context에서 파생되는 값이나 목록을 효율적으로 캐시하고 업데이트하는
+          방법을 배워봅시다.
         </p>
       </a>
     </div>

@@ -2,7 +2,16 @@ import { CodeBlock } from '@/components/CodeBlock';
 import { Example13 } from '@/components/examples/example13';
 import type { Introduction } from '@/pages/Introduction';
 
-const example13Code = `import { mount, Fragment, render, ref, mountCallback } from 'lithent';
+const ssrHtmlCode = `<!-- 서버에서 렌더링된 초기 HTML (실제 DOM) -->
+<div id="waitlist">
+  <div>ℹ️ Welcome to Lithent Restaurant (실제 DOM)</div>
+
+  <!-- 이 지점 위/아래는 서버가 렌더링한 실제 DOM 입니다 -->
+  <div id="offer-slot">🎁 Special Offer! (실제 DOM)</div>
+  <div>📞 Contact Info (실제 DOM)</div>
+</div>`;
+
+const clientCode = `import { Fragment, render } from 'lithent';
 import { state } from 'lithent/helper';
 
 interface Guest {
@@ -14,8 +23,8 @@ interface Guest {
 }
 
 // 동적 대기 목록 컴포넌트 (가상 DOM)
-const WaitlistManager = mount(r => {
-  const guests = state<Guest[]>([...initialGuests], r);
+const WaitlistManager = mount(renew => {
+  const guests = state<Guest[]>([...initialGuests], renew);
 
   const sortByWaitTime = () => {
     guests.v = [...guests.v].sort((a, b) => a.waitTime - b.waitTime);
@@ -31,13 +40,11 @@ const WaitlistManager = mount(r => {
 
   return () => (
     <Fragment>
-      {/* 컨트롤 패널 */}
       <div>
         <button onClick={sortByWaitTime}>By Wait Time</button>
         <button onClick={reverseOrder}>Reverse</button>
       </div>
 
-      {/* key 기반 리스트 */}
       {guests.v.map((guest, index) => (
         <div key={guest.id}>
           #{index + 1} {guest.name}
@@ -48,30 +55,13 @@ const WaitlistManager = mount(r => {
   );
 });
 
-// 메인 컴포넌트
-const RestaurantApp = mount(() => {
-  const containerRef = ref<null | HTMLElement>(null);
-  const insertionPointRef = ref<null | HTMLElement>(null);
+// 기존 실제 DOM 사이에 가상 DOM 리스트 삽입
+const container = document.getElementById('waitlist');
+const insertionPoint = document.getElementById('offer-slot');
 
-  mountCallback(() => {
-    // 가상 DOM을 실제 DOM 사이에 삽입
-    render(<WaitlistManager />, containerRef.value, insertionPointRef.value);
-  });
-
-  return () => (
-    <div ref={containerRef}>
-      {/* 상단: 실제 DOM */}
-      <div>Welcome Message (실제 DOM)</div>
-
-      {/* 중간: 가상 DOM 리스트가 여기 삽입됨 */}
-
-      {/* 하단: 실제 DOM */}
-      <div ref={insertionPointRef}>Special Offer (실제 DOM)</div>
-      <div>Footer (실제 DOM)</div>
-    </div>
-  );
-});
-`;
+if (container && insertionPoint) {
+  render(<WaitlistManager />, container, insertionPoint as HTMLElement);
+}`;
 
 export const Example13Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
@@ -100,7 +90,15 @@ export const Example13Page = (): ReturnType<typeof Introduction> => (
       있습니다!
     </p>
 
-    <CodeBlock language="typescript" code={example13Code} />
+    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mb-3">
+      1. 서버에서 내려온 초기 HTML (실제 DOM)
+    </h2>
+    <CodeBlock language="html" code={ssrHtmlCode} />
+
+    <h2 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white mt-8 mb-3">
+      2. 클라이언트에서 실행되는 Lithent 코드 (가상 DOM)
+    </h2>
+    <CodeBlock language="typescript" code={clientCode} />
 
     <div class="not-prose mt-6">
       <div class="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 shadow-sm">
@@ -337,6 +335,44 @@ export const Example13Page = (): ReturnType<typeof Introduction> => (
         <li>
           • <strong>Fragment 활용</strong>: 여러 요소를 그룹화하여 단일 삽입
           지점 사용
+        </li>
+      </ul>
+    </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 mb-6 space-y-2">
+        <li>
+          <a
+            href="/examples/12"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/examples/12');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Example 12: Mixed DOM Elements
+          </a>{' '}
+          - 동일한 Mixed DOM 패턴을 정적 포스트 토글 형태로 먼저 살펴보는 기초
+          예제입니다.
+        </li>
+        <li>
+          <a
+            href="/guide/render"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/render');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Render 가이드
+          </a>{' '}
+          - insertBefore 모드와 destroy 함수 등 Mixed DOM 시나리오에 필요한
+          render의 동작 원리를 설명합니다.
         </li>
       </ul>
     </div>

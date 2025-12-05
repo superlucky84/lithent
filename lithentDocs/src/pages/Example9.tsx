@@ -201,5 +201,43 @@ export const Example9Page = (): ReturnType<typeof Introduction> => (
         은 타이핑할 때마다 즉시 발생하여 더 반응적인 UI를 만들 수 있습니다.
       </p>
     </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
+        관련 문서
+      </h2>
+      <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
+        <li>
+          <a
+            href="/guide/state"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/state');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            State 가이드
+          </a>{' '}
+          - 명함 필드들을 state로 관리하고 불변성을 유지하는 방법을 자세히
+          다룹니다.
+        </li>
+        <li>
+          <a
+            href="/guide/props"
+            class="text-[#42b883] hover:underline"
+            onClick={(e: Event) => {
+              e.preventDefault();
+              window.history.pushState({}, '', '/guide/props');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }}
+          >
+            Props 가이드
+          </a>{' '}
+          - value/onInput처럼 폼 컨트롤을 제어 컴포넌트로 사용하는 패턴을
+          정리합니다.
+        </li>
+      </ul>
+    </div>
   </div>
 );

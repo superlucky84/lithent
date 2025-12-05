@@ -628,20 +628,21 @@ const Example = mount((renew) => {
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/mount-hooks"
+        href="/guide/stateless"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/mount-hooks');
+          navigateTo('/guide/stateless');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          기본 기능: Mount Hooks →
+          기본 기능: Stateless Components →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          컴포넌트 마운트 시점에 실행되는 mountCallback 훅에 대해 알아보세요.
+          상태가 전혀 없는 UI는 mount 없이 간단한 함수 컴포넌트로도 충분히
+          표현할 수 있습니다.
           <br />
-          초기화 작업과 클린업 처리 방법을 배워봅시다.
+          Lithent에서의 단순 컴포넌트 패턴을 살펴봅니다.
         </p>
       </a>
     </div>

@@ -555,6 +555,23 @@ const App = lmount(() => {
 
     <div class="grid gap-6 mt-6">
       <a
+        href="/examples/4"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/examples/4');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          예제: effect로 DOM 이벤트 다루기 →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          effect로 DOM 이벤트 리스너를 등록하고 클린업하는 실제 예제를 실행해
+          보세요.
+        </p>
+      </a>
+
+      <a
         href="/guide/store"
         onClick={(e: Event) => {
           e.preventDefault();
