@@ -6,13 +6,13 @@ export const Example20Page = mount(() => {
   return () => (
     <div>
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-        Example 20: 마법 포탈 메신저
+        Example 20: 이미지 갤러리 라이트박스
       </h1>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-6">
-        이 예제는 Portal 기능을 사용하여 메시지를 서로 다른 DOM 위치로 전송하는
-        마법 포탈 메신저를 구현합니다. Portal의 핵심 특성을 직관적이고 재미있게
-        경험할 수 있습니다!
+        이 예제는 Portal 기능을 사용하여 overflow:hidden 컨테이너 안의 썸네일을
+        클릭하면 전체 화면 라이트박스가 표시되는 이미지 갤러리를 구현합니다.
+        Portal의 핵심 특성을 가장 직관적으로 경험할 수 있습니다!
       </p>
 
       <div class="my-8 p-4 bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 rounded">
@@ -20,44 +20,43 @@ export const Example20Page = mount(() => {
           💡 학습 포인트
         </h3>
         <p class="text-sm text-purple-800 dark:text-purple-200">
-          <strong>Portal의 마법:</strong> 중앙 제어판에서 메시지를 생성하면,
-          선택한 포탈 영역(불의 차원/물의 차원)에 메시지가 나타납니다. 메시지는
-          물리적으로 다른 DOM 위치에 렌더링되지만, 상태와 생명주기는 부모
-          컴포넌트가 관리합니다.
+          <strong>Portal의 마법:</strong> 갤러리는 overflow:hidden 컨테이너 안에
+          갇혀 있지만, 썸네일을 클릭하면 Portal을 통해 전체 화면 라이트박스가
+          표시됩니다. 라이트박스는 물리적으로 다른 DOM 위치에 렌더링되어 부모의
+          overflow 제약을 받지 않습니다.
         </p>
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        Portal이란?
+        Portal이 해결하는 문제
       </h2>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
-        Portal은 컴포넌트를 부모 DOM 계층 외부로 렌더링하는 강력한 기능입니다.
-        일반적으로 컴포넌트는 부모의 DOM 트리 안에 렌더링되지만, 모달이나
-        툴팁처럼 화면 위에 떠 있어야 하는 UI는 부모의 overflow나 z-index 때문에
-        가려질 수 있습니다.
+        일반적으로 부모 컨테이너에 overflow: hidden이 있으면 자식 요소가
+        잘립니다. 하지만 라이트박스나 모달은 전체 화면을 덮어야 합니다. Portal은
+        이 문제를 해결합니다.
       </p>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        마법 포탈 메신저의 구조
+        갤러리 라이트박스 구조
       </h2>
 
       <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 mb-6 space-y-2">
         <li>
-          <strong>2개의 차원 포탈:</strong> 불의 차원(🔥), 물의 차원(💧)
+          <strong>썸네일 갤러리:</strong> overflow:hidden 컨테이너 안에 6개의
+          이미지
         </li>
         <li>
-          <strong>중앙 제어판:</strong> 메시지를 작성하고 전송할 포탈을 선택
+          <strong>클릭 이벤트:</strong> 썸네일 클릭 시 선택된 사진 상태 업데이트
         </li>
         <li>
-          <strong>Portal 렌더링:</strong> 선택한 포탈 영역에 메시지가 나타남
+          <strong>Portal 렌더링:</strong> 라이트박스를 별도 DOM 위치에 표시
         </li>
         <li>
-          <strong>독립적인 상태:</strong> 각 포탈은 자신만의 메시지 히스토리
-          유지
+          <strong>전체 화면 오버레이:</strong> 검은 배경 + 큰 이미지 표시
         </li>
         <li>
-          <strong>실시간 업데이트:</strong> 메시지 추가/삭제 시 즉시 반영
+          <strong>닫기 기능:</strong> X 버튼 또는 닫기 버튼으로 라이트박스 종료
         </li>
       </ul>
 
@@ -71,7 +70,7 @@ export const Example20Page = mount(() => {
             portal()
           </h3>
           <p class="text-sm text-purple-800 dark:text-purple-200">
-            메시지를 다른 DOM 위치로 렌더링합니다. portal(content,
+            라이트박스를 다른 DOM 위치로 렌더링합니다. portal(content,
             targetElement)로 사용합니다.
           </p>
         </div>
@@ -81,8 +80,8 @@ export const Example20Page = mount(() => {
             ref
           </h3>
           <p class="text-sm text-blue-800 dark:text-blue-200">
-            각 포탈 목적지의 DOM 엘리먼트를 참조합니다. Portal의 렌더링 대상으로
-            사용됩니다.
+            라이트박스 컨테이너 DOM 엘리먼트를 참조합니다. Portal의 렌더링
+            대상으로 사용됩니다.
           </p>
         </div>
 
@@ -91,8 +90,8 @@ export const Example20Page = mount(() => {
             state (helper)
           </h3>
           <p class="text-sm text-green-800 dark:text-green-200">
-            메시지 상태, 선택된 포탈, 메시지 히스토리를 관리합니다. .v로
-            접근하고 자동으로 리렌더링됩니다.
+            선택된 사진 상태를 관리합니다. .v로 접근하고 자동으로
+            리렌더링됩니다.
           </p>
         </div>
 
@@ -111,8 +110,8 @@ export const Example20Page = mount(() => {
       </h2>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
-        다음은 Portal을 사용하여 SSR로 미리 렌더링된 영역에 메시지를 전송하는
-        예제입니다:
+        다음은 Portal을 사용하여 SSR로 미리 렌더링된 영역에 라이트박스를
+        렌더링하는 예제입니다:
       </p>
 
       <div class="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
@@ -120,8 +119,8 @@ export const Example20Page = mount(() => {
           💡 SSR 시나리오
         </h3>
         <p class="text-xs text-gray-700 dark:text-gray-300">
-          서버에서 HTML에 포탈 영역을 미리 렌더링하고, 클라이언트에서 Portal을
-          사용해 해당 영역에 동적 콘텐츠를 렌더링합니다.
+          서버에서 HTML에 라이트박스 컨테이너를 미리 렌더링하고, 클라이언트에서
+          Portal을 사용해 해당 영역에 라이트박스를 렌더링합니다.
         </p>
       </div>
 
@@ -134,16 +133,8 @@ export const Example20Page = mount(() => {
   <!-- 앱이 마운트될 영역 -->
   <div id="app"></div>
 
-  <!-- SSR로 미리 렌더링된 포탈 영역들 -->
-  <div id="fire-portal" class="portal-zone">
-    <h3>🔥 불의 차원</h3>
-    <p>메시지가 이곳에 나타납니다...</p>
-  </div>
-
-  <div id="water-portal" class="portal-zone">
-    <h3>💧 물의 차원</h3>
-    <p>메시지가 이곳에 나타납니다...</p>
-  </div>
+  <!-- SSR로 미리 렌더링된 라이트박스 컨테이너 -->
+  <div id="lightbox-root"></div>
 </body>
 </html>`}
       />
@@ -151,100 +142,101 @@ export const Example20Page = mount(() => {
       <CodeBlock
         language="tsx"
         code={`// app.tsx (클라이언트 코드)
-import { mount, mountCallback, portal } from 'lithent';
+import { mount, mountCallback, portal, ref } from 'lithent';
 import { state } from 'lithent/helper';
 
-export const PortalMessenger = mount(r => {
-  const messageText = state('', r);
-  const selectedPortal = state('fire', r);
-  const messages = state<Record<string, string[]>>(
-    { fire: [], water: [] },
-    r
-  );
+interface Photo {
+  id: number;
+  title: string;
+  thumbnail: string;
+  full: string;
+}
 
-  // 첫 렌더링 후 포탈 DOM이 준비되면 리렌더
+const photos: Photo[] = [
+  { id: 1, title: '산 풍경', thumbnail: '🏔️', full: '🏔️' },
+  { id: 2, title: '바다 풍경', thumbnail: '🌊', full: '🌊' },
+  { id: 3, title: '도시 야경', thumbnail: '🌃', full: '🌃' },
+];
+
+export const Gallery = mount(r => {
+  const selectedPhoto = state<Photo | null>(null, r);
+
+  // 첫 렌더링 후 lightbox-root DOM이 준비되면 리렌더
   mountCallback(() => r());
 
-  const sendMessage = () => {
-    if (!messageText.v.trim()) return;
-    const portalId = selectedPortal.v;
-    messages.v = {
-      ...messages.v,
-      [portalId]: [...messages.v[portalId], messageText.v]
-    };
-    messageText.v = '';
+  const openLightbox = (photo: Photo) => {
+    selectedPhoto.v = photo;
   };
 
-  // 불의 차원 포탈 렌더링
-  const renderFirePortal = () => {
-    const fireEl = document.getElementById('fire-portal');
-    return fireEl && messages.v.fire.length > 0
-      ? portal(FireMessages, fireEl)
-      : null;
+  const closeLightbox = () => {
+    selectedPhoto.v = null;
   };
 
-  // 물의 차원 포탈 렌더링
-  const renderWaterPortal = () => {
-    const waterEl = document.getElementById('water-portal');
-    return waterEl && messages.v.water.length > 0
-      ? portal(WaterMessages, waterEl)
+  // 라이트박스 렌더링
+  const renderLightbox = () => {
+    const lightboxRoot = document.getElementById('lightbox-root');
+    return lightboxRoot && selectedPhoto.v
+      ? portal(Lightbox, lightboxRoot)
       : null;
   };
 
   return () => (
     <div>
-      {/* 메시지 입력 UI */}
-      <div class="control-panel">
-        <select
-          value={selectedPortal.v}
-          onChange={(e) => selectedPortal.v = e.target.value}
-        >
-          <option value="fire">🔥 불의 차원</option>
-          <option value="water">💧 물의 차원</option>
-        </select>
-
-        <textarea
-          value={messageText.v}
-          onInput={(e) => messageText.v = e.target.value}
-          placeholder="메시지를 입력하세요..."
-        />
-
-        <button onClick={sendMessage}>전송</button>
+      {/* 갤러리 (overflow:hidden 컨테이너) */}
+      <div class="gallery-container" style="overflow: hidden;">
+        {photos.map(photo => (
+          <button
+            key={photo.id}
+            onClick={() => openLightbox(photo)}
+          >
+            <span>{photo.thumbnail}</span>
+            <span>{photo.title}</span>
+          </button>
+        ))}
       </div>
 
       {/* Portal 렌더링 */}
-      {renderFirePortal()}
-      {renderWaterPortal()}
+      {renderLightbox()}
     </div>
   );
 });`}
       />
 
       <p class="text-sm text-gray-700 dark:text-gray-300 mt-4 mb-2">
-        <strong>불의 차원에 렌더링될 HTML:</strong>
+        <strong>라이트박스 컨테이너에 Portal로 렌더링되는 HTML:</strong>
       </p>
 
       <CodeBlock
         language="html"
-        code={`<!-- fire-portal 영역에 Portal로 렌더링되는 내용 -->
-<div class="messages">
-  <div class="message">첫 번째 메시지</div>
-  <div class="message">두 번째 메시지</div>
-  <div class="message">세 번째 메시지</div>
-</div>`}
-      />
+        code={`<!-- lightbox-root 영역에 Portal로 렌더링되는 내용 -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
+  <!-- 닫기 버튼 -->
+  <button class="absolute top-4 right-4 text-white text-3xl">
+    ✕
+  </button>
 
-      <p class="text-sm text-gray-700 dark:text-gray-300 mt-4 mb-2">
-        <strong>물의 차원에 렌더링될 HTML:</strong>
+  <!-- 라이트박스 본체 -->
+  <div class="bg-white rounded-lg shadow-2xl p-6 max-w-2xl">
+    <div class="flex flex-col items-center">
+      <!-- 큰 이미지 -->
+      <span class="text-9xl mb-4">🏔️</span>
+
+      <!-- 제목 -->
+      <h3 class="text-2xl font-bold mb-2">
+        산 풍경
+      </h3>
+
+      <!-- ID -->
+      <p class="text-sm text-gray-600 mb-4">
+        ID: 1
       </p>
 
-      <CodeBlock
-        language="html"
-        code={`<!-- water-portal 영역에 Portal로 렌더링되는 내용 -->
-<div class="messages">
-  <div class="message">안녕하세요</div>
-  <div class="message">Portal 테스트</div>
-  <div class="message">물의 차원 메시지</div>
+      <!-- 닫기 버튼 -->
+      <button class="px-6 py-2 bg-blue-600 text-white rounded-lg">
+        닫기
+      </button>
+    </div>
+  </div>
 </div>`}
       />
 
@@ -254,28 +246,24 @@ export const PortalMessenger = mount(r => {
         </h3>
         <ul class="text-sm text-blue-800 dark:text-blue-200 space-y-2">
           <li>
-            <strong>1. SSR 영역 활용:</strong> HTML에 미리 정의된 포탈 영역
-            (fire-portal, water-portal)을 사용합니다.
+            <strong>1. SSR 컨테이너:</strong> HTML에 미리 정의된 lightbox-root를
+            사용합니다.
           </li>
           <li>
             <strong>2. document.getElementById():</strong> SSR로 렌더링된 DOM
             요소를 직접 참조합니다.
           </li>
           <li>
-            <strong>3. portal() 함수:</strong> portal(내용, 대상Element)로 SSR
-            영역에 동적 콘텐츠를 렌더링합니다.
+            <strong>3. portal() 함수:</strong> portal(Lightbox, lightboxRoot)로
+            라이트박스를 렌더링합니다.
           </li>
           <li>
-            <strong>4. 분리된 렌더링:</strong> 불의 차원과 물의 차원은 각각
-            독립된 HTML로 렌더링되며, 서로 영향을 주지 않습니다.
+            <strong>4. 분리된 HTML:</strong> 라이트박스 HTML은 별도로 표시되어
+            Portal이 렌더링하는 실제 내용을 명확히 보여줍니다.
           </li>
           <li>
-            <strong>5. 상태 관리:</strong> 메시지 상태는 컴포넌트가 관리하지만,
-            UI는 HTML의 포탈 영역에 나타납니다.
-          </li>
-          <li>
-            <strong>6. 하이브리드 렌더링:</strong> SSR의 성능 + 클라이언트의
-            인터랙티브 UI를 결합한 패턴입니다.
+            <strong>5. overflow 해결:</strong> 갤러리는 overflow:hidden이지만
+            라이트박스는 전체 화면에 표시됩니다.
           </li>
         </ul>
       </div>
@@ -294,94 +282,47 @@ export const PortalMessenger = mount(r => {
 
       <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          🎯 Portal이 해결하는 문제
+          🎯 이 예제가 보여주는 것
         </h3>
 
         <div class="space-y-4">
           <div>
             <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
-              1️⃣ Overflow 문제 해결
+              1️⃣ Overflow 제약 극복
             </h4>
             <p class="text-sm text-gray-700 dark:text-gray-300">
-              부모 컨테이너에 overflow: hidden이 있어도 Portal로 렌더링된 요소는
-              영향받지 않습니다. 모달이나 드롭다운이 잘리지 않게 만들 수
-              있습니다.
+              갤러리 컨테이너는 overflow:hidden이지만, Portal로 렌더링된
+              라이트박스는 전체 화면을 덮을 수 있습니다.
             </p>
           </div>
 
           <div>
             <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
-              2️⃣ Z-index 관리 단순화
+              2️⃣ 시각적으로 명확한 개념
             </h4>
             <p class="text-sm text-gray-700 dark:text-gray-300">
-              Portal을 document.body나 전용 컨테이너에 렌더링하면 z-index 계층을
-              쉽게 관리할 수 있습니다.
+              작은 썸네일 → 큰 라이트박스로의 전환이 Portal의 "다른 위치 렌더링"
+              개념을 직관적으로 보여줍니다.
             </p>
           </div>
 
           <div>
             <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
-              3️⃣ 논리적 구조 유지
+              3️⃣ 실용적인 패턴
             </h4>
             <p class="text-sm text-gray-700 dark:text-gray-300">
-              DOM 위치는 다르지만, 컴포넌트 트리에서는 부모-자식 관계가
-              유지됩니다. 상태와 props를 자연스럽게 공유할 수 있습니다.
+              실제 웹사이트에서 자주 사용하는 이미지 갤러리 + 라이트박스
+              패턴입니다.
             </p>
           </div>
 
           <div>
             <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-2">
-              4️⃣ 생명주기 자동 관리
+              4️⃣ 생명주기 관리
             </h4>
             <p class="text-sm text-gray-700 dark:text-gray-300">
-              부모 컴포넌트가 언마운트되면 Portal 내부도 자동으로 정리됩니다.
-              메모리 누수 걱정이 없습니다.
+              선택된 사진 상태가 null이 되면 Portal도 자동으로 제거됩니다.
             </p>
-          </div>
-        </div>
-      </div>
-
-      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        코드 핵심 부분
-      </h2>
-
-      <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          Portal 사용 패턴
-        </h3>
-
-        <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300">
-          <div>
-            <strong>1. Ref로 대상 DOM 참조:</strong>
-            <pre class="bg-gray-800 text-gray-100 p-3 rounded mt-2 overflow-x-auto">
-              {`const portalRef = ref(null);
-
-return () => (
-  <div ref={portalRef}>
-    {/* 포탈 목적지 */}
-  </div>
-);`}
-            </pre>
-          </div>
-
-          <div>
-            <strong>2. Portal로 렌더링:</strong>
-            <pre class="bg-gray-800 text-gray-100 p-3 rounded mt-2 overflow-x-auto">
-              {`{portalRef.value && portal(
-  <MessageComponent message={msg} />,
-  portalRef.value as HTMLElement
-)}`}
-            </pre>
-          </div>
-
-          <div>
-            <strong>3. mountCallback으로 리렌더:</strong>
-            <pre class="bg-gray-800 text-gray-100 p-3 rounded mt-2 overflow-x-auto">
-              {`mountCallback(() => {
-  // 첫 렌더링 후 ref가 설정되면 다시 렌더링
-  renew();
-});`}
-            </pre>
           </div>
         </div>
       </div>
@@ -391,42 +332,41 @@ return () => (
       </h2>
 
       <div class="grid gap-4 mb-6">
-        <div class="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
-          <h4 class="text-base font-semibold text-red-900 dark:text-red-100 mb-2">
-            🎨 모달 & 다이얼로그
+        <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
+          <h4 class="text-base font-semibold text-purple-900 dark:text-purple-100 mb-2">
+            🖼️ 이미지 갤러리
           </h4>
-          <p class="text-sm text-red-800 dark:text-red-200">
-            사용자 확인, 경고, 정보 표시 등을 위한 모달을 document.body에
-            렌더링하여 항상 최상단에 표시할 수 있습니다.
+          <p class="text-sm text-purple-800 dark:text-purple-200">
+            포트폴리오, 블로그, 쇼핑몰 등에서 이미지를 크게 보여주는
+            라이트박스를 구현할 수 있습니다.
           </p>
         </div>
 
         <div class="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
           <h4 class="text-base font-semibold text-blue-900 dark:text-blue-100 mb-2">
-            💬 툴팁 & 팝오버
+            🎬 비디오 플레이어
           </h4>
           <p class="text-sm text-blue-800 dark:text-blue-200">
-            마우스 호버 시 나타나는 툴팁을 overflow 제약 없이 표시할 수
-            있습니다.
+            작은 썸네일 클릭 시 전체 화면 비디오 플레이어를 표시할 수 있습니다.
           </p>
         </div>
 
         <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
           <h4 class="text-base font-semibold text-green-900 dark:text-green-100 mb-2">
-            🔔 알림 시스템
+            📄 문서 미리보기
           </h4>
           <p class="text-sm text-green-800 dark:text-green-200">
-            화면 모서리에 고정된 알림을 표시하는 토스트 메시지 시스템을 구현할
-            수 있습니다.
+            PDF, 이미지 등의 문서를 큰 화면으로 미리 볼 수 있는 뷰어를 만들 수
+            있습니다.
           </p>
         </div>
 
-        <div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
-          <h4 class="text-base font-semibold text-purple-900 dark:text-purple-100 mb-2">
-            📋 드롭다운 메뉴
+        <div class="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+          <h4 class="text-base font-semibold text-orange-900 dark:text-orange-100 mb-2">
+            🎨 상품 상세보기
           </h4>
-          <p class="text-sm text-purple-800 dark:text-purple-200">
-            컨텍스트 메뉴나 드롭다운이 부모 컨테이너에 잘리지 않도록 할 수
+          <p class="text-sm text-orange-800 dark:text-orange-200">
+            쇼핑몰에서 상품 이미지를 확대해서 보여주는 줌 기능을 구현할 수
             있습니다.
           </p>
         </div>
@@ -438,20 +378,20 @@ return () => (
         </h3>
         <ul class="text-sm text-yellow-800 dark:text-yellow-200 space-y-2">
           <li>
-            <strong>이벤트 버블링:</strong> Portal로 렌더링된 요소의 이벤트는
-            DOM 트리가 아닌 컴포넌트 트리를 따라 버블링됩니다.
+            <strong>이벤트 버블링:</strong> Portal 내부의 클릭 이벤트가 부모로
+            전파될 수 있으므로 e.stopPropagation()이 필요할 수 있습니다.
           </li>
           <li>
-            <strong>CSS 상속:</strong> Portal 요소는 대상 위치의 CSS를
-            상속받습니다. 독립적인 스타일을 정의해야 합니다.
+            <strong>접근성:</strong> ESC 키로 닫기, 포커스 트랩 등의 접근성
+            기능을 추가하는 것이 좋습니다.
           </li>
           <li>
-            <strong>Ref 타이밍:</strong> 첫 렌더링 시 ref.value는 null입니다.
-            mountCallback으로 리렌더링이 필요할 수 있습니다.
+            <strong>스크롤 방지:</strong> 라이트박스 열릴 때 body 스크롤을
+            비활성화하면 더 나은 UX를 제공합니다.
           </li>
           <li>
-            <strong>SSR 제한:</strong> Portal은 브라우저 환경에서만 작동합니다.
-            SSR 시 조건부 렌더링이 필요할 수 있습니다.
+            <strong>애니메이션:</strong> fade-in/fade-out 애니메이션을 추가하면
+            더 부드러운 전환 효과를 얻을 수 있습니다.
           </li>
         </ul>
       </div>
@@ -463,41 +403,39 @@ return () => (
       <div class="grid gap-4 mb-6">
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
           <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            📱 다중 모달 관리
+            ⬅️➡️ 이전/다음 네비게이션
           </h4>
           <p class="text-sm text-gray-700 dark:text-gray-300">
-            여러 모달을 순서대로 쌓아 올릴 수 있는 모달 스택 매니저를
-            만들어보세요.
-          </p>
-        </div>
-
-        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            🎬 애니메이션 추가
-          </h4>
-          <p class="text-sm text-gray-700 dark:text-gray-300">
-            Portal 등장/사라짐에 fade-in, slide-in 등의 애니메이션을
+            라이트박스에서 화살표 버튼으로 다음/이전 이미지를 볼 수 있는 기능을
             추가해보세요.
           </p>
         </div>
 
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
           <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            🎯 위치 자동 계산
+            🔍 줌 인/아웃
           </h4>
           <p class="text-sm text-gray-700 dark:text-gray-300">
-            툴팁이 화면을 벗어나지 않도록 자동으로 위치를 조정하는 기능을
+            마우스 휠이나 핀치 제스처로 이미지를 확대/축소하는 기능을
             추가해보세요.
           </p>
         </div>
 
         <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
           <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            ⌨️ 키보드 네비게이션
+            📱 스와이프 지원
           </h4>
           <p class="text-sm text-gray-700 dark:text-gray-300">
-            Esc 키로 모달 닫기, Tab으로 포커스 이동 등의 접근성 기능을
-            추가해보세요.
+            모바일에서 좌우 스와이프로 이미지를 전환하는 기능을 추가해보세요.
+          </p>
+        </div>
+
+        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            🎞️ 슬라이드쇼
+          </h4>
+          <p class="text-sm text-gray-700 dark:text-gray-300">
+            자동으로 다음 이미지로 넘어가는 슬라이드쇼 모드를 추가해보세요.
           </p>
         </div>
       </div>

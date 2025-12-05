@@ -82,7 +82,7 @@ const menuData: MenuSection[] = [
       { text: 'SVG Rendering (Traffic Light)', link: '/examples/17' },
       { text: 'CacheUpdate (Product Filter)', link: '/examples/18' },
       { text: 'FTags CDN (Smart Todo List)', link: '/examples/19' },
-      { text: 'Portal (마법 포탈 메신저)', link: '/examples/20' },
+      { text: 'Portal (이미지 라이트박스)', link: '/examples/20' },
     ],
   },
 ];

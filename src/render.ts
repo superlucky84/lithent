@@ -77,12 +77,12 @@ export const typeDelete = (newWDom: WDom) => {
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
-    const nt = newWDom.el.nodeType;
-    if ([1, 3].includes(nt)) {
-      parent.removeChild(newWDom.el);
-    } else if (nt === 11) {
+    if (newWDom.el.nodeType === 11 || newWDom?.tag === 'portal') {
       findChildWithRemoveElement(newWDom, parent);
+    } else if ([1, 3].includes(newWDom.el.nodeType)) {
+      parent.removeChild(newWDom.el);
     }
+
     delete newWDom.el;
   }
 };
