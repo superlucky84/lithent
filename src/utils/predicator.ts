@@ -78,8 +78,8 @@ const checkLoopTypeElement = (
     checkPlainWDomType(newWDom) &&
     originalWDom &&
     originalWDom.type === newWDom.type &&
-    ((checkExisty(getKey((newWDom.children || [])[0])) &&
-      checkExisty(getKey((originalWDom.children || [])[0]))) ||
+    ((checkExistyKey((newWDom.children || [])[0]) &&
+      checkExistyKey((originalWDom.children || [])[0])) ||
       (originalWDom.children &&
         newWDom.children &&
         originalWDom.children.length === newWDom.children.length))
@@ -109,6 +109,8 @@ export const checkFragmentFunction = (
 
 export const checkEmptyElement = (wDom: WDomParam) =>
   checkPlainWDomType(wDom) && !wDom.type;
+
+export const checkExistyKey = (target: WDom) => checkExisty(getKey(target));
 
 export const checkExisty = (value: unknown) =>
   value !== null && value !== undefined;

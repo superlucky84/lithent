@@ -6,7 +6,7 @@ import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
-  checkExisty,
+  checkExistyKey,
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
@@ -107,10 +107,9 @@ const addReRenderTypeProperty = (
   const existOriginalWDom = originalWDom && originalWDom.type;
   if (!existOriginalWDom) return 'A';
 
-  const key = getKey(newWDom);
   const parent = getParent(originalWDom);
   const isKeyChecked =
-    !newWDom.isRoot && parent && parent.type === 'l' && checkExisty(key);
+    !newWDom.isRoot && parent && parent.type === 'l' && checkExistyKey(newWDom);
 
   let result: RenderType = isSameType
     ? isKeyChecked
@@ -138,8 +137,8 @@ const addReRenderTypeProperty = (
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
   // Fast exit: no keys to compare
   if (
-    !checkExisty(getKey((newWDom.children || [])[0])) ||
-    !checkExisty(getKey((originalWDom.children || [])[0]))
+    !checkExistyKey((newWDom.children || [])[0]) ||
+    !checkExistyKey((originalWDom.children || [])[0])
   ) {
     return false;
   }
@@ -254,7 +253,7 @@ const remakeChildrenForAdd = (newWDom: WDom) =>
  * Uses key-based diffing for loops, index-based for others
  */
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
-  newWDom.type === 'l' && checkExisty(getKey((newWDom.children || [])[0])) // 'l': loop
+  newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0]) // 'l': loop
     ? remakeChildrenForLoopUpdate(newWDom, originalWDom)
     : (newWDom.children || []).map((item: WDom, index: number) =>
         assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {
