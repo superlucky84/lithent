@@ -135,8 +135,8 @@ const addReRenderTypeProperty = (
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
   // Fast exit: no keys to compare
   if (
-    !getKey((newWDom.children || [])[0]) ||
-    !getKey((originalWDom.children || [])[0])
+    !checkExisty(getKey((newWDom.children || [])[0])) ||
+    !checkExisty(getKey((originalWDom.children || [])[0]))
   ) {
     return false;
   }

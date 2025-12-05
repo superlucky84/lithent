@@ -86,7 +86,7 @@ const checkLoopTypeElement = (
   );
 
 export const getKey = (target: WDom) =>
-  (target && target.compProps && target.compProps.key) ||
+  (target && target.compProps && target.compProps.key) ??
   (target && target.props && target.props.key);
 
 /**
