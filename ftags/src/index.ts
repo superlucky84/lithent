@@ -1,10 +1,11 @@
-import { h, Fragment, isPropType } from 'lithent';
+import { h, Fragment, isPropType, lmountComponentSet } from 'lithent';
 import type {
   Props,
   WDom,
   FragmentFunction,
   MiddleStateWDom,
   Component,
+  LComponent,
   TagFunction,
 } from 'lithent';
 
@@ -55,5 +56,29 @@ export const fMount = <T>(component: Component<T>) => {
     }
 
     return h(tagFunction as TagFunction, {}, ...children);
+  };
+};
+
+export const flMount = <T>(component: LComponent<T>) => {
+  const tagFunction = (_props: T, _children: WDom[]) => component;
+
+  // Register component in lmountComponentSet for automatic state management
+  lmountComponentSet.add(component);
+
+  return (
+    ...param: unknown extends T
+      ? (Props | MiddleStateWDom)[]
+      : [T, ...MiddleStateWDom[]]
+  ) => {
+    const props = param[0];
+    const children = param.slice(1) as MiddleStateWDom[];
+
+    if (isPropType(props)) {
+      return h(tagFunction as unknown as TagFunction, props || {}, ...children);
+    } else if (props !== undefined) {
+      return h(tagFunction as unknown as TagFunction, {}, props, ...children);
+    }
+
+    return h(tagFunction as unknown as TagFunction, {}, ...children);
   };
 };

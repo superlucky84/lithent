@@ -1,17 +1,6 @@
-import { render, mount } from 'lithent';
-import { HeaderNav } from '@/components/headernav';
-import { Main } from '@/components/Main';
+import { render } from 'lithent';
+import { Layout } from '@/components/Layout';
 import '@/input.css';
 
-// https://github.com/themesberg/flowbite-admin-dashboard
-
-const Root = mount(() => {
-  return () => (
-    <>
-      <HeaderNav />
-      <Main />
-    </>
-  );
-});
-
-render(<Root />, document.body);
+// Render the application
+render(<Layout />, document.body);

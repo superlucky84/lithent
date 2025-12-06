@@ -36,7 +36,12 @@ export default defineConfig({
       fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs'),
     },
     rollupOptions: {
-      external: ['vite', 'lithent', '@lithent/hmr-parser', '@lithent/lithent-template-vite'],
+      external: [
+        'vite',
+        'lithent',
+        '@lithent/hmr-parser',
+        '@lithent/lithent-template-vite',
+      ],
       output: {
         globals: {
           vite: 'vite',

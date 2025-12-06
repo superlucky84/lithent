@@ -4,6 +4,142 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lithent</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #0b1220;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --accent: #7c3aed;
+        --accent-2: #22d3ee;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Space Grotesk', 'Pretendard', system-ui, -apple-system,
+          sans-serif;
+        background: radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.15), transparent 30%),
+          radial-gradient(circle at 80% 0%, rgba(34, 211, 238, 0.14), transparent 35%),
+          var(--bg);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        padding: 32px;
+      }
+      #root {
+        width: min(960px, 100%);
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+        border-radius: 20px;
+        padding: 24px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+      }
+      .eyebrow {
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-size: 12px;
+        margin: 0 0 8px;
+      }
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.2;
+      }
+      .hint {
+        margin: 8px 0 0;
+        color: var(--muted);
+        max-width: 520px;
+      }
+      .controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      button {
+        background: linear-gradient(120deg, var(--accent), var(--accent-2));
+        border: none;
+        color: #0b1021;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s;
+        box-shadow: 0 10px 30px rgba(34, 211, 238, 0.3);
+      }
+      button:hover {
+        transform: translateY(-1px) scale(1.01);
+        filter: brightness(1.05);
+      }
+      button:active {
+        transform: translateY(0);
+        filter: brightness(0.95);
+      }
+      .list {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+      }
+      .item {
+        position: relative;
+        padding: 20px;
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(124, 58, 237, 0.25), rgba(34, 211, 238, 0.2));
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+        animation: floaty 3s ease-in-out infinite;
+        transition: transform 0.25s ease, filter 0.25s ease;
+      }
+      .item::after {
+        content: '';
+        position: absolute;
+        inset: -40% 40% 30% -30%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 50%);
+        transform: rotate(15deg);
+      }
+      .item:nth-child(2n) {
+        background: linear-gradient(145deg, rgba(34, 211, 238, 0.25), rgba(124, 58, 237, 0.2));
+      }
+      .item:hover {
+        transform: translateY(-6px);
+        filter: saturate(1.1);
+      }
+      .item__label {
+        font-size: 46px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+      .item__sub {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      @keyframes floaty {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+    </style>
   </head>
   <body>
     <section id="root"></section>

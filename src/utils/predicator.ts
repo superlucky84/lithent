@@ -6,6 +6,7 @@ import {
   FragmentFunction,
   WDomType,
 } from '@/types';
+import { isObject } from '@/utils';
 
 type WDomParam =
   | string
@@ -19,7 +20,7 @@ type WDomParam =
  */
 
 const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
-  typeof wDom === 'object' && !('resolve' in wDom);
+  isObject(wDom) && !('resolve' in wDom);
 
 const checkPlainType = (wDom: WDomParam, typeName: string) =>
   checkPlainWDomType(wDom) && wDom.type === typeName;
@@ -77,15 +78,15 @@ const checkLoopTypeElement = (
     checkPlainWDomType(newWDom) &&
     originalWDom &&
     originalWDom.type === newWDom.type &&
-    ((checkExisty(getKey((newWDom.children || [])[0])) &&
-      checkExisty(getKey((originalWDom.children || [])[0]))) ||
+    ((checkExistyKey((newWDom.children || [])[0]) &&
+      checkExistyKey((originalWDom.children || [])[0])) ||
       (originalWDom.children &&
         newWDom.children &&
         originalWDom.children.length === newWDom.children.length))
   );
 
 export const getKey = (target: WDom) =>
-  (target && target.compProps && target.compProps.key) ||
+  (target && target.compProps && target.compProps.key) ??
   (target && target.props && target.props.key);
 
 /**
@@ -99,7 +100,7 @@ export const checkCustemComponentFunction = (
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver =>
   (typeof target === 'function' && !checkFragmentFunction(target)) ||
-  (typeof target === 'object' && 'resolve' in target);
+  (isObject(target) && 'resolve' in target);
 
 export const checkFragmentFunction = (
   target: unknown
@@ -109,6 +110,8 @@ export const checkFragmentFunction = (
 export const checkEmptyElement = (wDom: WDomParam) =>
   checkPlainWDomType(wDom) && !wDom.type;
 
+export const checkExistyKey = (target: WDom) => checkExisty(getKey(target));
+
 export const checkExisty = (value: unknown) =>
   value !== null && value !== undefined;
 
@@ -116,14 +119,14 @@ export const checkStyleData = (
   dataKey: string,
   dataValue: unknown
 ): dataValue is Record<string, string> =>
-  dataKey === 'style' && typeof dataValue === 'object';
+  dataKey === 'style' && isObject(dataValue);
 
 export const checkRefData = (
   dataKey: string,
   dataValue: unknown
 ): dataValue is {
   value: HTMLElement | Element | DocumentFragment | Text | undefined;
-} => dataKey === 'ref' && typeof dataValue === 'object';
+} => dataKey === 'ref' && isObject(dataValue);
 
 export const hasAccessorMethods = (target: unknown, dataKey: string) => {
   const descriptor = Object.getOwnPropertyDescriptor(

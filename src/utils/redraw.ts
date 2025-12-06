@@ -5,8 +5,9 @@ const redrawQueue = new Map<Props, () => void>();
 let redrawQueueTimeout: boolean = false;
 
 export const setRedrawAction = (compKey: Props, exec: () => void) => {
-  if (componentMap.get(compKey)) {
-    componentMap.get(compKey)!.up = () => {
+  const comp = componentMap.get(compKey);
+  if (comp) {
+    comp.up = () => {
       redrawQueue.set(compKey, exec);
 
       if (!redrawQueueTimeout) {

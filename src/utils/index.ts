@@ -7,10 +7,14 @@ export const getParent = (vDom: WDom) =>
 
 export const entries = Object.entries;
 export const keys = Object.keys;
+
+export const isObject = (target: unknown): target is Record<string, unknown> =>
+  typeof target === 'object' && target !== null;
+
 export const assign = Object.assign;
 export const isPropType = (obj: unknown): obj is Props => {
   return (
-    typeof obj === 'object' &&
+    isObject(obj) &&
     !Array.isArray(obj) &&
     !Object.getOwnPropertySymbols(obj).includes(wdomSymbol)
   );

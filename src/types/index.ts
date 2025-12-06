@@ -10,7 +10,9 @@ export type CompKey = Props;
 export type TagFunction = (
   prop: Props,
   children?: MiddleStateWDomChildren
-) => (renew: Renew, prop: Props, children: WDom[]) => (props: Props) => WDom;
+) =>
+  | ((renew: Renew, prop: Props, children: WDom[]) => (props: Props) => WDom)
+  | WDom;
 
 export type Renew = () => boolean;
 export type Component<T> = (
@@ -22,7 +24,6 @@ export type Component<T> = (
 export type LComponent<T> = (props: T, childen: WDom[]) => (props: T) => WDom;
 
 export type TagFunctionResolver = {
-  tagName: string;
   ctor: Function;
   props: Props;
   children: WDom[];
@@ -46,27 +47,29 @@ export type MiddleStateWDomChildren = MiddleStateWDom[];
 // component, fragment, element, loop, text, none
 export type WDomType = 'c' | 'f' | 'e' | 'l' | 't' | 'et';
 
+// Internal metadata uses short keys to keep bundle size down.
+// we: wrapElement, ae: afterElement, op: oldProps, oc: oldChildren
+// nr: needRerender, il: isLegacy
 export interface WDom {
   type?: string | null;
   isRoot?: boolean;
   tag?: string;
   props?: Props;
-  oldProps?: Props;
-  tagName?: string;
+  op?: Props; // oldProps (previous props)
   ctor?: Function;
   children?: WDom[];
-  oldChildren?: WDom[];
+  oc?: WDom[]; // oldChildren (previous children)
   getParent?: () => WDom | undefined;
   text?: string | number;
   compKey?: CompKey;
   reRender?: () => WDom;
   compProps?: Props;
   compChild?: WDom[];
-  wrapElement?: HTMLElement;
-  afterElement?: HTMLElement;
+  we?: HTMLElement; // wrapElement (root wrapper)
+  ae?: HTMLElement; // afterElement (insert before)
   el?: HTMLElement | DocumentFragment | Text;
-  needRerender?: RenderType;
-  isLegacy?: boolean;
+  nr?: RenderType; // needRerender
+  il?: boolean; // isLegacy
   [wdomSymbol]?: boolean | 'provider';
 }
 
@@ -75,9 +78,9 @@ export type RenderType =
   | 'D' // DELETE
   | 'R' // REPLACE
   | 'U' // UPDATE
-  | 'SR' // S_REPLACE
-  | 'SU' // S_UPDATE
-  | 'CNSU' // CHILD NOT SORTED AT LOOP
+  | 'S' // SORTED_REPLACE (was SR)
+  | 'T' // SORTED_UPDATE (was SU)
+  | 'L' // LOOP_CHILDREN_NOT_SORTED_UPDATE (was CNSU)
   | 'N'; // NONE
 
 export type ComponentSubKey =

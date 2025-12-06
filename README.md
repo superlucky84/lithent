@@ -1,278 +1,172 @@
+<img src="./lithentDocs/public/lithent.png" alt="Lithent" height="60" align="left" style="margin-right: 10px;" />
 
-## ➿ lithent
-> An extensible JSX-based virtual DOM library for lightweight use in a variety of environments.
+# Lithent &nbsp; [![npm version](https://img.shields.io/npm/v/lithent.svg)](https://www.npmjs.com/package/lithent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/lithent)](https://bundlephobia.com/package/lithent) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
-
-![lithent-text](https://github.com/user-attachments/assets/a8848484-d315-4f81-be3b-61490d2be2b9)
-
-![npm](https://img.shields.io/npm/v/lithent)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/lithent)
-![npm](https://img.shields.io/npm/dt/lithent)
-![NPM](https://img.shields.io/npm/l/lithent)
+<br clear="left"/>
 
 
 
+**Lithent is a JavaScript library for building lightweight, predictable UIs with familiar closure-based patterns.**
 
-- [Manual](https://medium.com/p/13d6fe6d3330)
-- [Korean Manual](https://medium.com/@superlucky84/lithent-전체-기능-설명서-3cfab04c0722)
-- [Home Page](https://superlucky84.github.io/lithent) - (This page is written in lithent.)
+It trims away unnecessary magic and complex APIs so your UI code stays simple, explicit, and easy to reason about.
 
-Lithent were developed to make it easy to insert Virtual DOM component
-fragments into pages already drawn with SSR, and are intended to be
-used lightly in a variety of situations.
+<br />
 
-`(lithent.mjs  14.25 kB │ gzip: 4.49 kB │ map: 59.74 kB)`
-`(lithent.umd.js  10.39 kB │ gzip: 4.03 kB │ map: 58.16 kB)`
+## Why Lithent? &nbsp; [→ Learn more](https://superlucky84.github.io/lithent/guide/introduction)
 
-## 🚩 Table of Contents
-- [Thanks for the introduction](#thanks-for-the-introduction)
-- [Why Use Lithent](#why-use-lithent)
-- [Basic Guide](#basic-guide)
-- [Lithent Ssr Boilerplate](#lithent-ssr-boilerplate)
-- [How To Install](#how-to-install)
-  - [Use NPM](#use-npm)
-  - [Use CDN](#or-use-cdn)
-  - [With JSX](#with-jsx)
-  - [With FTAGS](#with-ftags)
-  - [With HTM](#with-htm)
-- [Examples](#examples)
-  - [With ESM](#with-esm)
-  - [With UMD](#with-umd)
-- [Related Projects](#related-projects)
-- [Develop Guide](#develop-guide)
-- [Test](#test)
+In many size‑sensitive environments you still need **lightweight DOM manipulation** without pulling in a full framework. Most existing solutions are powerful but heavy, especially when you just want to embed a small widget or ship a tiny library.
 
-## Thanks for the introduction
-- [unsuckjs](https://unsuckjs.com/)
-- [jster](https://jster.net/blog/jster-198/)
-- [webtoolsweekly](https://webtoolsweekly.com/archives/issue-531/)
+Lithent was designed for that gap. **The Core package alone can drive a complete UI.** When you need state management or a reactive system, you can **opt‑in to helper modules like expansion packs** instead of adopting a full stack up front.
 
-## Why use Lithent?
+You bring in only what you need, letting the stack scale with your project and team instead of the other way around.
 
-### Lithent have the bare minimum of necessary functionality, with no unnecessary features.
+### Design philosophy
 
-In a real-world development environment, you may want to use Virtual DOM lightly, with only the bare minimum of core functionality.
+- **Small Bundle** — 4KB core with optional extensions
+- **Closure-based State** — No magic, just JavaScript
+- **Manual or Reactive** — Choose your update strategy
+- **Progressive Enhancement** — From static HTML to full SPA
 
-"Lithent" makes it easy to add, remove, and update virtual DOM to specific parts of a pre-drawn SSR page.
+<br />
 
-"Lithent" has implemented the bare minimum functionality needed to create and update virtual DOM in general (we only need to know 'render', 'mounter', 'updater', 'renewer', 'mountCallback', and 'updateCallback').
+## Quick start &nbsp; [→ Full guide](https://superlucky84.github.io/lithent/guide/quick-start)
 
-We provide code in the form of 'helpers' that extend the basic functionality, but using the helpers is only optional and users can extend and develop custom helpers for their own projects.
-
-### Approach with the developer-friendly concept of closures between "component mounter" and "renderer"
-
-JavaScript users are used to using closures and love to develop with them.
-
-"Lithent" provides a familiar approach to my JavaScript development, as it leverages the properties of higher-order functions and closures to define and recycle the state of a component.
-
-## Basic Guide
-
-- https://superlucky84.github.io/lithent/
-
-## Lithent Ssr Boilerplate
-
-`Lithent-Ssr-Boilerplate` is a boilerplate designed for building server-side rendering (SSR) websites using the [Lithent](https://superlucky84.github.io/lithent/) UI library.
-
-* [README](https://github.com/superlucky84/lithent/tree/master/createLithent#readme)
+### Create a new project
 
 ```bash
-npx create-lithent-ssr@latest
+npx create-lithent@latest
 ```
 
+Pick a project name and template (SSR/SPA) and you’re ready to go.
 
-## How To Install
-
-#### Use NPM
+### Install via npm
 
 ```bash
-pnpm add lithent
+npm install lithent
 ```
 
-#### Or Use CDN
-
-* UMD : https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.umd.js
-* UMD-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.umd.js
-* UMD-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.umd.js
-* UMD-TAG: https://cdn.jsdelivr.net/npm/lithent@1.20.2/tag/dist/lithentTag.umd.js
-* ESM : https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.mjs
-* ESM-HELPER: https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.mjs
-* ESM-FTAGS: https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.mjs
-* ESM-TAG: https://cdn.jsdelivr.net/npm/lithent@1.20.2/tag/dist/lithentTag.mjs
-
-
-It's easier to use lithent with JSX or HTM.
-
-#### With JSX
-
-* Lithent is built on top of JSX.
-  * [Setting Guide](https://superlucky84.github.io/lithent/#install)
-
-
-#### With FTAGS
-
-You don't need to use h functions or JSX, you can call functions to mark them up.
-When creating a component, use `fMount` instead of `mount`.
-When creating a fragment, use `fFragment` instead of `Fragment`.
-
-```ts
-/* ESM */
-import { render, h } from 'lithent';
-import { fTags, fFragment, fMount } from 'lithent/ftags';
-
-const { section, div, p, br, strong } = fTags;
-
-/* UMD
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.umd.js"></script>
-
-const { render } = lithent;
-const { fTags, fMount, fFragment } = lithentFTags;
-const { section, div, p, br, strong } = fTags;
-*/
-
-const fTagComponent = fMount<{ firstProp: number }>((_r, props, children) => {
-  return () =>
-    fFragment(
-      'first inner',
-      div({ style: { border: '1px solid red' } }, 'second inner'),
-      div('The props argument can be omitted.'),
-      props.firstProp,
-      ...children
-    );
-});
-
-render(
-  fTagComponent(
-    { firstProp: 3 }, // The props argument can be omitted.
-    div({ style: { border: '1px solid green' } }, `Fchildren1`),
-    'Fchildren2',
-    br()
-  ),
-  document.getElementById('root')
-);
-```
-
-#### With HTM
-
-- [Htm Github](https://github.com/developit/htm)
-
-```js
-import { lTag } from 'lithent/tag';
-const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
-```
-
-
-## Examples
-
-- [More Examples](https://superlucky84.github.io/lithent/#examples)
-
-#### With ESM
-```js
-import { h, render, mount, Fragment } from 'lithent';
-import { lTag } from 'lithent/tag';
-import { state } from 'lithent/helper';
-
-const Component = mount((renew, _props) => {
-  const count = state(0, renew);
-
-  const change = () => {
-    count.value += 1;
-  };
-
-  // Updater
-  return () => lTag`
-    <${Fragment}>
-      <li>count: ${count.value}</li>
-      <button onClick=${change}>increase</button>
-    <//>
-  `;
-});
-
-// appendChild or insertBefore
-// The third argument is an optional value for insertBefore.
-const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
-```
-
-#### With UMD
+### Use directly from a CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/dist/lithent.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/helper/dist/lithentHelper.umd.js"></script-->
-<script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/tag/dist/lithentTag.umd.js"></script>
-<!--script src="https://cdn.jsdelivr.net/npm/lithent@1.20.2/ftags/dist/lithentFTags.umd.js"></script-->
+<script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
+```
 
-<div id="root"></div>
+No build step required — you can progressively enhance a static HTML page.
 
-<script>
-const { h, Fragment, render, mount } = lithent;
-const { lTag } = lithentTag;
-// const { state } = lithentHelper;
+<br />
 
-const Component = mount(renew => {
-  count = 0;
+## Two ways to build components &nbsp; [→ Learn more](https://superlucky84.github.io/lithent/guide/mounter)
 
-  const change = () => {
+Lithent offers two complementary styles that you can freely mix in the same project.
+
+### Manual control (Manual Mode)
+
+You explicitly call `renew()` to control when updates happen. State lives in closures, giving you an extremely predictable flow.
+
+```tsx
+import { mount } from 'lithent';
+
+const Counter = mount(renew => {
+  let count = 0;
+
+  const increment = () => {
     count += 1;
-    renew();
+    renew(); // Explicitly trigger an update
   };
 
-  // Updater
-  return () => lTag`
-    <${Fragment}>
-      <li>count: ${count}</li>
-      <button onClick=${change}>increase</button>
-    <//>
-  `;
+  return () => (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>+1</button>
+    </div>
+  );
 });
-
-// appendChild or insertBefore
-// The third argument is an optional value for insertBefore.
-const destroy = render(lTag`<${Component} />`, document.getElementById('root'), document.getElementById('#insert-before-this-element'));
-</script>
 ```
 
-## Related Projects
-- [htm](https://www.npmjs.com/package/htm) - making **H**yperscript **T**agged **M**arkup possible
+### Declarative (Light API Mode)
 
-## Develop Guide
+In this style state changes automatically reflect in the UI.
+Helper packages provide `lstate`, `computed`, `effect`, and more — all opt‑in.
 
-It's open source, so you can develop and contribute together.
+```tsx
+import { lmount } from 'lithent';
+import { lstate } from 'lithent/helper';
 
-### pnpm install (this project was created using pnpm.)
+const Counter = lmount(() => {
+  const count = lstate(0);
 
-```bash
-npm install -g pnpm
+  const increment = () => {
+    count.value += 1; // Updates the UI automatically
+  };
+
+  return () => (
+    <div>
+      <p>Count: {count.value}</p>
+      <button onClick={increment}>+1</button>
+    </div>
+  );
+});
 ```
 
-### project install
+<br />
 
-```bash
-git clone https://github.com/superlucky84/lithent.git
+## Key features
 
-cd lithent
+### Core
+- **[mount / lmount](https://superlucky84.github.io/lithent/guide/mounter)** — define and initialize components
+- **[Portal](https://superlucky84.github.io/lithent/guide/portal)** — render outside the parent DOM tree
+- **[Hooks](https://superlucky84.github.io/lithent/guide/mount-hooks)** — `mountCallback`, `updateCallback`, `mountReadyCallback`
+- **[Ref](https://superlucky84.github.io/lithent/guide/state-ref)** — directly reference DOM elements
 
-pnpm install
-```
+### Helpers (optional)
+- **[state / lstate](https://superlucky84.github.io/lithent/guide/state)** — reactive state management
+- **[computed](https://superlucky84.github.io/lithent/guide/computed)** — derived state
+- **[effect](https://superlucky84.github.io/lithent/guide/effect)** — side‑effect handling
+- **[store / lstore](https://superlucky84.github.io/lithent/guide/store)** — shared/global state
+- **[context / lcontext](https://superlucky84.github.io/lithent/guide/context)** — data sharing across components
 
-### project build
+### Template options
+- **[JSX](https://superlucky84.github.io/lithent/guide/vite-plugin)** — via a Vite plugin
+- **[FTags](https://superlucky84.github.io/lithent/guide/ftags)** — function‑style tags (no build step)
+- **[HTM](https://superlucky84.github.io/lithent/guide/htm-tags)** — tagged template literals
+- **[Template Strings](https://superlucky84.github.io/lithent/guide/template-strings)** — custom templates
 
-```bash
-pnpm build
-```
+<br />
 
-### Running the development environment
+## Documentation
 
-```bash
-pnpm dev // or pnpm dev:core
-```
+Find the full guide and API reference at:
 
-## Test
+**[https://superlucky84.github.io/lithent](https://superlucky84.github.io/lithent)**
 
-> To fully test everything, including plugins like helper and ftags, a build is required.
+### Quick links
+- [Introduction](https://superlucky84.github.io/lithent/guide/introduction)
+- [Quick start](https://superlucky84.github.io/lithent/guide/quick-start)
+- [Examples](https://superlucky84.github.io/lithent/examples/1)
+- [API reference](https://superlucky84.github.io/lithent/guide/mounter)
 
-```bash
-pnpm install
-pnpm build
-pnpm test
-```
+<br />
+
+## Ecosystem
+
+| Package | Description |
+|--------|-------------|
+| [lithent](https://www.npmjs.com/package/lithent) | Core library (~4KB) |
+| [lithent/helper](https://www.npmjs.com/package/lithent) | Reactive state helpers |
+| [lithent/ssr](https://www.npmjs.com/package/lithent) | Server‑side rendering |
+| [lithent/ftags](https://www.npmjs.com/package/lithent) | Function‑style tag API |
+| [lithent/tag](https://www.npmjs.com/package/lithent) | HTM template support |
+| [create-lithent](https://www.npmjs.com/package/create-lithent) | Project scaffolding tool |
+
+<br />
+
+## License
+
+[MIT](LICENSE) © [superlucky84](https://github.com/superlucky84)
+
+<br />
+
+<div align="center">
+  <sub>Built with ❤️ by the Lithent community</sub>
+</div>

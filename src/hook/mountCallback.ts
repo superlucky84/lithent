@@ -32,7 +32,9 @@ export const mountCallback = (effectAction: () => void) => {
   const compKey = getComponentKey();
   if (compKey) {
     const comp = componentMap.get(compKey);
-    comp && comp.mts.push(effectAction);
+    if (comp) {
+      comp.mts.push(effectAction);
+    }
   }
 };
 
@@ -44,8 +46,8 @@ const runMountedQueueFromWDom = (newWDom: WDom) => {
 
   if (compKey) {
     const component = componentMap.get(compKey);
-    const mountQueue = component && component.mts;
-    const sequence = component && component.upS;
+    if (!component) return;
+    const { mts: mountQueue, upS: sequence } = component;
 
     compKeyRef.value = compKey;
 

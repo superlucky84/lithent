@@ -6,7 +6,7 @@ import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
-  checkExisty,
+  checkExistyKey,
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
@@ -49,12 +49,16 @@ const remakeNewWDom = (
     );
   }
 
-  remakeWDom.needRerender = needRerender;
+  // NOTE: short-key metadata (nr = needRerender) keeps bundle size down
+  remakeWDom.nr = needRerender;
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
   if (!isNoting && originalWDom) {
-    originalWDom.isLegacy = true;
+    originalWDom.il = true;
     delete originalWDom.children;
+  }
+  if (originalWDom?.tag === 'portal') {
+    remakeWDom.tag = 'portal';
   }
 
   return remakeWDom;
@@ -72,15 +76,15 @@ const inheritPropForRender = (
     remakeWDom.el = originalWDom.el;
   }
 
-  if (needRerender && ['D', 'R', 'SR'].includes(needRerender)) {
+  if (needRerender === 'D' || needRerender === 'R' || needRerender === 'S') {
     if (originalWDom) {
       runUnmountQueueFromWDom(originalWDom);
       recursiveRemoveEvent(originalWDom);
     }
-    remakeWDom.oldChildren = originalWDom && originalWDom.children;
+    remakeWDom.oc = originalWDom && originalWDom.children;
   }
 
-  remakeWDom.oldProps = originalWDom && originalWDom.props;
+  remakeWDom.op = originalWDom && originalWDom.props;
 };
 
 /**
@@ -103,17 +107,16 @@ const addReRenderTypeProperty = (
   const existOriginalWDom = originalWDom && originalWDom.type;
   if (!existOriginalWDom) return 'A';
 
-  const key = getKey(newWDom);
   const parent = getParent(originalWDom);
   const isKeyChecked =
-    !newWDom.isRoot && parent && parent.type === 'l' && checkExisty(key);
+    !newWDom.isRoot && parent && parent.type === 'l' && checkExistyKey(newWDom);
 
   let result: RenderType = isSameType
     ? isKeyChecked
-      ? 'SU'
+      ? 'T'
       : 'U'
     : isKeyChecked
-      ? 'SR'
+      ? 'S'
       : 'R';
 
   if (
@@ -122,16 +125,24 @@ const addReRenderTypeProperty = (
     originalWDom &&
     chkDiffLoopOrder(newWDom, originalWDom)
   ) {
-    result = 'CNSU';
+    result = 'L';
   }
 
   return result;
 };
 
 /**
- * Check if a reverse order swap is needed when updating types that require reordering.
+ * Check if a reverse order swap is needed when updating keyed loop-type elements.
  */
 const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
+  // Fast exit: no keys to compare
+  if (
+    !checkExistyKey((newWDom.children || [])[0]) ||
+    !checkExistyKey((originalWDom.children || [])[0])
+  ) {
+    return false;
+  }
+
   const origChildren = [...((originalWDom && originalWDom.children) || [])];
   const newChildren = [...((newWDom && newWDom.children) || [])].filter(item =>
     origChildren.find(newItem => getKey(item) === getKey(newItem))
@@ -242,7 +253,7 @@ const remakeChildrenForAdd = (newWDom: WDom) =>
  * Uses key-based diffing for loops, index-based for others
  */
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
-  newWDom.type === 'l' && checkExisty(getKey((newWDom.children || [])[0])) // 'l': loop
+  newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0]) // 'l': loop
     ? remakeChildrenForLoopUpdate(newWDom, originalWDom)
     : (newWDom.children || []).map((item: WDom, index: number) =>
         assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {
