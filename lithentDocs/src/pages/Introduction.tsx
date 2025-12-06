@@ -8,8 +8,8 @@ export const Introduction = () => (
     </h1>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent is a lightweight JavaScript library for building small, predictable
-      pieces of UI.
+      Lithent is a lightweight JavaScript library for building small,
+      predictable pieces of UI.
       <br />
       It removes unnecessary magic or complex APIs so you can focus on a simple
       and fully predictable programming model.
@@ -150,8 +150,8 @@ const Counter = lmount((_props) => {
         <span class="font-medium text-gray-700 dark:text-gray-300">
           💡 Heads-up:
         </span>{' '}
-        Stateless UI does not require mount or lmount—just write a plain function
-        component in Lithent style (for example{' '}
+        Stateless UI does not require mount or lmount—just write a plain
+        function component in Lithent style (for example{' '}
         <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
           ({'{ props, children }'})
         </code>

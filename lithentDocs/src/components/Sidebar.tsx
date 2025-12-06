@@ -1,5 +1,5 @@
 import { mount } from 'lithent';
-import { appStore, navigateTo } from '@/store';
+import { appStore, navigateTo, resolveRouteForLanguage } from '@/store';
 
 interface MenuItem {
   text: string;
@@ -99,7 +99,8 @@ export const Sidebar = mount(renew => {
   let prevRoute = store.route;
 
   const handleClick = (link: string) => {
-    navigateTo(link);
+    const lang = store.route.startsWith('/ko') ? 'ko' : 'en';
+    navigateTo(resolveRouteForLanguage(link, lang));
   };
 
   const toggleSection = (title: string) => {
@@ -110,6 +111,9 @@ export const Sidebar = mount(renew => {
   return () => {
     const routeChanged = store.route !== prevRoute;
     const normalizedRoute = normalizePath(store.route);
+    const currentLang = store.route.startsWith('/ko') ? 'ko' : 'en';
+    const toLocalizedLink = (link: string) =>
+      normalizePath(resolveRouteForLanguage(link, currentLang));
 
     // 메인페이지로 이동하면 모든 섹션 닫기
     if (routeChanged && normalizedRoute === '/') {
@@ -146,7 +150,7 @@ export const Sidebar = mount(renew => {
             {menuData.map(section => {
               if (routeChanged && normalizedRoute !== '/') {
                 const hasActive = section.items.some(
-                  item => normalizePath(item.link) === normalizedRoute
+                  item => toLocalizedLink(item.link) === normalizedRoute
                 );
                 if (hasActive) {
                   expanded[section.text] = true;
@@ -174,12 +178,16 @@ export const Sidebar = mount(renew => {
                     aria-hidden={!isExpanded}
                   >
                     {section.items.map(item => {
+                      const targetLink = resolveRouteForLanguage(
+                        item.link,
+                        currentLang
+                      );
                       const isActive =
-                        normalizePath(store.route) === normalizePath(item.link);
+                        normalizedRoute === normalizePath(targetLink);
                       return (
                         <li>
                           <a
-                            href={item.link}
+                            href={targetLink}
                             onClick={(e: Event) => {
                               e.preventDefault();
                               handleClick(item.link);

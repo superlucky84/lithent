@@ -1,5 +1,28 @@
 import { lstore } from 'lithent/helper';
 
+const KO_PREFIX = '/ko';
+
+const ensureLeadingSlash = (path: string) =>
+  path.startsWith('/') ? path : `/${path}`;
+
+const stripKoPrefix = (path: string) => {
+  const normalized = ensureLeadingSlash(path || '/');
+  const stripped = normalized.replace(/^\/ko(?=\/|$)/, '');
+  return stripped || '/';
+};
+
+export const resolveRouteForLanguage = (path: string, lang: 'en' | 'ko') => {
+  const base = stripKoPrefix(path);
+  if (lang === 'ko') {
+    if (base === '/') {
+      return `${KO_PREFIX}/guide/introduction`;
+    }
+    return `${KO_PREFIX}${base}`;
+  }
+
+  return base;
+};
+
 // Get initial theme
 const getInitialTheme = (): 'light' | 'dark' => {
   const saved = localStorage.getItem('lithent-theme');
@@ -45,6 +68,19 @@ export const navigateTo = (path: string) => {
   window.history.pushState({}, '', path);
   store.sidebarOpen = false;
   window.scrollTo(0, 0);
+};
+
+export const isKoreanRoute = () => store.route.startsWith(KO_PREFIX);
+
+export const setLanguage = (lang: 'en' | 'ko') => {
+  const target = resolveRouteForLanguage(store.route, lang);
+  if (target !== store.route) {
+    navigateTo(target);
+  }
+};
+
+export const toggleLanguage = () => {
+  setLanguage(isKoreanRoute() ? 'en' : 'ko');
 };
 
 // Listen to popstate (browser back/forward)
