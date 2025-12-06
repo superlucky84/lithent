@@ -246,6 +246,15 @@ const createComponentResolver = (
   wrappedChildren: WDom[]
 ) => {
   return (compKey = props) => {
+    // Diff mode sets needDiffRef to true so h()/makeNode return a resolver
+    // placeholder. During actual resolution we must force a real WDom tree,
+    // otherwise nested components leave only resolvers (no getParent/children)
+    // and CSR renders a blank area. Temporarily drop needDiffRef, then restore.
+    // Regression tests: src/tests/core-composedRenew.test.tsx,
+    // src/tests/core-component-remount.test.tsx
+    const prevNeedDiff = needDiffRef.value;
+    needDiffRef.value = false;
+
     initMountHookState(compKey);
 
     const initialComponent = tag(props, wrappedChildren);
@@ -267,7 +276,15 @@ const createComponentResolver = (
         tag(nextProps, wrappedChildren) as WDom;
     }
 
-    return makeCustomNode(componentMaker, compKey, tag, props, wrappedChildren);
+    const node = makeCustomNode(
+      componentMaker,
+      compKey,
+      tag,
+      props,
+      wrappedChildren
+    );
+    needDiffRef.value = prevNeedDiff;
+    return node;
   };
 };
 
@@ -361,15 +378,35 @@ const wrapComponentMakerIfNeeded = (
 ): { wrappedComponentMaker: (props: Props) => WDom; customNode: WDom } => {
   let customNode = componentMaker(props);
 
+  // If the component returns a plain VDom (no reRender), nothing to wrap.
   if (!customNode.reRender) {
     return { wrappedComponentMaker: componentMaker, customNode };
   }
 
+  /**
+   * Avoid parent/child sharing the same WDom when a component directly returns
+   * another component. On remove→add toggles the shared instance would lose its
+   * parent pointer and fail to reinsert. We always wrap the child in a Fragment
+   * and attach getParent to the wrapped child so it stays anchored even after
+   * unmount/mount cycles.
+   * Regression tests: src/tests/core-composedRenew.test.tsx,
+   * src/tests/core-component-remount.test.tsx
+   */
   const wrappedComponentMaker = (newProps: Props): WDom => {
-    const customNode = componentMaker(newProps);
-    const newNode = Fragment({}, customNode);
-    customNode.getParent = () => newNode;
-    return newNode;
+    const next = componentMaker(newProps);
+
+    // When the child is null/primitive/element (no reRender), normalize it into
+    // a WDom via makeChildrenItem and wrap once so parent links are stable.
+    if (!next || !next.reRender) {
+      const child = makeChildrenItem(next as MiddleStateWDom);
+      const wrapper = Fragment({}, child);
+      child.getParent = () => wrapper;
+      return wrapper;
+    }
+
+    const wrapper = Fragment({}, next);
+    (next as WDom).getParent = () => wrapper;
+    return wrapper;
   };
 
   customNode = wrappedComponentMaker(props);
@@ -396,7 +433,14 @@ const addComponentProps = (
     reRender,
   });
 
-  setRedrawAction(compKey, () => replaceWDom(tag, props, children, wDom));
+  setRedrawAction(compKey, () =>
+    replaceWDom(
+      tag,
+      (wDom.compProps as Props) || props,
+      (wDom.compChild as WDom[]) || children,
+      wDom
+    )
+  );
 
   if (getComponentSubInfo(compKey, 'vd')) {
     (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
