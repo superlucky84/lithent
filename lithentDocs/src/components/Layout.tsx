@@ -53,20 +53,22 @@ import { Example17Page } from '@/pages/Example17';
 import { Example18Page } from '@/pages/Example18';
 import { Example19Page } from '@/pages/Example19';
 import { Example20Page } from '@/pages/Example20';
+import { IntroductionKo } from '@/pages/Introduction_ko';
+
+type PageComponent =
+  | ((...args: any[]) => ReturnType<typeof Introduction>)
+  | ((...args: any[]) => any);
 
 const normalizeRoute = (path: string) => {
   const cleaned = path.replace(/\/+$/, '');
   return cleaned || '/';
 };
 
-type PageComponent =
-  | ((...args: any[]) => ReturnType<typeof Introduction>)
-  | ((...args: any[]) => any);
-
 // Route configuration
 const routes: Record<string, PageComponent> = {
   '/': Home,
   '/guide/introduction': Introduction,
+  '/ko/guide/introduction': IntroductionKo,
   '/guide/quick-start': QuickStart,
   '/guide/mounter': Mounter,
   '/guide/updater': Updater,
@@ -118,12 +120,27 @@ const routes: Record<string, PageComponent> = {
   '/examples/20': Example20Page,
 };
 
+const resolveRoute = (path: string): PageComponent => {
+  const normalized = normalizeRoute(path);
+  const current = routes[normalized];
+
+  if (current) {
+    return current;
+  }
+
+  if (normalized.startsWith('/ko')) {
+    const fallback = normalizeRoute(normalized.replace(/^\/ko/, '') || '/');
+    return routes[fallback] || Introduction;
+  }
+
+  return Introduction;
+};
+
 export const Layout = mount(renew => {
   const store = appStore.watch(renew);
 
   return () => {
-    const normalized = normalizeRoute(store.route);
-    const CurrentPage = routes[normalized] || Introduction;
+    const CurrentPage = resolveRoute(store.route);
 
     return (
       <div class="min-h-screen bg-white dark:bg-[#1b1b1f] transition-colors">
