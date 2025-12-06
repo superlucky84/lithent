@@ -95,6 +95,8 @@ export const Example18 = mount(renew => {
   return () => {
     rootRenderCount += 1;
 
+    const productListNode = <CachedProductList />;
+
     return (
       <div class="w-full max-w-2xl mx-auto">
         <div class="mb-6">
@@ -204,7 +206,7 @@ export const Example18 = mount(renew => {
         </div>
 
         {/* 상품 목록 (cacheUpdate로 최적화) */}
-        <CachedProductList />
+        {productListNode}
 
         {/* cacheUpdate 설명 */}
         <div class="mt-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
