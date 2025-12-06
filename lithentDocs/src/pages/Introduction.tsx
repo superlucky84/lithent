@@ -20,11 +20,12 @@ export const Introduction = () => (
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      You still need a dependable library when you care about{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        Lightweight DOM manipulation in size-sensitive environments
+        lightweight DOM manipulation in size-sensitive environments
       </strong>
-      still needs a dependable library. Most frameworks are powerful, but they
-      tend to be heavy for small projects or embedded widgets.
+      . Most frameworks are powerful, but they tend to be heavy for small
+      projects or embedded widgets.
       <br />
       <br />
       Lithent was designed for that gap.{' '}
@@ -50,8 +51,8 @@ export const Introduction = () => (
       Lithent exposes two primary styles:{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
         Manual control
-      </strong>
-      과{' '}
+      </strong>{' '}
+      and{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
         Declarative Light API mode
       </strong>
@@ -102,7 +103,7 @@ const App = mount((renew, _props) => {
     renew();
   };
 
-  // 반환 함수로 JSX를 감싸는 이유는 클로저로 상태를 캡슐화하기 위함입니다.
+  // Wrapping JSX in a returned function keeps state inside a closure.
   return () => (
     <div>
       <p>{count}</p>
@@ -135,7 +136,7 @@ const Counter = lmount((_props) => {
     count.value += 1;
   };
 
-  // 반환 함수로 JSX를 감싸는 이유는 클로저로 상태를 캡슐화하기 위함입니다.
+  // Wrapping JSX in a returned function keeps state inside a closure.
   return () => (
     <div>
       <p>{count.value}</p>

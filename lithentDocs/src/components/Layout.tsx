@@ -54,6 +54,14 @@ import { Example18Page } from '@/pages/Example18';
 import { Example19Page } from '@/pages/Example19';
 import { Example20Page } from '@/pages/Example20';
 import { IntroductionKo } from '@/pages/Introduction_ko';
+import { QuickStartKo } from '@/pages/QuickStart_ko';
+import { MounterKo } from '@/pages/Mounter_ko';
+import { UpdaterKo } from '@/pages/Updater_ko';
+import { PropsKo } from '@/pages/Props_ko';
+import { ChildrenKo } from '@/pages/Children_ko';
+import { RenewerKo } from '@/pages/Renewer_ko';
+import { RenderKo } from '@/pages/Render_ko';
+import { PortalKo } from '@/pages/Portal_ko';
 
 type PageComponent =
   | ((...args: any[]) => ReturnType<typeof Introduction>)
@@ -70,13 +78,21 @@ const routes: Record<string, PageComponent> = {
   '/guide/introduction': Introduction,
   '/ko/guide/introduction': IntroductionKo,
   '/guide/quick-start': QuickStart,
+  '/ko/guide/quick-start': QuickStartKo,
   '/guide/mounter': Mounter,
+  '/ko/guide/mounter': MounterKo,
   '/guide/updater': Updater,
+  '/ko/guide/updater': UpdaterKo,
   '/guide/props': Props,
+  '/ko/guide/props': PropsKo,
   '/guide/children': Children,
+  '/ko/guide/children': ChildrenKo,
   '/guide/renewer': Renewer,
+  '/ko/guide/renewer': RenewerKo,
   '/guide/render': Render,
+  '/ko/guide/render': RenderKo,
   '/guide/portal': Portal,
+  '/ko/guide/portal': PortalKo,
   '/guide/next-tick': NextTick,
   '/guide/mount-hooks': MountHooks,
   '/guide/update-hooks': UpdateHooks,

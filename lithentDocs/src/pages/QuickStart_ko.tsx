@@ -1,21 +1,21 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const QuickStart = () => (
+export const QuickStartKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Quick start
+      빠르게 시작하기
     </h1>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Creating a Lithent application
+      Lithent 애플리케이션 생성하기
     </h2>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
       <p class="text-xs md:text-sm font-semibold text-gray-900 dark:text-white mb-3">
-        📋 Prerequisites
+        📋 사전 준비사항
       </p>
       <ul class="space-y-2.5 text-xs md:text-sm text-gray-700 dark:text-gray-300">
         <li class="flex items-start">
@@ -33,7 +33,7 @@ export const QuickStart = () => (
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span>Basic command line experience</span>
+          <span>커맨드 라인 사용에 익숙할 것</span>
         </li>
         <li class="flex items-start">
           <svg
@@ -54,35 +54,34 @@ export const QuickStart = () => (
             <strong class="font-medium text-gray-900 dark:text-white">
               Node.js 18.12
             </strong>{' '}
-            or higher installed
+            이상 버전 설치
           </span>
         </li>
       </ul>
     </div>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This section walks through creating a Lithent application on your local
-      machine. The generated project uses a Vite-based build setup.
+      이 섹션에서는 로컬 컴퓨터에서 Lithent 애플리케이션을 생성하는 방법을
+      소개합니다. 생성된 프로젝트는 Vite를 기반으로 한 빌드 환경을 사용합니다.
     </p>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Make sure you are running a recent Node.js version and that your current
-      working directory is where you want the project folder to live. Then run
-      the following command in your terminal (do not type the leading{' '}
-      <code>$</code>):
+      최신 버전의 Node.js가 설치되어 있는지 확인하고, 현재 작업 디렉터리가
+      프로젝트를 생성하려는 위치인지 확인하세요. 명령줄에서 다음 명령을
+      실행하세요($ 기호는 입력하지 않습니다):
     </p>
 
     <CodeBlock language="bash" code={`$ npx create-lithent@latest`} />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This command installs and runs <code>create-lithent</code>, the official
-      Lithent scaffolding tool.
+      이 명령은 공식 Lithent 프로젝트 생성 도구인 create-lithent를 설치하고
+      실행합니다.
       <br />
       <br />
-      It will prompt you for a project name and template type:
+      실행하면 프로젝트 이름과 템플릿 유형을 선택할 수 있습니다:
     </p>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
       <p class="text-xs md:text-sm font-semibold text-gray-900 dark:text-white mb-3">
-        📦 Template types
+        📦 템플릿 유형
       </p>
       <ul class="space-y-2.5 text-xs md:text-sm text-gray-700 dark:text-gray-300">
         <li class="flex items-start">
@@ -104,9 +103,8 @@ export const QuickStart = () => (
             <strong class="font-medium text-gray-900 dark:text-white">
               SSR (Express)
             </strong>
-            : Express-based template with server-side rendering support. Great
-            when SEO matters or you want to optimize perceived first-load
-            performance.
+            : 서버 사이드 렌더링을 지원하는 Express 기반 템플릿. SEO가
+            중요하거나 초기 로딩 성능을 최적화하려는 경우에 적합합니다.
           </div>
         </li>
         <li class="flex items-start">
@@ -128,16 +126,16 @@ export const QuickStart = () => (
             <strong class="font-medium text-gray-900 dark:text-white">
               SPA (Vite)
             </strong>
-            : Vite-based template for pure client-side rendering. Ideal for fast
-            DX and simple deployments.
+            : 클라이언트 사이드 렌더링만 사용하는 Vite 기반 템플릿. 빠른 개발
+            환경과 간단한 배포를 원하는 경우에 적합합니다.
           </div>
         </li>
       </ul>
     </div>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Once the project is scaffolded, follow the prompts to install dependencies
-      and start the dev server:
+      프로젝트가 생성되면, 의존성 설치 및 개발 서버 실행을 위한 안내에 따라
+      진행하세요:
     </p>
 
     <CodeBlock
@@ -148,29 +146,29 @@ $ npm run dev`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Your first Lithent project should now be running.
+      이제 첫 번째 Lithent 프로젝트가 실행되고 있을 것입니다!
       <br />
-      Lithent supports multiple template styles, but the default starter uses
-      JSX.
+      Lithent는 여러 가지 템플릿 스타일을 지원하지만, 기본 애플리케이션은 JSX를
+      사용하여 생성됩니다.
       <br />
       <br />
-      When you are ready to ship to production, run:
+      앱을 프로덕션에 배포할 준비가 되면 다음 명령을 실행하세요:
     </p>
 
     <CodeBlock language="bash" code={`$ npm run build`} />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This creates a production build under <code>./dist</code>.
+      이 명령은 프로젝트의 ./dist 디렉터리에 프로덕션용 빌드를 생성합니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Using Lithent from a CDN
+      CDN에서 Lithent 사용하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      You can load Lithent directly from a CDN via a script tag:
+      스크립트 태그를 통해 CDN에서 직접 Lithent를 사용할 수 있습니다:
     </p>
     <CodeBlock
       language="bash"
@@ -178,17 +176,16 @@ $ npm run dev`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      When using Lithent from a CDN you do not need a build step. This makes
-      setup much simpler and works well for enhancing static HTML or integrating
-      into an existing backend framework.
+      CDN에서 Lithent를 사용할 때는 빌드 단계가 필요하지 않습니다. 이로 인해
+      설정이 훨씬 간단해지며, 정적 HTML을 보강하거나 백엔드 프레임워크와 통합할
+      때 적합합니다.
       <br />
       <br />
-      JSX is not available in this setup. Instead, you can use{' '}
-      <code>ftags</code> to build templates in a functional style or wire it up
-      with <code>htm</code>.
+      다만 JSX 문법은 사용할 수 없습니다. 대신 함수형으로 템플릿을 만드는 ftags
+      방식을 사용하거나 htm을 사용할 수 있습니다.
     </p>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      Here is an example using <code>ftags</code>.
+      아래는 ftags를 사용한 예시입니다.
     </p>
 
     <CodeBlock
@@ -232,32 +229,30 @@ $ npm run dev`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      This example uses <code>flMount</code>, but you can also use
-      <code>fMount</code>.
+      예제에서는 flMount를 사용했지만 fMount를 사용할 수도 있습니다.
       <br />
       <br />
-      With <code>fMount</code>, helpers like <code>lstate</code> are no longer
-      required, so you can skip loading the helper bundle and reduce network
-      overhead.
+      fMount를 사용하면 lstate와 같은 확장 기능이 필요하지 않기 때문에 helper
+      리소스를 별도로 로드하지 않아도 되므로, 더 적은 네트워크 비용으로 사용할
+      수 있습니다.
     </p>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      When loading Lithent directly in the browser, <code>ftags</code> can be
-      very handy.
+      브라우저에서 직접 로드하는 방식으로 사용할 때 ftags가 매우 유용합니다.
       <br />
       <br />
-      Alternatively, you can use <code>htm</code> instead of ftags. That
-      approach is covered in more detail in a separate section.
+      ftags 외에도 htm을 이용하여 사용하는 방법이 있습니다. 이 방법은 다른
+      섹션에서 더 자세히 설명하겠습니다.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
-      Using the ES module build
+      ES 모듈 빌드 사용하기
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      You can also use the ES module build of Lithent. Most modern browsers
-      natively support ES modules, so you can load Lithent directly as a module
-      from a CDN:
+      ESM으로 빌드된 버전을 사용하면 ES 모듈 문법으로 사용할 수 있습니다.
+      대부분의 최신 브라우저는 ES 모듈을 기본적으로 지원하므로, 다음과 같이
+      CDN에서 네이티브 ES 모듈로 Lithent를 사용할 수 있습니다:
     </p>
     <CodeBlock
       language="html"
@@ -297,17 +292,16 @@ $ npm run dev`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
-      For security reasons, ES modules only run over the <code>http://</code> or
-      <code>https://</code> protocols—the ones browsers use when loading pages
-      from the web. To use ES modules locally, you should serve files through a
-      local HTTP server instead of opening them directly with the
-      <code>file://</code> protocol.
+      보안상의 이유로, ES 모듈은 http:// 또는 https:// 프로토콜에서만
+      동작합니다. 즉, 브라우저가 웹에서 페이지를 열 때 사용하는 프로토콜입니다.
+      로컬 컴퓨터에서 ES 모듈을 사용하려면 파일을 직접 열지 말고(file://), 로컬
+      HTTP 서버를 통해 제공해야 합니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What’s next
+      다음단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -320,12 +314,12 @@ $ npm run dev`}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Core feature: Mounter →
+          기본 기능: Mounter →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn about Mounter, one of the core concepts in Lithent.
+          Lithent의 핵심 개념인 Mounter에 대해 알아보세요.
           <br />
-          You will see how to create and initialize components step by step.
+          컴포넌트를 생성하고 초기화하는 방법을 배워봅시다.
         </p>
       </a>
     </div>

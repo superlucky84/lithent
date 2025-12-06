@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const Renewer = () => (
+export const RenewerKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Renewer
@@ -10,21 +10,20 @@ export const Renewer = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What is renew()?
+      renew()란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      <code>renew()</code> is the{' '}
+      renew()는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        core function that updates a component
+        컴포넌트를 업데이트하는 핵심 함수
       </strong>
-      . It is provided as the first argument to <code>mount</code>, and you call
-      it whenever state changes and the UI needs to update.
+      입니다. mount 함수의 첫 번째 인자로 제공되며, 상태가 변경되었을 때 이
+      함수를 호출하여 UI를 업데이트합니다.
       <br />
       <br />
-      When you call <code>renew()</code>, the Updater runs again to produce a
-      new virtual DOM. Lithent then diffs it against the previous tree and
-      applies only the changed parts to the real DOM.
+      renew()를 호출하면 Updater 함수가 다시 실행되어 새로운 Virtual DOM이
+      생성되고, 이전 Virtual DOM과 비교하여 변경된 부분만 실제 DOM에 반영됩니다.
     </p>
 
     <CodeBlock
@@ -36,7 +35,7 @@ const Counter = mount((renew, _props) => {
 
   const increase = () => {
     count += 1;
-    renew(); // 👈 Call renew() after changing state
+    renew(); // 👈 상태 변경 후 renew() 호출
   };
 
   return () => (
@@ -49,27 +48,26 @@ const Counter = mount((renew, _props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      If you never call <code>renew()</code>, the UI will not change even when
-      state does. This is Lithent&apos;s{' '}
+      renew()를 호출하지 않으면 상태가 변경되어도 화면이 업데이트되지 않습니다.
+      이것이 Lithent의{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        explicit update
+        명시적 업데이트
       </strong>{' '}
-      philosophy.
+      철학입니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      When should you call renew()?
+      언제 renew()를 호출해야 할까?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Call <code>renew()</code>{' '}
+      renew()는{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        whenever state changes and the view needs to reflect it
-      </strong>
-      . In practice, this usually happens inside event handlers after you mutate
-      state.
+        상태가 변경되어 화면을 업데이트해야 할 때
+      </strong>{' '}
+      호출합니다. 일반적으로 이벤트 핸들러 내부에서 상태를 변경한 후 호출합니다.
     </p>
 
     <CodeBlock
@@ -84,7 +82,7 @@ const TodoList = mount((renew, _props) => {
     if (inputValue.trim()) {
       todos.push({ id: Date.now(), text: inputValue });
       inputValue = '';
-      renew(); // Call renew() after pushing into the array
+      renew(); // 배열에 항목 추가 후 renew()
     }
   };
 
@@ -92,13 +90,13 @@ const TodoList = mount((renew, _props) => {
     const index = todos.findIndex(todo => todo.id === id);
     if (index > -1) {
       todos.splice(index, 1);
-      renew(); // Call renew() after removing from the array
+      renew(); // 배열에서 항목 제거 후 renew()
     }
   };
 
   const handleInput = (e: Event) => {
     inputValue = (e.target as HTMLInputElement).value;
-    renew(); // Call renew() after updating the input value
+    renew(); // 입력값 변경 후 renew()
   };
 
   return () => (
@@ -119,20 +117,19 @@ const TodoList = mount((renew, _props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      As in the example above, every handler that mutates state should call
-      <code>renew()</code> to refresh the UI.
+      위 예제처럼 상태를 변경하는 모든 이벤트 핸들러에서 renew()를 호출하여
+      화면을 업데이트합니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      renew() with async work
+      비동기 작업과 renew()
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When asynchronous work (API calls, <code>setTimeout</code>, etc.) changes
-      state, you should still call <code>renew()</code> at each significant
-      step.
+      비동기 작업(API 호출, setTimeout 등)의 결과로 상태를 업데이트할 때도
+      renew()를 호출해야 합니다.
     </p>
 
     <CodeBlock
@@ -147,7 +144,7 @@ const UserProfile = mount((renew, _props) => {
   const fetchUser = async () => {
     try {
       loading = true;
-      renew(); // Call renew() when loading starts
+      renew(); // 로딩 시작 시 renew()
 
       const response = await fetch('/api/user');
       user = await response.json();
@@ -157,7 +154,7 @@ const UserProfile = mount((renew, _props) => {
       user = null;
     } finally {
       loading = false;
-      renew(); // Call renew() after data is loaded
+      renew(); // 데이터 로드 완료 후 renew()
     }
   };
 
@@ -179,19 +176,18 @@ const UserProfile = mount((renew, _props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      At each stage of an async workflow (start, success, failure), call
-      <code>renew()</code> whenever state changes so the UI stays in sync.
+      비동기 작업의 각 단계(시작, 성공, 실패)에서 상태가 변경될 때마다 renew()를
+      호출하여 UI를 업데이트합니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      How renew() works under the hood
+      renew()의 동작 원리
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When <code>renew()</code> is called, Lithent goes through the following
-      steps:
+      renew()가 호출되면 다음과 같은 과정이 진행됩니다:
     </p>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
@@ -200,54 +196,49 @@ const UserProfile = mount((renew, _props) => {
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             1.
           </span>
-          <span>
-            <code>renew()</code> is called
-          </span>
+          <span>renew() 호출</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             2.
           </span>
-          <span>Updater runs → new virtual DOM is created</span>
+          <span>Updater 함수 실행 → 새로운 Virtual DOM 생성</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             3.
           </span>
-          <span>Previous and new virtual DOM are diffed</span>
+          <span>이전 Virtual DOM과 새로운 Virtual DOM 비교(Diffing)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             4.
           </span>
-          <span>Only the changed parts are patched into the real DOM</span>
+          <span>변경된 부분만 실제 DOM에 반영(Patching)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             5.
           </span>
-          <span>
-            <code>updateCallback</code> hooks run (when registered)
-          </span>
+          <span>updateCallback 훅 실행 (등록된 경우)</span>
         </li>
       </ol>
     </div>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This process lets Lithent update the UI efficiently. The Updater may
-      return a full virtual DOM tree, but only the minimal changes touch the
-      real DOM, keeping performance predictable.
+      이 과정을 통해 Lithent는 효율적으로 화면을 업데이트합니다. 전체 DOM을 다시
+      그리는 것이 아니라, 변경된 부분만 업데이트하므로 성능이 최적화됩니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Optimizing renew()
+      renew() 최적화
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Calling <code>renew()</code> too often can hurt performance. In edge
-      cases, you can batch updates like this:
+      renew()를 불필요하게 자주 호출하면 성능이 저하될 수 있습니다. 다음과 같은
+      방법으로 최적화할 수 있습니다:
     </p>
 
     <CodeBlock
@@ -258,10 +249,10 @@ const OptimizedCounter = mount((renew, _props) => {
   let count = 0;
   let pendingUpdate = false;
 
-	  const scheduleUpdate = () => {
+  const scheduleUpdate = () => {
     if (!pendingUpdate) {
       pendingUpdate = true;
-      // Only update once on the next frame
+      // 다음 프레임에서 한 번만 업데이트
       requestAnimationFrame(() => {
         pendingUpdate = false;
         renew();
@@ -270,11 +261,11 @@ const OptimizedCounter = mount((renew, _props) => {
   };
 
   const increaseMany = () => {
-    // Even if we change state multiple times, renew() runs once
+    // 여러 번 상태를 변경하더라도 renew()는 한 번만 호출
     count += 1;
     count += 1;
     count += 1;
-    scheduleUpdate(); // Batched update
+    scheduleUpdate(); // 배칭된 업데이트
   };
 
   return () => (
@@ -289,23 +280,22 @@ const OptimizedCounter = mount((renew, _props) => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Note:
+          💡 참고:
         </span>{' '}
-        In most cases, plain <code>renew()</code> calls are enough. Techniques
-        like the one above are only needed when updates happen extremely often.
+        대부분의 경우 일반적인 renew() 호출로 충분합니다. 위와 같은 최적화는
+        매우 빈번하게 업데이트가 발생하는 특수한 경우에만 필요합니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      lmount removes the need for renew()
+      lmount에서는 renew가 필요없다
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      With <code>lmount</code> and <code>lstate</code>, you do not call{' '}
-      <code>renew()</code> explicitly. When an <code>lstate</code> value
-      changes, <code>renew()</code> is invoked automatically.
+      lmount와 lstate를 사용하면 renew()를 명시적으로 호출할 필요가 없습니다.
+      lstate의 value가 변경되면 자동으로 renew()가 호출됩니다.
     </p>
 
     <CodeBlock
@@ -317,7 +307,7 @@ const Counter = lmount((_props) => {
   const count = lstate(0);
 
   const increase = () => {
-    count.value += 1; // renew() is called automatically ✨
+    count.value += 1; // renew() 자동 호출 ✨
   };
 
   return () => (
@@ -330,16 +320,15 @@ const Counter = lmount((_props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      <code>lstate</code> makes development convenient, but you lose explicit
-      control over when <code>renew()</code> fires. Choose between{' '}
-      <code>mount</code> and <code>lmount</code> based on how much control you
-      need.
+      lstate를 사용하면 개발이 편리하지만, renew() 호출 시점을 명시적으로 제어할
+      수 없다는 trade-off가 있습니다. 프로젝트의 요구사항에 따라 mount와 lmount
+      중 적합한 방식을 선택하세요.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What’s next
+      다음단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -352,13 +341,13 @@ const Counter = lmount((_props) => {
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Core feature: Render →
+          기본 기능: Render →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn how to render components into the real DOM.
+          컴포넌트를 실제 DOM에 렌더링하는 방법을 알아보세요.
           <br />
-          You&apos;ll see how the <code>render</code> function mounts and
-          unmounts components.
+          render 함수의 사용법과 컴포넌트를 마운트/언마운트하는 방법을
+          배워봅시다.
         </p>
       </a>
     </div>

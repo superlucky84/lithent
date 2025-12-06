@@ -62,20 +62,26 @@ export const toggleTheme = () => {
   applyTheme(store.theme === 'light' ? 'dark' : 'light');
 };
 
-// Navigate to route
-export const navigateTo = (path: string) => {
+export const isKoreanRoute = () => store.route.startsWith(KO_PREFIX);
+
+const navigateInternal = (path: string) => {
   store.route = path;
   window.history.pushState({}, '', path);
   store.sidebarOpen = false;
   window.scrollTo(0, 0);
 };
 
-export const isKoreanRoute = () => store.route.startsWith(KO_PREFIX);
+// Navigate to route (language-aware)
+export const navigateTo = (path: string) => {
+  const lang: 'en' | 'ko' = isKoreanRoute() ? 'ko' : 'en';
+  const target = resolveRouteForLanguage(path, lang);
+  navigateInternal(target);
+};
 
 export const setLanguage = (lang: 'en' | 'ko') => {
   const target = resolveRouteForLanguage(store.route, lang);
   if (target !== store.route) {
-    navigateTo(target);
+    navigateInternal(target);
   }
 };
 

@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const Portal = () => (
+export const PortalKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Portal
@@ -10,54 +10,53 @@ export const Portal = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What is a Portal?
+      Portal이란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      A Portal{' '}
+      Portal은{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        renders a component outside its parent DOM hierarchy
+        컴포넌트를 부모 DOM 계층 외부로 렌더링
       </strong>
-      .
+      하는 기능입니다.
       <br />
       <br />
-      Normally, components render inside their parent&apos;s DOM tree. But UI
-      like{' '}
+      일반적으로 컴포넌트는 부모의 DOM 트리 안에 렌더링됩니다. 하지만{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        modals
-      </strong>{' '}
-      or{' '}
+        모달(Modal)
+      </strong>
+      이나{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        tooltips
-      </strong>{' '}
-      often need to float above everything else. Parent styles such as{' '}
+        툴팁(Tooltip)
+      </strong>
+      처럼 화면 위에 떠 있어야 하는 UI는 부모의{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         overflow: hidden
       </code>{' '}
-      or{' '}
+      이나{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         z-index
       </code>{' '}
-      can clip or hide them.
+      때문에 가려지거나 잘릴 수 있습니다.
       <br />
       <br />
-      Portals solve this by letting you render a component at a completely
-      different place in the DOM, while its state and lifecycle still live with
-      its logical parent.
+      Portal을 사용하면 이런 문제를 해결할 수 있습니다. 컴포넌트의 상태와
+      생명주기는 부모와 함께 유지하면서도, DOM 상에서는 완전히 다른 위치에
+      렌더링됩니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      The simplest Portal usage
+      가장 간단한 Portal 사용법
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      The most common pattern is to render into{' '}
+      Portal을 사용하는 가장 일반적인 방법은{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         document.body
       </code>
-      . Here is a modal example:
+      에 렌더링하는 것입니다. 모달을 예로 들어보겠습니다:
     </p>
 
     <CodeBlock
@@ -91,11 +90,11 @@ const App = mount((renew) => {
 
   return () => (
     <div class="app-container" style="overflow: hidden; position: relative;">
-      {/* Even if the parent container has overflow: hidden */}
+      {/* 부모 컨테이너에 overflow: hidden이 있어도 */}
       <h1>My App</h1>
       <button onClick={openModal}>Open Modal</button>
 
-      {/* The modal is rendered into document.body and displays correctly */}
+      {/* 모달은 document.body에 렌더링되어 정상 표시됨 */}
       {showModal && portal(
         <Modal onClose={closeModal} />,
         document.body
@@ -106,12 +105,12 @@ const App = mount((renew) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      In this example, the App container uses{' '}
+      위 예제에서 App 컴포넌트의 컨테이너에{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         overflow: hidden
       </code>
-      , but the modal is rendered into <code>document.body</code>, so it can
-      cover the entire viewport without being clipped.
+      이 적용되어 있지만, Modal은 document.body에 렌더링되므로 아무 문제없이
+      화면 전체를 덮을 수 있습니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
@@ -121,7 +120,7 @@ const App = mount((renew) => {
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      The <code>portal()</code> helper takes two arguments:
+      portal() 함수는 두 개의 인자를 받습니다:
     </p>
 
     <CodeBlock
@@ -129,31 +128,31 @@ const App = mount((renew) => {
       code={`import { portal } from 'lithent';
 
 portal(
-  wDom,           // Virtual DOM to render
-  targetElement   // Target HTMLElement (e.g. document.body)
+  wDom,           // 렌더링할 Virtual DOM
+  targetElement   // 대상 HTMLElement (예: document.body)
 )`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       •{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">wDom</strong>
-      : the component or JSX tree to render
+      : 렌더링할 컴포넌트나 JSX 요소
       <br />•{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
         targetElement
       </strong>
-      : the real DOM element where the Portal should render
+      : Portal이 렌더링될 실제 DOM 요소
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Using predefined containers in HTML
+      HTML에 미리 정의된 컨테이너 사용하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      In larger apps it&apos;s common to define dedicated Portal containers in
-      your HTML. This makes it easier to layer and manage modals and tooltips:
+      대규모 앱에서는 HTML에 Portal 전용 컨테이너를 미리 만들어두는 것이
+      좋습니다. 이렇게 하면 모달, 툴팁 등을 계층적으로 관리할 수 있습니다:
     </p>
 
     <CodeBlock
@@ -163,7 +162,7 @@ portal(
 <html>
 <body>
   <div id="root"></div>
-  <!-- Dedicated Portal containers -->
+  <!-- Portal 전용 컨테이너들 -->
   <div id="modal-root"></div>
   <div id="tooltip-root"></div>
 </body>
@@ -189,7 +188,7 @@ const App = mount((renew) => {
     toastMessage = { message: 'Success!', type: 'success' };
     renew();
 
-    // Automatically hide after 3 seconds
+    // 3초 후 자동으로 사라짐
     setTimeout(() => {
       toastMessage = null;
       renew();
@@ -200,7 +199,7 @@ const App = mount((renew) => {
     <div>
       <button onClick={showSuccess}>Show Toast</button>
 
-      {/* Render into the modal-root container */}
+      {/* modal-root 컨테이너에 렌더링 */}
       {toastMessage && portal(
         <Toast {...toastMessage} />,
         document.getElementById('modal-root')!
@@ -211,31 +210,31 @@ const App = mount((renew) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Advantages of this approach:
+      이 방식의 장점:
       <br />
-      <br />• Easier <code>z-index</code> management by separating modals,
-      tooltips, etc.
       <br />
-      • Clearer CSS targeting
-      <br />• DOM structure is easier to inspect while debugging
+      • 모달, 툴팁 등을 용도별로 분리하여 z-index 관리가 쉬움
+      <br />
+      • CSS 스타일링이 명확해짐
+      <br />• 디버깅 시 DOM 구조 파악이 쉬움
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Using Portals from nested components
+      중첩된 컴포넌트에서 Portal 사용하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Portals work just fine from deeply nested components. State and lifecycle
-      stay with the logical parent:
+      Portal은 깊게 중첩된 컴포넌트에서도 작동합니다. 컴포넌트의 상태와
+      생명주기는 부모와 함께 유지됩니다:
     </p>
 
     <CodeBlock
       language="tsx"
       code={`import { mount, portal } from 'lithent';
 
-// Nested child component
+// 중첩된 자식 컴포넌트
 const ConfirmDialog = mount<{ message: string; onConfirm: () => void }>(() => {
   return ({ message, onConfirm }) => (
     <div class="dialog">
@@ -245,7 +244,7 @@ const ConfirmDialog = mount<{ message: string; onConfirm: () => void }>(() => {
   );
 });
 
-// Intermediate component
+// 중간 컴포넌트
 const UserCard = mount<{ name: string }>((renew) => {
   let showDialog = false;
 
@@ -265,7 +264,7 @@ const UserCard = mount<{ name: string }>((renew) => {
       <h3>{name}</h3>
       <button onClick={deleteUser}>Delete</button>
 
-      {/* Portals work even from nested components */}
+      {/* 중첩된 컴포넌트에서도 Portal 사용 가능 */}
       {showDialog && portal(
         <ConfirmDialog
           message={\`Delete \${name}?\`}
@@ -277,7 +276,7 @@ const UserCard = mount<{ name: string }>((renew) => {
   );
 });
 
-// Parent component
+// 부모 컴포넌트
 const App = mount(() => {
   return () => (
     <div class="app" style="overflow: hidden;">
@@ -289,23 +288,22 @@ const App = mount(() => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      In this example, <code>UserCard</code> is a child of <code>App</code>, and
-      <code>ConfirmDialog</code> is a child of <code>UserCard</code>. The dialog
-      still renders into <code>document.body</code>, so it is unaffected by
+      이 예제에서 UserCard 컴포넌트는 App의 자식이고, ConfirmDialog는 UserCard의
+      자식입니다. 하지만 Dialog는 document.body에 렌더링되므로 App의{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         overflow: hidden
-      </code>{' '}
-      on the App container.
+      </code>
+      에 영향받지 않습니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      How Portals work internally
+      Portal의 동작 원리
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Internally, Portals behave like this:
+      Portal은 내부적으로 다음과 같이 동작합니다:
     </p>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
@@ -318,7 +316,7 @@ const App = mount(() => {
             <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
               portal(wDom, element)
             </code>{' '}
-            creates a special <code>portal</code> virtual DOM node
+            호출 시 'portal' 타입의 특수한 Virtual DOM 노드 생성
           </span>
         </li>
         <li class="flex items-start">
@@ -326,8 +324,8 @@ const App = mount(() => {
             2.
           </span>
           <span>
-            When rendering, the Portal node itself is not added to the parent
-            DOM tree; instead, the given HTMLElement is used as the container
+            렌더링 시 Portal 노드는 부모 DOM 트리에 추가되지 않고, 지정된
+            HTMLElement를 컨테이너로 사용
           </span>
         </li>
         <li class="flex items-start">
@@ -335,26 +333,20 @@ const App = mount(() => {
             3.
           </span>
           <span>
-            Components inside the Portal share state and lifecycle with their
-            parent component
+            Portal 내부의 컴포넌트는 부모 컴포넌트와 동일한 상태와 생명주기 공유
           </span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             4.
           </span>
-          <span>
-            When the parent calls <code>renew()</code>, the Portal content
-            updates as well
-          </span>
+          <span>부모가 renew()를 호출하면 Portal 내부도 함께 업데이트됨</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             5.
           </span>
-          <span>
-            When the parent unmounts, the Portal content is cleaned up too
-          </span>
+          <span>부모가 언마운트되면 Portal 내부도 함께 정리됨</span>
         </li>
       </ol>
     </div>
@@ -362,39 +354,39 @@ const App = mount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Things to watch out for
+      주의사항
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ Event bubbling:</span> Events fired inside
-        a Portal bubble along the <strong>component tree</strong>, not the DOM
-        tree. For example, clicks inside a modal may bubble to its parent
-        component, so you might need to call{' '}
+        <span class="font-medium">⚠️ 이벤트 버블링:</span> Portal로 렌더링된
+        요소에서 발생한 이벤트는 <strong>컴포넌트 트리를 따라 버블링</strong>
+        됩니다. DOM 트리와는 무관합니다. 예를 들어, Modal 내부의 클릭 이벤트가
+        부모 컴포넌트로 전파될 수 있으므로{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
           e.stopPropagation()
         </code>
-        .
+        을 사용해야 할 수 있습니다.
         <br />
         <br />
-        <span class="font-medium">⚠️ CSS styling:</span> Portal content inherits
-        CSS from where it is rendered, not from its logical parent. Treat Portal
-        components as visually independent and style them accordingly.
+        <span class="font-medium">⚠️ CSS 스타일:</span> Portal로 렌더링된 요소는
+        대상 위치의 CSS를 상속받습니다. 부모 컴포넌트의 스타일은 상속되지
+        않으므로, Portal 컴포넌트는 독립적인 스타일을 가져야 합니다.
         <br />
         <br />
-        <span class="font-medium">⚠️ Server-side rendering:</span> Portals only
-        work in a browser environment. In SSR you may need a guard such as{' '}
+        <span class="font-medium">⚠️ 서버 사이드 렌더링:</span> Portal은
+        브라우저 환경에서만 동작합니다. SSR 환경에서는{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
           typeof window !== 'undefined'
-        </code>
-        .
+        </code>{' '}
+        체크가 필요할 수 있습니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What’s next
+      다음 단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -407,14 +399,13 @@ const App = mount(() => {
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Core feature: Mount Hooks →
+          기본 기능: Mount Hooks →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn about <code>mountCallback</code> and{' '}
-          <code>mountReadyCallback</code>, the hooks that run when a component
-          mounts.
+          컴포넌트의 마운트 시점에 실행되는 mountCallback과 mountReadyCallback
+          훅에 대해 알아보세요.
           <br />
-          They give you fine-grained control over the component lifecycle.
+          컴포넌트 생명주기를 제어하는 방법을 배워봅시다.
         </p>
       </a>
 
@@ -427,11 +418,11 @@ const App = mount(() => {
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Example: image gallery lightbox →
+          예제: 이미지 갤러리 라이트박스 →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Try the example that uses Portals to open a full-screen lightbox on
-          top of an <code>overflow: hidden</code> gallery container.
+          overflow:hidden 갤러리 밖으로 Portal을 사용해 전체 화면 라이트박스를
+          띄우는 예제를 직접 실행해 보세요.
         </p>
       </a>
     </div>

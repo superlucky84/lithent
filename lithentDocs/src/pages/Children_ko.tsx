@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const Children = () => (
+export const ChildrenKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Children
@@ -10,24 +10,23 @@ export const Children = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What are children?
+      Children이란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Children are the{' '}
+      Children은{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        elements a component wraps around
+        컴포넌트가 감싸고 있는 자식 요소들
       </strong>
-      .
+      입니다.
       <br />
       <br />
-      Unlike React, Lithent{' '}
+      Lithent에서는 React와 달리{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        passes children as a separate argument instead of bundling them into
-        props
+        children이 props에 포함되지 않고 별도의 인자로 전달
       </strong>
-      . This separation reflects Lithent&apos;s design philosophy of keeping
-      configuration (props) and structure (children) clearly distinct.
+      됩니다. 이는 props와 children을 명확히 분리하여 코드의 의도를 더 명확하게
+      만드는 Lithent의 설계 철학입니다.
     </p>
 
     <CodeBlock
@@ -35,7 +34,7 @@ export const Children = () => (
       code={`import { mount } from 'lithent';
 
 const Card = mount<{ title: string }>(
-  (renew, props, children) => {  // children is the third argument!
+  (renew, props, children) => {  // children은 세 번째 인자!
     return () => (
       <div class="card">
         <h2>{props.title}</h2>
@@ -47,7 +46,7 @@ const Card = mount<{ title: string }>(
   }
 );
 
-// Usage
+// 사용
 <Card title="My Card">
   <p>This is the card content</p>
   <button>Click me</button>
@@ -57,12 +56,12 @@ const Card = mount<{ title: string }>(
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Differences from React
+      React와의 차이점
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent keeps children and props separate to make component structure
-      easier to reason about.
+      Lithent는 children을 props와 별도로 관리함으로써 구조적 명확성을
+      제공합니다.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -72,7 +71,7 @@ const Card = mount<{ title: string }>(
         </h4>
         <CodeBlock
           language="tsx"
-          code={`// React: children is part of props
+          code={`// React: children이 props에 포함됨
 const Card = ({ title, children }) => {
   return (
     <div className="card">
@@ -89,7 +88,7 @@ const Card = ({ title, children }) => {
         </h4>
         <CodeBlock
           language="tsx"
-          code={`// Lithent: children is a separate argument
+          code={`// Lithent: children이 별도 인자
 const Card = mount(
   (renew, props, children) => {
     return () => (
@@ -107,22 +106,22 @@ const Card = mount(
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Why a separate argument?
+          💡 왜 별도 인자로?
         </span>{' '}
-        Props describe configuration for a component, while children describe
-        the nested structure. Keeping them separate clarifies intent and
-        improves type safety.
+        props는 컴포넌트의 설정 데이터이고, children은 컴포넌트가 감싸는
+        구조입니다. 이 둘을 분리함으로써 각각의 역할이 명확해지고, 타입 안전성도
+        향상됩니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Basic usage
+      기본 사용법
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      Using children with mount
+      mount에서 children 사용
     </h3>
 
     <CodeBlock
@@ -131,8 +130,8 @@ const Card = mount(
 
 const Container = mount<{ width: number }>(
   (renew, props, children) => {
-    // children has type WDom[]
-    // You can access it inside the mounter
+    // children은 WDom[] 타입
+    // 마운터 내부에서도 접근 가능
     console.log('Children count:', children.length);
 
     return () => (
@@ -143,7 +142,7 @@ const Container = mount<{ width: number }>(
   }
 );
 
-// Usage
+// 사용
 <Container width={300}>
   <h1>Title</h1>
   <p>Content</p>
@@ -151,7 +150,7 @@ const Container = mount<{ width: number }>(
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Using children with lmount
+      lmount에서 children 사용
     </h3>
 
     <CodeBlock
@@ -159,7 +158,7 @@ const Container = mount<{ width: number }>(
       code={`import { lmount } from 'lithent';
 
 const Container = lmount<{ width: number }>(
-  (props, children) => {  // lmount passes only props and children
+  (props, children) => {  // lmount는 renew 없이 props, children만
     return () => (
       <div style={{ width: \`\${props.width}px\` }}>
         {children}
@@ -172,20 +171,19 @@ const Container = lmount<{ width: number }>(
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Children in the mounter vs the Updater
+      Mounter vs Updater에서의 children
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      A key detail:{' '}
+      중요한 특징:{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        children are only passed into the mounter, not into the Updater.
+        children은 Mounter에서만 제공되고, Updater에서는 제공되지 않습니다.
       </strong>
       <br />
       <br />
-      The mounter runs when the component is first mounted and receives children
-      at that time. The Updater, on the other hand, only runs when props change.
-      Because children are already fixed by the mounter, they do not need to be
-      passed again to the Updater.
+      Mounter는 컴포넌트가 처음 마운트될 때 실행되며, 이때 children이 함께
+      전달됩니다. 하지만 Updater는 props가 변경될 때만 실행되며, children은 이미
+      Mounter에서 결정되었으므로 다시 전달되지 않습니다.
     </p>
 
     <CodeBlock
@@ -193,19 +191,19 @@ const Container = lmount<{ width: number }>(
       code={`import { mount } from 'lithent';
 
 const Container = mount<{ title: string }>(
-  // Mounter: receives renew, props, and children
+  // Mounter: renew, props, children 모두 제공
   (renew, props, children) => {
     console.log('Mounter - children:', children);
 
-    // Updater: receives only props (no children argument)
+    // Updater: props만 제공 (children 없음!)
     return (props) => {
       console.log('Updater - props:', props);
-      // children cannot be accessed as an argument in the Updater
+      // children은 Updater에서 접근할 수 없음
 
       return (
         <div>
           <h1>{props.title}</h1>
-          {/* children still available via closure */}
+          {/* 하지만 JSX에서는 사용 가능 (클로저로 캡처됨) */}
           {children}
         </div>
       );
@@ -217,78 +215,77 @@ const Container = mount<{ title: string }>(
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Closure capture:
+          💡 클로저 캡처:
         </span>{' '}
-        Even though the Updater does not receive children as an argument, it can
-        still access the children defined in the mounter through closure.
-        Whenever children truly change, the parent re-renders and the entire
-        component is re-evaluated. When only props change, the Updater reuses
-        the same children reference.
+        Updater에서 children을 직접 인자로 받지는 않지만, Mounter에서 선언된
+        children을 클로저를 통해 접근할 수 있습니다. children이 변경되면 부모
+        컴포넌트의 리렌더링으로 전체 컴포넌트가 다시 평가되므로, Updater만
+        실행되는 경우(props만 변경)에는 기존 children을 그대로 사용합니다.
       </p>
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Why doesn&apos;t the Updater receive children?
+      왜 Updater에서 children을 제공하지 않을까?
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       <strong class="font-semibold text-gray-900 dark:text-white">
-        1. The Updater only reacts to prop changes
+        1. Updater는 props 변경에만 반응
       </strong>
       <br />
-      The Updater runs when props change. When children change, the parent
-      re-renders and the whole component tree is re-evaluated, so there is no
-      need to pass children as a separate argument at Updater time.
+      Updater는 컴포넌트의 props가 변경될 때만 실행됩니다. children이 변경되는
+      경우는 부모 컴포넌트가 리렌더링되면서 전체 컴포넌트 트리가 다시
+      평가되므로, Updater 시점에 children을 전달할 필요가 없습니다.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
-        2. Closures already provide access
+        2. 클로저를 통한 접근으로 충분
       </strong>
       <br />
-      Children received by the mounter are still available in the Updater via
-      closure, so there is no need to pass them again.
+      Mounter에서 받은 children은 클로저를 통해 Updater에서도 자유롭게 접근할 수
+      있습니다. 별도로 인자를 전달하지 않아도 동일한 children 참조를 사용할 수
+      있습니다.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
-        3. Clear separation of responsibilities
+        3. 명확한 책임 분리
       </strong>
       <br />
-      The mounter is responsible for setting up initial structure (including
-      children), while the Updater focuses purely on prop-driven updates. This
-      keeps each function&apos;s role clear.
+      Mounter는 컴포넌트의 초기 구조(children 포함)를 설정하고, Updater는 props
+      데이터 변경에만 집중합니다. 이러한 분리가 각 함수의 역할을 더 명확하게
+      만듭니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Internal representation
+      내부 구조
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Internally, Lithent keeps children separate from props in the virtual DOM
-      structure.
+      Lithent 내부적으로 children은 가상 DOM 구조에서 props와 별도로 관리됩니다.
     </p>
 
     <CodeBlock
       language="typescript"
-      code={`// Lithent internal structure (wDom.ts)
+      code={`// Lithent 내부 구조 (wDom.ts)
 export interface WDom {
   type?: string | null;
   tag?: string;
-  props?: Props;       // Props for regular elements
-  children?: WDom[];   // Children of regular elements
+  props?: Props;       // 컴포넌트 props
+  children?: WDom[];   // 일반 요소의 children
 
-  compProps?: Props;   // Props of custom components
-  compChild?: WDom[];  // Children of custom components (managed separately)
+  compProps?: Props;   // 커스텀 컴포넌트의 props
+  compChild?: WDom[];  // 커스텀 컴포넌트의 children (별도 관리!)
 
   // ...
 }
 
-// h function signature
+// h 함수 시그니처
 export const h = (
   tag: TagFunction | FragmentFunction | string,
   props: Props,
-  ...children: MiddleStateWDomChildren  // children are the rest arguments
+  ...children: MiddleStateWDomChildren  // children은 나머지 인자
 ) => {
   // ...
 };`}
@@ -297,23 +294,22 @@ export const h = (
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Internal layout:
+          💡 내부 구조:
         </span>{' '}
-        Lithent distinguishes between children of regular elements and children
-        of components. Component props are stored in <code>compProps</code> and
-        component children in <code>compChild</code>, which helps the runtime
-        handle updates efficiently.
+        Lithent는 일반 요소의 children과 컴포넌트의 children을 구분하여
+        관리합니다. 컴포넌트의 경우 compProps와 compChild로 별도 저장되어
+        업데이트 시 효율적으로 처리됩니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Practical examples
+      실용적인 예제
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      Layout components
+      레이아웃 컴포넌트
     </h3>
 
     <CodeBlock
@@ -337,7 +333,7 @@ const Layout = mount<{ sidebar: boolean }>(
   }
 );
 
-// Usage
+// 사용
 <Layout sidebar={true}>
   <h1>Page Title</h1>
   <p>Page content goes here</p>
@@ -345,7 +341,7 @@ const Layout = mount<{ sidebar: boolean }>(
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Conditional rendering
+      조건부 렌더링
     </h3>
 
     <CodeBlock
@@ -376,7 +372,7 @@ const Accordion = mount<{ title: string }>(
   }
 );
 
-// Usage
+// 사용
 <Accordion title="Details">
   <p>This content is hidden by default</p>
   <p>Click the title to reveal it</p>
@@ -384,7 +380,7 @@ const Accordion = mount<{ title: string }>(
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Transforming children
+      Children 조작
     </h3>
 
     <CodeBlock
@@ -405,13 +401,13 @@ const List = mount<{ ordered: boolean }>(
   }
 );
 
-// Usage
+// 사용
 <List ordered={false}>
   <span>Item 1</span>
   <span>Item 2</span>
   <span>Item 3</span>
 </List>
-// Result:
+// 결과:
 // <ul>
 //   <li><span>Item 1</span></li>
 //   <li><span>Item 2</span></li>
@@ -420,7 +416,7 @@ const List = mount<{ ordered: boolean }>(
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Slot pattern (named children)
+      슬롯 패턴 (Named Children)
     </h3>
 
     <CodeBlock
@@ -454,7 +450,7 @@ const Card = mount<CardSlots>(
   }
 );
 
-// Usage
+// 사용
 <Card
   header={<h2>Card Title</h2>}
   footer={<button>Action</button>}
@@ -464,7 +460,7 @@ const Card = mount<CardSlots>(
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Render props pattern
+      Render Props 패턴
     </h3>
 
     <CodeBlock
@@ -498,7 +494,7 @@ const MouseTracker = mount<MouseTrackerProps>(
   }
 );
 
-// Usage
+// 사용
 <MouseTracker
   render={(x, y) => (
     <div>
@@ -513,22 +509,22 @@ const MouseTracker = mount<MouseTrackerProps>(
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Children type
+      Children 타입
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Children are represented as an array of <code>WDom</code>. You can
-      annotate this explicitly when using TypeScript.
+      Children은 WDom 배열 타입입니다. TypeScript를 사용할 때 타입을 명시할 수
+      있습니다.
     </p>
 
     <CodeBlock
       language="typescript"
       code={`import { mount, WDom } from 'lithent';
 
-// children has type WDom[]
+// children 타입은 WDom[]
 const Container = mount<{ title: string }>(
   (renew, props, children: WDom[]) => {
-    // You can freely transform the children array
+    // children 배열 조작 가능
     const hasChildren = children.length > 0;
 
     return () => (
@@ -544,37 +540,35 @@ const Container = mount<{ title: string }>(
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Things to watch out for
+      주의사항
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ No props.children:</span> In Lithent you
-        cannot access children via <code>props.children</code>. Always use the
-        separate <code>children</code> argument.
+        <span class="font-medium">⚠️ props.children 없음:</span> Lithent에서는
+        props.children으로 접근할 수 없습니다. 항상 별도의 children 인자를
+        사용하세요.
         <br />
         <br />
-        <span class="font-medium">⚠️ Argument order:</span> For
-        <code>mount</code>, the order is <code>(renew, props, children)</code>.
-        For <code>lmount</code>, it is <code>(props, children)</code>. Do not
-        swap them.
+        <span class="font-medium">⚠️ 인자 순서:</span> mount는 (renew, props,
+        children) 순서이고, lmount는 (props, children) 순서입니다. 순서를 바꾸지
+        마세요.
         <br />
         <br />
-        <span class="font-medium">⚠️ Children are arrays:</span> Children are
-        always passed as a <code>WDom[]</code> array, even when there is only a
-        single child.
+        <span class="font-medium">⚠️ children은 배열:</span> children은 항상
+        WDom[] 배열입니다. 단일 child라도 배열 형태로 전달됩니다.
         <br />
         <br />
-        <span class="font-medium">⚠️ Not passed to the Updater:</span> Children
-        are only provided to the mounter as an argument. In the Updater you
-        should rely on closure to access them.
+        <span class="font-medium">⚠️ Updater에서 제공 안 됨:</span> children은
+        Mounter에서만 인자로 제공되며, Updater에서는 제공되지 않습니다. 하지만
+        클로저를 통해 Mounter의 children에 접근할 수 있습니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What’s next
+      다음 단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -590,9 +584,9 @@ const Container = mount<{ title: string }>(
           Core: Renewer →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          You now have a solid grasp of children.
+          Children 개념을 마스터했습니다!
           <br />
-          Next, dive into Renewer to learn how components are updated.
+          이제 컴포넌트를 업데이트하는 Renewer에 대해 알아봅시다.
         </p>
       </a>
     </div>

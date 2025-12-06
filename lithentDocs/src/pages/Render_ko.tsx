@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const Render = () => (
+export const RenderKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Render
@@ -10,23 +10,23 @@ export const Render = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What does render() do?
+      render() 함수란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      The <code>render()</code> function{' '}
+      render() 함수는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        mounts a component into the real DOM
+        컴포넌트를 실제 DOM에 마운트
       </strong>
-      . It turns virtual DOM into real DOM nodes and attaches them to the
-      container element you specify.
+      하는 함수입니다. Virtual DOM을 실제 DOM으로 변환하여 지정한 컨테이너
+      요소에 렌더링합니다.
       <br />
       <br />
-      <code>render()</code> also{' '}
+      render() 함수는{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        returns a destroy function
+        destroy 함수를 반환
       </strong>
-      so you can unmount the component later.
+      하여, 나중에 컴포넌트를 언마운트할 수 있습니다.
     </p>
 
     <CodeBlock
@@ -49,61 +49,60 @@ const App = mount((renew) => {
   );
 });
 
-// Render the component into the #root element
+// 컴포넌트를 #root 요소에 렌더링
 const destroy = render(<App />, document.getElementById('root'));
 
-// Unmount later if needed
+// 나중에 언마운트
 // destroy();`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      The first argument to <code>render()</code> is the virtual DOM you want to
-      render; the second is the container element. If you omit the container,
-      the component is rendered into <code>document.body</code> by default.
+      render() 함수의 첫 번째 인자는 렌더링할 Virtual DOM이고, 두 번째 인자는
+      컨테이너 요소입니다. 컨테이너를 지정하지 않으면 기본적으로 document.body에
+      렌더링됩니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      render() signature
+      render() 함수의 시그니처
     </h2>
 
     <CodeBlock
       language="tsx"
       code={`render(
-  wDom: VirtualDOM,           // Virtual DOM to render
-  wrapElement?: HTMLElement,  // Container element (default: document.body)
-  afterElement?: HTMLElement  // Reference element for insertBefore (optional)
-): () => void                 // Returns a destroy function`}
+  wDom: VirtualDOM,           // 렌더링할 Virtual DOM
+  wrapElement?: HTMLElement,  // 컨테이너 요소 (기본값: document.body)
+  afterElement?: HTMLElement  // insertBefore 참조 요소 (선택적)
+): () => void                 // destroy 함수 반환`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      <code>render()</code> takes three parameters:
+      render() 함수는 3개의 매개변수를 받습니다:
       <br />
       <br />•{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">wDom</strong>
-      : the virtual DOM to render (required)
+      : 렌더링할 Virtual DOM (필수)
       <br />•{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
         wrapElement
       </strong>
-      : the container element (optional, defaults to <code>document.body</code>)
+      : 컨테이너 요소 (선택적, 기본값: document.body)
       <br />•{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
         afterElement
       </strong>
-      : a reference element used when inserting before a specific node
-      (optional)
+      : 특정 요소 앞에 삽입할 때 사용하는 참조 요소 (선택적)
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Basic usage
+      기본 사용법
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      The most common pattern is to render a component into a specific DOM node.
+      가장 일반적인 사용법은 컴포넌트를 특정 DOM 요소에 렌더링하는 것입니다.
     </p>
 
     <CodeBlock
@@ -114,35 +113,35 @@ const Greeting = mount(() => {
   return () => <h1>Hello, Lithent!</h1>;
 });
 
-// Render into the #app element
+// HTML의 #app 요소에 렌더링
 render(<Greeting />, document.getElementById('app'));
 
-// Or use document.querySelector
+// 또는 document.querySelector 사용
 render(<Greeting />, document.querySelector('.container'));
 
-// If you omit the container, it renders into document.body
+// 컨테이너를 지정하지 않으면 body에 렌더링
 render(<Greeting />);`}
     />
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Unmounting
+      언마운트하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Calling the destroy function returned by <code>render()</code> removes the
-      component from the DOM, unregisters event listeners, and runs any
-      registered cleanup callbacks.
+      render() 함수가 반환하는 destroy 함수를 호출하면 컴포넌트를 DOM에서
+      제거하고, 등록된 이벤트 리스너를 정리하며, 등록된 cleanup 콜백을
+      실행합니다.
       <br />
       <br />
-      If your component needs to clean up resources (timers, event listeners,
-      etc.) when it unmounts, use the{' '}
+      컴포넌트가 언마운트될 때 정리 작업(타이머 해제, 이벤트 리스너 제거 등)이
+      필요하다면{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        mountCallback hook
+        mountCallback 훅
       </strong>
-      . When you return a cleanup function from <code>mountCallback</code>, it
-      runs automatically on unmount.
+      을 사용합니다. mountCallback에서 cleanup 함수를 반환하면, 컴포넌트가
+      언마운트될 때 자동으로 실행됩니다.
     </p>
 
     <CodeBlock
@@ -152,15 +151,15 @@ render(<Greeting />);`}
 const Timer = mount((renew) => {
   let count = 0;
 
-  // Register work to run on mount via mountCallback
+  // mountCallback으로 마운트 시 작업 등록
   mountCallback(() => {
-    // Start a timer when the component mounts
+    // 마운트 시 타이머 시작
     const intervalId = setInterval(() => {
       count += 1;
       renew();
     }, 1000);
 
-    // Return a cleanup function – runs automatically on unmount
+    // cleanup 함수 반환 - 언마운트 시 자동 실행
     return () => {
       clearInterval(intervalId);
     };
@@ -171,32 +170,32 @@ const Timer = mount((renew) => {
 
 const destroy = render(<Timer />, document.getElementById('root'));
 
-// Remove the timer component after 5 seconds
+// 5초 후 타이머 컴포넌트 제거
 setTimeout(() => {
-  destroy(); // Unmount the component and run cleanup
+  destroy(); // 컴포넌트 언마운트 및 cleanup 함수 실행
 }, 5000);`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When you call <code>destroy()</code>:
+      destroy() 함수를 호출하면:
       <br />
       <br />
-      1. The cleanup function returned from <code>mountCallback</code> runs
+      1. mountCallback이 반환한 cleanup 함수 실행
       <br />
-      2. All event listeners are detached
+      2. 모든 이벤트 리스너 제거
       <br />
-      3. The rendered DOM nodes are removed
+      3. DOM에서 요소 제거
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Inserting before a specific element
+      insertBefore로 특정 위치에 삽입하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Using the third parameter, <code>afterElement</code>, you can insert a
-      component before a specific DOM node.
+      세 번째 매개변수인 afterElement를 사용하면 특정 요소 앞에 컴포넌트를
+      삽입할 수 있습니다.
     </p>
 
     <CodeBlock
@@ -207,7 +206,7 @@ const NewItem = mount(() => {
   return () => <li>New Item</li>;
 });
 
-// HTML structure:
+// HTML 구조:
 // <ul id="list">
 //   <li>Item 1</li>
 //   <li id="item2">Item 2</li>
@@ -217,32 +216,30 @@ const NewItem = mount(() => {
 const container = document.getElementById('list');
 const referenceElement = document.getElementById('item2');
 
-// Insert New Item before Item 2
+// Item 2 앞에 New Item 삽입
 render(<NewItem />, container, referenceElement);
 
-// Result:
+// 결과:
 // <ul id="list">
 //   <li>Item 1</li>
-//   <li>New Item</li>      ← inserted here
+//   <li>New Item</li>      ← 여기에 삽입됨
 //   <li id="item2">Item 2</li>
 //   <li>Item 3</li>
 // </ul>`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This is useful when you need to insert a component at a dynamic position
-      within existing DOM.
+      이 기능은 동적으로 특정 위치에 컴포넌트를 삽입해야 할 때 유용합니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Rendering multiple components
+      여러 컴포넌트 렌더링하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      You can render multiple independent components into different parts of the
-      page.
+      여러 개의 독립적인 컴포넌트를 각각 다른 위치에 렌더링할 수 있습니다.
     </p>
 
     <CodeBlock
@@ -261,12 +258,12 @@ const Content = mount(() => {
   return () => <main>Content</main>;
 });
 
-// Render each component independently
+// 각 컴포넌트를 독립적으로 렌더링
 const destroyHeader = render(<Header />, document.getElementById('header'));
 const destroySidebar = render(<Sidebar />, document.getElementById('sidebar'));
 const destroyContent = render(<Content />, document.getElementById('content'));
 
-// Unmount each independently when needed
+// 필요시 개별적으로 언마운트 가능
 // destroyHeader();
 // destroySidebar();
 // destroyContent();`}
@@ -275,23 +272,22 @@ const destroyContent = render(<Content />, document.getElementById('content'));
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Note:
+          💡 참고:
         </span>{' '}
-        In many apps it&apos;s simpler to render a single root component and
-        compose everything else inside it. When you truly need multiple roots,
-        consider wrapping them in a parent component to keep data flow
-        predictable.
+        대부분의 경우 하나의 루트 컴포넌트만 렌더링하는 것이 권장됩니다. 여러
+        컴포넌트를 렌더링해야 한다면, 하나의 부모 컴포넌트 안에 자식 컴포넌트로
+        구성하는 것이 상태 관리와 데이터 흐름 측면에서 유리합니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      How render() works internally
+      render()의 동작 원리
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When <code>render()</code> is called, Lithent goes through these steps:
+      render() 함수가 호출되면 다음과 같은 과정이 진행됩니다:
     </p>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
@@ -300,46 +296,44 @@ const destroyContent = render(<Content />, document.getElementById('content'));
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             1.
           </span>
-          <span>Convert the virtual DOM into real DOM nodes (wDomToDom)</span>
+          <span>Virtual DOM을 실제 DOM 요소로 변환 (wDomToDom)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             2.
           </span>
-          <span>
-            Attach nodes to the container (appendChild or insertBefore)
-          </span>
+          <span>컨테이너에 요소 추가 (appendChild 또는 insertBefore)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             3.
           </span>
-          <span>Run mountCallback hooks (when registered)</span>
+          <span>mountCallback 훅 실행 (등록된 경우)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             4.
           </span>
-          <span>Run mountReadyCallback hooks (when registered)</span>
+          <span>mountReadyCallback 훅 실행 (등록된 경우)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             5.
           </span>
-          <span>Return the destroy function</span>
+          <span>destroy 함수 반환</span>
         </li>
       </ol>
     </div>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This sequence turns the virtual DOM into pixels on the screen and ensures
-      lifecycle hooks fire in a well-defined order.
+      이 과정을 통해 Virtual DOM이 실제 브라우저 화면에 표시되고, 라이프사이클
+      훅이 적절한 순서로 실행됩니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What’s next
+      다음 단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -352,14 +346,12 @@ const destroyContent = render(<Content />, document.getElementById('content'));
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Core feature: Portal →
+          기본 기능: Portal →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn how to render components outside of their parent DOM hierarchy
-          using Portals.
+          컴포넌트를 부모 DOM 계층 외부로 렌더링하는 Portal 기능을 알아보세요.
           <br />
-          This is especially useful for modals, tooltips, and other UI that
-          needs to escape overflow boundaries.
+          모달, 툴팁 등을 구현할 때 유용한 Portal의 사용법을 배워봅시다.
         </p>
       </a>
 
@@ -372,12 +364,11 @@ const destroyContent = render(<Content />, document.getElementById('content'));
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Example: insertBefore + Destroy →
+          예제: insertBefore + Destroy →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          See a practical example of inserting a Lithent component between
-          existing DOM nodes using insertBefore, then cleaning it up with the
-          destroy function.
+          기존 실제 DOM 사이에 Lithent 컴포넌트를 insertBefore 모드로 삽입하고,
+          destroy 함수로 정리하는 실전 예제를 확인해 보세요.
         </p>
       </a>
     </div>

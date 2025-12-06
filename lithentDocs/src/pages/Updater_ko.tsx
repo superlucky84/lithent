@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const Updater = () => (
+export const UpdaterKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Updater
@@ -10,27 +10,27 @@ export const Updater = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What is an Updater?
+      Updater란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      An Updater is the function returned by the mounter. While the mounter runs{' '}
+      Updater는 마운터가 반환하는 함수입니다. 마운터가 컴포넌트 생성 시{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        exactly once when the component is created
+        단 한 번만 실행
       </strong>
-      , the Updater is{' '}
+      되는 것과 달리, Updater는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        called every time state changes
+        상태가 변경될 때마다 호출
       </strong>
-      .
+      됩니다.
       <br />
       <br />
-      Its job is to{' '}
+      Updater의 역할은 현재 상태를 기반으로{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        build a new virtual DOM tree from the current state
+        새로운 Virtual DOM을 생성
       </strong>
-      . Lithent then diffs this new tree against the previous one and applies
-      only the minimal changes to the real DOM.
+      하는 것입니다. Lithent는 이전 Virtual DOM과 새로운 Virtual DOM을
+      비교(diffing)하여 실제로 변경된 부분만 실제 DOM에 반영합니다.
     </p>
 
     <CodeBlock
@@ -42,10 +42,10 @@ const Counter = mount((renew, _props) => {
 
   const increase = () => {
     count += 1;
-    renew(); // Re-run the Updater and refresh the view
+    renew(); // Updater를 다시 호출하여 화면 업데이트
   };
 
-  // 👇 This returned function is the Updater
+  // 👇 이 함수가 바로 Updater입니다
   return () => (
     <div>
       <p>Count: {count}</p>
@@ -56,25 +56,23 @@ const Counter = mount((renew, _props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      In this example, the arrow function returned from the mounter is the
-      Updater. Every time <code>renew()</code> is called, this function runs
-      again to produce a fresh virtual DOM tree.
+      위 예제에서 화살표 함수로 반환되는 부분이 Updater입니다. renew()가 호출될
+      때마다 이 함수가 다시 실행되어 새로운 Virtual DOM을 생성합니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Accessing state via closures
+      클로저를 통한 상태 접근
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Because the Updater is defined inside the mounter, it has access to
-      everything the mounter declared through JavaScript closures. This is the
-      core of Lithent&apos;s{' '}
+      Updater는 마운터 내부에서 정의되므로, 클로저를 통해 마운터에서 선언한 모든
+      변수와 함수에 접근할 수 있습니다. 이것이 Lithent의{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        closure-based state management
+        클로저 기반 상태 관리
       </strong>
-      model.
+      의 핵심입니다.
     </p>
 
     <CodeBlock
@@ -82,7 +80,7 @@ const Counter = mount((renew, _props) => {
       code={`import { mount } from 'lithent';
 
 const TodoList = mount((renew, _props) => {
-  // State and methods defined in the mounter
+  // 마운터에서 정의한 상태와 메서드
   const todos = [];
   let inputValue = '';
 
@@ -102,7 +100,7 @@ const TodoList = mount((renew, _props) => {
     }
   };
 
-  // The Updater can access all of the above via closure
+  // Updater는 클로저를 통해 위의 모든 변수/함수에 접근 가능
   return () => (
     <div>
       <input
@@ -128,23 +126,21 @@ const TodoList = mount((renew, _props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Inside the Updater you can freely use <code>todos</code>,{' '}
-      <code>inputValue</code>, <code>addTodo</code>, <code>removeTodo</code>,
-      and anything else defined in the mounter. This is just standard JavaScript
-      closure behavior.
+      Updater 내부에서 todos, inputValue, addTodo, removeTodo 등 마운터에서
+      정의한 모든 것을 자유롭게 사용할 수 있습니다. 이는 JavaScript의 클로저
+      특성을 활용한 것입니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Updaters with lmount
+      lmount에서의 Updater
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When using <code>lmount</code>, the Updater works the same way
-      conceptually. The main difference is that you do not call{' '}
-      <code>renew</code> explicitly: whenever an <code>lstate</code> value
-      changes, the Updater runs automatically.
+      lmount를 사용할 때도 Updater의 개념은 동일합니다. 차이점은 renew를
+      명시적으로 호출하지 않아도 lstate 값이 변경될 때 자동으로 Updater가
+      호출된다는 점입니다.
     </p>
 
     <CodeBlock
@@ -156,10 +152,10 @@ const Counter = lmount((_props) => {
   const count = lstate(0);
 
   const increase = () => {
-    count.value += 1; // Changing lstate.value automatically triggers the Updater
+    count.value += 1; // lstate 값 변경 시 자동으로 Updater 호출
   };
 
-  // This returned function is the Updater
+  // 이 함수가 Updater
   return () => (
     <div>
       <p>Count: {count.value}</p>
@@ -170,19 +166,19 @@ const Counter = lmount((_props) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When you update <code>lstate.value</code>, Lithent internally calls
-      <code>renew</code> for you and re-runs the Updater. A new virtual DOM tree
-      is produced and the view updates accordingly.
+      lstate의 value를 변경하면 내부적으로 renew가 자동 호출되어 Updater가
+      실행됩니다. 결과적으로 새로운 Virtual DOM이 생성되고 화면이
+      업데이트됩니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Updater lifecycle
+      Updater 실행 흐름
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      The update flow for a Lithent component looks like this:
+      Lithent 컴포넌트의 업데이트 흐름은 다음과 같습니다:
     </p>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
@@ -191,47 +187,45 @@ const Counter = lmount((_props) => {
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             1.
           </span>
-          <span>State changes (plain variable or lstate.value)</span>
+          <span>상태 변경 (변수 값 변경 또는 lstate.value 변경)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             2.
           </span>
-          <span>
-            <code>renew()</code> is called (manually or automatically by lstate)
-          </span>
+          <span>renew() 호출 (수동 또는 lstate에 의해 자동)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             3.
           </span>
-          <span>Updater runs → new virtual DOM is created</span>
+          <span>Updater 함수 실행 → 새로운 Virtual DOM 생성</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             4.
           </span>
-          <span>Previous and new virtual DOM are diffed</span>
+          <span>이전 Virtual DOM과 새로운 Virtual DOM 비교(Diffing)</span>
         </li>
         <li class="flex items-start">
           <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">
             5.
           </span>
-          <span>Only the changed parts are patched into the real DOM</span>
+          <span>변경된 부분만 실제 DOM에 반영(Patching)</span>
         </li>
       </ol>
     </div>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This flow lets Lithent update the UI efficiently. The Updater can freely
-      return a full virtual DOM tree every time, but only the minimal changes
-      touch the real DOM.
+      이러한 흐름을 통해 Lithent는 효율적으로 화면을 업데이트합니다. Updater가
+      매번 전체 Virtual DOM을 반환하지만, 실제 DOM 조작은 변경된 부분에만
+      이루어지므로 성능이 최적화됩니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What’s next
+      다음단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -244,13 +238,13 @@ const Counter = lmount((_props) => {
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Core feature: Props →
+          기본 기능: Props →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn how Props are used to pass data between components.
+          컴포넌트 간 데이터를 전달하는 Props에 대해 알아보세요.
           <br />
-          You&apos;ll see how parent components provide data and callbacks to
-          children.
+          부모 컴포넌트에서 자식 컴포넌트로 데이터와 함수를 전달하는 방법을
+          배워봅시다.
         </p>
       </a>
     </div>

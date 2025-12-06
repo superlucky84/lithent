@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const Props = () => (
+export const PropsKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Props
@@ -10,22 +10,22 @@ export const Props = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What are Props?
+      Props란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Props are how a parent component passes data down to a child component.
+      Props는 부모 컴포넌트에서 자식 컴포넌트로 데이터를 전달하는 방법입니다.
       <br />
       <br />
-      In Lithent, props are provided as{' '}
+      Props는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        the second argument to the mounter
+        마운터의 두 번째 인자
       </strong>
-      and also as{' '}
+      로 제공되며,{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        the first argument to the Updater
+        Updater의 첫 번째 인자
       </strong>
-      . The same props reference is preserved for the lifetime of the component.
+      로도 제공됩니다. 컴포넌트의 생명주기 동안 동일한 참조를 유지합니다.
     </p>
 
     <CodeBlock
@@ -35,10 +35,10 @@ export const Props = () => (
 type Props = { name: string; age: number };
 
 const UserCard = mount<Props>((renew, props) => {
-  // props is the second argument of the mounter
+  // props는 마운터의 두 번째 인자
 
   return (propsFromUpdater) => (
-    // props is also passed as the first argument to the Updater
+    // props는 Updater의 첫 번째 인자로도 제공됨
     <div>
       <h2>{props.name}</h2>
       <p>Age: {props.age}</p>
@@ -53,23 +53,23 @@ render(
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When using TypeScript, you can define the Props type as the generic
-      parameter of <code>mount</code> for better type safety.
+      TypeScript를 사용할 때는 mount 함수의 제네릭으로 Props 타입을 정의할 수
+      있습니다. 이를 통해 타입 안정성을 확보할 수 있습니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Access patterns and gotchas
+      Props 접근 방법과 주의사항
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Props keep the same{' '}
+      Props는 컴포넌트의 생명주기 동안 동일한{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        reference
-      </strong>{' '}
-      throughout the component&apos;s lifetime. This is important because the
-      way you access props can change the behavior you see.
+        참조(reference)
+      </strong>
+      를 유지합니다. 이는 매우 중요한 특성으로, Props에 접근하는 방식에 따라
+      다른 결과를 얻을 수 있습니다.
     </p>
 
     <CodeBlock
@@ -79,18 +79,18 @@ render(
 type Props = { count: number };
 
 const Counter = mount<Props>((renew, props) => {
-  // ⚠️ Be careful: destructuring props in the mounter
+  // ⚠️ 주의: 마운터에서 구조분해 할당
   const { count: countFromMounter } = props;
 
   return ({ count: countFromUpdater }) => (
     <>
-      {/* ✅ Always up to date – direct props access */}
+      {/* ✅ 항상 최신 값 - props 객체를 직접 참조 */}
       <div>count: {props.count}</div>
 
-      {/* ❌ Stale value – primitive copied in the mounter */}
-      <div>count: {countFromMounter} (does not update)</div>
+      {/* ❌ 고정된 값 - 마운터에서 분해한 primitive 값 */}
+      <div>count: {countFromMounter} (업데이트 안 됨)</div>
 
-      {/* ✅ Always up to date – props from the Updater */}
+      {/* ✅ 항상 최신 값 - Updater에서 받은 props */}
       <div>count: {countFromUpdater}</div>
     </>
   );
@@ -114,51 +114,50 @@ const Parent = mount(renew => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When you click the button in the example above:
+      위 예제에서 버튼을 클릭하면:
       <br />
       <br />•{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         props.count
       </code>{' '}
-      - ✅ becomes 1, 2, 3... as expected
+      - ✅ 1, 2, 3... 정상적으로 증가
       <br />•{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         countFromMounter
       </code>{' '}
-      - ❌ stays fixed at 0 (primitive copied by value)
+      - ❌ 0으로 고정 (primitive 값 복사)
       <br />•{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         countFromUpdater
       </code>{' '}
-      - ✅ becomes 1, 2, 3... as expected
+      - ✅ 1, 2, 3... 정상적으로 증가
     </p>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ Important:</span> If you destructure props
-        inside the mounter, the values are <strong>copied</strong> at that time.
-        For primitive types (number, string, boolean) this behaves like
-        &quot;call by value&quot;, so those destructured variables will not
-        update when props change later.
+        <span class="font-medium">⚠️ 중요:</span> 마운터에서 props를 구조분해
+        할당하면 그 시점의 값이 <strong>복사</strong>됩니다. Primitive
+        타입(number, string, boolean)의 경우 "call by value"로 동작하므로, 이후
+        props가 업데이트되어도 마운터에서 분해한 변수는 업데이트되지 않습니다.
         <br />
         <br />
-        To always get the latest values, prefer accessing{' '}
+        항상 최신 값을 얻으려면{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
-          props.propertyName
+          props.속성명
         </code>
-        directly or using the props object passed into the Updater.
+        으로 직접 접근하거나, Updater에서 받은 props를 사용하세요.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Passing functions as props
+      함수를 Props로 전달하기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Props can carry not only data but also functions. This lets child
-      components update state that lives in their parents.
+      Props를 통해 데이터뿐만 아니라 함수도 전달할 수 있습니다. 이를 통해 자식
+      컴포넌트에서 부모 컴포넌트의 상태를 변경할 수 있습니다.
     </p>
 
     <CodeBlock
@@ -205,21 +204,20 @@ const Parent = mount(renew => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Functions are reference types, so a function passed through props always
-      keeps the parent component&apos;s closure. This makes it safe for children
-      to drive updates to parent state.
+      함수는 참조 타입이므로, props를 통해 전달된 함수는 항상 부모 컴포넌트의
+      클로저를 유지합니다. 따라서 자식 컴포넌트에서 부모의 상태를 안전하게
+      변경할 수 있습니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Object and array props
+      객체와 배열 Props
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When you pass an object or array as props, the reference is passed. Even
-      if you destructure it in the mounter, you are copying the reference, so
-      nested values stay in sync.
+      객체나 배열을 props로 전달할 때는 참조가 전달되므로, 마운터에서 구조분해
+      할당을 해도 객체/배열 내부의 속성은 최신 상태를 유지합니다.
     </p>
 
     <CodeBlock
@@ -230,14 +228,14 @@ type User = { name: string; age: number };
 type Props = { user: User };
 
 const UserCard = mount<Props>((renew, props) => {
-  // Objects are reference types, so destructuring here is fine
+  // 객체는 참조 타입이므로 구조분해 해도 OK
   const { user } = props;
 
   return () => (
     <div>
       <h2>{user.name}</h2>
       <p>Age: {user.age}</p>
-      {/* Accessing via props.user yields the same result */}
+      {/* props.user로 접근해도 동일한 결과 */}
       <p>Age: {props.user.age}</p>
     </div>
   );
@@ -261,32 +259,31 @@ const Parent = mount(renew => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Objects and arrays are reference types, so destructuring in the mounter
-      still copies the reference. When nested values change, the UI will update
-      correctly after <code>renew</code>.
+      객체나 배열은 참조 타입이므로, 마운터에서 구조분해 할당을 하더라도 그
+      참조를 복사하는 것입니다. 따라서 객체/배열 내부의 값이 변경되면 정상적으로
+      업데이트됩니다.
     </p>
 
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Note:
+          💡 참고:
         </span>{' '}
-        It&apos;s still a good idea to keep objects and arrays immutable where
-        possible. Creating new objects instead of mutating existing ones makes
-        data flow easier to reason about.
+        객체나 배열을 props로 전달할 때는 불변성(immutability)을 유지하는 것이
+        좋습니다. 객체의 속성을 직접 변경하는 대신, 새로운 객체를 생성하여
+        전달하면 예측 가능한 상태 관리가 가능합니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Props with lmount
+      lmount에서의 Props
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      When using <code>lmount</code>, props behave the same way as with{' '}
-      <code>mount</code>. There is no <code>renew</code>, but the access
-      patterns and caveats are identical.
+      lmount를 사용할 때도 Props의 동작 방식은 동일합니다. renew가 없을 뿐,
+      props 접근 방법과 주의사항은 mount와 같습니다.
     </p>
 
     <CodeBlock
@@ -333,7 +330,7 @@ const Parent = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What’s next
+      다음단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -349,10 +346,9 @@ const Parent = lmount(() => {
           Core: Children →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn how Lithent handles children, the elements a component wraps
-          around.
+          컴포넌트가 감싸는 자식 요소들인 Children에 대해 알아보세요.
           <br />
-          You&apos;ll see how children are managed separately from props.
+          Lithent에서 children이 props와 별도로 관리되는 방식을 배워봅시다.
         </p>
       </a>
     </div>
