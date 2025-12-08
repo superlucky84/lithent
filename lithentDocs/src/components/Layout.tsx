@@ -13,6 +13,7 @@ import { Renewer } from '@/pages/Renewer';
 import { Render } from '@/pages/Render';
 import { Portal } from '@/pages/Portal';
 import { MountHooks } from '@/pages/MountHooks';
+import { MountHooksKo } from '@/pages/MountHooks_ko';
 import { UpdateHooks } from '@/pages/UpdateHooks';
 import { MountReadyHooks } from '@/pages/MountReadyHooks';
 import { UseRenewHooks } from '@/pages/UseRenewHooks';
@@ -95,6 +96,7 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/portal': PortalKo,
   '/guide/next-tick': NextTick,
   '/guide/mount-hooks': MountHooks,
+  '/ko/guide/mount-hooks': MountHooksKo,
   '/guide/update-hooks': UpdateHooks,
   '/guide/mount-ready-hooks': MountReadyHooks,
   '/guide/use-renew-hooks': UseRenewHooks,
