@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const Lstate = () => (
+export const LstateKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Lstate
@@ -10,30 +10,29 @@ export const Lstate = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What is lstate?
+      lstate란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstate is a{' '}
+      lstate는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        reactive state helper used in lmount components
+        lmount 컴포넌트에서 사용하는 반응형 상태 헬퍼
       </strong>
-      .
+      입니다.
       <br />
       <br />
-      The core feature of lstate is that it{' '}
+      lstate의 핵심은{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        automatically handles renew
+        renew를 자동으로 처리
       </strong>
-      . Unlike state, you do not need to pass renew as an argument. Internally,
-      it retrieves renew automatically via the useRenew hook. This is the
-      fundamental difference from state, and it is the natural and correct way
-      to use lstate together with lmount.
+      한다는 점입니다. state와 달리 renew를 인자로 전달할 필요가 없으며,
+      내부적으로 useRenew 훅을 사용하여 자동으로 renew를 가져옵니다. 이것이
+      state와의 근본적인 차이이며, lmount와 함께 사용하는 것이 자연스럽고 올바른
+      방식입니다.
       <br />
       <br />
-      Since renew() is automatically called whenever the value changes, the UI
-      is updated automatically, making lstate highly optimized for declarative
-      patterns.
+      값이 변경될 때마다 자동으로 renew()가 호출되어 UI가 업데이트되므로, 선언형
+      패턴에 최적화되어 있습니다.
     </p>
 
     <CodeBlock
@@ -42,10 +41,10 @@ export const Lstate = () => (
 import { lstate } from 'lithent/helper';
 
 const Counter = lmount(() => {
-  const count = lstate(0); // No renew argument required
+  const count = lstate(0); // renew 인자 불필요
 
   const increment = () => {
-    count.value += 1; // renew() is called automatically
+    count.value += 1; // 자동으로 renew() 호출
   };
 
   return () => (
@@ -60,17 +59,16 @@ const Counter = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Basic Usage
+      기본 사용법
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstate only takes the initial value as its argument. renew is handled
-      internally and automatically. You can read and write the value through the
-      returned object’s{' '}
+      lstate는 초기값만 인자로 받습니다. renew는 내부적으로 자동 처리됩니다.
+      반환된 객체의{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         value
       </code>{' '}
-      property.
+      프로퍼티를 통해 값을 읽고 쓸 수 있습니다.
     </p>
 
     <CodeBlock
@@ -79,16 +77,16 @@ const Counter = lmount(() => {
 import { lstate } from 'lithent/helper';
 
 const App = lmount(() => {
-  // Create lstate: lstate(initialValue) - no renew required
+  // lstate 생성: lstate(초기값) - renew 불필요!
   const count = lstate(0);
   const message = lstate('Hello');
 
   const increment = () => {
-    count.value += 1; // setter - renew() is called automatically
+    count.value += 1; // setter - 자동으로 renew() 호출
   };
 
   const updateMessage = () => {
-    message.value = 'World'; // setter - renew() is called automatically
+    message.value = 'World'; // setter - 자동으로 renew() 호출
   };
 
   return () => (
@@ -105,20 +103,19 @@ const App = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      state vs lstate
+      state vs lstate 비교
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Let’s compare the differences between state and lstate. The key difference
-      lies in{' '}
+      state와 lstate의 차이를 비교해봅시다. 핵심 차이는{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        how renew is handled
+        renew를 어떻게 처리하는가
       </strong>
-      :
+      입니다:
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      state (mount + explicit renew delegation)
+      state (mount + 명시적 renew 위임)
     </h3>
 
     <CodeBlock
@@ -127,7 +124,7 @@ const App = lmount(() => {
 import { state } from 'lithent/helper';
 
 const Counter = mount((renew) => {
-  const count = state(0, renew); // Explicit renew delegation
+  const count = state(0, renew); // renew 명시적 전달
 
   const increment = () => {
     count.value += 1;
@@ -138,7 +135,7 @@ const Counter = mount((renew) => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      lstate (lmount + automatic renew)
+      lstate (lmount + 자동 renew 처리)
     </h3>
 
     <CodeBlock
@@ -147,7 +144,7 @@ const Counter = mount((renew) => {
 import { lstate } from 'lithent/helper';
 
 const Counter = lmount(() => {
-  const count = lstate(0); // renew handled automatically
+  const count = lstate(0); // renew 자동 처리
 
   const increment = () => {
     count.value += 1;
@@ -160,26 +157,25 @@ const Counter = lmount(() => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Selection Guide:
+          💡 선택 기준:
         </span>{' '}
         <strong class="font-medium text-gray-700 dark:text-gray-300">
-          lstate should be used together with lmount.
+          lstate는 lmount와 함께 사용하는 것이 자연스럽고 올바른 방식입니다.
         </strong>{' '}
-        lstate is optimized for declarative patterns by handling renew
-        automatically, while state is optimized for manual control by explicitly
-        delegating renew. If you use mount, choose state. If you use lmount,
-        choose lstate.
+        lstate는 renew를 자동으로 처리하여 선언형 패턴에 최적화되어 있으며,
+        state는 renew를 명시적으로 위임하여 수동 제어에 최적화되어 있습니다.
+        mount를 사용한다면 state를, lmount를 사용한다면 lstate를 선택하세요.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Practical Examples
+      실용적인 예제
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      Using Multiple lstate Values
+      여러 개의 lstate 사용
     </h3>
 
     <CodeBlock
@@ -233,7 +229,7 @@ const Form = lmount(() => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Toggle State
+      토글 상태 관리
     </h3>
 
     <CodeBlock
@@ -264,7 +260,7 @@ const Accordion = lmount(() => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Tabs Component
+      탭 컴포넌트
     </h3>
 
     <CodeBlock
@@ -310,13 +306,12 @@ const Tabs = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Working with Objects and Arrays
+      객체와 배열 다루기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstate can store not only primitive values, but also objects and arrays.
-      However, for objects and arrays, changes are only detected when a new
-      reference is assigned.
+      lstate는 원시 값뿐만 아니라 객체나 배열도 저장할 수 있습니다. 하지만
+      객체나 배열의 경우, 새로운 참조를 할당해야 변경이 감지됩니다.
     </p>
 
     <CodeBlock
@@ -328,12 +323,12 @@ const TodoList = lmount(() => {
   const todos = lstate<string[]>([]);
 
   const addTodo = (text: string) => {
-    // Must create a new array for change detection
+    // 새로운 배열을 생성해야 변경 감지됨
     todos.value = [...todos.value, text];
   };
 
   const removeTodo = (index: number) => {
-    // Create a new array
+    // 새로운 배열을 생성
     todos.value = todos.value.filter((_, i) => i !== index);
   };
 
@@ -355,16 +350,16 @@ const TodoList = lmount(() => {
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ Warning:</span> Mutating objects or arrays
-        directly will NOT trigger a UI update.
+        <span class="font-medium">⚠️ 주의:</span> 객체나 배열의 내부를 직접
+        변경하면 UI가 업데이트되지 않습니다.
         <br />
         <br />
         <code class="px-2 py-1 bg-yellow-100 dark:bg-yellow-800 rounded text-sm">
-          todos.value.push('new') // ❌ Will NOT work
+          todos.value.push('new') // ❌ 동작하지 않음
         </code>
         <br />
         <code class="px-2 py-1 bg-yellow-100 dark:bg-yellow-800 rounded text-sm">
-          todos.value = [...todos.value, 'new'] // ✅ Assign a new reference
+          todos.value = [...todos.value, 'new'] // ✅ 새 참조로 할당
         </code>
       </p>
     </div>
@@ -372,12 +367,11 @@ const TodoList = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Advanced State Management Example
+      복잡한 상태 관리 예제
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      You can combine multiple lstate values to manage complex application
-      state.
+      여러 개의 lstate를 조합하여 복잡한 상태를 관리할 수 있습니다.
     </p>
 
     <CodeBlock
@@ -472,32 +466,32 @@ const TodoApp = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Notes & Cautions
+      주의사항
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ Use with lmount:</span> lstate is designed
-        to be used with lmount components. Use state with mount. lstate
-        automatically handles renew, which is the fundamental difference from
-        state.
+        <span class="font-medium">⚠️ lmount와 함께 사용:</span> lstate는 lmount
+        컴포넌트에서 사용하는 것이 자연스럽고 올바른 방식입니다. mount에서는
+        state를 사용하세요. lstate는 renew를 자동으로 처리하는 방식이며, 이것이
+        state와의 근본적인 차이입니다.
         <br />
         <br />
-        <span class="font-medium">⚠️ Automatic renew:</span> lstate internally
-        uses useRenew to retrieve renew automatically. You do not need to pass
-        renew as an argument. This design is optimized for declarative patterns.
+        <span class="font-medium">⚠️ renew 자동 처리:</span> lstate는 내부적으로
+        useRenew를 사용하여 renew를 자동으로 가져옵니다. 따라서 renew를 인자로
+        전달할 필요가 없으며, 이는 선언형 패턴에 최적화된 설계입니다.
         <br />
         <br />
-        <span class="font-medium">⚠️ Only inside mounters:</span> lstate must
-        only be called inside the mounter. Do not call it inside updaters or
-        event handlers.
+        <span class="font-medium">⚠️ 마운터에서만 호출:</span> lstate는 마운터
+        내부에서만 호출해야 합니다. Updater나 이벤트 핸들러에서 호출하면 안
+        됩니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Next Step
+      다음단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -513,9 +507,9 @@ const TodoApp = lmount(() => {
           Helper: Computed →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn about computed, which derives values from other state.
+          다른 상태로부터 파생된 값을 계산하는 computed에 대해 알아보세요.
           <br />
-          See how to create read-only derived values.
+          읽기 전용 파생 값을 만드는 방법을 배워봅시다.
         </p>
       </a>
     </div>

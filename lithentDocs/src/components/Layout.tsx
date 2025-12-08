@@ -15,10 +15,14 @@ import { Portal } from '@/pages/Portal';
 import { MountHooks } from '@/pages/MountHooks';
 import { MountHooksKo } from '@/pages/MountHooks_ko';
 import { UpdateHooks } from '@/pages/UpdateHooks';
+import { UpdateHooksKo } from '@/pages/UpdateHooks_ko';
 import { MountReadyHooks } from '@/pages/MountReadyHooks';
+import { MountReadyHooksKo } from '@/pages/MountReadyHooks_ko';
 import { UseRenewHooks } from '@/pages/UseRenewHooks';
 import { State } from '@/pages/State';
+import { StateKo } from '@/pages/State_ko';
 import { Lstate } from '@/pages/Lstate';
+import { LstateKo } from '@/pages/Lstate_ko';
 import { Computed } from '@/pages/Computed';
 import { Effect } from '@/pages/Effect';
 import { Store } from '@/pages/Store';
@@ -28,12 +32,14 @@ import { Context } from '@/pages/Context';
 import { LContext } from '@/pages/LContext';
 import { CacheUpdate } from '@/pages/CacheUpdate';
 import { NextTick } from '@/pages/NextTick';
+import { NextTickKo } from '@/pages/NextTick_ko';
 import { VitePlugin } from '@/pages/VitePlugin';
 import { ManualJSX } from '@/pages/ManualJSX';
 import { FTags } from '@/pages/FTags';
 import { HtmTags } from '@/pages/HtmTags';
 import { TemplateStrings } from '@/pages/TemplateStrings';
 import { Stateless } from '@/pages/Stateless';
+import { StatelessKo } from '@/pages/Stateless_ko';
 import { InnerHTML } from '@/pages/InnerHTML';
 import { Example1Page } from '@/pages/Example1';
 import { Example2Page } from '@/pages/Example2';
@@ -99,13 +105,18 @@ const routes: Record<string, PageComponent> = {
   '/guide/inner-html': InnerHTML,
   '/ko/guide/inner-html': InnerHTMLKo,
   '/guide/next-tick': NextTick,
+  '/ko/guide/next-tick': NextTickKo,
   '/guide/mount-hooks': MountHooks,
   '/ko/guide/mount-hooks': MountHooksKo,
   '/guide/update-hooks': UpdateHooks,
+  '/ko/guide/update-hooks': UpdateHooksKo,
   '/guide/mount-ready-hooks': MountReadyHooks,
+  '/ko/guide/mount-ready-hooks': MountReadyHooksKo,
   '/guide/use-renew-hooks': UseRenewHooks,
   '/guide/state': State,
+  '/ko/guide/state': StateKo,
   '/guide/lstate': Lstate,
+  '/ko/guide/lstate': LstateKo,
   '/guide/computed': Computed,
   '/guide/effect': Effect,
   '/guide/store': Store,
@@ -120,6 +131,7 @@ const routes: Record<string, PageComponent> = {
   '/guide/htm-tags': HtmTags,
   '/guide/template-strings': TemplateStrings,
   '/guide/stateless': Stateless,
+  '/ko/guide/stateless': StatelessKo,
   '/examples/1': Example1Page,
   '/examples/2': Example2Page,
   '/examples/3': Example3Page,

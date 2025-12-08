@@ -1,7 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 
-export const State = () => (
+export const StateKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       State
@@ -10,30 +10,29 @@ export const State = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      What is state?
+      state란?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      state is a{' '}
+      state는{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        reactive state helper used inside mount components
+        mount 컴포넌트에서 사용하는 반응형 상태 헬퍼
       </strong>
-      .
+      입니다.
       <br />
       <br />
-      The core idea of state is that it{' '}
+      state의 핵심은{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        explicitly delegates the renew function through its arguments
+        renew 함수를 명시적으로 인자를 통해 위임
       </strong>
-      . This is the fundamental difference from lstate, and it is the natural
-      and correct way to use state together with mount.
+      한다는 점입니다. 이것이 lstate와의 근본적인 차이이며, mount와 함께
+      사용하는 것이 자연스럽고 올바른 방식입니다.
       <br />
       <br />
-      With plain closure variables, you must manually call renew() after
-      changing a value. With state, once renew is delegated, renew() is
-      automatically called whenever the value changes, updating the UI. This
-      allows you to combine the explicit control of mount with the convenience
-      of automatic updates.
+      클로저 변수는 값을 변경한 후 renew()를 직접 호출해야 하지만, state를
+      사용하면 renew를 한 번 위임한 후 값이 변경될 때마다 자동으로 renew()가
+      호출되어 UI가 업데이트됩니다. mount의 명시적 제어와 자동 업데이트의
+      편리함을 함께 누릴 수 있습니다.
     </p>
 
     <CodeBlock
@@ -45,7 +44,7 @@ const Counter = mount((renew) => {
   const count = state(0, renew);
 
   const increment = () => {
-    count.value += 1; // renew() is called automatically
+    count.value += 1; // 자동으로 renew() 호출
   };
 
   return () => (
@@ -60,16 +59,15 @@ const Counter = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Basic Usage
+      기본 사용법
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      state takes an initial value and the renew function as arguments. You can
-      read and write the value through the returned object’s{' '}
+      state는 초기값과 renew 함수를 인자로 받습니다. 반환된 객체의{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         value
       </code>{' '}
-      property.
+      프로퍼티를 통해 값을 읽고 쓸 수 있습니다.
     </p>
 
     <CodeBlock
@@ -78,16 +76,16 @@ const Counter = mount((renew) => {
 import { state } from 'lithent/helper';
 
 const App = mount((renew) => {
-  // Create state: state(initialValue, renew)
+  // state 생성: state(초기값, renew 함수)
   const count = state(0, renew);
   const message = state('Hello', renew);
 
   const increment = () => {
-    count.value += 1; // setter - renew() is called automatically
+    count.value += 1; // setter - 자동으로 renew() 호출
   };
 
   const updateMessage = () => {
-    message.value = 'World'; // setter - renew() is called automatically
+    message.value = 'World'; // setter - 자동으로 renew() 호출
   };
 
   return () => (
@@ -104,19 +102,19 @@ const App = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Closure Variables vs state
+      클로저 변수 vs state 비교
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Let’s compare closure variables and state. state follows an{' '}
+      클로저 변수와 state의 차이를 비교해봅시다. state는{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        explicit renew delegation model
+        renew를 명시적으로 위임하는 방식
       </strong>
-      , which perfectly aligns with the philosophy of mount components:
+      으로, mount 컴포넌트의 철학과 완벽하게 일치합니다:
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      Closure Variables (Manual renew)
+      클로저 변수 (수동 renew 호출)
     </h3>
 
     <CodeBlock
@@ -128,7 +126,7 @@ const Counter = mount((renew) => {
 
   const increment = () => {
     count += 1;
-    renew(); // Must explicitly call renew
+    renew(); // 명시적으로 renew 호출 필요
   };
 
   return () => <div>Count: {count}</div>;
@@ -136,7 +134,7 @@ const Counter = mount((renew) => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      state Helper (Automatic renew)
+      state 헬퍼 (자동 renew 호출)
     </h3>
 
     <CodeBlock
@@ -148,7 +146,7 @@ const Counter = mount((renew) => {
   const count = state(0, renew);
 
   const increment = () => {
-    count.value += 1; // renew is called automatically
+    count.value += 1; // 자동으로 renew 호출됨
   };
 
   return () => <div>Count: {count.value}</div>;
@@ -158,26 +156,26 @@ const Counter = mount((renew) => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 Selection Guide:
+          💡 선택 기준:
         </span>{' '}
         <strong class="font-medium text-gray-700 dark:text-gray-300">
-          Using state together with mount is the natural and recommended
-          approach.
+          state는 mount와 함께 사용하는 것이 자연스럽고 올바른 방식입니다.
         </strong>{' '}
-        For simple values, state provides excellent convenience by explicitly
-        delegating renew. For complex objects or arrays, using closure variables
-        and calling renew() only when needed can be more efficient.
+        간단한 값이라면 state를 사용하는 것이 편리하며, renew를 명시적으로
+        위임하여 제어권을 명확히 할 수 있습니다. 복잡한 객체나 배열을 다룬다면
+        클로저 변수를 사용하고 필요할 때만 renew()를 호출하는 것이 더 효율적일
+        수 있습니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Practical Examples
+      실용적인 예제
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      Using Multiple state Values
+      여러 개의 state 사용
     </h3>
 
     <CodeBlock
@@ -231,7 +229,7 @@ const Form = mount((renew) => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Toggle State
+      토글 상태 관리
     </h3>
 
     <CodeBlock
@@ -262,7 +260,7 @@ const Accordion = mount((renew) => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Counter Group
+      카운터 그룹
     </h3>
 
     <CodeBlock
@@ -303,13 +301,12 @@ const CounterGroup = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Working with Objects and Arrays
+      객체와 배열 다루기
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      state can store not only primitive values, but also objects and arrays.
-      However, for objects and arrays, changes are only detected when a new
-      reference is assigned.
+      state는 원시 값뿐만 아니라 객체나 배열도 저장할 수 있습니다. 하지만 객체나
+      배열의 경우, 새로운 참조를 할당해야 변경이 감지됩니다.
     </p>
 
     <CodeBlock
@@ -321,12 +318,12 @@ const TodoList = mount((renew) => {
   const todos = state<string[]>([], renew);
 
   const addTodo = (text: string) => {
-    // Must create a new array for change detection
+    // 새로운 배열을 생성해야 변경 감지됨
     todos.value = [...todos.value, text];
   };
 
   const removeTodo = (index: number) => {
-    // Create a new filtered array
+    // 새로운 배열을 생성
     todos.value = todos.value.filter((_, i) => i !== index);
   };
 
@@ -348,16 +345,16 @@ const TodoList = mount((renew) => {
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ Warning:</span> Mutating objects or arrays
-        directly will NOT trigger a UI update.
+        <span class="font-medium">⚠️ 주의:</span> 객체나 배열의 내부를 직접
+        변경하면 UI가 업데이트되지 않습니다.
         <br />
         <br />
         <code class="px-2 py-1 bg-yellow-100 dark:bg-yellow-800 rounded text-sm">
-          todos.value.push('new') // ❌ Will NOT work
+          todos.value.push('new') // ❌ 동작하지 않음
         </code>
         <br />
         <code class="px-2 py-1 bg-yellow-100 dark:bg-yellow-800 rounded text-sm">
-          todos.value = [...todos.value, 'new'] // ✅ Assign a new reference
+          todos.value = [...todos.value, 'new'] // ✅ 새 참조로 할당
         </code>
       </p>
     </div>
@@ -365,33 +362,33 @@ const TodoList = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Notes & Cautions
+      주의사항
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ Use with mount:</span> state is designed to
-        be used inside mount components. Use lstate with lmount. The explicit
-        delegation of renew is the fundamental difference between state and
-        lstate.
+        <span class="font-medium">⚠️ mount와 함께 사용:</span> state는 mount
+        컴포넌트에서 사용하는 것이 자연스럽고 올바른 방식입니다. lmount에서는
+        lstate를 사용하세요. state는 renew를 명시적으로 인자를 통해 위임하는
+        방식이며, 이것이 lstate와의 근본적인 차이입니다.
         <br />
         <br />
-        <span class="font-medium">⚠️ Explicit renew delegation:</span> You must
-        pass the renew function as the second argument to state. This follows
-        the mount philosophy of explicit control delegation. Without renew, UI
-        updates will not occur.
+        <span class="font-medium">⚠️ renew 명시적 위임:</span> state는 두 번째
+        인자로 renew 함수를 반드시 전달해야 합니다. 이는 제어권을 명확히
+        위임하는 mount의 철학을 따릅니다. renew를 전달하지 않으면 값이
+        변경되어도 UI가 업데이트되지 않습니다.
         <br />
         <br />
-        <span class="font-medium">⚠️ Only inside mounters:</span> state must
-        only be called inside the mounter. Do not call it inside updaters or
-        event handlers.
+        <span class="font-medium">⚠️ 마운터에서만 호출:</span> state는 마운터
+        내부에서만 호출해야 합니다. Updater나 이벤트 핸들러에서 호출하면 안
+        됩니다.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Next Step
+      다음단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -407,9 +404,9 @@ const TodoList = mount((renew) => {
           Helper: Lstate →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Learn about lstate, the reactive state system used with lmount.
+          lmount에서 사용하는 반응형 상태 관리인 lstate에 대해 알아보세요.
           <br />
-          It is similar to state, but handles renew automatically.
+          state와 유사하지만 renew를 자동으로 처리하는 방법을 배워봅시다.
         </p>
       </a>
     </div>

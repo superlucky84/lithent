@@ -2,40 +2,39 @@ import { CodeBlock } from '@/components/CodeBlock';
 import type { Introduction } from '@/pages/Introduction';
 import { navigateTo } from '@/store';
 
-export const Stateless = (): ReturnType<typeof Introduction> => (
+export const StatelessKo = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Stateless Components
     </h1>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      If your UI does not require any state at all, you can define components as
-      simple functions without using{' '}
+      상태가 전혀 필요 없는 UI라면{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         mount
-      </code>{' '}
-      or{' '}
+      </code>
+      나{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         lmount
       </code>
-      . This helps reduce bundle size and minimize dependencies. Unlike React,
-      Lithent passes{' '}
+      를 쓰지 않고도 간단한 함수로 컴포넌트를 정의할 수 있습니다. 이렇게 하면
+      번들 크기를 줄이고 의존성을 최소화할 수 있습니다. Lithent에서는 React와
+      달리{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         children
-      </code>{' '}
-      as the second argument instead of inside props, so be mindful of the
-      function signature.
+      </code>
+      이 props 안이 아니라 두 번째 인자로 전달된다는 점만 주의하면 됩니다.
     </p>
 
     <CodeBlock
       language="tsx"
-      code={`// Simple display-only components can be defined as plain functions.
+      code={`// 단순 표시용 컴포넌트는 함수만으로도 충분합니다.
 export const Badge = ({ label }: { label: string }) => (
   <span>[{label}]</span>
 );
 
-// In Lithent, children are passed as the second argument instead of props.
-// Make sure to follow the (props, children) order.
+// Lithent에서는 children이 props가 아니라 두 번째 인자로 들어옵니다.
+// (props, children) 순서를 지켜 주세요.
 export const Card = (
   { title }: { title: string },
   children: JSX.Element
@@ -46,34 +45,33 @@ export const Card = (
   </div>
 );
 
-// Add state only when needed using mount/lmount
+// 필요한 경우에만 mount/lmount를 사용해 상태를 추가
 // const StatefulCard = mount(renew => { ... });`}
     />
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">Tip:</span> Reusing pure function components
-        defined outside of the render scope is beneficial for performance, as it
-        avoids creating new function instances on every render.
+        <span class="font-medium">Tip:</span> 렌더링마다 새 함수를 만들지 않도록
+        바깥에서 정의한 순수 함수 컴포넌트를 재사용하면 성능에도 유리합니다.
       </p>
     </div>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-8">
-      When you eventually need state, you can introduce{' '}
+      상태가 필요한 순간이 오면 언제든지{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         mount
-      </code>{' '}
-      or{' '}
+      </code>
+      나
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         lmount
-      </code>{' '}
-      at any time. Keep small UI building blocks as lightweight as possible.
+      </code>
+      를 도입하면 됩니다. 작은 UI 조각은 가능한 한 가볍게 유지하세요.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Next Step
+      다음 단계
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -89,8 +87,8 @@ export const Card = (
           Helper: State →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          If you now want to start writing stateful components, take a look at
-          the state helper.
+          이제 상태가 있는 컴포넌트를 작성해보고 싶다면 helper의 state 훅을
+          확인해 보세요.
         </p>
       </a>
     </div>
