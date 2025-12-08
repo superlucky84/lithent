@@ -509,22 +509,19 @@ const FullLifecycle = mount((renew) => {
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/use-renew-hooks"
+        href="/guide/inner-html"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/use-renew-hooks');
+          navigateTo('/guide/inner-html');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          기본 기능: useRenew Hook →
+          콘텐츠 렌더링: innerHTML →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          lmount 컴포넌트에서 renew 함수를 가져오는 useRenew 훅에 대해
-          알아보세요.
-          <br />
-          클로저 변수와 함께 수동 업데이트가 필요한 경우 사용하는 방법을
-          배워봅시다.
+          Markdown이나 서버에서 내려온 HTML 문자열을 그대로 렌더링할 수 있는
+          innerHTML 사용법과 보안 주의사항을 살펴봅니다.
         </p>
       </a>
     </div>

@@ -34,6 +34,7 @@ import { FTags } from '@/pages/FTags';
 import { HtmTags } from '@/pages/HtmTags';
 import { TemplateStrings } from '@/pages/TemplateStrings';
 import { Stateless } from '@/pages/Stateless';
+import { InnerHTML } from '@/pages/InnerHTML';
 import { Example1Page } from '@/pages/Example1';
 import { Example2Page } from '@/pages/Example2';
 import { Example3Page } from '@/pages/Example3';
@@ -63,6 +64,7 @@ import { ChildrenKo } from '@/pages/Children_ko';
 import { RenewerKo } from '@/pages/Renewer_ko';
 import { RenderKo } from '@/pages/Render_ko';
 import { PortalKo } from '@/pages/Portal_ko';
+import { InnerHTMLKo } from '@/pages/InnerHTML_ko';
 
 type PageComponent =
   | ((...args: any[]) => ReturnType<typeof Introduction>)
@@ -94,6 +96,8 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/render': RenderKo,
   '/guide/portal': Portal,
   '/ko/guide/portal': PortalKo,
+  '/guide/inner-html': InnerHTML,
+  '/ko/guide/inner-html': InnerHTMLKo,
   '/guide/next-tick': NextTick,
   '/guide/mount-hooks': MountHooks,
   '/ko/guide/mount-hooks': MountHooksKo,

@@ -1,5 +1,6 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 export const Stateless = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
@@ -78,8 +79,7 @@ export const Card = (
         href="/guide/state"
         onClick={(e: Event) => {
           e.preventDefault();
-          window.history.pushState({}, '', '/guide/state');
-          window.dispatchEvent(new PopStateEvent('popstate'));
+          navigateTo('/guide/state');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
