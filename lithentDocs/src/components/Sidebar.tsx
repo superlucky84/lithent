@@ -66,7 +66,7 @@ const menuData: MenuSection[] = [
   {
     text: 'Examples',
     items: [
-      { text: 'Computed (바나나 칼로리)', link: '/examples/1' },
+      { text: 'Computed (Banana Calories)', link: '/examples/1' },
       { text: 'Shared Store (helper)', link: '/examples/2' },
       { text: 'Render Props (Mouse tracker)', link: '/examples/3' },
       { text: 'Effect Lifecycle (helper)', link: '/examples/4' },
@@ -85,7 +85,7 @@ const menuData: MenuSection[] = [
       { text: 'SVG Rendering (Traffic Light)', link: '/examples/17' },
       { text: 'CacheUpdate (Product Filter)', link: '/examples/18' },
       { text: 'FTags CDN (Smart Todo List)', link: '/examples/19' },
-      { text: 'Portal (이미지 라이트박스)', link: '/examples/20' },
+      { text: 'Portal (Image Lightbox)', link: '/examples/20' },
     ],
   },
 ];
