@@ -36,7 +36,7 @@ interface CategoryWithTheme extends Category {
 const categories: CategoryWithTheme[] = [
   {
     title: 'Getting Started',
-    description: 'Lithent를 시작하기 위한 기본 가이드',
+    description: 'Basic guide to get started with Lithent',
     icon: '🚀',
     theme: {
       gradient:
@@ -54,7 +54,7 @@ const categories: CategoryWithTheme[] = [
   },
   {
     title: 'Essential Features',
-    description: 'Lithent의 핵심 기능',
+    description: 'Core features of Lithent',
     icon: '⚡',
     theme: {
       gradient:
@@ -66,23 +66,25 @@ const categories: CategoryWithTheme[] = [
       textColor: 'text-green-900 dark:text-green-100',
     },
     items: [
-      { text: 'Mounter', link: '/guide/mounter' },
-      { text: 'Updater', link: '/guide/updater' },
-      { text: 'Props', link: '/guide/props' },
-      { text: 'Children', link: '/guide/children' },
-      { text: 'Renewer', link: '/guide/renewer' },
-      { text: 'Render', link: '/guide/render' },
-      { text: 'Portal', link: '/guide/portal' },
-      { text: 'Mount Hooks', link: '/guide/mount-hooks' },
-      { text: 'Update Hooks', link: '/guide/update-hooks' },
-      { text: 'Mount Ready Hooks', link: '/guide/mount-ready-hooks' },
-      { text: 'useRenew Hooks', link: '/guide/use-renew-hooks' },
-      { text: 'NextTick', link: '/guide/next-tick' },
+      { text: 'mount', link: '/guide/mounter' },
+      { text: 'updater', link: '/guide/updater' },
+      { text: 'props', link: '/guide/props' },
+      { text: 'children', link: '/guide/children' },
+      { text: 'renew', link: '/guide/renewer' },
+      { text: 'render', link: '/guide/render' },
+      { text: 'portal', link: '/guide/portal' },
+      { text: 'mountCallback', link: '/guide/mount-hooks' },
+      { text: 'updateCallback', link: '/guide/update-hooks' },
+      { text: 'mountReadyCallback', link: '/guide/mount-ready-hooks' },
+      { text: 'useRenew', link: '/guide/use-renew-hooks' },
+      { text: 'innerHTML', link: '/guide/inner-html' },
+      { text: 'nextTick', link: '/guide/next-tick' },
+      { text: 'stateless components', link: '/guide/stateless' },
     ],
   },
   {
     title: 'Helper Features',
-    description: '선택적으로 사용할 수 있는 헬퍼 기능',
+    description: 'Optional helper features',
     icon: '🔧',
     theme: {
       gradient:
@@ -94,21 +96,21 @@ const categories: CategoryWithTheme[] = [
       textColor: 'text-purple-900 dark:text-purple-100',
     },
     items: [
-      { text: 'State', link: '/guide/state' },
-      { text: 'Lstate', link: '/guide/lstate' },
-      { text: 'Computed', link: '/guide/computed' },
-      { text: 'Effect', link: '/guide/effect' },
-      { text: 'Store', link: '/guide/store' },
-      { text: 'Lstore', link: '/guide/lstore' },
-      { text: 'Context', link: '/guide/context' },
-      { text: 'LContext', link: '/guide/lcontext' },
-      { text: 'CacheUpdate', link: '/guide/cache-update' },
-      { text: 'State-Ref', link: '/guide/state-ref' },
+      { text: 'state', link: '/guide/state' },
+      { text: 'lstate', link: '/guide/lstate' },
+      { text: 'computed', link: '/guide/computed' },
+      { text: 'effect', link: '/guide/effect' },
+      { text: 'store', link: '/guide/store' },
+      { text: 'lstore', link: '/guide/lstore' },
+      { text: 'context', link: '/guide/context' },
+      { text: 'lcontext', link: '/guide/lcontext' },
+      { text: 'cacheUpdate', link: '/guide/cache-update' },
+      { text: 'stateRef', link: '/guide/state-ref' },
     ],
   },
   {
     title: 'JSX & Templates',
-    description: '다양한 템플릿 방식 지원',
+    description: 'Support for various template syntaxes',
     icon: '📝',
     theme: {
       gradient:
@@ -131,104 +133,105 @@ const categories: CategoryWithTheme[] = [
 
 const examples: ExampleItem[] = [
   {
-    text: 'Computed (커피 주문 계산기)',
+    text: 'Computed (Coffee Order Calculator)',
     link: '/examples/1',
-    description: 'computed로 여러 state에서 자동 계산되는 파생 값 관리',
+    description:
+      'Manage derived values automatically calculated from multiple states using computed',
   },
   {
     text: 'Shared Store (helper)',
     link: '/examples/2',
-    description: '전역 store로 여러 컴포넌트 간 상태 공유',
+    description: 'Share state across multiple components with a global store',
   },
   {
     text: 'Render Props (Mouse tracker)',
     link: '/examples/3',
-    description: 'render props 패턴으로 재사용 가능한 로직 구현',
+    description: 'Implement reusable logic with the render props pattern',
   },
   {
     text: 'Effect Lifecycle (helper)',
     link: '/examples/4',
-    description: 'effect로 상태 변경 시 사이드 이펙트 실행',
+    description: 'Execute side effects when state changes using effect',
   },
   {
     text: 'Nested Fragments (Notifications)',
     link: '/examples/5',
-    description: '중첩된 Fragment로 복잡한 DOM 구조 관리',
+    description: 'Manage complex DOM structures with nested Fragments',
   },
   {
     text: 'Key-based Lists (Playlist)',
     link: '/examples/6',
-    description: 'key 기반 리스트 렌더링으로 효율적인 업데이트',
+    description: 'Efficient updates with key-based list rendering',
   },
   {
     text: 'innerHTML (Markdown Editor)',
     link: '/examples/7',
-    description: 'innerHTML로 동적 HTML 콘텐츠 렌더링',
+    description: 'Render dynamic HTML content with innerHTML',
   },
   {
     text: 'Select Controls (Character)',
     link: '/examples/8',
-    description: 'select 입력 제어와 상태 동기화',
+    description: 'Control select inputs and synchronize state',
   },
   {
     text: 'Input Controls (Business Card)',
     link: '/examples/9',
-    description: 'input 필드 제어와 양방향 데이터 바인딩',
+    description: 'Control input fields with two-way data binding',
   },
   {
     text: 'Checkbox & Radio (Pizza Builder)',
     link: '/examples/10',
-    description: 'checkbox와 radio 입력 제어',
+    description: 'Control checkbox and radio inputs',
   },
   {
     text: 'Context (Theme & User)',
     link: '/examples/11',
-    description: 'Context로 user/theme/accent를 트리 전체에서 공유',
+    description: 'Share user/theme/accent across the entire tree with Context',
   },
   {
     text: 'Mixed DOM (Social Timeline)',
     link: '/examples/12',
-    description: '가상 DOM과 실제 DOM을 혼합 사용',
+    description: 'Mix virtual DOM with real DOM',
   },
   {
     text: 'Mixed DOM + Loop (Waitlist)',
     link: '/examples/13',
-    description: '반복문과 혼합 DOM 패턴 활용',
+    description: 'Utilize loops with mixed DOM patterns',
   },
   {
     text: 'Nested Unmount (Game Inventory)',
     link: '/examples/14',
-    description: '중첩된 컴포넌트의 unmount 생명주기 관리',
+    description: 'Manage unmount lifecycle of nested components',
   },
   {
     text: 'Nested Props (Volume Controller)',
     link: '/examples/15',
-    description: '중첩 컴포넌트에 props 전달',
+    description: 'Pass props to nested components',
   },
   {
     text: 'insertBefore + Destroy (Music Library)',
     link: '/examples/16',
-    description: 'DOM 삽입 위치 제어와 컴포넌트 제거',
+    description: 'Control DOM insertion position and component removal',
   },
   {
     text: 'SVG Rendering (Traffic Light)',
     link: '/examples/17',
-    description: 'SVG 요소 동적 렌더링',
+    description: 'Dynamic SVG element rendering',
   },
   {
     text: 'CacheUpdate (Product Filter)',
     link: '/examples/18',
-    description: 'cacheUpdate로 여러 상태 변경을 한 번에 반영',
+    description: 'Apply multiple state changes at once with cacheUpdate',
   },
   {
     text: 'FTags CDN (Smart Todo List)',
     link: '/examples/19',
-    description: 'FTags로 빌드 없이 CDN만으로 앱 구현',
+    description: 'Build apps with FTags using only CDN without build tools',
   },
   {
-    text: 'Portal (이미지 라이트박스)',
+    text: 'Portal (Image Lightbox)',
     link: '/examples/20',
-    description: 'portal로 다른 DOM 위치에 컴포넌트 렌더링',
+    description: 'Render components in a different DOM location with portal',
   },
 ];
 
@@ -243,7 +246,7 @@ export const Home = mount(renew => {
   const toggleExamples = () => {
     examplesExpanded.v = !examplesExpanded.v;
 
-    // 열렸을 때 스크롤
+    // Scroll when expanded
     if (examplesExpanded.v) {
       setTimeout(() => {
         if (examplesSectionRef.value) {
@@ -264,8 +267,8 @@ export const Home = mount(renew => {
           Lithent Documentation
         </h1>
         <p class="text-lg text-gray-600 dark:text-gray-400">
-          친숙한 클로저 패턴을 사용하여 예측 가능하고 가벼운 UI를 만드는
-          JavaScript 라이브러리
+          A JavaScript library for building predictable and lightweight UIs
+          using familiar closure patterns
         </p>
       </div>
 
@@ -325,7 +328,7 @@ export const Home = mount(renew => {
               </h2>
               {!examplesExpanded.v && (
                 <p class="text-sm text-gray-700 dark:text-gray-300">
-                  {examples.length}개의 실용적인 예제를 확인해보세요
+                  Explore {examples.length} practical examples
                 </p>
               )}
             </div>

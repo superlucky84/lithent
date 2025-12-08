@@ -107,7 +107,7 @@ export const Example9 = mount(r => {
   const exportCard = () => {
     const json = JSON.stringify(card.v, null, 2);
     navigator.clipboard.writeText(json);
-    alert('명함 데이터가 클립보드에 복사되었습니다!');
+    alert('Business card data has been copied to the clipboard!');
   };
 
   return () => {
@@ -204,7 +204,7 @@ export const Example9 = mount(r => {
               </div>
             </div>
             <div class="mt-3 text-xs text-gray-500 dark:text-gray-400 text-center">
-              💡 Input fields update the card in real-time
+              💡 Input fields update the card in real time.
             </div>
           </div>
 
@@ -379,10 +379,11 @@ export const Example9 = mount(r => {
 
         <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <p class="text-xs text-blue-800 dark:text-blue-200">
-            💡 <strong>Input 동작 확인:</strong> 각 input 필드에 텍스트를
-            입력하면 onInput 이벤트가 발생하고, Lithent가 변경된 값을 감지하여
-            명함 프리뷰를 실시간으로 업데이트합니다. value 속성을 통해 양방향
-            바인딩이 올바르게 동작하는지 확인해보세요!
+            💡 <strong>Checking input behavior:</strong> when you type into any
+            field, the <code>onInput</code> event fires and Lithent detects the
+            new value, updating the business card preview immediately. Verify
+            that two-way binding via the <code>value</code> attribute works as
+            expected.
           </p>
         </div>
       </div>

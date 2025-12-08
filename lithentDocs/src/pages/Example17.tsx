@@ -6,59 +6,64 @@ export const Example17Page = mount(() => {
   return () => (
     <div>
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-        Example 17: SVG Rendering (Traffic Light)
+        SVG Rendering (Traffic Light)
       </h1>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-6">
-        이 예제는 Lithent가 SVG 요소를 정확하게 렌더링하고, SVG 속성(fill,
-        opacity, stroke 등)을 반응형으로 업데이트할 수 있는지를 테스트합니다.
-        신호등을 통해 SVG의 다양한 기능을 확인할 수 있습니다.
+        This example tests whether Lithent can accurately render SVG elements
+        and reactively update SVG attributes (fill, opacity, stroke, etc.). You
+        can verify various SVG features through the traffic light.
       </p>
 
       <div class="my-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
         <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-          💡 테스트 요점
+          💡 Key Test Points
         </h3>
         <p class="text-sm text-blue-800 dark:text-blue-200">
-          <strong>SVG Rendering</strong>: Lithent가 SVG 요소(rect, circle)를
-          정확히 렌더링하고, 동적 속성 변경(opacity, fill, stroke)이 반응형으로
-          업데이트되는지 확인합니다. 또한 SVG 요소에 조건부 렌더링과 CSS
-          클래스를 적용할 수 있는지 테스트합니다.
+          <strong>SVG Rendering</strong>: Verify that Lithent accurately renders
+          SVG elements (rect, circle) and that dynamic attribute changes
+          (opacity, fill, stroke) update reactively. Also test whether
+          conditional rendering and CSS classes can be applied to SVG elements.
         </p>
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        컴포넌트 구조
+        Component Structure
       </h2>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
-        이 예제는 다음과 같은 요소로 구성되어 있습니다:
+        This example consists of the following elements:
       </p>
 
       <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 mb-6 space-y-2">
         <li>
-          <strong>컨트롤 패널</strong>: Next Light 버튼과 Auto Mode 토글
+          <strong>Control Panel</strong>: Next Light button and Auto Mode toggle
         </li>
         <li>
-          <strong>신호등 SVG</strong>:
+          <strong>Traffic Light SVG</strong>:
           <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
-            <li>외곽 박스 (rect 요소)</li>
-            <li>빨간불 (circle, cy=85)</li>
-            <li>노란불 (circle, cy=200)</li>
-            <li>초록불 (circle, cy=315)</li>
-            <li>켜진 신호의 glow 효과 (조건부 렌더링된 circle with stroke)</li>
+            <li>Frame box (rect element)</li>
+            <li>Red light (circle, cy=85)</li>
+            <li>Yellow light (circle, cy=200)</li>
+            <li>Green light (circle, cy=315)</li>
+            <li>
+              Glow effect on active light (conditionally rendered circle with
+              stroke)
+            </li>
           </ul>
         </li>
         <li>
-          <strong>현재 상태 표시</strong>: 실시간으로 켜진 신호 정보 표시
+          <strong>Current Status Display</strong>: Real-time display of active
+          light information
         </li>
         <li>
-          <strong>사용된 SVG 요소 설명</strong>: 각 SVG 요소와 속성 설명
+          <strong>SVG Elements Description</strong>: Explanation of each SVG
+          element and attribute
         </li>
       </ol>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        코드 예제
+        Code Example
       </h2>
 
       <CodeBlock
@@ -99,7 +104,7 @@ const TrafficLight = mount(renew => {
 
   return () => (
     <div>
-      {/* 컨트롤 패널 */}
+      {/* Control Panel */}
       <button onClick={nextLight} disabled={autoMode.v}>
         Next Light
       </button>
@@ -107,14 +112,14 @@ const TrafficLight = mount(renew => {
         {autoMode.v ? 'Stop Auto' : 'Auto Mode'}
       </button>
 
-      {/* 신호등 SVG */}
+      {/* Traffic Light SVG */}
       <svg
         width="200"
         height="400"
         viewBox="0 0 200 400"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* 외곽 박스 */}
+        {/* Frame box */}
         <rect
           x="25"
           y="25"
@@ -124,7 +129,7 @@ const TrafficLight = mount(renew => {
           fill="#1F2937"
         />
 
-        {/* 빨간불 */}
+        {/* Red light */}
         <circle
           cx="100"
           cy="85"
@@ -145,7 +150,7 @@ const TrafficLight = mount(renew => {
           />
         )}
 
-        {/* 노란불 */}
+        {/* Yellow light */}
         <circle
           cx="100"
           cy="200"
@@ -154,7 +159,7 @@ const TrafficLight = mount(renew => {
           opacity={getLightOpacity('yellow')}
         />
 
-        {/* 초록불 */}
+        {/* Green light */}
         <circle
           cx="100"
           cy="315"
@@ -170,103 +175,108 @@ const TrafficLight = mount(renew => {
       />
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        SVG 요소와 속성
+        SVG Elements and Attributes
       </h2>
 
       <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-6">
         <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">
-          사용된 SVG 요소
+          SVG Elements Used
         </h3>
         <ul class="list-disc list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
           <li>
             <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               &lt;svg&gt;
             </code>
-            : SVG 컨테이너 (width, height, viewBox, <strong>xmlns</strong> 속성)
+            : SVG container (width, height, viewBox, <strong>xmlns</strong>{' '}
+            attribute)
             <div class="ml-6 mt-1 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
-              <strong class="text-red-700 dark:text-red-300">⚠️ 중요:</strong>{' '}
+              <strong class="text-red-700 dark:text-red-300">
+                ⚠️ Important:
+              </strong>{' '}
               <code class="px-1 py-0.5 bg-red-100 dark:bg-red-900 rounded text-xs">
                 xmlns="http://www.w3.org/2000/svg"
               </code>{' '}
-              속성이 <strong>반드시 필요합니다</strong>. 이 속성이 없으면
-              브라우저가 SVG를 올바르게 렌더링하지 못합니다.
+              attribute is <strong>required</strong>. Without this attribute,
+              the browser cannot render SVG correctly.
             </div>
           </li>
           <li>
             <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               &lt;rect&gt;
             </code>
-            : 사각형 요소 (x, y, width, height, rx for rounded corners)
+            : Rectangle element (x, y, width, height, rx for rounded corners)
           </li>
           <li>
             <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               &lt;circle&gt;
             </code>
-            : 원 요소 (cx, cy for center position, r for radius)
+            : Circle element (cx, cy for center position, r for radius)
           </li>
         </ul>
 
         <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3 mt-4">
-          동적으로 업데이트되는 속성
+          Dynamically Updated Attributes
         </h3>
         <ul class="list-disc list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
           <li>
             <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               opacity
             </code>
-            : 현재 켜진 신호는 1.0, 나머지는 0.2
+            : Current active light is 1.0, others are 0.2
           </li>
           <li>
             <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               fill
             </code>
-            : 요소의 채우기 색상 (빨강: #EF4444, 노랑: #FBBF24, 초록: #10B981)
+            : Fill color of element (Red: #EF4444, Yellow: #FBBF24, Green:
+            #10B981)
           </li>
           <li>
             <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               stroke
             </code>
-            : 외곽선 색상 (glow 효과용)
+            : Outline color (for glow effect)
           </li>
           <li>
             <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               stroke-width
             </code>
-            : 외곽선 두께
+            : Outline thickness
           </li>
         </ul>
       </div>
 
       <div class="my-8 p-4 bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 rounded">
         <h3 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
-          🎯 핵심 개념
+          🎯 Key Concepts
         </h3>
         <ul class="text-sm text-purple-800 dark:text-purple-200 space-y-2">
           <li>
-            <strong>SVG in JSX:</strong> Lithent는 SVG 요소를 JSX 문법으로
-            자연스럽게 작성할 수 있습니다.
+            <strong>SVG in JSX:</strong> Lithent allows writing SVG elements
+            naturally in JSX syntax.
           </li>
           <li>
-            <strong>반응형 SVG 속성:</strong> opacity, fill, stroke 등의 속성이
-            state 변경에 따라 자동으로 업데이트됩니다.
+            <strong>Reactive SVG Attributes:</strong> Attributes like opacity,
+            fill, stroke automatically update when state changes.
           </li>
           <li>
-            <strong>조건부 SVG 렌더링:</strong> 켜진 신호에만 glow 효과(외곽
-            circle)가 조건부로 렌더링됩니다.
+            <strong>Conditional SVG Rendering:</strong> Glow effect (outer
+            circle) is conditionally rendered only on the active light.
           </li>
           <li>
-            <strong>CSS 클래스 적용:</strong> SVG 요소에 Tailwind CSS 클래스
-            (animate-pulse, transition-opacity)를 적용할 수 있습니다.
+            <strong>CSS Class Application:</strong> Tailwind CSS classes
+            (animate-pulse, transition-opacity) can be applied to SVG elements.
           </li>
           <li>
-            <strong>타이머 관리:</strong> setInterval로 자동 모드를 구현하고,
-            컴포넌트 상태에 따라 clearInterval로 정리합니다.
+            <strong>Timer Management:</strong> Auto mode is implemented with
+            setInterval and cleaned up with clearInterval based on component
+            state.
           </li>
         </ul>
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        실행 예제
+        Live Example
       </h2>
 
       <div class="my-8">
@@ -274,110 +284,116 @@ const TrafficLight = mount(renew => {
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        테스트 시나리오
+        Test Scenarios
       </h2>
 
       <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          1️⃣ 수동 신호 전환
+          1️⃣ Manual Light Switching
         </h3>
         <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
-          <li>"Next Light" 버튼을 클릭하여 신호 전환</li>
-          <li>신호가 빨강 → 노랑 → 초록 → 빨강 순서로 순환하는지 확인</li>
+          <li>Click "Next Light" button to switch lights</li>
+          <li>Verify that lights cycle through Red → Yellow → Green → Red</li>
           <li>
-            현재 켜진 신호만 밝게 표시되고 나머지는 어둡게 표시되는지 확인
+            Verify that only the current active light is bright and others are
+            dim
           </li>
-          <li>켜진 신호에 외곽선 glow 효과(animate-pulse)가 나타나는지 확인</li>
+          <li>
+            Verify that outline glow effect (animate-pulse) appears on active
+            light
+          </li>
         </ol>
 
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          2️⃣ 자동 모드 테스트
+          2️⃣ Auto Mode Test
         </h3>
         <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
-          <li>"Auto Mode" 버튼 클릭</li>
-          <li>2초마다 자동으로 신호가 전환되는지 확인</li>
-          <li>"Next Light" 버튼이 비활성화되는지 확인</li>
-          <li>"Stop Auto" 버튼을 눌러 자동 모드를 종료하는지 확인</li>
+          <li>Click "Auto Mode" button</li>
+          <li>Verify that lights automatically switch every 2 seconds</li>
+          <li>Verify that "Next Light" button is disabled</li>
+          <li>Verify that "Stop Auto" button stops auto mode</li>
         </ol>
 
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          3️⃣ SVG 렌더링 확인
+          3️⃣ SVG Rendering Verification
         </h3>
         <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2">
-          <li>신호등의 외곽 박스(rect)가 둥근 모서리로 표시되는지 확인</li>
-          <li>3개의 원(circle)이 정확한 위치에 렌더링되는지 확인</li>
-          <li>opacity 전환 시 부드러운 transition 효과가 적용되는지 확인</li>
+          <li>Verify that traffic light frame (rect) has rounded corners</li>
+          <li>Verify that 3 circles are rendered at correct positions</li>
           <li>
-            브라우저 개발자 도구로 SVG 요소가 올바른 속성값을 가지는지 확인
+            Verify that smooth transition effect is applied during opacity
+            changes
+          </li>
+          <li>
+            Use browser dev tools to verify SVG elements have correct attribute
+            values
           </li>
         </ol>
       </div>
 
       <div class="my-8 p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded">
         <h3 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
-          🌟 실전 활용 사례
+          🌟 Practical Use Cases
         </h3>
         <p class="text-sm text-green-700 dark:text-green-300 mb-2">
-          SVG를 사용한 동적 UI 요소는 다음과 같은 경우에 유용합니다:
+          Dynamic UI elements using SVG are useful in the following cases:
         </p>
         <ul class="text-sm text-green-700 dark:text-green-300 space-y-1 ml-4">
           <li>
-            • <strong>아이콘 시스템</strong>: 상태에 따라 색상과 스타일이 변하는
-            동적 아이콘
+            • <strong>Icon Systems</strong>: Dynamic icons that change color and
+            style based on state
           </li>
           <li>
-            • <strong>데이터 시각화</strong>: 실시간으로 업데이트되는 차트와
-            그래프
+            • <strong>Data Visualization</strong>: Charts and graphs that update
+            in real-time
           </li>
           <li>
-            • <strong>애니메이션</strong>: CSS transition과 결합한 부드러운 SVG
-            애니메이션
+            • <strong>Animations</strong>: Smooth SVG animations combined with
+            CSS transitions
           </li>
           <li>
-            • <strong>UI 컴포넌트</strong>: 프로그레스 바, 로딩 스피너, 상태
-            표시기 등
+            • <strong>UI Components</strong>: Progress bars, loading spinners,
+            status indicators, etc.
           </li>
           <li>
-            • <strong>인터랙티브 다이어그램</strong>: 클릭/호버 시 변하는
-            다이어그램이나 플로우차트
+            • <strong>Interactive Diagrams</strong>: Diagrams or flowcharts that
+            change on click/hover
           </li>
         </ul>
       </div>
 
       <div class="my-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded">
         <h3 class="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
-          ⚠️ 주의사항
+          ⚠️ Cautions
         </h3>
         <ul class="text-sm text-yellow-800 dark:text-yellow-200 space-y-2">
           <li>
             <strong class="text-red-700 dark:text-red-300">
-              xmlns 속성 필수:
+              xmlns attribute required:
             </strong>{' '}
             <code class="px-1.5 py-0.5 bg-yellow-200 dark:bg-yellow-900 rounded text-xs font-mono">
               xmlns="http://www.w3.org/2000/svg"
             </code>{' '}
-            속성이 반드시 있어야 SVG가 올바르게 렌더링됩니다. 이 속성이 없으면
-            브라우저가 SVG 요소를 일반 HTML 요소로 인식하여 제대로 표시되지
-            않습니다.
+            attribute is required for SVG to render correctly. Without this
+            attribute, browsers treat SVG elements as regular HTML elements and
+            they won't display properly.
           </li>
           <li>
-            <strong>속성 이름:</strong> SVG 속성은 kebab-case를 사용합니다
-            (stroke-width, fill-rule 등)
+            <strong>Attribute Names:</strong> SVG attributes use kebab-case
+            (stroke-width, fill-rule, etc.)
           </li>
           <li>
-            <strong>타이머 정리:</strong> setInterval을 사용할 때는 컴포넌트
-            언마운트 시 clearInterval로 정리해야 메모리 누수를 방지할 수
-            있습니다
+            <strong>Timer Cleanup:</strong> When using setInterval, clean it up
+            with clearInterval on component unmount to prevent memory leaks
           </li>
           <li>
-            <strong>viewBox:</strong> viewBox를 사용하면 SVG가 반응형으로
-            스케일됩니다
+            <strong>viewBox:</strong> Using viewBox makes SVG scale responsively
           </li>
         </ul>
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        관련 가이드
+        Related Guides
       </h2>
 
       <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 mb-6 space-y-2">
@@ -391,9 +407,9 @@ const TrafficLight = mount(renew => {
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            State 가이드
+            State Guide
           </a>{' '}
-          - 반응형 상태 관리
+          - Reactive state management
         </li>
         <li>
           <a
@@ -405,9 +421,9 @@ const TrafficLight = mount(renew => {
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Updater 가이드
+            Updater Guide
           </a>{' '}
-          - 컴포넌트 업데이트 메커니즘
+          - Component update mechanism
         </li>
       </ul>
     </div>

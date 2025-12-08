@@ -44,7 +44,7 @@ const newPosts: Post[] = [
   },
 ];
 
-// 동적 포스트 컴포넌트 (가상 DOM)
+// Dynamic posts component (virtual DOM)
 const DynamicPosts = mount(r => {
   const visiblePosts = state<boolean[]>([true, true, true], r);
 
@@ -62,11 +62,11 @@ const DynamicPosts = mount(r => {
 
   return () => (
     <Fragment>
-      {/* 컨트롤 패널 */}
+      {/* Control panel */}
       <div class="sticky top-0 z-10 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-3 mb-3">
         <div class="flex items-center gap-2 mb-2">
           <span class="text-xs font-semibold text-blue-800 dark:text-blue-200">
-            🔄 실시간 포스트 (가상 DOM)
+            🔄 Live posts (virtual DOM)
           </span>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -116,7 +116,7 @@ const DynamicPosts = mount(r => {
         </div>
       </div>
 
-      {/* 동적 포스트들 */}
+      {/* Dynamic posts */}
       {visiblePosts.v[0] && (
         <article class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-3 border-l-4 border-blue-500 shadow-sm animate-fade-in">
           <div class="flex items-start gap-3">
@@ -130,7 +130,7 @@ const DynamicPosts = mount(r => {
                   · {newPosts[0].time}
                 </span>
                 <span class="px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
-                  가상 DOM
+                  virtual DOM
                 </span>
               </div>
               <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -164,7 +164,7 @@ const DynamicPosts = mount(r => {
                   🔥 Trending
                 </span>
                 <span class="px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
-                  가상 DOM
+                  virtual DOM
                 </span>
               </div>
               <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -195,7 +195,7 @@ const DynamicPosts = mount(r => {
                   · {newPosts[2].time}
                 </span>
                 <span class="px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
-                  가상 DOM
+                  virtual DOM
                 </span>
               </div>
               <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -233,8 +233,8 @@ export const Example12 = mount(() => {
           📱 Social Media Timeline
         </h3>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          실제 DOM (서버 렌더링)과 가상 DOM (클라이언트 렌더링)이 혼합된
-          타임라인
+          Timeline mixing real DOM (server-rendered) and virtual DOM
+          (client-rendered)
         </p>
       </div>
 
@@ -242,7 +242,7 @@ export const Example12 = mount(() => {
         ref={feedContainer}
         class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 max-h-[600px] overflow-y-auto"
       >
-        {/* 상단 고정 포스트 (실제 DOM - SSR) */}
+        {/* Pinned post at the top (real DOM - SSR) */}
         <article class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 mb-3 border-l-4 border-purple-500 shadow-sm">
           <div class="flex items-start gap-3">
             <div class="text-3xl">📌</div>
@@ -258,7 +258,7 @@ export const Example12 = mount(() => {
                   Pinned
                 </span>
                 <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                  실제 DOM
+                  real DOM
                 </span>
               </div>
               <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -285,7 +285,7 @@ export const Example12 = mount(() => {
                   · 15 min ago
                 </span>
                 <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                  실제 DOM
+                  real DOM
                 </span>
               </div>
               <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -305,7 +305,7 @@ export const Example12 = mount(() => {
           render(<DynamicPosts />, feedContainer, insertionPoint)
         */}
 
-        {/* 하단 광고 포스트 (실제 DOM - 항상 고정) */}
+        {/* Sponsored post at the bottom (real DOM - fixed) */}
         <article
           ref={insertionPoint}
           class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-3 border-l-4 border-green-500 shadow-sm"
@@ -321,7 +321,7 @@ export const Example12 = mount(() => {
                   · Ad
                 </span>
                 <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                  실제 DOM
+                  real DOM
                 </span>
               </div>
               <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -347,7 +347,7 @@ export const Example12 = mount(() => {
                   · 2 hours ago
                 </span>
                 <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                  실제 DOM
+                  real DOM
                 </span>
               </div>
               <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
@@ -365,11 +365,11 @@ export const Example12 = mount(() => {
 
       <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <p class="text-xs text-blue-800 dark:text-blue-200">
-          💡 <strong>혼합 DOM 테스트:</strong> 컨트롤 패널의 버튼으로 중간의
-          포스트들을 토글하세요. 실제 DOM 요소(상단 Pinned, 하단 Sponsored,
-          Archive)는 그대로 유지되고, 그 사이에 가상 DOM 포스트들이 동적으로
-          추가/제거됩니다. Lithent가 실제 DOM과 가상 DOM을 올바르게 혼합
-          관리하는지 확인하세요!
+          💡 <strong>Mixed DOM test:</strong> use the control panel buttons to
+          toggle the posts in the middle. The real DOM elements (Pinned at the
+          top, Sponsored and Archive at the bottom) stay in place while virtual
+          DOM posts are dynamically added/removed between them. Verify that
+          Lithent manages the mix of real and virtual DOM correctly.
         </p>
       </div>
 

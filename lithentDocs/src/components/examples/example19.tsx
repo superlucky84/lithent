@@ -266,9 +266,9 @@ const htmlCode = `<!DOCTYPE html>
       };
 
       const categoryLabel = {
-        home: '집안일',
-        work: '회사일',
-        other: '기타'
+        home: 'Home',
+        work: 'Work',
+        other: 'Other'
       };
 
       return () => div(
@@ -283,7 +283,7 @@ const htmlCode = `<!DOCTYPE html>
           { className: 'input-group' },
           input({
             type: 'text',
-            placeholder: '할 일을 입력하세요... (예: 빨래하기, 보고서 작성)',
+            placeholder: 'Enter a task... (e.g., Do laundry, Write report)',
             value: taskText.value,
             onInput: (e) => taskText.value = e.target.value,
             onKeyPress: (e) => e.key === 'Enter' && addTodo()
@@ -293,16 +293,16 @@ const htmlCode = `<!DOCTYPE html>
               value: category.value,
               onChange: (e) => category.value = e.target.value
             },
-            option({ value: 'home' }, '🏠 집안일'),
-            option({ value: 'work' }, '💼 회사일'),
-            option({ value: 'other' }, '📌 기타')
+            option({ value: 'home' }, '🏠 Home'),
+            option({ value: 'work' }, '💼 Work'),
+            option({ value: 'other' }, '📌 Other')
           ),
           button(
             {
               className: 'btn-add',
               onClick: addTodo
             },
-            '+ 추가'
+            '+ Add'
           )
         ),
 
@@ -311,17 +311,17 @@ const htmlCode = `<!DOCTYPE html>
           { className: 'summary' },
           div(
             { className: 'summary-card total' },
-            div({ className: 'summary-label' }, '📋 전체'),
+            div({ className: 'summary-label' }, '📋 Total'),
             div({ className: 'summary-amount' }, totalCount.value)
           ),
           div(
             { className: 'summary-card completed' },
-            div({ className: 'summary-label' }, '✅ 완료'),
+            div({ className: 'summary-label' }, '✅ Completed'),
             div({ className: 'summary-amount' }, completedCount.value)
           ),
           div(
             { className: 'summary-card pending' },
-            div({ className: 'summary-label' }, '⏳ 진행중'),
+            div({ className: 'summary-label' }, '⏳ Pending'),
             div({ className: 'summary-amount' }, pendingCount.value)
           )
         ),
@@ -334,42 +334,42 @@ const htmlCode = `<!DOCTYPE html>
               className: \`filter-btn \${filter.value === 'all' ? 'active' : ''}\`,
               onClick: () => filter.value = 'all'
             },
-            \`전체 (\${todos.value.length})\`
+            \`All (\${todos.value.length})\`
           ),
           button(
             {
               className: \`filter-btn \${filter.value === 'completed' ? 'active' : ''}\`,
               onClick: () => filter.value = 'completed'
             },
-            \`완료 (\${completedCount.value})\`
+            \`Completed (\${completedCount.value})\`
           ),
           button(
             {
               className: \`filter-btn \${filter.value === 'pending' ? 'active' : ''}\`,
               onClick: () => filter.value = 'pending'
             },
-            \`진행중 (\${pendingCount.value})\`
+            \`Pending (\${pendingCount.value})\`
           ),
           button(
             {
               className: \`filter-btn \${filter.value === 'home' ? 'active' : ''}\`,
               onClick: () => filter.value = 'home'
             },
-            \`🏠 집안일 (\${todos.value.filter(t => t.category === 'home').length})\`
+            \`🏠 Home (\${todos.value.filter(t => t.category === 'home').length})\`
           ),
           button(
             {
               className: \`filter-btn \${filter.value === 'work' ? 'active' : ''}\`,
               onClick: () => filter.value = 'work'
             },
-            \`💼 회사일 (\${todos.value.filter(t => t.category === 'work').length})\`
+            \`💼 Work (\${todos.value.filter(t => t.category === 'work').length})\`
           ),
           button(
             {
               className: \`filter-btn \${filter.value === 'other' ? 'active' : ''}\`,
               onClick: () => filter.value = 'other'
             },
-            \`📌 기타 (\${todos.value.filter(t => t.category === 'other').length})\`
+            \`📌 Other (\${todos.value.filter(t => t.category === 'other').length})\`
           )
         ),
 
@@ -381,16 +381,16 @@ const htmlCode = `<!DOCTYPE html>
               p(
                 { style: { fontSize: '16px', fontWeight: '600' } },
                 filter.value === 'all'
-                  ? '아직 할 일이 없습니다'
+                  ? 'No tasks yet'
                   : filter.value === 'completed'
-                  ? '완료된 할 일이 없습니다'
+                  ? 'No completed tasks'
                   : filter.value === 'pending'
-                  ? '진행중인 할 일이 없습니다'
-                  : \`\${categoryLabel[filter.value]} 할 일이 없습니다\`
+                  ? 'No pending tasks'
+                  : \`No \${categoryLabel[filter.value]} tasks\`
               ),
               p(
                 { style: { fontSize: '14px', marginTop: '10px' } },
-                '위에서 새로운 할 일을 추가해보세요!'
+                'Add a new task above!'
               )
             )
           : ul(
@@ -446,140 +446,152 @@ export const Example19 = mount(() => {
           ✅ Smart Todo List with FTags
         </h3>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          빌드 도구 없이 CDN만으로 작동하는 완전한 예제 - 복사해서 HTML 파일로
-          저장하고 브라우저에서 바로 실행하세요!
+          A complete example that works with CDN only, no build tools - Copy and
+          save as an HTML file and run it directly in your browser!
         </p>
       </div>
 
       <div class="my-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
         <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-          💡 사용 방법
+          💡 How to Use
         </h3>
         <ol class="text-sm text-blue-800 dark:text-blue-200 space-y-2 ml-4">
-          <li>1. 아래 코드를 전체 선택하여 복사합니다</li>
+          <li>1. Select and copy the entire code below</li>
           <li>
-            2.{' '}
+            2. Create a{' '}
             <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded">
               smart-todo.html
             </code>{' '}
-            파일을 생성합니다
+            file
           </li>
-          <li>3. 복사한 코드를 붙여넣고 저장합니다</li>
-          <li>4. 브라우저에서 파일을 열면 바로 작동합니다!</li>
+          <li>3. Paste the copied code and save</li>
+          <li>4. Open the file in your browser and it works immediately!</li>
         </ol>
       </div>
 
       <div class="my-8 p-4 bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 rounded">
         <h3 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
-          🎯 예제 특징
+          🎯 Example Features
         </h3>
         <ul class="text-sm text-purple-800 dark:text-purple-200 space-y-2">
           <li>
-            <strong>제로 설정:</strong> NPM, Webpack, Babel 등 빌드 도구 불필요
+            <strong>Zero Configuration:</strong> No build tools required like
+            NPM, Webpack, Babel, etc.
           </li>
           <li>
-            <strong>CDN 로딩:</strong> Lithent, FTags, Helper를 CDN에서 직접
-            로드
+            <strong>CDN Loading:</strong> Load Lithent, FTags, and Helper
+            directly from CDN
           </li>
           <li>
-            <strong>반응형 상태:</strong> lstate와 computed를 활용한 자동
-            업데이트
+            <strong>Reactive State:</strong> Automatic updates using lstate and
+            computed
           </li>
           <li>
-            <strong>카테고리 관리:</strong> 집안일, 회사일, 기타로 할 일 분류
+            <strong>Category Management:</strong> Categorize tasks into Home,
+            Work, and Other
           </li>
           <li>
-            <strong>다중 필터:</strong> 전체, 완료, 진행중, 카테고리별 필터링
+            <strong>Multiple Filters:</strong> Filter by All, Completed,
+            Pending, and category
           </li>
           <li>
-            <strong>체크박스 완료:</strong> 클릭으로 완료/미완료 토글
+            <strong>Checkbox Completion:</strong> Toggle complete/incomplete
+            with clicks
           </li>
           <li>
-            <strong>아름다운 UI:</strong> 그라데이션과 애니메이션이 포함된 모던
-            디자인
+            <strong>Beautiful UI:</strong> Modern design with gradients and
+            animations
           </li>
         </ul>
       </div>
 
       <div class="my-8">
         <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3">
-          📋 완전한 HTML 파일
+          📋 Complete HTML File
         </h4>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-          아래 코드를 복사해서 .html 파일로 저장하고 브라우저에서 열어보세요!
+          Copy the code below, save it as an .html file, and open it in your
+          browser!
         </p>
         <CodeBlock code={htmlCode} language="html" />
       </div>
 
       <div class="my-8 p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded">
         <h3 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
-          ✨ 주요 학습 포인트
+          ✨ Key Learning Points
         </h3>
         <div class="text-sm text-green-800 dark:text-green-200 space-y-3">
           <div>
-            <strong>1. flMount 사용:</strong>
+            <strong>1. Using flMount:</strong>
             <br />
+            Create components with{' '}
             <code class="px-2 py-1 bg-green-200 dark:bg-green-800 rounded">
               flMount
-            </code>
-            로 컴포넌트를 생성하고 JSX 없이 함수 호출로 UI 구성
+            </code>{' '}
+            and compose UI with function calls without JSX
           </div>
           <div>
-            <strong>2. lstate 반응성:</strong>
+            <strong>2. lstate Reactivity:</strong>
             <br />
+            Managing state with{' '}
             <code class="px-2 py-1 bg-green-200 dark:bg-green-800 rounded">
               lstate
-            </code>
-            로 상태를 관리하면 자동으로 UI가 업데이트됨
+            </code>{' '}
+            automatically updates the UI
           </div>
           <div>
-            <strong>3. computed 값:</strong>
+            <strong>3. computed Values:</strong>
             <br />
+            Use{' '}
             <code class="px-2 py-1 bg-green-200 dark:bg-green-800 rounded">
               computed
-            </code>
-            로 파생 상태(전체/완료/진행중 개수)를 자동 계산
+            </code>{' '}
+            to automatically calculate derived state (total/completed/pending
+            counts)
           </div>
           <div>
-            <strong>4. Props 생략:</strong>
+            <strong>4. Omitting Props:</strong>
             <br />
-            fTags는 Props 객체를 생략하고 바로 children을 전달 가능
+            fTags allows omitting the Props object and passing children directly
           </div>
           <div>
-            <strong>5. 조건부 렌더링:</strong>
+            <strong>5. Conditional Rendering:</strong>
             <br />
-            삼항 연산자로 빈 상태와 리스트를 조건부로 렌더링
+            Use ternary operators to conditionally render empty state and lists
           </div>
         </div>
       </div>
 
       <div class="my-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded">
         <h3 class="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
-          🔧 커스터마이징 아이디어
+          🔧 Customization Ideas
         </h3>
         <ul class="text-sm text-yellow-800 dark:text-yellow-200 space-y-2">
           <li>
-            • <strong>LocalStorage 추가:</strong> 브라우저를 닫아도 할 일이
-            유지되도록 개선
+            • <strong>Add LocalStorage:</strong> Persist tasks even after
+            closing the browser
           </li>
           <li>
-            • <strong>우선순위 기능:</strong> 높음/중간/낮음 우선순위 추가
+            • <strong>Priority Feature:</strong> Add High/Medium/Low priority
+            levels
           </li>
           <li>
-            • <strong>마감일 설정:</strong> 각 할 일에 마감일을 추가하고 정렬
+            • <strong>Due Date Settings:</strong> Add due dates to each task and
+            sort accordingly
           </li>
           <li>
-            • <strong>서브태스크:</strong> 큰 작업을 작은 단계로 나누기
+            • <strong>Subtasks:</strong> Break down large tasks into smaller
+            steps
           </li>
           <li>
-            • <strong>검색 기능:</strong> 할 일 제목으로 검색
+            • <strong>Search Feature:</strong> Search tasks by title
           </li>
         </ul>
       </div>
 
       <div class="mt-8 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3">
-          📚 더 알아보기
+          📚 Learn More
         </h4>
         <div class="space-y-2 text-sm">
           <a
@@ -591,7 +603,7 @@ export const Example19 = mount(() => {
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            → FTags 가이드: 전체 API 문서와 더 많은 예제
+            → FTags Guide: Complete API documentation and more examples
           </a>
           <a
             href="/guide/lstate"
@@ -602,7 +614,7 @@ export const Example19 = mount(() => {
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            → Lstate 가이드: 반응형 상태 관리 자세히 알아보기
+            → Lstate Guide: Learn more about reactive state management
           </a>
           <a
             href="/guide/computed"
@@ -613,7 +625,7 @@ export const Example19 = mount(() => {
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            → Computed 가이드: 파생 상태 활용법
+            → Computed Guide: How to use derived state
           </a>
         </div>
       </div>

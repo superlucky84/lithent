@@ -24,7 +24,7 @@ export const Example18 = mount(renew => {
   let rootRenderCount = 0;
   let listRenderCount = 0;
 
-  // 가격 범위가 바뀔 때만 상품 리스트를 다시 만드는 TagFunction
+  // TagFunction that recreates product list only when price range changes
   const CachedProductList = cacheUpdate(
     () => [priceRange.v],
     () => {
@@ -39,7 +39,7 @@ export const Example18 = mount(renew => {
             </h4>
             <div class="flex flex-col items-end gap-1 text-xs">
               <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 rounded text-purple-700 dark:text-purple-300 font-semibold">
-                ProductList 렌더링: {listRenderCount}회
+                ProductList renders: {listRenderCount} times
               </span>
             </div>
           </div>
@@ -105,34 +105,34 @@ export const Example18 = mount(renew => {
             Product Filter Dashboard
           </h3>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            cacheUpdate를 사용해 <strong>가격 범위</strong>가 바뀔 때만 상품
-            리스트를 다시 렌더링합니다. 정렬 보기 모드는 Root UI만 다시 그려지고
-            리스트는 그대로 유지됩니다.
+            Using cacheUpdate, the product list re-renders only when the{' '}
+            <strong>price range</strong> changes. Changing the sort view mode
+            only re-renders the Root UI while keeping the list unchanged.
           </p>
         </div>
 
-        {/* 렌더링 카운터 */}
+        {/* Render Counter */}
         <div class="mb-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
           <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">
-            렌더링 카운터:
+            Render Counter:
           </div>
           <div class="flex gap-3 flex-wrap">
             <span class="px-3 py-1 bg-green-100 dark:bg-green-900 rounded text-green-700 dark:text-green-300 text-sm font-semibold">
-              Root 렌더링: {rootRenderCount}회
+              Root renders: {rootRenderCount} times
             </span>
             <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900 rounded text-purple-700 dark:text-purple-300 text-sm font-semibold">
-              ProductList 렌더링: {listRenderCount}회
+              ProductList renders: {listRenderCount} times
             </span>
           </div>
         </div>
 
-        {/* 필터 컨트롤 */}
+        {/* Filter Controls */}
         <div class="mb-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-4">
-          {/* 가격 범위 슬라이더 */}
+          {/* Price Range Slider */}
           <div>
             <div class="flex items-center justify-between mb-2">
               <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                💰 Price Range (추적됨)
+                💰 Price Range (Tracked)
               </label>
               <span class="text-sm font-bold text-blue-600 dark:text-blue-400">
                 ${priceRange.v}
@@ -153,14 +153,14 @@ export const Example18 = mount(renew => {
               <span>$1500</span>
             </div>
             <div class="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs text-green-700 dark:text-green-300">
-              ✓ 이 값이 변경되면 <strong>ProductList</strong>가 리렌더링됩니다
+              ✓ When this value changes, <strong>ProductList</strong> re-renders
             </div>
           </div>
 
-          {/* 정렬 옵션 (UI 전용 상태) */}
+          {/* Sort Options (UI State Only) */}
           <div>
             <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
-              🔀 Sort View (UI 전용)
+              🔀 Sort View (UI Only)
             </label>
             <div class="flex gap-2 flex-wrap">
               <button
@@ -195,23 +195,23 @@ export const Example18 = mount(renew => {
               </button>
             </div>
             <div class="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-xs text-yellow-700 dark:text-yellow-300">
-              ⚠️ 이 값은 <strong>UI 표시용</strong> 상태입니다. 버튼 스타일과
-              "현재 보기" 텍스트만 바뀌고 ProductList는 다시 렌더링되지
-              않습니다.
+              ⚠️ This value is for <strong>UI display only</strong>. Only the
+              button styles and "Current view" text change, ProductList does not
+              re-render.
             </div>
             <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
-              현재 보기: <strong>{getSortLabel()}</strong>
+              Current view: <strong>{getSortLabel()}</strong>
             </div>
           </div>
         </div>
 
-        {/* 상품 목록 (cacheUpdate로 최적화) */}
+        {/* Product List (Optimized with cacheUpdate) */}
         {productListNode}
 
-        {/* cacheUpdate 설명 */}
+        {/* cacheUpdate Explanation */}
         <div class="mt-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
-            💡 cacheUpdate 동작 방식
+            💡 How cacheUpdate Works
           </h4>
           <div class="text-xs text-blue-700 dark:text-blue-300 space-y-2">
             <div>
@@ -220,15 +220,19 @@ export const Example18 = mount(renew => {
               </code>
             </div>
             <div>
-              첫 번째 인자의 배열 값들을 이전 렌더링과 비교하여, 변경되지 않으면
-              두 번째 인자(updater)의 실행을 스킵합니다.
+              Compares the array values from the first argument with the
+              previous render, and skips execution of the second argument
+              (updater) if unchanged.
             </div>
             <div class="pt-2 border-t border-blue-200 dark:border-blue-700">
-              <strong>이 예제에서:</strong>
+              <strong>In this example:</strong>
               <ul class="list-disc list-inside ml-2 mt-1 space-y-1">
-                <li>priceRange 변경 → ProductList 렌더링 카운터 증가 ✓</li>
                 <li>
-                  sortOption 변경 → Root 렌더링만 증가, ProductList는 그대로 ✗
+                  priceRange changes → ProductList render counter increases ✓
+                </li>
+                <li>
+                  sortOption changes → Only Root renders increase, ProductList
+                  stays unchanged ✗
                 </li>
               </ul>
             </div>

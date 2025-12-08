@@ -54,7 +54,7 @@ const ThemePreview = mount(renew => {
             </span>
           </div>
           <p class="text-xs text-gray-100/80">
-            이 카드와 아래 배지는 모두 같은 Context를 구독하고 있습니다.
+            This card and the badge below both subscribe to the same Context.
           </p>
         </div>
       </div>
@@ -101,7 +101,7 @@ const ContextControls = mount(renew => {
     <div class="space-y-4">
       <div class="space-y-2">
         <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-          사용자 & 테마 변경
+          Change user & theme
         </h4>
         <div class="flex flex-wrap gap-2">
           <button
@@ -109,21 +109,21 @@ const ContextControls = mount(renew => {
             onClick={cycleUser}
             class="px-3 py-1.5 rounded-md text-xs font-medium bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors"
           >
-            사용자 바꾸기
+            Switch user
           </button>
           <button
             type="button"
             onClick={toggleTheme}
             class="px-3 py-1.5 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
-            테마 토글 ({ctx.theme.value === 'light' ? 'Light' : 'Dark'})
+            Toggle theme ({ctx.theme.value === 'light' ? 'Light' : 'Dark'})
           </button>
         </div>
       </div>
 
       <div class="space-y-2">
         <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
-          Accent 색상
+          Accent color
         </h4>
         <div class="flex flex-wrap gap-2">
           {[
@@ -159,19 +159,20 @@ export const Example11 = mount(_renew => {
       <div class="space-y-6">
         <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
           <h3 class="text-sm font-semibold text-emerald-900 dark:text-emerald-100 mb-1">
-            💡 Context Helper 데모
+            💡 Context Helper demo
           </h3>
           <p class="text-xs md:text-sm text-emerald-800 dark:text-emerald-200">
-            여러 컴포넌트가 하나의 Context(AppContext)를{' '}
-            <strong>구독하고 공유</strong>합니다. 위/아래 뷰는 서로 다른
-            컴포넌트지만, 같은 user/theme/accent 값을 실시간으로 참조합니다.
+            Multiple components <strong>subscribe to and share</strong> a single
+            Context (AppContext). The top and bottom views are separate
+            components, but they reference the same user/theme/accent values in
+            real time.
           </p>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3">
           <UserBadge />
           <div class="text-[11px] text-gray-500 dark:text-gray-400">
-            Header, Controls, Preview 모두 같은 Context를 사용합니다.
+            Header, Controls, and Preview all use the same Context instance.
           </div>
         </div>
 

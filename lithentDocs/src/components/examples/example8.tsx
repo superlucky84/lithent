@@ -161,7 +161,7 @@ export const Example8 = mount(r => {
   const exportCharacter = () => {
     const json = JSON.stringify(character.v, null, 2);
     navigator.clipboard.writeText(json);
-    alert('캐릭터 데이터가 클립보드에 복사되었습니다!');
+    alert('Character data has been copied to the clipboard!');
   };
 
   return () => {
@@ -399,10 +399,10 @@ export const Example8 = mount(r => {
 
         <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <p class="text-xs text-blue-800 dark:text-blue-200">
-            💡 <strong>Select 동작 확인:</strong> 각 드롭다운에서 옵션을
-            선택하면 onChange 이벤트가 발생하고, Lithent가 변경된 값을 감지하여
-            캐릭터 프리뷰를 즉시 업데이트합니다. selected 속성이 올바르게
-            동기화되는지 확인해보세요!
+            💡 <strong>Checking select behavior:</strong> when you choose an
+            option in any dropdown, the onChange event fires and Lithent detects
+            the new value, updating the character preview immediately. Make sure
+            the <code>selected</code> attribute stays in sync with the state.
           </p>
         </div>
       </div>

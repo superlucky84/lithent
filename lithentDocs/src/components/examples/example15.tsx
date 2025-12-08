@@ -1,7 +1,7 @@
 import { mount, Fragment } from 'lithent';
 import { state } from 'lithent/helper';
 
-// Depth 3: 이모지로 볼륨 표시
+// Depth 3: Display volume with emoji
 const VolumeEmoji = mount<{ volume: number }>(() => ({ volume }) => {
   const getEmoji = (vol: number) => {
     if (vol === 0) return '🔇';
@@ -20,7 +20,7 @@ const VolumeEmoji = mount<{ volume: number }>(() => ({ volume }) => {
   );
 });
 
-// Depth 2: 프로그레스 바로 볼륨 표시
+// Depth 2: Display volume with progress bar
 const VolumeBar = mount<{ volume: number }>(() => ({ volume }) => {
   return (
     <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
@@ -43,7 +43,7 @@ const VolumeBar = mount<{ volume: number }>(() => ({ volume }) => {
   );
 });
 
-// Depth 1: 숫자로 볼륨 표시
+// Depth 1: Display volume with number
 const VolumeDisplay = mount<{ volume: number }>(() => ({ volume }) => {
   return (
     <Fragment>
@@ -56,7 +56,7 @@ const VolumeDisplay = mount<{ volume: number }>(() => ({ volume }) => {
             {volume}
           </div>
           <div class="text-sm text-green-600 dark:text-green-400 mt-1">
-            볼륨 레벨
+            Volume Level
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@ const VolumeDisplay = mount<{ volume: number }>(() => ({ volume }) => {
   );
 });
 
-// Root: 볼륨 상태 관리
+// Root: Volume state management
 export const Example15 = mount(renew => {
   const volume = state(50, renew);
 
@@ -89,18 +89,18 @@ export const Example15 = mount(renew => {
       <div class="mb-6">
         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
           <span class="text-2xl">🔊</span>
-          볼륨 컨트롤러
+          Volume Controller
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          Root에서 관리하는{' '}
+          Verify that the{' '}
           <code class="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
             volume
           </code>{' '}
-          값이 3단계 중첩 컴포넌트에 전달되는 것을 확인하세요
+          value managed in Root is passed to 3 nested components
         </p>
       </div>
 
-      {/* 컨트롤 패널 */}
+      {/* Control Panel */}
       <div class="mb-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
         <div class="flex items-center gap-3 mb-3">
           <button
@@ -127,19 +127,19 @@ export const Example15 = mount(renew => {
           </button>
         </div>
         <div class="text-center text-xs text-gray-600 dark:text-gray-400">
-          Root 컴포넌트 (state 관리)
+          Root Component (state management)
         </div>
       </div>
 
-      {/* 중첩된 컴포넌트들 */}
+      {/* Nested Components */}
       <div class="bg-white dark:bg-gray-900 rounded-lg p-6 border-2 border-gray-300 dark:border-gray-700">
         <VolumeDisplay volume={volume.v} />
       </div>
 
-      {/* Props 전달 흐름 */}
+      {/* Props Flow */}
       <div class="mt-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
-          💡 Props 전달 흐름
+          💡 Props Flow
         </h4>
         <div class="text-xs font-mono text-blue-700 dark:text-blue-300 space-y-1">
           <div class="flex items-center gap-2">
@@ -174,23 +174,23 @@ export const Example15 = mount(renew => {
 
       <div class="mt-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
         <h4 class="text-sm font-semibold text-green-800 dark:text-green-200 mb-2">
-          🎯 테스트 요점
+          🎯 Key Points
         </h4>
         <ul class="text-xs text-green-700 dark:text-green-300 space-y-1">
           <li>
-            • 슬라이더나 버튼으로 <strong>volume</strong>을 변경하세요
+            • Change <strong>volume</strong> with the slider or buttons
           </li>
           <li>
-            • 3개의 컴포넌트가 모두 <strong>동시에 업데이트</strong>되는 것을
-            확인하세요
+            • Verify that all 3 components{' '}
+            <strong>update simultaneously</strong>
           </li>
           <li>
-            • 각 컴포넌트는 <strong>같은 값을 다른 방식</strong>으로 표현합니다
-            (숫자 / 바 / 이모지)
+            • Each component expresses the{' '}
+            <strong>same value in different ways</strong> (number / bar / emoji)
           </li>
           <li>
-            • Fragment를 사용하여 <strong>불필요한 DOM 래퍼 없이</strong>{' '}
-            구성됩니다
+            • Composed <strong>without unnecessary DOM wrappers</strong> using
+            Fragment
           </li>
         </ul>
       </div>

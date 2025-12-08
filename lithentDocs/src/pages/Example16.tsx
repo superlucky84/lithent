@@ -2,15 +2,15 @@ import { mount } from 'lithent';
 import { Example16 } from '@/components/examples/example16';
 import { CodeBlock } from '@/components/CodeBlock';
 
-const ssrHtmlCode = `<!-- 서버에서 렌더링된 초기 HTML (실제 DOM) -->
+const ssrHtmlCode = `<!-- Initial HTML rendered from server (Real DOM) -->
 <div id="music-library">
-  <!-- 상단: 실제 DOM -->
-  <div>🔔 System Sounds (실제 DOM)</div>
+  <!-- Top: Real DOM -->
+  <div>🔔 System Sounds (Real DOM)</div>
 
-  <!-- 중간: 여기 사이에 가상 DOM 플레이리스트가 삽입됩니다 -->
+  <!-- Middle: Virtual DOM playlist will be inserted between here -->
 
-  <!-- 하단: 실제 DOM (삽입 기준점) -->
-  <div id="downloaded-music">💾 Downloaded Music (실제 DOM)</div>
+  <!-- Bottom: Real DOM (insertion point) -->
+  <div id="downloaded-music">💾 Downloaded Music (Real DOM)</div>
 </div>`;
 
 const clientCode = `import { Fragment, render } from 'lithent';
@@ -23,7 +23,7 @@ interface Song {
   artist: string;
 }
 
-// 동적 플레이리스트 컴포넌트 (가상 DOM)
+// Dynamic Playlist Component (Virtual DOM)
 const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
   const currentIndex = state(0, renew);
 
@@ -37,7 +37,7 @@ const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
 
   return () => (
     <Fragment>
-      <div>Current Playlist (가상 DOM)</div>
+      <div>Current Playlist (Virtual DOM)</div>
       <button onClick={playPrev} disabled={currentIndex.v === 0}>
         ⏮ Prev
       </button>
@@ -57,7 +57,7 @@ const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
   );
 });
 
-// 기존 실제 DOM 사이에 가상 DOM(loop)을 삽입하고 destroy로 제거
+// Insert virtual DOM (loop) between existing real DOM elements and remove with destroy
 const playlist: Song[] = [
   { id: 1, emoji: '🎸', title: 'Rock Anthem', artist: 'The Rockers' },
   { id: 2, emoji: '🎹', title: 'Jazz Night', artist: 'Smooth Jazz Band' },
@@ -78,112 +78,115 @@ if (container && insertionPoint) {
   );
 }
 
-// 나중에 필요하면 destroyPlaylist?.() 로 가상 DOM만 제거`;
+// If needed later, call destroyPlaylist?.() to remove only the virtual DOM`;
 
 export const Example16Page = mount(() => {
   return () => (
     <div>
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-        Example 16: insertBefore + Loop + Destroy (Music Library Manager)
+        insertBefore + Loop + Destroy (Music Library Manager)
       </h1>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-6">
-        이 예제는 실제 DOM 요소들 사이에 가상 DOM(loop 포함)이 삽입되고, destroy
-        함수로 제거될 수 있는지를 테스트합니다. 음악 라이브러리 관리자를 통해
-        insertBefore 모드, keyed list 렌더링, 그리고 destroy 기능을 모두 확인할
-        수 있습니다.
+        This example tests whether a virtual DOM (including loops) can be
+        inserted between real DOM elements and removed using the destroy
+        function. Through the Music Library Manager, you can verify insertBefore
+        mode, keyed list rendering, and the destroy functionality all at once.
       </p>
 
       <div class="my-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
         <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-          💡 테스트 요점
+          💡 Key Test Points
         </h3>
         <p class="text-sm text-blue-800 dark:text-blue-200">
-          <strong>insertBefore + Loop + Destroy</strong>: render() 함수의 세
-          번째 인자를 사용해 가상 DOM을 실제 DOM 사이에 삽입하고, 반환된 destroy
-          함수로 가상 DOM만 선택적으로 제거할 수 있습니다. 이 예제는 loop
-          렌더링(key 사용)과 destroy 기능이 함께 작동하는 것을 보여줍니다.
+          <strong>insertBefore + Loop + Destroy</strong>: Using the third
+          argument of the render() function, you can insert a virtual DOM
+          between real DOM elements and selectively remove only the virtual DOM
+          using the returned destroy function. This example demonstrates how
+          loop rendering (using keys) and destroy functionality work together.
         </p>
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        컴포넌트 구조
+        Component Structure
       </h2>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
-        이 예제는 다음과 같은 순서로 구성되어 있습니다:
+        This example is structured in the following order:
       </p>
 
       <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 mb-6 space-y-2">
         <li>
-          <strong>Title과 설명</strong>: 예제 제목과 간단한 설명
+          <strong>Title and description</strong>: Example title and brief
+          explanation
         </li>
         <li>
-          <strong>컨트롤 패널</strong>: Clear Playlist/Restore Playlist 버튼과
-          상태 표시 (playlistContainer 밖에 위치)
+          <strong>Control Panel</strong>: Clear Playlist/Restore Playlist
+          buttons and status display (located outside playlistContainer)
         </li>
         <li>
           <strong>Music Library Container (playlistContainer)</strong>:
           <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
             <li>
-              <strong>System Sounds (실제 DOM - 상단)</strong>: 서버에서
-              렌더링되었거나 정적으로 존재하는 콘텐츠
+              <strong>System Sounds (Real DOM - Top)</strong>: Content that is
+              server-rendered or statically exists
             </li>
             <li>
-              <strong>Current Playlist (가상 DOM - 중간)</strong>:
-              mountCallback에서 render()로 삽입되는 동적 플레이리스트 (4개 곡,
-              key 사용)
+              <strong>Current Playlist (Virtual DOM - Middle)</strong>: Dynamic
+              playlist inserted by render() in mountCallback (4 songs, using
+              keys)
             </li>
             <li>
               <strong>
-                Downloaded Music (실제 DOM - 하단, insertionPoint)
+                Downloaded Music (Real DOM - Bottom, insertionPoint)
               </strong>
-              : 가상 DOM이 이 요소 앞에 삽입되는 기준점
+              : Reference point where virtual DOM is inserted before this
+              element
             </li>
           </ul>
         </li>
         <li>
-          <strong>DOM 구조 설명</strong>: 실시간으로 DOM 상태를 보여주는
-          다이어그램
+          <strong>DOM Structure</strong>: Diagram showing DOM state in real-time
         </li>
         <li>
-          <strong>테스트 요점</strong>: 예제의 핵심 개념 설명
+          <strong>Key Test Points</strong>: Explanation of core concepts in the
+          example
         </li>
       </ol>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        코드 예제
+        Code Example
       </h2>
 
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-        1. 서버에서 내려온 초기 HTML (실제 DOM)
+        1. Initial HTML from server (Real DOM)
       </h3>
       <CodeBlock language="html" code={ssrHtmlCode} />
 
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-3">
-        2. 클라이언트에서 실행되는 Lithent 코드 (가상 DOM)
+        2. Lithent code executed on client (Virtual DOM)
       </h3>
       <CodeBlock language="tsx" code={clientCode} />
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        render() 함수의 insertBefore 모드
+        insertBefore Mode of render() Function
       </h2>
 
       <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-6">
         <pre class="text-sm text-gray-700 dark:text-gray-300 font-mono whitespace-pre">
           {`const destroyFn = render(
   <Component />,
-  parentElement,      // 부모 요소
-  beforeElement       // 이 요소 앞에 삽입 (insertBefore)
+  parentElement,      // Parent element
+  beforeElement       // Insert before this element (insertBefore)
 );
 
-// 나중에 가상 DOM 제거
+// Remove virtual DOM later
 destroyFn();`}
         </pre>
       </div>
 
       <p class="text-base text-gray-700 dark:text-gray-300 mb-4">
-        render() 함수의 세 가지 사용 방법:
+        Three ways to use the render() function:
       </p>
 
       <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-6">
@@ -191,48 +194,49 @@ destroyFn();`}
           <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
             render(&lt;C /&gt;, parent)
           </code>{' '}
-          - 부모의 끝에 추가
+          - Append to the end of parent
         </li>
         <li>
           <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
             render(&lt;C /&gt;, parent, next)
           </code>{' '}
-          - next 요소 앞에 삽입
+          - Insert before next element
         </li>
         <li>
           <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
             const destroy = render(...)
           </code>{' '}
-          - destroy 함수로 나중에 제거 가능
+          - Can remove later with destroy function
         </li>
       </ol>
 
       <div class="my-8 p-4 bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 rounded">
         <h3 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
-          🎯 핵심 개념
+          🎯 Key Concepts
         </h3>
         <ul class="text-sm text-purple-800 dark:text-purple-200 space-y-2">
           <li>
-            <strong>insertBefore 모드:</strong> render() 함수의 세 번째 인자로
-            삽입 위치를 정확하게 지정할 수 있습니다.
+            <strong>insertBefore mode:</strong> You can precisely specify the
+            insertion position using the third argument of the render()
+            function.
           </li>
           <li>
-            <strong>Loop with keys:</strong> map()으로 렌더링할 때 key를
-            지정하면 Lithent가 요소를 효율적으로 추적합니다.
+            <strong>Loop with keys:</strong> When rendering with map(),
+            specifying keys allows Lithent to efficiently track elements.
           </li>
           <li>
-            <strong>destroy 함수:</strong> render()가 반환하는 함수를 호출하면
-            해당 가상 DOM만 제거되고 실제 DOM은 영향받지 않습니다.
+            <strong>destroy function:</strong> Calling the function returned by
+            render() removes only the virtual DOM without affecting real DOM.
           </li>
           <li>
-            <strong>재렌더링:</strong> destroy 후에도 같은 위치에 다시
-            render()를 호출할 수 있습니다.
+            <strong>Re-rendering:</strong> Even after destroy, you can call
+            render() again at the same location.
           </li>
         </ul>
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        실행 예제
+        Live Example
       </h2>
 
       <div class="my-8">
@@ -240,111 +244,117 @@ destroyFn();`}
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        테스트 시나리오
+        Test Scenarios
       </h2>
 
       <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 mb-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          1️⃣ 플레이리스트 네비게이션
+          1️⃣ Playlist Navigation
         </h3>
         <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
-          <li>Prev/Next 버튼으로 현재 재생 곡을 변경</li>
+          <li>Change currently playing song with Prev/Next buttons</li>
           <li>
-            현재 재생 중인 곡이 시각적으로 강조(scale-105, 색상 변경)되는지 확인
+            Verify that the currently playing song is visually emphasized
+            (scale-105, color change)
           </li>
           <li>
-            첫 곡에서 Prev 버튼, 마지막 곡에서 Next 버튼이 비활성화되는지 확인
+            Verify that Prev button is disabled on first song and Next button is
+            disabled on last song
           </li>
         </ol>
 
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          2️⃣ Destroy 기능 테스트
+          2️⃣ Destroy Function Test
         </h3>
         <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2 mb-4">
-          <li>"Clear Playlist" 버튼 클릭</li>
+          <li>Click "Clear Playlist" button</li>
           <li>
-            플레이리스트(가상 DOM)만 사라지고 System Sounds와 Downloaded
-            Music(실제 DOM)은 그대로인지 확인
+            Verify that only the playlist (virtual DOM) disappears while System
+            Sounds and Downloaded Music (real DOM) remain
           </li>
-          <li>Status가 "✗ Destroyed"로 변경되는지 확인</li>
-          <li>DOM 구조 섹션에서 "(destroyed)" 표시가 나타나는지 확인</li>
+          <li>Verify that Status changes to "✗ Destroyed"</li>
+          <li>
+            Verify that "(destroyed)" indicator appears in DOM Structure section
+          </li>
         </ol>
 
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          3️⃣ 재렌더링 테스트
+          3️⃣ Re-rendering Test
         </h3>
         <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-2">
-          <li>"Restore Playlist" 버튼 클릭</li>
+          <li>Click "Restore Playlist" button</li>
           <li>
-            플레이리스트가 정확히 같은 위치(실제 DOM 사이)에 다시 나타나는지
-            확인
+            Verify that playlist reappears at exactly the same location (between
+            real DOM)
           </li>
-          <li>Status가 "✓ Active"로 변경되는지 확인</li>
-          <li>Prev/Next 버튼이 다시 작동하는지 확인 (상태가 초기화됨)</li>
+          <li>Verify that Status changes to "✓ Active"</li>
+          <li>Verify that Prev/Next buttons work again (state is reset)</li>
         </ol>
       </div>
 
       <div class="my-8 p-4 bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 rounded">
         <h3 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
-          🌟 실전 활용 사례
+          🌟 Practical Use Cases
         </h3>
         <p class="text-sm text-green-700 dark:text-green-300 mb-2">
-          이 패턴은 다음과 같은 실제 시나리오에서 매우 유용합니다:
+          This pattern is very useful in the following real-world scenarios:
         </p>
         <ul class="text-sm text-green-700 dark:text-green-300 space-y-1 ml-4">
           <li>
-            • <strong>필터링 가능한 리스트</strong>: 고정 헤더/푸터 사이에 동적
-            필터링되는 아이템 리스트
+            • <strong>Filterable Lists</strong>: Dynamically filtered item lists
+            between fixed header/footer
           </li>
           <li>
-            • <strong>모달/오버레이</strong>: 페이지의 특정 위치에 동적 콘텐츠를
-            삽입하고 제거
+            • <strong>Modal/Overlay</strong>: Inserting and removing dynamic
+            content at specific page locations
           </li>
           <li>
-            • <strong>Progressive Enhancement</strong>: 서버 렌더링된 페이지에
-            클라이언트 측 인터랙티브 요소 추가
+            • <strong>Progressive Enhancement</strong>: Adding client-side
+            interactive elements to server-rendered pages
           </li>
           <li>
-            • <strong>위젯 시스템</strong>: 기존 페이지의 특정 위치에 동적 위젯
-            삽입/제거
+            • <strong>Widget System</strong>: Inserting/removing dynamic widgets
+            at specific locations in existing pages
           </li>
           <li>
-            • <strong>A/B 테스팅</strong>: 페이지의 특정 섹션만 동적으로 교체
+            • <strong>A/B Testing</strong>: Dynamically replacing only specific
+            sections of a page
           </li>
         </ul>
       </div>
 
       <div class="my-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded">
         <h3 class="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
-          ⚠️ 주의사항
+          ⚠️ Cautions
         </h3>
         <ul class="text-sm text-yellow-800 dark:text-yellow-200 space-y-2">
           <li>
-            <strong>insertBefore 요소 확인:</strong> 세 번째
-            인자(beforeElement)는 반드시 두 번째 인자(parentElement)의
-            자식이어야 합니다.
+            <strong>Verify insertBefore element:</strong> The third argument
+            (beforeElement) must be a child of the second argument
+            (parentElement).
           </li>
           <li>
-            <strong>ref 타이밍:</strong> ref 값은 mountCallback() 이후에만 사용
-            가능합니다.
+            <strong>ref timing:</strong> ref values are only available after
+            mountCallback().
           </li>
           <li>
-            <strong>destroy 함수 저장:</strong> destroy 함수를 변수에 저장하지
-            않으면 나중에 제거할 수 없습니다.
+            <strong>Store destroy function:</strong> If you don't store the
+            destroy function in a variable, you won't be able to remove it
+            later.
           </li>
           <li>
-            <strong>key 사용:</strong> loop 렌더링 시 key를 사용하면 Lithent가
-            요소를 효율적으로 추적하고 업데이트합니다.
+            <strong>Use keys:</strong> Using keys in loop rendering allows
+            Lithent to efficiently track and update elements.
           </li>
           <li>
-            <strong>실제 DOM 수정 금지:</strong> 실제 DOM 요소를 직접 수정하면
-            Lithent의 가상 DOM 추적에서 벗어날 수 있습니다.
+            <strong>Don't modify real DOM:</strong> Directly modifying real DOM
+            elements can break Lithent's virtual DOM tracking.
           </li>
         </ul>
       </div>
 
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mt-8 mb-4">
-        관련 예제
+        Related Examples
       </h2>
 
       <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 mb-6 space-y-2">
@@ -360,7 +370,7 @@ destroyFn();`}
           >
             Example 12: Mixed DOM Elements
           </a>{' '}
-          - 실제 DOM과 가상 DOM 혼합
+          - Mixing real DOM and virtual DOM
         </li>
         <li>
           <a
@@ -374,7 +384,7 @@ destroyFn();`}
           >
             Example 13: Mixed DOM + Loop
           </a>{' '}
-          - 실제 DOM과 가상 DOM(loop) 혼합
+          - Mixing real DOM and virtual DOM (loop)
         </li>
         <li>
           <a
@@ -386,9 +396,9 @@ destroyFn();`}
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Render 가이드
+            Render Guide
           </a>{' '}
-          - render() 함수 사용법
+          - How to use render() function
         </li>
         <li>
           <a
@@ -400,9 +410,9 @@ destroyFn();`}
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Mount Hooks 가이드
+            Mount Hooks Guide
           </a>{' '}
-          - mountCallback 사용법
+          - How to use mountCallback
         </li>
       </ul>
     </div>

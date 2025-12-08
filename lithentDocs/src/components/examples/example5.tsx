@@ -304,8 +304,8 @@ export const Example5 = mount(r => {
         </div>
 
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-4">
-          이 예제는 중첩된 Fragment를 사용하여 알림 타입별로 그룹화합니다.
-          필터를 토글하면 Fragment 단위로 DOM이 추가/제거됩니다.
+          This example uses nested Fragments to group notifications by type.
+          Toggling the filters adds or removes DOM at Fragment boundaries.
         </p>
       </div>
     );

@@ -580,11 +580,11 @@ export const Example10 = mount(r => {
 
         <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <p class="text-xs text-blue-800 dark:text-blue-200">
-            💡 <strong>Checkbox & Radio 동작 확인:</strong> 체크박스는 여러
-            토핑을 동시에 선택할 수 있고(다중 선택), 라디오 버튼은 크기와
-            크러스트에서 하나만 선택할 수 있습니다(단일 선택). Lithent가 checked
-            속성을 올바르게 동기화하고 onChange 이벤트를 정확히 처리하는지
-            확인해보세요!
+            💡 <strong>Checking checkbox & radio behavior:</strong> checkboxes
+            allow multiple toppings to be selected at once, while radios for
+            size and crust allow only a single choice. Verify that Lithent keeps
+            the <code>checked</code> attribute in sync and handles{' '}
+            <code>onChange</code> events correctly.
           </p>
         </div>
       </div>

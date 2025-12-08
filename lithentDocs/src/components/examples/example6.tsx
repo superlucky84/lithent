@@ -284,10 +284,10 @@ export const Example6 = mount(r => {
 
         <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <p class="text-xs text-blue-800 dark:text-blue-200">
-            💡 <strong>Key 동작 확인:</strong> 노래를 재생하여 plays 카운터를
-            증가시킨 후 Shuffle이나 Sort를 해보세요. 각 노래의 ID와 plays
-            카운터가 유지되는 것을 확인할 수 있습니다. 이는 key prop 덕분에
-            Lithent가 동일한 요소를 정확하게 추적하고 있기 때문입니다.
+            💡 <strong>Checking key behavior:</strong> Play a few songs to
+            increase their counters, then use Shuffle or Sort. You should see
+            that each song&apos;s ID and plays counter stay attached to the
+            correct card thanks to the <code>key</code> prop.
           </p>
         </div>
       </div>

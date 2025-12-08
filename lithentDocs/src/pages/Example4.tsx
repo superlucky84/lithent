@@ -68,7 +68,7 @@ const Children = mount<{ logEl: { value: HTMLElement | null } }>((r, props) => {
   };
 
   const fadeOldLogs = (ele: HTMLElement) => {
-    // 기존 컬러 로그들을 회색으로 변경
+    // Turn previous colored logs into gray
     ele.innerHTML = ele.innerHTML
       .replace(/text-green-400/g, 'text-gray-500')
       .replace(/text-orange-400/g, 'text-gray-500');
@@ -77,7 +77,7 @@ const Children = mount<{ logEl: { value: HTMLElement | null } }>((r, props) => {
   effect(
     () => {
       const ele = props.logEl.value as HTMLElement;
-      // cleanup 직후가 아니면 기존 로그를 회색으로 (새로운 이벤트)
+      // For new events, fade old logs to gray unless we just ran cleanup
       if (!cleanupJustRan) {
         fadeOldLogs(ele);
       }
@@ -91,7 +91,7 @@ const Children = mount<{ logEl: { value: HTMLElement | null } }>((r, props) => {
       const ele = props.logEl.value as HTMLElement;
       fadeOldLogs(ele);
       cleanupJustRan = true;
-      // cleanup만 실행되는 경우를 대비해 타이머로 플래그 리셋
+      // Reset the flag on the next tick in case only cleanup ran
       setTimeout(() => {
         cleanupJustRan = false;
       }, 0);
@@ -143,8 +143,9 @@ const Example4Preview = mount(renew => {
         {mountState ? <Children logEl={logEl} /> : null}
       </div>
       <p class="text-xs text-gray-500 dark:text-gray-400">
-        count 변경 시 CLEAN_UP → INJECT가 실행되고, 컴포넌트 unmount 시
-        CLEAN_UP만 실행됩니다.
+        When the count changes, <code>CLEAN_UP</code> runs first and then{' '}
+        <code>INJECT</code>. When the component unmounts, only{' '}
+        <code>CLEAN_UP</code> runs.
       </p>
     </div>
   );
@@ -153,15 +154,16 @@ const Example4Preview = mount(renew => {
 export const Example4Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Effect Helper
+      Effect helper
     </h1>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      This example shows how to manage side effects with the{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         effect
-      </code>
-      훅으로 컴포넌트 생명주기에 따른 사이드 이펙트를 관리하는 예제입니다. 첫
-      번째 인자는 mount/update 후 실행되는 액션, 두 번째 인자는 unmount/update
-      전 실행되는 cleanup 함수입니다.
+      </code>{' '}
+      helper across the component lifecycle. The first argument runs after
+      mount/update, and the second argument runs as a cleanup before unmount or
+      before the next update.
     </p>
 
     <CodeBlock language="typescript" code={example4Code} />
@@ -177,7 +179,7 @@ export const Example4Page = (): ReturnType<typeof Introduction> => (
 
     <div class="mt-10">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        관련 문서
+        Related docs
       </h2>
       <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 space-y-2">
         <li>
@@ -190,10 +192,10 @@ export const Example4Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Effect 가이드
+            Effect guide
           </a>{' '}
-          - effect 헬퍼의 forward/backward/dependencies 설계와 생명주기 연동
-          방식을 자세히 설명합니다.
+          - Explains the forward/backward/dependencies design of the{' '}
+          <code>effect</code> helper and how it ties into the lifecycle.
         </li>
         <li>
           <a
@@ -205,10 +207,11 @@ export const Example4Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Mount Hooks 가이드
+            Mount Hooks guide
           </a>{' '}
-          - effect의 내부 구현에 사용되는 mountCallback/mountReadyCallback
-          흐름을 함께 이해할 수 있습니다.
+          - Helps you understand the <code>mountCallback</code> and{' '}
+          <code>mountReadyCallback</code> flow used internally by{' '}
+          <code>effect</code>.
         </li>
       </ul>
     </div>

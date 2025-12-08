@@ -10,17 +10,18 @@ export const LContext = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      LContext란?
+      What is LContext?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      LContext는{' '}
+      LContext is{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        lmount 컴포넌트 전용 Context
+        Context specifically for lmount components
       </strong>
-      입니다.
+      .
       <br />
       <br />
+      Unlike{' '}
       <a
         href="/guide/context"
         onClick={(e: Event) => {
@@ -31,16 +32,15 @@ export const LContext = () => (
       >
         Context
       </a>
-      와 달리{' '}
+      ,{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        renew를 자동으로 관리
-      </strong>
-      하며, lmount의{' '}
+        it automatically manages renew
+      </strong>{' '}
+      and internally uses lmount's{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         useRenew()
       </code>{' '}
-      훅을 내부적으로 사용합니다. 따라서 lmount 컴포넌트에서 더 간편하게
-      Context를 사용할 수 있습니다.
+      hook. This makes Context usage more convenient in lmount components.
     </p>
 
     <CodeBlock
@@ -48,7 +48,7 @@ export const LContext = () => (
       code={`import { lmount } from 'lithent';
 import { createLContext } from 'lithent/helper';
 
-// 1. LContext 생성
+// 1. Create LContext
 type AppContext = {
   user: string;
   theme: string;
@@ -57,7 +57,7 @@ type AppContext = {
 const appContext = createLContext<AppContext>();
 const { Provider, contextState, useContext } = appContext;
 
-// 2. Provider 컴포넌트
+// 2. Provider component
 const App = lmount((props, children) => {
   const userState = contextState('John');
   const themeState = contextState('light');
@@ -70,9 +70,9 @@ const App = lmount((props, children) => {
   );
 });
 
-// 3. Consumer 컴포넌트 (자동 renew 관리)
+// 3. Consumer component (automatic renew management)
 const Header = lmount((props, children) => {
-  // renew 전달 불필요 - useRenew()로 자동 관리
+  // No need to pass renew - automatically managed by useRenew()
   const ctx = useContext(appContext);
 
   const changeUser = () => {
@@ -92,54 +92,54 @@ const Header = lmount((props, children) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      기본 사용법
+      Basic Usage
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      1. LContext 생성
+      1. Create LContext
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Create LContext with{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         createLContext
       </code>
-      로 LContext를 생성합니다. 타입 인자로 Context가 관리할 데이터 구조를
-      정의합니다.
+      . Define the data structure the Context will manage with a type argument.
     </p>
 
     <CodeBlock
       language="tsx"
       code={`import { createLContext } from 'lithent/helper';
 
-// LContext 타입 정의
+// Define LContext type
 type UserContext = {
   name: string;
   age: number;
 };
 
-// LContext 생성
+// Create LContext
 const userContext = createLContext<UserContext>();
 
-// 구조분해로 필요한 것들 추출
+// Extract what you need via destructuring
 const { Provider, contextState, useContext } = userContext;`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      2. contextState로 상태 생성
+      2. Create State with contextState
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Provider에 전달할 상태를{' '}
+      Create state to pass to the Provider with{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         contextState
       </code>
-      로 생성합니다. 초기값을 인자로 전달합니다.
+      . Pass the initial value as an argument.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
-        Context와 달리 renew 파라미터가 없습니다.
+        Unlike Context, there's no renew parameter.
       </strong>{' '}
-      Consumer에서 useContext를 호출할 때 자동으로 renew가 연결됩니다.
+      When useContext is called in Consumers, renew is automatically connected.
     </p>
 
     <CodeBlock
@@ -147,11 +147,11 @@ const { Provider, contextState, useContext } = userContext;`}
       code={`import { lmount } from 'lithent';
 
 const App = lmount((props, children) => {
-  // contextState로 상태 생성 (renew 없음)
+  // Create state with contextState (no renew)
   const nameState = contextState('John');
   const ageState = contextState(25);
 
-  // Provider에 전달할 준비 완료
+  // Ready to pass to Provider
   return () => (
     <Provider name={nameState} age={ageState}>
       <Content />
@@ -161,12 +161,12 @@ const App = lmount((props, children) => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      3. Provider로 Context 제공
+      3. Provide Context with Provider
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Provider 컴포넌트로 하위 컴포넌트들에게 Context를 제공합니다. Context
-      타입에 정의된 키들을 props로 전달합니다.
+      Use the Provider component to provide Context to child components. Pass
+      the keys defined in the Context type as props.
     </p>
 
     <CodeBlock
@@ -176,21 +176,21 @@ const App = lmount((props, children) => {
   const ageState = contextState(25);
 
   const updateName = () => {
-    // Provider에서 값 변경 가능
+    // Can change value in Provider
     nameState.value = 'Jane';
-    // Consumer들이 자동으로 리렌더링됨
+    // Consumers automatically re-render
   };
 
   return () => (
     <div>
       <Provider name={nameState} age={ageState}>
-        {/* Provider 내부의 모든 컴포넌트가 Context 사용 가능 */}
+        {/* All components inside Provider can use Context */}
         <Header />
         <Content />
         <Footer />
       </Provider>
 
-      {/* Provider 외부에서 상태 변경 */}
+      {/* Change state outside Provider */}
       <button onClick={updateName}>Change Name</button>
     </div>
   );
@@ -198,33 +198,33 @@ const App = lmount((props, children) => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      4. useContext로 Context 사용
+      4. Use Context with useContext
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      하위 컴포넌트에서{' '}
+      In child components, use{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         useContext
-      </code>
-      로 Context를 사용합니다.{' '}
+      </code>{' '}
+      to access Context.{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        renew를 전달하지 않습니다
+        No need to pass renew
       </strong>{' '}
-      - 내부적으로{' '}
+      - internally calls{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         useRenew()
-      </code>
-      를 자동으로 호출하여 리렌더링을 관리합니다.
+      </code>{' '}
+      automatically to manage re-rendering.
     </p>
 
     <CodeBlock
       language="tsx"
       code={`const Header = lmount((props, children) => {
-  // renew 전달 불필요 - 자동으로 관리됨
+  // No need to pass renew - automatically managed
   const ctx = useContext(userContext);
 
   const changeName = () => {
-    // Consumer에서 값 변경
+    // Change value in Consumer
     ctx.name.value = 'Alice';
   };
 
@@ -240,24 +240,25 @@ const App = lmount((props, children) => {
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 자동 renew 관리:</span> LContext는 lmount의{' '}
+        <span class="font-medium">💡 Automatic renew management:</span> LContext
+        uses lmount's{' '}
         <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-sm">
           useRenew()
         </code>{' '}
-        훅을 사용하여 renew를 자동으로 관리합니다. 따라서 Context보다 더
-        간편하게 사용할 수 있습니다.
+        hook to automatically manage renew. This makes it more convenient to use
+        than Context.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      선택적 구독
+      Selective Subscription
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      useContext의 두 번째 인자로 구독할 키를 지정할 수 있습니다. 특정 필드의
-      변경에만 반응하도록 최적화할 수 있습니다.
+      You can specify which keys to subscribe to as the second argument of
+      useContext. This optimizes to react only to changes in specific fields.
     </p>
 
     <CodeBlock
@@ -288,10 +289,10 @@ const App = lmount((props, children) => {
   );
 });
 
-// 모든 키 구독 (기본값)
+// Subscribe to all keys (default)
 const FullSubscribe = lmount((props, children) => {
   const ctx = useContext(appContext);
-  // user, theme, count 중 하나라도 변경되면 리렌더링
+  // Re-renders when any of user, theme, or count changes
 
   return () => (
     <div>
@@ -302,10 +303,10 @@ const FullSubscribe = lmount((props, children) => {
   );
 });
 
-// user만 구독
+// Subscribe to user only
 const UserOnly = lmount((props, children) => {
   const ctx = useContext(appContext, ['user']);
-  // user만 변경될 때만 리렌더링 (성능 최적화)
+  // Re-renders only when user changes (performance optimization)
 
   return () => (
     <div>
@@ -314,10 +315,10 @@ const UserOnly = lmount((props, children) => {
   );
 });
 
-// theme과 count만 구독
+// Subscribe to theme and count only
 const ThemeAndCount = lmount((props, children) => {
   const ctx = useContext(appContext, ['theme', 'count']);
-  // theme 또는 count 변경 시에만 리렌더링
+  // Re-renders only when theme or count changes
 
   return () => (
     <div>
@@ -331,32 +332,34 @@ const ThemeAndCount = lmount((props, children) => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 성능 최적화:
+          💡 Performance Optimization:
         </span>{' '}
-        여러 필드를 가진 큰 Context에서는 선택적 구독을 사용하는 것이 좋습니다.
-        필요한 필드만 구독하면 불필요한 리렌더링을 방지할 수 있습니다.
+        For large Contexts with many fields, it's better to use selective
+        subscription. Subscribing only to needed fields prevents unnecessary
+        re-renders.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Context 값 변경
+      Changing Context Values
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      LContext의{' '}
+      LContext's{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         contextState
-      </code>
-      는 renew 파라미터를 받지 않습니다. 따라서{' '}
+      </code>{' '}
+      doesn't accept a renew parameter. Therefore,{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        Provider는 Context 값 변경을 구독하지 않습니다.
+        the Provider doesn't subscribe to Context value changes.
       </strong>
       <br />
       <br />
-      Provider에서 값을 변경하면 Consumer들은 업데이트되지만, Provider 자체는
-      리렌더링되지 않습니다. 실질적으로는 단방향처럼 동작합니다.
+      When values are changed in the Provider, Consumers get updated, but the
+      Provider itself doesn't re-render. It effectively works like one-way data
+      flow.
     </p>
 
     <CodeBlock
@@ -372,13 +375,13 @@ const counterContext = createLContext<CounterContext>();
 const { Provider, contextState, useContext } = counterContext;
 
 const App = lmount((props, children) => {
-  // contextState는 renew를 받지 않음 - Provider는 구독하지 않음
+  // contextState doesn't take renew - Provider doesn't subscribe
   const countState = contextState(0);
 
   const incrementFromProvider = () => {
-    // ⚠️ 값은 변경되지만 Provider는 리렌더링 안 됨
+    // ⚠️ Value changes but Provider doesn't re-render
     countState.value += 1;
-    // Consumer는 이 변경사항을 받아서 리렌더링됨
+    // Consumers receive this change and re-render
   };
 
   return () => (
@@ -387,29 +390,29 @@ const App = lmount((props, children) => {
         <Counter />
       </Provider>
 
-      {/* Provider에서 변경 */}
+      {/* Change from Provider */}
       <button onClick={incrementFromProvider}>
         Increment from Provider
       </button>
 
-      {/* ⚠️ Provider는 리렌더링 안 되므로 이 값은 갱신 안 됨 */}
+      {/* ⚠️ Provider doesn't re-render, so this value won't update */}
       <p>Provider count: {countState.value}</p>
     </div>
   );
 });
 
 const Counter = lmount((props, children) => {
-  // Consumer는 useRenew()로 자동 구독
+  // Consumer automatically subscribes with useRenew()
   const ctx = useContext(counterContext);
 
   const incrementFromConsumer = () => {
-    // ✅ Consumer에서 값 변경 - Consumer만 리렌더링
+    // ✅ Change value in Consumer - Only Consumer re-renders
     ctx.count.value += 1;
   };
 
   return () => (
     <div>
-      {/* ✅ Consumer는 변경사항을 항상 반영 */}
+      {/* ✅ Consumer always reflects changes */}
       <p>Consumer count: {ctx.count.value}</p>
       <button onClick={incrementFromConsumer}>
         Increment from Consumer
@@ -421,9 +424,9 @@ const Counter = lmount((props, children) => {
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 권장 패턴:</span> Provider는 초기값만
-        제공하는 역할로 사용하고, Consumer에서만 값을 읽고 변경하는 것이
-        좋습니다. 이는{' '}
+        <span class="font-medium">💡 Recommended Pattern:</span> Use the
+        Provider only to provide initial values, and only read and change values
+        in Consumers. This is the same pattern as{' '}
         <a
           href="/guide/context"
           onClick={(e: Event) => {
@@ -434,22 +437,23 @@ const Counter = lmount((props, children) => {
         >
           Context
         </a>
-        와 동일한 패턴입니다.
+        .
       </p>
     </div>
 
     <div class="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-red-800 dark:text-red-200 leading-relaxed">
-        <span class="font-medium">⚠️ 양방향 동기화 불가:</span> LContext의{' '}
+        <span class="font-medium">⚠️ No Bidirectional Sync:</span> LContext's{' '}
         <code class="px-2 py-1 bg-red-200 dark:bg-red-800 rounded text-sm">
           contextState
-        </code>
-        는 renew 파라미터를 받지 않으므로, Provider에서 양방향 동기화를 구현할
-        수 없습니다.
+        </code>{' '}
+        doesn't accept a renew parameter, so you cannot implement bidirectional
+        sync in the Provider.
         <br />
         <br />
-        만약 Provider에서도 Context 값 변경에 반응해야 한다면, 일반적으로{' '}
-        <strong class="font-semibold">권장하지 않지만</strong>{' '}
+        If the Provider needs to react to Context value changes, which is{' '}
+        <strong class="font-semibold">generally not recommended</strong>, you
+        can use{' '}
         <a
           href="/guide/context"
           onClick={(e: Event) => {
@@ -459,25 +463,24 @@ const Counter = lmount((props, children) => {
           class="underline hover:no-underline font-medium"
         >
           Context
-        </a>
-        를 사용하고{' '}
+        </a>{' '}
+        and pass renew with{' '}
         <code class="px-2 py-1 bg-red-200 dark:bg-red-800 rounded text-sm">
           contextState(value, renew)
         </code>
-        로 renew를 전달할 수 있습니다. 하지만 이 경우 Provider 하위 트리 전체가
-        리렌더링되는 성능 문제가 있습니다.
+        . However, this causes the entire Provider subtree to re-render, which
+        can lead to performance issues.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      중첩 Provider
+      Nested Providers
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Provider는 중첩될 수 있으며, Consumer는 가장 가까운 상위 Provider를
-      사용합니다.
+      Providers can be nested, and Consumers use the closest parent Provider.
     </p>
 
     <CodeBlock
@@ -498,11 +501,11 @@ const App = lmount((props, children) => {
 
   return () => (
     <Provider color={blueTheme}>
-      <Child /> {/* blue 사용 */}
+      <Child /> {/* Uses blue */}
 
-      {/* 중첩 Provider */}
+      {/* Nested Provider */}
       <Provider color={redTheme}>
-        <Child /> {/* red 사용 (가까운 Provider) */}
+        <Child /> {/* Uses red (closest Provider) */}
       </Provider>
     </Provider>
   );
@@ -522,11 +525,11 @@ const Child = lmount((props, children) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      여러 Context 사용
+      Using Multiple Contexts
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      하나의 컴포넌트에서 여러 Context를 동시에 사용할 수 있습니다.
+      You can use multiple Contexts simultaneously in one component.
     </p>
 
     <CodeBlock
@@ -534,7 +537,7 @@ const Child = lmount((props, children) => {
       code={`import { lmount } from 'lithent';
 import { createLContext } from 'lithent/helper';
 
-// 여러 LContext 정의
+// Define multiple LContexts
 type UserContext = { name: string };
 type ThemeContext = { mode: string };
 
@@ -555,7 +558,7 @@ const App = lmount((props, children) => {
 });
 
 const Content = lmount((props, children) => {
-  // 여러 Context 동시 사용
+  // Use multiple Contexts simultaneously
   const user = userContext.useContext(userContext);
   const theme = themeContext.useContext(themeContext);
 
@@ -571,7 +574,7 @@ const Content = lmount((props, children) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Context vs LContext 비교
+      Context vs LContext Comparison
     </h2>
 
     <div class="overflow-x-auto mb-6">
@@ -579,7 +582,7 @@ const Content = lmount((props, children) => {
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              특성
+              Feature
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
               Context
@@ -592,7 +595,7 @@ const Content = lmount((props, children) => {
         <tbody>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              대상 컴포넌트
+              Target Component
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               mount
@@ -603,13 +606,13 @@ const Content = lmount((props, children) => {
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              renew 관리
+              Renew Management
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              수동 (renew 전달)
+              Manual (pass renew)
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              자동 (useRenew 사용)
+              Automatic (uses useRenew)
             </td>
           </tr>
           <tr>
@@ -636,35 +639,35 @@ const Content = lmount((props, children) => {
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              Provider 구독
+              Provider Subscription
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              renew 전달 시 (비권장)
+              When renew passed (not recommended)
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              불가 (renew 없음)
-            </td>
-          </tr>
-          <tr>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              선택적 구독
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              지원
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              지원
+              Not possible (no renew)
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              사용 편의성
+              Selective Subscription
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              보통 (명시적 관리)
+              Supported
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              높음 (자동 관리)
+              Supported
+            </td>
+          </tr>
+          <tr>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Ease of Use
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Moderate (explicit management)
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              High (automatic management)
             </td>
           </tr>
         </tbody>
@@ -674,24 +677,26 @@ const Content = lmount((props, children) => {
     <div class="grid gap-6 mb-6">
       <div class="border-l-4 border-green-500 bg-green-50 dark:bg-green-900/20 p-4 rounded-r">
         <h3 class="text-lg font-medium text-green-900 dark:text-green-100 mb-2">
-          ✅ LContext 사용 권장
+          ✅ Use LContext When
         </h3>
         <ul class="text-sm md:text-base text-green-800 dark:text-green-200 leading-relaxed space-y-2">
-          <li>• lmount 컴포넌트를 사용하는 경우</li>
-          <li>• renew를 자동으로 관리하고 싶을 때</li>
-          <li>• Consumer에서만 Context 값을 변경하는 단방향 패턴</li>
-          <li>• 더 간편한 API를 원할 때</li>
+          <li>• Using lmount components</li>
+          <li>• Want to automatically manage renew</li>
+          <li>• One-way pattern where only Consumers change Context values</li>
+          <li>• Want a simpler API</li>
         </ul>
       </div>
 
       <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-r">
         <h3 class="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">
-          ✅ Context 사용 권장
+          ✅ Use Context When
         </h3>
         <ul class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed space-y-2">
-          <li>• mount 컴포넌트를 사용하는 경우</li>
-          <li>• renew를 명시적으로 관리하고 싶을 때</li>
-          <li>• Provider는 초기값만 제공하는 단방향 패턴을 원할 때</li>
+          <li>• Using mount components</li>
+          <li>• Want to explicitly manage renew</li>
+          <li>
+            • Want one-way pattern where Provider only provides initial values
+          </li>
         </ul>
       </div>
     </div>
@@ -699,16 +704,17 @@ const Content = lmount((props, children) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      주의사항
+      Precautions
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ lmount 전용:</span> LContext는{' '}
+        <span class="font-medium">⚠️ For lmount only:</span> LContext is
+        specifically for{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
           lmount
         </code>{' '}
-        컴포넌트 전용입니다. mount 컴포넌트에서는{' '}
+        components. For mount components, use{' '}
         <a
           href="/guide/context"
           onClick={(e: Event) => {
@@ -719,36 +725,36 @@ const Content = lmount((props, children) => {
         >
           Context
         </a>
-        를 사용하세요.
+        .
         <br />
         <br />
-        <span class="font-medium">⚠️ Provider 필수:</span> useContext를
-        사용하려면 상위에 Provider가 반드시 있어야 합니다. Provider가 없으면
-        Context를 찾을 수 없습니다.
+        <span class="font-medium">⚠️ Provider required:</span> To use
+        useContext, there must be a Provider above it. Without a Provider, the
+        Context cannot be found.
         <br />
         <br />
-        <span class="font-medium">⚠️ .value 접근:</span> contextState로 생성한
-        상태는{' '}
+        <span class="font-medium">⚠️ .value access:</span> State created with
+        contextState must be accessed and changed through{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
           .value
         </code>
-        를 통해 접근하고 변경해야 합니다.
+        .
         <br />
         <br />
-        <span class="font-medium">⚠️ useRenew 의존성:</span> LContext는
-        내부적으로{' '}
+        <span class="font-medium">⚠️ useRenew dependency:</span> LContext
+        internally uses{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
           useRenew()
         </code>
-        를 사용하므로, lmount의 Hook 규칙을 따라야 합니다. useContext는 조건문
-        안에서 호출하지 마세요.
+        , so it must follow lmount's Hook rules. Don't call useContext inside
+        conditionals.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음 단계
+      Next Steps
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -764,8 +770,8 @@ const Content = lmount((props, children) => {
           Helper: CacheUpdate →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Context에서 파생되는 값이나 목록을 효율적으로 캐시하고 업데이트하는
-          방법을 배워봅시다.
+          Learn how to efficiently cache and update values or lists derived from
+          Context.
         </p>
       </a>
     </div>

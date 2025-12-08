@@ -25,7 +25,7 @@ const potionItems: Item[] = [
   { id: 'p3', name: 'Elixir of Life', icon: '✨', rarity: 'epic' },
 ];
 
-// 아이템 컴포넌트 (Depth 3)
+// Item component (Depth 3)
 const ItemSlot = mount<{
   item: Item;
   logEl: { value: HTMLElement | null };
@@ -72,7 +72,7 @@ const ItemSlot = mount<{
   );
 });
 
-// 카테고리 컴포넌트 (Depth 2)
+// Category component (Depth 2)
 const InventoryCategory = mount<{
   title: string;
   icon: string;
@@ -123,7 +123,7 @@ const InventoryCategory = mount<{
   );
 });
 
-// 인벤토리 컴포넌트 (Depth 1)
+// Inventory component (Depth 1)
 const Inventory = mount<{ logEl: { value: HTMLElement | null } }>(
   (_r, props) => {
     mountCallback(() => {
@@ -201,11 +201,11 @@ export const Example14 = mount(r => {
           🎮 Game Inventory System
         </h3>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          중첩된 컴포넌트의 mount/unmount 콜백 테스트
+          Test nested components&apos; mount/unmount callbacks.
         </p>
       </div>
 
-      {/* 컨트롤 패널 */}
+      {/* Control panel */}
       <div class="flex gap-2 mb-4">
         <button
           onClick={toggle}
@@ -226,7 +226,7 @@ export const Example14 = mount(r => {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* 인벤토리 영역 */}
+        {/* Inventory area */}
         <div class="order-2 md:order-1">
           <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
             Inventory View
@@ -246,7 +246,7 @@ export const Example14 = mount(r => {
           )}
         </div>
 
-        {/* 로그 영역 */}
+        {/* Log area */}
         <div class="order-1 md:order-2">
           <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
             Lifecycle Log
@@ -262,31 +262,31 @@ export const Example14 = mount(r => {
 
       <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <p class="text-xs text-blue-800 dark:text-blue-200 mb-2">
-          💡 <strong>중첩된 언마운트 테스트:</strong> "Close Inventory" 버튼을
-          누르면 다음 순서로 cleanup이 실행됩니다:
+          💡 <strong>Nested unmount test:</strong> when you click &quot;Close
+          Inventory&quot;, cleanup runs in this order:
         </p>
         <ol class="text-xs text-blue-700 dark:text-blue-300 ml-4 space-y-1">
           <li>
-            1. <strong>Inventory system shutdown</strong> (Depth 1 - 부모)
+            1. <strong>Inventory system shutdown</strong> (Depth 1 - parent)
           </li>
           <li>
-            2. <strong>Weapons category closed</strong> → 해당 카테고리의 모든
-            아이템 unequipped
+            2. <strong>Weapons category closed</strong> → all items in that
+            category unequipped
           </li>
           <li>
-            3. <strong>Armor category closed</strong> → 해당 카테고리의 모든
-            아이템 unequipped
+            3. <strong>Armor category closed</strong> → all items in that
+            category unequipped
           </li>
           <li>
-            4. <strong>Potions category closed</strong> → 해당 카테고리의 모든
-            아이템 unequipped
+            4. <strong>Potions category closed</strong> → all items in that
+            category unequipped
           </li>
         </ol>
       </div>
 
       <div class="mt-4 p-3 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
         <h4 class="text-xs font-semibold text-purple-800 dark:text-purple-200 mb-2">
-          🎯 컴포넌트 계층 구조
+          🎯 Component hierarchy
         </h4>
         <div class="text-xs font-mono text-purple-700 dark:text-purple-300 leading-relaxed">
           <div>Inventory (Depth 1)</div>

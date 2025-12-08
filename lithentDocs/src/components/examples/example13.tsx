@@ -38,7 +38,7 @@ const initialGuests: Guest[] = [
   { id: 4, name: 'Jordan', partySize: 1, waitTime: 5, vip: false, emoji: '🧑' },
 ];
 
-// 동적 대기 목록 컴포넌트 (가상 DOM)
+// Dynamic waitlist component (virtual DOM)
 const WaitlistManager = mount(r => {
   const guests = state<Guest[]>([...initialGuests], r);
   const nextId = state(5, r);
@@ -100,11 +100,11 @@ const WaitlistManager = mount(r => {
 
   return () => (
     <Fragment>
-      {/* 컨트롤 패널 */}
+      {/* Control panel */}
       <div class="bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500 p-3 mb-3 rounded">
         <div class="flex items-center gap-2 mb-2">
           <span class="text-xs font-semibold text-orange-800 dark:text-orange-200">
-            🎛️ Waitlist Controls (가상 DOM)
+            🎛️ Waitlist Controls (virtual DOM)
           </span>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -147,7 +147,7 @@ const WaitlistManager = mount(r => {
         </div>
       </div>
 
-      {/* 대기 목록 */}
+      {/* Waitlist */}
       {guests.v.map((guest, index) => (
         <div
           key={guest.id}
@@ -218,7 +218,7 @@ export const Example13 = mount(() => {
           🍽️ Restaurant Waitlist Manager
         </h3>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          실제 DOM과 가상 DOM이 혼합된 상태에서 리스트 업데이트 테스트
+          Test how list updates behave when real DOM and virtual DOM are mixed.
         </p>
       </div>
 
@@ -226,7 +226,7 @@ export const Example13 = mount(() => {
         ref={containerRef}
         class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 max-h-[700px] overflow-y-auto"
       >
-        {/* 상단 안내 (실제 DOM) */}
+        {/* Top notice (real DOM) */}
         <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 mb-3 border-l-4 border-purple-500">
           <div class="flex items-start gap-3">
             <div class="text-2xl">ℹ️</div>
@@ -239,15 +239,15 @@ export const Example13 = mount(() => {
                 ready.
               </p>
               <span class="inline-block mt-2 px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                실제 DOM (고정)
+                real DOM (fixed)
               </span>
             </div>
           </div>
         </div>
 
-        {/* 중간: 가상 DOM 대기 목록이 여기 삽입됨 */}
+        {/* Middle: virtual DOM waitlist is inserted here */}
 
-        {/* 하단 광고 (실제 DOM - insertionPoint) */}
+        {/* Bottom promo (real DOM - insertionPoint) */}
         <div
           ref={insertionPointRef}
           class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-3 border-l-4 border-green-500"
@@ -262,13 +262,13 @@ export const Example13 = mount(() => {
                 Get 10% off your meal if you join our rewards program today!
               </p>
               <span class="inline-block mt-2 px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-                실제 DOM (고정)
+                real DOM (fixed)
               </span>
             </div>
           </div>
         </div>
 
-        {/* 하단 푸터 (실제 DOM) */}
+        {/* Bottom footer (real DOM) */}
         <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 border-l-4 border-gray-400">
           <div class="flex items-center gap-2">
             <div class="text-xl">📞</div>
@@ -279,7 +279,7 @@ export const Example13 = mount(() => {
               </p>
             </div>
             <span class="ml-auto px-2 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
-              실제 DOM (고정)
+              real DOM (fixed)
             </span>
           </div>
         </div>
@@ -287,11 +287,11 @@ export const Example13 = mount(() => {
 
       <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <p class="text-xs text-blue-800 dark:text-blue-200">
-          💡 <strong>리스트 + 혼합 DOM 테스트:</strong> 대기 목록을 정렬하거나
-          역순으로 바꿔보세요. Lithent가 key 기반으로 DOM 요소를 올바르게
-          재정렬하고, 실제 DOM(Welcome, Special Offer, Contact)은 영향받지
-          않는지 확인하세요! Call 버튼으로 손님을 호출하면 리스트에서
-          제거됩니다.
+          💡 <strong>List + mixed DOM test:</strong> try sorting or reversing
+          the waitlist. Verify that Lithent reorders DOM nodes correctly based
+          on keys, while the real DOM (Welcome, Special Offer, Contact) stays
+          untouched. When you click the Call button, the guest is removed from
+          the list.
         </p>
       </div>
     </div>

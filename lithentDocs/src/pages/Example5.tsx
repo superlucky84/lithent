@@ -78,25 +78,26 @@ export const Example5Page = (): ReturnType<typeof Introduction> => (
       Nested Fragments (Notification Center)
     </h1>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-      중첩된{' '}
+      This example implements a notification center using nested{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         Fragment
       </code>
-      를 사용하여 알림 센터를 구현한 예제입니다. 각 알림 타입(좋아요, 댓글,
-      팔로우, 시스템)을 Fragment로 그룹화하고, 필터 버튼으로 특정 타입의
-      알림들을 토글할 수 있습니다.
+      s. Each notification type (like, comment, follow, system) is grouped into
+      its own Fragment section, and filter buttons let you toggle each group on
+      and off.
     </p>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-      이 예제는{' '}
+      It is designed to{' '}
       <strong>
-        Lithent의 가상 돔 엔진이 복잡하게 중첩된 Fragment 구조를 정확하게
-        처리하고 효율적으로 업데이트하는지 테스트
+        test how Lithent&apos;s virtual DOM engine handles deeply nested
+        Fragment structures and updates them efficiently
       </strong>
-      하기 위해 설계되었습니다.
+      .
     </p>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      필터를 변경하면 Fragment 단위로 DOM이 추가/제거되며, 여러 단계로 중첩된
-      구조에서도 올바르게 diff 알고리즘이 작동합니다.
+      When you change filters, DOM nodes are added and removed at the Fragment
+      boundaries, and the diff algorithm continues to work correctly even with
+      multiple levels of nesting.
     </p>
 
     <CodeBlock language="typescript" code={example5Code} />
@@ -112,31 +113,31 @@ export const Example5Page = (): ReturnType<typeof Introduction> => (
 
     <div class="mt-6">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        Fragment 중첩 구조의 장점
+        Benefits of nested Fragment structures
       </h2>
       <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
         <li>
-          <strong>논리적 그룹화</strong>: 관련된 요소들을 Fragment로 묶어 구조를
-          명확하게 표현
+          <strong>Logical grouping</strong>: group related elements with
+          Fragments to make structure clearer.
         </li>
         <li>
-          <strong>효율적인 업데이트</strong>: 필터 변경 시 해당 Fragment 그룹만
-          추가/제거
+          <strong>Efficient updates</strong>: only the affected Fragment groups
+          are added/removed when filters change.
         </li>
         <li>
-          <strong>깨끗한 DOM</strong>: Fragment는 실제 DOM 노드를 생성하지 않아
-          불필요한 래퍼 요소가 없음
+          <strong>Clean DOM</strong>: Fragments do not create real DOM nodes, so
+          there are no unnecessary wrapper elements.
         </li>
         <li>
-          <strong>유연한 구조</strong>: 여러 단계로 중첩하여 복잡한 조건부
-          렌더링 구현 가능
+          <strong>Flexible structure</strong>: multiple nesting levels make it
+          easy to express complex conditional rendering.
         </li>
       </ul>
     </div>
 
     <div class="mt-10">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        관련 문서
+        Related docs
       </h2>
       <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
         <li>
@@ -149,10 +150,9 @@ export const Example5Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Children 가이드
+            Children guide
           </a>{' '}
-          - Fragment와 children이 어떻게 렌더 트리를 구성하는지 기본 개념을
-          정리합니다.
+          - Summarizes how Fragments and children shape the render tree.
         </li>
         <li>
           <a
@@ -164,10 +164,10 @@ export const Example5Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Updater 가이드
+            Updater guide
           </a>{' '}
-          - 필터 변경 시 Fragment 그룹이 어떻게 갱신되는지, 업데이트 흐름
-          관점에서 이해할 수 있습니다.
+          - Explains how Fragment groups are updated when filters change, from
+          the updater&apos;s perspective.
         </li>
       </ul>
     </div>

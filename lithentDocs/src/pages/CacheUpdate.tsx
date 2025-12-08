@@ -10,72 +10,74 @@ export const CacheUpdate = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      CacheUpdate란?
+      What is CacheUpdate?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      CacheUpdate는{' '}
+      CacheUpdate is a helper that{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        컴포넌트의 렌더링 결과를 캐싱
+        caches component rendering results
       </strong>
-      하는 헬퍼입니다.
+      .
       <br />
       <br />
-      의존성 배열이 변경되지 않으면 이전에 생성한 Virtual DOM을 재사용하여{' '}
+      If the dependency array hasn't changed, it reuses the previously created
+      Virtual DOM to{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        불필요한 리렌더링을 방지
+        prevent unnecessary re-renders
       </strong>
-      합니다. React의{' '}
+      . It's similar to React's{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         useMemo
-      </code>
-      나{' '}
+      </code>{' '}
+      or{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         React.memo
       </code>
-      와 유사한 개념입니다.
+      .
     </p>
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 성능 최적화:</span> cacheUpdate는 렌더링
-        최적화를 위한 도구입니다. 모든 컴포넌트에 사용할 필요는 없으며, 성능
-        병목이 발생하는 컴포넌트에만 선택적으로 적용하세요.
+        <span class="font-medium">💡 Performance Optimization:</span>{' '}
+        cacheUpdate is a tool for rendering optimization. You don't need to use
+        it on every component—apply it selectively only where performance
+        bottlenecks occur.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      기본 사용법
+      Basic Usage
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      cacheUpdate는 두 개의 인자를 받습니다:
+      cacheUpdate takes two arguments:
       <br />
       <br />
       1.{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         checkFunction
       </code>
-      : 의존성 배열을 반환하는 함수
+      : A function that returns a dependency array
       <br />
       2.{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         updater
       </code>
-      : Virtual DOM을 반환하는 렌더 함수
+      : A render function that returns Virtual DOM
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
-        중요:
+        Important:
       </strong>{' '}
-      checkFunction은 배열을 직접 전달하는 것이 아니라{' '}
+      checkFunction is not an array passed directly, but{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        배열을 반환하는 함수
+        a function that returns an array
       </strong>
-      입니다. 이는 Lithent의 클로저 기반 상태 관리 방식 때문에 매 렌더링마다
-      최신 값을 읽기 위함입니다.
+      . This is because of Lithent's closure-based state management—it needs to
+      read the latest values on every render.
     </p>
 
     <CodeBlock
@@ -97,12 +99,12 @@ const Counter = mount(renew => {
     renew();
   };
 
-  // cacheUpdate로 렌더링 결과 캐싱
+  // Cache rendering results with cacheUpdate
   return cacheUpdate(
-    // 1. checkFunction: 의존성 배열 반환
+    // 1. checkFunction: Returns dependency array
     () => [count],
 
-    // 2. updater: 렌더 함수
+    // 2. updater: Render function
     (props) => (
       <div>
         <p>Count: {count}</p>
@@ -118,58 +120,61 @@ const Counter = mount(renew => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 동작 방식:
+          💡 How it works:
         </span>{' '}
-        위 예제에서{' '}
+        In the example above, clicking{' '}
         <code class="px-2 py-1 bg-gray-300 dark:bg-gray-600 rounded text-sm">
           changeOther
-        </code>
-        를 클릭해도{' '}
+        </code>{' '}
+        won't trigger rendering because{' '}
         <code class="px-2 py-1 bg-gray-300 dark:bg-gray-600 rounded text-sm">
           count
-        </code>
-        가 변경되지 않았으므로 렌더링이 발생하지 않습니다. 화면에 표시된{' '}
+        </code>{' '}
+        hasn't changed. The displayed{' '}
         <code class="px-2 py-1 bg-gray-300 dark:bg-gray-600 rounded text-sm">
           otherValue
-        </code>
-        는 업데이트되지 않습니다.
+        </code>{' '}
+        won't update on screen.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      의존성 배열
+      Dependency Array
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      checkFunction은 배열을 반환해야 하며, 이 배열의 각 요소는{' '}
+      checkFunction must return an array, and each element in this array is
+      compared with the previous value using{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        참조 비교(===)
+        reference equality (===)
       </strong>
-      로 이전 값과 비교됩니다. 모든 요소가 같으면 캐시된 렌더링 결과를
-      재사용합니다.
+      . If all elements are the same, it reuses the cached rendering result.
     </p>
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 왜 함수로 설계되었나요?</span>
+        <span class="font-medium">💡 Why is it designed as a function?</span>
         <br />
         <br />
-        Lithent는 <strong class="font-semibold">클로저 기반 상태 관리</strong>를
-        사용합니다. 컴포넌트의 상태(count, name 등)는 클로저 변수로 존재하며, 매
-        렌더링 시점마다 변경 여부를 확인하려면{' '}
-        <strong class="font-semibold">그 시점의 최신 값</strong>을 읽어야
-        합니다.
+        Lithent uses{' '}
+        <strong class="font-semibold">closure-based state management</strong>.
+        Component state (count, name, etc.) exists as closure variables, and to
+        check whether they've changed at each render point, you need to{' '}
+        <strong class="font-semibold">read their latest values</strong> at that
+        moment.
         <br />
         <br />
+        By designing it as a function like{' '}
         <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-sm">
           () =&gt; [count, name]
         </code>
-        처럼 함수로 설계하면, 의존성을 확인할 때마다 이 함수를 호출하여{' '}
-        <strong class="font-semibold">항상 최신 클로저 값</strong>을 가져올 수
-        있습니다. 함수 호출 시점에 count와 name의 현재 값을 읽어 배열로
-        반환하므로, 이전 값과 비교하여 변경 여부를 정확히 감지할 수 있습니다.
+        , each time you check dependencies, calling this function gets{' '}
+        <strong class="font-semibold">the latest closure values</strong>. The
+        function reads count and name's current values at call time and returns
+        them as an array, so you can accurately detect changes by comparing with
+        previous values.
       </p>
     </div>
 
@@ -179,15 +184,15 @@ const Counter = mount(renew => {
 import { cacheUpdate } from 'lithent/helper';
 
 const UserProfile = mount<{ userId: number }>(renew => {
-  // 클로저 변수로 상태 관리
+  // Manage state with closure variables
   let userName = 'John';
   let userAge = 25;
   let settings = { theme: 'light' };
 
   return cacheUpdate(
     () => [userName, userAge],
-    // ☝️ 렌더링 시점마다 함수를 호출하여 최신 값으로 배열 생성
-    //    이전 값과 비교하여 변경 여부 감지
+    // ☝️ Calls function at each render to create array with latest values
+    //    Detects changes by comparing with previous values
 
     (props) => (
       <div>
@@ -200,32 +205,32 @@ const UserProfile = mount<{ userId: number }>(renew => {
   );
 });
 
-// userName이나 userAge가 변경되면 리렌더링
-// settings.theme이 변경되어도 리렌더링 안 됨 (의존성이 아님)
-// props.userId가 변경되면? updater 함수가 props를 받으므로 자동으로 반영됨`}
+// Re-renders when userName or userAge changes
+// Doesn't re-render when settings.theme changes (not a dependency)
+// What about props.userId changes? Automatically reflected since updater receives props`}
     />
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ 참조 비교:</span> 의존성 배열은 참조 비교를
-        사용합니다. 객체나 배열을 의존성으로 사용할 때는 주의하세요. 내용이
-        같아도 참조가 다르면 다른 값으로 인식됩니다.
+        <span class="font-medium">⚠️ Reference Comparison:</span> The dependency
+        array uses reference comparison. When using objects or arrays as
+        dependencies, be careful. Even with identical contents, different
+        references are recognized as different values.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      실제 사용 예시
+      Practical Examples
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      1. 리스트 아이템 최적화
+      1. List Item Optimization
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      리스트의 각 아이템을 최적화하여, 다른 아이템이 변경되어도 영향을 받지
-      않도록 할 수 있습니다.
+      Optimize each list item so they're not affected when other items change.
     </p>
 
     <CodeBlock
@@ -241,7 +246,7 @@ type TodoItem = {
 
 const TodoListItem = mount<TodoItem>(renew => {
   return cacheUpdate(
-    // props의 모든 값을 의존성으로 지정
+    // Specify all props values as dependencies
     (props) => [props.id, props.text, props.done],
 
     (props) => (
@@ -250,7 +255,7 @@ const TodoListItem = mount<TodoItem>(renew => {
           type="checkbox"
           checked={props.done}
           onChange={() => {
-            // 부모 컴포넌트에서 처리
+            // Handled by parent component
           }}
         />
         <span style={{ textDecoration: props.done ? 'line-through' : 'none' }}>
@@ -278,11 +283,12 @@ const TodoList = mount(renew => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      2. 복잡한 계산 결과 캐싱
+      2. Caching Complex Computations
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      비용이 큰 계산의 결과를 캐싱하여 불필요한 재계산을 방지할 수 있습니다.
+      Cache results of expensive computations to prevent unnecessary
+      recalculation.
     </p>
 
     <CodeBlock
@@ -301,12 +307,12 @@ const ExpensiveComponent = mount(renew => {
   };
 
   return cacheUpdate(
-    // searchQuery만 의존성으로 지정
-    // filterOption, sortOption 변경 시에는 리렌더링 안 함
+    // Only searchQuery as dependency
+    // No re-render when filterOption or sortOption changes
     () => [searchQuery],
 
     () => {
-      // 비용이 큰 계산
+      // Expensive computation
       const filteredResults = performExpensiveSearch(searchQuery);
 
       return (
@@ -326,19 +332,19 @@ const ExpensiveComponent = mount(renew => {
 });
 
 function performExpensiveSearch(query: string) {
-  // 비용이 큰 검색 로직
+  // Expensive search logic
   console.log('Performing expensive search...');
   return [];
 }`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      3. 부분 업데이트 최적화
+      3. Partial Update Optimization
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      컴포넌트의 일부만 의존성으로 지정하여, 나머지 상태 변경 시 렌더링을 건너뛸
-      수 있습니다.
+      Specify only part of the component as dependencies to skip rendering when
+      other state changes.
     </p>
 
     <CodeBlock
@@ -358,11 +364,11 @@ const Dashboard = mount(renew => {
 
   const updateDebug = () => {
     debugInfo = \`Debug \${Date.now()}\`;
-    renew(); // renew 호출해도 리렌더링 안 됨!
+    renew(); // Even calling renew won't re-render!
   };
 
   return cacheUpdate(
-    // importantData만 의존성으로 지정
+    // Only importantData as dependency
     () => [importantData],
 
     () => (
@@ -382,7 +388,7 @@ const Dashboard = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      cacheUpdate vs Computed 비교
+      cacheUpdate vs Computed Comparison
     </h2>
 
     <div class="overflow-x-auto mb-6">
@@ -390,7 +396,7 @@ const Dashboard = mount(renew => {
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              특성
+              Feature
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
               cacheUpdate
@@ -403,68 +409,68 @@ const Dashboard = mount(renew => {
         <tbody>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              목적
+              Purpose
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              렌더링 결과 캐싱
+              Cache rendering results
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              계산 결과 캐싱
-            </td>
-          </tr>
-          <tr>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              반환값
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              Virtual DOM (렌더 함수)
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              계산된 값
+              Cache computation results
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              사용 위치
+              Return Value
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              mount의 return 문
+              Virtual DOM (render function)
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              mounter 함수 내부
-            </td>
-          </tr>
-          <tr>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              의존성 지정
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              명시적 (checkFunction)
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              자동 추적 (state 접근)
+              Computed value
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              renew 필요
+              Usage Location
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              필요 (수동)
+              mount's return statement
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              자동
+              Inside mounter function
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              적용 대상
+              Dependency Specification
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Explicit (checkFunction)
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Automatic tracking (state access)
+            </td>
+          </tr>
+          <tr>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Renew Required
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Required (manual)
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Automatic
+            </td>
+          </tr>
+          <tr>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Target
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               mount, lmount
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              mount (state와 함께)
+              mount (with state)
             </td>
           </tr>
         </tbody>
@@ -474,63 +480,69 @@ const Dashboard = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      주의사항
+      Precautions
     </h2>
 
     <div class="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-red-800 dark:text-red-200 leading-relaxed">
-        <span class="font-medium">⚠️ 참조 비교:</span> 의존성 배열의 각 요소는{' '}
+        <span class="font-medium">⚠️ Reference Comparison:</span> Each element
+        in the dependency array is compared using{' '}
         <code class="px-2 py-1 bg-red-200 dark:bg-red-800 rounded text-sm">
           ===
         </code>
-        로 비교됩니다. 객체나 배열을 의존성으로 사용하면, 내용이 같아도 참조가
-        다르면 매번 리렌더링됩니다.
+        . If you use objects or arrays as dependencies, they'll cause
+        re-rendering every time even with identical contents if references
+        differ.
         <br />
         <br />
-        <span class="font-medium">⚠️ 의존성 누락:</span> updater 함수에서
-        사용하는 모든 변수를 의존성 배열에 포함해야 합니다. 누락하면 화면이 최신
-        상태를 반영하지 못합니다.
+        <span class="font-medium">⚠️ Missing Dependencies:</span> Include all
+        variables used in the updater function in the dependency array. Omitting
+        them means the screen won't reflect the latest state.
         <br />
         <br />
-        <span class="font-medium">⚠️ 과도한 사용 주의:</span> 모든 컴포넌트에
-        cacheUpdate를 사용할 필요는 없습니다. 실제로 성능 문제가 있는 부분에만
-        적용하세요. 불필요하게 사용하면 오히려 코드가 복잡해집니다.
+        <span class="font-medium">⚠️ Avoid Overuse:</span> You don't need to use
+        cacheUpdate on every component. Apply it only where actual performance
+        issues exist. Unnecessary use makes code more complex.
         <br />
         <br />
-        <span class="font-medium">⚠️ renew 호출:</span> 의존성이 변경되지 않으면
-        renew를 호출해도 리렌더링이 발생하지 않습니다. 이는 의도된 동작이지만,
-        예상과 다를 수 있으니 주의하세요.
+        <span class="font-medium">⚠️ Renew Calls:</span> If dependencies haven't
+        changed, calling renew won't trigger re-rendering. This is intentional
+        behavior, but be aware as it might be unexpected.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      언제 사용해야 할까?
+      When to Use?
     </h2>
 
     <div class="grid gap-6 mb-6">
       <div class="border-l-4 border-green-500 bg-green-50 dark:bg-green-900/20 p-4 rounded-r">
         <h3 class="text-lg font-medium text-green-900 dark:text-green-100 mb-2">
-          ✅ cacheUpdate 사용 권장
+          ✅ Use cacheUpdate When
         </h3>
         <ul class="text-sm md:text-base text-green-800 dark:text-green-200 leading-relaxed space-y-2">
-          <li>• 렌더링 비용이 큰 컴포넌트 (복잡한 리스트, 차트 등)</li>
-          <li>• 일부 상태만 화면에 영향을 주는 경우</li>
-          <li>• 리스트의 각 아이템을 독립적으로 최적화하고 싶을 때</li>
-          <li>• Props가 자주 변경되지만 특정 props만 렌더링에 영향을 줄 때</li>
+          <li>
+            • Components with expensive rendering (complex lists, charts, etc.)
+          </li>
+          <li>• When only some state affects the screen</li>
+          <li>• Want to optimize each list item independently</li>
+          <li>
+            • Props change frequently but only specific props affect rendering
+          </li>
         </ul>
       </div>
 
       <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-r">
         <h3 class="text-lg font-medium text-yellow-900 dark:text-yellow-100 mb-2">
-          ⚠️ cacheUpdate 사용 불필요
+          ⚠️ cacheUpdate Not Needed
         </h3>
         <ul class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed space-y-2">
-          <li>• 단순한 컴포넌트 (렌더링 비용이 작음)</li>
-          <li>• 모든 상태 변경이 화면에 반영되어야 하는 경우</li>
-          <li>• 성능 문제가 실제로 발생하지 않는 경우</li>
-          <li>• 코드 복잡도를 낮추는 것이 더 중요한 경우</li>
+          <li>• Simple components (low rendering cost)</li>
+          <li>• When all state changes should be reflected on screen</li>
+          <li>• When performance issues don't actually occur</li>
+          <li>• When reducing code complexity is more important</li>
         </ul>
       </div>
     </div>
@@ -538,7 +550,7 @@ const Dashboard = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음 단계
+      Next Steps
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -551,12 +563,12 @@ const Dashboard = mount(renew => {
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          예제: cacheUpdate로 리스트 최적화 →
+          Example: Optimize Lists with cacheUpdate →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          cacheUpdate로 리스트 렌더링 횟수를 줄이고,
+          Try an example that reduces list rendering count with cacheUpdate
           <br />
-          루트 렌더와 부분 렌더 카운트를 눈으로 확인하는 예제를 실행해 보세요.
+          and visually tracks root render and partial render counts.
         </p>
       </a>
 
@@ -572,10 +584,10 @@ const Dashboard = mount(renew => {
           Helper: State-Ref →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          깊은 중첩 객체에 대한 반응성을 제공하는 외부 라이브러리인 state-ref를
-          알아보세요.
+          Learn about state-ref, an external library providing reactivity for
+          deeply nested objects.
           <br />
-          복잡한 데이터 구조를 다룰 때 매우 유용합니다.
+          Very useful when dealing with complex data structures.
         </p>
       </a>
     </div>

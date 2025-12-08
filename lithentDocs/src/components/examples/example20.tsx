@@ -11,37 +11,37 @@ interface Photo {
 const photos: Photo[] = [
   {
     id: 1,
-    title: '산 풍경',
+    title: 'Mountain Landscape',
     thumbnail: '🏔️',
     full: '🏔️',
   },
   {
     id: 2,
-    title: '바다 풍경',
+    title: 'Ocean View',
     thumbnail: '🌊',
     full: '🌊',
   },
   {
     id: 3,
-    title: '도시 야경',
+    title: 'City Night View',
     thumbnail: '🌃',
     full: '🌃',
   },
   {
     id: 4,
-    title: '숲 속',
+    title: 'Forest',
     thumbnail: '🌲',
     full: '🌲',
   },
   {
     id: 5,
-    title: '석양',
+    title: 'Sunset',
     thumbnail: '🌅',
     full: '🌅',
   },
   {
     id: 6,
-    title: '별이 빛나는 밤',
+    title: 'Starry Night',
     thumbnail: '🌌',
     full: '🌌',
   },
@@ -62,17 +62,17 @@ export const Example20 = mount(renew => {
     <div class="w-full max-w-4xl mx-auto">
       <div class="mb-4">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-          🖼️ 이미지 갤러리
+          🖼️ Image Gallery
         </h3>
         <p class="text-xs text-gray-500 dark:text-gray-400">
-          썸네일을 클릭하면 Portal을 통해 라이트박스가 표시됩니다
+          Click thumbnails to display lightbox via Portal
         </p>
       </div>
 
-      {/* 갤러리 컨테이너 (overflow:hidden) */}
+      {/* Gallery container (overflow:hidden) */}
       <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4 overflow-hidden border-2 border-dashed border-gray-400 dark:border-gray-600">
         <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
-          📦 overflow: hidden 컨테이너
+          📦 overflow: hidden container
         </p>
         <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
           {photos.map(photo => (
@@ -90,7 +90,7 @@ export const Example20 = mount(renew => {
         </div>
       </div>
 
-      {/* Portal로 라이트박스 렌더링 */}
+      {/* Render lightbox with Portal */}
       {selectedPhoto.v &&
         portal(
           <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 animate-fadeIn">
@@ -114,7 +114,7 @@ export const Example20 = mount(renew => {
                   onClick={closeLightbox}
                   class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  닫기
+                  Close
                 </button>
               </div>
             </div>
@@ -122,22 +122,22 @@ export const Example20 = mount(renew => {
           document.body as HTMLElement
         )}
 
-      {/* 설명 */}
+      {/* Description */}
       <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <p class="text-xs text-blue-800 dark:text-blue-200 mb-2">
-          💡 <strong>Portal의 핵심 특성:</strong>
+          💡 <strong>Key characteristics of Portal:</strong>
         </p>
         <ol class="text-xs text-blue-700 dark:text-blue-300 ml-4 space-y-1">
           <li>
-            1. 갤러리는 <strong>overflow:hidden</strong> 컨테이너 안에 있습니다
+            1. Gallery is inside <strong>overflow:hidden</strong> container
           </li>
           <li>
-            2. 라이트박스는 <strong>Portal</strong>을 통해 별도 영역에
-            렌더링됩니다
+            2. Lightbox is rendered in a separate area via{' '}
+            <strong>Portal</strong>
           </li>
           <li>
-            3. overflow 제약을 받지 않고 <strong>전체 화면</strong>으로
-            표시됩니다
+            3. Displays as <strong>full screen</strong> without overflow
+            constraints
           </li>
         </ol>
       </div>

@@ -4,7 +4,7 @@ import { state, computed } from 'lithent/helper';
 export const Example1 = mount(renew => {
   const cups = state(1, renew);
 
-  // 1잔당 95 kcal 기준 간단 칼로리 계산
+  // Simple calorie calculator (95 kcal per cup)
   const calories = computed(() => cups.v * 95);
 
   const inc = () => {
@@ -27,7 +27,7 @@ export const Example1 = mount(renew => {
           -1
         </button>
         <span class="text-sm text-gray-800 dark:text-gray-200">
-          🍌 스무디 {cups.v}잔
+          🍌 Smoothie cups: {cups.v}
         </span>
         <button
           type="button"
@@ -38,7 +38,8 @@ export const Example1 = mount(renew => {
         </button>
       </div>
       <div class="text-sm text-gray-800 dark:text-gray-200">
-        예상 칼로리: <strong class="text-[#42b883]">{calories.v} kcal</strong>
+        Estimated calories:{' '}
+        <strong class="text-[#42b883]">{calories.v} kcal</strong>
       </div>
     </div>
   );

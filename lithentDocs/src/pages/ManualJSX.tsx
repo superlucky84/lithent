@@ -10,109 +10,112 @@ export const ManualJSX = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      개요
+      Overview
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Vite 플러그인을 사용하지 않고 직접 JSX를 설정하는 방법을 안내합니다.
+      This guide explains how to configure JSX manually without using the Vite
+      plugin.
       <br />
       <br />
-      TypeScript, Babel, Vite(esbuild) 등 다양한 도구에서 Lithent의 JSX를 사용할
-      수 있도록 설정할 수 있습니다.
+      You can configure Lithent JSX in various environments such as TypeScript,
+      Babel, and Vite (esbuild).
     </p>
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 언제 Manual Setup이 필요한가요?</span>
+        <span class="font-medium">💡 When do you need Manual Setup?</span>
         <br />
-        <br />• Vite를 사용하지 않는 프로젝트
-        <br />• Babel 기반 빌드 시스템 (Create React App, Next.js 등)
-        <br />• TypeScript만으로 빌드하는 환경
-        <br />• 커스텀 빌드 파이프라인
+        <br />• Projects that do not use Vite
+        <br />• Babel-based build systems (Create React App, Next.js, etc.)
+        <br />• TypeScript-only build environments
+        <br />• Custom build pipelines
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      JSX 변환 방식
+      JSX Transformation Modes
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      JSX는 JavaScript의 확장 문법으로, 브라우저가 직접 이해할 수 없습니다.
-      따라서 빌드 도구가 JSX를 일반 JavaScript로 변환해야 합니다.
+      JSX is a syntax extension of JavaScript that browsers cannot understand
+      directly. Therefore, build tools must transform JSX into standard
+      JavaScript.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      Classic Transform (전통적 변환)
+      Classic Transform
     </h3>
 
     <CodeBlock
       language="tsx"
-      code={`// JSX 코드
+      code={`// JSX code
 const element = <div className="box">Hello</div>;
 
-// 변환 후 (Classic)
+// After transformation (Classic)
 import { h } from 'lithent';
 const element = h('div', { className: 'box' }, 'Hello');`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Classic 방식은{' '}
+      The Classic mode explicitly calls the{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         h
       </code>{' '}
-      함수를 명시적으로 호출합니다. React의 React.createElement와 동일한
-      패턴입니다.
+      function. This follows the same pattern as React.createElement.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Automatic Transform (자동 변환)
+      Automatic Transform
     </h3>
 
     <CodeBlock
       language="tsx"
-      code={`// JSX 코드
+      code={`// JSX code
 const element = <div className="box">Hello</div>;
 
-// 변환 후 (Automatic)
+// After transformation (Automatic)
 import { jsx as _jsx } from 'lithent/jsx-runtime';
 const element = _jsx('div', { className: 'box', children: 'Hello' });`}
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Automatic 방식은 JSX runtime을 자동으로 import하며, 파일 상단에{' '}
+      The Automatic mode automatically imports the JSX runtime, so you no longer
+      need to manually write{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         import &#123; h &#125;
-      </code>
-      를 작성할 필요가 없습니다.
+      </code>{' '}
+      at the top of every file.
     </p>
 
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 권장 사항:
+          💡 Recommendation:
         </span>{' '}
-        TypeScript 4.1.1 이상을 사용한다면{' '}
+        If you are using TypeScript 4.1.1 or later, we strongly recommend{' '}
         <strong class="text-gray-700 dark:text-gray-300">
           Automatic Transform
         </strong>
-        을 권장합니다. 코드가 더 깔끔하고 import 문을 자동으로 처리합니다.
+        . It results in cleaner code and handles imports automatically.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      TypeScript 설정
+      TypeScript Configuration
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      방법 1: Automatic Transform (권장)
+      Option 1: Automatic Transform (Recommended)
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      TypeScript 4.1.1 이상에서 사용 가능한 자동 JSX 변환 방식입니다.
+      This automatic JSX transform mode is available starting from TypeScript
+      4.1.1.
     </p>
 
     <CodeBlock
@@ -130,10 +133,10 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              옵션
+              Option
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설명
+              Description
             </th>
           </tr>
         </thead>
@@ -145,8 +148,8 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              새로운 JSX 변환 방식 활성화. JSX를 자동으로 <code>_jsx()</code>{' '}
-              함수 호출로 변환
+              Enables the new JSX transform and compiles JSX into calls to the{' '}
+              <code>_jsx()</code> helper.
             </td>
           </tr>
           <tr>
@@ -156,8 +159,8 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              JSX runtime을 가져올 패키지 지정. <code>lithent/jsx-runtime</code>
-              에서 자동으로 import
+              Specifies which package to import the JSX runtime from. Lithent
+              uses <code>lithent/jsx-runtime</code>.
             </td>
           </tr>
         </tbody>
@@ -165,36 +168,34 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
     </div>
 
     <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2 mt-6">
-      장점
+      Advantages
     </h4>
 
     <ul class="space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300 mb-6">
       <li class="flex items-start">
         <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">✓</span>
         <div>
-          매 파일마다{' '}
-          <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-            import &#123; h, Fragment &#125; from 'lithent'
-          </code>{' '}
-          작성 불필요
+          No need to import <code>h</code> and <code>Fragment</code> in every
+          file
         </div>
       </li>
       <li class="flex items-start">
         <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">✓</span>
-        <div>더 작은 번들 크기 (사용되는 함수만 import)</div>
+        <div>Smaller bundle size (only required functions are imported)</div>
       </li>
       <li class="flex items-start">
         <span class="font-semibold text-[#42b883] mr-3 flex-shrink-0">✓</span>
-        <div>최신 React 생태계와 호환</div>
+        <div>Compatible with the modern React ecosystem</div>
       </li>
     </ul>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-8">
-      방법 2: Classic Transform
+      Option 2: Classic Transform
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      전통적인 JSX 변환 방식입니다. 모든 TypeScript 버전에서 사용 가능합니다.
+      This is the traditional JSX transform mode and is supported by all
+      TypeScript versions.
     </p>
 
     <CodeBlock
@@ -213,10 +214,10 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              옵션
+              Option
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설명
+              Description
             </th>
           </tr>
         </thead>
@@ -228,7 +229,8 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              Classic JSX 변환 활성화. JSX를 factory 함수 호출로 변환
+              Enables the classic JSX transform, converting JSX into factory
+              function calls.
             </td>
           </tr>
           <tr>
@@ -238,7 +240,8 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              JSX 요소를 변환할 함수 이름. Lithent는 <code>h</code> 함수 사용
+              The function used to create JSX elements. Lithent uses{' '}
+              <code>h</code>.
             </td>
           </tr>
           <tr>
@@ -248,8 +251,9 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              Fragment 요소를 변환할 함수 이름. Lithent는 <code>Fragment</code>{' '}
-              사용
+              The function used for React-style fragments{' '}
+              <code>&lt;&gt;...&lt;/&gt;</code>. Lithent uses{' '}
+              <code>Fragment</code>.
             </td>
           </tr>
         </tbody>
@@ -257,7 +261,7 @@ const element = _jsx('div', { className: 'box', children: 'Hello' });`}
     </div>
 
     <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2 mt-6">
-      사용 예시
+      Usage Example
     </h4>
 
     <CodeBlock
@@ -276,26 +280,28 @@ const App = mount((renew) => {
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <strong>⚠️ 주의:</strong> Classic Transform 사용 시 매 파일마다{' '}
+        <strong>⚠️ Warning:</strong> When using the Classic Transform, you must
+        explicitly add{' '}
         <code class="px-2 py-1 bg-yellow-700 dark:bg-yellow-600 rounded text-sm">
           import &#123; h, Fragment &#125;
-        </code>
-        를 작성해야 합니다. 작성하지 않으면{' '}
+        </code>{' '}
+        in every file. Otherwise, you will encounter the{' '}
         <code class="px-2 py-1 bg-yellow-700 dark:bg-yellow-600 rounded text-sm">
           h is not defined
         </code>{' '}
-        에러가 발생합니다.
+        error.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Babel 설정
+      Babel Configuration
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Babel을 사용하는 프로젝트에서 Lithent JSX를 설정하는 방법입니다.
+      This section explains how to configure Lithent JSX in projects that use
+      Babel.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
@@ -322,10 +328,10 @@ const App = mount((renew) => {
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              옵션
+              Option
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설명
+              Description
             </th>
           </tr>
         </thead>
@@ -337,8 +343,8 @@ const App = mount((renew) => {
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              JSX 요소를 생성할 함수 이름. 기본값은{' '}
-              <code>React.createElement</code>, Lithent는 <code>h</code>
+              The function used to create JSX elements. Default is{' '}
+              <code>React.createElement</code>. Lithent uses <code>h</code>.
             </td>
           </tr>
           <tr>
@@ -348,8 +354,8 @@ const App = mount((renew) => {
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              Fragment 컴포넌트 이름. 기본값은 <code>React.Fragment</code>,
-              Lithent는 <code>Fragment</code>
+              Fragment component name. Default is <code>React.Fragment</code>,
+              Lithent uses <code>Fragment</code>.
             </td>
           </tr>
         </tbody>
@@ -380,10 +386,10 @@ const App = mount((renew) => {
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              옵션
+              Option
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설명
+              Description
             </th>
           </tr>
         </thead>
@@ -395,7 +401,7 @@ const App = mount((renew) => {
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              새로운 JSX 변환 활성화. JSX runtime을 자동으로 import
+              Enables the new automatic JSX runtime.
             </td>
           </tr>
           <tr>
@@ -405,8 +411,8 @@ const App = mount((renew) => {
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              JSX runtime 패키지 지정. <code>lithent/jsx-runtime</code>에서
-              import
+              Specifies the JSX runtime package. Automatically imports from{' '}
+              <code>lithent/jsx-runtime</code>.
             </td>
           </tr>
         </tbody>
@@ -416,17 +422,18 @@ const App = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Vite 설정 (esbuild)
+      Vite Configuration (esbuild)
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Vite 플러그인 없이 esbuild의 JSX 설정만 사용하는 방법입니다.
+      This section explains how to configure JSX using esbuild only, without the
+      Vite plugin.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
-        주의:
+        Note:
       </strong>{' '}
-      이 방식은 HMR을 지원하지 않습니다. HMR이 필요하다면{' '}
+      This method does not support HMR. If you need HMR support, use the{' '}
       <a
         href="/guide/vite-plugin"
         onClick={(e: Event) => {
@@ -437,7 +444,7 @@ const App = mount((renew) => {
       >
         @lithent/lithent-vite
       </a>{' '}
-      플러그인을 사용하세요.
+      plugin instead.
     </p>
 
     <CodeBlock
@@ -452,65 +459,26 @@ export default defineConfig({
 });`}
     />
 
-    <div class="overflow-x-auto mb-6 mt-4">
-      <table class="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
-        <thead class="bg-gray-100 dark:bg-gray-800">
-          <tr>
-            <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              옵션
-            </th>
-            <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설명
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-                jsxFactory
-              </code>
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              esbuild의 JSX factory 함수. <code>&lt;div /&gt;</code>를{' '}
-              <code>h('div')</code>로 변환
-            </td>
-          </tr>
-          <tr>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-                jsxFragment
-              </code>
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              esbuild의 Fragment 컴포넌트. <code>&lt;&gt;&lt;/&gt;</code>를{' '}
-              <code>Fragment</code>로 변환
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
-        esbuild는 현재 Automatic Transform을 지원하지 않습니다. Classic
-        Transform만 사용 가능합니다.
+        esbuild currently does not support the Automatic Transform. Only the
+        Classic Transform is available.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      TypeScript + Babel 조합
+      TypeScript + Babel Combination
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      TypeScript로 타입 체크만 하고, Babel로 실제 변환을 수행하는 설정입니다.
-      <br />
-      Next.js, Create React App 등에서 주로 사용하는 패턴입니다.
+      This setup uses TypeScript for type checking only and Babel for the actual
+      JSX transformation. This pattern is commonly used in frameworks like
+      Next.js and Create React App.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
@@ -533,10 +501,10 @@ export default defineConfig({
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              옵션
+              Option
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설명
+              Description
             </th>
           </tr>
         </thead>
@@ -548,7 +516,8 @@ export default defineConfig({
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              JSX 구문을 그대로 유지하고 변환하지 않음. Babel이 나중에 변환
+              Keeps JSX syntax in the output so Babel can perform the actual JSX
+              transform later.
             </td>
           </tr>
           <tr>
@@ -558,7 +527,8 @@ export default defineConfig({
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              타입 체크용. TypeScript가 <code>h</code>가 유효한 factory임을 인식
+              Used only for type checking so that TypeScript knows{' '}
+              <code>h</code> is a valid JSX factory.
             </td>
           </tr>
         </tbody>
@@ -593,10 +563,10 @@ export default defineConfig({
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설정
+              Setting
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              설명
+              Description
             </th>
           </tr>
         </thead>
@@ -608,18 +578,19 @@ export default defineConfig({
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              TypeScript 파일 처리. <code>jsxPragma: "h"</code>로 factory 지정
+              Handles TypeScript files. The <code>jsxPragma: "h"</code> option
+              tells Babel which JSX factory function to use.
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-                @babel/transform-react-jsx
+                @babel/plugin-transform-react-jsx
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              JSX를 JavaScript로 변환. <code>pragma</code>와{' '}
-              <code>pragmaFrag</code> 설정
+              Transforms JSX into JavaScript using the configured{' '}
+              <code>pragma</code> and <code>pragmaFrag</code> settings.
             </td>
           </tr>
         </tbody>
@@ -629,25 +600,22 @@ export default defineConfig({
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      문제 해결
+      Troubleshooting
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      "h is not defined" 에러
+      "h is not defined" Error
     </h3>
 
     <div class="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-red-800 dark:text-red-200 leading-relaxed">
-        <strong>원인:</strong> Classic Transform 사용 시{' '}
-        <code class="px-2 py-1 bg-red-700 dark:bg-red-600 rounded text-sm">
-          h
-        </code>{' '}
-        함수를 import하지 않았습니다.
+        <strong>Cause:</strong> The <code>h</code> function was not imported
+        when using the Classic Transform.
       </p>
     </div>
 
     <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-      해결 방법 1: h 함수 import
+      Solution 1: Import h explicitly
     </h4>
 
     <CodeBlock
@@ -658,7 +626,7 @@ const App = () => <div>Hello</div>;`}
     />
 
     <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2 mt-6">
-      해결 방법 2: Automatic Transform 사용
+      Solution 2: Use Automatic Transform
     </h4>
 
     <CodeBlock
@@ -671,28 +639,32 @@ const App = () => <div>Hello</div>;`}
   }
 }
 
-// 이제 import 없이 사용 가능
+// You can now use JSX without manual imports
 const App = () => <div>Hello</div>;`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-8">
-      TypeScript 타입 에러
+      TypeScript Type Errors
     </h3>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <strong>증상:</strong> JSX 요소에 빨간 밑줄이 생기고 "JSX element
-        implicitly has type 'any'" 에러가 발생합니다.
+        <strong>Symptom:</strong> JSX elements are underlined in red with an
+        error such as{' '}
+        <code class="px-2 py-1 bg-yellow-700 dark:bg-yellow-600 rounded text-sm">
+          JSX element implicitly has type 'any'
+        </code>
+        .
       </p>
     </div>
 
     <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-      해결 방법: 타입 정의 추가
+      Solution: Add JSX type definitions
     </h4>
 
     <CodeBlock
       language="typescript"
-      code={`// src/jsx.d.ts 파일 생성
+      code={`// Create src/jsx.d.ts
 import 'lithent';
 
 declare module 'lithent' {
@@ -705,7 +677,8 @@ declare module 'lithent' {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      또는 tsconfig.json에 lithent 타입을 포함:
+      Alternatively, include Lithent&apos;s types in your{' '}
+      <code>tsconfig.json</code>:
     </p>
 
     <CodeBlock
@@ -720,12 +693,12 @@ declare module 'lithent' {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      권장 설정 요약
+      Recommended Setup Summary
     </h2>
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        현대적인 TypeScript 프로젝트
+        Modern TypeScript Projects
       </h3>
       <CodeBlock
         language="json"
@@ -740,7 +713,7 @@ declare module 'lithent' {
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        Vite 프로젝트 (HMR 필요)
+        Vite Projects (HMR Required)
       </h3>
       <CodeBlock
         language="typescript"
@@ -755,7 +728,7 @@ export default defineConfig({
 
     <div class="border-l-4 border-[#42b883] bg-gradient-to-r from-[#42b883]/5 to-transparent dark:from-[#42b883]/10 dark:to-transparent p-6 mb-6 rounded-r">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-        Babel 프로젝트
+        Babel-based Projects
       </h3>
       <CodeBlock
         language="json"
@@ -776,7 +749,7 @@ export default defineConfig({
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음 단계
+      Next Step
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -792,9 +765,10 @@ export default defineConfig({
           JSX & Templates: FTags →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          JSX 없이 함수형 API로 컴포넌트를 작성하는 FTags를 알아보세요.
+          Learn about FTags, a functional API for building components without
+          JSX.
           <br />
-          빌드 도구 설정 없이 즉시 사용 가능합니다.
+          You can use it immediately with no build tool configuration.
         </p>
       </a>
     </div>

@@ -1,7 +1,7 @@
 import { mount } from 'lithent';
 import { state } from 'lithent/helper';
 
-// 신호등 상태 타입
+// Traffic light state type
 type LightState = 'red' | 'yellow' | 'green';
 
 export const Example17 = mount(renew => {
@@ -64,11 +64,12 @@ export const Example17 = mount(renew => {
           Traffic Light Controller
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          SVG 요소(circle, rect, text)를 사용한 인터랙티브 신호등 예제입니다
+          An interactive traffic light example using SVG elements (circle, rect,
+          text)
         </p>
       </div>
 
-      {/* 컨트롤 패널 */}
+      {/* Control Panel */}
       <div class="mb-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
         <div class="flex gap-3 mb-3">
           <button
@@ -102,7 +103,7 @@ export const Example17 = mount(renew => {
         </div>
       </div>
 
-      {/* 신호등 SVG */}
+      {/* Traffic Light SVG */}
       <div class="flex justify-center mb-6">
         <div class="p-8 bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-2xl">
           <svg
@@ -111,7 +112,7 @@ export const Example17 = mount(renew => {
             viewBox="0 0 200 400"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* 신호등 외곽 */}
+            {/* Traffic light frame */}
             <rect
               x="25"
               y="25"
@@ -123,7 +124,7 @@ export const Example17 = mount(renew => {
               stroke-width="3"
             />
 
-            {/* 빨간불 */}
+            {/* Red light */}
             <circle
               cx="100"
               cy="85"
@@ -145,7 +146,7 @@ export const Example17 = mount(renew => {
               />
             )}
 
-            {/* 노란불 */}
+            {/* Yellow light */}
             <circle
               cx="100"
               cy="200"
@@ -167,7 +168,7 @@ export const Example17 = mount(renew => {
               />
             )}
 
-            {/* 초록불 */}
+            {/* Green light */}
             <circle
               cx="100"
               cy="315"
@@ -192,10 +193,10 @@ export const Example17 = mount(renew => {
         </div>
       </div>
 
-      {/* SVG 요소 설명 */}
+      {/* SVG Elements Description */}
       <div class="mt-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
-          💡 사용된 SVG 요소
+          💡 SVG Elements Used
         </h4>
         <div class="text-xs text-blue-700 dark:text-blue-300 space-y-2">
           <div class="flex items-start gap-2">
@@ -206,7 +207,7 @@ export const Example17 = mount(renew => {
               <strong class="text-red-700 dark:text-red-300">
                 xmlns="http://www.w3.org/2000/svg"
               </strong>{' '}
-              - SVG 네임스페이스 선언 (필수!)
+              - SVG namespace declaration (required!)
             </span>
           </div>
           <div class="flex items-start gap-2">
@@ -214,7 +215,7 @@ export const Example17 = mount(renew => {
               &lt;rect&gt;
             </code>
             <span>
-              신호등 외곽 박스 (width, height, rx for rounded corners)
+              Traffic light frame box (width, height, rx for rounded corners)
             </span>
           </div>
           <div class="flex items-start gap-2">
@@ -222,7 +223,8 @@ export const Example17 = mount(renew => {
               &lt;circle&gt;
             </code>
             <span>
-              3개의 신호등 (cx, cy for position, r for radius, fill, opacity)
+              3 traffic lights (cx, cy for position, r for radius, fill,
+              opacity)
             </span>
           </div>
           <div class="flex items-start gap-2">
@@ -230,65 +232,67 @@ export const Example17 = mount(renew => {
               opacity
             </code>
             <span>
-              현재 신호: {currentLight.v === 'red' && '빨강(1.0)'}
-              {currentLight.v === 'yellow' && '노랑(1.0)'}
-              {currentLight.v === 'green' && '초록(1.0)'}, 나머지: 0.2
+              Current light: {currentLight.v === 'red' && 'Red(1.0)'}
+              {currentLight.v === 'yellow' && 'Yellow(1.0)'}
+              {currentLight.v === 'green' && 'Green(1.0)'}, Others: 0.2
             </span>
           </div>
           <div class="flex items-start gap-2">
             <code class="px-2 py-0.5 bg-blue-200 dark:bg-blue-800 rounded font-mono">
               stroke
             </code>
-            <span>켜진 신호에 외곽선 효과 (animate-pulse로 깜빡임)</span>
+            <span>
+              Outline effect on active light (pulsing with animate-pulse)
+            </span>
           </div>
         </div>
       </div>
 
-      {/* 테스트 요점 */}
+      {/* Key Test Points */}
       <div class="mt-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
         <h4 class="text-sm font-semibold text-green-800 dark:text-green-200 mb-2">
-          🎯 테스트 요점
+          🎯 Key Test Points
         </h4>
         <ul class="text-xs text-green-700 dark:text-green-300 space-y-1">
           <li>
-            • <strong>SVG 렌더링</strong>: Lithent가 SVG 요소를 정확히
-            렌더링하는지 확인
+            • <strong>SVG Rendering</strong>: Verify that Lithent renders SVG
+            elements accurately
           </li>
           <li>
-            • <strong>동적 속성</strong>: opacity, fill, stroke 등의 SVG 속성이
-            반응형으로 업데이트됨
+            • <strong>Dynamic Attributes</strong>: SVG attributes like opacity,
+            fill, stroke update reactively
           </li>
           <li>
-            • <strong>조건부 렌더링</strong>: 켜진 신호에만 외곽 원(glow 효과)이
-            표시됨
+            • <strong>Conditional Rendering</strong>: Outer circle (glow effect)
+            only appears on active light
           </li>
           <li>
-            • <strong>CSS transition</strong>: SVG 요소에 Tailwind CSS 클래스
-            적용 가능
+            • <strong>CSS transition</strong>: Tailwind CSS classes can be
+            applied to SVG elements
           </li>
           <li>
-            • <strong>Auto Mode</strong>: setInterval로 자동 전환,
-            clearInterval로 정리
+            • <strong>Auto Mode</strong>: Automatic switching with setInterval,
+            cleanup with clearInterval
           </li>
         </ul>
       </div>
 
-      {/* 신호등 작동 설명 */}
+      {/* How Traffic Light Works */}
       <div class="mt-4 p-4 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
         <h4 class="text-sm font-semibold text-purple-800 dark:text-purple-200 mb-2">
-          🚦 신호등 작동 방식
+          🚦 How Traffic Light Works
         </h4>
         <ol class="text-xs text-purple-700 dark:text-purple-300 space-y-1 list-decimal list-inside">
           <li>
-            <strong>빨간불 (🔴 Stop)</strong>: 정지 - 차량 멈춤
+            <strong>Red Light (🔴 Stop)</strong>: Stop - Vehicles must stop
           </li>
           <li>
-            <strong>노란불 (🟡 Ready)</strong>: 준비 - 출발 준비
+            <strong>Yellow Light (🟡 Ready)</strong>: Ready - Prepare to go
           </li>
           <li>
-            <strong>초록불 (🟢 Go)</strong>: 출발 - 차량 통과
+            <strong>Green Light (🟢 Go)</strong>: Go - Vehicles proceed
           </li>
-          <li>순환: 빨강 → 노랑 → 초록 → 빨강 (무한 반복)</li>
+          <li>Cycle: Red → Yellow → Green → Red (infinite loop)</li>
         </ol>
       </div>
     </div>

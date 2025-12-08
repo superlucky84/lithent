@@ -60,28 +60,36 @@ export const Example9Page = (): ReturnType<typeof Introduction> => (
     </h1>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
+      This real-time business card generator demonstrates how{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         &lt;input&gt;
       </code>{' '}
-      요소와{' '}
+      and{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         &lt;textarea&gt;
       </code>{' '}
-      요소가 올바르게 동작하는지 보여주는 실시간 명함 생성기 예제입니다.
+      elements behave when controlled by state.
     </p>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-      이 예제는{' '}
+      It is designed to{' '}
       <strong>
-        Lithent가 input/textarea 요소의 onInput 이벤트를 처리하고, value 속성을
-        통해 양방향 바인딩을 정확하게 구현하는지 테스트
+        test how Lithent handles input/textarea{' '}
+        <code class="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
+          onInput
+        </code>{' '}
+        events and two-way binding via the{' '}
+        <code class="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
+          value
+        </code>{' '}
+        attribute
       </strong>
-      하기 위해 설계되었습니다.
+      .
     </p>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      각 input 필드에 텍스트를 입력하면 명함 프리뷰가 실시간으로 업데이트됩니다.
-      Template 버튼으로 샘플 데이터를 불러오거나 직접 입력해보세요!
+      As you type into each input field, the card preview updates instantly. Try
+      loading a template or entering your own data.
     </p>
 
     <CodeBlock language="typescript" code={example9Code} />
@@ -97,87 +105,93 @@ export const Example9Page = (): ReturnType<typeof Introduction> => (
 
     <div class="mt-6">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        Input 요소의 핵심 동작
+        Core behavior of input elements
       </h2>
       <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
         <li>
-          <strong>onInput 이벤트</strong>: 사용자가 타이핑할 때마다 이벤트
-          핸들러가 즉시 실행됩니다
+          <strong>onInput events</strong>: fire on every keystroke for a highly
+          responsive UI.
         </li>
         <li>
-          <strong>value 바인딩</strong>: value prop으로 현재 입력값을 설정하여
-          양방향 바인딩 구현
+          <strong>Value binding</strong>: use the value prop to implement
+          two-way binding.
         </li>
         <li>
-          <strong>다양한 input 타입</strong>: text, email, tel, url 등 다양한
-          타입의 input 지원
+          <strong>Multiple input types</strong>: supports text, email, tel, url,
+          and more.
         </li>
         <li>
-          <strong>textarea 지원</strong>: 여러 줄 텍스트 입력도 동일한 방식으로
-          동작
+          <strong>Textarea support</strong>: multi-line inputs behave the same
+          way.
         </li>
         <li>
-          <strong>실시간 동기화</strong>: Template 로드 시 모든 input 필드가
-          즉시 업데이트됨
+          <strong>Live sync</strong>: all fields update immediately when a
+          template is loaded.
         </li>
       </ul>
     </div>
 
     <div class="mt-6">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        주요 기능
+        Key features
       </h2>
       <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
         <li>
-          <strong>7가지 입력 필드</strong>: Name, Title, Company, Email, Phone,
-          Website, Bio
+          <strong>Seven input fields</strong>: Name, Title, Company, Email,
+          Phone, Website, Bio.
         </li>
         <li>
-          <strong>Template 시스템</strong>: Developer, Designer, Entrepreneur
-          프리셋
+          <strong>Template system</strong>: Developer, Designer, and
+          Entrepreneur presets.
         </li>
         <li>
-          <strong>4가지 테마</strong>: Modern, Classic, Minimal, Vibrant 스타일
+          <strong>Four themes</strong>: Modern, Classic, Minimal, and Vibrant
+          styles.
         </li>
         <li>
-          <strong>실시간 프리뷰</strong>: 명함 카드가 입력과 동시에 업데이트
+          <strong>Live preview</strong>: the card updates with each keystroke.
         </li>
         <li>
-          <strong>Reset 기능</strong>: 모든 필드를 한 번에 초기화
+          <strong>Reset</strong>: clear all fields at once.
         </li>
         <li>
-          <strong>Export 기능</strong>: 명함 데이터를 JSON으로 내보내기
+          <strong>Export</strong>: export card data as JSON.
         </li>
       </ul>
     </div>
 
     <div class="mt-6">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        테스트 시나리오
+        Test scenarios
       </h2>
       <ol class="list-decimal list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
-        <li>각 input 필드에 텍스트를 입력하여 실시간 업데이트 확인</li>
-        <li>Template 버튼으로 모든 필드가 한 번에 채워지는지 확인</li>
-        <li>Email이나 Phone 같은 특수 input type이 올바르게 동작하는지 확인</li>
-        <li>Textarea에 여러 줄 텍스트를 입력하여 line-clamp 동작 확인</li>
-        <li>Theme 버튼으로 명함 스타일이 즉시 변경되는지 확인</li>
-        <li>Reset 후 모든 input 필드가 초기화되는지 확인</li>
+        <li>Type into each input field and confirm the preview updates.</li>
+        <li>Use Template buttons to fill all fields at once.</li>
+        <li>
+          Check that special input types like Email and Phone behave correctly.
+        </li>
+        <li>
+          Enter multi-line text in the textarea and observe the line clamp
+          behavior.
+        </li>
+        <li>Switch themes and confirm card styles update immediately.</li>
+        <li>Use Reset and confirm all fields return to their initial state.</li>
       </ol>
     </div>
 
     <div class="mt-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
       <h3 class="text-base font-semibold text-green-800 dark:text-green-200 mb-2">
-        💼 실용적인 예제
+        💼 A practical example
       </h3>
       <p class="text-sm text-green-700 dark:text-green-300 mb-2">
-        이 명함 생성기는 단순한 데모를 넘어 실제로 사용 가능한 도구입니다.
-        네트워킹 이벤트에서 디지털 명함으로 사용하거나, 이메일 서명에 넣을
-        프로필 카드로 활용할 수 있습니다.
+        This card generator is more than a demo—it can be used as a real tool,
+        for example as a digital card at networking events or as a profile card
+        in your email signature.
       </p>
       <p class="text-xs text-green-600 dark:text-green-400 italic">
-        💡 참고: 실제 서비스에서는 입력값 검증(이메일 형식, 전화번호 형식 등)과
-        sanitization을 추가하는 것이 좋습니다. 또한 명함 디자인을 이미지나 PDF로
-        내보내는 기능도 구현할 수 있습니다!
+        💡 In a production app, you&apos;d typically add input validation (email
+        format, phone format, etc.) and sanitization. You could also export the
+        card design as an image or PDF.
       </p>
     </div>
 
@@ -186,25 +200,25 @@ export const Example9Page = (): ReturnType<typeof Introduction> => (
         🎯 Input vs onChange vs onInput
       </h3>
       <p class="text-sm text-purple-700 dark:text-purple-300">
-        Lithent는{' '}
+        Lithent recommends using{' '}
         <code class="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900 rounded text-xs">
           onInput
         </code>
-        이벤트를 권장합니다.{' '}
+        . While{' '}
         <code class="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900 rounded text-xs">
           onChange
-        </code>
-        는 포커스를 잃었을 때만 발생하지만,{' '}
+        </code>{' '}
+        only fires when the field loses focus,{' '}
         <code class="px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900 rounded text-xs">
           onInput
-        </code>
-        은 타이핑할 때마다 즉시 발생하여 더 반응적인 UI를 만들 수 있습니다.
+        </code>{' '}
+        fires on every keystroke, making the UI feel much more responsive.
       </p>
     </div>
 
     <div class="mt-10">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        관련 문서
+        Related docs
       </h2>
       <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300">
         <li>
@@ -217,10 +231,10 @@ export const Example9Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            State 가이드
+            State guide
           </a>{' '}
-          - 명함 필드들을 state로 관리하고 불변성을 유지하는 방법을 자세히
-          다룹니다.
+          - Explains how to manage card fields as state while preserving
+          immutability.
         </li>
         <li>
           <a
@@ -232,10 +246,10 @@ export const Example9Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Props 가이드
+            Props guide
           </a>{' '}
-          - value/onInput처럼 폼 컨트롤을 제어 컴포넌트로 사용하는 패턴을
-          정리합니다.
+          - Covers patterns for using form controls like value/onInput in
+          controlled components.
         </li>
       </ul>
     </div>

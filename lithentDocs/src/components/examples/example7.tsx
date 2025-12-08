@@ -19,7 +19,7 @@ const markdownToHtml = (markdown: string): string => {
     '<h1 class="text-2xl font-bold mt-4 mb-2 text-gray-900 dark:text-white">$1</h1>'
   );
 
-  // Unordered lists (처리 순서를 앞으로 이동)
+  // Unordered lists
   html = html.replace(
     /^\* (.*$)/gim,
     '<li class="ml-4 text-gray-700 dark:text-gray-300">$1</li>'
@@ -230,7 +230,7 @@ export const Example7 = mount(r => {
         {/* Supported Syntax */}
         <div class="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
           <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
-            💡 Supported Markdown Syntax
+            💡 Supported Markdown syntax
           </h4>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-blue-700 dark:text-blue-300">
             <div>

@@ -10,20 +10,20 @@ export const Computed = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Computed란?
+      What is computed?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      computed는{' '}
+      computed is a{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        다른 값으로부터 파생된 값을 계산하는 읽기 전용 헬퍼
+        read-only helper that derives values from other values
       </strong>
-      입니다.
+      .
       <br />
       <br />
-      computed는 함수를 인자로 받아, 해당 함수가 반환하는 값을 읽기 전용으로
-      제공합니다. 값에 접근할 때마다 함수가 다시 실행되므로, 항상 최신 상태를
-      반영하는 파생 값을 얻을 수 있습니다.
+      computed takes a function as its argument and exposes the return value as
+      a read-only property. The function is executed every time the value is
+      accessed, so you always get the latest derived value.
     </p>
 
     <CodeBlock
@@ -35,14 +35,14 @@ const PriceCalculator = mount(renew => {
   const price = state(100, renew);
   const quantity = state(1, renew);
 
-  // 총 가격을 계산하는 computed
+  // Compute total price
   const total = computed(() => price.value * quantity.value);
 
   return () => (
     <div>
-      <p>가격: {price.value}원</p>
-      <p>수량: {quantity.value}개</p>
-      <p>총액: {total.value}원</p>
+      <p>Price: {price.value}</p>
+      <p>Quantity: {quantity.value}</p>
+      <p>Total: {total.value}</p>
     </div>
   );
 });`}
@@ -51,45 +51,45 @@ const PriceCalculator = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      핵심 특징
+      Key Characteristics
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      computed의 핵심은{' '}
+      The core characteristics of computed are that it is{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        읽기 전용이며, 접근할 때마다 함수를 실행
+        read-only and re-evaluated on every access
       </strong>
-      한다는 점입니다.
+      .
       <br />
-      <br />• <strong>읽기 전용</strong>: computed 값을 직접 변경하려고 하면
-      에러가 발생합니다.
-      <br />• <strong>즉시 평가 (Lazy Evaluation)</strong>: 값에 접근할 때마다
-      함수가 실행됩니다.
-      <br />• <strong>항상 최신 값</strong>: 의존하는 상태가 변경되면 다음 접근
-      시 새로운 값을 반환합니다.
-      <br />• <strong>mount와 lmount 모두 사용 가능</strong>: renew를 필요로
-      하지 않기 때문에 mount, lmount 어디서든 자유롭게 사용할 수 있습니다.
+      <br />• <strong>Read-only</strong>: Attempting to modify a computed value
+      will throw an error.
+      <br />• <strong>Lazy Evaluation</strong>: The function runs each time the
+      value is accessed.
+      <br />• <strong>Always up-to-date</strong>: When dependencies change, the
+      next access returns a new value.
+      <br />• <strong>Works with both mount and lmount</strong>: Since it does
+      not require renew, it can be used anywhere.
     </p>
 
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
-        computed는 의존성을 자동으로 추적하지 않습니다. Vue나 React의 computed
-        속성과 달리, 단순히 함수를 래핑하여 접근할 때마다 실행하는 편리한
-        헬퍼입니다.
+        computed does NOT automatically track dependencies. Unlike Vue or React
+        computed values, this is simply a convenient helper that wraps a
+        function and executes it on access.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      기본 사용법
+      Basic Usage
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      단순 계산
+      Simple Computation
     </h3>
 
     <CodeBlock
@@ -100,7 +100,7 @@ import { state, computed } from 'lithent/helper';
 const Counter = mount(renew => {
   const count = state(0, renew);
 
-  // 두 배 값을 계산
+  // Compute doubled value
   const doubled = computed(() => count.value * 2);
 
   return () => (
@@ -114,7 +114,7 @@ const Counter = mount(renew => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      여러 값 조합
+      Combining Multiple Values
     </h3>
 
     <CodeBlock
@@ -126,7 +126,7 @@ const UserProfile = mount(renew => {
   const firstName = state('John', renew);
   const lastName = state('Doe', renew);
 
-  // 여러 값을 조합하여 계산
+  // Combine multiple values
   const fullName = computed(() => \`\${firstName.value} \${lastName.value}\`);
 
   return () => (
@@ -150,11 +150,11 @@ const UserProfile = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      실용적인 예제
+      Practical Examples
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      장바구니 계산
+      Shopping Cart Calculation
     </h3>
 
     <CodeBlock
@@ -168,12 +168,12 @@ const ShoppingCart = mount(renew => {
     { name: 'Banana', price: 500, quantity: 3 },
   ], renew);
 
-  // 총 가격 계산
+  // Total price
   const totalPrice = computed(() =>
     items.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
   );
 
-  // 총 수량 계산
+  // Total quantity
   const totalQuantity = computed(() =>
     items.value.reduce((sum, item) => sum + item.quantity, 0)
   );
@@ -187,23 +187,23 @@ const ShoppingCart = mount(renew => {
 
   return () => (
     <div>
-      <h3>장바구니</h3>
+      <h3>Shopping Cart</h3>
       {items.value.map((item, i) => (
         <div key={i}>
-          {item.name} - {item.price}원 x {item.quantity}개
+          {item.name} - {item.price} x {item.quantity}
         </div>
       ))}
       <hr />
-      <p>총 상품 수: {totalQuantity.value}개</p>
-      <p>총 가격: {totalPrice.value}원</p>
-      <button onClick={addItem}>상품 추가</button>
+      <p>Total Items: {totalQuantity.value}</p>
+      <p>Total Price: {totalPrice.value}</p>
+      <button onClick={addItem}>Add Item</button>
     </div>
   );
 });`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      필터링 및 정렬
+      Filtering & Sorting
     </h3>
 
     <CodeBlock
@@ -220,7 +220,6 @@ const TodoList = mount(renew => {
 
   const filter = state<'all' | 'active' | 'completed'>('all', renew);
 
-  // 필터링된 할 일 목록
   const filteredTodos = computed(() => {
     switch (filter.value) {
       case 'active':
@@ -232,7 +231,6 @@ const TodoList = mount(renew => {
     }
   });
 
-  // 완료된 할 일 개수
   const completedCount = computed(() =>
     todos.value.filter(t => t.completed).length
   );
@@ -245,16 +243,14 @@ const TodoList = mount(renew => {
 
   return () => (
     <div>
-      <h3>할 일 목록</h3>
+      <h3>Todo List</h3>
 
-      {/* 필터 버튼 */}
       <div>
-        <button onClick={() => (filter.value = 'all')}>전체</button>
-        <button onClick={() => (filter.value = 'active')}>진행중</button>
-        <button onClick={() => (filter.value = 'completed')}>완료</button>
+        <button onClick={() => (filter.value = 'all')}>All</button>
+        <button onClick={() => (filter.value = 'active')}>Active</button>
+        <button onClick={() => (filter.value = 'completed')}>Completed</button>
       </div>
 
-      {/* 필터링된 목록 */}
       {filteredTodos.value.map(todo => (
         <div key={todo.id}>
           <input
@@ -270,14 +266,14 @@ const TodoList = mount(renew => {
         </div>
       ))}
 
-      <p>완료: {completedCount.value} / {todos.value.length}</p>
+      <p>Completed: {completedCount.value} / {todos.value.length}</p>
     </div>
   );
 });`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      동적 클래스명 생성
+      Dynamic Class Name Generation
     </h3>
 
     <CodeBlock
@@ -289,7 +285,6 @@ const ThemeButton = mount(renew => {
   const theme = state<'light' | 'dark'>('light', renew);
   const isActive = state(false, renew);
 
-  // 여러 조건에 따른 클래스명 생성
   const buttonClass = computed(() => {
     const classes = ['btn'];
 
@@ -327,55 +322,55 @@ const ThemeButton = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      읽기 전용 특성
+      Read-only Behavior
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      computed는 읽기 전용입니다. 값을 직접 변경하려고 하면 에러가 발생합니다.
+      computed values are read-only. Attempting to modify them will throw an
+      error.
     </p>
 
     <CodeBlock
       language="tsx"
       code={`const doubled = computed(() => count.value * 2);
 
-// ❌ 에러 발생!
+// ❌ Error!
 doubled.value = 10;  // Error: You can't change 'computed'
 
-// ✅ 올바른 방법: 원본 값을 변경
-count.value = 5;  // doubled는 자동으로 10이 됨`}
+// ✅ Correct approach: update the source value
+count.value = 5;  // doubled automatically becomes 10`}
     />
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ 읽기 전용:</span> computed 값은 파생
-        값이므로 직접 변경할 수 없습니다. 원본 상태를 변경하면 computed 값도
-        자동으로 업데이트됩니다.
+        <span class="font-medium">⚠️ Read-only:</span> computed values cannot be
+        modified directly. Update the original source state instead.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      mount와 lmount 모두 사용 가능
+      Works with Both mount & lmount
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      computed는{' '}
+      computed is{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        renew 함수를 필요로 하지 않는 읽기 전용 헬퍼
+        a read-only helper that does not require renew
       </strong>
-      이므로, mount와 lmount 어디서든 자유롭게 사용할 수 있습니다.
+      , so it can be freely used in both mount and lmount.
       <br />
       <br />
-      이것이 state/lstate와의 차이점입니다. state는 renew를 명시적으로 전달받고,
-      lstate는 useRenew로 자동 처리하지만, computed는 renew 자체가 필요 없으므로
-      lcomputed라는 별도 버전이 존재하지 않습니다.
+      This is what distinguishes it from state and lstate. state explicitly
+      receives renew, lstate retrieves it automatically via useRenew, but
+      computed does not need renew at all—so there is no separate lcomputed.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <div>
         <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          mount에서 사용
+          Using with mount
         </h4>
         <CodeBlock
           language="tsx"
@@ -396,7 +391,7 @@ const App = mount(renew => {
       </div>
       <div>
         <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          lmount에서 사용
+          Using with lmount
         </h4>
         <CodeBlock
           language="tsx"
@@ -420,28 +415,29 @@ const App = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      주의사항
+      Notes & Cautions
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ 즉시 평가:</span> computed는 값에 접근할
-        때마다 함수를 실행합니다. 계산 비용이 큰 작업의 경우 주의가 필요합니다.
+        <span class="font-medium">⚠️ Lazy evaluation:</span> The function runs
+        on every access. Be cautious with expensive computations.
         <br />
         <br />
-        <span class="font-medium">⚠️ 의존성 추적 없음:</span> Vue나 React와 달리
-        의존성을 자동으로 추적하지 않습니다. 단순히 함수를 래핑한 헬퍼입니다.
+        <span class="font-medium">⚠️ No dependency tracking:</span> Unlike Vue
+        or React, dependencies are not tracked automatically.
         <br />
         <br />
-        <span class="font-medium">⚠️ 부수 효과 금지:</span> computed 함수 내에서
-        상태를 변경하거나 부수 효과를 일으키지 마세요. 순수 함수여야 합니다.
+        <span class="font-medium">⚠️ Side effects are forbidden:</span> Do not
+        mutate state or perform side effects inside computed functions. They
+        must remain pure.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음 단계
+      Next Step
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -454,12 +450,11 @@ const App = lmount(() => {
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          예제: 바나나 스무디 칼로리 →
+          Example: Banana Smoothie Calories →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          computed로 파생된 칼로리 값을 계산하고,
-          <br />
-          상태 변경에 따라 자동으로 업데이트되는 간단한 예제를 실행해 보세요.
+          Run a simple example that calculates derived calorie values using
+          computed and automatically updates when state changes.
         </p>
       </a>
 
@@ -475,9 +470,9 @@ const App = lmount(() => {
           Helper: Effect →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          파생 값 계산을 마스터했습니다!
+          You’ve mastered derived values!
           <br />
-          이제 부수 효과를 관리하는 Effect 헬퍼를 알아봅시다.
+          Now let’s explore the Effect helper for managing side effects.
         </p>
       </a>
     </div>

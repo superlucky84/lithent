@@ -10,26 +10,26 @@ export const Lstore = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      lstore란?
+      What is lstore?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstore는{' '}
+      lstore is{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        전역 상태를 관리하는 헬퍼
+        a helper for managing global state
       </strong>
-      로, store의 lmount 전용 버전입니다.
+      , specifically designed as the lmount version of store.
       <br />
       <br />
-      lstore의 핵심은{' '}
+      The key feature of lstore is that{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        useStore() 메서드가 내부적으로 useRenew()를 자동 호출
+        the useStore() method automatically calls useRenew() internally
       </strong>
-      하여, 수동으로 renew를 전달할 필요가 없다는 점입니다.
+      , eliminating the need to manually pass renew.
       <br />
       <br />
-      여러 컴포넌트에서 동일한 상태를 공유할 수 있으며, 상태가 변경되면 구독한
-      모든 컴포넌트가 자동으로 업데이트됩니다.
+      Multiple components can share the same state, and when the state changes,
+      all subscribed components are automatically updated.
     </p>
 
     <CodeBlock
@@ -37,15 +37,15 @@ export const Lstore = () => (
       code={`import { lmount } from 'lithent';
 import { lstore } from 'lithent/helper';
 
-// 1. lstore 생성 (전역)
+// 1. Create lstore (global)
 const userStore = lstore({
   name: 'John',
   age: 25,
 });
 
-// 2. lmount 컴포넌트에서 사용
+// 2. Use in lmount component
 const UserProfile = lmount(() => {
-  const user = userStore.useStore();  // 자동으로 useRenew() 호출
+  const user = userStore.useStore();  // Automatically calls useRenew()
 
   return () => (
     <div>
@@ -55,12 +55,12 @@ const UserProfile = lmount(() => {
   );
 });
 
-// 3. 다른 컴포넌트에서 공유
+// 3. Share across components
 const UserEditor = lmount(() => {
-  const user = userStore.useStore();  // 동일한 store 공유
+  const user = userStore.useStore();  // Share the same store
 
   const updateAge = () => {
-    user.age += 1;  // 변경 시 모든 구독 컴포넌트 업데이트
+    user.age += 1;  // Update all subscribed components on change
   };
 
   return () => (
@@ -78,27 +78,26 @@ const UserEditor = lmount(() => {
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstore는 두 가지 메서드를 제공합니다:
+      lstore provides two methods:
     </p>
 
     <div class="grid gap-6 mb-6">
       <div class="border-l-4 border-[#42b883] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-r">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          useStore() - lmount 전용
+          useStore() - For lmount only
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-          내부적으로 useRenew()를 호출하여 자동으로 구독합니다. renew를 수동으로
-          전달할 필요가 없습니다.
+          Automatically subscribes by calling useRenew() internally. No need to
+          manually pass renew.
         </p>
       </div>
 
       <div class="border-l-4 border-gray-400 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-r">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          watch() - mount 호환
+          watch() - Compatible with mount
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-          수동으로 renew를 전달합니다. store의 일반 호출 방식과 동일하게
-          동작합니다.
+          Manually pass renew. Works the same as the regular store call method.
         </p>
       </div>
     </div>
@@ -110,16 +109,16 @@ import { lstore } from 'lithent/helper';
 
 const counterStore = lstore({ count: 0 });
 
-// ✅ lmount에서 useStore() 사용
+// ✅ Using useStore() with lmount
 const LmountCounter = lmount(() => {
-  const state = counterStore.useStore();  // 자동 renew
+  const state = counterStore.useStore();  // Automatic renew
 
   return () => <div>Count: {state.count}</div>;
 });
 
-// ✅ mount에서 watch() 사용
+// ✅ Using watch() with mount
 const MountCounter = mount(renew => {
-  const state = counterStore.watch(renew);  // 수동 renew
+  const state = counterStore.watch(renew);  // Manual renew
 
   return () => <div>Count: {state.count}</div>;
 });`}
@@ -128,12 +127,12 @@ const MountCounter = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      선택적 구독 (Observer)
+      Selective Subscription (Observer)
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      makeObserver를 사용하면 특정 필드의 변경에만 반응할 수 있습니다. 성능
-      최적화에 유용합니다.
+      Using makeObserver, you can react only to changes in specific fields.
+      Useful for performance optimization.
     </p>
 
     <CodeBlock
@@ -147,13 +146,13 @@ const appStore = lstore({
   count: 0,
 });
 
-// user만 구독
+// Subscribe to user only
 const UserDisplay = lmount(() => {
   const app = appStore.useStore(
-    store => [store.user]  // user 필드만 관찰
+    store => [store.user]  // Observe user field only
   );
 
-  // count가 변경되어도 이 컴포넌트는 리렌더링 안 됨
+  // No re-render when count changes
   return () => (
     <div>
       <p>User: {app.user.name}</p>
@@ -161,10 +160,10 @@ const UserDisplay = lmount(() => {
   );
 });
 
-// theme만 구독
+// Subscribe to theme only
 const ThemeToggle = lmount(() => {
   const app = appStore.useStore(
-    store => [store.theme]  // theme 필드만 관찰
+    store => [store.theme]  // Observe theme field only
   );
 
   const toggleTheme = () => {
@@ -178,13 +177,13 @@ const ThemeToggle = lmount(() => {
   );
 });
 
-// 여러 필드 구독
+// Subscribe to multiple fields
 const MultiFieldWatch = lmount(() => {
   const app = appStore.useStore(
-    store => [store.user, store.theme]  // 두 필드 관찰
+    store => [store.user, store.theme]  // Observe two fields
   );
 
-  // count 변경 시에는 리렌더링 안 됨
+  // No re-render when count changes
   return () => (
     <div>
       <p>{app.user.name}</p>
@@ -197,28 +196,31 @@ const MultiFieldWatch = lmount(() => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
-        makeObserver를 생략하면 store의 모든 필드 변경에 반응합니다. 큰
-        store에서는 성능 저하가 발생할 수 있으므로, 필요한 필드만 선택적으로
-        구독하는 것이 좋습니다.
+        If you omit makeObserver, it will react to all field changes in the
+        store. For large stores, this can cause performance issues, so it's
+        better to selectively subscribe to only the fields you need.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      중첩 객체 반응성 (중요!)
+      Nested Object Reactivity (Important!)
     </h2>
 
     <div class="border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-red-800 dark:text-red-200 leading-relaxed">
-        <span class="font-medium">⚠️ 주의:</span> lstore는 store와 동일하게{' '}
-        <strong>1depth(루트 레벨)의 속성에 대해서만 반응성을 제공</strong>
-        합니다.
+        <span class="font-medium">⚠️ Warning:</span> Like store, lstore{' '}
+        <strong>
+          provides reactivity only for 1-depth (root level) properties
+        </strong>
+        .
         <br />
         <br />
-        중첩된 객체의 속성을 직접 변경하면 반응성이 동작하지 않습니다.
+        Directly changing properties of nested objects will not trigger
+        reactivity.
       </p>
     </div>
 
@@ -241,13 +243,13 @@ const App = lmount(() => {
   const app = appStore.useStore();
 
   const tryUpdateName = () => {
-    // ❌ 2depth 변경 - 반응성 동작 안 함!
+    // ❌ 2-depth change - Reactivity won't work!
     app.user.profile.name = 'Jane';
-    // 값은 변경되지만 리렌더링이 발생하지 않음
+    // Value changes but no re-render occurs
   };
 
   const correctUpdateName = () => {
-    // ✅ 1depth 객체를 교체 - 반응성 동작함!
+    // ✅ Replace 1-depth object - Reactivity works!
     app.user = {
       ...app.user,
       profile: {
@@ -255,29 +257,29 @@ const App = lmount(() => {
         name: 'Jane',
       },
     };
-    // 새로운 객체로 교체되므로 리렌더링 발생
+    // Triggers re-render because object is replaced
   };
 
   return () => (
     <div>
       <p>Name: {app.user.profile.name}</p>
-      <button onClick={tryUpdateName}>직접 변경 (동작 안 함)</button>
-      <button onClick={correctUpdateName}>객체 교체 (동작함)</button>
+      <button onClick={tryUpdateName}>Direct Change (Won't Work)</button>
+      <button onClick={correctUpdateName}>Object Replace (Works)</button>
     </div>
   );
 });`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      중첩 객체 다루기 패턴
+      Pattern for Handling Nested Objects
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      중첩 객체를 업데이트할 때는 항상{' '}
+      When updating nested objects, always{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        1depth 속성을 새로운 객체로 교체
+        replace the 1-depth property with a new object
       </strong>
-      해야 합니다. 스프레드 연산자를 활용하면 편리합니다.
+      . The spread operator makes this convenient.
     </p>
 
     <CodeBlock
@@ -301,7 +303,7 @@ const Settings = lmount(() => {
   const data = dataStore.useStore();
 
   const changeTheme = () => {
-    // ✅ 올바른 방법: spread로 새 객체 생성
+    // ✅ Correct method: Create new object with spread
     data.settings = {
       ...data.settings,
       display: {
@@ -312,7 +314,7 @@ const Settings = lmount(() => {
   };
 
   const changeFontSize = () => {
-    // ✅ 헬퍼 함수를 만들어 사용하면 더 깔끔
+    // ✅ Using a helper function is cleaner
     updateNestedProperty(
       data,
       ['settings', 'display', 'fontSize'],
@@ -330,7 +332,7 @@ const Settings = lmount(() => {
   );
 });
 
-// 중첩 속성 업데이트 헬퍼 함수
+// Helper function for updating nested properties
 function updateNestedProperty(store: any, path: string[], value: any) {
   const [first, ...rest] = path;
 
@@ -352,8 +354,8 @@ function updateNestedProperty(store: any, path: string[], value: any) {
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💎 Deep Reactivity:</span> 중첩 객체에 대한
-        세밀한 반응성이 필요하다면{' '}
+        <span class="font-medium">💎 Deep Reactivity:</span> If you need
+        fine-grained reactivity for nested objects, we recommend using the{' '}
         <a
           href="/guide/state-ref"
           onClick={(e: Event) => {
@@ -364,24 +366,23 @@ function updateNestedProperty(store: any, path: string[], value: any) {
         >
           state-ref
         </a>{' '}
-        라이브러리를 사용하는 것을 권장합니다. 자세한 내용은 state-ref 페이지를
-        참고하세요.
+        library. See the state-ref page for more details.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Primitive 값 저장
+      Storing Primitive Values
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstore는 객체뿐만 아니라 primitive 값(number, string, boolean)도 저장할 수
-      있습니다. primitive 값을 저장하면 자동으로{' '}
+      lstore can store primitive values (number, string, boolean) as well as
+      objects. When storing a primitive value, it's automatically wrapped in a{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         {`{ value: ... }`}
       </code>{' '}
-      형태로 래핑됩니다.
+      structure.
     </p>
 
     <CodeBlock
@@ -389,14 +390,14 @@ function updateNestedProperty(store: any, path: string[], value: any) {
       code={`import { lmount } from 'lithent';
 import { lstore } from 'lithent/helper';
 
-// primitive 값으로 저장
+// Store as primitive value
 const countStore = lstore(0);
 
 const Counter = lmount(() => {
   const count = countStore.useStore();
 
   const increment = () => {
-    count.value += 1;  // .value를 통해 접근
+    count.value += 1;  // Access through .value
   };
 
   return () => (
@@ -411,17 +412,17 @@ const Counter = lmount(() => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
-        대부분의 경우 객체 형태로 store를 정의하는 것이 좋습니다. 여러 관련된
-        상태를 하나의 store에 그룹화할 수 있고, 타입 추론도 더 명확합니다.
+        In most cases, it's better to define stores as objects. You can group
+        multiple related states in one store, and type inference is clearer.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      lstore vs store 비교
+      lstore vs store Comparison
     </h2>
 
     <div class="overflow-x-auto mb-6">
@@ -429,7 +430,7 @@ const Counter = lmount(() => {
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              특성
+              Feature
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
               lstore
@@ -442,7 +443,7 @@ const Counter = lmount(() => {
         <tbody>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              대상 컴포넌트
+              Target Component
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               lmount (useStore)
@@ -453,18 +454,18 @@ const Counter = lmount(() => {
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              renew 전달
+              Renew Passing
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              자동 (useRenew 호출)
+              Automatic (calls useRenew)
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              수동 (인자로 전달)
+              Manual (pass as argument)
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              사용 방식
+              Usage Pattern
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               store.useStore()
@@ -475,35 +476,35 @@ const Counter = lmount(() => {
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              반응성 depth
+              Reactivity Depth
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              1depth (얕은 반응성)
+              1-depth (shallow)
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              1depth (얕은 반응성)
-            </td>
-          </tr>
-          <tr>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              선택적 구독
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              지원 (makeObserver)
-            </td>
-            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              지원 (makeObserver)
+              1-depth (shallow)
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              mount 호환성
+              Selective Subscription
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              watch() 메서드로 가능
+              Supported (makeObserver)
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              기본 방식
+              Supported (makeObserver)
+            </td>
+          </tr>
+          <tr>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              mount Compatibility
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Available via watch() method
+            </td>
+            <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
+              Default method
             </td>
           </tr>
         </tbody>
@@ -515,25 +516,25 @@ const Counter = lmount(() => {
       code={`import { mount, lmount } from 'lithent';
 import { store, lstore } from 'lithent/helper';
 
-// store - mount에서 사용
+// store - Use with mount
 const userStore = store({ name: 'John' });
 
 const MountComponent = mount(renew => {
-  const user = userStore(renew);  // renew 수동 전달
+  const user = userStore(renew);  // Manual renew passing
   return () => <div>{user.name}</div>;
 });
 
-// lstore - lmount에서 사용
+// lstore - Use with lmount
 const userLstore = lstore({ name: 'John' });
 
 const LmountComponent = lmount(() => {
-  const user = userLstore.useStore();  // 자동 renew
+  const user = userLstore.useStore();  // Automatic renew
   return () => <div>{user.name}</div>;
 });
 
-// lstore의 watch() - mount에서도 사용 가능
+// lstore's watch() - Can also be used with mount
 const MountWithLstore = mount(renew => {
-  const user = userLstore.watch(renew);  // 수동 renew
+  const user = userLstore.watch(renew);  // Manual renew
   return () => <div>{user.name}</div>;
 });`}
     />
@@ -541,16 +542,16 @@ const MountWithLstore = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Cache 옵션
+      Cache Option
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lstore는 기본적으로 컴포넌트별로 store 접근을 캐싱합니다. 캐시를
-      비활성화하려면{' '}
+      lstore caches store access per component by default. To disable caching,
+      pass the{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         {`{ cache: false }`}
       </code>{' '}
-      옵션을 전달하세요.
+      option.
     </p>
 
     <CodeBlock
@@ -561,7 +562,7 @@ import { lstore } from 'lithent/helper';
 const appStore = lstore({ count: 0 });
 
 const Component = lmount(() => {
-  // 캐시 비활성화
+  // Disable caching
   const app = appStore.useStore(null, { cache: false });
 
   return () => <div>Count: {app.count}</div>;
@@ -571,18 +572,18 @@ const Component = lmount(() => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
-        일반적으로 캐시를 활성화(기본값)하는 것이 좋습니다. 캐시를 비활성화하면
-        동일한 컴포넌트 인스턴스에서 useStore()를 여러 번 호출할 때마다 새로운
-        구독이 생성됩니다.
+        It's generally better to keep caching enabled (default). Disabling cache
+        creates a new subscription each time useStore() is called from the same
+        component instance.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음 단계
+      Next Steps
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -598,10 +599,11 @@ const Component = lmount(() => {
           Helper: Context →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          컴포넌트 트리에서 데이터를 공유하는 Context API에 대해 알아보세요.
+          Learn about the Context API for sharing data across the component
+          tree.
           <br />
-          props drilling 없이 깊은 컴포넌트 계층에 데이터를 전달하는 방법을
-          배워봅시다.
+          Discover how to pass data to deeply nested components without props
+          drilling.
         </p>
       </a>
     </div>

@@ -10,7 +10,7 @@ export const HtmTags = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      HTM이란?
+      What is HTM?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -22,71 +22,72 @@ export const HtmTags = () => (
       >
         HTM (Hyperscript Tagged Markup)
       </a>
-      은{' '}
+      is a library that lets you use a{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        JSX-like 문법을 순수 JavaScript로 사용
+        JSX-like syntax with plain JavaScript
       </strong>
-      할 수 있게 해주는 라이브러리입니다.
+      .
       <br />
       <br />
-      트랜스파일러 없이 브라우저에서 직접 JSX와 유사한 문법을 사용할 수 있으며,
-      매우 작은 크기(약 600 bytes)를 자랑합니다.
+      You can use JSX-style markup directly in the browser without a transpiler,
+      and the library is extremely small (around 600 bytes).
       <br />
       <br />
-      Lithent는{' '}
+      Lithent exposes HTM via the{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         lithent/tag
       </code>{' '}
-      패키지를 통해 HTM을 Lithent의{' '}
+      package, binding HTM to Lithent&apos;s{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         h
       </code>{' '}
-      함수에 바인딩하여 제공합니다.
+      function.
     </p>
 
     <div class="border-l-4 border-[#42b883] bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
-        <span class="font-medium">✨ 주요 특징:</span>
+        <span class="font-medium">✨ Key properties:</span>
         <br />
         <br />
-        • 트랜스파일러 불필요 - 순수 JavaScript
+        • No transpiler required – pure JavaScript
         <br />
-        • 매우 작은 크기 - 약 600 bytes
+        • Very small footprint – ~600 bytes
         <br />
-        • JSX와 유사한 문법
+        • JSX-like authoring experience
         <br />
-        • ES6 Tagged Templates 사용
-        <br />• 모든 모던 브라우저 지원
+        • Uses ES6 tagged template literals
+        <br />• Supports all modern browsers
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      설치 및 기본 사용법
+      Installation & basic usage
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      설치
+      Install
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent를 설치하면{' '}
+      Once you install Lithent, you can use{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         lithent/tag
-      </code>
-      를 바로 사용할 수 있습니다. 별도의 설치가 필요하지 않습니다.
+      </code>{' '}
+      right away—no extra package is required.
     </p>
 
     <CodeBlock language="bash" code={`npm install lithent`} />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      CDN 사용
+      Using via CDN
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      빌드 툴 없이 브라우저에서 직접 사용하고 싶다면 CDN을 통해 import할 수
-      있습니다. ES modules를 사용하여 HTM과 Lithent를 함께 사용할 수 있습니다.
+      If you want to use HTM directly in the browser without build tools, you
+      can import it from a CDN. With ES modules you can wire HTM up to Lithent
+      in a single HTML file.
     </p>
 
     <CodeBlock
@@ -118,16 +119,16 @@ export const HtmTags = () => (
 <body>
   <div id="root"></div>
 
-  <!-- CDN에서 Lithent와 lithentTag 로드 -->
+  <!-- Load Lithent and lithentTag from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lithent/tag/dist/lithentTag.umd.js"></script>
 
   <script>
-    // 전역 변수에서 필요한 것들 가져오기
+    // Pull required APIs from globals
     const { h, Fragment, mount, render } = lithent;
     const { lTag } = lithentTag;
 
-    // 카운터 컴포넌트
+    // Counter component
     const Counter = mount(renew => {
       let count = 0;
 
@@ -150,7 +151,7 @@ export const HtmTags = () => (
       \`;
     });
 
-    // 렌더링
+    // Render
     render(lTag\`<\${Counter} />\`, document.getElementById('root'));
   </script>
 </body>
@@ -159,40 +160,42 @@ export const HtmTags = () => (
 
     <div class="border-l-4 border-green-500 bg-green-50 dark:bg-green-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-green-800 dark:text-green-200 leading-relaxed">
-        <span class="font-medium">✨ CDN 장점:</span> 위 HTML 파일을 그대로
-        저장하고 브라우저에서 열면 바로 동작합니다. 빌드 설정이나 번들러가 전혀
-        필요하지 않습니다!
+        <span class="font-medium">✨ Why CDN is nice:</span> save the HTML file
+        above and open it in a browser—it works immediately. No build setup or
+        bundler is required.
         <br />
         <br />
-        <span class="font-medium">📦 추가 패키지:</span> Helper 기능도
-        사용하려면{' '}
+        <span class="font-medium">📦 Optional helper bundle:</span> if you also
+        want helper features, load{' '}
         <code class="px-2 py-1 bg-green-200 dark:bg-green-800 rounded text-sm">
           lithent@2/helper/dist/lithentHelper.umd.js
         </code>
-        를 추가로 로드하세요.
+        as well.
         <br />
         <br />
-        <span class="font-medium">🔖 버전 지정:</span> 특정 버전을 사용하려면{' '}
+        <span class="font-medium">🔖 Pinning versions:</span> to lock a specific
+        version, use a URL like{' '}
         <code class="px-2 py-1 bg-green-200 dark:bg-green-800 rounded text-sm">
           lithent@1.20.2
         </code>{' '}
-        처럼 버전을 명시할 수 있습니다.
+        in your script tag.
       </p>
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      기본 사용 (npm)
+      Basic usage (npm)
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-        lithent/tag
-      </code>
-      에서{' '}
+      Import{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         lTag
-      </code>
-      를 import하면 바로 사용할 수 있습니다.
+      </code>{' '}
+      from{' '}
+      <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
+        lithent/tag
+      </code>{' '}
+      and you can start using HTM with Lithent immediately.
     </p>
 
     <CodeBlock
@@ -221,23 +224,23 @@ render(lTag\`<\${App} />\`, document.getElementById('root'));`}
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 Tagged Templates:</span> HTM은 ES6 Tagged
-        Templates를 사용합니다.{' '}
+        <span class="font-medium">💡 Tagged templates:</span> HTM uses ES6
+        tagged template literals.{' '}
         <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-sm">
           lTag`...`
         </code>{' '}
-        형태로 사용하며, 백틱(`) 안에 HTML-like 마크업을 작성합니다.
+        syntax and write HTML-like markup inside backticks (`).
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      JSX와의 차이점
+      Differences from JSX
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      HTM은 JSX와 매우 유사하지만 몇 가지 차이점이 있습니다:
+      HTM is very similar to JSX but there are a few important differences:
     </p>
 
     <div class="overflow-x-auto mb-6">
@@ -245,7 +248,7 @@ render(lTag\`<\${App} />\`, document.getElementById('root'));`}
         <thead class="bg-gray-100 dark:bg-gray-800">
           <tr>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
-              특성
+              Aspect
             </th>
             <th class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-white">
               JSX
@@ -258,18 +261,18 @@ render(lTag\`<\${App} />\`, document.getElementById('root'));`}
         <tbody>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              트랜스파일러
+              Transpiler
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              필요 (Babel 등)
+              Required (Babel, etc.)
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              불필요 (순수 JS)
+              Not required (pure JS)
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              컴포넌트
+              Components
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               {`<Foo />`}
@@ -291,24 +294,24 @@ render(lTag\`<\${App} />\`, document.getElementById('root'));`}
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              종료 태그
+              Closing tags
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               {`</Foo>`}
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              {`<//>`} (간단 종료)
+              {`<//>`} (shorthand closing)
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              HTML 따옴표
+              HTML quotes
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              필수
+              Required
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              선택 (class=foo)
+              Optional (e.g. <code>class=foo</code>)
             </td>
           </tr>
         </tbody>
@@ -316,7 +319,7 @@ render(lTag\`<\${App} />\`, document.getElementById('root'));`}
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      예제 비교
+      Example comparison
     </h3>
 
     <CodeBlock
@@ -333,12 +336,12 @@ lTag\`<\${MyComponent} name="John" age=\${25} />\`
 // HTM - Spread props
 lTag\`<div ...\${props}>content</div>\`
 
-// JSX - 종료 태그
+// JSX - closing tag
 <MyComponent>
   <h1>Title</h1>
 </MyComponent>
 
-// HTM - 간단 종료
+// HTM - shorthand closing
 lTag\`<\${MyComponent}>
   <h1>Title</h1>
 <//>\``}
@@ -347,11 +350,11 @@ lTag\`<\${MyComponent}>
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      실전 예제
+      Practical examples
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      카운터 애플리케이션
+      Counter application
     </h3>
 
     <CodeBlock
@@ -385,7 +388,7 @@ render(lTag\`<\${Counter} />\`, document.getElementById('root'));`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Todo 리스트
+      Todo list
     </h3>
 
     <CodeBlock
@@ -440,7 +443,7 @@ render(lTag\`<\${TodoApp} />\`, document.getElementById('root'));`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      컴포넌트 구성
+      Composing components
     </h3>
 
     <CodeBlock
@@ -448,7 +451,7 @@ render(lTag\`<\${TodoApp} />\`, document.getElementById('root'));`}
       code={`import { mount, render } from 'lithent';
 import { lTag } from 'lithent/tag';
 
-// Header 컴포넌트
+// Header component
 const Header = mount((renew, props) => {
   return () => lTag\`
     <header>
@@ -458,7 +461,7 @@ const Header = mount((renew, props) => {
   \`;
 });
 
-// Footer 컴포넌트
+// Footer component
 const Footer = mount((renew, props) => {
   return () => lTag\`
     <footer ...\${props}>
@@ -467,7 +470,7 @@ const Footer = mount((renew, props) => {
   \`;
 });
 
-// Main 컴포넌트
+// Main component
 const Main = mount(renew => {
   return () => lTag\`
     <main>
@@ -476,7 +479,7 @@ const Main = mount(renew => {
   \`;
 });
 
-// App 컴포넌트
+// App component
 const App = mount(renew => {
   return () => lTag\`
     <div class="app">
@@ -494,15 +497,16 @@ render(lTag\`<\${App} />\`, document.getElementById('root'));`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      Fragment 사용
+      Using fragments
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      HTM은 자동으로 여러 루트 요소를 Fragment로 처리합니다. JSX처럼{' '}
+      HTM automatically treats multiple root elements as a fragment. Unlike JSX,
+      you don&apos;t need to explicitly write{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         {`<></>`}
       </code>
-      를 명시할 필요가 없습니다.
+      for grouped siblings.
     </p>
 
     <CodeBlock
@@ -518,7 +522,7 @@ const MultipleElements = mount(renew => {
   \`;
 });
 
-// Fragment를 명시적으로 사용할 수도 있습니다
+// You can also use Fragment explicitly
 const ExplicitFragment = mount(renew => {
   return () => lTag\`
     <\${Fragment}>
@@ -528,7 +532,7 @@ const ExplicitFragment = mount(renew => {
   \`;
 });
 
-// 조건부 렌더링에서 Fragment 유용
+// Fragment is also useful in conditional rendering
 const ConditionalContent = mount(renew => {
   let showDetails = true;
 
@@ -562,23 +566,25 @@ render(lTag\`<\${ConditionalContent} />\`, document.getElementById('root'));`}
         <span class="font-medium text-gray-700 dark:text-gray-300">
           💡 Fragment:
         </span>{' '}
-        HTM은 자동으로 여러 루트 요소를 배열로 반환하므로, 대부분의 경우
-        Fragment를 명시하지 않아도 됩니다. 하지만 조건부 렌더링이나 의미를
-        명확히 하고 싶을 때는 Fragment를 명시적으로 사용할 수 있습니다.
+        HTM returns multiple root elements as an array, so in most cases you
+        don&apos;t need to mark fragments explicitly. However, when you want to
+        clarify intent or structure—especially with conditional rendering—you
+        can still use <code>Fragment</code> explicitly.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      직접 바인딩하기
+      Binding HTM manually
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      You can also bind HTM directly without going through{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         lithent/tag
       </code>
-      를 사용하지 않고 직접 HTM을 바인딩할 수도 있습니다.
+      .
     </p>
 
     <CodeBlock
@@ -586,7 +592,7 @@ render(lTag\`<\${ConditionalContent} />\`, document.getElementById('root'));`}
       code={`import { h, mount, render } from 'lithent';
 import htm from 'htm';
 
-// Lithent의 h 함수에 직접 바인딩
+// Bind HTM directly to Lithent's h
 const html = htm.bind(h);
 
 const App = mount(renew => {
@@ -611,49 +617,55 @@ render(html\`<\${App} />\`, document.getElementById('root'));`}
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
         <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
           lithent/tag
         </code>
-        의 lTag는 내부적으로{' '}
+        &apos;s <code>lTag</code> is essentially{' '}
         <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
           htm.bind(h)
         </code>
-        를 수행한 것입니다. 직접 바인딩하는 것과 동일하게 동작합니다.
+        under the hood, so it behaves the same as the manual binding shown
+        above.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      HTM vs JSX 선택하기
+      Choosing between HTM and JSX
     </h2>
 
     <div class="grid gap-6 mb-6">
       <div class="border-l-4 border-green-500 bg-green-50 dark:bg-green-900/20 p-4 rounded-r">
         <h3 class="text-lg font-medium text-green-900 dark:text-green-100 mb-2">
-          ✅ HTM을 사용하면 좋은 경우
+          ✅ When HTM is a good fit
         </h3>
         <ul class="text-sm md:text-base text-green-800 dark:text-green-200 leading-relaxed space-y-2">
-          <li>• 빌드 툴 없이 브라우저에서 직접 개발하고 싶을 때</li>
-          <li>• 프로토타입이나 간단한 프로젝트</li>
-          <li>• CDN에서 직접 import하여 사용하고 싶을 때</li>
-          <li>• 빌드 설정이 복잡한 환경을 피하고 싶을 때</li>
-          <li>• 번들 크기를 최소화하고 싶을 때</li>
+          <li>
+            • You want to develop directly in the browser without build tools
+          </li>
+          <li>• Prototypes or small/medium projects</li>
+          <li>• You prefer importing everything from a CDN</li>
+          <li>• You want to avoid complex build configuration</li>
+          <li>• You need to keep bundle size minimal</li>
         </ul>
       </div>
 
       <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-r">
         <h3 class="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">
-          ✅ JSX를 사용하면 좋은 경우
+          ✅ When JSX is a better choice
         </h3>
         <ul class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed space-y-2">
-          <li>• 대규모 프로젝트</li>
-          <li>• TypeScript를 사용하고 완전한 타입 체킹을 원할 때</li>
-          <li>• IDE의 자동완성과 문법 검사를 최대한 활용하고 싶을 때</li>
-          <li>• 빌드 시간에 최적화를 원할 때</li>
-          <li>• 팀에서 JSX에 익숙한 경우</li>
+          <li>• Large-scale applications</li>
+          <li>• You rely heavily on TypeScript and strict type checking</li>
+          <li>• You want the best IDE autocomplete and syntax tooling</li>
+          <li>
+            • You care about maximum runtime performance via build-time
+            compilation
+          </li>
+          <li>• Your team is already fluent in JSX</li>
         </ul>
       </div>
     </div>
@@ -661,39 +673,39 @@ render(html\`<\${App} />\`, document.getElementById('root'));`}
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      주의사항
+      Caveats
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ 컴포넌트 참조:</span> HTM에서 컴포넌트를
-        사용할 때는{' '}
+        <span class="font-medium">⚠️ Component references:</span> When using
+        components in HTM, you must use{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
           {`<\${Component} />`}
         </code>{' '}
-        형태로 달러 기호와 중괄호를 사용해야 합니다. JSX처럼{' '}
+        with the dollar + braces syntax. Writing JSX-style{' '}
         <code class="px-2 py-1 bg-yellow-200 dark:bg-yellow-800 rounded text-sm">
           {`<Component />`}
         </code>
-        를 사용하면 동작하지 않습니다.
+        will not work.
         <br />
         <br />
-        <span class="font-medium">⚠️ 백틱 사용:</span> HTM은 ES6 Tagged
-        Templates를 사용하므로 반드시 백틱(`)을 사용해야 합니다. 일반 따옴표나
-        큰따옴표는 사용할 수 없습니다.
+        <span class="font-medium">⚠️ Backticks:</span> HTM relies on ES6 tagged
+        templates, so you must use backticks (`). Regular single or double
+        quotes will not work.
         <br />
         <br />
-        <span class="font-medium">⚠️ 런타임 파싱:</span> HTM은 런타임에 템플릿을
-        파싱합니다. JSX는 빌드 타임에 컴파일되므로 런타임 성능은 JSX가 더
-        우수합니다. 하지만 HTM도 충분히 빠르며, 템플릿 캐싱을 통해 성능을
-        최적화합니다.
+        <span class="font-medium">⚠️ Runtime parsing:</span> HTM parses
+        templates at runtime, whereas JSX is compiled at build time. JSX can
+        have better raw runtime performance, but HTM is still fast in practice
+        and caches templates internally.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      더 알아보기
+      Learn more
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -707,7 +719,7 @@ render(html\`<\${App} />\`, document.getElementById('root'));`}
           HTM GitHub Repository →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          HTM의 공식 문서와 더 많은 예제를 확인하세요.
+          Browse HTM&apos;s official documentation and more examples.
         </p>
       </a>
 
@@ -723,10 +735,10 @@ render(html\`<\${App} />\`, document.getElementById('root'));`}
           Template Strings →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          강력한 지시자(l-if, l-for)를 제공하는 Lithent의 템플릿 시스템을
-          알아보세요.
+          Explore Lithent&apos;s template-string based system with powerful
+          directives like <code>l-if</code> and <code>l-for</code>.
           <br />
-          JSX와 유사하면서도 더 선언적인 문법을 제공합니다.
+          It feels similar to JSX but offers an even more declarative syntax.
         </p>
       </a>
     </div>

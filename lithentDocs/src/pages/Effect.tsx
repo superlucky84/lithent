@@ -10,24 +10,24 @@ export const Effect = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      effect란?
+      What is effect?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      effect는{' '}
+      effect is a{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        부수 효과(Side Effect)를 관리하는 헬퍼
+        helper for managing side effects
       </strong>
-      입니다.
+      .
       <br />
       <br />
-      컴포넌트의 마운트, 업데이트, 언마운트 시점에 특정 작업을 실행하고, 필요한
-      경우 클린업(정리)할 수 있습니다. 내부적으로 mountCallback과
-      updateCallback을 사용하여 구현되어 있습니다.
+      It allows you to run specific logic during component mount, update, and
+      unmount phases, with optional cleanup. Internally, it is implemented using
+      mountCallback and updateCallback.
       <br />
       <br />
-      API 호출, DOM 이벤트 리스너 등록, 타이머 설정 등의 부수 효과를 선언적으로
-      관리할 수 있습니다.
+      You can declaratively manage side effects such as API calls, DOM event
+      listeners, and timers.
     </p>
 
     <CodeBlock
@@ -42,16 +42,16 @@ const Timer = mount(renew => {
 
   effect(
     () => {
-      // 마운트/업데이트 시 실행
+      // Executed on mount/update
       intervalId = setInterval(() => {
         seconds.value += 1;
       }, 1000);
     },
     () => {
-      // 클린업
+      // Cleanup
       clearInterval(intervalId);
     },
-    () => [] // dependencies (빈 배열 = 마운트 시에만 실행)
+    () => [] // dependencies (empty array = run only on mount)
   );
 
   return () => <div>Seconds: {seconds.value}</div>;
@@ -61,16 +61,16 @@ const Timer = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      기본 사용법
+      Basic Usage
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      effect는 세 가지 인자를 받습니다:
+      effect accepts three arguments:
       <br />
-      <br />• <strong>forward</strong>: 부수 효과를 실행하는 함수
-      <br />• <strong>backward</strong>: 클린업 함수 (선택적)
-      <br />• <strong>dependencies</strong>: 의존성 배열을 반환하는 함수
-      (선택적, 기본값은 빈 배열)
+      <br />• <strong>forward</strong>: function that executes the side effect
+      <br />• <strong>backward</strong>: cleanup function (optional)
+      <br />• <strong>dependencies</strong>: function that returns a dependency
+      array (optional, default is an empty array)
     </p>
 
     <CodeBlock
@@ -80,15 +80,15 @@ import { effect } from 'lithent/helper';
 
 const App = mount(renew => {
   effect(
-    // forward: 부수 효과 실행
+    // forward: run side effect
     () => {
       console.log('Effect executed');
     },
-    // backward: 클린업 함수 (선택적)
+    // backward: cleanup (optional)
     () => {
       console.log('Cleanup');
     },
-    // dependencies: 의존성 배열 반환 함수 (선택적)
+    // dependencies: function that returns dependency array (optional)
     () => []
   );
 
@@ -99,42 +99,42 @@ const App = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      핵심 특징
+      Key Characteristics
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       <strong class="font-semibold text-gray-900 dark:text-white">
-        1. mount와 lmount 모두 사용 가능
+        1. Works with both mount and lmount
       </strong>
       <br />
-      effect는 renew를 필요로 하지 않으므로 mount, lmount 어디서든 사용할 수
-      있습니다.
+      Since effect does not require renew, it can be used in both mount and
+      lmount.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
-        2. 의존성 기반 실행
+        2. Dependency-based execution
       </strong>
       <br />
-      dependencies 배열의 값이 변경되었을 때만 effect가 재실행됩니다. 빈 배열을
-      전달하면 마운트 시에만 실행됩니다.
+      The effect is re-executed only when the values returned by the dependency
+      array function change. Passing an empty array runs it only on mount.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
-        3. 자동 클린업
+        3. Automatic cleanup
       </strong>
       <br />
-      backward 클린업 함수는 컴포넌트 언마운트 시 또는 다음 업데이트 전에
-      자동으로 실행됩니다.
+      The backward cleanup function is automatically executed on component
+      unmount or before the next update.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      실용적인 예제
+      Practical Examples
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      타이머 구현
+      Timer
     </h3>
 
     <CodeBlock
@@ -156,12 +156,11 @@ const Timer = mount(renew => {
       }, 1000);
     },
     () => {
-      // 클린업: 인터벌 제거
       if (intervalId) {
         clearInterval(intervalId);
       }
     },
-    () => [isRunning.value] // isRunning이 변경될 때마다 재실행
+    () => [isRunning.value]
   );
 
   return () => (
@@ -176,7 +175,7 @@ const Timer = mount(renew => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      DOM 이벤트 리스너
+      DOM Event Listener
     </h3>
 
     <CodeBlock
@@ -198,10 +197,9 @@ const WindowSize = mount(renew => {
       window.addEventListener('resize', handleResize);
     },
     () => {
-      // 클린업: 이벤트 리스너 제거
       window.removeEventListener('resize', handleResize);
     },
-    () => [] // 마운트 시에만 실행
+    () => []
   );
 
   return () => (
@@ -213,7 +211,7 @@ const WindowSize = mount(renew => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      API 데이터 가져오기
+      Fetching API Data
     </h3>
 
     <CodeBlock
@@ -256,10 +254,9 @@ const UserProfile = mount<{ userId: number }>((renew, props) => {
       fetchUser();
     },
     () => {
-      // 클린업: API 요청 취소 플래그 설정
       cancelled = true;
     },
-    () => [props.userId] // userId가 변경될 때마다 재실행
+    () => [props.userId]
   );
 
   return () => (
@@ -278,7 +275,7 @@ const UserProfile = mount<{ userId: number }>((renew, props) => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      로컬 스토리지 동기화
+      Local Storage Sync
     </h3>
 
     <CodeBlock
@@ -292,7 +289,6 @@ const ThemeToggle = mount(renew => {
     renew
   );
 
-  // 테마 변경 시 로컬 스토리지에 저장
   effect(
     () => {
       localStorage.setItem('theme', theme.value);
@@ -320,48 +316,48 @@ const ThemeToggle = mount(renew => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      의존성 배열 동작
+      How the Dependency Array Works
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      dependencies는{' '}
+      dependencies must be a{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        배열을 반환하는 함수
+        function that returns an array
       </strong>
-      여야 합니다. 이 함수가 반환하는 배열의 값이 변경되었을 때만 effect가
-      재실행됩니다.
+      . The effect is re-executed only when values in that returned array
+      change.
       <br />
       <br />
-      Lithent는 클로저 기반으로 동작하므로, effect 내부에서 외부 변수를 자유롭게
-      참조할 수 있습니다. 의존성 배열은 React와 달리 모든 외부 값을 포함할
-      필요가 없으며, 단순히 effect를 재실행할 시점을 결정하는 조건으로만
-      사용됩니다.
+      Since Lithent is closure-based, values can be freely referenced inside the
+      effect. Unlike React, you do not need to include every external value in
+      the dependency array—it only controls when the effect should re-run.
     </p>
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-blue-800 dark:text-blue-200 leading-relaxed">
-        <span class="font-medium">💡 왜 함수로 설계되었나요?</span>
+        <span class="font-medium">💡 Why is it designed as a function?</span>
         <br />
         <br />
-        Lithent는 <strong class="font-semibold">클로저 기반 상태 관리</strong>를
-        사용합니다. 컴포넌트의 상태(count, isRunning 등)는 클로저 변수로
-        존재하며, 매 업데이트 시점마다 변경 여부를 확인하려면{' '}
-        <strong class="font-semibold">그 시점의 최신 값</strong>을 읽어야
-        합니다.
+        Lithent uses{' '}
+        <strong class="font-semibold">closure-based state management</strong>.
+        State values exist as closure variables, and to compare them correctly,
+        the latest values must be read at evaluation time.
         <br />
+        <br />
+        By defining dependencies as a function like:
         <br />
         <code class="px-2 py-1 bg-blue-200 dark:bg-blue-800 rounded text-sm">
           () =&gt; [count, isRunning]
         </code>
-        처럼 함수로 설계하면, 의존성을 확인할 때마다 이 함수를 호출하여{' '}
-        <strong class="font-semibold">항상 최신 클로저 값</strong>을 가져올 수
-        있습니다. 함수 호출 시점에 count와 isRunning의 현재 값을 읽어 배열로
-        반환하므로, 이전 값과 비교하여 변경 여부를 정확히 감지할 수 있습니다.
+        <br />
+        Lithent can always retrieve the{' '}
+        <strong class="font-semibold">latest closure values</strong>
+        at comparison time.
       </p>
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      빈 배열: 마운트 시에만 실행
+      Empty Array: Run Only on Mount
     </h3>
 
     <CodeBlock
@@ -371,12 +367,12 @@ const ThemeToggle = mount(renew => {
     console.log('Only once on mount');
   },
   undefined,
-  () => [] // 빈 배열 = 마운트 시에만 실행
+  () => []
 );`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      특정 값 의존: 값 변경 시마다 실행
+      Single Dependency
     </h3>
 
     <CodeBlock
@@ -388,12 +384,12 @@ effect(
     console.log('Count changed:', count.value);
   },
   undefined,
-  () => [count.value] // count.value가 변경될 때마다 실행
+  () => [count.value]
 );`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      여러 값 의존
+      Multiple Dependencies
     </h3>
 
     <CodeBlock
@@ -406,17 +402,17 @@ effect(
     console.log('Count or message changed');
   },
   undefined,
-  () => [count.value, message.value] // 둘 중 하나라도 변경되면 실행
+  () => [count.value, message.value]
 );`}
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      클로저 안전성 (React와의 차이점)
+      Closure Safety (Difference from React)
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent는 클로저 기반으로 동작하므로, 의존성 배열에 포함하지 않은 값도
-      안전하게 참조할 수 있습니다.
+      Since Lithent is closure-based, values not included in the dependency
+      array can still be safely referenced.
     </p>
 
     <CodeBlock
@@ -426,42 +422,41 @@ const multiplier = state(2, renew);
 
 effect(
   () => {
-    // multiplier는 의존성 배열에 없지만 안전하게 참조 가능
     console.log('Result:', count.value * multiplier.value);
   },
   undefined,
-  () => [count.value] // count 변경 시에만 재실행
+  () => [count.value]
 );
 
-// count가 변경되면 effect 재실행 (최신 multiplier 값 사용)
-// multiplier가 변경되어도 effect는 재실행되지 않음`}
+// Effect re-runs when count changes (uses latest multiplier)
+// Changing multiplier does NOT trigger effect`}
     />
 
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
-        React의 useEffect와 달리, Lithent의 effect는 클로저를 통해 항상 최신
-        값을 참조합니다. 의존성 배열은 단순히 "언제 재실행할지"만 결정합니다.
+        Unlike React’s useEffect, Lithent’s effect always sees the latest values
+        via closures. The dependency array only determines when to re-run.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      mount vs lmount에서 사용
+      Using with mount vs lmount
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      effect는 renew를 필요로 하지 않으므로 mount와 lmount 모두에서 동일하게
-      사용할 수 있습니다.
+      Since effect does not require renew, it behaves identically in both mount
+      and lmount.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <div>
         <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          mount에서 사용
+          Using with mount
         </h4>
         <CodeBlock
           language="tsx"
@@ -489,7 +484,7 @@ const App = mount(renew => {
       </div>
       <div>
         <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          lmount에서 사용
+          Using with lmount
         </h4>
         <CodeBlock
           language="tsx"
@@ -520,37 +515,36 @@ const App = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      주의사항
+      Notes & Cautions
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ 마운터에서만 호출:</span> effect는 마운터
-        내부에서만 호출해야 합니다. Updater나 이벤트 핸들러에서 호출하면 안
-        됩니다.
+        <span class="font-medium">⚠️ Call only inside the mounter:</span> effect
+        must only be called inside the mounter. Do not call it inside updaters
+        or event handlers.
         <br />
         <br />
-        <span class="font-medium">⚠️ 클린업 필수:</span> 타이머, 이벤트 리스너,
-        구독 등을 설정한 경우 반드시 클린업 함수에서 정리해야 메모리 누수를
-        방지할 수 있습니다.
+        <span class="font-medium">⚠️ Cleanup is required:</span> When using
+        timers, event listeners, or subscriptions, always clean them up to avoid
+        memory leaks.
         <br />
         <br />
-        <span class="font-medium">⚠️ 의존성은 함수로 전달:</span> dependencies는
-        배열이 아닌 <strong>배열을 반환하는 함수</strong>여야 합니다. Lithent의
-        클로저 기반 상태 관리 방식 때문입니다. 자세한 내용은 위의 "의존성 배열
-        동작" 섹션을 참고하세요.
+        <span class="font-medium">⚠️ Dependencies must be functions:</span> The
+        dependencies argument must be a{' '}
+        <strong>function that returns an array</strong>.
         <br />
         <br />
-        <span class="font-medium">⚠️ 비동기 처리:</span> async/await를 사용할
-        경우, forward 함수를 async로 만들지 말고 내부에서 async 함수를
-        호출하세요.
+        <span class="font-medium">⚠️ Async handling:</span> Do not make the
+        forward function async. Instead, define and call an async function
+        inside it.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음 단계
+      Next Step
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -563,11 +557,11 @@ const App = lmount(() => {
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          예제: effect로 DOM 이벤트 다루기 →
+          Example: Handling DOM Events with effect →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          effect로 DOM 이벤트 리스너를 등록하고 클린업하는 실제 예제를 실행해
-          보세요.
+          Run a real example that registers and cleans up DOM event listeners
+          using effect.
         </p>
       </a>
 
@@ -583,9 +577,9 @@ const App = lmount(() => {
           Helper: Store →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          전역 상태 관리를 위한 Store 헬퍼에 대해 알아보세요.
+          Learn about the Store helper for global state management.
           <br />
-          여러 컴포넌트 간 상태를 공유하는 방법을 배워봅시다.
+          Share state across multiple components.
         </p>
       </a>
     </div>

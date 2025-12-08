@@ -34,9 +34,10 @@ export const Example3Page = (): ReturnType<typeof Introduction> => (
       Render Props (Mouse tracker)
     </h1>
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      마우스 위치를 추적하는 로직을 <strong>render prop</strong>으로 노출해
-      원하는 뷰를 그릴 수 있는 예제입니다. 기본 데모는 컬러풀 배경이며, 이모지
-      팔로워·좌표 표시 뷰로 전환할 수도 있습니다.
+      This example uses a <strong>render prop</strong> to expose the mouse
+      tracking logic so you can render any view you like. The default demo shows
+      a colorful background, and you can switch to an emoji follower or a simple
+      coordinate display.
     </p>
 
     <CodeBlock language="typescript" code={example3Code} />
@@ -52,7 +53,7 @@ export const Example3Page = (): ReturnType<typeof Introduction> => (
 
     <div class="mt-10">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        관련 문서
+        Related docs
       </h2>
       <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 space-y-2">
         <li>
@@ -65,10 +66,9 @@ export const Example3Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Children 가이드
+            Children guide
           </a>{' '}
-          - render prop처럼 함수 형태의 children을 다루는 패턴과 차이를
-          정리합니다.
+          - Explains how function-as-children patterns relate to render props.
         </li>
         <li>
           <a
@@ -80,10 +80,9 @@ export const Example3Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            State 가이드
+            State guide
           </a>{' '}
-          - 마우스 위치를 추적하는 state 업데이트 흐름을 다시 한 번 살펴볼 수
-          있습니다.
+          - Reviews the state update flow used to track the mouse position.
         </li>
       </ul>
     </div>

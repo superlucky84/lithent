@@ -10,20 +10,20 @@ export const UseRenewHooks = () => (
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      useRenew란?
+      What is useRenew?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      useRenew는{' '}
+      useRenew is{' '}
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
-        lmount 컴포넌트 내에서 renew 함수를 가져오는 훅
+        a hook that retrieves the renew function within an lmount component
       </strong>
-      입니다.
+      .
       <br />
       <br />
-      lmount는 일반적으로 lstate와 같은 반응형 헬퍼와 함께 사용되어 자동으로
-      UI가 업데이트됩니다. 하지만 클로저 변수를 사용하면서 수동으로 업데이트를
-      트리거해야 하는 특별한 경우에 useRenew를 사용할 수 있습니다.
+      lmount is typically used with reactive helpers like lstate, which
+      automatically update the UI. However, in special cases where you need to
+      use closure variables and manually trigger updates, you can use useRenew.
     </p>
 
     <CodeBlock
@@ -36,7 +36,7 @@ const Counter = lmount(() => {
 
   const increment = () => {
     count += 1;
-    renew(); // 수동으로 업데이트 트리거
+    renew(); // Manually trigger update
   };
 
   return () => (
@@ -51,48 +51,49 @@ const Counter = lmount(() => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      언제 사용해야 할까?
+      When Should You Use It?
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      useRenew는 다음과 같은 특별한 상황에서 유용합니다:
+      useRenew is useful in these special situations:
       <br />
       <br />
-      • lmount 컴포넌트에서 클로저 변수를 사용할 때
+      • When using closure variables in lmount components
       <br />
-      • lstate를 사용하지 않고 단순한 값을 관리할 때
+      • When managing simple values without using lstate
       <br />
-      • 외부 라이브러리와의 통합에서 수동 업데이트가 필요할 때
+      • When manual updates are needed for external library integration
       <br />
       <br />
-      하지만 대부분의 경우{' '}
+      However, in most cases,{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        lstate를 사용하는 것이 더 권장
+        using lstate is more recommended
       </strong>
-      됩니다. lstate를 사용하면 자동으로 업데이트되므로 renew를 명시적으로
-      호출할 필요가 없습니다.
+      . With lstate, updates happen automatically, eliminating the need to
+      explicitly call renew.
       <br />
       <br />
-      또한 클로저 변수와 함께 renew가 필요하다면,{' '}
+      Additionally, if you need renew with closure variables,{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
-        lmount + useRenew보다는 그냥 mount를 사용하는 것이 더 효과적
+        using mount directly is more effective than lmount + useRenew
       </strong>
-      입니다. mount는 renew를 매개변수로 직접 제공하므로 더 간결하고
-      직관적입니다.
+      . mount provides renew directly as a parameter, making it more concise and
+      intuitive.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      useRenew vs lstate 비교
+      useRenew vs lstate Comparison
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      같은 기능을 useRenew와 lstate로 구현한 예시를 비교해봅시다:
+      Let's compare implementing the same functionality with useRenew and
+      lstate:
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      useRenew 사용 (수동 업데이트)
+      Using useRenew (Manual Update)
     </h3>
 
     <CodeBlock
@@ -105,7 +106,7 @@ const Counter = lmount(() => {
 
   const increment = () => {
     count += 1;
-    renew(); // 명시적으로 renew 호출 필요
+    renew(); // Explicit renew call required
   };
 
   return () => <div>Count: {count}</div>;
@@ -113,7 +114,7 @@ const Counter = lmount(() => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      lstate 사용 (자동 업데이트) - 권장
+      Using lstate (Automatic Update) - Recommended
     </h3>
 
     <CodeBlock
@@ -125,7 +126,7 @@ const Counter = lmount(() => {
   const count = lstate(0);
 
   const increment = () => {
-    count.value += 1; // 자동으로 업데이트됨
+    count.value += 1; // Automatically updates
   };
 
   return () => <div>Count: {count.value}</div>;
@@ -135,26 +136,26 @@ const Counter = lmount(() => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 권장사항:
+          💡 Recommendation:
         </span>{' '}
-        lmount를 사용한다면 lstate를 함께 사용하는 것이 더 간결하고
-        직관적입니다. useRenew는 특별한 경우에만 사용하세요.
+        If you're using lmount, it's more concise and intuitive to use lstate
+        together. Use useRenew only in special cases.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      실용적인 예제
+      Practical Examples
     </h2>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4">
-      외부 라이브러리 통합
+      External Library Integration
     </h3>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      외부 라이브러리의 이벤트를 받아서 UI를 업데이트해야 할 때 useRenew가
-      유용할 수 있습니다.
+      useRenew can be useful when you need to receive events from an external
+      library and update the UI.
     </p>
 
     <CodeBlock
@@ -166,16 +167,16 @@ const ExternalLibComponent = lmount(() => {
   const renew = useRenew();
 
   mountCallback(() => {
-    // 외부 라이브러리 초기화
+    // Initialize external library
     const library = initExternalLibrary();
 
-    // 외부 라이브러리의 이벤트 리스너
+    // External library event listener
     library.on('data', (newData) => {
       data = newData;
-      renew(); // 데이터 변경 시 업데이트
+      renew(); // Update on data change
     });
 
-    // cleanup: 언마운트 시 리스너 제거
+    // cleanup: Remove listener on unmount
     return () => {
       library.off('data');
     };
@@ -190,7 +191,7 @@ const ExternalLibComponent = lmount(() => {
     />
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mb-4 mt-6">
-      타이머 예제
+      Timer Example
     </h3>
 
     <CodeBlock
@@ -223,14 +224,14 @@ const Timer = lmount(() => {
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      lmount에서 useRenew를 사용하는 것과 mount를 사용하는 것은 거의 동일합니다.
-      차이점은 renew 함수를 어떻게 받느냐입니다.
+      Using useRenew with lmount is almost identical to using mount. The
+      difference is how you receive the renew function.
     </p>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       <div>
         <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          mount (renew 매개변수로 받음)
+          mount (Receive renew as parameter)
         </h4>
         <CodeBlock
           language="tsx"
@@ -255,7 +256,7 @@ const Counter = mount((renew) => {
       </div>
       <div>
         <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-          lmount + useRenew (훅으로 받음)
+          lmount + useRenew (Receive via hook)
         </h4>
         <CodeBlock
           language="tsx"
@@ -284,42 +285,42 @@ const Counter = lmount(() => {
     <div class="border-l-4 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
         <span class="font-medium text-gray-700 dark:text-gray-300">
-          💡 참고:
+          💡 Note:
         </span>{' '}
-        두 방식 모두 동일하게 동작합니다. 클로저 변수를 사용한다면 mount를
-        사용하는 것이 더 일반적이고, lmount는 lstate 같은 반응형 헬퍼와 함께
-        사용하는 것이 권장됩니다.
+        Both approaches work identically. If you're using closure variables,
+        mount is more conventional. lmount is recommended for use with reactive
+        helpers like lstate.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      주의사항
+      Precautions
     </h2>
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ lmount에서만 사용:</span> useRenew는 lmount
-        컴포넌트 내에서만 사용할 수 있습니다. mount 컴포넌트에서는 매개변수로
-        renew를 직접 받으므로 useRenew가 필요 없습니다.
+        <span class="font-medium">⚠️ Use only in lmount:</span> useRenew can
+        only be used within lmount components. In mount components, renew is
+        provided directly as a parameter, so useRenew is unnecessary.
         <br />
         <br />
-        <span class="font-medium">⚠️ lstate 사용 권장:</span> lmount를
-        사용한다면 대부분의 경우 lstate를 사용하는 것이 더 직관적입니다.
-        useRenew는 특별한 경우에만 사용하세요.
+        <span class="font-medium">⚠️ lstate usage recommended:</span> If you're
+        using lmount, it's more intuitive to use lstate in most cases. Use
+        useRenew only in special cases.
         <br />
         <br />
-        <span class="font-medium">⚠️ 마운터에서만 호출:</span> useRenew는 마운터
-        내부에서만 호출해야 합니다. Updater나 이벤트 핸들러에서 호출하면 안
-        됩니다.
+        <span class="font-medium">⚠️ Call only in mounter:</span> useRenew
+        should only be called inside the mounter. Do not call it in the updater
+        or event handlers.
       </p>
     </div>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음단계
+      Next Steps
     </h2>
 
     <div class="grid gap-6 mt-6">
@@ -335,9 +336,9 @@ const Counter = lmount(() => {
           Helper: State →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          Core 기능 학습을 완료했습니다!
+          You've completed learning the Core features!
           <br />
-          이제 Helper 기능을 알아봅시다. State 헬퍼부터 시작해보세요.
+          Now let's explore Helper features. Start with the State helper.
         </p>
       </a>
     </div>

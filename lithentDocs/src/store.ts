@@ -14,9 +14,6 @@ const stripKoPrefix = (path: string) => {
 export const resolveRouteForLanguage = (path: string, lang: 'en' | 'ko') => {
   const base = stripKoPrefix(path);
   if (lang === 'ko') {
-    if (base === '/') {
-      return `${KO_PREFIX}/guide/introduction`;
-    }
     return `${KO_PREFIX}${base}`;
   }
 

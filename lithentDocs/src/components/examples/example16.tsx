@@ -1,7 +1,7 @@
 import { mount, Fragment, render, ref, mountCallback } from 'lithent';
 import { state } from 'lithent/helper';
 
-// 플레이리스트 아이템 타입
+// Playlist item type
 interface Song {
   id: number;
   emoji: string;
@@ -9,7 +9,7 @@ interface Song {
   artist: string;
 }
 
-// 동적 플레이리스트 컴포넌트 (가상 DOM)
+// Dynamic Playlist Component (Virtual DOM)
 const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
   const currentIndex = state(0, renew);
 
@@ -27,11 +27,11 @@ const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
 
   return () => (
     <Fragment>
-      {/* 플레이어 컨트롤 */}
+      {/* Player Controls */}
       <div class="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-700 mb-2">
         <div class="flex items-center justify-between mb-3">
           <span class="text-sm font-semibold text-purple-700 dark:text-purple-300">
-            🎵 Current Playlist (가상 DOM)
+            🎵 Current Playlist (Virtual DOM)
           </span>
           <span class="text-xs text-purple-600 dark:text-purple-400">
             {currentIndex.v + 1} / {songs.length}
@@ -55,7 +55,7 @@ const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
         </div>
       </div>
 
-      {/* 플레이리스트 아이템들 (Loop with keys) */}
+      {/* Playlist items (Loop with keys) */}
       {songs.map((song, idx) => (
         <div
           key={song.id}
@@ -85,7 +85,7 @@ const DynamicPlaylist = mount<{ songs: Song[] }>((renew, { songs }) => {
   );
 });
 
-// 메인 컴포넌트
+// Main component
 export const Example16 = mount(renew => {
   const playlistContainer = ref<null | HTMLElement>(null);
   const insertionPoint = ref<null | HTMLElement>(null);
@@ -141,12 +141,12 @@ export const Example16 = mount(renew => {
           Music Library Manager
         </h3>
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          실제 DOM 요소 사이에 가상 DOM(loop)이 삽입되고, destroy 함수로
-          제거되는 것을 확인하세요
+          Verify that a virtual DOM (loop) is inserted between real DOM elements
+          and can be removed using the destroy function
         </p>
       </div>
 
-      {/* 컨트롤 패널 */}
+      {/* Control Panel */}
       <div class="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
         <div class="flex gap-2">
           <button
@@ -183,13 +183,13 @@ export const Example16 = mount(renew => {
         ref={playlistContainer}
         class="bg-white dark:bg-gray-900 rounded-lg p-4 border-2 border-gray-300 dark:border-gray-700 space-y-2"
       >
-        {/* 상단: 실제 DOM */}
+        {/* Top: Real DOM */}
         <div class="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700">
           <div class="flex items-center gap-3">
             <div class="text-2xl">🔔</div>
             <div class="flex-1">
               <div class="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                System Sounds (실제 DOM)
+                System Sounds (Real DOM)
               </div>
               <div class="text-xs text-blue-700 dark:text-blue-300">
                 Cannot be removed
@@ -198,9 +198,9 @@ export const Example16 = mount(renew => {
           </div>
         </div>
 
-        {/* 중간: 가상 DOM이 여기 삽입됨 (mountCallback에서 render 호출) */}
+        {/* Middle: Virtual DOM is inserted here (render called in mountCallback) */}
 
-        {/* 하단: 실제 DOM (insertionPoint) */}
+        {/* Bottom: Real DOM (insertionPoint) */}
         <div
           ref={insertionPoint}
           class="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700"
@@ -209,7 +209,7 @@ export const Example16 = mount(renew => {
             <div class="text-2xl">💾</div>
             <div class="flex-1">
               <div class="text-sm font-semibold text-green-900 dark:text-green-100">
-                Downloaded Music (실제 DOM)
+                Downloaded Music (Real DOM)
               </div>
               <div class="text-xs text-green-700 dark:text-green-300">
                 Permanent storage
@@ -219,54 +219,54 @@ export const Example16 = mount(renew => {
         </div>
       </div>
 
-      {/* DOM 구조 설명 */}
+      {/* DOM Structure */}
       <div class="mt-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
         <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-3">
-          💡 DOM 구조
+          💡 DOM Structure
         </h4>
         <div class="text-xs font-mono text-blue-700 dark:text-blue-300 space-y-1">
           <div>&lt;div ref={'{playlistContainer}'}&gt;</div>
           <div class="ml-4">
-            &lt;div&gt;System Sounds (실제 DOM)&lt;/div&gt;
+            &lt;div&gt;System Sounds (Real DOM)&lt;/div&gt;
           </div>
           <div class="ml-4 text-purple-600 dark:text-purple-400 font-semibold">
             {isPlaylistActive.v
-              ? '⬅ Current Playlist (가상 DOM - Loop with keys)'
+              ? '⬅ Current Playlist (Virtual DOM - Loop with keys)'
               : '⬅ (destroyed)'}
           </div>
           <div class="ml-4">
-            &lt;div ref={'{insertionPoint}'}&gt;Downloaded Music (실제
+            &lt;div ref={'{insertionPoint}'}&gt;Downloaded Music (Real
             DOM)&lt;/div&gt;
           </div>
           <div>&lt;/div&gt;</div>
         </div>
       </div>
 
-      {/* 테스트 요점 */}
+      {/* Key Test Points */}
       <div class="mt-4 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
         <h4 class="text-sm font-semibold text-green-800 dark:text-green-200 mb-2">
-          🎯 테스트 요점
+          🎯 Key Test Points
         </h4>
         <ul class="text-xs text-green-700 dark:text-green-300 space-y-1">
           <li>
-            • <strong>insertBefore 모드</strong>: 가상 DOM이 실제 DOM{' '}
-            <strong>사이</strong>에 삽입됩니다
+            • <strong>insertBefore mode</strong>: Virtual DOM is inserted{' '}
+            <strong>between</strong> real DOM elements
           </li>
           <li>
-            • <strong>Loop with keys</strong>: 4개의 곡이 key를 가진 리스트로
-            렌더링됩니다
+            • <strong>Loop with keys</strong>: 4 songs are rendered as a keyed
+            list
           </li>
           <li>
-            • <strong>destroy 함수</strong>: "Clear Playlist"로 가상 DOM만
-            제거하고 실제 DOM은 유지됩니다
+            • <strong>destroy function</strong>: "Clear Playlist" removes only
+            the virtual DOM while preserving real DOM
           </li>
           <li>
-            • <strong>재렌더링</strong>: "Restore Playlist"로 같은 위치에 다시
-            렌더링할 수 있습니다
+            • <strong>Re-rendering</strong>: "Restore Playlist" can render again
+            at the same location
           </li>
           <li>
-            • Prev/Next 버튼으로 현재 재생 중인 곡을 변경하며 반응형 업데이트를
-            확인하세요
+            • Use Prev/Next buttons to change the currently playing song and
+            verify reactive updates
           </li>
         </ul>
       </div>

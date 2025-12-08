@@ -17,7 +17,7 @@ type AppContext = {
 const appContext = createContext<AppContext>();
 const { Provider, contextState, useContext } = appContext;
 
-// Context를 제공하는 루트 컴포넌트
+// Root component that provides context
 const App = mount(renew => {
   const userState = contextState('Alice');
   const themeState = contextState<ThemeMode>('light');
@@ -31,7 +31,7 @@ const App = mount(renew => {
   );
 });
 
-// 여러 Consumer가 같은 Context를 구독
+// Multiple consumers subscribe to the same context
 const Header = mount(renew => {
   const ctx = useContext(appContext, renew, ['user', 'theme']);
 
@@ -77,29 +77,30 @@ const Controls = mount(renew => {
 export const Example11Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
-      Context Helper (테마 & 사용자 패널)
+      Context Helper (Theme & User Panel)
     </h1>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-      이 예제는 여러 컴포넌트가{' '}
+      This example is a small "theme &amp; user" panel where multiple components
+      share <strong>user / theme / accent</strong> values via{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         Context
       </code>
-      를 통해 <strong>user / theme / accent</strong> 값을 공유하는 작은 "테마
-      &amp; 사용자" 패널입니다. 상단 배지, 컨트롤 패널, 프리뷰 카드가 모두 같은
-      Context를 구독하고 있습니다.
+      . The header badge, control panel, and preview card all consume the same
+      Context.
     </p>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      위/아래 컴포넌트들은 서로 독립적인 마운터이지만,{' '}
+      Even though the components above and below are mounted independently, they
+      sit inside the same{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         Provider
-      </code>
-      로 감싼 트리 안에 있기 때문에{' '}
+      </code>{' '}
+      tree, so{' '}
       <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
         useContext
-      </code>
-      로 같은 데이터를 읽고, 변경 사항도 함께 반영됩니다.
+      </code>{' '}
+      reads the same data and all changes are reflected across them.
     </p>
 
     <CodeBlock language="tsx" code={example11Code} />
@@ -115,7 +116,7 @@ export const Example11Page = (): ReturnType<typeof Introduction> => (
 
     <div class="mt-6">
       <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-3">
-        관련 문서
+        Related docs
       </h2>
       <ul class="list-disc list-inside text-sm md:text-base text-gray-700 dark:text-gray-300 space-y-2">
         <li>
@@ -128,10 +129,10 @@ export const Example11Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Context 가이드
+            Context guide
           </a>{' '}
-          - createContext / Provider / useContext / contextState API와 선택적
-          구독(subscribeKeys) 패턴을 자세히 설명합니다.
+          - Explains the createContext / Provider / useContext / contextState
+          APIs and the optional subscription (subscribeKeys) pattern in detail.
         </li>
         <li>
           <a
@@ -143,10 +144,10 @@ export const Example11Page = (): ReturnType<typeof Introduction> => (
               window.dispatchEvent(new PopStateEvent('popstate'));
             }}
           >
-            Store 가이드
+            Store guide
           </a>{' '}
-          - 트리 범위에 한정된 Context와 달리, 전역 store로 상태를 공유하는
-          방식과의 차이를 비교해 볼 수 있습니다.
+          - Compares Context, which is scoped to a tree, with sharing state via
+          a global store.
         </li>
       </ul>
     </div>

@@ -10,7 +10,7 @@ interface MouseTrackerProps {
   render: (pos: MousePosition) => any;
 }
 
-// Render Prop 패턴: 마우스 위치를 추적하고 render prop에 전달
+// Render prop pattern: track mouse position and pass it to the renderer
 const MouseTracker = mount<MouseTrackerProps>(renew => {
   const position = state<MousePosition>({ x: 0, y: 0 }, renew);
   const containerRef = ref<HTMLDivElement | null>(null);
@@ -36,7 +36,7 @@ const MouseTracker = mount<MouseTrackerProps>(renew => {
   );
 });
 
-// 마우스를 따라다니는 이모지
+// Emoji that follows the mouse cursor
 const FollowerEmoji = ({
   emoji,
   pos,
@@ -56,7 +56,7 @@ const FollowerEmoji = ({
   </div>
 );
 
-// 좌표 정보 표시
+// Coordinate display
 const CoordinateDisplay = mount(_r => {
   return ({ pos }: { pos: MousePosition }) => (
     <div class="absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
@@ -78,7 +78,7 @@ const CoordinateDisplay = mount(_r => {
   );
 });
 
-// 마우스 위치에 따라 색상이 변하는 배경
+// Background that changes color based on mouse position
 const ColorfulBackground = mount(_r => {
   return ({ pos }: { pos: MousePosition }) => {
     const hue = (pos.x + pos.y) % 360;
@@ -100,18 +100,23 @@ export const Example3 = mount((renew: any) => {
   );
 
   const demos = [
-    { id: 'emoji' as const, label: '🐱 이모지 팔로워', color: 'blue' },
-    { id: 'coords' as const, label: '📍 좌표 표시', color: 'green' },
-    { id: 'colorful' as const, label: '🎨 컬러풀 배경', color: 'purple' },
+    { id: 'emoji' as const, label: '🐱 Emoji follower', color: 'blue' },
+    { id: 'coords' as const, label: '📍 Coordinate display', color: 'green' },
+    {
+      id: 'colorful' as const,
+      label: '🎨 Colorful background',
+      color: 'purple',
+    },
   ];
 
   return () => (
     <div class="space-y-6">
       <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
         <p class="text-sm md:text-base text-orange-800 dark:text-orange-200">
-          💡 <strong>Render Prop 패턴</strong>: 컴포넌트가 렌더링 로직을 함수로
-          받아서 실행합니다. 이 예제에서 MouseTracker는 마우스 위치를 추적하고,
-          render prop으로 받은 함수에 데이터를 전달합니다.
+          💡 <strong>Render prop pattern</strong>: a component receives the
+          rendering logic as a function. In this example,{' '}
+          <code>MouseTracker</code> tracks the mouse position and passes it into
+          the render prop.
         </p>
       </div>
 
@@ -135,7 +140,7 @@ export const Example3 = mount((renew: any) => {
           render={pos => (
             <>
               <div class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm pointer-events-none">
-                마우스를 움직여보세요!
+                Move your mouse inside the area
               </div>
               <FollowerEmoji emoji="🐱" pos={pos} />
             </>
@@ -148,7 +153,7 @@ export const Example3 = mount((renew: any) => {
           render={pos => (
             <>
               <div class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm pointer-events-none">
-                마우스를 움직여 좌표를 확인하세요
+                Move your mouse to see the coordinates
               </div>
               <CoordinateDisplay pos={pos} />
               <div
@@ -170,7 +175,7 @@ export const Example3 = mount((renew: any) => {
             <>
               <ColorfulBackground pos={pos} />
               <div class="absolute inset-0 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm pointer-events-none z-10">
-                마우스를 움직여 색상을 변경하세요
+                Move your mouse to change the colors
               </div>
             </>
           )}
@@ -179,7 +184,7 @@ export const Example3 = mount((renew: any) => {
 
       <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
         <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          📌 핵심 개념
+          📌 Key ideas
         </h4>
         <ul class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
           <li>
@@ -187,11 +192,13 @@ export const Example3 = mount((renew: any) => {
             <code class="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
               render
             </code>{' '}
-            prop을 함수로 받아서 데이터 전달
+            prop as a function that receives data
           </li>
-          <li>• MouseTracker가 마우스 위치 추적 로직을 캡슐화</li>
-          <li>• 렌더링 로직은 외부에서 자유롭게 구현 가능</li>
-          <li>• 재사용성과 유연성이 뛰어난 컴포넌트 디자인 패턴</li>
+          <li>
+            • <code>MouseTracker</code> encapsulates the mouse tracking logic
+          </li>
+          <li>• Rendering logic can be implemented freely from the outside</li>
+          <li>• Great for building reusable and flexible components</li>
         </ul>
       </div>
     </div>
