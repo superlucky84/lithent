@@ -54,7 +54,7 @@ const categories: CategoryWithTheme[] = [
   },
   {
     title: 'Essential Features',
-    description: 'Lithent의 핵심 기능',
+    description: 'Lithent의 기본 기능',
     icon: '⚡',
     theme: {
       gradient:

@@ -23,7 +23,7 @@ const menuData: MenuSection[] = [
     ],
   },
   {
-    text: { en: 'Essential Features', ko: '핵심 기능' },
+    text: { en: 'Essential Features', ko: '기본 기능' },
     items: [
       { text: { en: 'mount', ko: 'mount' }, link: '/guide/mounter' },
       { text: { en: 'updater', ko: 'updater' }, link: '/guide/updater' },
