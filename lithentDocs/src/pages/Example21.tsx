@@ -19,11 +19,16 @@ export const Example21Page = mount(() => {
         <h3 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
           💡 Key Learning Points
         </h3>
-        <p class="text-sm text-purple-800 dark:text-purple-200">
+        <p class="text-sm text-purple-800 dark:text-purple-200 mb-3">
           <strong>HTM Tags + Import Maps:</strong> HTM (Hyperscript Tagged
           Markup) lets you write JSX-like code using template literals. Combined
           with Import Maps, you can load modules from CDN without any build
           step. Save as an HTML file and open in your browser - it just works!
+        </p>
+        <p class="text-sm text-purple-800 dark:text-purple-200">
+          <strong>lmount + lstate:</strong> This example uses Lithent's
+          Declarative Light API mode. Use lmount with lstate for automatic
+          reactive updates—no need to call renew() manually!
         </p>
       </div>
 
@@ -147,11 +152,11 @@ export const Example21Page = mount(() => {
 
         <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
           <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100 mb-2">
-            lstate
+            lmount + lstate
           </h3>
           <p class="text-sm text-blue-800 dark:text-blue-200">
-            Reactive state management from lithent/helper. Access with .value
-            and UI updates automatically.
+            Declarative Light API mode. Use lmount with lstate for automatic UI
+            updates without manual renew() calls.
           </p>
         </div>
 

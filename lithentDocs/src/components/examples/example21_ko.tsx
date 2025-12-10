@@ -243,16 +243,16 @@ export const Example21Ko = mount(() => {
 
   <script type="module">
     // Import from CDN using import map
-    import { mount, render } from 'lithent';
+    import { lmount, render } from 'lithent';
     import { lstate } from 'lithent/helper';
     import { lTag } from 'lithent/tag';
 
     // Notes App Component
-    const NotesApp = mount(renew => {
+    const NotesApp = lmount(() => {
       // State
-      const title = lstate('', renew);
-      const content = lstate('', renew);
-      const notes = lstate([], renew);
+      const title = lstate('');
+      const content = lstate('');
+      const notes = lstate([]);
 
       // 새 메모 추가
       const addNote = () => {

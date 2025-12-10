@@ -18,11 +18,16 @@ export const Example21PageKo = mount(() => {
         <h3 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
           💡 핵심 학습 포인트
         </h3>
-        <p class="text-sm text-purple-800 dark:text-purple-200">
+        <p class="text-sm text-purple-800 dark:text-purple-200 mb-3">
           <strong>HTM Tags + Import Maps:</strong> HTM (Hyperscript Tagged
           Markup)은 템플릿 리터럴을 사용하여 JSX와 유사한 코드를 작성할 수 있게
           해줍니다. Import Maps와 결합하면 빌드 단계 없이 CDN에서 모듈을 로드할
           수 있습니다. HTML 파일로 저장하고 브라우저에서 열기만 하면 됩니다!
+        </p>
+        <p class="text-sm text-purple-800 dark:text-purple-200">
+          <strong>lmount + lstate:</strong> 이 예제는 Lithent의 선언형 Light API
+          모드를 사용합니다. lmount와 lstate를 함께 사용하면 수동으로 renew()를
+          호출할 필요 없이 자동으로 반응형 업데이트가 됩니다!
         </p>
       </div>
 
@@ -141,11 +146,11 @@ export const Example21PageKo = mount(() => {
 
         <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
           <h3 class="text-base font-semibold text-blue-900 dark:text-blue-100 mb-2">
-            lstate
+            lmount + lstate
           </h3>
           <p class="text-sm text-blue-800 dark:text-blue-200">
-            lithent/helper의 반응형 상태 관리. .value로 접근하면 자동으로 UI가
-            업데이트됩니다.
+            선언형 Light API 모드. lmount와 lstate를 함께 사용하면 수동 renew()
+            호출 없이 자동으로 UI가 업데이트됩니다.
           </p>
         </div>
 

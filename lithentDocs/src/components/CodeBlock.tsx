@@ -5,12 +5,14 @@ import javascript from 'highlight.js/lib/languages/javascript';
 import xml from 'highlight.js/lib/languages/xml';
 import bash from 'highlight.js/lib/languages/bash';
 import json from 'highlight.js/lib/languages/json';
+import css from 'highlight.js/lib/languages/css';
 
 // Register languages
 hljs.registerLanguage('typescript', typescript);
 hljs.registerLanguage('tsx', typescript); // TSX uses TypeScript highlighting
 hljs.registerLanguage('javascript', javascript);
 hljs.registerLanguage('js', javascript);
+hljs.registerLanguage('css', css); // CSS must be registered before HTML for embedded CSS highlighting
 hljs.registerLanguage('xml', xml);
 hljs.registerLanguage('html', xml); // HTML uses XML highlighting
 hljs.registerLanguage('jsx', typescript);

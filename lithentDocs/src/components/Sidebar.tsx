@@ -230,6 +230,13 @@ const menuData: MenuSection[] = [
         },
         link: '/examples/20',
       },
+      {
+        text: {
+          en: 'HTM Tags CDN (Quick Notes)',
+          ko: 'HTM Tags CDN (빠른 메모)',
+        },
+        link: '/examples/21',
+      },
     ],
   },
 ];
