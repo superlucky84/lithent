@@ -248,7 +248,7 @@ export const Sidebar = mount(renew => {
   const expanded: Record<string, boolean> = Object.fromEntries(
     menuData.map(section => [section.text.en, false])
   );
-  let prevRoute = store.route;
+  let prevRoute = ''; // Initialize with empty string to trigger expansion on first load
 
   const handleClick = (link: string) => {
     const lang = store.route.startsWith('/ko') ? 'ko' : 'en';
