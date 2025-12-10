@@ -12,21 +12,10 @@ const stripKoPrefix = (path: string) => {
   return stripped || '/';
 };
 
-const stripBaseUrl = (path: string) => {
-  if (BASE_URL === '/') return path;
-  const normalized = ensureLeadingSlash(path);
-  const baseWithoutTrailingSlash = BASE_URL.replace(/\/$/, '');
-  if (normalized.startsWith(baseWithoutTrailingSlash)) {
-    return normalized.slice(baseWithoutTrailingSlash.length) || '/';
-  }
-  return normalized;
-};
-
-const addBaseUrl = (path: string) => {
-  if (BASE_URL === '/') return path;
-  const baseWithoutTrailingSlash = BASE_URL.replace(/\/$/, '');
-  const pathWithSlash = ensureLeadingSlash(path);
-  return `${baseWithoutTrailingSlash}${pathWithSlash}`;
+// Get path from hash
+const getPathFromHash = (): string => {
+  const hash = location.hash.slice(1); // Remove #
+  return hash || '/guide/introduction';
 };
 
 export const resolveRouteForLanguage = (path: string, lang: 'en' | 'ko') => {
@@ -53,7 +42,7 @@ export const appStore = lstore<{
   sidebarOpen: boolean;
 }>({
   theme: getInitialTheme(),
-  route: stripBaseUrl(location.pathname) || '/guide/introduction',
+  route: getPathFromHash(),
   sidebarOpen: false,
 });
 
@@ -81,7 +70,7 @@ export const isKoreanRoute = () => store.route.startsWith(KO_PREFIX);
 
 const navigateInternal = (path: string) => {
   store.route = path;
-  window.history.pushState({}, '', addBaseUrl(path));
+  location.hash = `#${path}`;
   store.sidebarOpen = false;
   window.scrollTo(0, 0);
 };
@@ -104,9 +93,9 @@ export const toggleLanguage = () => {
   setLanguage(isKoreanRoute() ? 'en' : 'ko');
 };
 
-// Listen to popstate (browser back/forward)
-window.addEventListener('popstate', () => {
-  store.route = stripBaseUrl(location.pathname) || '/guide/introduction';
+// Listen to hashchange (browser back/forward and hash changes)
+window.addEventListener('hashchange', () => {
+  store.route = getPathFromHash();
   window.scrollTo(0, 0);
 });
 
