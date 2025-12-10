@@ -304,6 +304,83 @@ $ npm run dev`}
       <code>file://</code> protocol.
     </p>
 
+    <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
+      Available CDN URLs
+    </h3>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      All Lithent packages are available via jsdelivr CDN. You can choose
+      between UMD (for script tags) or ESM (for module imports):
+    </p>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/50">
+        <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+          <span class="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+          UMD Build (script tag)
+        </h4>
+        <ul class="space-y-2.5 text-xs">
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">Core</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js
+            </code>
+          </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">Helper</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.umd.js
+            </code>
+          </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">FTags</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js
+            </code>
+          </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">HTM Tags</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/tag/dist/lithentTag.umd.js
+            </code>
+          </li>
+        </ul>
+      </div>
+
+      <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/50">
+        <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+          <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+          ESM Build (ES module)
+        </h4>
+        <ul class="space-y-2.5 text-xs">
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">Core</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/dist/lithent.mjs
+            </code>
+          </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">Helper</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.mjs
+            </code>
+          </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">FTags</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.mjs
+            </code>
+          </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">HTM Tags</div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/tag/dist/lithentTag.mjs
+            </code>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
