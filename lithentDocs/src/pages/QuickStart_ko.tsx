@@ -264,10 +264,20 @@ $ npm run dev`}
 <body>
   <div id="root"></div>
 
+  <script type="importmap">
+  {
+    "imports": {
+      "lithent": "https://cdn.jsdelivr.net/npm/lithent/dist/lithent.mjs",
+      "lithent/helper": "https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.mjs",
+      "lithent/ftags": "https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.mjs"
+    }
+  }
+  </script>
+
   <script type="module">
-    import { render } from 'https://cdn.jsdelivr.net/npm/lithent/dist/lithent.mjs';
-    import { lstate } from 'https://cdn.jsdelivr.net/npm/lithent/helper/dist/lithentHelper.mjs';
-    import { fTags, flMount } from 'https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.mjs';
+    import { render } from 'lithent';
+    import { lstate } from 'lithent/helper';
+    import { fTags, flMount } from 'lithent/ftags';
 
     const { div, h1, button } = fTags;
 
