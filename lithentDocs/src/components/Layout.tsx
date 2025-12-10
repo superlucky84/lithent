@@ -96,6 +96,8 @@ import { Example19Page } from '@/pages/Example19';
 import { Example19PageKo } from '@/pages/Example19_ko';
 import { Example20Page } from '@/pages/Example20';
 import { Example20PageKo } from '@/pages/Example20_ko';
+import { Example21Page } from '@/pages/Example21';
+import { Example21PageKo } from '@/pages/Example21_ko';
 import { IntroductionKo } from '@/pages/Introduction_ko';
 import { QuickStartKo } from '@/pages/QuickStart_ko';
 import { MounterKo } from '@/pages/Mounter_ko';
@@ -222,6 +224,8 @@ const routes: Record<string, PageComponent> = {
   '/ko/examples/19': Example19PageKo,
   '/examples/20': Example20Page,
   '/ko/examples/20': Example20PageKo,
+  '/examples/21': Example21Page,
+  '/ko/examples/21': Example21PageKo,
 };
 
 const resolveRoute = (path: string): PageComponent => {
