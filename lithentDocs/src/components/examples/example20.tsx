@@ -1,107 +1,160 @@
-import { mount, ref, mountCallback, portal } from 'lithent';
+import { mount, portal } from 'lithent';
+import { state } from 'lithent/helper';
 
-import hljs from 'highlight.js';
-import 'highlight.js/styles/hybrid.css';
+interface Photo {
+  id: number;
+  title: string;
+  thumbnail: string;
+  full: string;
+}
 
-const code = `import { h, render, mount, portal } from 'lithent';
+const photos: Photo[] = [
+  {
+    id: 1,
+    title: 'Mountain Landscape',
+    thumbnail: '🏔️',
+    full: '🏔️',
+  },
+  {
+    id: 2,
+    title: 'Ocean View',
+    thumbnail: '🌊',
+    full: '🌊',
+  },
+  {
+    id: 3,
+    title: 'City Night View',
+    thumbnail: '🌃',
+    full: '🌃',
+  },
+  {
+    id: 4,
+    title: 'Forest',
+    thumbnail: '🌲',
+    full: '🌲',
+  },
+  {
+    id: 5,
+    title: 'Sunset',
+    thumbnail: '🌅',
+    full: '🌅',
+  },
+  {
+    id: 6,
+    title: 'Starry Night',
+    thumbnail: '🌌',
+    full: '🌌',
+  },
+];
 
-const Children = mount<{ count: number }>(() => {
-  return ({ count }) => <span>child updated count: {count}</span>;
-});
+export const Example20 = mount(renew => {
+  const selectedPhoto = state<Photo | null>(null, renew);
 
-const Parent = mount(renew => {
-  let portalEl = ref(null);
-  let count = 0;
-
-  const change = () => {
-    count += 1;
-    renew();
+  const openLightbox = (photo: Photo) => {
+    selectedPhoto.v = photo;
   };
 
-  // In our example, specifically, portalEl.value was not present the first time it was rendered, so re-render
-  mountCallback(() => {
-    renew();
-  });
-
-  return () => (
-    <>
-      <div ref={portalEl} />
-      <button onClick={change}>Update</button>
-      {portalEl.value && portal( <Children count={count} logEl={logEl} />, portalEl.value as HTMLElement)}
-    </>
-  );
-});
-
-render(<Parent />, document.getElementById('root'));
-`;
-
-const exCode1 = hljs.highlight(code, {
-  language: 'javascript',
-}).value;
-
-const Children = mount<{
-  count: number;
-  logEl: { value: HTMLElement | null };
-}>(() => {
-  return ({ count }) => <span>child updated count: {count}</span>;
-});
-
-const Parent = mount(renew => {
-  let logEl = ref(null);
-  let portalEl = ref(null);
-  let count = 0;
-
-  const change = () => {
-    count += 1;
-    renew();
+  const closeLightbox = () => {
+    selectedPhoto.v = null;
   };
 
-  mountCallback(() => {
-    renew();
-  });
-
   return () => (
-    <>
-      <div ref={portalEl} />
-      <button
-        onClick={change}
-        type="button"
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800"
-      >
-        Update
-      </button>
-      {portalEl.value &&
+    <div class="w-full max-w-4xl mx-auto">
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          🖼️ Image Gallery
+        </h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Click thumbnails to display lightbox via Portal
+        </p>
+      </div>
+
+      {/* Gallery container (overflow:hidden) */}
+      <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-4 overflow-hidden border-2 border-dashed border-gray-400 dark:border-gray-600">
+        <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+          📦 overflow: hidden container
+        </p>
+        <div class="grid grid-cols-3 md:grid-cols-6 gap-3">
+          {photos.map(photo => (
+            <button
+              key={photo.id}
+              onClick={() => openLightbox(photo)}
+              class="aspect-square bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-lg transition-all hover:scale-105 flex flex-col items-center justify-center p-2 border border-gray-200 dark:border-gray-600"
+            >
+              <span class="text-3xl md:text-4xl">{photo.thumbnail}</span>
+              <span class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                {photo.title}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Render lightbox with Portal */}
+      {selectedPhoto.v &&
         portal(
-          <Children count={count} logEl={logEl} />,
-          portalEl.value as HTMLElement
+          <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 animate-fadeIn">
+            <button
+              onClick={closeLightbox}
+              class="absolute top-4 right-4 text-white text-3xl hover:text-gray-300 transition-colors"
+            >
+              ✕
+            </button>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 max-w-2xl w-full mx-4">
+              <div class="flex flex-col items-center">
+                <span class="text-9xl mb-4">{selectedPhoto.v.full}</span>
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  {selectedPhoto.v.title}
+                </h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  ID: {selectedPhoto.v.id}
+                </p>
+                <button
+                  onClick={closeLightbox}
+                  class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body as HTMLElement
         )}
-    </>
-  );
-});
-export const Example20 = mount(() => {
-  return () => (
-    <div class="flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
-      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        Example 20 - portal
-      </h3>
-      <p class="mt-2 text-sm md:text-base text-gray-400">
-        "portal" lets you render some children into a different part of the DOM.
-      </p>
-      <p class="mt-2 text-sm md:text-base text-gray-400">
-        In the example below, a child component defined after the parent
-        component button will navigate to the portal before the parent
-        component.
-      </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <div
-          class="font-normal"
-          innerHTML={exCode1}
-          style={{ whiteSpace: 'pre' }}
-        />
+
+      {/* Description */}
+      <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+        <p class="text-xs text-blue-800 dark:text-blue-200 mb-2">
+          💡 <strong>Key characteristics of Portal:</strong>
+        </p>
+        <ol class="text-xs text-blue-700 dark:text-blue-300 ml-4 space-y-1">
+          <li>
+            1. Gallery is inside <strong>overflow:hidden</strong> container
+          </li>
+          <li>
+            2. Lightbox is rendered in a separate area via{' '}
+            <strong>Portal</strong>
+          </li>
+          <li>
+            3. Displays as <strong>full screen</strong> without overflow
+            constraints
+          </li>
+        </ol>
       </div>
-      <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <Parent />
-      </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+      `}</style>
     </div>
   );
 });

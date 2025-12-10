@@ -19,13 +19,13 @@ export type ContextState<T> = {
 
 export type ProviderProps<T> =
   T extends Record<string, unknown>
-    ? {
-        [K in keyof T]: ContextState<T[K]>;
-      }
+    ? { children?: any } & { [K in keyof T]: ContextState<T[K]> }
     : never;
 
+type ProviderComponent<T> = ReturnType<typeof mount<ProviderPropsInternal<T>>>;
+
 export type Context<T> = {
-  Provider: ReturnType<typeof mount<ProviderProps<T>>>;
+  Provider: ProviderComponent<T>;
   contextState: <V>(value?: V, renew?: Renew) => ContextState<V>;
   useContext: (
     context: Context<T>,

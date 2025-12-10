@@ -1,98 +1,205 @@
-import { mount } from 'lithent';
-import { store } from 'lithent/helper';
+import { mount, ref } from 'lithent';
+import { state } from 'lithent/helper';
 
-import hljs from 'highlight.js';
-import 'highlight.js/styles/hybrid.css';
+interface MousePosition {
+  x: number;
+  y: number;
+}
 
-const code = `import { h, Fragment, render, mount } from 'lithent';
-import { store } from 'lithent/helper';
+interface MouseTrackerProps {
+  render: (pos: MousePosition) => any;
+}
 
-const Component = mount(r => {
-  const local = store<{ count1: number; count2: number; count3: number }>({
-    count1: 1,
-    count2: 1,
-    count3: 1,
-  })(r);
+// Render prop pattern: track mouse position and pass it to the renderer
+const MouseTracker = mount<MouseTrackerProps>(renew => {
+  const position = state<MousePosition>({ x: 0, y: 0 }, renew);
+  const containerRef = ref<HTMLDivElement | null>(null);
 
-  const click = () => {
-    local.count1 += 1;
-    local.count2 -= 1;
-    local.count3 *= 2;
+  const handleMouseMove = (e: MouseEvent) => {
+    if (containerRef.value) {
+      const rect = containerRef.value.getBoundingClientRect();
+      position.v = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    }
   };
-  return () => (
-    <>
-      <div>count1: {local.count1}</div>
-      <div>count2: {local.count2}</div>
-      <div>count3: {local.count3}</div>
-      <button type="text" onClick={click}>
-        change count
-      </button>
-    </>
+
+  return ({ render }) => (
+    <div
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      class="relative w-full h-64 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden cursor-crosshair"
+    >
+      {render(position.v)}
+    </div>
   );
 });
 
-render(<Parent />, document.getElementById('root'));
-`;
+// Emoji that follows the mouse cursor
+const FollowerEmoji = ({
+  emoji,
+  pos,
+}: {
+  emoji: string;
+  pos: MousePosition;
+}) => (
+  <div
+    class="absolute text-4xl pointer-events-none transition-transform duration-100"
+    style={{
+      left: `${pos.x}px`,
+      top: `${pos.y}px`,
+      transform: 'translate(-50%, -50%)',
+    }}
+  >
+    {emoji}
+  </div>
+);
 
-const exCode1 = hljs.highlight(code, {
-  language: 'javascript',
-}).value;
-
-const Component = mount(r => {
-  const local = store<{ count1: number; count2: number; count3: number }>({
-    count1: 1,
-    count2: 1,
-    count3: 1,
-  })(r);
-
-  const click = () => {
-    local.count1 += 1;
-    local.count2 -= 1;
-    local.count3 *= 2;
-  };
-  return () => (
-    <>
-      <div>count1: {local.count1}</div>
-      <div>count2: {local.count2}</div>
-      <div>count3: {local.count3}</div>
-      <button
-        type="text"
-        onClick={click}
-        class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
-      >
-        change count
-      </button>
-    </>
-  );
-});
-
-export const Example3 = mount(() => {
-  return () => (
-    <div class="flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
-      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        Example 3 - helper (local store)
-      </h3>
-      <p class="text-sm md:text-base text-gray-400 mb-2">
-        <a
-          class="text-orange-200 hover:underline"
-          href="https://github.com/superlucky84/lithent/blob/master/helper/src/hook/store.ts"
-          target="_blank"
-        >
-          view helper code
-        </a>
-      </p>
-      <p class="text-sm md:text-base text-gray-400">
-        You can also use "store" only in local component.&nbsp;
-      </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <div
-          class="font-normal"
-          innerHTML={exCode1}
-          style={{ whiteSpace: 'pre' }}
-        />
+// Coordinate display
+const CoordinateDisplay = mount(_r => {
+  return ({ pos }: { pos: MousePosition }) => (
+    <div class="absolute top-4 left-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg px-4 py-2 border border-gray-200 dark:border-gray-700">
+      <div class="text-sm font-mono space-y-1">
+        <div class="text-gray-600 dark:text-gray-400">
+          X:{' '}
+          <span class="font-bold text-blue-600 dark:text-blue-400">
+            {Math.round(pos.x)}
+          </span>
+        </div>
+        <div class="text-gray-600 dark:text-gray-400">
+          Y:{' '}
+          <span class="font-bold text-purple-600 dark:text-purple-400">
+            {Math.round(pos.y)}
+          </span>
+        </div>
       </div>
-      <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <Component />
+    </div>
+  );
+});
+
+// Background that changes color based on mouse position
+const ColorfulBackground = mount(_r => {
+  return ({ pos }: { pos: MousePosition }) => {
+    const hue = (pos.x + pos.y) % 360;
+    return (
+      <div
+        class="absolute inset-0 opacity-20 transition-all duration-300"
+        style={{
+          background: `radial-gradient(circle at ${pos.x}px ${pos.y}px, hsl(${hue}, 70%, 60%), transparent 50%)`,
+        }}
+      />
+    );
+  };
+});
+
+export const Example3 = mount((renew: any) => {
+  const selectedDemo = state<'emoji' | 'coords' | 'colorful'>(
+    'colorful',
+    renew
+  );
+
+  const demos = [
+    { id: 'emoji' as const, label: '🐱 Emoji follower', color: 'blue' },
+    { id: 'coords' as const, label: '📍 Coordinate display', color: 'green' },
+    {
+      id: 'colorful' as const,
+      label: '🎨 Colorful background',
+      color: 'purple',
+    },
+  ];
+
+  return () => (
+    <div class="space-y-6">
+      <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+        <p class="text-sm md:text-base text-orange-800 dark:text-orange-200">
+          💡 <strong>Render prop pattern</strong>: a component receives the
+          rendering logic as a function. In this example,{' '}
+          <code>MouseTracker</code> tracks the mouse position and passes it into
+          the render prop.
+        </p>
+      </div>
+
+      <div class="flex gap-2 flex-wrap">
+        {demos.map(demo => (
+          <button
+            onClick={() => (selectedDemo.v = demo.id)}
+            class={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              selectedDemo.v === demo.id
+                ? `bg-${demo.color}-600 text-white shadow-lg scale-105`
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            {demo.label}
+          </button>
+        ))}
+      </div>
+
+      {selectedDemo.v === 'emoji' && (
+        <MouseTracker
+          render={pos => (
+            <>
+              <div class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm pointer-events-none">
+                Move your mouse inside the area
+              </div>
+              <FollowerEmoji emoji="🐱" pos={pos} />
+            </>
+          )}
+        />
+      )}
+
+      {selectedDemo.v === 'coords' && (
+        <MouseTracker
+          render={pos => (
+            <>
+              <div class="absolute inset-0 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm pointer-events-none">
+                Move your mouse to see the coordinates
+              </div>
+              <CoordinateDisplay pos={pos} />
+              <div
+                class="absolute w-2 h-2 bg-red-500 rounded-full pointer-events-none"
+                style={{
+                  left: `${pos.x}px`,
+                  top: `${pos.y}px`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+            </>
+          )}
+        />
+      )}
+
+      {selectedDemo.v === 'colorful' && (
+        <MouseTracker
+          render={pos => (
+            <>
+              <ColorfulBackground pos={pos} />
+              <div class="absolute inset-0 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm pointer-events-none z-10">
+                Move your mouse to change the colors
+              </div>
+            </>
+          )}
+        />
+      )}
+
+      <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          📌 Key ideas
+        </h4>
+        <ul class="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+          <li>
+            •{' '}
+            <code class="px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">
+              render
+            </code>{' '}
+            prop as a function that receives data
+          </li>
+          <li>
+            • <code>MouseTracker</code> encapsulates the mouse tracking logic
+          </li>
+          <li>• Rendering logic can be implemented freely from the outside</li>
+          <li>• Great for building reusable and flexible components</li>
+        </ul>
       </div>
     </div>
   );

@@ -1,117 +1,395 @@
 import { mount, mountCallback, Fragment, render, ref } from 'lithent';
 import { state } from 'lithent/helper';
 
-import hljs from 'highlight.js';
-import 'highlight.js/styles/hybrid.css';
+interface Post {
+  id: string;
+  author: string;
+  avatar: string;
+  content: string;
+  time: string;
+  likes: number;
+  type: 'user' | 'trending' | 'sponsored';
+}
 
-const code = `import { h, mount } from 'lithent';
-const Root = mount(function (r) {
-  const showFive = state<boolean>(true, r);
-  const showSix = state<boolean>(true, r);
+const newPosts: Post[] = [
+  {
+    id: 'new1',
+    author: 'Sarah Chen',
+    avatar: '👩‍💻',
+    content:
+      'Just shipped a new feature with Lithent! The virtual DOM performance is amazing 🚀',
+    time: '2 min ago',
+    likes: 42,
+    type: 'user',
+  },
+  {
+    id: 'new2',
+    author: 'Alex Rivera',
+    avatar: '🧑‍🎨',
+    content:
+      'Hot take: Mixing real DOM and virtual DOM is actually a superpower for progressive enhancement',
+    time: '5 min ago',
+    likes: 28,
+    type: 'trending',
+  },
+  {
+    id: 'new3',
+    author: 'Jordan Kim',
+    avatar: '🧑‍🚀',
+    content:
+      'Anyone else loving how lightweight Lithent is? No more bloated bundles!',
+    time: '8 min ago',
+    likes: 67,
+    type: 'user',
+  },
+];
 
-  const toggleFive = () => {
-    showFive.v = !showFive.v;
+// Dynamic posts component (virtual DOM)
+const DynamicPosts = mount(r => {
+  const visiblePosts = state<boolean[]>([true, true, true], r);
+
+  const togglePost = (index: number) => {
+    visiblePosts.v = visiblePosts.v.map((v, i) => (i === index ? !v : v));
   };
 
-  const toggleSix = () => {
-    showSix.v = !showSix.v;
+  const showAll = () => {
+    visiblePosts.v = [true, true, true];
+  };
+
+  const hideAll = () => {
+    visiblePosts.v = [false, false, false];
   };
 
   return () => (
     <Fragment>
-      <li>
-        4
-        <button onClick={toggleFive}>toggleFive</button>
-        <button onClick={toggleSix}>toggleSix</button>
-      </li>
-      {showFive.v ? <li>5</li> : null}
-      {showSix.v ? <li>6</li> : null}
-      <li>7</li>
-    </Fragment>
-  );
-});
+      {/* Control panel */}
+      <div class="sticky top-0 z-10 bg-blue-50 dark:bg-blue-900 border-l-4 border-blue-500 p-3 mb-3">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-xs font-semibold text-blue-800 dark:text-blue-200">
+            🔄 Live posts (virtual DOM)
+          </span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            onClick={() => togglePost(0)}
+            class={`px-2 py-1 text-xs rounded ${
+              visiblePosts.v[0]
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            Post 1
+          </button>
+          <button
+            onClick={() => togglePost(1)}
+            class={`px-2 py-1 text-xs rounded ${
+              visiblePosts.v[1]
+                ? 'bg-orange-600 text-white'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            Post 2 (Trending)
+          </button>
+          <button
+            onClick={() => togglePost(2)}
+            class={`px-2 py-1 text-xs rounded ${
+              visiblePosts.v[2]
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+            }`}
+          >
+            Post 3
+          </button>
+          <div class="flex-1"></div>
+          <button
+            onClick={showAll}
+            class="px-2 py-1 text-xs rounded bg-green-600 text-white hover:bg-green-700"
+          >
+            전체 보기
+          </button>
+          <button
+            onClick={hideAll}
+            class="px-2 py-1 text-xs rounded bg-red-600 text-white hover:bg-red-700"
+          >
+            전체 숨기기
+          </button>
+        </div>
+      </div>
 
-/*
-<ul id="list-root">
-  <li>1</li><li>2</li><li>3</li><li id="nextTarget">8</li><li>9</li>
-</ul>
-*/
-render(
-  <Root />,
-  document.querySelector('#list-root'),
-  document.querySelector('#nextTarget')
-);
-`;
+      {/* Dynamic posts */}
+      {visiblePosts.v[0] && (
+        <article class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-3 border-l-4 border-blue-500 shadow-sm animate-fade-in">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">{newPosts[0].avatar}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                  {newPosts[0].author}
+                </h4>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  · {newPosts[0].time}
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                  virtual DOM
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                {newPosts[0].content}
+              </p>
+              <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <button class="hover:text-red-500">
+                  ❤️ {newPosts[0].likes}
+                </button>
+                <button class="hover:text-blue-500">💬 Reply</button>
+                <button class="hover:text-green-500">🔄 Repost</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      )}
 
-const exCode1 = hljs.highlight(code, {
-  language: 'javascript',
-}).value;
+      {visiblePosts.v[1] && (
+        <article class="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20 rounded-lg p-4 mb-3 border-l-4 border-orange-500 shadow-sm animate-fade-in">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">{newPosts[1].avatar}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                  {newPosts[1].author}
+                </h4>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  · {newPosts[1].time}
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded">
+                  🔥 Trending
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                  virtual DOM
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                {newPosts[1].content}
+              </p>
+              <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <button class="hover:text-red-500">
+                  ❤️ {newPosts[1].likes}
+                </button>
+                <button class="hover:text-blue-500">💬 Reply</button>
+                <button class="hover:text-green-500">🔄 Repost</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      )}
 
-const Root = mount(function (r) {
-  const showFive = state<boolean>(true, r);
-  const showSix = state<boolean>(true, r);
-
-  const toggleFive = () => {
-    showFive.v = !showFive.v;
-  };
-
-  const toggleSix = () => {
-    showSix.v = !showSix.v;
-  };
-
-  return () => (
-    <Fragment>
-      <li>
-        4{' '}
-        <button
-          class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
-          onClick={toggleFive}
-        >
-          toggleFive
-        </button>
-        <button
-          class="text-white bg-blue-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-1 bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-primary-800"
-          onClick={toggleSix}
-        >
-          toggleSix
-        </button>
-      </li>
-      {showFive.v ? <li>5</li> : null}
-      {showSix.v ? <li>6</li> : null}
-      <li>7</li>
+      {visiblePosts.v[2] && (
+        <article class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-3 border-l-4 border-blue-500 shadow-sm animate-fade-in">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">{newPosts[2].avatar}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                  {newPosts[2].author}
+                </h4>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  · {newPosts[2].time}
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+                  virtual DOM
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                {newPosts[2].content}
+              </p>
+              <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <button class="hover:text-red-500">
+                  ❤️ {newPosts[2].likes}
+                </button>
+                <button class="hover:text-blue-500">💬 Reply</button>
+                <button class="hover:text-green-500">🔄 Repost</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      )}
     </Fragment>
   );
 });
 
 export const Example12 = mount(() => {
-  const wrapEl = ref<null | HTMLElement>(null);
-  const nextEl = ref<null | HTMLElement>(null);
+  const feedContainer = ref<null | HTMLElement>(null);
+  const insertionPoint = ref<null | HTMLElement>(null);
+
   mountCallback(() => {
-    const wrap = wrapEl.value as HTMLElement;
-    const next = nextEl.value as HTMLElement;
-    render(<Root />, wrap, next);
+    const container = feedContainer.value as HTMLElement;
+    const nextElement = insertionPoint.value as HTMLElement;
+    render(<DynamicPosts />, container, nextElement);
   });
+
   return () => (
-    <div class="flex flex-col p-4 mb-2  border border-gray-200 rounded-lg shadow-sm 2xl:col-span-1 border-gray-700 sm:p-6 bg-gray-800">
-      <h3 class="text-slate-50 text-lg md:text-2xl mb-2">
-        Example 12 - Root With Fragment
-      </h3>
-      <p class="text-sm md:text-base text-gray-400">
-        Test that 'Lithent' can correctly handle virtual DOM elements when real
-        and virtual DOM elements are mixed under one parent.
-      </p>
-      <div class="mt-4 px-2 py-2 overflow-x-auto text-sm text-gray-50 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <div
-          class="font-normal"
-          innerHTML={exCode1}
-          style={{ whiteSpace: 'pre' }}
-        />
+    <div class="w-full max-w-2xl mx-auto">
+      <div class="mb-4">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          📱 Social Media Timeline
+        </h3>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          Timeline mixing real DOM (server-rendered) and virtual DOM
+          (client-rendered)
+        </p>
       </div>
-      <div class="flex-auto px-2 py-2 text-gray-400 border border-gray-200 border-dashed rounded border-gray-600 bg-slate-950">
-        <ul ref={wrapEl}>
-          <li>1</li> <li>2</li> <li>3</li> <li ref={nextEl}>8</li> <li>9</li>
-        </ul>
+
+      <div
+        ref={feedContainer}
+        class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 max-h-[600px] overflow-y-auto"
+      >
+        {/* Pinned post at the top (real DOM - SSR) */}
+        <article class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 mb-3 border-l-4 border-purple-500 shadow-sm">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">📌</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                  Lithent Team
+                </h4>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  · 1 hour ago
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded">
+                  Pinned
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
+                  real DOM
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                Welcome to our feed! This post is server-rendered (real DOM) and
+                always stays at the top.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <button class="hover:text-red-500">❤️ 156</button>
+                <button class="hover:text-blue-500">💬 Reply</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 mb-3 border-l-4 border-gray-400 shadow-sm">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">👤</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                  Previous User
+                </h4>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  · 15 min ago
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
+                  real DOM
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                This is an older post that was server-rendered. It's part of the
+                initial HTML.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <button class="hover:text-red-500">❤️ 23</button>
+                <button class="hover:text-blue-500">💬 Reply</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {/*
+          여기에 가상 DOM 포스트들이 삽입됩니다!
+          render(<DynamicPosts />, feedContainer, insertionPoint)
+        */}
+
+        {/* Sponsored post at the bottom (real DOM - fixed) */}
+        <article
+          ref={insertionPoint}
+          class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 mb-3 border-l-4 border-green-500 shadow-sm"
+        >
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">📢</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                  Sponsored
+                </h4>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  · Ad
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
+                  real DOM
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                This sponsored post is also real DOM - it stays in place
+                regardless of what happens above!
+              </p>
+              <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <button class="hover:text-blue-500">Learn More →</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 border-l-4 border-gray-400 shadow-sm">
+          <div class="flex items-start gap-3">
+            <div class="text-3xl">📜</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                  Archive
+                </h4>
+                <span class="text-xs text-gray-500 dark:text-gray-400">
+                  · 2 hours ago
+                </span>
+                <span class="px-1.5 py-0.5 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">
+                  real DOM
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                Older content that's part of the initial page load. Real DOM
+                element.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <button class="hover:text-red-500">❤️ 8</button>
+                <button class="hover:text-blue-500">💬 Reply</button>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
+
+      <div class="mt-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+        <p class="text-xs text-blue-800 dark:text-blue-200">
+          💡 <strong>Mixed DOM test:</strong> use the control panel buttons to
+          toggle the posts in the middle. The real DOM elements (Pinned at the
+          top, Sponsored and Archive at the bottom) stay in place while virtual
+          DOM posts are dynamically added/removed between them. Verify that
+          Lithent manages the mix of real and virtual DOM correctly.
+        </p>
+      </div>
+
+      <style>
+        {`
+          @keyframes fade-in {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in {
+            animation: fade-in 0.3s ease-out;
+          }
+        `}
+      </style>
     </div>
   );
 });

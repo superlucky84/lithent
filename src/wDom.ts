@@ -134,14 +134,15 @@ export const replaceWDom = (
   children: WDom[],
   originalWDom: WDom
 ) => {
-  if (originalWDom.isLegacy) {
+  if (originalWDom.il) {
     return;
   }
   needDiffRef.value = true;
 
   const newWDom = makeWDomResolver(tag, props, children);
   const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
-  const { isRoot, getParent, wrapElement, afterElement } = originalWDom;
+  // NOTE: we/ae are short for wrapElement/afterElement
+  const { isRoot, getParent, we, ae } = originalWDom;
 
   newWDomTree.getParent = getParent;
 
@@ -157,8 +158,8 @@ export const replaceWDom = (
     syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
   } else {
     newWDomTree.isRoot = true;
-    newWDomTree.wrapElement = wrapElement;
-    newWDomTree.afterElement = afterElement;
+    newWDomTree.we = we;
+    newWDomTree.ae = ae;
   }
 
   needDiffRef.value = false;
@@ -245,23 +246,45 @@ const createComponentResolver = (
   wrappedChildren: WDom[]
 ) => {
   return (compKey = props) => {
+    // Diff mode sets needDiffRef to true so h()/makeNode return a resolver
+    // placeholder. During actual resolution we must force a real WDom tree,
+    // otherwise nested components leave only resolvers (no getParent/children)
+    // and CSR renders a blank area. Temporarily drop needDiffRef, then restore.
+    // Regression tests: src/tests/core-composedRenew.test.tsx,
+    // src/tests/core-component-remount.test.tsx
+    const prevNeedDiff = needDiffRef.value;
+    needDiffRef.value = false;
+
     initMountHookState(compKey);
 
     const initialComponent = tag(props, wrappedChildren);
-    const component =
-      typeof initialComponent === 'function'
-        ? initialComponent
-        : () => () => initialComponent;
 
-    // Check if component is created with lmount (no renew parameter)
-    // TypeScript cannot infer that component is LComponent when has() returns true,
-    // because WeakSet.has() is a runtime check that doesn't narrow types.
-    // We use 'as any' since the runtime check guarantees type safety.
-    const componentMaker = lmountComponentSet.has(component)
-      ? (component as any)(props, wrappedChildren)
-      : component(componentUpdate(compKey), props, wrappedChildren);
+    let componentMaker: (nextProps: Props) => WDom;
 
-    return makeCustomNode(componentMaker, compKey, tag, props, wrappedChildren);
+    if (typeof initialComponent === 'function') {
+      const component = initialComponent;
+      // Check if component is created with lmount (no renew parameter)
+      // TypeScript cannot infer that component is LComponent when has() returns true,
+      // because WeakSet.has() is a runtime check that doesn't narrow types.
+      // We use 'as any' since the runtime check guarantees type safety.
+      componentMaker = lmountComponentSet.has(component)
+        ? (component as any)(props, wrappedChildren)
+        : component(componentUpdate(compKey), props, wrappedChildren);
+    } else {
+      // For components that directly return a VDom, recreate it each render.
+      componentMaker = (nextProps: Props) =>
+        tag(nextProps, wrappedChildren) as WDom;
+    }
+
+    const node = makeCustomNode(
+      componentMaker,
+      compKey,
+      tag,
+      props,
+      wrappedChildren
+    );
+    needDiffRef.value = prevNeedDiff;
+    return node;
   };
 };
 
@@ -269,14 +292,13 @@ const createComponentResolver = (
  * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
  */
 const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
-  const tagName = tag.name;
   const ctor = tag;
 
   const wrappedChildren = children;
 
   const resolve = createComponentResolver(tag, props, wrappedChildren);
 
-  return { tagName, ctor, props, children: wrappedChildren, resolve };
+  return { ctor, props, children: wrappedChildren, resolve };
 };
 
 /**
@@ -356,15 +378,35 @@ const wrapComponentMakerIfNeeded = (
 ): { wrappedComponentMaker: (props: Props) => WDom; customNode: WDom } => {
   let customNode = componentMaker(props);
 
+  // If the component returns a plain VDom (no reRender), nothing to wrap.
   if (!customNode.reRender) {
     return { wrappedComponentMaker: componentMaker, customNode };
   }
 
+  /**
+   * Avoid parent/child sharing the same WDom when a component directly returns
+   * another component. On remove→add toggles the shared instance would lose its
+   * parent pointer and fail to reinsert. We always wrap the child in a Fragment
+   * and attach getParent to the wrapped child so it stays anchored even after
+   * unmount/mount cycles.
+   * Regression tests: src/tests/core-composedRenew.test.tsx,
+   * src/tests/core-component-remount.test.tsx
+   */
   const wrappedComponentMaker = (newProps: Props): WDom => {
-    const customNode = componentMaker(newProps);
-    const newNode = Fragment({}, customNode);
-    customNode.getParent = () => newNode;
-    return newNode;
+    const next = componentMaker(newProps);
+
+    // When the child is null/primitive/element (no reRender), normalize it into
+    // a WDom via makeChildrenItem and wrap once so parent links are stable.
+    if (!next || !next.reRender) {
+      const child = makeChildrenItem(next as MiddleStateWDom);
+      const wrapper = Fragment({}, child);
+      child.getParent = () => wrapper;
+      return wrapper;
+    }
+
+    const wrapper = Fragment({}, next);
+    (next as WDom).getParent = () => wrapper;
+    return wrapper;
   };
 
   customNode = wrappedComponentMaker(props);
@@ -387,12 +429,18 @@ const addComponentProps = (
     compProps: props,
     compChild: children,
     ctor: tag,
-    tagName: tag.name,
     compKey,
     reRender,
   });
 
-  setRedrawAction(compKey, () => replaceWDom(tag, props, children, wDom));
+  setRedrawAction(compKey, () =>
+    replaceWDom(
+      tag,
+      (wDom.compProps as Props) || props,
+      (wDom.compChild as WDom[]) || children,
+      wDom
+    )
+  );
 
   if (getComponentSubInfo(compKey, 'vd')) {
     (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;

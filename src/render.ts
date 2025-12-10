@@ -12,12 +12,7 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import { getParent, entries, keys } from '@/utils';
-
-const getAttrKey = (k: string) => (k === 'className' ? 'class' : k);
-
-const getEventName = (k: string) =>
-  k.replace(/^on(.*)/, (_, p) => p.toLowerCase());
+import { getParent, entries, keys, isObject } from '@/utils';
 
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
@@ -30,12 +25,12 @@ export const render = (
 ) => {
   wDom.isRoot = true;
   wrapElement = wrapElement || document.body;
-  wDom.wrapElement = wrapElement;
+  wDom.we = wrapElement;
 
   const Dom = wDomToDom(wDom, isHydration);
 
   if (afterElement) {
-    wDom.afterElement = afterElement;
+    wDom.ae = afterElement;
     wrapElement.insertBefore(Dom, afterElement);
   } else if (!isHydration) {
     if (wrapElement.tagName === 'HTML') {
@@ -56,26 +51,6 @@ export const render = (
   };
 };
 
-export const wDomUpdate = (newWDomTree: WDom) => {
-  const { needRerender } = newWDomTree;
-
-  if (needRerender && needRerender !== 'N') {
-    ({
-      A: typeAdd,
-      D: typeDelete,
-      R: typeReplace,
-      U: typeUpdate,
-      CNSU: typeUpdate,
-      SR: typeSortedReplace,
-      SU: typeSortedUpdate,
-    })[needRerender](newWDomTree);
-
-    delete newWDomTree.needRerender;
-    delete newWDomTree.oldChildren;
-    delete newWDomTree.oldProps;
-  }
-};
-
 export const recursiveRemoveEvent = (originalWDom: WDom) => {
   if (originalWDom.props && originalWDom.el) {
     removeEvent(originalWDom.props, originalWDom.el);
@@ -87,11 +62,11 @@ export const recursiveRemoveEvent = (originalWDom: WDom) => {
 };
 
 const rootDelete = (newWDom: WDom) =>
-  deleteRealDom(newWDom, newWDom.wrapElement as HTMLElement);
+  deleteRealDom(newWDom, newWDom.we as HTMLElement);
 
 export const typeDelete = (newWDom: WDom) => {
-  if (newWDom.oldProps && newWDom.el) {
-    removeEvent(newWDom.oldProps, newWDom.el);
+  if (newWDom.op && newWDom.el) {
+    removeEvent(newWDom.op, newWDom.el);
   }
 
   deleteRealDom(
@@ -102,32 +77,30 @@ export const typeDelete = (newWDom: WDom) => {
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
-    const nt = newWDom.el.nodeType;
-    if ([1, 3].includes(nt)) {
-      parent.removeChild(newWDom.el);
-    } else if (nt === 11) {
+    if (newWDom.el.nodeType === 11 || newWDom?.tag === 'portal') {
       findChildWithRemoveElement(newWDom, parent);
+    } else if ([1, 3].includes(newWDom.el.nodeType)) {
+      parent.removeChild(newWDom.el);
     }
+
     delete newWDom.el;
   }
 };
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
-  (
-    (newWDom && newWDom.oldChildren) ||
-    (newWDom && newWDom.children) ||
-    []
-  ).forEach(item => {
-    const nt = item.el && item.el.nodeType;
-    if (nt) {
-      if ([1, 3].includes(nt)) {
-        const el = item.el as HTMLElement;
-        el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
-      } else if (nt === 11) {
-        findChildWithRemoveElement(item, parent);
+  ((newWDom && newWDom.oc) || (newWDom && newWDom.children) || []).forEach(
+    item => {
+      const nt = item.el && item.el.nodeType;
+      if (nt) {
+        if ([1, 3].includes(nt)) {
+          const el = item.el as HTMLElement;
+          el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
+        } else if (nt === 11) {
+          findChildWithRemoveElement(item, parent);
+        }
       }
     }
-  });
+  );
 };
 
 const typeSortedReplace = (newWDom: WDom) => {
@@ -139,7 +112,7 @@ const typeSortedUpdate = (newWDom: WDom) => {
   typeUpdate(newWDom);
 
   const parentWDom = getParent(newWDom);
-  if (parentWDom.needRerender !== 'CNSU') {
+  if (parentWDom.nr !== 'L') {
     const newElement = getElementFromFragment(newWDom);
 
     typeAdd(newWDom, newElement);
@@ -159,7 +132,7 @@ const typeAdd = (
     const parentEl = findRealParentElement(parentWDom);
     const isLoop = parentWDom.type === 'l';
     const nextEl =
-      isLoop && parentWDom.needRerender && parentWDom.needRerender !== 'CNSU'
+      isLoop && parentWDom.nr && parentWDom.nr !== 'L'
         ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
         : startFindNextBrotherElement(newWDom, parentWDom);
 
@@ -210,9 +183,9 @@ const startFindNextBrotherElement = (
   } else if (
     parentWDom.isRoot &&
     checkVirtualType(parentType) &&
-    parentWDom.afterElement
+    parentWDom.ae
   ) {
-    return parentWDom.afterElement;
+    return parentWDom.ae;
   }
 
   return undefined;
@@ -221,15 +194,14 @@ const startFindNextBrotherElement = (
 const findChildFragmentNextElement = (
   candidiateBrothers: WDom[]
 ): HTMLElement | DocumentFragment | Text | undefined =>
-  candidiateBrothers.reduce(
-    (
-      targetEl: HTMLElement | DocumentFragment | Text | undefined,
-      bItem: WDom
-    ) => {
+  candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
+    (targetEl, bItem) => {
       if (targetEl) return targetEl;
       const { type, el } = bItem;
-      if (type && checkVirtualType(type))
-        return findChildFragmentNextElement(bItem.children || []);
+      if (type && checkVirtualType(type)) {
+        const found = findChildFragmentNextElement(bItem.children || []);
+        if (found) return found;
+      }
       if (el && el.nodeType !== 11) return el;
       return targetEl;
     },
@@ -262,7 +234,7 @@ const removeEvent = (
   entries(oldProps || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
     if (dataKey.match(/^on/)) {
       element.removeEventListener(
-        getEventName(dataKey),
+        dataKey.slice(2).toLowerCase(),
         dataValue as (e: Event) => void
       );
     }
@@ -276,9 +248,9 @@ const typeUpdate = (newWDom: WDom) => {
   }
 
   if (newWDom.el) {
-    const { oldProps, props } = newWDom;
+    const { op: oldProps, props } = newWDom;
     updateProps(props, newWDom.el, oldProps);
-    delete newWDom.oldProps;
+    delete newWDom.op;
 
     if (newWDom.tag === 'input') {
       (newWDom.el as HTMLInputElement).value = String(
@@ -290,6 +262,28 @@ const typeUpdate = (newWDom: WDom) => {
   (newWDom.children || []).forEach(childItem => wDomUpdate(childItem));
   runUpdatedQueueFromWDom(newWDom);
 };
+
+export const wDomUpdate = (newWDomTree: WDom) => {
+  const { nr: needRerender } = newWDomTree;
+
+  if (needRerender !== undefined && needRerender !== 'N') {
+    renderHandlers[needRerender](newWDomTree);
+
+    delete newWDomTree.nr;
+    delete newWDomTree.oc;
+    delete newWDomTree.op;
+  }
+};
+
+const renderHandlers = {
+  A: typeAdd,
+  D: typeDelete,
+  R: typeReplace,
+  U: typeUpdate,
+  S: typeSortedReplace,
+  T: typeSortedUpdate,
+  L: typeUpdate,
+} as const;
 
 const updateText = (newWDom: WDom) => {
   if (newWDom.el) {
@@ -303,9 +297,14 @@ const updateProps = (
   oldProps?: Props | null,
   isHydration?: boolean
 ) => {
-  const originalProps = { ...oldProps };
+  const originalProps = oldProps || {};
 
   entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
+    if (dataValue === originalProps[dataKey]) {
+      delete originalProps[dataKey];
+      return;
+    }
+
     if (isHydration && dataKey.match(/^on/)) {
       updateEvent(
         element as HTMLElement,
@@ -316,7 +315,7 @@ const updateProps = (
     } else {
       if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
         // Do nothing
-      } else if (dataKey === 'portal' && typeof dataValue === 'object') {
+      } else if (dataKey === 'portal' && isObject(dataValue)) {
         // Do nothing
       } else if (dataKey === 'innerHTML' && typeof dataValue === 'string') {
         (element as HTMLElement).innerHTML = dataValue;
@@ -343,7 +342,7 @@ const updateProps = (
             dataValue;
         } else {
           setAttr(
-            getAttrKey(dataKey),
+            dataKey === 'className' ? 'class' : dataKey,
             element as HTMLElement,
             dataValue as string
           );
@@ -391,7 +390,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
       // text node
       element = document.createTextNode(String(text));
     } else {
-      element = CE('e');
+      throw Error('Invalid wDom');
     }
 
     wDom.el = element as HTMLElement;
@@ -438,7 +437,7 @@ const updateEvent = (
   newEventHandler: (e: Event) => void,
   oldEventHandler: (e: Event) => void
 ) => {
-  const eventName = getEventName(eventKey);
+  const eventName = eventKey.slice(2).toLowerCase();
 
   if (oldEventHandler !== newEventHandler) {
     if (oldEventHandler) {
@@ -479,7 +478,7 @@ const findRealParentElement = (
 ): HTMLElement | DocumentFragment | Text | undefined => {
   const isVirtualType = checkVirtualType(vDom.type);
   if (vDom.isRoot && isVirtualType) {
-    return vDom.wrapElement;
+    return vDom.we;
   }
 
   if (!isVirtualType) {

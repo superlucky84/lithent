@@ -9,6 +9,7 @@ export {
   getComponentSubInfo,
   setComponentMapManualMode,
   disposeComponentEntry,
+  lmountComponentSet,
 } from '@/utils/universalRef';
 export { render } from '@/render';
 export { mountCallback } from '@/hook/mountCallback';
