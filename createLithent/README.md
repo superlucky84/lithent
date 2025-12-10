@@ -1,75 +1,120 @@
-# Welcome to Lithent-Ssr-Boilerplate
+# create-lithent
 
-`Lithent-Ssr-Boilerplate` is a boilerplate designed for building server-side rendering (SSR) websites using the [Lithent](https://superlucky84.github.io/lithent/) UI library.
+The official scaffolding tool for [Lithent](https://superlucky84.github.io/lithent/#/) projects.
 
+## Quick Start
 
-## Warning
+### Prerequisites
 
-This project is still experimental and requires [Express](https://expressjs.com/) as a mandatory dependency.
+- **Node.js 18.12** or higher
+- Basic command line experience
 
-## Usage
+### Creating a New Project
 
-### Create a Project
+Run the following command in your terminal:
 
 ```bash
-npx create-lithent-ssr@latest
-cd project-name
+npx create-lithent@latest
 ```
 
-### Install Dependencies
+This command installs and runs `create-lithent`, which will guide you through the project setup process.
+
+### Setup Process
+
+The CLI will prompt you for:
+
+1. **Project name**: Choose a name for your project directory
+2. **Template type**: Select between two options:
+   - **SSR (Express)**: Server-side rendering with Express. Ideal for SEO and optimized first-load performance
+   - **SPA (Vite)**: Client-side rendering with Vite. Perfect for fast development and simple deployments
+
+### Installation and Development
+
+Once scaffolded, navigate to your project and start developing:
 
 ```bash
+cd <your-project-name>
 npm install
-```
-
-
-### Run the Development Server
-
-```bash
 npm run dev
 ```
 
-### Build and Run
+Your Lithent project will be running locally. The default template uses JSX for component markup.
 
-The build files will be generated in the `dist` directory.
+### Building for Production
+
+When ready to deploy:
 
 ```bash
 npm run build
+```
+
+This creates an optimized production build in the `./dist` directory.
+
+For **SSR projects**, start the production server with:
+
+```bash
 npm run start
 ```
 
-### Routing Rules
+## Template Features
 
-Routing is determined by the filenames under the `/src/pages/` directory. The routing behavior is as follows:
+### SSR Template (Express)
 
-* `src/pages/index.tsx` maps to the root URL: `http://localhost:3000`.
+- Server-side rendering with Express
+- File-based routing in `/src/pages/`
+- MDX support via `@lithent/lithent-mdx`
+- Hot Module Replacement (HMR)
+- Tailwind CSS pre-configured
+- State management with [state-ref](https://github.com/superlucky84/state-ref)
 
-* A file with a specific name like `one.tsx` will create a static route. For example:
-    * `src/pages/one.tsx` maps to `http://localhost:3000/one`.
+#### Routing Rules
 
-* Files with dynamic segments are defined by using an underscore (`_`) in the filename. For example:
-    * `src/pages/index._type.tsx` maps to a dynamic route like `http://localhost:3000/:type`.
+Routing is determined by filenames under `/src/pages/`:
 
-* You can chain dynamic segments for more complex routes. For example:
-    * `src/pages/one._type._name.tsx` maps to `http://localhost:3000/one/:type/:name`.
+- `src/pages/index.tsx` → `http://localhost:3000/`
+- `src/pages/one.tsx` → `http://localhost:3000/one`
+- `src/pages/index._type.tsx` → `http://localhost:3000/:type`
+- `src/pages/one._type._name.tsx` → `http://localhost:3000/one/:type/:name`
 
-These routing patterns allow you to create both static and dynamic URLs with flexibility in your project structure.
+Dynamic segments use underscore (`_`) prefix.
 
-### MDX Support
+#### MDX Support
 
-MDX is enabled by default through `@lithent/lithent-mdx` and `@lithent/lithent-vite`.  
-Simply drop an `.mdx` file under `src/pages/` (for example `src/pages/docs.mdx`) and it will be compiled into a Lithent page automatically.  
-Hot reload works the same as for `.tsx` files, so edits inside `.mdx` files refresh instantly during development.
+Drop `.mdx` files in `src/pages/` and they compile automatically:
 
-### HMR Usage Notice
+```bash
+src/pages/docs.mdx → http://localhost:3000/docs
+```
 
-This starter wires `@lithent/lithent-vite`, so components and MDX pages participate in Hot Module Replacement out of the box.
+Hot reload works seamlessly with MDX files.
 
+### SPA Template (Vite)
 
-### State Management
+- Pure client-side rendering
+- Vite-powered development
+- Fast HMR and build times
+- Tailwind CSS pre-configured
+- Ideal for GitHub Pages and static hosting
 
-This template includes [state-ref](https://github.com/superlucky84/state-ref), a lightweight state management library, already configured to simplify your development experience. It provides an intuitive API for managing and sharing state across components, making your application more predictable and maintainable.
+## Using Lithent from CDN
 
-### Styling
+You can use Lithent without a build step by loading it from a CDN:
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience.
+```html
+<script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
+```
+
+Use `ftags` or `htm` for templates when working without JSX.
+
+**[📦 View all available CDN URLs](https://superlucky84.github.io/lithent/#/guide/quick-start)**
+
+## Documentation
+
+- **[Full Documentation](https://superlucky84.github.io/lithent/#/)** - Complete guide and API reference
+- **[Quick Start Guide](https://superlucky84.github.io/lithent/#/guide/quick-start)** - Detailed setup instructions
+- **[Examples](https://superlucky84.github.io/lithent/#/examples/1)** - Live examples and patterns
+
+## License
+
+MIT © [superlucky84](https://github.com/superlucky84)
