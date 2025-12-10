@@ -390,7 +390,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
       // text node
       element = document.createTextNode(String(text));
     } else {
-      element = CE('e');
+      throw Error('Invalid wDom');
     }
 
     wDom.el = element as HTMLElement;
