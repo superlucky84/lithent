@@ -55,7 +55,7 @@ npm install lithent
 <script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
 ```
 
-> **[📦 View all available CDN URLs](https://superlucky84.github.io/lithent/#/guide/quick-start#available-cdn-urls)**
+> **[📦 View all available CDN URLs](https://superlucky84.github.io/lithent/#/guide/quick-start)**
 
 <br />
 
