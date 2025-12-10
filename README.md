@@ -12,7 +12,9 @@ It trims away unnecessary magic and complex APIs so your UI code stays simple, e
 
 <br />
 
-## Why Lithent? &nbsp; [→ Learn more](https://superlucky84.github.io/lithent/guide/introduction)
+## Why Lithent?
+
+> **[📖 Learn more in the introduction guide](https://superlucky84.github.io/lithent/guide/introduction)**
 
 In many size‑sensitive environments you still need **lightweight DOM manipulation** without pulling in a full framework. Most existing solutions are powerful but heavy, especially when you just want to embed a small widget or ship a tiny library.
 
@@ -29,7 +31,9 @@ You bring in only what you need, letting the stack scale with your project and t
 
 <br />
 
-## Quick start &nbsp; [→ Full guide](https://superlucky84.github.io/lithent/guide/quick-start)
+## Quick start
+
+> **[📘 Read the full guide](https://superlucky84.github.io/lithent/guide/quick-start)**
 
 ### Create a new project
 
@@ -56,7 +60,9 @@ No build step required — you can progressively enhance a static HTML page.
 
 <br />
 
-## Two ways to build components &nbsp; [→ Learn more](https://superlucky84.github.io/lithent/guide/mounter)
+## Two ways to build components
+
+> **[📚 Explore component patterns](https://superlucky84.github.io/lithent/guide/mounter)**
 
 Lithent offers two complementary styles that you can freely mix in the same project.
 
