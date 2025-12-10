@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example12Ko } from '@/components/examples/example12_ko';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const ssrHtmlCode = `<!-- 서버에서 렌더링된 초기 HTML (실제 DOM) -->
 <div id="feed">
@@ -271,8 +272,7 @@ export const Example12PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/render');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/render');
             }}
           >
             Render 가이드
@@ -286,8 +286,7 @@ export const Example12PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/examples/13');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/examples/13');
             }}
           >
             Example 13: Mixed DOM + Loop

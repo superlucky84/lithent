@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example5 } from '@/components/examples/example5';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const example5Code = `import { mount, Fragment } from 'lithent';
 import { state } from 'lithent/helper';
@@ -146,8 +147,7 @@ export const Example5Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/children');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/children');
             }}
           >
             Children guide
@@ -160,8 +160,7 @@ export const Example5Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/updater');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/updater');
             }}
           >
             Updater guide

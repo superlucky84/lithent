@@ -1,6 +1,7 @@
 import { mount } from 'lithent';
 import { Example14Ko } from '@/components/examples/example14_ko';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const Example14PageKo = mount(() => {
   return () => (
@@ -326,8 +327,7 @@ const Inventory = mount<{ logEl: { value: HTMLElement | null } }>(
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/examples/4');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/examples/4');
             }}
           >
             Example 4: Effect Lifecycle
@@ -340,8 +340,7 @@ const Inventory = mount<{ logEl: { value: HTMLElement | null } }>(
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/mount-hooks');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/mount-hooks');
             }}
           >
             Mount Hooks 가이드

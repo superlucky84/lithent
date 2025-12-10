@@ -1,6 +1,7 @@
 import { mount } from 'lithent';
 import { Example18 } from '@/components/examples/example18';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const Example18Page = mount(() => {
   return () => (
@@ -420,8 +421,7 @@ export const Example18 = mount(renew => {
               class="text-[#42b883] hover:underline"
               onClick={(e: Event) => {
                 e.preventDefault();
-                window.history.pushState({}, '', '/guide/cache-update');
-                window.dispatchEvent(new PopStateEvent('popstate'));
+                navigateTo('/guide/cache-update');
               }}
             >
               CacheUpdate Guide
@@ -435,8 +435,7 @@ export const Example18 = mount(renew => {
               class="text-[#42b883] hover:underline"
               onClick={(e: Event) => {
                 e.preventDefault();
-                window.history.pushState({}, '', '/guide/computed');
-                window.dispatchEvent(new PopStateEvent('popstate'));
+                navigateTo('/guide/computed');
               }}
             >
               Computed Guide

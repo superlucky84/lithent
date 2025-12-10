@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import type { Introduction } from '@/pages/Introduction';
 import { Example1Ko } from '@/components/examples/example1_ko';
+import { navigateTo } from '@/store';
 
 export const Example1PageKo = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
@@ -63,8 +64,7 @@ export const BananaSmoothie = mount(renew => {
           class="text-[#42b883] hover:underline"
           onClick={(e: Event) => {
             e.preventDefault();
-            window.history.pushState({}, '', '/guide/computed');
-            window.dispatchEvent(new PopStateEvent('popstate'));
+            navigateTo('/guide/computed');
           }}
         >
           Computed 가이드
@@ -77,8 +77,7 @@ export const BananaSmoothie = mount(renew => {
           class="text-[#42b883] hover:underline"
           onClick={(e: Event) => {
             e.preventDefault();
-            window.history.pushState({}, '', '/guide/state');
-            window.dispatchEvent(new PopStateEvent('popstate'));
+            navigateTo('/guide/state');
           }}
         >
           State 가이드

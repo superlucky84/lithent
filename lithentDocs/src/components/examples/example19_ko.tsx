@@ -1,5 +1,6 @@
 import { mount } from 'lithent';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 const htmlCode = `<!DOCTYPE html>
 <html lang="en">
@@ -587,8 +588,7 @@ export const Example19Ko = mount(() => {
             class="block text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/ftags');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/ftags');
             }}
           >
             → FTags 가이드: 전체 API 문서와 더 많은 예제
@@ -598,8 +598,7 @@ export const Example19Ko = mount(() => {
             class="block text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/lstate');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/lstate');
             }}
           >
             → Lstate 가이드: 반응형 상태 관리 자세히 알아보기
@@ -609,8 +608,7 @@ export const Example19Ko = mount(() => {
             class="block text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/computed');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/computed');
             }}
           >
             → Computed 가이드: 파생 상태 활용법

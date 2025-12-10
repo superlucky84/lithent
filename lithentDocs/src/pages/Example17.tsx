@@ -1,6 +1,7 @@
 import { mount } from 'lithent';
 import { Example17 } from '@/components/examples/example17';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const Example17Page = mount(() => {
   return () => (
@@ -403,8 +404,7 @@ const TrafficLight = mount(renew => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/state');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/state');
             }}
           >
             State Guide
@@ -417,8 +417,7 @@ const TrafficLight = mount(renew => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/updater');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/updater');
             }}
           >
             Updater Guide

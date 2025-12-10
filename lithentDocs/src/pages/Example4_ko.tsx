@@ -2,6 +2,7 @@ import { CodeBlock } from '@/components/CodeBlock';
 import { mount, ref } from 'lithent';
 import { effect, state } from 'lithent/helper';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const example4Code = `import { mount, render, ref } from 'lithent';
 import { state, effect } from 'lithent/helper';
@@ -186,8 +187,7 @@ export const Example4PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/effect');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/effect');
             }}
           >
             Effect 가이드
@@ -201,8 +201,7 @@ export const Example4PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/mount-hooks');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/mount-hooks');
             }}
           >
             Mount Hooks 가이드

@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example2 } from '@/components/examples/example2';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const example2Code = `import { mount, render } from 'lithent';
 import { store } from 'lithent/helper';
@@ -57,8 +58,7 @@ export const Example2Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/store');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/store');
             }}
           >
             Store guide
@@ -72,8 +72,7 @@ export const Example2Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/state');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/state');
             }}
           >
             State guide

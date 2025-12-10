@@ -1,6 +1,7 @@
 import { mount } from 'lithent';
 import { Example18Ko } from '@/components/examples/example18_ko';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const Example18PageKo = mount(() => {
   return () => (
@@ -412,8 +413,7 @@ export const Example18 = mount(renew => {
               class="text-[#42b883] hover:underline"
               onClick={(e: Event) => {
                 e.preventDefault();
-                window.history.pushState({}, '', '/ko/guide/cache-update');
-                window.dispatchEvent(new PopStateEvent('popstate'));
+                navigateTo('/ko/guide/cache-update');
               }}
             >
               CacheUpdate 가이드
@@ -427,8 +427,7 @@ export const Example18 = mount(renew => {
               class="text-[#42b883] hover:underline"
               onClick={(e: Event) => {
                 e.preventDefault();
-                window.history.pushState({}, '', '/ko/guide/computed');
-                window.dispatchEvent(new PopStateEvent('popstate'));
+                navigateTo('/ko/guide/computed');
               }}
             >
               Computed 가이드

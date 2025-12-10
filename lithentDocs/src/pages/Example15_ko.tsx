@@ -1,6 +1,7 @@
 import { mount } from 'lithent';
 import { Example15Ko } from '@/components/examples/example15_ko';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const Example15PageKo = mount(() => {
   return () => (
@@ -266,8 +267,7 @@ const VolumeController = mount(renew => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/props');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/props');
             }}
           >
             Props 가이드
@@ -280,8 +280,7 @@ const VolumeController = mount(renew => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/updater');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/updater');
             }}
           >
             Updater 가이드

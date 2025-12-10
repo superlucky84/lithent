@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example7 } from '@/components/examples/example7';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const example7Code = `import { mount } from 'lithent';
 import { state } from 'lithent/helper';
@@ -185,8 +186,7 @@ export const Example7Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/props');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/props');
             }}
           >
             Props guide
@@ -200,8 +200,7 @@ export const Example7Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/htm-tags');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/htm-tags');
             }}
           >
             HTM Tags guide

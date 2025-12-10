@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 
 export default defineConfig({
+  base: '/lithent/',
   plugins: [
     checker({
       typescript: true,
@@ -22,7 +23,7 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    open: '/guide/introduction',
+    open: '/lithent/',
     historyApiFallback: true,
   },
 });

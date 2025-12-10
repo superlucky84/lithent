@@ -1,5 +1,6 @@
 import { mount } from 'lithent';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 const htmlCode = `<!DOCTYPE html>
 <html lang="en">
@@ -599,8 +600,7 @@ export const Example19 = mount(() => {
             class="block text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/ftags');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/ftags');
             }}
           >
             → FTags Guide: Complete API documentation and more examples
@@ -610,8 +610,7 @@ export const Example19 = mount(() => {
             class="block text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/lstate');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/lstate');
             }}
           >
             → Lstate Guide: Learn more about reactive state management
@@ -621,8 +620,7 @@ export const Example19 = mount(() => {
             class="block text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/computed');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/computed');
             }}
           >
             → Computed Guide: How to use derived state

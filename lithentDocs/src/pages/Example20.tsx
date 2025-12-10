@@ -1,6 +1,7 @@
 import { mount } from 'lithent';
 import { Example20 } from '@/components/examples/example20';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 export const Example20Page = mount(() => {
   return () => (
@@ -441,8 +442,7 @@ const renderLightbox = () => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/portal');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/portal');
             }}
           >
             Portal Guide
@@ -455,8 +455,7 @@ const renderLightbox = () => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/mount-hooks');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/mount-hooks');
             }}
           >
             Mount Hooks Guide
@@ -469,8 +468,7 @@ const renderLightbox = () => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/state-ref');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/state-ref');
             }}
           >
             State-Ref Guide

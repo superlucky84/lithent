@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example9Ko } from '@/components/examples/example9_ko';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const example9Code = `import { mount } from 'lithent';
 import { state } from 'lithent/helper';
@@ -213,8 +214,7 @@ export const Example9PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/state');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/state');
             }}
           >
             State 가이드
@@ -228,8 +228,7 @@ export const Example9PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/props');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/props');
             }}
           >
             Props 가이드

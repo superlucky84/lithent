@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example13 } from '@/components/examples/example13';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const ssrHtmlCode = `<!-- Initial HTML rendered on the server (real DOM) -->
 <div id="waitlist">
@@ -319,8 +320,7 @@ export const Example13Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/examples/12');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/examples/12');
             }}
           >
             Example 12: Mixed DOM Elements
@@ -334,8 +334,7 @@ export const Example13Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/render');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/render');
             }}
           >
             Render guide

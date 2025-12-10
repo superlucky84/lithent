@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import type { Introduction } from '@/pages/Introduction';
 import { Example1 } from '@/components/examples/example1';
+import { navigateTo } from '@/store';
 
 export const Example1Page = (): ReturnType<typeof Introduction> => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
@@ -21,6 +22,7 @@ export const Example1Page = (): ReturnType<typeof Introduction> => (
       language="tsx"
       code={`import { mount } from 'lithent';
 import { state, computed } from 'lithent/helper';
+import { navigateTo } from '@/store';
 
 // Banana smoothie calorie calculator (95 kcal per cup)
 export const BananaSmoothie = mount(renew => {
@@ -63,8 +65,7 @@ export const BananaSmoothie = mount(renew => {
           class="text-[#42b883] hover:underline"
           onClick={(e: Event) => {
             e.preventDefault();
-            window.history.pushState({}, '', '/guide/computed');
-            window.dispatchEvent(new PopStateEvent('popstate'));
+            navigateTo('/guide/computed');
           }}
         >
           Computed guide
@@ -77,8 +78,7 @@ export const BananaSmoothie = mount(renew => {
           class="text-[#42b883] hover:underline"
           onClick={(e: Event) => {
             e.preventDefault();
-            window.history.pushState({}, '', '/guide/state');
-            window.dispatchEvent(new PopStateEvent('popstate'));
+            navigateTo('/guide/state');
           }}
         >
           State guide

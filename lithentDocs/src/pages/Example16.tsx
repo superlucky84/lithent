@@ -1,6 +1,7 @@
 import { mount } from 'lithent';
 import { Example16 } from '@/components/examples/example16';
 import { CodeBlock } from '@/components/CodeBlock';
+import { navigateTo } from '@/store';
 
 const ssrHtmlCode = `<!-- Initial HTML rendered from server (Real DOM) -->
 <div id="music-library">
@@ -364,8 +365,7 @@ destroyFn();`}
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/examples/12');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/examples/12');
             }}
           >
             Example 12: Mixed DOM Elements
@@ -378,8 +378,7 @@ destroyFn();`}
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/examples/13');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/examples/13');
             }}
           >
             Example 13: Mixed DOM + Loop
@@ -392,8 +391,7 @@ destroyFn();`}
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/render');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/render');
             }}
           >
             Render Guide
@@ -406,8 +404,7 @@ destroyFn();`}
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/mount-hooks');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/mount-hooks');
             }}
           >
             Mount Hooks Guide

@@ -22,7 +22,7 @@ export const Header = mount(renew => {
                 }}
                 class="flex items-center gap-3"
               >
-                <img src="/lithent.png" alt="Lithent" class="w-8 h-8" />
+                <img src="/lithent/lithent.png" alt="Lithent" class="w-8 h-8" />
                 <span class="font-semibold text-xl text-gray-900 dark:text-white">
                   Lithent
                 </span>

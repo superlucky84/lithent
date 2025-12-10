@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example12 } from '@/components/examples/example12';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const ssrHtmlCode = `<!-- Initial HTML rendered on the server (real DOM) -->
 <div id="feed">
@@ -282,8 +283,7 @@ export const Example12Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/render');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/render');
             }}
           >
             Render guide
@@ -297,8 +297,7 @@ export const Example12Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/examples/13');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/examples/13');
             }}
           >
             Example 13: Mixed DOM + Loop

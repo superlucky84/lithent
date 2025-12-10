@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example11 } from '@/components/examples/example11';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const example11Code = `import { mount } from 'lithent';
 import { createContext } from 'lithent/helper';
@@ -125,8 +126,7 @@ export const Example11Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/context');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/context');
             }}
           >
             Context guide
@@ -140,8 +140,7 @@ export const Example11Page = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/store');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/store');
             }}
           >
             Store guide

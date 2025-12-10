@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { Example3Ko } from '@/components/examples/example3_ko';
 import type { Introduction } from '@/pages/Introduction';
+import { navigateTo } from '@/store';
 
 const example3Code = `import { mount, ref } from 'lithent';
 import { state } from 'lithent/helper';
@@ -61,8 +62,7 @@ export const Example3PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/children');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/children');
             }}
           >
             Children 가이드
@@ -76,8 +76,7 @@ export const Example3PageKo = (): ReturnType<typeof Introduction> => (
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/state');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/state');
             }}
           >
             State 가이드

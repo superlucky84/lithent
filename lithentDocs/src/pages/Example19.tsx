@@ -1,5 +1,6 @@
 import { mount } from 'lithent';
 import { Example19 } from '@/components/examples/example19';
+import { navigateTo } from '@/store';
 
 export const Example19Page = mount(() => {
   return () => (
@@ -304,8 +305,7 @@ export const Example19Page = mount(() => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/ftags');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/ftags');
             }}
           >
             FTags Guide
@@ -318,8 +318,7 @@ export const Example19Page = mount(() => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/lstate');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/lstate');
             }}
           >
             Lstate Guide
@@ -332,8 +331,7 @@ export const Example19Page = mount(() => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/computed');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/computed');
             }}
           >
             Computed Guide

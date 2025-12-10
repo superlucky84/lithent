@@ -1,5 +1,6 @@
 import { mount } from 'lithent';
 import { Example19Ko } from '@/components/examples/example19_ko';
+import { navigateTo } from '@/store';
 
 export const Example19PageKo = mount(() => {
   return () => (
@@ -290,8 +291,7 @@ export const Example19PageKo = mount(() => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/ftags');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/ftags');
             }}
           >
             FTags 가이드
@@ -304,8 +304,7 @@ export const Example19PageKo = mount(() => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/lstate');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/lstate');
             }}
           >
             Lstate 가이드
@@ -318,8 +317,7 @@ export const Example19PageKo = mount(() => {
             class="text-[#42b883] hover:underline"
             onClick={(e: Event) => {
               e.preventDefault();
-              window.history.pushState({}, '', '/guide/computed');
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              navigateTo('/guide/computed');
             }}
           >
             Computed 가이드
