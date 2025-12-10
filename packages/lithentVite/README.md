@@ -25,7 +25,7 @@ yarn add @lithent/lithent-vite
 ```
 
 **Peer Dependencies:**
-- `lithent: ^1.20.2`
+- `lithent: ^1.21.0`
 - `vite: ^5.0.0`
 
 ## Usage
