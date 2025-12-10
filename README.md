@@ -12,7 +12,7 @@ It trims away unnecessary magic and complex APIs so your UI code stays simple, e
 
 <div align="center">
 
-### 🚀 [Get Started](https://superlucky84.github.io/lithent/guide/quick-start) · 📖 [Documentation](https://superlucky84.github.io/lithent) · 💡 [Examples](https://superlucky84.github.io/lithent/examples/1)
+### 🚀 [Get Started](https://superlucky84.github.io/lithent/#/guide/quick-start) · 📖 [Documentation](https://superlucky84.github.io/lithent/#/) · 💡 [Examples](https://superlucky84.github.io/lithent/#/examples/1)
 
 </div>
 
@@ -55,7 +55,7 @@ npm install lithent
 <script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
 ```
 
-> **[📦 View all available CDN URLs](https://superlucky84.github.io/lithent/guide/quick-start#available-cdn-urls)**
+> **[📦 View all available CDN URLs](https://superlucky84.github.io/lithent/#/guide/quick-start#available-cdn-urls)**
 
 <br />
 
@@ -84,7 +84,7 @@ const Counter = lmount(() => {
 });
 ```
 
-> **[📚 Explore component patterns in detail](https://superlucky84.github.io/lithent/guide/mounter)**
+> **[📚 Explore component patterns in detail](https://superlucky84.github.io/lithent/#/guide/mounter)**
 
 <br />
 
@@ -109,7 +109,7 @@ const Counter = lmount(() => {
 - **HTM** — Tagged template literals
 - **Template Strings** — Custom templates
 
-> **[📖 View full API reference](https://superlucky84.github.io/lithent)**
+> **[📖 View full API reference](https://superlucky84.github.io/lithent/#/)**
 
 <br />
 
