@@ -96,9 +96,13 @@ function toPrompt<
     let onAbort = args.onAbort || opts.onAbort || identity;
     let onSubmit = args.onSubmit || opts.onSubmit || identity;
     let onExit = args.onExit || opts.onExit || identity;
+    // @ts-expect-error - prompts library type definition issue
     p.on('state', args.onState || identity);
+    // @ts-expect-error - prompts library type definition issue
     p.on('submit', (x: any) => res(onSubmit(x)));
+    // @ts-expect-error - prompts library type definition issue
     p.on('exit', (x: any) => res(onExit(x)));
+    // @ts-expect-error - prompts library type definition issue
     p.on('abort', (x: any) => rej(onAbort(x)));
   });
 }
