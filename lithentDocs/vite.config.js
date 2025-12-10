@@ -23,7 +23,7 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    open: '/lithent/',
+    open: '/lithent/#/',
     historyApiFallback: true,
   },
 });

@@ -15,7 +15,7 @@ const stripKoPrefix = (path: string) => {
 // Get path from hash
 const getPathFromHash = (): string => {
   const hash = location.hash.slice(1); // Remove #
-  return hash || '/guide/introduction';
+  return hash || '/';
 };
 
 export const resolveRouteForLanguage = (path: string, lang: 'en' | 'ko') => {
