@@ -233,6 +233,12 @@ const examples: ExampleItem[] = [
     link: '/examples/20',
     description: 'Render components in a different DOM location with portal',
   },
+  {
+    text: 'HTM Tags CDN (Quick Notes)',
+    link: '/examples/21',
+    description:
+      'Build a complete notes app using HTM Tags, Import Maps, and Lithent’s light API with CDN only',
+  },
 ];
 
 export const Home = mount(renew => {

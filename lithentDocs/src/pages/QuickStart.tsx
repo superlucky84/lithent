@@ -405,7 +405,7 @@ $ npm run dev`}
       What’s next
     </h2>
 
-    <div class="grid gap-6 mt-6">
+    <div class="grid gap-6 mt-6 mb-8">
       <a
         href="/guide/mounter"
         onClick={(e: Event) => {
@@ -421,6 +421,98 @@ $ npm run dev`}
           Learn about Mounter, one of the core concepts in Lithent.
           <br />
           You will see how to create and initialize components step by step.
+        </p>
+      </a>
+    </div>
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      Related guides
+    </h2>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <a
+        href="/guide/vite-plugin"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/vite-plugin');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          Dev tooling: Vite Plugin →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          Set up the official Lithent Vite plugin for fast HMR and a smooth DX
+          when building SPA/SSR apps.
+        </p>
+      </a>
+
+      <a
+        href="/guide/jsx-manual"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/jsx-manual');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & Templates: Manual JSX →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          Learn how to configure Lithent JSX manually with TypeScript, Babel, or
+          custom build pipelines.
+        </p>
+      </a>
+
+      <a
+        href="/guide/ftags"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/ftags');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & Templates: FTags →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          Explore FTags, a functional API for building components without JSX
+          and with zero build configuration.
+        </p>
+      </a>
+
+      <a
+        href="/guide/htm-tags"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/htm-tags');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & Templates: HTM Tags →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          Use HTM-style tagged template literals to author Lithent UIs without a
+          JSX transform.
+        </p>
+      </a>
+
+      <a
+        href="/guide/template-strings"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/template-strings');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & Templates: Template Strings →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          Try Lithent’s experimental template-string system with directives like
+          <code> l-if </code> and <code> l-for </code> for highly declarative
+          UIs.
         </p>
       </a>
     </div>

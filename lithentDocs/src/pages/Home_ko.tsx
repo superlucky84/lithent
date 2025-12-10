@@ -232,6 +232,12 @@ const examples: ExampleItem[] = [
     link: '/examples/20',
     description: 'portal로 다른 DOM 위치에 컴포넌트 렌더링',
   },
+  {
+    text: 'HTM Tags CDN (Quick Notes)',
+    link: '/examples/21',
+    description:
+      'HTM Tags와 Import Maps, Lithent Light API를 사용해 CDN만으로 완전한 메모 앱 구현',
+  },
 ];
 
 export const HomeKo = mount(renew => {

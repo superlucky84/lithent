@@ -396,10 +396,10 @@ $ npm run dev`}
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      다음단계
+      다음 단계
     </h2>
 
-    <div class="grid gap-6 mt-6">
+    <div class="grid gap-6 mt-6 mb-8">
       <a
         href="/guide/mounter"
         onClick={(e: Event) => {
@@ -414,7 +414,98 @@ $ npm run dev`}
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
           Lithent의 핵심 개념인 Mounter에 대해 알아보세요.
           <br />
-          컴포넌트를 생성하고 초기화하는 방법을 배워봅시다.
+          컴포넌트를 생성하고 초기화하는 방법을 단계별로 살펴봅니다.
+        </p>
+      </a>
+    </div>
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      연관문서
+    </h2>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <a
+        href="/guide/vite-plugin"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/vite-plugin');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          개발 환경: Vite Plugin →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          공식 Lithent Vite 플러그인을 설정하고 HMR이 적용된 빠른 개발 환경을
+          구성해 보세요.
+        </p>
+      </a>
+
+      <a
+        href="/guide/jsx-manual"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/jsx-manual');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & 템플릿: 수동 JSX 설정 →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          Vite 플러그인 없이 TypeScript, Babel, 커스텀 빌드 환경에서 JSX를 직접
+          설정하는 방법을 확인하세요.
+        </p>
+      </a>
+
+      <a
+        href="/guide/ftags"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/ftags');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & 템플릿: FTags →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          빌드 도구 없이 함수형 API로 컴포넌트를 작성할 수 있는 FTags 방식을
+          자세히 살펴보세요.
+        </p>
+      </a>
+
+      <a
+        href="/guide/htm-tags"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/htm-tags');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & 템플릿: HTM Tags →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          JSX 변환 없이 tagged template 방식으로 Lithent UI를 작성하는 방법을
+          알아보세요.
+        </p>
+      </a>
+
+      <a
+        href="/guide/template-strings"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/template-strings');
+        }}
+        class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
+      >
+        <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
+          JSX & 템플릿: Template Strings →
+        </h3>
+        <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
+          <code>l-if</code>, <code>l-for</code>와 같은 지시어를 사용하는 실험적
+          템플릿 문자열 시스템을 체험해 보세요.
         </p>
       </a>
     </div>
