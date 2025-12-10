@@ -257,7 +257,15 @@ $ npm run dev`}
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
       You can also use the ES module build of Lithent. Most modern browsers
       natively support ES modules, so you can load Lithent directly as a module
-      from a CDN:
+      from a CDN.
+    </p>
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      The example below uses an <strong>Import Map</strong> to define clean
+      module specifiers like <code>'lithent'</code> instead of full CDN URLs.
+      Import Maps are a web standard supported by all modern browsers that let
+      you control how module specifiers are resolved. This approach makes it
+      easy to switch between different CDNs (jsdelivr, unpkg, esm.sh) or even
+      use locally hosted files—just update the Import Map.
     </p>
     <CodeBlock
       language="html"

@@ -251,8 +251,16 @@ $ npm run dev`}
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
       ESM으로 빌드된 버전을 사용하면 ES 모듈 문법으로 사용할 수 있습니다.
-      대부분의 최신 브라우저는 ES 모듈을 기본적으로 지원하므로, 다음과 같이
-      CDN에서 네이티브 ES 모듈로 Lithent를 사용할 수 있습니다:
+      대부분의 최신 브라우저는 ES 모듈을 기본적으로 지원하므로, CDN에서 네이티브
+      ES 모듈로 Lithent를 사용할 수 있습니다.
+    </p>
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 mb-4">
+      아래 예제는 <strong>Import Map</strong>을 사용하여 전체 CDN URL 대신{' '}
+      <code>'lithent'</code>와 같은 깔끔한 모듈 경로를 정의합니다. Import Map은
+      모든 최신 브라우저에서 지원하는 웹 표준으로, 모듈 경로가 어떻게 해석될지
+      제어할 수 있습니다. 이 방식을 사용하면 다른 CDN(jsdelivr, unpkg,
+      esm.sh)으로 전환하거나 로컬에 호스팅된 파일을 사용할 때도 Import Map만
+      수정하면 됩니다.
     </p>
     <CodeBlock
       language="html"
