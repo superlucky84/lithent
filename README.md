@@ -10,7 +10,7 @@ It trims away unnecessary magic and complex APIs so your UI code stays simple, e
 
 <br />
 
-<div align="center">
+<div align="left">
 
 ### 🚀 [Get Started](https://superlucky84.github.io/lithent/#/guide/quick-start) · 📖 [Documentation](https://superlucky84.github.io/lithent/#/) · 💡 [Examples](https://superlucky84.github.io/lithent/#/examples/1)
 
