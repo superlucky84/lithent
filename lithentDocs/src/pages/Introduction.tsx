@@ -152,15 +152,7 @@ const Counter = lmount((_props) => {
           💡 Heads-up:
         </span>{' '}
         Stateless UI does not require mount or lmount—just write a plain
-        function component in Lithent style (for example{' '}
-        <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-          ({'{ props, children }'})
-        </code>
-        is not necessary). A Lithent function component looks like{' '}
-        <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-          ({'{ title }'}, children)
-        </code>
-        . Read more in the{' '}
+        function component. Read more in the{' '}
         <a
           href="/guide/stateless"
           onClick={(e: Event) => {

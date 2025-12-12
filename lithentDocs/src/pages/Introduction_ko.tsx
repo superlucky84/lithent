@@ -154,15 +154,8 @@ const Counter = lmount((_props) => {
         <span class="font-medium text-gray-700 dark:text-gray-300">
           💡 참고:
         </span>{' '}
-        상태가 전혀 필요 없는 단순한 UI는 mount나 lmount 없이{' '}
-        <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-          ({'{ props, children }'})
-        </code>
-        가 아닌, Lithent 스타일의 일반 함수 컴포넌트(예:{' '}
-        <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-          ({'{ title }'}, children)
-        </code>
-        )로도 표현할 수 있습니다. 자세한 패턴은{' '}
+        상태가 전혀 필요 없는 단순한 UI는 mount나 lmount 없이 일반 함수
+        컴포넌트로 표현할 수 있습니다. 자세한 패턴은{' '}
         <a
           href="/guide/stateless"
           onClick={(e: Event) => {
