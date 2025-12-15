@@ -56,6 +56,8 @@ import { TemplateStringsKo } from '@/pages/TemplateStrings_ko';
 import { Stateless } from '@/pages/Stateless';
 import { StatelessKo } from '@/pages/Stateless_ko';
 import { InnerHTML } from '@/pages/InnerHTML';
+import { Fragment as FragmentPage } from '@/pages/Fragment';
+import { FragmentKo } from '@/pages/Fragment_ko';
 import { Example1Page } from '@/pages/Example1';
 import { Example1PageKo } from '@/pages/Example1_ko';
 import { Example2Page } from '@/pages/Example2';
@@ -184,6 +186,8 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/template-strings': TemplateStringsKo,
   '/guide/stateless': Stateless,
   '/ko/guide/stateless': StatelessKo,
+  '/guide/fragment': FragmentPage,
+  '/ko/guide/fragment': FragmentKo,
   '/examples/1': Example1Page,
   '/ko/examples/1': Example1PageKo,
   '/examples/2': Example2Page,

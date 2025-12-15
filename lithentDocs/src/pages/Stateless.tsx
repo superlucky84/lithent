@@ -78,19 +78,19 @@ export const Card = (
 
     <div class="grid gap-6 mt-6">
       <a
-        href="/guide/state"
+        href="/guide/fragment"
         onClick={(e: Event) => {
           e.preventDefault();
-          navigateTo('/guide/state');
+          navigateTo('/guide/fragment');
         }}
         class="block p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-[#42b883] dark:hover:border-[#42b883] transition-colors cursor-pointer"
       >
         <h3 class="text-lg md:text-xl font-medium text-[#42b883] mb-2">
-          Helper: State →
+          Core feature: Fragment →
         </h3>
         <p class="text-sm md:text-base text-gray-700 dark:text-gray-300">
-          If you now want to start writing stateful components, take a look at
-          the state helper.
+          Learn how to group multiple elements without adding extra DOM nodes
+          using Fragments.
         </p>
       </a>
     </div>

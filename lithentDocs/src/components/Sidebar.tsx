@@ -54,6 +54,7 @@ const menuData: MenuSection[] = [
         text: { en: 'stateless components', ko: 'stateless components' },
         link: '/guide/stateless',
       },
+      { text: { en: 'Fragment', ko: 'Fragment' }, link: '/guide/fragment' },
     ],
   },
   {
