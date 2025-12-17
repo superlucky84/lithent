@@ -130,8 +130,8 @@ importers:
         specifier: ^9.16.0
         version: 9.16.0
       '@lithent/lithent-vite':
-        specifier: ^0.3.2
-        version: 0.3.2(lithent@1.20.2)(vite@5.4.8(@types/node@20.19.25)(lightningcss@1.30.1)(terser@5.18.1))
+        specifier: ^0.3.3
+        version: 0.3.3(lithent@1.21.0)(vite@5.4.8(@types/node@20.19.25)(lightningcss@1.30.1)(terser@5.18.1))
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.1.14
@@ -151,8 +151,8 @@ importers:
         specifier: ^9.1.0
         version: 9.1.0(eslint@9.16.0(jiti@2.6.1))
       lithent:
-        specifier: ^1.20.2
-        version: 1.20.2
+        specifier: ^1.21.0
+        version: 1.21.0
       postcss:
         specifier: ^8.4.24
         version: 8.4.47
@@ -184,18 +184,18 @@ importers:
         specifier: ^4.21.1
         version: 4.21.1
       lithent:
-        specifier: ^1.20.2
-        version: 1.20.2
+        specifier: ^1.21.0
+        version: 1.21.0
       state-ref:
         specifier: ^2.0.0
         version: 2.0.0
     devDependencies:
       '@lithent/lithent-mdx':
-        specifier: ^0.2.3
-        version: 0.2.3(acorn@8.14.0)(lithent@1.20.2)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
+        specifier: ^0.2.6
+        version: 0.2.6(acorn@8.14.0)(lithent@1.21.0)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
       '@lithent/lithent-vite':
-        specifier: ^0.3.2
-        version: 0.3.2(lithent@1.20.2)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
+        specifier: ^0.3.3
+        version: 0.3.3(lithent@1.21.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
       '@tailwindcss/postcss':
         specifier: ^4.0.0
         version: 4.1.14
@@ -834,10 +834,10 @@ packages:
   '@lithent/hmr-parser@0.2.2':
     resolution: {integrity: sha512-RPM9KxMcve5PanpD9WyZJpxpTkqCiDMje4PMcQ7uLc2m09g0TFCzv4RIJvfTkXFJAAPX4Ws9FH8Qcq17fYcZug==}
 
-  '@lithent/lithent-mdx@0.2.3':
-    resolution: {integrity: sha512-ftUU6Yhzvo/4HA39TchKMNGV+3igkt78dCXMudaLjhAtQFcpggQJ45R65Xjt6YJTzGNJIiDLQX10Y83TClAsKw==}
+  '@lithent/lithent-mdx@0.2.6':
+    resolution: {integrity: sha512-8/jTEcMqzMrB5Bbn0WkMZD09ZYft6vM5fHwpBn8q8xhz+rMo9HqDbvqU+y+Q9TajIW/d01o7wu9l2spNWCvXTA==}
     peerDependencies:
-      lithent: ^1.20.1
+      lithent: ^1.21.0
       vite: ^5.0.0
 
   '@lithent/lithent-template-parser@0.1.0':
@@ -848,10 +848,10 @@ packages:
     peerDependencies:
       vite: ^5.0.0
 
-  '@lithent/lithent-vite@0.3.2':
-    resolution: {integrity: sha512-g6i0CPnH1khVnDJfVwdi7cLQaWWq2+pt4tzmV6dwNuTqGC9FtGEgrwRlhFsG1zUmmWxKu/6o+RUI32VgQSTpzw==}
+  '@lithent/lithent-vite@0.3.3':
+    resolution: {integrity: sha512-7w/p5uRGNKQvsOnh+TD15doE8d0OnD2oKn6Wcjh2lpq9PjbZZIRqyXF43MNDnjZDJfYNMsLnLvZpDK9Iv40ZJQ==}
     peerDependencies:
-      lithent: ^1.20.2
+      lithent: ^1.21.0
       vite: ^5.0.0
 
   '@mdx-js/mdx@3.1.0':
@@ -2717,8 +2717,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  lithent@1.20.2:
-    resolution: {integrity: sha512-jir7mixD54FlWkNixFQKSXBwjEIZZukO+INMfbmCQwsxcxzB5UqCxicea0W/p0JTduEvfzQOc8ip21JCvHVEjA==}
+  lithent@1.21.0:
+    resolution: {integrity: sha512-Uq3660cOfIzHaibQvM8pxydVJvNiZrzlaCFQ6Rq350m8JOKBqahxeKI13xaMdS24/cjQhkoPUrtq7h9k8tY+cw==}
 
   local-pkg@0.5.1:
     resolution: {integrity: sha512-9rrA30MRRP3gBD3HTGnC6cDFpaE1kVDWxWgqWJUN0RvDNAo+Nz/9GxB+nHOH0ifbVFy0hSA1V6vFDvnx54lTEQ==}
@@ -4461,10 +4461,10 @@ snapshots:
       '@babel/types': 7.28.5
       magic-string: 0.30.19
 
-  '@lithent/lithent-mdx@0.2.3(acorn@8.14.0)(lithent@1.20.2)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
+  '@lithent/lithent-mdx@0.2.6(acorn@8.14.0)(lithent@1.21.0)(rollup@4.24.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
     dependencies:
       '@mdx-js/rollup': 3.1.0(acorn@8.14.0)(rollup@4.24.0)
-      lithent: 1.20.2
+      lithent: 1.21.0
       vite: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
     transitivePeerDependencies:
       - acorn
@@ -4485,18 +4485,18 @@ snapshots:
       '@lithent/lithent-template-parser': 0.1.0
       vite: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
 
-  '@lithent/lithent-vite@0.3.2(lithent@1.20.2)(vite@5.4.8(@types/node@20.19.25)(lightningcss@1.30.1)(terser@5.18.1))':
+  '@lithent/lithent-vite@0.3.3(lithent@1.21.0)(vite@5.4.8(@types/node@20.19.25)(lightningcss@1.30.1)(terser@5.18.1))':
     dependencies:
       '@lithent/hmr-parser': 0.2.2
       '@lithent/lithent-template-vite': 0.1.0(vite@5.4.8(@types/node@20.19.25)(lightningcss@1.30.1)(terser@5.18.1))
-      lithent: 1.20.2
+      lithent: 1.21.0
       vite: 5.4.8(@types/node@20.19.25)(lightningcss@1.30.1)(terser@5.18.1)
 
-  '@lithent/lithent-vite@0.3.2(lithent@1.20.2)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
+  '@lithent/lithent-vite@0.3.3(lithent@1.21.0)(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))':
     dependencies:
       '@lithent/hmr-parser': 0.2.2
       '@lithent/lithent-template-vite': 0.1.0(vite@5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1))
-      lithent: 1.20.2
+      lithent: 1.21.0
       vite: 5.4.8(@types/node@22.9.0)(lightningcss@1.30.1)(terser@5.18.1)
 
   '@mdx-js/mdx@3.1.0(acorn@8.14.0)':
@@ -6610,7 +6610,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lithent@1.20.2: {}
+  lithent@1.21.0: {}
 
   local-pkg@0.5.1:
     dependencies:

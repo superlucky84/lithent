@@ -7,7 +7,7 @@ import {
   getComponentKey,
 } from 'lithent';
 import type { TagFunction } from 'lithent';
-import { createBoundary } from '@/index';
+import { createBoundary } from '../index';
 
 const __lithentModuleId = new URL(import.meta.url).pathname;
 const __lithentBoundaryStoreKey = `__lithent_hmr_boundary__${__lithentModuleId}`;

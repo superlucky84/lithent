@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createBoundary } from '@/index';
+import { createBoundary } from '../index';
 
 describe('createBoundary retry limit', () => {
   it('prevents infinite retry loops on failed boundary updates', async () => {
