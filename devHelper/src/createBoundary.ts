@@ -6,11 +6,14 @@ import {
   removeComponentEntry,
 } from './componentMapControl';
 
+const MAX_RETRY = 3;
+
 type InstanceRegistry = {
   instances: Set<CompKey>;
   domMap: Map<CompKey, WDom>;
   scheduled: boolean;
   pendingCtor?: TagFunction;
+  retryCount: number;
 };
 
 const boundaryRegistry = new Map<string, InstanceRegistry>();
@@ -24,6 +27,7 @@ const getRegistry = (moduleId: string): InstanceRegistry => {
       domMap: new Map(),
       scheduled: false,
       pendingCtor: undefined,
+      retryCount: 0,
     };
     boundaryRegistry.set(moduleId, registry);
   }
@@ -89,6 +93,7 @@ export const applyBoundaryUpdate = (
   if (!registry) return false;
 
   registry.pendingCtor = nextCtor;
+  registry.retryCount = 0;
 
   if (!registry.scheduled) {
     registry.scheduled = true;
@@ -141,11 +146,46 @@ const flushBoundary = (moduleId: string) => {
     }
   });
 
-  if ((hasMissing && !updated) || registry.pendingCtor) {
-    if (!registry.scheduled) {
-      registry.scheduled = true;
-      setTimeout(() => flushBoundary(moduleId), 0);
+  let nextPendingCtor: TagFunction | undefined = registry.pendingCtor;
+  const shouldRetryMissing = hasMissing && !updated;
+  const hasQueuedUpdate = Boolean(nextPendingCtor);
+  const shouldRetry = shouldRetryMissing || hasQueuedUpdate;
+
+  if (!shouldRetry) {
+    registry.retryCount = 0;
+    return;
+  }
+
+  if (shouldRetryMissing) {
+    registry.retryCount += 1;
+
+    if (registry.retryCount > MAX_RETRY) {
+      console.warn(
+        `[Lithent HMR] boundary update failed after ${registry.retryCount} attempts; aborting: ${moduleId}`
+      );
+
+      const hot = (
+        import.meta as unknown as {
+          hot?: { invalidate?: () => void };
+        }
+      ).hot;
+      hot?.invalidate?.();
+
+      registry.pendingCtor = undefined;
+      registry.scheduled = false;
+      return;
     }
+
+    if (!nextPendingCtor) {
+      nextPendingCtor = ctor;
+    }
+  }
+
+  registry.pendingCtor = nextPendingCtor;
+
+  if (!registry.scheduled) {
+    registry.scheduled = true;
+    setTimeout(() => flushBoundary(moduleId), 0);
   }
 };
 
