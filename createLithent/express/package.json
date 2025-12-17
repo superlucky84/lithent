@@ -11,7 +11,7 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "express": "^4.21.1",
-    "lithent": "^1.21.0",
+    "lithent": "^1.21.1",
     "state-ref": "^2.0.0"
   },
   "devDependencies": {
