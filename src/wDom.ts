@@ -369,49 +369,22 @@ const wDomMaker = (
 // ============================================================================
 
 /**
- * Prevent parents and children from sharing the same WDom node when a component
- * simply returns another component. Without this wrapper addComponentProps would
- * overwrite the child's metadata (compProps, reRender, etc.) and break its
- * update wiring.
+ * Wrap component output in a stable Fragment so component metadata lives on a
+ * dedicated node. This prevents parent/child sharing when a component returns
+ * another component and keeps updates stable even when output becomes empty.
  */
 const wrapComponentMakerIfNeeded = (
   componentMaker: (props: Props) => WDom,
   props: Props
 ): { wrappedComponentMaker: (props: Props) => WDom; customNode: WDom } => {
-  let customNode = componentMaker(props);
-
-  // If the component returns a plain VDom (no reRender), nothing to wrap.
-  if (!customNode.reRender) {
-    return { wrappedComponentMaker: componentMaker, customNode };
-  }
-
-  /**
-   * Avoid parent/child sharing the same WDom when a component directly returns
-   * another component. On remove→add toggles the shared instance would lose its
-   * parent pointer and fail to reinsert. We always wrap the child in a Fragment
-   * and attach getParent to the wrapped child so it stays anchored even after
-   * unmount/mount cycles.
-   * Regression tests: src/tests/core-composedRenew.test.tsx,
-   * src/tests/core-component-remount.test.tsx
-   */
   const wrappedComponentMaker = (newProps: Props): WDom => {
     const next = componentMaker(newProps);
-
-    // When the child is null/primitive/element (no reRender), normalize it into
-    // a WDom via makeChildrenItem and wrap once so parent links are stable.
-    if (!next || !next.reRender) {
-      const child = makeChildrenItem(next as MiddleStateWDom);
-      const wrapper = Fragment({}, child);
-      child.getParent = () => wrapper;
-      return wrapper;
-    }
-
     const wrapper = Fragment({}, next);
-    (next as WDom).getParent = () => wrapper;
+    next.getParent = () => wrapper;
     return wrapper;
   };
 
-  customNode = wrappedComponentMaker(props);
+  const customNode = wrappedComponentMaker(props);
 
   return { wrappedComponentMaker, customNode };
 };
