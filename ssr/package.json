@@ -25,7 +25,7 @@
     "lithent"
   ],
   "peerDependencies": {
-    "lithent": "^1.21.2"
+    "lithent": "^1.21.3"
   },
   "devDependencies": {
     "express": "^4.21.1",
