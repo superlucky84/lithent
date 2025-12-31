@@ -11,17 +11,24 @@ export type TagFunction = (
   prop: Props,
   children?: MiddleStateWDomChildren
 ) =>
-  | ((renew: Renew, prop: Props, children: WDom[]) => (props: Props) => WDom)
-  | WDom;
+  | ((
+      renew: Renew,
+      prop: Props,
+      children: WDom[]
+    ) => (props: Props) => MiddleStateWDom)
+  | MiddleStateWDom;
 
 export type Renew = () => boolean;
 export type Component<T> = (
   renew: Renew,
   props: T,
   childen: WDom[]
-) => (props: T) => WDom;
+) => (props: T) => MiddleStateWDom;
 
-export type LComponent<T> = (props: T, childen: WDom[]) => (props: T) => WDom;
+export type LComponent<T> = (
+  props: T,
+  childen: WDom[]
+) => (props: T) => MiddleStateWDom;
 
 export type TagFunctionResolver = {
   ctor: Function;

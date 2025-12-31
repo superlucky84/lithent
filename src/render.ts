@@ -69,10 +69,16 @@ export const typeDelete = (newWDom: WDom) => {
     removeEvent(newWDom.op, newWDom.el);
   }
 
-  deleteRealDom(
-    newWDom,
-    findRealParentElement(getParent(newWDom)) as HTMLElement
-  );
+  const parentWDom = getParent(newWDom);
+  const parentElement = newWDom.isRoot
+    ? newWDom.we
+    : parentWDom
+      ? findRealParentElement(parentWDom)
+      : undefined;
+
+  if (parentElement) {
+    deleteRealDom(newWDom, parentElement as HTMLElement);
+  }
 };
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
@@ -112,6 +118,13 @@ const typeSortedUpdate = (newWDom: WDom) => {
   typeUpdate(newWDom);
 
   const parentWDom = getParent(newWDom);
+  if (!parentWDom) {
+    if (newWDom.isRoot) {
+      const newElement = getElementFromFragment(newWDom);
+      typeAdd(newWDom, newElement);
+    }
+    return;
+  }
   if (parentWDom.nr !== 'L') {
     const newElement = getElementFromFragment(newWDom);
 
@@ -128,22 +141,39 @@ const typeAdd = (
   }
 
   const parentWDom = getParent(newWDom);
-  if (parentWDom.type) {
-    const parentEl = findRealParentElement(parentWDom);
-    const isLoop = parentWDom.type === 'l';
-    const nextEl =
-      isLoop && parentWDom.nr && parentWDom.nr !== 'L'
-        ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
-        : startFindNextBrotherElement(newWDom, parentWDom);
-
-    if (newElement && parentEl) {
-      if (newWDom.tag !== 'portal') {
-        nextEl
-          ? parentEl.insertBefore(newElement, nextEl)
-          : parentEl.appendChild(newElement);
+  if (!parentWDom || !parentWDom.type) {
+    if (
+      newWDom.isRoot &&
+      newWDom.we &&
+      newElement &&
+      newWDom.tag !== 'portal'
+    ) {
+      if (newWDom.ae) {
+        newWDom.we.insertBefore(newElement, newWDom.ae);
+      } else if (newWDom.we.tagName === 'HTML') {
+        newWDom.we.replaceWith(newElement);
+      } else {
+        newWDom.we.appendChild(newElement);
       }
       execMountedQueue();
     }
+    return;
+  }
+
+  const parentEl = findRealParentElement(parentWDom);
+  const isLoop = parentWDom.type === 'l';
+  const nextEl =
+    isLoop && parentWDom.nr && parentWDom.nr !== 'L'
+      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+      : startFindNextBrotherElement(newWDom, parentWDom);
+
+  if (newElement && parentEl) {
+    if (newWDom.tag !== 'portal') {
+      nextEl
+        ? parentEl.insertBefore(newElement, nextEl)
+        : parentEl.appendChild(newElement);
+    }
+    execMountedQueue();
   }
 };
 
@@ -212,7 +242,12 @@ const typeReplace = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
   const orignalElement = newWDom.el;
 
-  if (parentWDom.type && orignalElement) {
+  if (newWDom.isRoot && !parentWDom && orignalElement) {
+    typeSortedReplace(newWDom);
+    return;
+  }
+
+  if (parentWDom && parentWDom.type && orignalElement) {
     if (orignalElement.nodeType === 11) {
       typeSortedReplace(newWDom);
     } else {
@@ -375,7 +410,9 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
   }
 
   if (!isHydration) {
-    if (isVirtualType) {
+    if (!type) {
+      element = DF();
+    } else if (isVirtualType) {
       element = DF();
     } else if (type === 'e' && tag) {
       // element

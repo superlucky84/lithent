@@ -259,7 +259,7 @@ const createComponentResolver = (
 
     const initialComponent = tag(props, wrappedChildren);
 
-    let componentMaker: (nextProps: Props) => WDom;
+    let componentMaker: (nextProps: Props) => MiddleStateWDom;
 
     if (typeof initialComponent === 'function') {
       const component = initialComponent;
@@ -273,7 +273,7 @@ const createComponentResolver = (
     } else {
       // For components that directly return a VDom, recreate it each render.
       componentMaker = (nextProps: Props) =>
-        tag(nextProps, wrappedChildren) as WDom;
+        tag(nextProps, wrappedChildren) as MiddleStateWDom;
     }
 
     const node = makeCustomNode(
@@ -305,14 +305,16 @@ const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
  * Create the actual virtual DOM node from the component.
  */
 const makeCustomNode = (
-  componentMaker: (props: Props) => WDom,
+  componentMaker: (props: Props) => MiddleStateWDom,
   compKey: Props,
   tag: TagFunction,
   props: Props,
   children: WDom[]
 ) => {
+  const normalizedComponentMaker = (nextProps: Props): WDom =>
+    makeChildrenItem(componentMaker(nextProps));
   const { wrappedComponentMaker, customNode } = wrapComponentMakerIfNeeded(
-    componentMaker,
+    normalizedComponentMaker,
     props
   );
   const reRender = makeReRender(
