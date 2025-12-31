@@ -41,7 +41,7 @@
     "url": "https://github.com/superlucky84/lithent.git"
   },
   "peerDependencies": {
-    "lithent": "^1.21.0",
+    "lithent": "^1.21.2",
     "vite": "^5.0.0"
   },
   "files": [
