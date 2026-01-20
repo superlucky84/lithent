@@ -6,6 +6,7 @@ import { Home } from '@/pages/Home';
 import { HomeKo } from '@/pages/Home_ko';
 import { Introduction } from '@/pages/Introduction';
 import { QuickStart } from '@/pages/QuickStart';
+import { AgentGuide } from '@/pages/AgentGuide';
 import { Mounter } from '@/pages/Mounter';
 import { Updater } from '@/pages/Updater';
 import { Props } from '@/pages/Props';
@@ -102,6 +103,7 @@ import { Example21Page } from '@/pages/Example21';
 import { Example21PageKo } from '@/pages/Example21_ko';
 import { IntroductionKo } from '@/pages/Introduction_ko';
 import { QuickStartKo } from '@/pages/QuickStart_ko';
+import { AgentGuideKo } from '@/pages/AgentGuide_ko';
 import { MounterKo } from '@/pages/Mounter_ko';
 import { UpdaterKo } from '@/pages/Updater_ko';
 import { PropsKo } from '@/pages/Props_ko';
@@ -128,6 +130,8 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/introduction': IntroductionKo,
   '/guide/quick-start': QuickStart,
   '/ko/guide/quick-start': QuickStartKo,
+  '/guide/agent-guide': AgentGuide,
+  '/ko/guide/agent-guide': AgentGuideKo,
   '/guide/mounter': Mounter,
   '/ko/guide/mounter': MounterKo,
   '/guide/updater': Updater,

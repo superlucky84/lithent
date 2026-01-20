@@ -20,6 +20,10 @@ const menuData: MenuSection[] = [
         text: { en: 'Quick Start', ko: '빠른 시작' },
         link: '/guide/quick-start',
       },
+      {
+        text: { en: 'AI Agent Guide', ko: 'AI 에이전트 가이드' },
+        link: '/guide/agent-guide',
+      },
     ],
   },
   {
