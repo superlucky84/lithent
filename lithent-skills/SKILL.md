@@ -1,3 +1,14 @@
+---
+name: lithent
+title: Lithent Agent Skills
+version: {{VERSION}}
+description: AI agent skills for working with the Lithent library.
+additional_materials:
+  - constraints/
+  - reference/
+  - examples/
+---
+
 # Lithent Agent Skills
 
 > Version: {{VERSION}}
@@ -363,3 +374,9 @@ import { fTags, fFragment, fMount } from 'lithent/ftags';
 // HTM
 import { lTag } from 'lithent/tag';
 ```
+
+## Additional materials (optional)
+
+- `constraints/` (rules, mistakes, troubleshooting)
+- `reference/` (props types, children types, lstore inference)
+- `examples/` (quick examples)

@@ -32,17 +32,17 @@ export const AgentGuide = () => (
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent ships with two AI agent guidance files:
+      Lithent ships with a skills bundle and an agent addon file:
     </p>
 
     <div class="grid md:grid-cols-2 gap-6 mb-8">
       <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/50">
         <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
           <span class="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-          lithent-skills.md
+          lithent-skills/
         </h4>
         <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mb-3">
-          Comprehensive code examples and API reference for all Lithent features
+          Folder-based skills bundle with a self-contained SKILL.md
         </p>
         <ul class="space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
           <li>• Component patterns (mount/lmount)</li>
@@ -101,7 +101,7 @@ export const AgentGuide = () => (
     <CodeBlock
       language="bash"
       code={`# Reference in chat
-@node_modules/lithent/dist/lithent-skills.md`}
+@node_modules/lithent/dist/lithent-skills/SKILL.md`}
     />
 
     <div class="border-l-4 border-blue-500 bg-gradient-to-r from-blue-500/5 to-transparent dark:from-blue-500/10 dark:to-transparent p-6 my-6 rounded-r">
@@ -126,7 +126,7 @@ export const AgentGuide = () => (
       <li>Open your Claude.ai Project settings</li>
       <li>Navigate to "Project knowledge"</li>
       <li>
-        Upload <code>node_modules/lithent/dist/lithent-skills.md</code>
+        Upload <code>node_modules/lithent/dist/lithent-skills/SKILL.md</code>
       </li>
       <li>
         Upload <code>node_modules/lithent/dist/lithent-agent-addon.md</code>
@@ -134,7 +134,10 @@ export const AgentGuide = () => (
     </ol>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-      Alternatively, copy the content and paste it into custom instructions.
+      If folder uploads are supported, include the full
+      <code>node_modules/lithent/dist/lithent-skills/</code> directory for all
+      sub-guides. Alternatively, copy the content and paste it into custom
+      instructions.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
@@ -168,7 +171,7 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .cursor/rules/lithent.md`}
       <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mb-2">
         You can also reference the skills file directly in Cursor chat with:
       </p>
-      <code class="text-xs">@node_modules/lithent/dist/lithent-skills.md</code>
+      <code class="text-xs">@node_modules/lithent/dist/lithent-skills/SKILL.md</code>
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
@@ -216,7 +219,7 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .github/copilot-instructions
     </p>
 
     <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300 mb-6">
-      <li>Copy the content from the skills files</li>
+      <li>Copy the content from SKILL.md and related guides</li>
       <li>Paste into custom instructions or project settings</li>
       <li>Reference the files in your prompts when needed</li>
     </ul>
@@ -233,7 +236,7 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .github/copilot-instructions
 
     <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-5 mb-6">
       <ul class="space-y-2 text-sm font-mono text-gray-700 dark:text-gray-300">
-        <li>📄 node_modules/lithent/dist/lithent-skills.md</li>
+        <li>📁 node_modules/lithent/dist/lithent-skills/</li>
         <li>📄 node_modules/lithent/dist/lithent-agent-addon.md</li>
       </ul>
     </div>
