@@ -120,7 +120,7 @@ COMMON MISTAKES TO CATCH:
 REFERENCE MATERIALS (NOT PART OF BEHAVIORAL RULES):
 
 For detailed code examples and API usage, refer to:
-node_modules/lithent/dist/lithent-skills/SKILL.md
+node_modules/lithent/dist/skills/SKILL.md
 
 This reference material provides comprehensive examples, patterns,
 and import references that complement the behavioral guidelines above.

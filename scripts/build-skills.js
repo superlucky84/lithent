@@ -55,16 +55,12 @@ const processDirectory = (srcDir, destDir) => {
   }
 };
 
-const skillDir = 'lithent-skills';
+const skillDir = 'skills';
 const skillSrcDir = resolve(rootDir, skillDir);
 const skillDistDir = resolve(distDir, skillDir);
-const legacySkillFile = resolve(distDir, 'lithent-skills.md');
 
 if (existsSync(skillDistDir)) {
   rmSync(skillDistDir, { recursive: true, force: true });
-}
-if (existsSync(legacySkillFile)) {
-  rmSync(legacySkillFile, { force: true });
 }
 
 processDirectory(skillSrcDir, skillDistDir);
