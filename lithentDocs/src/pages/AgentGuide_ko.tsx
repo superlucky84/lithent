@@ -133,9 +133,9 @@ export const AgentGuideKo = () => (
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
       폴더 업로드가 가능하다면
-      <code>node_modules/lithent/dist/skills/</code> 전체를 추가해
-      하위 가이드를 모두 포함하세요. 또는 내용을 복사하여 커스텀 지침에
-      붙여넣을 수도 있습니다.
+      <code>node_modules/lithent/dist/skills/</code> 전체를 추가해 하위 가이드를
+      모두 포함하세요. 또는 내용을 복사하여 커스텀 지침에 붙여넣을 수도
+      있습니다.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
