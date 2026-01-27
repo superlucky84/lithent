@@ -30,17 +30,17 @@ export const AgentGuideKo = () => (
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Lithent는 두 개의 AI 에이전트 가이드 파일을 제공합니다:
+      Lithent는 스킬 번들 폴더와 에이전트 애드온 파일을 제공합니다:
     </p>
 
     <div class="grid md:grid-cols-2 gap-6 mb-8">
       <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-5 bg-gray-50 dark:bg-gray-800/50">
         <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
           <span class="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-          lithent-skills.md
+          skills/
         </h4>
         <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mb-3">
-          모든 Lithent 기능에 대한 포괄적인 코드 예제 및 API 레퍼런스
+          SKILL.md가 자체적으로 완결된 폴더형 스킬 번들
         </p>
         <ul class="space-y-1.5 text-xs text-gray-600 dark:text-gray-400">
           <li>• 컴포넌트 패턴 (mount/lmount)</li>
@@ -99,7 +99,7 @@ export const AgentGuideKo = () => (
     <CodeBlock
       language="bash"
       code={`# 채팅에서 참조
-@node_modules/lithent/dist/lithent-skills.md`}
+@node_modules/lithent/dist/skills/SKILL.md`}
     />
 
     <div class="border-l-4 border-blue-500 bg-gradient-to-r from-blue-500/5 to-transparent dark:from-blue-500/10 dark:to-transparent p-6 my-6 rounded-r">
@@ -124,7 +124,7 @@ export const AgentGuideKo = () => (
       <li>Claude.ai 프로젝트 설정 열기</li>
       <li>"Project knowledge"로 이동</li>
       <li>
-        <code>node_modules/lithent/dist/lithent-skills.md</code> 업로드
+        <code>node_modules/lithent/dist/skills/SKILL.md</code> 업로드
       </li>
       <li>
         <code>node_modules/lithent/dist/lithent-agent-addon.md</code> 업로드
@@ -132,7 +132,10 @@ export const AgentGuideKo = () => (
     </ol>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
-      또는 내용을 복사하여 커스텀 지침에 붙여넣을 수도 있습니다.
+      폴더 업로드가 가능하다면
+      <code>node_modules/lithent/dist/skills/</code> 전체를 추가해
+      하위 가이드를 모두 포함하세요. 또는 내용을 복사하여 커스텀 지침에
+      붙여넣을 수도 있습니다.
     </p>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
@@ -167,7 +170,7 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .cursor/rules/lithent.md`}
       <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mb-2">
         Cursor 채팅에서 스킬 파일을 직접 참조할 수도 있습니다:
       </p>
-      <code class="text-xs">@node_modules/lithent/dist/lithent-skills.md</code>
+      <code class="text-xs">@node_modules/lithent/dist/skills/SKILL.md</code>
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
@@ -215,7 +218,7 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .github/copilot-instructions
     </p>
 
     <ul class="list-disc list-inside space-y-2 text-sm md:text-base text-gray-700 dark:text-gray-300 mb-6">
-      <li>스킬 파일의 내용을 복사</li>
+      <li>SKILL.md와 관련 가이드 내용을 복사</li>
       <li>커스텀 지침이나 프로젝트 설정에 붙여넣기</li>
       <li>필요할 때 프롬프트에서 파일 참조</li>
     </ul>
@@ -232,7 +235,7 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .github/copilot-instructions
 
     <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-5 mb-6">
       <ul class="space-y-2 text-sm font-mono text-gray-700 dark:text-gray-300">
-        <li>📄 node_modules/lithent/dist/lithent-skills.md</li>
+        <li>📁 node_modules/lithent/dist/skills/</li>
         <li>📄 node_modules/lithent/dist/lithent-agent-addon.md</li>
       </ul>
     </div>
