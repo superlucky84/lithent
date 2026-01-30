@@ -133,8 +133,8 @@ export const AgentGuideKo = () => (
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-4">
       폴더 업로드가 가능하다면
-      <code>node_modules/lithent/dist/skills/lithent/</code> 전체를 추가해 하위 가이드를
-      모두 포함하세요. 또는 내용을 복사하여 커스텀 지침에 붙여넣을 수도
+      <code>node_modules/lithent/dist/skills/lithent/</code> 전체를 추가해 하위
+      가이드를 모두 포함하세요. 또는 내용을 복사하여 커스텀 지침에 붙여넣을 수도
       있습니다.
     </p>
 
@@ -170,7 +170,9 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .cursor/rules/lithent.md`}
       <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mb-2">
         Cursor 채팅에서 스킬 파일을 직접 참조할 수도 있습니다:
       </p>
-      <code class="text-xs">@node_modules/lithent/dist/skills/lithent/SKILL.md</code>
+      <code class="text-xs">
+        @node_modules/lithent/dist/skills/lithent/SKILL.md
+      </code>
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">

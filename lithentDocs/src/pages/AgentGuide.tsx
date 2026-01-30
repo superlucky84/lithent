@@ -171,7 +171,9 @@ cp node_modules/lithent/dist/lithent-agent-addon.md .cursor/rules/lithent.md`}
       <p class="text-xs md:text-sm text-gray-700 dark:text-gray-300 mb-2">
         You can also reference the skills file directly in Cursor chat with:
       </p>
-      <code class="text-xs">@node_modules/lithent/dist/skills/lithent/SKILL.md</code>
+      <code class="text-xs">
+        @node_modules/lithent/dist/skills/lithent/SKILL.md
+      </code>
     </div>
 
     <h3 class="text-xl md:text-2xl font-medium text-gray-900 dark:text-white mt-10 mb-4">
