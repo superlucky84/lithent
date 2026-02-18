@@ -225,7 +225,7 @@ lithent는 기본 기능만으로도 충분히 좋지만 기본 기능을 활용
 
 사용자가 유용하게 사용할만한 기능들을 미리 코드로 작성해 놨습니다. 사용자는 이 코드를 직접 import 하여 사용해도 좋고, 참고하여 새로운 형태의 확장코드를 만들어도 됩니다.
 
-헬퍼 코드의 모든 구현은 [저장소](https://github.com/superlucky84/lithent/blob/master/helper/src/hook)에서 확인하세요.
+헬퍼 코드의 모든 구현은 [저장소](https://github.com/superlucky84/lithent/blob/main/helper/src/hook)에서 확인하세요.
 
 ### state 헬퍼
 
@@ -329,7 +329,7 @@ render(<Component />, element, element.querySelector('span:nth-of-type(3)'));
 
 `store 헬퍼`의 구현 방법은 `state 헬퍼`의 구현방법과 유사합니다. 다만 `store 헬퍼`는 `state 헬퍼`와는 다르게 여러 컴포넌트의 `renew`를 가지고 있을 수 있으므로,  언마운트 되어 사라진 컴포넌트의 `리뉴어`를 항상 확인하여 제거해줘야 합니다. 이미 제거된 `리뉴어`를 실행하면 리턴 값으로 false를 반환하는 특성을 이용하여 이를 구현합니다..
 
-store의 구현 코드는 모든 헬퍼 코드 중 가장 복잡하지만 그래봤자 100줄도 안되므로 어렵지 않게 파악 가능합니다. 코드는 [(저장소)](https://github.com/superlucky84/lithent/blob/master/helper/src/hook/store.ts)에서 확인 가능합니다.
+store의 구현 코드는 모든 헬퍼 코드 중 가장 복잡하지만 그래봤자 100줄도 안되므로 어렵지 않게 파악 가능합니다. 코드는 [(저장소)](https://github.com/superlucky84/lithent/blob/main/helper/src/hook/store.ts)에서 확인 가능합니다.
 
 
 ### cacheUpdate 헬퍼

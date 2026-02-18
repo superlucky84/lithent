@@ -119,7 +119,7 @@ export const Example4 = mount(() => {
       <p class="text-sm md:text-base text-gray-400 mb-2">
         <a
           class="text-orange-200 hover:underline"
-          href="https://github.com/superlucky84/lithent/blob/master/helper/src/hook/effect.ts"
+          href="https://github.com/superlucky84/lithent/blob/main/helper/src/hook/effect.ts"
           target="_blank"
         >
           view helper code
