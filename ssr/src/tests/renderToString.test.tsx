@@ -25,9 +25,7 @@ describe('renderToString — text node HTML escaping', () => {
   });
 
   it('escapes multiple occurrences', () => {
-    const Comp = mount(_r => () => (
-      <p>{'<b>bold</b> & <i>italic</i>'}</p>
-    ));
+    const Comp = mount(_r => () => <p>{'<b>bold</b> & <i>italic</i>'}</p>);
     expect(render(Comp)).toBe(
       '<p>&lt;b&gt;bold&lt;/b&gt; &amp; &lt;i&gt;italic&lt;/i&gt;</p>'
     );
@@ -42,7 +40,9 @@ describe('renderToString — text node HTML escaping', () => {
     const Comp = mount(_r => () => (
       <section innerHTML="<article>raw content</article>" />
     ));
-    expect(render(Comp)).toBe('<section><article>raw content</article></section>');
+    expect(render(Comp)).toBe(
+      '<section><article>raw content</article></section>'
+    );
   });
 
   it('escapes text nodes inside nested elements', () => {
@@ -76,8 +76,6 @@ describe('renderToString — text node HTML escaping', () => {
         <p>{'A & B'}</p>
       </Fragment>
     ));
-    expect(render(Comp)).toBe(
-      '<p>&lt;h-state&gt; anchor</p><p>A &amp; B</p>'
-    );
+    expect(render(Comp)).toBe('<p>&lt;h-state&gt; anchor</p><p>A &amp; B</p>');
   });
 });
