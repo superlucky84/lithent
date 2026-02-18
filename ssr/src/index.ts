@@ -1,8 +1,8 @@
 import { h } from 'lithent';
 import type { TagFunction } from 'lithent';
-import Test from '@/tests/tostring';
-import { renderToString as _renderToString } from '@/renderToString';
-import { hydration as _hydration } from '@/hydration';
+import Test from './tests/tostring';
+import { renderToString as _renderToString } from './renderToString';
+import { hydration as _hydration } from './hydration';
 
 export const renderToString = _renderToString;
 export const hydration = _hydration;

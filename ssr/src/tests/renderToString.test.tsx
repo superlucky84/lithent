@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { h, mount, Fragment } from 'lithent';
-import { renderToString } from '@/renderToString';
+import { renderToString } from '../renderToString';
 
 // ── helpers ──
 

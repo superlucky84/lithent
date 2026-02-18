@@ -6,7 +6,7 @@ import {
   checkStyleData,
   checkRefData,
   styleObjectToString,
-} from '@/helper';
+} from './helper';
 
 /**
  * Escape special HTML characters in text node content.
