@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "create-lithent",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "lithent-boilerplate",
   "packageManager": "pnpm@7.6.0",
   "scripts": {
