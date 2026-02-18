@@ -9,6 +9,14 @@ import {
 } from '@/helper';
 
 /**
+ * Escape special HTML characters in text node content.
+ * Prevents text like `<h-state>` from being parsed as HTML elements by the browser.
+ */
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/**
  * Main function of renderToString"
  */
 export function renderToString(wDom: WDom) {
@@ -38,7 +46,7 @@ function wDomToString(wDom: WDom) {
       element = `${element}</${tag}>`;
     }
   } else if (type === 't' && checkExisty(text)) {
-    element = String(text);
+    element = escapeHtml(String(text));
     element = wDomChildrenToDom(children, element);
   } else {
     throw new Error(
