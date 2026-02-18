@@ -321,8 +321,8 @@ function validatePackageManager(pkgManager: string): PackageManager {
 }
 
 const TEMPLATE_URLS: Record<'ssr' | 'spa', string> = {
-  ssr: 'https://github.com/superlucky84/lithent/tree/master/createLithent/express',
-  spa: 'https://github.com/superlucky84/lithent/tree/master/createLithent/basic',
+  ssr: 'https://github.com/superlucky84/lithent/tree/main/createLithent/express',
+  spa: 'https://github.com/superlucky84/lithent/tree/main/createLithent/basic',
 };
 
 async function templateSelectionStep(ctx: Context) {
