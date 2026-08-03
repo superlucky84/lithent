@@ -4,7 +4,7 @@ const changeRef = ref<null | ((ids: number[]) => void)>(null);
 const mountLog: number[] = [];
 const unmountLog: number[] = [];
 
-const Row = mount<{ id: number }>((_renew, props) => {
+const Row = mount<{ key: number; id: number }>((_renew, props) => {
   mountCallback(() => {
     mountLog.push(props.id);
     return () => {
