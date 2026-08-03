@@ -76,6 +76,7 @@ export interface WDom {
   ae?: HTMLElement; // afterElement (insert before)
   el?: HTMLElement | DocumentFragment | Text;
   nr?: RenderType; // needRerender
+  oi?: number; // originalIndex (matched keyed position in previous children)
   il?: boolean; // isLegacy
   [wdomSymbol]?: boolean | 'provider';
 }

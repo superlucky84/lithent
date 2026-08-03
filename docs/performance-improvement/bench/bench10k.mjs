@@ -1,0 +1,23 @@
+import { createRequire } from 'module';
+const require = createRequire('/Users/n250109005/project/lithent/package.json');
+const { JSDOM } = require('jsdom');
+const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></html>');
+globalThis.window = dom.window; globalThis.document = dom.window.document;
+globalThis.DocumentFragment = dom.window.DocumentFragment;
+globalThis.HTMLElement = dom.window.HTMLElement; globalThis.Element = dom.window.Element;
+globalThis.Text = dom.window.Text; globalThis.Node = dom.window.Node;
+const { h, mount, render } = await import('/Users/n250109005/project/lithent/dist/lithent.mjs');
+let idCounter = 1;
+const buildData = n => Array.from({ length: n }, () => ({ id: idCounter++, label: 'row ' + Math.random().toString(36).slice(2, 8) }));
+let data = []; let renewFn;
+const App = mount(renew => { renewFn = renew; return () => h('table', {}, data.map(item => h('tr', { key: item.id, class: 'row' }, h('td', { class: 'col-md-1' }, String(item.id)), h('td', { class: 'col-md-4' }, h('a', {}, item.label)), h('td', { class: 'col-md-6' }, 'x')))); });
+render(h(App, {}), document.getElementById('root'));
+const ms = async fn => { const t0 = performance.now(); fn(); await Promise.resolve(); return performance.now() - t0; };
+// warmup
+data = buildData(200); renewFn(); await Promise.resolve(); data = []; renewFn(); await Promise.resolve();
+const create10k = await ms(() => { data = buildData(10000); renewFn(); });
+const upd = await ms(() => { data.forEach((it, i) => { if (i % 10 === 0) it.label += ' !!!'; }); renewFn(); });
+const swap = await ms(() => { const t = data[1]; data[1] = data[998]; data[998] = t; renewFn(); });
+const append1k = await ms(() => { data = data.concat(buildData(1000)); renewFn(); });
+const clear = await ms(() => { data = []; renewFn(); });
+console.log(JSON.stringify({ create10k, updateEvery10thOf10k: upd, swap2of10k: swap, append1kTo10k: append1k, clear10k: clear }, (k,v) => typeof v === 'number' ? +v.toFixed(1) : v));

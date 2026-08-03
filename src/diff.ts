@@ -1,7 +1,7 @@
 import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent } from '@/utils';
-import { typeDelete, recursiveRemoveEvent } from '@/render';
+import { typeDeleteUnused, recursiveRemoveEvent } from '@/render';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
@@ -10,7 +10,7 @@ import {
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
-import { assign, keys, entries } from '@/utils';
+import { keys, entries } from '@/utils';
 
 /**
  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
@@ -111,54 +111,7 @@ const addReRenderTypeProperty = (
   const isKeyChecked =
     !newWDom.isRoot && parent && parent.type === 'l' && checkExistyKey(newWDom);
 
-  let result: RenderType = isSameType
-    ? isKeyChecked
-      ? 'T'
-      : 'U'
-    : isKeyChecked
-      ? 'S'
-      : 'R';
-
-  if (
-    newWDom.type === 'l' &&
-    result === 'U' &&
-    originalWDom &&
-    chkDiffLoopOrder(newWDom, originalWDom)
-  ) {
-    result = 'L';
-  }
-
-  return result;
-};
-
-/**
- * Check if a reverse order swap is needed when updating keyed loop-type elements.
- */
-const chkDiffLoopOrder = (newWDom: WDom, originalWDom: WDom) => {
-  // Fast exit: no keys to compare
-  if (
-    !checkExistyKey((newWDom.children || [])[0]) ||
-    !checkExistyKey((originalWDom.children || [])[0])
-  ) {
-    return false;
-  }
-
-  const origChildren = [...((originalWDom && originalWDom.children) || [])];
-  const newChildren = [...((newWDom && newWDom.children) || [])].filter(item =>
-    origChildren.find(newItem => getKey(item) === getKey(newItem))
-  );
-  const filteredChildren = origChildren.filter(item =>
-    newChildren.find(newItem => getKey(item) === getKey(newItem))
-  );
-  let isSame = filteredChildren.length === newChildren.length;
-
-  if (isSame) {
-    isSame = filteredChildren.every(
-      (item, index) => getKey(item) === getKey(newChildren[index])
-    );
-  }
-
-  return isSame;
+  return isSameType ? (isKeyChecked ? 'T' : 'U') : isKeyChecked ? 'S' : 'R';
 };
 
 /**
@@ -243,23 +196,34 @@ const remakeChildrenForDiff = (
 /**
  * Recursive handling for the creation of a new virtual DOM.
  */
-const remakeChildrenForAdd = (newWDom: WDom) =>
-  (newWDom.children || []).map((item: WDom) =>
-    assign(makeNewWDomTree(item), { getParent: () => newWDom })
-  );
+const remakeChildrenForAdd = (newWDom: WDom) => {
+  const getParent = () => newWDom;
+
+  return (newWDom.children || []).map((item: WDom) => {
+    const child = makeNewWDomTree(item);
+    child.getParent = getParent;
+    return child;
+  });
+};
 
 /**
  * Recursive handling for updates, not additions.
  * Uses key-based diffing for loops, index-based for others
  */
-const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) =>
-  newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0]) // 'l': loop
-    ? remakeChildrenForLoopUpdate(newWDom, originalWDom)
-    : (newWDom.children || []).map((item: WDom, index: number) =>
-        assign(makeNewWDomTree(item, (originalWDom.children || [])[index]), {
-          getParent: () => newWDom,
-        })
-      );
+const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
+  if (newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0])) {
+    return remakeChildrenForLoopUpdate(newWDom, originalWDom);
+  }
+
+  const origChildren = originalWDom.children || [];
+  const getParent = () => newWDom;
+
+  return (newWDom.children || []).map((item: WDom, index: number) => {
+    const child = makeNewWDomTree(item, origChildren[index]);
+    child.getParent = getParent;
+    return child;
+  });
+};
 
 /**
  * Handling virtual DOM of loop-type elements.
@@ -270,37 +234,48 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
     originalWDom
   );
 
-  unUsedChildren.forEach(unusedItem => {
-    runUnmountQueueFromWDom(unusedItem);
-    recursiveRemoveEvent(unusedItem);
-    typeDelete(unusedItem);
-  });
+  typeDeleteUnused(unUsedChildren);
 
   return remakedChildren;
 };
 
 /**
  * Recursive handling of loop-type virtual DOM elements.
+ * Matches children against the originals by key via a Map in O(n) and
+ * records each match's original index (oi) for the render phase to
+ * minimize moves via LIS.
  */
 const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
-  const origCh = [...(originalWDom.children || [])];
-  const remaked = (newWDom.children || []).map(item => {
-    const orig = findSameKeyOriginalItem(item, origCh);
-    const child = makeNewWDomTree(item, orig);
+  const origChildren = originalWDom.children || [];
+  const keyMap = new Map<unknown, number>();
+  origChildren.forEach((item, index) => {
+    const key = getKey(item);
+    if (!keyMap.has(key)) {
+      keyMap.set(key, index);
+    }
+  });
 
-    if (orig) origCh.splice(origCh.indexOf(orig), 1);
-    child.getParent = () => newWDom;
+  const getParent = () => newWDom;
+  const remaked = (newWDom.children || []).map(item => {
+    const key = getKey(item);
+    const origIndex = keyMap.get(key);
+    const matched = origIndex !== undefined;
+
+    if (matched) {
+      keyMap.delete(key);
+    }
+
+    const child = makeNewWDomTree(
+      item,
+      matched ? origChildren[origIndex] : undefined
+    );
+    if (matched) {
+      child.oi = origIndex;
+    }
+    child.getParent = getParent;
 
     return child;
   });
 
-  return [remaked, origCh];
+  return [remaked, [...keyMap.values()].map(index => origChildren[index])];
 };
-
-/**
- * When comparing loop-type virtual DOM elements, use the key to determine the comparison
- */
-const findSameKeyOriginalItem = (item: WDom, originalChildren: WDom[]) =>
-  originalChildren.find(
-    orignalChildItem => getKey(orignalChildItem) === getKey(item)
-  );
