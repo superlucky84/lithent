@@ -93,6 +93,16 @@
 | clear 10k | 86.1ms | 정상상태 62~66ms (cold 86~99) | ≤50ms | 미달 — 프로파일상 GC 21%+jsdom 해체 비용 지배, 알고리즘 여지 없음 → P5 실브라우저 판정으로 이관 |
 | min 빌드 br | 4,678B | 4,797B | ≤5,120B | ✅ (여유 323B) |
 
+### 코드 골프 패스 (Phase 3 후속, 동작 불변)
+
+- `insertBefore(el, anchor || null)`로 append/insert 분기 통합, `getElementFromFragment`의
+  내장 virtual 체크 활용, hasLeftNew 루프 → 생성 카운터, clearDiffMeta 일괄화,
+  `updateProps` 중복 비교 제거, `[1,3].includes` → 직접 비교.
+- 죽은 코드 제거: `'L'` RenderType은 chkDiffLoopOrder 삭제 후 부여처가 없어져
+  타입·핸들러·분기(`typeSortedUpdate`/`typeAdd`) 전부 제거.
+- 결과: min gzip 5,205→5,133B(−72B), br 4,797→**4,734B**(−63B, 예산 여유 386B).
+  전체 테스트·정합성·벤치 회귀 없음 (swap 83ms, append 94ms, partial 96ms, create 301ms).
+
 ## Phase 4 — 테스트 하드닝
 
 - [x] 4-1. `src/tests/core-loopMoveOrder.tsx` — 원거리 swap, 역순, 셔플+삽입/삭제 혼합,

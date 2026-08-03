@@ -83,9 +83,10 @@ export const typeDelete = (newWDom: WDom) => {
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
-    if (newWDom.el.nodeType === 11 || newWDom?.tag === 'portal') {
+    const nt = newWDom.el.nodeType;
+    if (nt === 11 || newWDom?.tag === 'portal') {
       findChildWithRemoveElement(newWDom, parent);
-    } else if ([1, 3].includes(newWDom.el.nodeType)) {
+    } else if (nt === 1 || nt === 3) {
       parent.removeChild(newWDom.el);
     }
 
@@ -153,18 +154,8 @@ const typeSortedReplace = (newWDom: WDom) => {
 const typeSortedUpdate = (newWDom: WDom) => {
   typeUpdate(newWDom);
 
-  const parentWDom = getParent(newWDom);
-  if (!parentWDom) {
-    if (newWDom.isRoot) {
-      const newElement = getElementFromFragment(newWDom);
-      typeAdd(newWDom, newElement);
-    }
-    return;
-  }
-  if (parentWDom.nr !== 'L') {
-    const newElement = getElementFromFragment(newWDom);
-
-    typeAdd(newWDom, newElement);
+  if (getParent(newWDom) || newWDom.isRoot) {
+    typeAdd(newWDom, getElementFromFragment(newWDom));
   }
 };
 
@@ -197,17 +188,14 @@ const typeAdd = (
   }
 
   const parentEl = findRealParentElement(parentWDom);
-  const isLoop = parentWDom.type === 'l';
   const nextEl =
-    isLoop && parentWDom.nr && parentWDom.nr !== 'L'
+    parentWDom.type === 'l' && parentWDom.nr
       ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
       : startFindNextBrotherElement(newWDom, parentWDom);
 
   if (newElement && parentEl) {
     if (newWDom.tag !== 'portal') {
-      nextEl
-        ? parentEl.insertBefore(newElement, nextEl)
-        : parentEl.appendChild(newElement);
+      parentEl.insertBefore(newElement, nextEl || null);
     }
     execMountedQueue();
   }
@@ -347,12 +335,7 @@ const updateChildren = (newWDom: WDom) => {
 
   if (newWDom.type === 'l') {
     for (const item of children) {
-      if (
-        item.nr === 'A' ||
-        item.nr === 'T' ||
-        item.nr === 'S' ||
-        item.oi !== undefined
-      ) {
+      if ('ATS'.includes(item.nr as string) || item.oi !== undefined) {
         needPlace = true;
         break;
       }
@@ -369,14 +352,18 @@ const updateChildren = (newWDom: WDom) => {
   const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
   const matchedIndexes: number[] = [];
   const oiSeq: number[] = [];
+  let createdCount = 0;
 
   children.forEach((item, index) => {
-    if (item.nr === 'A' || item.nr === 'S') {
-      if (item.nr === 'S') {
+    const nr = item.nr;
+
+    if (nr === 'A' || nr === 'S') {
+      if (nr === 'S') {
         typeDelete(item);
       }
       created[index] = wDomToDom(item);
-    } else if (item.nr === 'T') {
+      createdCount++;
+    } else if (nr === 'T') {
       typeUpdate(item);
     } else {
       wDomUpdate(item);
@@ -388,53 +375,35 @@ const updateChildren = (newWDom: WDom) => {
     }
   });
 
-  const stay = new Set<number>();
-  getLisPositions(oiSeq).forEach(pos => stay.add(matchedIndexes[pos]));
-
+  const stay = new Set(getLisPositions(oiSeq).map(pos => matchedIndexes[pos]));
   const parentEl = findRealParentElement(newWDom);
   const baseAnchor = newWDom.isRoot
     ? newWDom.ae
     : startFindNextBrotherElement(newWDom, getParent(newWDom));
 
   // Fast-append the trailing run of added children in order
-  // (appendChild instead of insertBefore-walking from the right).
+  // (a null anchor makes insertBefore behave as appendChild).
   let tail = children.length;
   while (tail > 0 && created[tail - 1] !== undefined) {
     tail--;
   }
 
   for (let i = tail; i < children.length; i++) {
-    const item = children[i];
     const el = created[i];
 
-    if (el && parentEl && item.tag !== 'portal') {
-      baseAnchor
-        ? parentEl.insertBefore(el, baseAnchor)
-        : parentEl.appendChild(el);
-    }
-    clearDiffMeta(item);
-  }
-
-  const hasMove = stay.size !== matchedIndexes.length;
-  let hasLeftNew = false;
-  for (let i = 0; i < tail; i++) {
-    if (created[i] !== undefined) {
-      hasLeftNew = true;
-      break;
+    if (el && parentEl && children[i].tag !== 'portal') {
+      parentEl.insertBefore(el, baseAnchor || null);
     }
   }
 
-  if (hasMove || hasLeftNew) {
+  if (
+    stay.size !== matchedIndexes.length ||
+    createdCount > children.length - tail
+  ) {
     // Placement pass (right-to-left): insert added children and non-LIS
     // moves before a running anchor.
-    let anchor = baseAnchor;
-    for (let k = tail; k < children.length; k++) {
-      const el = findChildFragmentNextElement([children[k]]);
-      if (el) {
-        anchor = el;
-        break;
-      }
-    }
+    let anchor =
+      findChildFragmentNextElement(children.slice(tail)) || baseAnchor;
 
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
@@ -442,14 +411,10 @@ const updateChildren = (newWDom: WDom) => {
       const needMove = item.oi !== undefined && !isNew && !stay.has(i);
 
       if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
-        const el = isNew
-          ? created[i]
-          : checkVirtualType(item.type)
-            ? getElementFromFragment(item)
-            : item.el;
+        const el = isNew ? created[i] : getElementFromFragment(item);
 
         if (el) {
-          anchor ? parentEl.insertBefore(el, anchor) : parentEl.appendChild(el);
+          parentEl.insertBefore(el, anchor || null);
         }
       }
 
@@ -457,15 +422,10 @@ const updateChildren = (newWDom: WDom) => {
       if (first) {
         anchor = first;
       }
-
-      clearDiffMeta(item);
-    }
-  } else {
-    for (let i = 0; i < tail; i++) {
-      clearDiffMeta(children[i]);
     }
   }
 
+  children.forEach(clearDiffMeta);
   execMountedQueue();
 };
 
@@ -533,10 +493,7 @@ export const wDomUpdate = (newWDomTree: WDom) => {
 
   if (needRerender !== undefined && needRerender !== 'N') {
     renderHandlers[needRerender](newWDomTree);
-
-    delete newWDomTree.nr;
-    delete newWDomTree.oc;
-    delete newWDomTree.op;
+    clearDiffMeta(newWDomTree);
   }
 };
 
@@ -547,7 +504,6 @@ const renderHandlers = {
   U: typeUpdate,
   S: typeSortedReplace,
   T: typeSortedUpdate,
-  L: typeUpdate,
 } as const;
 
 const updateText = (newWDom: WDom) => {
@@ -582,7 +538,7 @@ const updateProps = (
         originalProps[dataKey] as (e: Event) => void
       );
     } else {
-      if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
+      if (dataKey === 'key') {
         // Do nothing
       } else if (dataKey === 'portal' && isObject(dataValue)) {
         // Do nothing
