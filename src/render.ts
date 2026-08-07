@@ -12,7 +12,7 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import { getParent, entries, keys, isObject } from '@/utils';
+import { getParent, isObject } from '@/utils';
 
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
@@ -83,9 +83,10 @@ export const typeDelete = (newWDom: WDom) => {
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
-    if (newWDom.el.nodeType === 11 || newWDom?.tag === 'portal') {
+    const nt = newWDom.el.nodeType;
+    if (nt === 11 || newWDom?.tag === 'portal') {
       findChildWithRemoveElement(newWDom, parent);
-    } else if ([1, 3].includes(newWDom.el.nodeType)) {
+    } else if (nt === 1 || nt === 3) {
       parent.removeChild(newWDom.el);
     }
 
@@ -94,19 +95,55 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
 };
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
-  ((newWDom && newWDom.oc) || (newWDom && newWDom.children) || []).forEach(
-    item => {
+  const items = (newWDom && newWDom.oc) || (newWDom && newWDom.children) || [];
+
+  // Bulk fast path: the parent element contains exactly these children,
+  // so they can all be dropped in a single operation.
+  // (counted via sibling pointers -- childNodes would materialize a live list)
+  let count = 0;
+  for (let node = parent.firstChild; node; node = node.nextSibling) {
+    count++;
+  }
+
+  if (
+    items.length > 1 &&
+    count === items.length &&
+    items.every(item => {
       const nt = item.el && item.el.nodeType;
-      if (nt) {
-        if ([1, 3].includes(nt)) {
-          const el = item.el as HTMLElement;
-          el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
-        } else if (nt === 11) {
-          findChildWithRemoveElement(item, parent);
-        }
+      return (
+        (nt === 1 || nt === 3) &&
+        (item.el as HTMLElement).tagName !== 'HTML' &&
+        item.tag !== 'portal'
+      );
+    })
+  ) {
+    parent.textContent = '';
+    items.forEach(item => delete item.el);
+    return;
+  }
+
+  items.forEach(item => {
+    const nt = item.el && item.el.nodeType;
+    if (nt) {
+      if (nt === 1 || nt === 3) {
+        const el = item.el as HTMLElement;
+        el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
+      } else if (nt === 11) {
+        findChildWithRemoveElement(item, parent);
       }
     }
-  );
+  });
+};
+
+/**
+ * Unmount, detach events, and remove unused keyed children.
+ */
+export const typeDeleteUnused = (items: WDom[]) => {
+  items.forEach(item => {
+    runUnmountQueueFromWDom(item);
+    recursiveRemoveEvent(item);
+    typeDelete(item);
+  });
 };
 
 const typeSortedReplace = (newWDom: WDom) => {
@@ -117,18 +154,8 @@ const typeSortedReplace = (newWDom: WDom) => {
 const typeSortedUpdate = (newWDom: WDom) => {
   typeUpdate(newWDom);
 
-  const parentWDom = getParent(newWDom);
-  if (!parentWDom) {
-    if (newWDom.isRoot) {
-      const newElement = getElementFromFragment(newWDom);
-      typeAdd(newWDom, newElement);
-    }
-    return;
-  }
-  if (parentWDom.nr !== 'L') {
-    const newElement = getElementFromFragment(newWDom);
-
-    typeAdd(newWDom, newElement);
+  if (getParent(newWDom) || newWDom.isRoot) {
+    typeAdd(newWDom, getElementFromFragment(newWDom));
   }
 };
 
@@ -161,17 +188,14 @@ const typeAdd = (
   }
 
   const parentEl = findRealParentElement(parentWDom);
-  const isLoop = parentWDom.type === 'l';
   const nextEl =
-    isLoop && parentWDom.nr && parentWDom.nr !== 'L'
+    parentWDom.type === 'l' && parentWDom.nr
       ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
       : startFindNextBrotherElement(newWDom, parentWDom);
 
   if (newElement && parentEl) {
     if (newWDom.tag !== 'portal') {
-      nextEl
-        ? parentEl.insertBefore(newElement, nextEl)
-        : parentEl.appendChild(newElement);
+      parentEl.insertBefore(newElement, nextEl || null);
     }
     execMountedQueue();
   }
@@ -266,14 +290,14 @@ const removeEvent = (
   oldProps: Props,
   element: HTMLElement | DocumentFragment | Text
 ) => {
-  entries(oldProps || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
-    if (dataKey.match(/^on/)) {
+  for (const dataKey in oldProps) {
+    if (dataKey[0] === 'o' && dataKey[1] === 'n') {
       element.removeEventListener(
         dataKey.slice(2).toLowerCase(),
-        dataValue as (e: Event) => void
+        oldProps[dataKey] as (e: Event) => void
       );
     }
-  });
+  }
 };
 
 const typeUpdate = (newWDom: WDom) => {
@@ -294,8 +318,174 @@ const typeUpdate = (newWDom: WDom) => {
     }
   }
 
-  (newWDom.children || []).forEach(childItem => wDomUpdate(childItem));
+  updateChildren(newWDom);
   runUpdatedQueueFromWDom(newWDom);
+};
+
+/**
+ * Process child updates. Loop parents with added/moved children are handled
+ * in O(n): a left-to-right content pass (keeps lifecycle order), an LIS over
+ * the matched original indices (oi, recorded by the diff phase) to pick the
+ * children that can stay in place, and a right-to-left placement pass that
+ * inserts only added children and non-LIS moves before a running anchor.
+ */
+const updateChildren = (newWDom: WDom) => {
+  const children = newWDom.children || [];
+  let needPlace = false;
+
+  if (newWDom.type === 'l') {
+    for (const item of children) {
+      if ('ATS'.includes(item.nr as string) || item.oi !== undefined) {
+        needPlace = true;
+        break;
+      }
+    }
+  }
+
+  if (!needPlace) {
+    children.forEach(childItem => wDomUpdate(childItem));
+    return;
+  }
+
+  // Content pass (left-to-right, keeps lifecycle order).
+  // Added children are created here but inserted in the placement pass.
+  const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
+  const matchedIndexes: number[] = [];
+  const oiSeq: number[] = [];
+  let createdCount = 0;
+
+  children.forEach((item, index) => {
+    const nr = item.nr;
+
+    if (nr === 'A' || nr === 'S') {
+      if (nr === 'S') {
+        typeDelete(item);
+      }
+      created[index] = wDomToDom(item);
+      createdCount++;
+    } else if (nr === 'T') {
+      typeUpdate(item);
+    } else {
+      wDomUpdate(item);
+    }
+
+    if (item.oi !== undefined && created[index] === undefined) {
+      matchedIndexes.push(index);
+      oiSeq.push(item.oi);
+    }
+  });
+
+  const stay = new Set(getLisPositions(oiSeq).map(pos => matchedIndexes[pos]));
+  const parentEl = findRealParentElement(newWDom);
+  const baseAnchor = newWDom.isRoot
+    ? newWDom.ae
+    : startFindNextBrotherElement(newWDom, getParent(newWDom));
+
+  // Fast-append the trailing run of added children in order
+  // (a null anchor makes insertBefore behave as appendChild).
+  let tail = children.length;
+  while (tail > 0 && created[tail - 1] !== undefined) {
+    tail--;
+  }
+
+  for (let i = tail; i < children.length; i++) {
+    const el = created[i];
+
+    if (el && parentEl && children[i].tag !== 'portal') {
+      parentEl.insertBefore(el, baseAnchor || null);
+    }
+  }
+
+  if (
+    stay.size !== matchedIndexes.length ||
+    createdCount > children.length - tail
+  ) {
+    // Placement pass (right-to-left): insert added children and non-LIS
+    // moves before a running anchor.
+    let anchor =
+      findChildFragmentNextElement(children.slice(tail)) || baseAnchor;
+
+    for (let i = tail - 1; i >= 0; i--) {
+      const item = children[i];
+      const isNew = created[i] !== undefined;
+      const needMove = item.oi !== undefined && !isNew && !stay.has(i);
+
+      if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
+        const el = isNew ? created[i] : getElementFromFragment(item);
+
+        if (el) {
+          parentEl.insertBefore(el, anchor || null);
+        }
+      }
+
+      const first = findChildFragmentNextElement([item]);
+      if (first) {
+        anchor = first;
+      }
+    }
+  }
+
+  children.forEach(clearDiffMeta);
+  execMountedQueue();
+};
+
+const clearDiffMeta = (item: WDom) => {
+  delete item.oi;
+  delete item.nr;
+  delete item.oc;
+  delete item.op;
+};
+
+/**
+ * Longest increasing subsequence positions (binary search, O(n log n)).
+ * Returns the positions in seq that form the LIS.
+ */
+const getLisPositions = (seq: number[]) => {
+  const result: number[] = [];
+
+  if (!seq.length) {
+    return result;
+  }
+
+  const prev = new Array(seq.length);
+  result.push(0);
+
+  for (let i = 1; i < seq.length; i++) {
+    const value = seq[i];
+
+    if (seq[result[result.length - 1]] < value) {
+      prev[i] = result[result.length - 1];
+      result.push(i);
+      continue;
+    }
+
+    let lo = 0;
+    let hi = result.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (seq[result[mid]] < value) {
+        lo = mid + 1;
+      } else {
+        hi = mid;
+      }
+    }
+
+    if (value < seq[result[lo]]) {
+      if (lo > 0) {
+        prev[i] = result[lo - 1];
+      }
+      result[lo] = i;
+    }
+  }
+
+  let i = result.length;
+  let last = result[i - 1];
+  while (i-- > 0) {
+    result[i] = last;
+    last = prev[last];
+  }
+
+  return result;
 };
 
 export const wDomUpdate = (newWDomTree: WDom) => {
@@ -303,10 +493,7 @@ export const wDomUpdate = (newWDomTree: WDom) => {
 
   if (needRerender !== undefined && needRerender !== 'N') {
     renderHandlers[needRerender](newWDomTree);
-
-    delete newWDomTree.nr;
-    delete newWDomTree.oc;
-    delete newWDomTree.op;
+    clearDiffMeta(newWDomTree);
   }
 };
 
@@ -317,7 +504,6 @@ const renderHandlers = {
   U: typeUpdate,
   S: typeSortedReplace,
   T: typeSortedUpdate,
-  L: typeUpdate,
 } as const;
 
 const updateText = (newWDom: WDom) => {
@@ -334,13 +520,17 @@ const updateProps = (
 ) => {
   const originalProps = oldProps || {};
 
-  entries(props || {}).forEach(([dataKey, dataValue]: [string, unknown]) => {
+  for (const dataKey in props) {
+    const dataValue: unknown = props[dataKey];
+
     if (dataValue === originalProps[dataKey]) {
       delete originalProps[dataKey];
-      return;
+      continue;
     }
 
-    if (isHydration && dataKey.match(/^on/)) {
+    const isEvent = dataKey[0] === 'o' && dataKey[1] === 'n';
+
+    if (isHydration && isEvent) {
       updateEvent(
         element as HTMLElement,
         dataKey,
@@ -348,7 +538,7 @@ const updateProps = (
         originalProps[dataKey] as (e: Event) => void
       );
     } else {
-      if (dataKey === 'key' || dataValue === originalProps[dataKey]) {
+      if (dataKey === 'key') {
         // Do nothing
       } else if (dataKey === 'portal' && isObject(dataValue)) {
         // Do nothing
@@ -364,7 +554,7 @@ const updateProps = (
         );
       } else if (checkRefData(dataKey, dataValue)) {
         dataValue.value = element;
-      } else if (dataKey.match(/^on/)) {
+      } else if (isEvent) {
         updateEvent(
           element as HTMLElement,
           dataKey,
@@ -386,11 +576,11 @@ const updateProps = (
 
       delete originalProps[dataKey];
     }
-  });
+  }
 
-  keys(originalProps).forEach(dataKey =>
-    (element as HTMLElement).removeAttribute(dataKey)
-  );
+  for (const dataKey in originalProps) {
+    (element as HTMLElement).removeAttribute(dataKey);
+  }
 };
 
 const setAttr = (k: string, el: HTMLElement, v: string) =>
@@ -453,19 +643,16 @@ const wDomChildrenToDom = (
   parentElement?: HTMLElement | Element | DocumentFragment | Text,
   isHydration?: boolean
 ) => {
-  const frag = children.reduce((acc: DocumentFragment, childItem: WDom) => {
+  // The parent is not attached to the document yet, so children can be
+  // appended directly (no intermediate fragment allocation).
+  children.forEach((childItem: WDom) => {
     if (childItem.type) {
       const childElement = wDomToDom(childItem, isHydration);
-      if (childItem.tag !== 'portal' && !isHydration) {
-        acc.appendChild(childElement);
+      if (childItem.tag !== 'portal' && !isHydration && parentElement) {
+        parentElement.appendChild(childElement);
       }
     }
-    return acc;
-  }, DF());
-
-  if (!isHydration && parentElement && frag.hasChildNodes()) {
-    parentElement.appendChild(frag);
-  }
+  });
 };
 
 const updateEvent = (
@@ -500,14 +687,14 @@ const updateStyle = (
 
   const styleProxy = cssStyle as unknown as Record<string, string>;
 
-  entries(style).forEach(([k, v]) => {
-    styleProxy[k] = v;
+  for (const k in style) {
+    styleProxy[k] = style[k];
     delete orig[k];
-  });
+  }
 
-  entries(orig).forEach(([k]) => {
+  for (const k in orig) {
     styleProxy[k] = '';
-  });
+  }
 };
 
 const findRealParentElement = (

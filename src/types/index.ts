@@ -76,6 +76,7 @@ export interface WDom {
   ae?: HTMLElement; // afterElement (insert before)
   el?: HTMLElement | DocumentFragment | Text;
   nr?: RenderType; // needRerender
+  oi?: number; // originalIndex (matched keyed position in previous children)
   il?: boolean; // isLegacy
   [wdomSymbol]?: boolean | 'provider';
 }
@@ -87,7 +88,6 @@ export type RenderType =
   | 'U' // UPDATE
   | 'S' // SORTED_REPLACE (was SR)
   | 'T' // SORTED_UPDATE (was SU)
-  | 'L' // LOOP_CHILDREN_NOT_SORTED_UPDATE (was CNSU)
   | 'N'; // NONE
 
 export type ComponentSubKey =

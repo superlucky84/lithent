@@ -204,10 +204,16 @@ const makeNode = (
 const remakeChildren = (
   nodeParentPointer: NodePointer,
   children: MiddleStateWDomChildren
-): WDom[] =>
-  children.map((item: MiddleStateWDom) =>
-    assign(makeChildrenItem(item), { getParent: () => nodeParentPointer.value })
-  );
+): WDom[] => {
+  // Siblings share a single getParent closure (one allocation per parent)
+  const getParent = () => nodeParentPointer.value;
+
+  return children.map((item: MiddleStateWDom) => {
+    const childItem = makeChildrenItem(item);
+    childItem.getParent = getParent;
+    return childItem;
+  });
+};
 
 /**
  * Recursively process the child virtual DOM elements.

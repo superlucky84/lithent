@@ -93,8 +93,9 @@ export const getKey = (target: WDom) =>
  * Check if the type is virtual (fragment or loop)
  * Virtual types don't create real DOM elements themselves
  */
-export const checkVirtualType = (type?: string | null) =>
-  type && ['f', 'l'].includes(type); // 'f': fragment, 'l': loop
+export const checkVirtualType = (
+  type?: string | null // 'f': fragment, 'l': loop
+) => type === 'f' || type === 'l';
 
 export const checkCustemComponentFunction = (
   target: WDomParam
@@ -128,13 +129,24 @@ export const checkRefData = (
   value: HTMLElement | Element | DocumentFragment | Text | undefined;
 } => dataKey === 'ref' && isObject(dataValue);
 
-export const hasAccessorMethods = (target: unknown, dataKey: string) => {
-  const descriptor = Object.getOwnPropertyDescriptor(
-    target!.constructor.prototype,
-    dataKey
-  );
+// Descriptor lookups are cached per nodeName+key (HTML nodeName is uppercase,
+// SVG lowercase, so the two prototypes never collide on the same cache key).
+const accessorCache = new Map<string, boolean>();
 
-  return descriptor && descriptor.get && descriptor.set;
+export const hasAccessorMethods = (target: unknown, dataKey: string) => {
+  const cacheKey = (target as HTMLElement).nodeName + '|' + dataKey;
+  let result = accessorCache.get(cacheKey);
+
+  if (result === undefined) {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      target!.constructor.prototype,
+      dataKey
+    );
+    result = !!(descriptor && descriptor.get && descriptor.set);
+    accessorCache.set(cacheKey, result);
+  }
+
+  return result;
 };
 
 /**
