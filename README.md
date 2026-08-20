@@ -30,9 +30,12 @@ Bring in only what you need — let the stack scale with your project.
 - **Manual or Reactive** — Choose your update strategy
 - **Progressive Enhancement** — From static HTML to full SPA
 
-<sub>Core size measured on `dist/lithent.umd.js` (v1.22.0): 12,532 B raw, **5,148 B gzip**, 4,735 B brotli.
-The ESM build (`dist/lithent.mjs`) is 12,327 B raw / 5,004 B gzip / 4,618 B brotli.
-Helpers are separate entry points and are not included in that figure.</sub>
+<sub>Core size measured on `dist/lithent.umd.js` (v1.22.0): 12,532 B raw, **5,133 B gzip**, 4,734 B brotli.
+The core ships the lifecycle hooks (`mountCallback`, `updateCallback`, `mountReadyCallback`, `ref`,
+`nextTick`, `useRenew`); reactive state (`state`, `computed`, `store`) lives separately in
+`lithent/helper`. Cross-library size figures rarely line up on the same feature set — preact, for
+instance, measures 4,402 B brotli for its core but keeps both lifecycle and state hooks in a
+separate `preact/hooks` (1,388 B brotli).</sub>
 
 <br />
 
