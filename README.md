@@ -20,15 +20,19 @@ It trims away unnecessary magic and complex APIs so your UI code stays simple, e
 
 ## Why Lithent?
 
-**Lightweight DOM manipulation without the framework weight.** The 4KB core drives complete UIs. Need state management? Opt into helpers like expansion packs instead of adopting a full stack.
+**Lightweight DOM manipulation without the framework weight.** The 5KB core drives complete UIs. Need state management? Opt into helpers like expansion packs instead of adopting a full stack.
 
 Bring in only what you need — let the stack scale with your project.
 
 **Design philosophy:**
-- **Small Bundle** — 4KB core with optional extensions
+- **Small Bundle** — 5KB core with optional extensions
 - **Closure-based State** — No magic, just JavaScript
 - **Manual or Reactive** — Choose your update strategy
 - **Progressive Enhancement** — From static HTML to full SPA
+
+<sub>Core size measured on `dist/lithent.umd.js` (v1.22.0): 12,532 B raw, **5,148 B gzip**, 4,735 B brotli.
+The ESM build (`dist/lithent.mjs`) is 12,327 B raw / 5,004 B gzip / 4,618 B brotli.
+Helpers are separate entry points and are not included in that figure.</sub>
 
 <br />
 
@@ -117,7 +121,7 @@ const Counter = lmount(() => {
 
 | Package | Description |
 |--------|-------------|
-| [lithent](https://www.npmjs.com/package/lithent) | Core library (~4KB) |
+| [lithent](https://www.npmjs.com/package/lithent) | Core library (~5KB) |
 | [lithent/helper](https://www.npmjs.com/package/lithent) | Reactive state helpers |
 | [lithent/ssr](https://www.npmjs.com/package/lithent) | Server‑side rendering |
 | [lithent/ftags](https://www.npmjs.com/package/lithent) | Function‑style tag API |

@@ -17,7 +17,7 @@ This file provides AI agent skills for working with the Lithent library.
 
 ## Overview
 
-Lithent is a lightweight (~4KB) JSX-based virtual DOM library with closure-based state management. It offers two component modes:
+Lithent is a lightweight (~5KB) JSX-based virtual DOM library with closure-based state management. It offers two component modes:
 - **Manual Mode** (`mount`): Explicit control with `renew()` function
 - **Light API Mode** (`lmount`): Auto-reactive with `lstate`/`lstore`
 
