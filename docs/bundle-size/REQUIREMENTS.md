@@ -221,7 +221,7 @@ README가 "4KB"라고 주장하지만 실측은 5.78KB(ESM) / 4.74KB(UMD)다.
   - **`build.minify: 'terser'`는 해법이 아니라 악화다.** vite의 terser 플러그인은
     `if (config.build.lib && outputOptions.format === "es") return null;`로 ES lib를 **완전히 건너뛴다**.
     실측: ESM 산출물이 35,950B / 1,128줄로 **전혀 minify되지 않음** (UMD는 정상 12,327B / 1줄).
-- **A6. `@__PURE__` 주석 손실은 다운스트림에 실질 영향이 없다 (실측 검증 완료, 2026-08-20).**
+- **A6. `@__PURE__` 주석 손실은 다운스트림에 실질 영향이 없다 — 코어·helper 양쪽 실측 완료 (2026-08-20).**
   재압축 시 현 산출물의 `@__PURE__` 주석 6개가 전부 소실된다
   (esbuild의 파싱→재출력 과정에서 발생하며, `--minify-whitespace` 단독으로도 동일하게 소실).
   그러나 소비자 번들 크기 차이는 **0~3B**에 그친다:
@@ -233,8 +233,37 @@ README가 "4KB"라고 주장하지만 실측은 5.78KB(ESM) / 4.74KB(UMD)다.
   | 전체 import | 4,968 | 4,967 | -1 |
 
   원인: 6개 주석은 모두 모듈 최상위 `new Map`×3 / `new Set` / `new WeakMap` / `new WeakSet`이며,
-  코어 내부(`componentMap`, `lmountComponentSet`, `redrawQueue` 등)가 항상 참조하므로
-  주석 유무와 무관하게 제거될 수 없다.
+  코어 내부가 항상 참조하므로 주석 유무와 무관하게 제거될 수 없다:
+
+  | 대상 | 위치 |
+  |---|---|
+  | `componentMap` | `src/utils/universalRef.ts:7` |
+  | `lmountComponentSet` | `src/utils/universalRef.ts:8` |
+  | `redrawQueue` | `src/utils/redraw.ts:4` |
+  | `accessorCache` | `src/utils/predicator.ts:134` |
+
+  PURE 주석이 실제로 값어치를 가지려면 `export const X = /* @__PURE__ */ createSomething()`처럼
+  **export 단위**로 붙어서 해당 export를 쓰지 않을 때 통째로 제거되는 구조여야 한다.
+  lithent는 그 패턴을 사용하지 않는다.
+
+  **helper 교차 검증 (2026-08-20)** — 코어보다 강한 근거다.
+  helper는 export가 11개이고 선택 import가 실제로 걸러지며, PURE 주석도 14개로 코어보다 많았다.
+  작업 전(PURE 14)과 후(PURE 0) 산출물로 소비자 번들을 만들어 비교한 결과:
+
+  | 소비 시나리오 | 작업 전 gzip | 작업 후 gzip | 차이 |
+  |---|---:|---:|---:|
+  | `state`만 | 282 | 282 | **0** |
+  | `state` + `computed` | 342 | 342 | **0** |
+  | `store`만 | 762 | 762 | **0** |
+  | 전체 import | 1,882 | 1,882 | **0** |
+
+  바이트 단위로 완전히 동일하다. 동시에 트리셰이킹 자체는 정상 작동한다 —
+  `state`만 쓰면 282B, 전체는 1,882B로 **6.7배 차이**가 난다.
+  즉 "트리셰이킹이 무력해서 무관한" 것이 아니라,
+  **트리셰이킹은 잘 되지만 PURE 주석이 거기에 기여하지 않는다**는 것이 정확한 설명이다.
+
+  결론: 코어(A7의 89% 미분리)와 helper(트리셰이킹 정상 작동) **양쪽 모두 안전**하다.
+  다만 이는 lithent의 코드 패턴에 기인하므로, 다른 라이브러리로 일반화할 수 없다(A9).
 - **A7. 코어는 트리셰이킹 여지가 거의 없다.**
   `h`+`Fragment`만 import해도 4,428B gzip, 전체 import는 4,968B gzip —
   **약 89%가 무조건 포함**된다. 따라서 G2의 전략은 트리셰이킹 개선이 아니라 **절대 크기 축소**여야 한다.
