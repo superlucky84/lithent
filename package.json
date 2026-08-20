@@ -124,6 +124,7 @@
     "lithent"
   ],
   "devDependencies": {
+    "@jridgewell/remapping": "^2.3.5",
     "@testing-library/jest-dom": "^6.5.0",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",

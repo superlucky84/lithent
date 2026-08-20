@@ -2,9 +2,11 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { minifyEsm } from '../scripts/viteMinifyEsm.js';
 
 export default defineConfig({
   plugins: [
+    minifyEsm(),
     checker({
       typescript: true,
       eslint: {
