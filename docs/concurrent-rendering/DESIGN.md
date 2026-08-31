@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
-- 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **DC-1~DC-9 전부 확정. Phase 0 착수 가능**
+- 작성일: 2026-08-28 (최종 수정: 2026-08-31)
+- 상태: **DC-1~DC-12 확정. Phase 0 완료 (2026-08-31), Phase 1 착수 가능**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -10,7 +10,9 @@
   공유 모듈 변경이 불가피하면 양쪽 테스트 통과 + 기본 크기 가드 준수가 조건.
 - **P2. 클로저 모델 불가침.** `mount(setup → updater)`와 `state`/`lstate`의 클로저 보관을
   바꾸지 않는다. **파이버를 도입해도 유지된다** (REQUIREMENTS §7.7).
-- **P3. 인터페이스 호환.** 위성 39개 import와 공개 export 11개가 무수정 동작.
+- **P3. 인터페이스 호환.** 위성의 bare `lithent` import와 공개 export가 무수정 동작.
+  실측(2026-08-31): import **41건**(구현 24 + 테스트 17), deep import **0건**,
+  공개 export **값 21개 + 타입 16개**. `concurrent-exportSurface.test.ts`가 이를 고정한다.
   파이버 전환 시 `getParent` 호환 접근자 필수 (D10).
 - **P4. 단계 독립성.** T1 / T1.5 / T2는 각각 단독 머지 가능.
 - **P5. 순수화 우선.** 중단 능력보다 diff 순수화를 먼저 한다. 순수화는 그 자체로 품질 개선이고,
@@ -54,6 +56,30 @@ alias: [
 | `src/hook/useRenew.ts:3` | `import { componentUpdate } from '@/utils/redraw'` | 스케줄러가 아닌 기본 redraw에 연결되어 우선순위가 무시된다 |
 
 둘 다 위 alias로 해소되지만 **놓치면 디버깅이 괴로운 종류**다 → Phase 0에서 전용 검증(0-5, 0-6).
+
+> **Phase 0 구현 반영 (D12).** 이 표는 `lithentConcurrent/alias.js` 한 곳에 `forkModules`로
+> 두고 vite 빌드·vitest·타입 생성 세 소비자가 공유한다. 인라인으로 흩어 두면 셋이
+> 어긋나도 아무 데서도 안 터진다. 구현된 형태는 아래와 같고, catch-all이 마지막에
+> 오는 것은 배열 조립 순서로 **구조적으로 보장**된다.
+>
+> ```js
+> export const forkModules = {
+>   '@/index': 'index',   '@/wDom': 'wDom',   '@/diff': 'diff',
+>   '@/render': 'render', '@/scheduler': 'scheduler',
+>   '@/utils/redraw': 'scheduler',
+> };
+> export const concurrentAlias = pkgDir => [
+>   ...Object.entries(forkModules).map(([spec, name]) => ({
+>     find: new RegExp(`^${spec.replace(/\//g, '\\/')}$`),
+>     replacement: resolve(pkgDir, 'src', `${name}.ts`),
+>   })),
+>   { find: /^@\//, replacement: `${resolve(pkgDir, '..', 'src')}/` },
+> ];
+> ```
+>
+> catch-all을 `{ find: '@' }`(문자열 prefix)가 아니라 `/^@\//`(정규식)로 둔 이유:
+> 문자열 형태는 `@scope/pkg` 같은 스코프 패키지 이름도 삼킨다. 현재 코어는 그런 import가
+> 없어 기본 빌드에서는 드러나지 않지만, 공유 범위가 넓어질수록 위험이 커진다.
 
 ### 2.3 빌드 파이프라인 편입
 
@@ -240,6 +266,64 @@ node.getParent = () => node.return;   // 1줄 shim, 기존 인터페이스 보�
 이것 외에 코어 밖에서 읽는 WDom 필드(`compProps`, `el`)는 파이버가 그대로 유지한다
 (REQUIREMENTS §7.7 표).
 
+## 6.5. Phase 0에서 확정된 빌드 인프라 설계
+
+### D12. 분기 표를 단일 원본으로 — **DC-10 확정**
+
+§2.2 참조. `alias.js`의 `forkModules` 하나를 vite 빌드 · vitest · 타입 생성이 공유한다.
+"무엇이 분기본인가"에 대한 답이 세 군데에 복제되면, 그중 하나만 어긋났을 때
+**런타임 그래프와 타입 표면이 서로 다른 코어를 가리키는** 상태가 조용히 만들어진다.
+
+### D13. 타입 선언 생성 — **DC-11 확정: `tsc` + specifier 재작성**
+
+문제: `vite-plugin-dts`는 소스 루트가 하나라고 가정한다. 이 패키지는 의도적으로 둘이다
+(`lithentConcurrent/src` 분기본 + `../src` 공유분 709줄). 결과는 `TS6059 rootDir` 오류이며,
+`rootDir`/`entryRoot`/`root`를 어떻게 조합해도 **분기본과 공유분이 함께 나오는 조합이 없었다**.
+
+확정안: `tsconfig.build.json`(`rootDir: '..'`, `emitDeclarationOnly`)로 `tsc`를 돌리고,
+`scripts/emitTypes.js`가 살아남은 `@/…` specifier를 상대 경로로 재작성한다.
+
+- 재작성은 **`forkModules`를 그대로 사용**한다 (D12). 따라서 타입 표면이 런타임 그래프와
+  다른 모듈을 가리키는 일이 원리적으로 불가능하다.
+- 재작성 후 `@/`가 남아 있으면 **exit 1**. 조용히 깨진 `.d.ts`를 내보내지 않는다.
+- 산출 경로: `dist/types/lithentConcurrent/src/*.d.ts`(분기본) + `dist/types/src/**`(공유분).
+  `package.json`의 `types`는 전자의 `index.d.ts`를 가리킨다.
+- 검증: 이 선언만으로 외부 소비자 파일이 `tsc --strict`를 통과하는 것을 확인했다.
+
+> 대안으로 "concurrent는 기본 코어의 `.d.ts`를 그대로 쓴다"도 검토했다. C3(인터페이스 동일)
+> 때문에 Phase 0에서는 성립하지만, T1에서 `startTransition`이 추가되는 순간 거짓이 된다.
+> 계약을 문서가 아니라 **생성물로** 유지하는 쪽을 택했다.
+
+### D14. 위성 스위트의 코어 전환 — **DC-12 확정: `LITHENT_CORE` + 빌드 산출물 alias**
+
+RC-9은 위성 스위트를 양쪽 코어에서 돌릴 것을 요구한다. 순진한 방법(위성 테스트에서
+`lithent`를 concurrent **소스**로 alias)은 성립하지 않는다 — 위성 패키지도 자기 `src`를
+`@`로 alias하는데, concurrent 소스 역시 `@`로 코어를 참조하므로 **같은 `@`가 두 의미를
+가져야** 하기 때문이다.
+
+확정안: 각 위성의 `vite.config.js`에서 `LITHENT_CORE=concurrent`일 때 bare `lithent`를
+**빌드된 번들**(`../lithentConcurrent/dist/lithentConcurrent.mjs`)로 돌린다.
+
+- 번들은 `@`를 이미 해소한 상태이므로 `@` 충돌이 원천적으로 없다.
+- 소비자가 실제로 하는 일(번들러에서 `lithent` → `lithent-concurrent` alias)과 **동일한 경로**를
+  검증하게 된다. 소스 alias보다 계약에 가깝다.
+- **매칭은 반드시 anchored `/^lithent$/`**여야 한다. Vite의 객체형 alias는 prefix 매칭이라
+  `lithent/jsx-dev-runtime` → `<번들경로>/jsx-dev-runtime`으로 망가진다.
+  (Phase 0에서 실제로 ssr 스위트가 이 형태로 깨졌고, 배열형 + 정규식으로 고쳤다.)
+  서브패스(`lithent/helper`, `lithent/jsx-dev-runtime`)는 실제 패키지로 남아야 한다 —
+  **교체 대상은 코어뿐**이다.
+- 스크립트: `pnpm test:satellites` / `pnpm test:satellites:concurrent` / `pnpm test:dual`.
+- 이 alias가 실제로 작동함을 확인했다: concurrent 번들을 숨기면 `Failed to resolve import
+  "lithent"`로 실패하고, 되돌리면 통과한다. 즉 통과가 공허하지 않다.
+
+### D15. RC-4를 실행 가능한 게이트로
+
+`scripts/size-report.js`가 두 빌드의 brotli를 재고 예산 초과 시 **exit 1**. 기본 코어 예산은
+목표가 아니라 **회귀 가드**다 — `src/`가 동결(P1)이므로 움직였다면 경계를 넘어 뭔가 샌 것이다.
+concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린다.
+
+---
+
 ## 7. 결정 체크리스트
 
 - [x] **DC-1**: 우선순위 API 표현 → **(A) ambient `startTransition`**.
@@ -261,6 +345,14 @@ node.getParent = () => node.return;   // 1줄 shim, 기존 인터페이스 보�
   근거: BC-1은 순서 정합성 개선, BC-2는 옵트인 경로에서만 발생.
 - [x] **DC-9**: BC-4(`nextTick` 레인 의존성) → **`whenIdle()` 신규 제공, `nextTick` 의미는 불변**.
   근거: 기존 12개 사용처 호환 유지가 우선.
+- [x] **DC-10**: 분기 표의 위치 → **`alias.js`의 `forkModules` 단일 원본** (D12).
+  근거: 빌드·테스트·타입 생성 세 소비자가 어긋나면 런타임과 타입이 다른 코어를 가리킨다.
+- [x] **DC-11**: 타입 선언 생성 → **`tsc` + specifier 재작성** (D13). `vite-plugin-dts` 폐기.
+  근거: 소스 루트가 둘이라 플러그인이 성립하지 않음. 재작성이 `forkModules`를 공유하므로
+  타입 표면이 런타임 그래프와 갈라질 수 없다.
+- [x] **DC-12**: 위성 스위트 코어 전환 → **`LITHENT_CORE` + 빌드 산출물 alias (anchored)** (D14).
+  근거: 소스 alias는 위성의 `@`와 코어의 `@`가 충돌한다. 번들 alias는 충돌이 없고
+  소비자의 실제 경로와 동일하다.
 
 ## 8. 설계 ↔ 검증 연결
 
@@ -278,10 +370,16 @@ node.getParent = () => node.return;   // 1줄 shim, 기존 인터페이스 보�
 | D8 훅 스냅샷 | RC-8 (Phase 9), 수동 E-3 |
 | D9 마운트 정책 | RC-8, 수동 E-2 |
 | D10 `getParent` shim | **RC-9** (양쪽 코어 위성 통과), 수동 A-6 |
+| D12 분기 표 단일 원본 | `concurrent-aliasTable.test.ts` (Phase 0-4) |
+| D13 타입 선언 생성 | `emitTypes.js`의 잔여 `@/` exit 1 + 외부 소비자 `tsc --strict` 통과 |
+| D14 위성 코어 전환 | **RC-9** — `pnpm test:dual`, 번들 은닉 시 실패 확인 |
+| D15 크기 게이트 | **RC-4** — `pnpm size` (exit 1) |
+| C3 export 표면 | `concurrent-exportSurface.test.ts` (빌드된 기본 번들과 이름 집합 비교) |
 
 ## 9. 상태 / 핸드오프
 
 - done: 배포 구조 설계(alias + Fragment 함정), D1~D11, DC-1~DC-9 전부 확정, 설계↔검증 매핑.
-- next: [IMPLEMENT.md](./IMPLEMENT.md) Phase 0 착수.
+  **Phase 0 구현 완료 (2026-08-31)** — 구현 중 드러난 3건을 D12~D15 / DC-10~DC-12로 확정.
+- next: [IMPLEMENT.md](./IMPLEMENT.md) Phase 1 (우선순위 큐, D1·D2) 착수.
 - blockers: 없음.
-- 기준 커밋: `f3921cc`
+- 기준 커밋: `f3921cc` (Phase 0 작업은 아직 미커밋)

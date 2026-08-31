@@ -1,8 +1,8 @@
 # REQUIREMENTS — Lithent Concurrent 렌더링 (별도 빌드)
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
-- 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **설계 확정 — DC-1~DC-8 전부 결정 완료. Phase 0 착수 가능**
+- 작성일: 2026-08-28 (최종 수정: 2026-08-31)
+- 상태: **Phase 0 완료 (2026-08-31) — DC-1~DC-12 결정 완료. Phase 1 착수 가능**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -51,8 +51,11 @@ concurrent 모드는 벗어나며, 대부분의 사용 환경(SSR 페이지에 �
 | 위성 패키지 (helper 1,046 / ssr 346 / devHelper 222 / ftags 84 / jsx-runtime 34 / tag 4) | 1,736 | 18% |
 | 빌드 툴링 (`packages/*`) | 5,886 | 60% |
 
-- 위성 → 코어 import **39건 전부 bare `'lithent'`, deep import 0건**.
-  공개 인터페이스는 `src/index.ts`의 export 11개뿐 → 인터페이스만 지키면 양쪽에서 공유된다.
+- 위성 → 코어 import **41건 전부 bare `'lithent'`, deep import 0건** (실측 2026-08-31.
+  구현 24 + 테스트 17. 최초 기록 39건은 측정 시점 차이).
+  공개 인터페이스는 `src/index.ts`의 **값 export 21개 + 타입 export 16개**
+  (최초 기록 "11개"는 오기) → 인터페이스만 지키면 양쪽에서 공유된다.
+  Phase 0에서 `concurrent-exportSurface.test.ts`로 이 집합을 고정했다.
 - 전체의 15%만 갈라진다. 별도 레포로 가면 나머지 85%를 복제하거나 크로스 레포 의존을 관리해야 한다.
 - **비대칭**: 나중에 쪼개는 것은 디렉터리 이동으로 끝나지만, 나중에 합치는 것은 어렵다.
 
@@ -64,12 +67,16 @@ src/                        ← 동결. 기본 코어
   utils/universalRef.ts  hook/*                   ← 공유 (709줄)
   diff.ts  render.ts  wDom.ts  utils/redraw.ts    ← 기본 전용 (1,461줄)
 
-lithentConcurrent/          ← 신규 워크스페이스 패키지 (name: lithent-concurrent)
+lithentConcurrent/          ← 워크스페이스 패키지 (name: lithent-concurrent). Phase 0에서 생성
   src/
-    diff.ts  render.ts  wDom.ts  scheduler.ts     ← 분기본
-    index.ts                                       ← 동일한 11개 export
-  package.json
-  vite.config.js                                   ← alias로 공유분 재사용
+    diff.ts  render.ts  wDom.ts  scheduler.ts     ← 분기본 (Phase 0 시점 base와 바이트 동일)
+    index.ts                                       ← base와 동일한 export (값 21 + 타입 16)
+    tests/                                         ← alias 함정 가드 + export 계약 가드
+  alias.js  alias.d.ts                             ← 분기 표 단일 원본 (DESIGN D12)
+  scripts/emitTypes.js                             ← 타입 선언 생성 (DESIGN D13)
+  package.json  tsconfig.json  tsconfig.build.json
+  vite.config.js                                   ← 빌드. alias로 공유분 재사용
+  vitest.config.js                                 ← 공유 core 스위트를 concurrent 코어로 실행
 ```
 
 소비자 측은 preact/compat과 동일한 패턴 — 번들러에서 `lithent` → `lithent-concurrent` alias.
@@ -123,12 +130,16 @@ child/sibling/return 포인터 + 명시적 work loop + alternate(current/WIP) �
 - **C1. 크기 예산 이원화** — 기본 코어는 회귀 가드, concurrent는 단계별 상한 (RC-4).
 - **C2. 벤치마크** — T1·T1.5는 회귀 0. T2 파이버는 DC-6 허용폭 적용.
   단, concurrent 빌드의 판정 기준은 "기본 코어 대비"가 아니라 "대규모 시나리오에서의 총 체감"이다.
-- **C3. 인터페이스 보존** — 위성 39개 import와 공개 export 11개가 무수정 동작해야 한다.
+- **C3. 인터페이스 보존** — 위성의 bare `lithent` import 41건과 공개 export
+  (값 21 + 타입 16)가 무수정 동작해야 한다 (§3.1 실측).
+  Phase 0의 `concurrent-exportSurface.test.ts`가 이름 집합을 자동 고정하며,
+  concurrent 전용 export 추가는 그 파일의 `CONCURRENT_ONLY`에 명시해야 통과한다.
   파이버 전환 시 **`getParent` 호환 접근자를 반드시 유지**한다 (§7.7).
 - **C4. 참조 안정성** — WDom의 `props`/`children` 배열 인스턴스는 조상·클로저가 공유하므로
   in-place 동기화만 허용 (`src/diff.ts:144-165`).
 - **C5. 단계별 독립 출하** — T1, T1.5, T2는 각각 단독 머지·릴리스 가능해야 한다.
-- **C6. 테스트 통과** — `pnpm build && pnpm test` 전량 통과 + 위성 스위트를 **양쪽 코어에서** 실행.
+- **C6. 테스트 통과** — `pnpm build && pnpm test` 전량 통과 + 위성 스위트를 **양쪽 코어에서**
+  실행 (`pnpm test:dual`). Phase 0에서 이 인프라가 완성되었다.
 
 ## 7. 현행 코드 분석 (concurrent 구현의 substrate)
 
@@ -207,7 +218,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 |
 | **RC-7** | 단일 작업 단위가 프레임(16ms)을 초과하는 시나리오가 실재한다 | Phase 7 프로파일링 |
 | **RC-8** | 폐기된 렌더가 이펙트 유실·중복을 일으키지 않는다 | 단위 테스트 |
-| **RC-9** | **위성 패키지가 양쪽 코어에서 무수정 통과한다** | 양쪽 alias로 스위트 2회 실행 |
+| **RC-9** | **위성 패키지가 양쪽 코어에서 무수정 통과한다** | `pnpm test:dual` (Phase 0에서 인프라 완성) |
 | **RC-10** | 단일 컴포넌트의 무거운 렌더(10k행) 중 입력이 차단되지 않는다 | 수동 E-4 — **T2의 존재 이유** |
 
 ### RC-4 크기 예산
@@ -217,7 +228,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | 빌드 | 단계 | br 상한 | 비고 |
 |---|---|---|---|
 | **기본 `lithent`** | 전 기간 | **≤ 4,800 B** | 현재 4,734 B. **회귀 가드** — 철학 보호선 |
-| concurrent | Phase 0 (순수 포크) | ≤ 4,800 B | 기본과 동등해야 정상 |
+| concurrent | Phase 0 (순수 포크) | ≤ 4,800 B | **실측 4,742 B** — 기본과 8 B 차이 (UMD 전역 이름 문자열) |
 | concurrent | T1 | **≤ 5,400 B** | |
 | concurrent | T1.5 | **≤ 6,200 B** | |
 | concurrent | T2 (파이버) | **≤ 9,000 B** | 파이버 raw +4.5~7KB 반영 |
@@ -238,8 +249,25 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
 
 ## 10. 상태 / 핸드오프
 
-- done: 배포 구조 확정(모노레포 2중 빌드), 3단계 범위 확정, 파이버 채택,
-  N1 불변 조건 격상, 인터페이스 영향 실측(§7.7), DC-1~DC-9 전부 결정.
-- next: [IMPLEMENT.md](./IMPLEMENT.md) **Phase 0 (패키지 스캐폴딩 + alias 함정 검증)** 착수.
+- done:
+  - 배포 구조 확정(모노레포 2중 빌드), 3단계 범위 확정, 파이버 채택,
+    N1 불변 조건 격상, 인터페이스 영향 실측(§7.7), DC-1~DC-9 전부 결정.
+  - **Phase 0 완료 (2026-08-31)** — `lithentConcurrent/` 스캐폴딩, alias 함정 검증,
+    RC-9 이중 실행 인프라, RC-4 게이트 스크립트. 구현 중 드러난 3건을
+    DC-10~DC-12로 확정 ([DESIGN.md](./DESIGN.md) §6.5).
+  - 실측 갱신: 위성 import 41건 / 공개 export 값 21 + 타입 16 (본문 §3.1 반영).
+- Phase 0 판정:
+
+  | 수용 기준 | 결과 |
+  |---|---|
+  | 동작 변경 0 | 포크 5개 파일 **바이트 동일**, core 스위트 양쪽 통과 |
+  | RC-4 | 기본 **4,734** / concurrent **4,742**, 둘 다 ≤ 4,800 |
+  | RC-9 인프라 | `pnpm test:dual` 통과 — helper 37 / devHelper 2 / ftags 10 / ssr 8, 양쪽 동일 |
+  | N2 (`src/` 동결) | `git status src/` 비어 있음 |
+
+- next: [IMPLEMENT.md](./IMPLEMENT.md) **Phase 1 — 우선순위 큐 (D1, D2)**.
 - blockers: 없음.
-- 기준 커밋: `f3921cc`
+- 미결(경미):
+  - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
+    npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
+- 기준 커밋: `f3921cc` (Phase 0 작업은 아직 미커밋)

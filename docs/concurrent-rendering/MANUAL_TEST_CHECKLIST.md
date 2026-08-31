@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — Concurrent 렌더링 릴리스 전 수동 확인
 
-- 작성일: 2026-08-28 (최종 수정: 2026-08-28)
+- 작성일: 2026-08-28 (최종 수정: 2026-08-31)
 - 대상: `feat/concurrentRendering` — `lithent-concurrent` 별도 빌드 (T1 스케줄러 / T1.5 순수화·tearing / T2 파이버)
 - 사전 조건: `pnpm build && pnpm test` 전량 통과 상태에서 수행
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
@@ -10,6 +10,9 @@
 >
 > **B~F는 `lithent` → `lithent-concurrent` alias를 적용한 앱에서 수행한다.**
 > 기본 코어는 동결이므로 동작 변화가 없어야 한다 (A-7).
+>
+> **현재 상태 (2026-08-31)**: Phase 0(빌드 인프라)만 완료. T1 미착수이므로
+> **B~F 전 섹션이 `N/A`**이고, 수행 대상은 A 섹션뿐이다.
 
 ## A. 자동 검증 + 빌드 무결성 (릴리스 직전 1회)
 
@@ -21,10 +24,18 @@
 - [ ] A-4. 크기 실측 — concurrent가 단계 예산 이내 (T1 ≤ 5,400 / T1.5 ≤ 6,200 / T2 ≤ 9,000)
 - [ ] A-5. **Fragment 동일성**: concurrent 빌드에서 `checkFragmentFunction(Fragment) === true`
   (alias 함정 — DESIGN §2.2. 자동 테스트 0-5가 있어도 릴리스 빌드 산출물로 1회 확인)
+  > Phase 0에서 `concurrent-aliasFragment.tsx`로 자동화됨. 여기서는 **소스가 아니라
+  > `dist/lithentConcurrent.mjs`를 import해서** 확인하는 것이 목적이다.
 - [ ] A-6. **`getParent` shim**: concurrent 빌드에서 `helper/context`·`lcontext`의
   Provider 탐색이 동작 (파이버 `return` 포인터 경유)
-- [ ] A-7. **기본 코어 무회귀**: `dist/lithent.umd.js` br ≤ 4,800 B **이고**
+- [ ] A-7. **기본 코어 무회귀**: `pnpm size` 통과 (`dist/lithent.umd.js` br ≤ 4,800 B) **이고**
   기본 코어로 빌드한 예제 앱의 동작이 이전 릴리스와 동일
+- [ ] A-8. **RC-9 이중 실행**: `pnpm test:dual` 통과 — 위성 스위트가 양쪽 코어에서 동일 결과
+- [ ] A-9. **타입 선언 자립**: concurrent의 `.d.ts`만으로 외부 소비자 파일이
+  `tsc --strict`를 통과한다 (`@/…` 잔여 specifier 0건 — DESIGN D13)
+- [ ] A-10. **소비자 alias 시나리오**: 번들러에서 `lithent` → `lithent-concurrent`로 바꾼
+  앱이 동작하고, 서브패스(`lithent/helper`, `lithent/jsx-runtime`)는 **실제 패키지로 남는다**
+  (DESIGN D14 — anchored 매칭)
 
 ## B. 스케줄러 동작 (실브라우저) — T1부터
 

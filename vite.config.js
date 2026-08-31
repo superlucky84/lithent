@@ -43,6 +43,9 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/packages/lithentTemplateVite/**',
+      // The concurrent build has its own runner (`pnpm test:concurrent`); its
+      // specs only make sense under the concurrent alias table.
+      '**/lithentConcurrent/**',
     ],
   },
   server: {

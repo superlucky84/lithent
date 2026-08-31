@@ -296,6 +296,8 @@ importers:
         specifier: workspace:*
         version: link:..
 
+  lithentConcurrent: {}
+
   lithentDocs:
     devDependencies:
       autoprefixer:

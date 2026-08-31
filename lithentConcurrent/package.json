@@ -1,0 +1,44 @@
+{
+  "type": "module",
+  "name": "lithent-concurrent",
+  "version": "0.0.0",
+  "description": "Concurrent rendering build of lithent. Interface-compatible drop-in for large sites.",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "main": "./dist/lithentConcurrent.umd.js",
+  "module": "./dist/lithentConcurrent.mjs",
+  "types": "./dist/types/lithentConcurrent/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/lithentConcurrent/src/index.d.ts",
+      "import": "./dist/lithentConcurrent.mjs",
+      "require": "./dist/lithentConcurrent.umd.js"
+    }
+  },
+  "files": [
+    "src",
+    "dist",
+    "package.json"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build && node scripts/emitTypes.js",
+    "watch": "vite build --watch",
+    "test": "vitest run --reporter verbose -c vitest.config.js",
+    "test:dev": "vitest -c vitest.config.js"
+  },
+  "author": "superlucky84",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent",
+    "concurrent"
+  ],
+  "volta": {
+    "node": "20.3.0"
+  }
+}

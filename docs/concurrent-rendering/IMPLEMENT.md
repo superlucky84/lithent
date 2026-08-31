@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **미착수 — Phase 0 착수 가능 (DC 전부 확정)**
+- 상태: **Phase 0 완료 (2026-08-31) — Phase 1 착수 가능**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 공통 종료 조건 (모든 Phase):
@@ -22,28 +22,63 @@ node -e "const z=require('zlib'),f=require('fs');for(const p of ['dist/lithent.u
 
 ---
 
-## Phase 0 — 패키지 스캐폴딩 + alias 검증
+## Phase 0 — 패키지 스캐폴딩 + alias 검증 ✅ 완료 (2026-08-31)
 
 진입: 없음. / 종료: 순수 포크 상태에서 기존 테스트 전량 통과 + 크기가 기본과 동등.
 
 이 Phase는 **동작 변경이 0**이다. 분기 뼈대만 세우고 alias가 옳게 걸렸는지 증명한다.
 
-- [ ] 0-1. `lithentConcurrent/` 워크스페이스 생성 (`pnpm-workspace.yaml` 등록)
+- [x] 0-1. `lithentConcurrent/` 워크스페이스 생성 (`pnpm-workspace.yaml` 등록)
       — name `lithent-concurrent`, exports/types 구조는 루트 `package.json` 패턴 복제
-- [ ] 0-2. `src/{diff,render,wDom}.ts`를 `lithentConcurrent/src/`로 **무변경 복사**,
+- [x] 0-2. `src/{diff,render,wDom}.ts`를 `lithentConcurrent/src/`로 **무변경 복사**,
       `src/utils/redraw.ts` → `lithentConcurrent/src/scheduler.ts`로 무변경 복사
-- [ ] 0-3. `lithentConcurrent/src/index.ts` — 기본 코어와 **동일한 11개 export**
-- [ ] 0-4. `vite.config.js` alias 작성 (DESIGN §2.2) — 구체적 패턴 4개 먼저, `@` → `../src` 마지막
-- [ ] 0-5. **함정 검증 ①**: `predicator.ts`의 `Fragment` 동일성 —
-      concurrent 빌드에서 `checkFragmentFunction(Fragment)`가 `true`인지 단언하는 테스트 추가.
-      alias 누락 시 fragment 판정이 통째로 깨지므로 회귀 감시용으로 영구 보존
-- [ ] 0-6. **함정 검증 ②**: `useRenew.ts`가 기본 `redraw`가 아닌 `scheduler`에 연결됐는지 단언
-- [ ] 0-7. `build:concurrent` / `watch:concurrent` / `test:concurrent` 스크립트 추가,
-      `build:sequence`에 core 이후로 편입
-- [ ] 0-8. 위성 테스트를 concurrent 코어 alias로 실행하는 vitest 설정 추가 (RC-9 기반)
-- [ ] 0-9. 기준 테스트: 기본·concurrent **양쪽에서 core 스위트 전량 통과** (동작 동일 증명)
-- [ ] 0-10. 위성 스위트 양쪽 통과 (helper / ssr / devHelper / ftags)
-- [ ] 0-11. 크기 실측 — concurrent가 기본과 동등(≤ 4,800 B)해야 정상. 차이가 크면 alias 오류 의심
+      → 5개 파일 전부 `diff -q`로 **바이트 동일** 확인. 순수 포크임이 기계적으로 증명된다.
+- [x] 0-3. `lithentConcurrent/src/index.ts` — 기본 코어와 **동일한 export**
+      (문서상 11개로 적혀 있었으나 실측 **값 export 21개 + 타입 export 16개** — REQUIREMENTS §3.1 갱신)
+- [x] 0-4. `alias.js` 작성 (DESIGN §2.2, D12) — 분기 항목 5개 먼저, `@/` catch-all 마지막
+- [x] 0-5. **함정 검증 ①**: Fragment 동일성 — `concurrent-aliasFragment.tsx`
+- [x] 0-6. **함정 검증 ②**: `useRenew` → scheduler 연결 — `concurrent-aliasScheduler.tsx`
+- [x] 0-7. `build:concurrent` / `watch:concurrent` / `test:concurrent` / `size` 스크립트 추가,
+      `build:sequence`에 core 직후로 편입 (+ `build:parallel`에서 중복 제외)
+- [x] 0-8. 위성 테스트를 concurrent 코어로 실행하는 스위치 추가 —
+      `LITHENT_CORE=concurrent` (D13). `test:satellites` / `test:satellites:concurrent` / `test:dual`
+- [x] 0-9. 기준 테스트: 기본 45파일 195테스트 / concurrent 39파일 94테스트 전량 통과
+- [x] 0-10. 위성 스위트 양쪽 통과 — helper 37 / devHelper 2 / ftags 10 / ssr 8, 양쪽 동일
+- [x] 0-11. 크기 실측 — 기본 br **4,734** / concurrent br **4,742** (차이 8 B). 둘 다 ≤ 4,800
+
+### Phase 0 실측 결과
+
+| 항목 | 기본 `lithent` | `lithent-concurrent` |
+|---|---|---|
+| raw | 12,532 | 12,552 |
+| gzip | 5,121 | 5,128 |
+| **brotli** | **4,734** / 4,800 | **4,742** / 4,800 |
+
+8 B 차이는 UMD 전역 이름 문자열(`lithent` → `lithentConcurrent`) 뿐이다.
+alias 오류가 있었다면 공유 모듈 중복 번들링으로 훨씬 큰 차이가 났을 것이므로,
+이 수치 자체가 alias 정합성의 보조 증거다 (0-11의 판정 근거).
+
+### Phase 0에서 확정된 추가 결정
+
+Phase 0 착수 중 DESIGN에 없던 문제 3건이 드러났고 DC-10~DC-12로 확정했다
+([DESIGN.md](./DESIGN.md) §D12~D14, §7).
+
+### Phase 0에서 추가된 회귀 가드 (영구 보존)
+
+`lithentConcurrent/src/tests/`:
+
+| 파일 | 지키는 것 |
+|---|---|
+| `concurrent-aliasFragment.tsx` | Fragment 동일성 (0-5). 포크가 base와 **다른 인스턴스**임을 단언 |
+| `concurrent-aliasScheduler.tsx` | `useRenew` → fork scheduler 연결 (0-6). base redraw와 **다름**을 단언 |
+| `concurrent-aliasTable.test.ts` | catch-all 최후 순서 + `@/diff`·`@/render`·`@/wDom`·`@/scheduler` 4개 전부 포크 해석 |
+| `concurrent-exportSurface.test.ts` | **C3 계약** — 빌드된 기본 번들과 export 이름 집합 일치 |
+
+> **가드가 실제로 작동하는지 확인했다.** `forkModules`에서 `@/wDom`·`@/utils/redraw`를
+> 제거하고 돌려서 3개 단언이 실패하는 것을 확인한 뒤 복구했다.
+> "포크와 base가 다른 인스턴스인가"를 묻는 단언만 실패하고, 동일성 단언은 통과한다 —
+> alias가 **통째로** 빠지면 전부 일관되게 base로 가므로 버그가 아니기 때문이다.
+> 실제 함정은 **일부만** 빠질 때 생기고, 그것을 잡는 것이 distinctness 단언이다.
 
 ---
 
@@ -230,12 +265,29 @@ node -e "const z=require('zlib'),f=require('fs');for(const p of ['dist/lithent.u
 
 ## 상태 / 핸드오프
 
-- done: Phase 0~11 구성, 각 Phase 진입·종료 조건 및 기준 테스트 배치.
-- next: **Phase 0** — `lithentConcurrent/` 스캐폴딩 + alias 함정 검증(0-5, 0-6).
+- done:
+  - Phase 0~11 구성, 각 Phase 진입·종료 조건 및 기준 테스트 배치.
+  - **Phase 0 완료 (2026-08-31)** — 0-1~0-11 전부. 순수 포크 상태에서 동작 변경 0을
+    바이트 동일성 + 양쪽 테스트 동일 통과 + 크기 8 B 차이로 증명.
+  - Phase 0 중 발견된 3건을 DC-10~DC-12로 확정 (DESIGN §D12~D14).
+- next: **Phase 1 — 우선순위 큐 (D1, D2)**. `lithentConcurrent/src/scheduler.ts`는
+  현재 `src/utils/redraw.ts`와 바이트 동일하므로, 여기서부터가 실제 분기의 시작이다.
+  - 1-6에서 `startTransition`을 export할 때 **`concurrent-exportSurface.test.ts`의
+    `CONCURRENT_ONLY` 배열에 같은 커밋에서 추가**할 것. 그러지 않으면 그 테스트가 실패한다
+    (의도된 설계 — 인터페이스 확장을 리뷰에서 보이게 하려는 것).
+  - `scripts/size-report.js`의 `CONCURRENT_BUDGET`을 T1 진입 시 **5,400**으로,
+    `CONCURRENT_PHASE` 문자열을 함께 올릴 것.
 - blockers: 없음.
 - 진행 원칙:
-  - **`src/`는 수정하지 않는다** (P1). 위반이 필요하면 REQUIREMENTS N2 조건을 먼저 만족시킬 것.
+  - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.
   - **Phase 3에서 멈춰도 완결된 결과물이다** (startTransition 완성).
-  - **Phase 0-5·0-6을 건너뛰지 말 것.** Fragment 동일성 함정은 증상이 엉뚱한 곳에서 터진다.
+  - **Phase 0의 가드 4종을 지우지 말 것.** alias 함정은 증상이 엉뚱한 곳에서 터진다.
   - **10-10을 유지할 것.** N1 경계는 코드가 아니라 테스트로 지킨다.
-- 기준 커밋: `f3921cc`
+- 검증 명령:
+  ```bash
+  pnpm build          # core -> concurrent -> 나머지
+  pnpm test           # core + concurrent + 위성 + 툴링
+  pnpm test:dual      # RC-9: 위성 스위트를 양쪽 코어로 2회
+  pnpm size           # RC-4 게이트 (예산 초과 시 exit 1)
+  ```
+- 기준 커밋: `f3921cc` (Phase 0 작업은 아직 미커밋)
