@@ -382,4 +382,4 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   **Phase 0 구현 완료 (2026-08-31)** — 구현 중 드러난 3건을 D12~D15 / DC-10~DC-12로 확정.
 - next: [IMPLEMENT.md](./IMPLEMENT.md) Phase 1 (우선순위 큐, D1·D2) 착수.
 - blockers: 없음.
-- 기준 커밋: `f3921cc` (Phase 0 작업은 아직 미커밋)
+- 기준 커밋: `f3921cc` (설계 기준) / **Phase 0 구현: `95ae243`**

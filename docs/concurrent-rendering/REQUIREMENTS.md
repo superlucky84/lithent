@@ -270,4 +270,4 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
 - 미결(경미):
   - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
     npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
-- 기준 커밋: `f3921cc` (Phase 0 작업은 아직 미커밋)
+- 기준 커밋: `f3921cc` (설계 기준) / **Phase 0 구현: `95ae243`**

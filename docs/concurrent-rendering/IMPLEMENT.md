@@ -290,4 +290,4 @@ Phase 0 착수 중 DESIGN에 없던 문제 3건이 드러났고 DC-10~DC-12로 �
   pnpm test:dual      # RC-9: 위성 스위트를 양쪽 코어로 2회
   pnpm size           # RC-4 게이트 (예산 초과 시 exit 1)
   ```
-- 기준 커밋: `f3921cc` (Phase 0 작업은 아직 미커밋)
+- 기준 커밋: `f3921cc` (설계 기준) / **Phase 0 구현: `95ae243`**
