@@ -150,13 +150,21 @@ if (import.meta.vitest) {
     });
   });
 
-  describe('coalescing — what makes a transition worth using', () => {
-    it('renders once for a burst of updates, where sync renders every time', async () => {
-      // This is the property the manual demo is built to show, pinned here so
-      // it does not depend on anyone's typing speed or machine. At T1 the win
-      // is not that a render is interruptible — it is that intermediate
-      // updates never render at all, because a newer entry replaces the queued
-      // one under the same compKey.
+  describe('coalescing', () => {
+    it('replaces a queued entry instead of rendering every update', async () => {
+      // Pins the MECHANISM: a newer entry replaces the queued one under the
+      // same compKey, so intermediate updates never render. That — not
+      // interruptibility, which is T2 — is what T1 buys.
+      //
+      // Read the numbers narrowly. The burst below happens inside a single
+      // task (only microtasks are awaited), which is the BEST case. Real input
+      // arrives in separate tasks, and then the low lane usually drains
+      // between keystrokes and coalesces nothing. Measured: no benefit at all
+      // until one render costs more than the gap between inputs, then it grows
+      // fast (docs/concurrent-rendering/bench/coalescing.mjs).
+      //
+      // So this asserts that the queue replaces, not that a typical app saves
+      // renders.
       const KEYSTROKES = 8;
 
       let syncRenders = 0;

@@ -225,7 +225,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **RC-4** | 크기 예산 준수 (기본 가드 + concurrent 단계별) | 각 Phase 종료 시 실측 |
 | **RC-5** | 라이프사이클 콜백이 커밋 경계 1곳에서만 flush된다 | `core-loopLifecycleOrder` 등 재검토 |
 | **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 |
-| **RC-7** | 단일 작업 단위가 프레임(16ms)을 초과하는 시나리오가 실재한다 | Phase 7 프로파일링 |
+| **RC-7** | 단일 작업 단위가 프레임(16ms)을 초과하는 시나리오가 실재한다 | Phase 7 프로파일링 (예비 측정은 IMPLEMENT Phase 7) |
 | **RC-8** | 폐기된 렌더가 이펙트 유실·중복을 일으키지 않는다 | 단위 테스트 |
 | **RC-9** | **위성 패키지가 양쪽 코어에서 무수정 통과한다** | `pnpm test:dual` (Phase 0에서 인프라 완성) |
 | **RC-10** | 단일 컴포넌트의 무거운 렌더(10k행) 중 입력이 차단되지 않는다 | 수동 E-4 — **T2의 존재 이유** |
@@ -252,6 +252,16 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 
 → RC-2는 **"전환 중 같은 컴포넌트의 sync 렌더가 끼어들지 않는 한"** 성립한다.
 끼어들면 전환 값이 그 시점에 화면에 나타난다. 자세한 것은 [DESIGN.md](./DESIGN.md) §4 D2.
+
+### T1의 이득 구간 (Phase 3 예비 측정)
+
+`docs/concurrent-rendering/bench/coalescing.mjs` 실측: **단일 렌더가 입력 간격을
+넘어야 이득이 생기고, 그 아래에서는 정확히 0이다** (렌더 60ms/입력 100ms → sync·deferred
+모두 10렌더, 총시간 동일. 렌더 400ms → 10렌더 4.1초 vs 4렌더 1.7초).
+
+이는 §1.1의 제품 판단 — "대부분의 사용 환경에서 체감 이득이 없다" — 을
+측정으로 확인해 준다. 통합 여부를 재검토한다면 이 표가 근거다
+([IMPLEMENT.md](./IMPLEMENT.md) Phase 7 예비 측정).
 
 ### RC-3의 단서 (Phase 2에서 확정)
 
@@ -304,4 +314,4 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
 - 미결(경미):
   - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
     npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: `3ebf375`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / Phase 2: `3ebf375` / **Phase 3: `299d4cd`**

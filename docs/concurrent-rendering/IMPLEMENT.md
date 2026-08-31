@@ -364,6 +364,40 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
 - [ ] 7-4. 실재하지 않으면 T2 보류하고 근거를 REQUIREMENTS §10에 기록
 - [ ] 7-5. 실재하면 Phase 8 진입
 
+### 예비 측정 (Phase 3 중, 2026-08-31)
+
+`docs/concurrent-rendering/bench/coalescing.mjs` — T1의 이득이 **어느 구간부터**
+생기는지 잰다. 10회 입력, 100ms 간격, jsdom:
+
+| 렌더 1회 비용 | sync 렌더 | deferred 렌더 | sync 총시간 | deferred 총시간 |
+|---:|---:|---:|---:|---:|
+| 0ms | 10 | 10 | 1,304ms | 1,303ms |
+| 60ms | 10 | 10 | 1,302ms | 1,303ms |
+| 150ms | 10 | **7** | 1,604ms | 1,303ms |
+| 400ms | 10 | **4** | 4,106ms | 1,705ms |
+
+**단일 렌더가 입력 간격을 넘어야 이득이 생긴다. 그 아래에서는 정확히 0이다.**
+렌더가 빠르면 MessageChannel 태스크가 다음 입력 전에 이미 발화하므로 병합할 것이 없다.
+
+이 결과는 두 가지를 말한다.
+
+1. **REQUIREMENTS §1.1의 제품 판단을 측정이 뒷받침한다.** "SSR 페이지에 인터랙티브
+   컴포넌트 삽입"에서 렌더는 100ms를 넘지 않고, 그 구간에서 T1의 이득은 0이다.
+   이득이 나타나는 지점이 정확히 별도 빌드로 뺀 이유인 대규모 사이트다.
+2. **7-3의 질문이 T1에도 그대로 적용된다.** "16ms 초과 단위가 실재하는가"는
+   T2뿐 아니라 T1을 쓸 가치가 있는지도 가른다.
+
+> **측정 설계 주의 (두 번 틀렸다가 고쳤다).**
+> - 한 프로세스에서 sync/deferred를 같이 돌리면 sync 쪽 blocking이 deferred 쪽
+>   타이머를 밀어 결과가 오염된다 → 프로세스를 나눈다.
+> - `await setTimeout` 체이닝은 "렌더가 막는 동안 입력이 쌓이는" 거동을 재현하지
+>   못한다. 앞 렌더가 끝나야 다음 타이머가 시작되므로 겹침이 영영 안 생긴다
+>   → 키 입력을 **절대 시각에 미리 예약**해야 한다.
+
+> **helper 스위트의 coalescing 테스트를 이 수치로 읽지 말 것.** 그 테스트는 버스트가
+> 한 태스크 안에서 일어나는 **최선의 경우**이며, 큐 항목이 교체된다는 *메커니즘*을
+> 고정할 뿐 전형적 워크로드의 이득을 주장하지 않는다.
+
 ---
 
 # 단계 T2 — 파이버 (concurrent br ≤ 9,000)
@@ -495,4 +529,4 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/verify-order.mjs
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/bench10k.mjs
   ```
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: `3ebf375`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / Phase 2: `3ebf375` / **Phase 3: `299d4cd`**

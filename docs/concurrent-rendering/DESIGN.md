@@ -493,4 +493,4 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
     바이트 동일이었고, 그래서 지금까지의 동치성 증명이 값쌌다. Phase 4 이후로는
     동치성을 테스트로만 지켜야 한다 (4-9의 존재 이유).
 - blockers: 없음.
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: `3ebf375`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / Phase 2: `3ebf375` / **Phase 3: `299d4cd`**
