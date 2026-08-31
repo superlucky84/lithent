@@ -507,4 +507,4 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   - `render.ts`는 아직 base와 바이트 동일하다. Phase 5에서 갈라진다.
 - blockers: 없음. (3-4 수동 확인과 3-5 릴리스 판정은 미완이며 사람 몫)
 - 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
-  Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: 미커밋**
+  Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: `d094a4e`**

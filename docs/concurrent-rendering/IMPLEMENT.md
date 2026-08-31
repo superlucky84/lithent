@@ -637,4 +637,4 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/bench10k.mjs
   ```
 - 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
-  Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: 미커밋**
+  Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: `d094a4e`**
