@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **Phase 0 완료 (2026-08-31) — DC-1~DC-12 결정 완료. Phase 1 착수 가능**
+- 상태: **Phase 1 완료 (2026-08-31) — T1 스케줄러 동작. Phase 2 착수 가능**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -210,9 +210,9 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 
 | ID | 기준 | 판정 방법 |
 |---|---|---|
-| **RC-1** | 급한 업데이트가 저우선순위 업데이트보다 먼저 커밋된다 | 단위 테스트 (큐 순서) |
-| **RC-2** | 저우선순위 렌더 진행 전까지 이전 화면이 유지된다 | 단위 테스트 + 수동 B-2 |
-| **RC-3** | `isPending` 상당 상태를 조회할 수 있다 | 단위 테스트 |
+| **RC-1** | 급한 업데이트가 저우선순위 업데이트보다 먼저 커밋된다 | 단위 테스트 (큐 순서) — **Phase 1 통과** |
+| **RC-2** | 저우선순위 렌더 진행 전까지 이전 화면이 유지된다 | 단위 테스트 + 수동 B-2 — **Phase 1 통과** (단서는 아래) |
+| **RC-3** | `isPending` 상당 상태를 조회할 수 있다 | 스케줄러 `hasPending` Phase 1 완료 / helper 노출은 Phase 2 |
 | **RC-4** | 크기 예산 준수 (기본 가드 + concurrent 단계별) | 각 Phase 종료 시 실측 |
 | **RC-5** | 라이프사이클 콜백이 커밋 경계 1곳에서만 flush된다 | `core-loopLifecycleOrder` 등 재검토 |
 | **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 |
@@ -229,12 +229,20 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 |---|---|---|---|
 | **기본 `lithent`** | 전 기간 | **≤ 4,800 B** | 현재 4,734 B. **회귀 가드** — 철학 보호선 |
 | concurrent | Phase 0 (순수 포크) | ≤ 4,800 B | **실측 4,742 B** — 기본과 8 B 차이 (UMD 전역 이름 문자열) |
-| concurrent | T1 | **≤ 5,400 B** | |
+| concurrent | T1 | **≤ 5,400 B** | **실측 4,989 B** (Phase 0 대비 +247 B) |
 | concurrent | T1.5 | **≤ 6,200 B** | |
 | concurrent | T2 (파이버) | **≤ 9,000 B** | 파이버 raw +4.5~7KB 반영 |
 
 > 선행 작업(performance-improvement)의 예산 5,120 B는 기본 코어에 한해 유효하며,
 > 위 "기본 4,800 B" 가드로 더 엄격하게 대체된다 (DC-4).
+
+### RC-2의 단서 (Phase 1에서 확정)
+
+`startTransition`은 **렌더를 미루지 상태를 미루지 않는다.** 상태가 컴포넌트 클로저에
+있고 setter가 그 자리에서 바꾸기 때문이며(P2·N6), 레인별 상태 사본을 두는 것은 N6 위반이다.
+
+→ RC-2는 **"전환 중 같은 컴포넌트의 sync 렌더가 끼어들지 않는 한"** 성립한다.
+끼어들면 전환 값이 그 시점에 화면에 나타난다. 자세한 것은 [DESIGN.md](./DESIGN.md) §4 D2.
 
 ## 9. 계약 변경 (호환성 우려)
 
@@ -256,6 +264,9 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
     RC-9 이중 실행 인프라, RC-4 게이트 스크립트. 구현 중 드러난 3건을
     DC-10~DC-12로 확정 ([DESIGN.md](./DESIGN.md) §6.5).
   - 실측 갱신: 위성 import 41건 / 공개 export 값 21 + 타입 16 (본문 §3.1 반영).
+  - **Phase 1 완료 (2026-08-31)** — 2레인 스케줄러 + ambient `startTransition`.
+    RC-1·RC-2 통과, RC-3 절반(`hasPending`), C2 회귀 없음, concurrent br 4,989 / 5,400.
+    concurrent 공개 export는 값 **22개**가 되었다 (`startTransition` 추가).
 - Phase 0 판정:
 
   | 수용 기준 | 결과 |
@@ -265,9 +276,9 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   | RC-9 인프라 | `pnpm test:dual` 통과 — helper 37 / devHelper 2 / ftags 10 / ssr 8, 양쪽 동일 |
   | N2 (`src/` 동결) | `git status src/` 비어 있음 |
 
-- next: [IMPLEMENT.md](./IMPLEMENT.md) **Phase 1 — 우선순위 큐 (D1, D2)**.
+- next: [IMPLEMENT.md](./IMPLEMENT.md) **Phase 2 — 값 단위 deferred API + `whenIdle`**.
 - blockers: 없음.
 - 미결(경미):
   - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
     npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
-- 기준 커밋: `f3921cc` (설계 기준) / **Phase 0 구현: `95ae243`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: 이 커밋**

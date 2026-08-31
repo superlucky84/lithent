@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **Phase 0 완료 (2026-08-31) — Phase 1 착수 가능**
+- 상태: **Phase 1 완료 (2026-08-31) — Phase 2 착수 가능**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 공통 종료 조건 (모든 Phase):
@@ -84,20 +84,60 @@ Phase 0 착수 중 DESIGN에 없던 문제 3건이 드러났고 DC-10~DC-12로 �
 
 # 단계 T1 — 스케줄러 (concurrent br ≤ 5,400)
 
-## Phase 1 — 우선순위 큐 (D1, D2)
+## Phase 1 — 우선순위 큐 (D1, D2) ✅ 완료 (2026-08-31)
 
 진입: Phase 0 종료. / 종료: RC-1 통과 + 기존 테스트 무수정 통과.
 
-- [ ] 1-1. `lithentConcurrent/src/scheduler.ts`에 `laneRef: { value: Lane }` 도입
-- [ ] 1-2. 레인별 큐로 재작성 — **compKey dedup 유지** (REQUIREMENTS 7.6)
-- [ ] 1-3. sync 레인 `queueMicrotask` 유지 (BC-3 무영향 보장), low 레인 MessageChannel (DC-3)
-- [ ] 1-4. `shouldYield()` — low flush가 예산 초과 시 다음 태스크로 이월
-- [ ] 1-5. 같은 compKey가 두 레인에 있을 때 sync 우선 + low에서 제거
-- [ ] 1-6. `startTransition` export (DC-1 ambient)
-- [ ] 1-7. 기준 테스트: 양쪽 코어 전량 무수정 통과 (기본 우선순위 타이밍 불변)
-- [ ] 1-8. 신규 테스트 `core-scheduler-lane` — RC-1 (sync가 low보다 먼저 커밋)
-- [ ] 1-9. 신규 테스트 — low 항목이 sync 갱신으로 무효화되는 경로
-- [ ] 1-10. 크기 실측
+- [x] 1-1. `lithentConcurrent/src/scheduler.ts`에 `laneRef: { value: Lane }` 도입
+- [x] 1-2. 레인별 큐로 재작성 — **compKey dedup 유지** (REQUIREMENTS 7.6)
+- [x] 1-3. sync 레인 `queueMicrotask` 유지 (BC-3 무영향 보장), low 레인 MessageChannel (DC-3)
+      — `flushSync`는 base `execRedrawQueue`의 `forEach` → `clear` → 플래그 해제 **순서까지 그대로**
+      유지했다. 이 순서가 "렌더 중 발생한 갱신이 같은 flush에 합류한다"는 기존 동작을 만든다.
+- [x] 1-4. `shouldYield()` — low flush가 예산(5 ms) 초과 시 다음 태스크로 이월
+- [x] 1-5. 같은 compKey가 두 레인에 있을 때 sync 우선 + low에서 제거
+- [x] 1-6. `startTransition` export (DC-1 ambient) + `CONCURRENT_ONLY`에 동시 등록
+- [x] 1-7. 기준 테스트: 양쪽 코어 전량 무수정 통과 (기본 우선순위 타이밍 불변)
+- [x] 1-8. 신규 테스트 `concurrent-schedulerLane.test.tsx` — RC-1 + RC-2
+- [x] 1-9. 신규 테스트 — low 항목이 sync 갱신으로 무효화되는 경로 (양방향)
+- [x] 1-10. 크기 실측 — concurrent br **4,989** / 5,400 (Phase 0 대비 **+247 B**)
+
+### Phase 1 실측 결과
+
+| 항목 | 기본 `lithent` | `lithent-concurrent` |
+|---|---|---|
+| **brotli** | **4,734** / 4,800 (무변동) | **4,989** / 5,400 (411 B 여유) |
+| core 스위트 | 45파일 195테스트 | 40파일 102테스트 |
+| bench10k (3회, ms) | create10k 299~304 | create10k 298~301 |
+| verify-order | ALL PASS | ALL PASS |
+
+bench는 두 코어가 서로 노이즈 범위 안에 있다 → **C2(T1 회귀 0) 충족**.
+sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
+
+### Phase 1에서 드러난 것 (DESIGN §4에 반영)
+
+1. **전환은 렌더를 미루지 상태를 미루지 않는다** (D2 보강).
+   클로저 모델(P2)의 직접적 귀결이며, RC-2의 정확한 서술을 좁힌다.
+2. **sync 우선 규칙은 정확성이 아니라 낭비 제거다** (D1 보강).
+   `replaceWDom`의 `il` 가드가 낡은 `exec`를 이미 무력화하므로, 규칙을 지워도
+   렌더 횟수는 변하지 않는다. → 관측 수단이 없어 **2-3의 스케줄러 몫(`hasPending`)을
+   Phase 1로 당겨왔다.**
+3. **MessageChannel은 지연 생성 + `setTimeout` 폴백** (DC-3 보강).
+
+### Phase 1 테스트의 유효성 검증
+
+작성한 테스트가 **실제로 기능을 붙잡고 있는지** 돌연변이로 확인했다.
+1차 작성본은 두 돌연변이를 모두 통과해 버려서 다시 썼다.
+
+| 돌연변이 | 1차 작성본 | 현재 |
+|---|---|---|
+| `flushLow`의 yield 제거 | ✗ 통과(무의미) | ✓ 실패 |
+| sync 우선 dedup 제거 | ✗ 통과(무의미) | ✓ 실패 (2건) |
+
+- yield 테스트가 무의미했던 이유: 급한 갱신을 low flush **이전에** 큐잉하면
+  마이크로태스크가 어차피 먼저 돈다. 지금은 **low flush 도중(첫 커밋 안에서)**
+  급한 갱신을 일으켜서, yield가 있어야만 `a, urgent, b, c` 순서가 나오게 했다.
+- dedup 테스트가 무의미했던 이유: 위 §2의 `il` 가드. 지금은 `hasPending`으로
+  **큐 상태를 직접** 단언한다.
 
 ## Phase 2 — 값 단위 deferred API + `whenIdle` (D3, D11)
 
@@ -105,7 +145,8 @@ Phase 0 착수 중 DESIGN에 없던 문제 3건이 드러났고 DC-10~DC-12로 �
 
 - [ ] 2-1. `helper/src/hook/ldeferred.ts` 신규 (lstate 패턴, setter만 `startTransition`)
 - [ ] 2-2. `deferred(value, renew)` — mount 모드용
-- [ ] 2-3. 스케줄러 `hasPending(compKey, lane)` 노출 → helper `isPending`
+- [x] 2-3a. 스케줄러 `hasPending(compKey, lane)` 노출 — **Phase 1에서 선행 완료** (위 참조)
+- [ ] 2-3b. helper `isPending`으로 감싸기
 - [ ] 2-4. 스케줄러 `whenIdle(): Promise<void>` 노출 (DC-9) — **`nextTick` 의미는 변경 금지**
 - [ ] 2-5. `helper/src/index.ts` export 추가 (가산적 — 기본 코어에서도 import 가능해야 함)
 - [ ] 2-6. 기준 테스트: helper 스위트 양쪽 통과
@@ -270,24 +311,37 @@ Phase 0 착수 중 DESIGN에 없던 문제 3건이 드러났고 DC-10~DC-12로 �
   - **Phase 0 완료 (2026-08-31)** — 0-1~0-11 전부. 순수 포크 상태에서 동작 변경 0을
     바이트 동일성 + 양쪽 테스트 동일 통과 + 크기 8 B 차이로 증명.
   - Phase 0 중 발견된 3건을 DC-10~DC-12로 확정 (DESIGN §D12~D14).
-- next: **Phase 1 — 우선순위 큐 (D1, D2)**. `lithentConcurrent/src/scheduler.ts`는
-  현재 `src/utils/redraw.ts`와 바이트 동일하므로, 여기서부터가 실제 분기의 시작이다.
-  - 1-6에서 `startTransition`을 export할 때 **`concurrent-exportSurface.test.ts`의
-    `CONCURRENT_ONLY` 배열에 같은 커밋에서 추가**할 것. 그러지 않으면 그 테스트가 실패한다
-    (의도된 설계 — 인터페이스 확장을 리뷰에서 보이게 하려는 것).
-  - `scripts/size-report.js`의 `CONCURRENT_BUDGET`을 T1 진입 시 **5,400**으로,
-    `CONCURRENT_PHASE` 문자열을 함께 올릴 것.
+  - **Phase 1 완료 (2026-08-31)** — 1-1~1-10 전부 + 2-3a 선행. 2레인 스케줄러,
+    ambient `startTransition`, 5 ms 예산 yield. concurrent br 4,989 / 5,400,
+    기본 코어 4,734 무변동, bench 노이즈 범위 (C2 충족).
+  - Phase 1 테스트는 **돌연변이로 유효성을 확인**했다 (1차 작성본은 무의미했음).
+- next: **Phase 2 — 값 단위 deferred API + `whenIdle` (D3, D11)**.
+  - 2-3a(`hasPending`)는 Phase 1에서 선행 완료. 남은 것은 helper 래핑(2-3b)이다.
+  - helper에 추가하는 것은 **가산적**이어야 한다 — 기본 코어에서도 import 가능해야 하고,
+    `startTransition`은 concurrent에만 있으므로 helper가 그것을 **정적으로 import하면 안 된다**.
+    (기본 코어 사용자의 빌드가 깨진다. 주입/옵셔널 경로를 설계할 것.)
+  - `whenIdle`은 low 큐가 빈 시점에 resolve해야 하는데, 지금 `flushLow`는 이월 시
+    `scheduleFlush('low')` 후 반환한다. 완료 시점 판정을 그 경로와 함께 넣을 것.
+  - `scripts/size-report.js` 예산은 T1.5 진입 시 **6,200**으로.
 - blockers: 없음.
 - 진행 원칙:
   - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.
   - **Phase 3에서 멈춰도 완결된 결과물이다** (startTransition 완성).
   - **Phase 0의 가드 4종을 지우지 말 것.** alias 함정은 증상이 엉뚱한 곳에서 터진다.
   - **10-10을 유지할 것.** N1 경계는 코드가 아니라 테스트로 지킨다.
+  - **스케줄러 테스트는 작성 후 돌연변이로 검증할 것.** 레인 동작은 통과하는 테스트를
+    쓰기는 쉽고 *구분하는* 테스트를 쓰기는 어렵다 (Phase 1에서 두 번 겪었다).
 - 검증 명령:
   ```bash
   pnpm build          # core -> concurrent -> 나머지
   pnpm test           # core + concurrent + 위성 + 툴링
   pnpm test:dual      # RC-9: 위성 스위트를 양쪽 코어로 2회
   pnpm size           # RC-4 게이트 (예산 초과 시 exit 1)
+
+  # C2 벤치 — 같은 하니스를 코어만 바꿔 돌린다 (Phase 1에서 전환 가능하게 함)
+  node docs/performance-improvement/bench/verify-order.mjs
+  node docs/performance-improvement/bench/bench10k.mjs
+  LITHENT_CORE=concurrent node docs/performance-improvement/bench/verify-order.mjs
+  LITHENT_CORE=concurrent node docs/performance-improvement/bench/bench10k.mjs
   ```
-- 기준 커밋: `f3921cc` (설계 기준) / **Phase 0 구현: `95ae243`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: 이 커밋**

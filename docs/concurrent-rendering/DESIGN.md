@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-12 확정. Phase 0 완료 (2026-08-31), Phase 1 착수 가능**
+- 상태: **DC-1~DC-12 확정. Phase 1 완료 (2026-08-31), Phase 2 착수 가능**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -131,11 +131,54 @@ scheduleFlush(low)  → port.postMessage(null)     // MessageChannel
 - 같은 compKey가 두 레인에 동시에 있으면 **sync가 이기고 low에서 제거**.
 - `flush(low)`는 `shouldYield()` true 시 잔여 항목을 다음 태스크로 이월.
 
+#### Phase 1 구현 반영
+
+- **`flushSync`는 base `execRedrawQueue`의 형태를 그대로 유지한다** (BC-3).
+  `forEach` → `clear` → 플래그 해제 순서가 관측 가능한 계약이다: flush 도중 플래그가
+  true로 남아 있어서 렌더 중 발생한 갱신이 **새 마이크로태스크를 잡지 않고 같은 pass에
+  합류**한다. 기존 스위트가 이 동작에 의존한다.
+- **low 예산은 5 ms** (`LOW_LANE_BUDGET`). `flushLow`는 항목을 실행 **전에** 큐에서
+  제거하므로, 이월되는 잔여분이 정확히 "아직 안 돈 것"과 일치한다.
+- **`shouldYield()`를 export**한다. Phase 8의 work loop가 작업 단위 사이에서 쓴다.
+
+#### sync 우선 규칙은 정확성이 아니라 낭비 제거다 — Phase 1에서 확인
+
+낡은 큐 항목은 이미 무해하다. `setRedrawAction`이 렌더마다 새 `exec`로 `comp.up`을
+덮어쓰고, 큐에 남은 낡은 `exec`는 `replaceWDom`의 `if (originalWDom.il) return;`에
+걸려 no-op이 된다 (REQUIREMENTS 7.6).
+
+따라서 이 규칙을 **지워도 렌더 횟수가 변하지 않는다**. 얻는 것은 돌지 않을 작업을
+큐에 두지 않는 것뿐이다.
+
+> 이 사실의 실질적 귀결은 **테스트 방법**이다. 렌더 횟수로는 규칙의 유무를 구분할 수
+> 없으므로, 큐 상태를 직접 볼 수단이 필요하다. 그래서 2-3의 스케줄러 몫인
+> `hasPending(compKey, lane?)`을 Phase 1로 앞당겼다 (Phase 2는 helper 래핑만 남는다).
+
 ### D2. 우선순위 표현 — **DC-1 확정: (A) ambient**
 
 `laneRef: { value: Lane }`를 모듈 전역으로 두고 `startTransition`이 세운다.
 `Renew = () => boolean` 시그니처 변경 0 → helper 파급 없음 (REQUIREMENTS C3).
 기존 `needDiffRef`/`compKeyRef` 관행과 일치.
+
+#### ⚠ 전환은 렌더를 미루지 **상태를 미루지 않는다** — 클로저 모델의 귀결
+
+React는 레인마다 상태 큐를 따로 들고 있어서, 전환 중인 값과 현재 값이 동시에 존재한다.
+Lithent는 상태가 컴포넌트 클로저에 있고 setter가 그 자리에서 값을 바꾼다 (P2, N6).
+`startTransition`이 미룰 수 있는 것은 **언제 렌더할지**뿐이다.
+
+관측 가능한 차이:
+
+| 상황 | React | Lithent concurrent |
+|---|---|---|
+| 전환 값만 바뀜 | 이전 화면 유지 | 이전 화면 유지 (동일) |
+| 전환 중 같은 컴포넌트가 sync로도 렌더됨 | 전환 값은 **아직 안 보임** | 전환 값이 **즉시 보인다** |
+
+RC-2("저우선순위 렌더 진행 전까지 이전 화면 유지")는 **그 사이에 같은 컴포넌트의 sync
+렌더가 끼어들지 않는 한** 성립한다고 읽어야 한다.
+
+레인별 상태를 두려면 값의 사본이 필요하고, 그것은 클로저 보관 방식을 바꾸는 일이라
+**N6에 걸린다**. 넘지 않는다. 문서화하고 사는 쪽을 택한다 (BC 추가 없음 — 기본 코어에는
+전환 자체가 없으므로 호환성 문제가 아니다).
 
 ### D3. 값 단위 deferred API (`helper/`)
 
@@ -332,6 +375,8 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   근거: 3단계의 실이득 미검증. 후속 추가는 하위 호환.
 - [x] **DC-3**: 저우선순위 스케줄링 → **MessageChannel**.
   근거: 브라우저 호환성, `requestIdleCallback` 타이밍 부정확, `scheduler.postTask` 지원 부족.
+  Phase 1 구현: 채널은 **첫 low 갱신에서 지연 생성**하고(전환을 안 쓰면 비용 0),
+  `MessageChannel`이 없는 런타임에서는 `setTimeout` 폴백.
 - [x] **DC-4**: 크기 예산 → **이원화** (기본 회귀 가드 ≤ 4,800 B / concurrent 단계별 상한).
   근거: 별도 빌드이므로 concurrent 예산 해제, 대신 **기본 코어 가드를 더 엄격하게**
   (선행 작업 5,120 B → 4,800 B). 철학 보호선은 여기다.
@@ -359,8 +404,11 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | 설계 | 검증 |
 |---|---|
 | §2.2 alias / Fragment 동일성 | Phase 0-5·0-6, 수동 A-5 |
-| D1 우선순위 큐 | RC-1 (Phase 1), 수동 B-1 |
-| D2 우선순위 표현 | C3 회귀 (기존 helper 테스트 무수정 통과) |
+| D1 우선순위 큐 | RC-1 (Phase 1) ✅, 수동 B-1 |
+| D1 sync 우선 규칙 | `hasPending` 기반 큐 상태 단언 (렌더 횟수로는 관측 불가) |
+| D1 yield | low flush 도중 발생한 sync 갱신이 잔여 low보다 먼저 커밋 |
+| D2 우선순위 표현 | C3 회귀 (기존 helper 테스트 무수정 통과) ✅ |
+| D2 lane 복원 | `startTransition` 스코프가 throw해도 이전 레인 복원 / 중첩 |
 | D3 deferred API | RC-2·RC-3 (Phase 2), 수동 B-2 |
 | D11 `whenIdle` | BC-4, 수동 B-9 |
 | D4 커밋 이펙트 리스트 | Phase 4 동치성 테스트, RC-5 |
@@ -379,7 +427,11 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 ## 9. 상태 / 핸드오프
 
 - done: 배포 구조 설계(alias + Fragment 함정), D1~D11, DC-1~DC-9 전부 확정, 설계↔검증 매핑.
-  **Phase 0 구현 완료 (2026-08-31)** — 구현 중 드러난 3건을 D12~D15 / DC-10~DC-12로 확정.
-- next: [IMPLEMENT.md](./IMPLEMENT.md) Phase 1 (우선순위 큐, D1·D2) 착수.
+  **Phase 0 구현 완료** — D12~D15 / DC-10~DC-12 추가.
+  **Phase 1 구현 완료 (2026-08-31)** — D1·D2에 구현 반영 절 추가. 전환의 상태 의미론
+  한계(§4 D2)와 sync 우선 규칙의 성격(§4 D1)을 명시했다.
+- next: [IMPLEMENT.md](./IMPLEMENT.md) Phase 2 (값 단위 deferred API + `whenIdle`, D3·D11).
+  - **D3의 함정**: helper는 기본 코어에서도 import 가능해야 하므로 `startTransition`을
+    정적 import할 수 없다. concurrent 전용 심볼에 대한 옵셔널 접근 경로를 먼저 정할 것.
 - blockers: 없음.
-- 기준 커밋: `f3921cc` (설계 기준) / **Phase 0 구현: `95ae243`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: 이 커밋**
