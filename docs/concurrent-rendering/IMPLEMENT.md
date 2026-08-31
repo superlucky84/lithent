@@ -344,4 +344,4 @@ sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/verify-order.mjs
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/bench10k.mjs
   ```
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: 이 커밋**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: `16d9e74`**

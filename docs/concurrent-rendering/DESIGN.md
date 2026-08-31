@@ -434,4 +434,4 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   - **D3의 함정**: helper는 기본 코어에서도 import 가능해야 하므로 `startTransition`을
     정적 import할 수 없다. concurrent 전용 심볼에 대한 옵셔널 접근 경로를 먼저 정할 것.
 - blockers: 없음.
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: 이 커밋**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: `16d9e74`**
