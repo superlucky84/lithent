@@ -13,12 +13,20 @@
       "types": "./dist/types/lithentConcurrent/src/index.d.ts",
       "import": "./dist/lithentConcurrent.mjs",
       "require": "./dist/lithentConcurrent.umd.js"
+    },
+    "./helper": {
+      "types": "./helper/dist/types/index.d.ts",
+      "import": "./helper/dist/lithentConcurrentHelper.mjs",
+      "require": "./helper/dist/lithentConcurrentHelper.umd.js"
     }
   },
   "files": [
     "src",
     "dist",
-    "package.json"
+    "package.json",
+    "helper/src",
+    "helper/dist",
+    "helper/package.json"
   ],
   "sideEffects": false,
   "scripts": {

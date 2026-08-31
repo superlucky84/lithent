@@ -298,6 +298,12 @@ importers:
 
   lithentConcurrent: {}
 
+  lithentConcurrent/helper:
+    devDependencies:
+      lithent-concurrent:
+        specifier: workspace:*
+        version: link:..
+
   lithentDocs:
     devDependencies:
       autoprefixer:

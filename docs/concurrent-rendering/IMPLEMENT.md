@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **Phase 1 완료 (2026-08-31) — Phase 2 착수 가능**
+- 상태: **Phase 2 완료 (2026-08-31) — Phase 3(T1 출하 게이트) 판정 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 공통 종료 조건 (모든 Phase):
@@ -139,31 +139,94 @@ sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
 - dedup 테스트가 무의미했던 이유: 위 §2의 `il` 가드. 지금은 `hasPending`으로
   **큐 상태를 직접** 단언한다.
 
-## Phase 2 — 값 단위 deferred API + `whenIdle` (D3, D11)
+## Phase 2 — 값 단위 deferred API + `whenIdle` (D3, D11) ✅ 완료 (2026-08-31)
 
 진입: Phase 1 종료. / 종료: RC-2·RC-3 통과, BC-4 완화 확인.
 
-- [ ] 2-1. `helper/src/hook/ldeferred.ts` 신규 (lstate 패턴, setter만 `startTransition`)
-- [ ] 2-2. `deferred(value, renew)` — mount 모드용
-- [x] 2-3a. 스케줄러 `hasPending(compKey, lane)` 노출 — **Phase 1에서 선행 완료** (위 참조)
-- [ ] 2-3b. helper `isPending`으로 감싸기
-- [ ] 2-4. 스케줄러 `whenIdle(): Promise<void>` 노출 (DC-9) — **`nextTick` 의미는 변경 금지**
-- [ ] 2-5. `helper/src/index.ts` export 추가 (가산적 — 기본 코어에서도 import 가능해야 함)
-- [ ] 2-6. 기준 테스트: helper 스위트 양쪽 통과
-- [ ] 2-7. 신규 테스트 — RC-2 (저우선순위 렌더 전까지 이전 DOM 유지)
-- [ ] 2-8. 신규 테스트 — RC-3 (`isPending` 전이)
-- [ ] 2-9. 신규 테스트 — BC-4: `nextTick` 후에는 low 렌더가 미반영, `whenIdle` 후에는 반영
-- [ ] 2-10. 크기 실측
+> **소재 변경**: 2-1·2-2·2-3b·2-5는 원래 `helper/`에 넣는 계획이었으나,
+> **`lithent-concurrent/helper`** 로 확정했다 (DC-13). `helper/`는 무변경이다.
+
+- [x] 2-1. `ldeferred` — `lithentConcurrent/helper/src/hook/ldeferred.ts`
+- [x] 2-2. `deferred(value, renew)` — mount 모드용
+- [x] 2-3a. 스케줄러 `hasPending(compKey, lane)` 노출 — **Phase 1에서 선행 완료**
+- [x] 2-3b. `isPending()` — `Computed<boolean>` 모양, 마운터에서 compKey 캡처
+- [x] 2-4. 스케줄러 `whenIdle(): Promise<void>` 노출 (DC-9) — `nextTick` 의미 변경 없음
+- [x] 2-5. export — `lithent-concurrent/helper` 서브패스 신설 (DC-13).
+      `helper/src/index.ts`는 **건드리지 않았다**
+- [x] 2-6. 기준 테스트: helper 스위트 양쪽 코어 통과 (37개, 기존 그대로)
+- [x] 2-7. 신규 테스트 — RC-2
+- [x] 2-8. 신규 테스트 — RC-3 (`isPending` 전이 + 컴포넌트별 격리 + 비반응성)
+- [x] 2-9. 신규 테스트 — BC-4 (`nextTick` 미반영 / `whenIdle` 반영)
+- [x] 2-10. 크기 실측 — concurrent 코어 br **5,057** / 5,400 (`whenIdle` 몫 +68 B)
+
+### Phase 2 실측 결과
+
+| 항목 | 기본 `lithent` | `lithent-concurrent` |
+|---|---|---|
+| **코어 brotli** | **4,734** / 4,800 (무변동) | **5,057** / 5,400 (343 B 여유) |
+| helper 번들 | br 1,973 (무변경) | `/helper` br **379** (신규, 별도 번들) |
+| helper 스위트 | 37개 (무변경) | `/helper` 7개 (신규) |
+
+### DC-13 — concurrent 전용 helper는 어디에 사는가
+
+`deferred`·`ldeferred`·`isPending`은 low 레인이 있어야 의미가 있다.
+`lithent-concurrent/helper`에 두고, `lithent` ↔ `lithent/helper` 구조를 복제했다.
+
+```
+lithent            ↔  lithent/helper              ← 무변경
+lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
+```
+
+**두 대안을 실제로 만들어 보고 물렸다** ([DESIGN.md](./DESIGN.md) §D12b):
+
+| 대안 | 물린 이유 |
+|---|---|
+| `lithent/helper`에 넣고 네임스페이스 import로 옵셔널 접근 | 동작은 하지만 기본 코어 사용자에게 **조용히 no-op인 API**가 생긴다. 크기가 아니라 약속의 문제 |
+| concurrent **코어**에 직접 export | 기본 코어가 `state`/`lstate`를 export하지 않는데 concurrent만 `ldeferred`를 내면 드롭인 대칭이 깨진다 |
+
+부수 효과로 테스트가 훨씬 단순해졌다. 한 파일에서 두 코어를 분기 단언할 필요가 없어져
+`if (concurrent)` 분기가 전부 사라졌다.
+
+레인 관련 export(`startTransition`·`hasPending`·`whenIdle`)는 스케줄러 기능이므로
+**코어에 남는다.** concurrent helper는 이를 **external**로 가져간다 — 번들에 스케줄러
+사본이 들어가면 레인 큐가 둘로 갈라진다.
+
+### 테스트 유효성 검증 (돌연변이)
+
+| 돌연변이 | 결과 |
+|---|---|
+| `ldeferred`가 `startTransition` 대신 `renew()` | ✓ 4개 실패 |
+| `isPending`이 항상 false | ✓ 2개 실패 |
+| 코어 `whenIdle`이 항상 즉시 resolve | ✓ 5개 실패 |
+
+### 파일 명명 규약 함정
+
+처음에 helper 테스트를 `deferred.test.tsx`로 만들었더니 **루트 러너가 수집**해서 깨졌다
+(루트 config에서 `@`는 코어 `src/`를 가리킨다). 위성 테스트는 `*.tsx` +
+`import.meta.vitest` in-source 방식이어야 루트의 `includeSource`(`src/tests/*`)에
+걸리지 않는다. → **위성 테스트 파일에 `.test.`를 붙이지 말 것.**
 
 ## Phase 3 — T1 출하 게이트
 
 진입: Phase 2 종료. / 종료: T1 릴리스 판정.
 
-- [ ] 3-1. RC-4: concurrent ≤ 5,400 B **및 기본 ≤ 4,800 B 무회귀**
-- [ ] 3-2. C2: bench 회귀 0
-- [ ] 3-3. RC-9: 위성 양쪽 코어 통과
-- [ ] 3-4. 수동 체크리스트 A·B·D 수행
-- [ ] 3-5. **T1 단독 릴리스 판정** — 여기서 멈춰도 `startTransition`은 완성 상태
+- [x] 3-1. RC-4: concurrent **5,057** ≤ 5,400 B, 기본 **4,734** ≤ 4,800 B (무회귀)
+- [x] 3-2. C2: bench 회귀 0 — 두 코어가 서로 노이즈 범위 안 (3회 측정)
+- [x] 3-3. RC-9: 위성 양쪽 코어 통과 (`pnpm test:dual`)
+- [ ] 3-4. 수동 체크리스트 A·B·D 수행 — **실브라우저 필요, 사용자 몫**
+- [ ] 3-5. **T1 단독 릴리스 판정** — 사용자 판단
+
+자동 검증 항목(3-1~3-3)은 모두 통과했다. 남은 것은 사람이 해야 하는 확인이다.
+
+| bench10k (ms, 3회) | 기본 | concurrent |
+|---|---|---|
+| create10k | 299 / 313 / 316 | 314 / 301 / 314 |
+| updateEvery10thOf10k | 86 / 88 / 139 | 85 / 81 / 89 |
+| swap2of10k | 103 / 102 / 105 | 101 / 99 / 106 |
+| append1kTo10k | 114 / 119 / 97 | 114 / 114 / 118 |
+| clear10k | 95 / 98 / 98 | 91 / 91 / 98 |
+
+verify-order: 양쪽 ALL PASS.
 
 ---
 
@@ -315,14 +378,16 @@ sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
     ambient `startTransition`, 5 ms 예산 yield. concurrent br 4,989 / 5,400,
     기본 코어 4,734 무변동, bench 노이즈 범위 (C2 충족).
   - Phase 1 테스트는 **돌연변이로 유효성을 확인**했다 (1차 작성본은 무의미했음).
-- next: **Phase 2 — 값 단위 deferred API + `whenIdle` (D3, D11)**.
-  - 2-3a(`hasPending`)는 Phase 1에서 선행 완료. 남은 것은 helper 래핑(2-3b)이다.
-  - helper에 추가하는 것은 **가산적**이어야 한다 — 기본 코어에서도 import 가능해야 하고,
-    `startTransition`은 concurrent에만 있으므로 helper가 그것을 **정적으로 import하면 안 된다**.
-    (기본 코어 사용자의 빌드가 깨진다. 주입/옵셔널 경로를 설계할 것.)
-  - `whenIdle`은 low 큐가 빈 시점에 resolve해야 하는데, 지금 `flushLow`는 이월 시
-    `scheduleFlush('low')` 후 반환한다. 완료 시점 판정을 그 경로와 함께 넣을 것.
-  - `scripts/size-report.js` 예산은 T1.5 진입 시 **6,200**으로.
+  - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`isPending` (신규 서브패스
+    `lithent-concurrent/helper`) + 코어 `whenIdle`. DC-13으로 소재 확정, `helper/`는 무변경.
+    concurrent 코어 br 5,057 / 5,400. RC-2·RC-3·BC-4 통과, 돌연변이 3종 확인.
+  - **Phase 3 자동 항목(3-1~3-3) 통과.** 남은 것은 수동 체크리스트(3-4)와 릴리스 판정(3-5).
+- next: **Phase 3의 사람 몫** — 수동 체크리스트 A·B·D(3-4)와 T1 단독 릴리스 판정(3-5).
+  그 뒤가 갈림길이다:
+  - **여기서 멈추면** T1은 완결된 결과물이다 (`startTransition` + deferred API 완성).
+  - **계속하면** Phase 4 (커밋 이펙트 리스트, D4) — `lithentConcurrent/src/diff.ts`와
+    `wDom.ts`가 base와 갈라지기 시작한다. Phase 0~2에서 두 파일은 아직 **바이트 동일**이다.
+  - `scripts/size-report.js` 예산은 T1.5 진입 시 **6,200**, `CONCURRENT_PHASE`도 함께.
 - blockers: 없음.
 - 진행 원칙:
   - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.
@@ -331,12 +396,19 @@ sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
   - **10-10을 유지할 것.** N1 경계는 코드가 아니라 테스트로 지킨다.
   - **스케줄러 테스트는 작성 후 돌연변이로 검증할 것.** 레인 동작은 통과하는 테스트를
     쓰기는 쉽고 *구분하는* 테스트를 쓰기는 어렵다 (Phase 1에서 두 번 겪었다).
+  - **위성 테스트 파일에 `.test.`를 붙이지 말 것.** 루트 러너가 수집해서 `@` alias가
+    어긋난다. 기존 규약대로 `*.tsx` + `import.meta.vitest`.
+  - **`helper/`(기본)에 concurrent 전용 API를 넣지 말 것** (DC-13). 기본 코어에서
+    no-op이 되는 API는 거기 있으면 안 된다. `lithentConcurrent/helper/`에 넣는다.
+  - **concurrent helper는 코어를 external로 둘 것.** 번들에 스케줄러 사본이 들어가면
+    레인 큐가 둘로 갈라진다.
 - 검증 명령:
   ```bash
   pnpm build          # core -> concurrent -> 나머지
   pnpm test           # core + concurrent + 위성 + 툴링
   pnpm test:dual      # RC-9: 위성 스위트를 양쪽 코어로 2회
   pnpm size           # RC-4 게이트 (예산 초과 시 exit 1)
+  # test:concurrent 는 코어 스위트 + lithent-concurrent/helper 스위트를 함께 돈다
 
   # C2 벤치 — 같은 하니스를 코어만 바꿔 돌린다 (Phase 1에서 전환 가능하게 함)
   node docs/performance-improvement/bench/verify-order.mjs
@@ -344,4 +416,4 @@ sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/verify-order.mjs
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/bench10k.mjs
   ```
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: `16d9e74`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: 미커밋**

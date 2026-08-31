@@ -1,0 +1,38 @@
+{
+  "type": "module",
+  "name": "lithent-concurrent-helper",
+  "version": "0.0.0",
+  "description": "Lane-aware state helpers for lithent-concurrent. Meaningless on the base core, so they ship here rather than in lithent/helper.",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "main": "./dist/lithentConcurrentHelper.umd.js",
+  "module": "./dist/lithentConcurrentHelper.mjs",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build",
+    "watch": "vite build --watch",
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest"
+  },
+  "author": "superlucky84",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent",
+    "concurrent"
+  ],
+  "devDependencies": {
+    "lithent-concurrent": "workspace:*"
+  },
+  "peerDependencies": {
+    "lithent-concurrent": "workspace:*"
+  },
+  "volta": {
+    "node": "20.3.0"
+  }
+}

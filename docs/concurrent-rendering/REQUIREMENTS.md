@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **Phase 1 완료 (2026-08-31) — T1 스케줄러 동작. Phase 2 착수 가능**
+- 상태: **Phase 2 완료 (2026-08-31) — T1 기능 완성. 출하 게이트(Phase 3) 대기**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -69,15 +69,24 @@ src/                        ← 동결. 기본 코어
 
 lithentConcurrent/          ← 워크스페이스 패키지 (name: lithent-concurrent). Phase 0에서 생성
   src/
-    diff.ts  render.ts  wDom.ts  scheduler.ts     ← 분기본 (Phase 0 시점 base와 바이트 동일)
-    index.ts                                       ← base와 동일한 export (값 21 + 타입 16)
-    tests/                                         ← alias 함정 가드 + export 계약 가드
+    diff.ts  render.ts  wDom.ts                    ← 분기본 (아직 base와 바이트 동일)
+    scheduler.ts                                   ← 분기본 (Phase 1에서 2레인으로 재작성)
+    index.ts                                       ← base와 동일 + concurrent 전용 3개
+    tests/                                         ← alias 함정 가드 + export 계약 가드 + 레인 테스트
   alias.js  alias.d.ts                             ← 분기 표 단일 원본 (DESIGN D12)
   scripts/emitTypes.js                             ← 타입 선언 생성 (DESIGN D13)
   package.json  tsconfig.json  tsconfig.build.json
   vite.config.js                                   ← 빌드. alias로 공유분 재사용
   vitest.config.js                                 ← 공유 core 스위트를 concurrent 코어로 실행
+
+  helper/                   ← 워크스페이스 패키지 (name: lithent-concurrent-helper). Phase 2
+    src/hook/{deferred,ldeferred,isPending}.ts     ← 레인이 있어야 의미 있는 helper (DC-13)
+    src/types.ts  src/index.ts  src/tests/
+    package.json  tsconfig.json  vite.config.js    ← 코어는 external
 ```
+
+`helper/`(기본)는 **이 작업에서 무변경**이다. 기본 코어에서 no-op이 되는 API를
+거기 두지 않는다는 것이 DC-13의 요지다.
 
 소비자 측은 preact/compat과 동일한 패턴 — 번들러에서 `lithent` → `lithent-concurrent` alias.
 
@@ -212,7 +221,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 |---|---|---|
 | **RC-1** | 급한 업데이트가 저우선순위 업데이트보다 먼저 커밋된다 | 단위 테스트 (큐 순서) — **Phase 1 통과** |
 | **RC-2** | 저우선순위 렌더 진행 전까지 이전 화면이 유지된다 | 단위 테스트 + 수동 B-2 — **Phase 1 통과** (단서는 아래) |
-| **RC-3** | `isPending` 상당 상태를 조회할 수 있다 | 스케줄러 `hasPending` Phase 1 완료 / helper 노출은 Phase 2 |
+| **RC-3** | `isPending` 상당 상태를 조회할 수 있다 | 단위 테스트 — **Phase 2 통과** (조회 전용, 아래 단서) |
 | **RC-4** | 크기 예산 준수 (기본 가드 + concurrent 단계별) | 각 Phase 종료 시 실측 |
 | **RC-5** | 라이프사이클 콜백이 커밋 경계 1곳에서만 flush된다 | `core-loopLifecycleOrder` 등 재검토 |
 | **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 |
@@ -229,7 +238,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 |---|---|---|---|
 | **기본 `lithent`** | 전 기간 | **≤ 4,800 B** | 현재 4,734 B. **회귀 가드** — 철학 보호선 |
 | concurrent | Phase 0 (순수 포크) | ≤ 4,800 B | **실측 4,742 B** — 기본과 8 B 차이 (UMD 전역 이름 문자열) |
-| concurrent | T1 | **≤ 5,400 B** | **실측 4,989 B** (Phase 0 대비 +247 B) |
+| concurrent | T1 | **≤ 5,400 B** | **실측 5,057 B** (Phase 0 대비 +315 B) |
 | concurrent | T1.5 | **≤ 6,200 B** | |
 | concurrent | T2 (파이버) | **≤ 9,000 B** | 파이버 raw +4.5~7KB 반영 |
 
@@ -243,6 +252,15 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 
 → RC-2는 **"전환 중 같은 컴포넌트의 sync 렌더가 끼어들지 않는 한"** 성립한다.
 끼어들면 전환 값이 그 시점에 화면에 나타난다. 자세한 것은 [DESIGN.md](./DESIGN.md) §4 D2.
+
+### RC-3의 단서 (Phase 2에서 확정)
+
+`isPending`은 `lithent-concurrent/helper`에 있으며, **조회**이지 반응성 상태가 아니다. `.value`를 읽는 것만으로는 리렌더가
+일어나지 않는다. pending 표시는 sync로 렌더되는 곳(부모·형제의 `state`/`lstate`)에 두고
+무거운 쪽만 `deferred`/`ldeferred`로 미루는 조합으로 쓴다.
+
+React의 `useTransition`이 `isPending` 변화로 sync 렌더를 일으키는 것과 다르다.
+그렇게 하려면 전환 값의 레인별 사본이 필요한데 N6에 걸린다 (RC-2의 단서와 같은 뿌리).
 
 ## 9. 계약 변경 (호환성 우려)
 
@@ -265,8 +283,11 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
     DC-10~DC-12로 확정 ([DESIGN.md](./DESIGN.md) §6.5).
   - 실측 갱신: 위성 import 41건 / 공개 export 값 21 + 타입 16 (본문 §3.1 반영).
   - **Phase 1 완료 (2026-08-31)** — 2레인 스케줄러 + ambient `startTransition`.
-    RC-1·RC-2 통과, RC-3 절반(`hasPending`), C2 회귀 없음, concurrent br 4,989 / 5,400.
-    concurrent 공개 export는 값 **22개**가 되었다 (`startTransition` 추가).
+    RC-1·RC-2 통과, C2 회귀 없음, concurrent br 4,989 / 5,400.
+  - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`isPending`/`whenIdle`.
+    RC-3·BC-4 통과, concurrent br 5,057 / 5,400. concurrent 공개 export는 값 **24개**
+    (`startTransition`·`hasPending`·`whenIdle` 추가), helper는 **가산적**으로 4개 추가.
+  - **Phase 3 자동 항목(3-1~3-3) 통과.** 수동 확인(3-4)과 릴리스 판정(3-5)이 남았다.
 - Phase 0 판정:
 
   | 수용 기준 | 결과 |
@@ -276,9 +297,9 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   | RC-9 인프라 | `pnpm test:dual` 통과 — helper 37 / devHelper 2 / ftags 10 / ssr 8, 양쪽 동일 |
   | N2 (`src/` 동결) | `git status src/` 비어 있음 |
 
-- next: [IMPLEMENT.md](./IMPLEMENT.md) **Phase 2 — 값 단위 deferred API + `whenIdle`**.
+- next: T1 출하 게이트(Phase 3)의 수동 확인. 계속한다면 Phase 4 (커밋 이펙트 리스트).
 - blockers: 없음.
 - 미결(경미):
   - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
     npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: `16d9e74`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: 미커밋**

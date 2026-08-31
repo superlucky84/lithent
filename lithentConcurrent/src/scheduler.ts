@@ -61,6 +61,7 @@ let syncScheduled = false;
 let lowScheduled = false;
 let lowDeadline = 0;
 let lowPort: MessagePort | null = null;
+let idleWaiters: (() => void)[] = [];
 
 /**
  * Whether the current low-lane flush has used up its slice. Phase 8's work loop
@@ -131,6 +132,12 @@ const flushLow = () => {
       return;
     }
   }
+
+  // Drained. Entries queued by the renders above were picked up by the loop,
+  // so reaching here means the lane really is empty.
+  const waiters = idleWaiters;
+  idleWaiters = [];
+  waiters.forEach(resolve => resolve());
 };
 
 // ============================================================================
@@ -169,6 +176,24 @@ export const hasPending = (compKey: Props, lane?: Lane) =>
   lane
     ? lanes[lane].has(compKey)
     : lanes.sync.has(compKey) || lanes.low.has(compKey);
+
+/**
+ * Resolves once the low lane has drained — DC-9's answer to BC-4.
+ *
+ * `nextTick()` is a microtask, so `await nextTick()` only guarantees a sync
+ * commit; low-lane work is a task and is still pending at that point. Rather
+ * than redefine `nextTick` (12 call sites across the satellites depend on it),
+ * the lane-aware wait is a separate function.
+ *
+ * On the base core there is no low lane, so the helper wrapper resolves
+ * immediately — which is the truthful answer there, not a stub.
+ */
+export const whenIdle = (): Promise<void> =>
+  lanes.low.size || lowScheduled
+    ? new Promise<void>(resolve => {
+        idleWaiters.push(resolve);
+      })
+    : Promise.resolve();
 
 export const componentUpdate = (compKey: Props) => () => {
   const comp = componentMap.get(compKey);

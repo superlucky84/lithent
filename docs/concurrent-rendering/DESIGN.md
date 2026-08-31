@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-12 확정. Phase 1 완료 (2026-08-31), Phase 2 착수 가능**
+- 상태: **DC-1~DC-13 확정. Phase 2 완료 (2026-08-31), T1 출하 게이트 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -183,6 +183,7 @@ RC-2("저우선순위 렌더 진행 전까지 이전 화면 유지")는 **그 �
 ### D3. 값 단위 deferred API (`helper/`)
 
 반응성이 이미 값 단위이므로 helper 레벨에서 `renew` 호출만 감싼다. 코어 변경 불필요.
+(소재는 `lithent-concurrent/helper` — D12b.)
 
 ```ts
 export const ldeferred = <T>(value: T): State<T> => {
@@ -197,14 +198,65 @@ export const ldeferred = <T>(value: T): State<T> => {
 
 `isPending` (RC-3): 스케줄러가 `hasPending(compKey, 'low')` 노출 → helper가 감싼다.
 
-### D11. transition 완료 프로미스 — **DC-9** (BC-4 완화)
+#### Phase 2 구현 반영
 
-`nextTick = () => Promise.resolve()` (`src/hook/ref.ts:2`)는 마이크로태스크라
-**sync 레인에서만** "await 후 DOM 갱신됨"이 성립한다. 위성에서 12회 사용된다.
+- `deferred(value, renew)` / `ldeferred(value)` — `state`/`lstate`와 같은 모양,
+  setter만 `startTransition`을 통과한다.
+- `isPending()`은 **`Computed<boolean>`** 모양으로 돌려준다.
+  마운터에서 호출해 compKey를 캡처하므로 컴포넌트 인스턴스에 묶인다 — `useRenew`와 같은 방식.
+- **`isPending`은 그 자체로 리렌더를 일으키지 않는다.** 반응성이 아니라 조회다.
+  pending 표시는 sync로 렌더되는 곳(부모·형제의 `state`/`lstate`)에 두고,
+  무거운 쪽만 `deferred`로 미루는 조합으로 쓴다. RC-3의 "조회할 수 있다"가 이 의미다.
 
-→ 스케줄러가 `whenIdle(): Promise<void>` (low 레인 큐가 빌 때 resolve)를 제공하고,
-helper가 `nextTickRender` 계열과 함께 노출한다. `nextTick` 자체의 의미는 **변경하지 않는다**
-(기존 코드 호환). 문서에 레인 의존성을 명시한다.
+### D12b. concurrent 전용 helper의 소재 — **DC-13 확정: 별도 서브패스 패키지**
+
+`deferred`·`ldeferred`·`isPending`은 low 레인이 있어야 의미가 있다. 어디에 둘 것인가.
+
+**확정**: `lithent-concurrent/helper` (워크스페이스 패키지 `lithent-concurrent-helper`).
+`lithent` ↔ `lithent/helper` 관계를 그대로 복제한다. `helper/`는 **한 줄도 건드리지 않는다.**
+
+```
+lithent            ↔  lithent/helper              ← 기본. 무변경
+lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
+```
+
+소비자 관점:
+
+```ts
+import { h, mount, startTransition } from 'lithent';   // 번들러에서 concurrent로 alias
+import { lstate, computed } from 'lithent/helper';      // 기존 helper 그대로
+import { ldeferred, isPending } from 'lithent-concurrent/helper';  // concurrent 전용
+```
+
+경로가 곧 "이건 concurrent에서만 동작한다"는 표시가 된다.
+
+#### 폐기한 대안 두 가지 (둘 다 실제로 만들어 보고 물렸다)
+
+**(a) `lithent/helper`에 넣고 네임스페이스 import로 옵셔널 접근.**
+
+```ts
+import * as core from 'lithent';
+const concurrent = core as unknown as ConcurrentCore;  // 없는 이름은 undefined
+```
+
+동작은 한다. 기본 코어 폴백도 "참인 답"으로 만들 수 있다 (레인이 없으면 전환은 즉시,
+pending인 것은 없음). 문제는 **기본 코어 사용자의 `lithent/helper`에 조용히 아무것도
+하지 않는 API가 생긴다**는 것이다. `ldeferred`가 미루지 않고 `isPending`이 늘 false인
+API를 API 목록에 두는 것은, 크기가 아니라 **약속의 문제**다.
+부수적으로 테스트도 한 파일에서 두 코어를 분기 단언해야 해서 읽기 어려워진다.
+
+**(b) concurrent 코어(`lithent-concurrent`)에 직접 export.**
+
+concurrent 코어는 `lithent`의 드롭인 대체다. 기본 코어가 `state`/`lstate`를 export하지
+않는데 concurrent만 `ldeferred`를 export하면 그 대칭이 깨진다. "최소 코어 + 선택적 helper"는
+이 프로젝트의 선언된 구조이므로(CLAUDE.md), 상태 helper를 코어에 넣지 않는다.
+
+#### 레인 관련 코어 export는 코어에 남는다
+
+`startTransition`·`hasPending`·`whenIdle`은 스케줄러 기능이므로 **코어**에 있다.
+concurrent helper는 이것들을 `lithent-concurrent`에서 **external로** import한다 —
+번들에 스케줄러 사본이 들어가면 레인 큐가 둘로 갈라지기 때문이다
+(`helper/`가 `lithent`를 external로 두는 것과 같은 이유).
 
 ## 5. 상세 설계 — T1.5 (순수화 + tearing)
 
@@ -398,6 +450,9 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 - [x] **DC-12**: 위성 스위트 코어 전환 → **`LITHENT_CORE` + 빌드 산출물 alias (anchored)** (D14).
   근거: 소스 alias는 위성의 `@`와 코어의 `@`가 충돌한다. 번들 alias는 충돌이 없고
   소비자의 실제 경로와 동일하다.
+- [x] **DC-13**: concurrent 전용 helper의 소재 → **`lithent-concurrent/helper` 별도 서브패스** (D12b).
+  근거: `lithent/helper`에 두면 기본 코어 사용자에게 조용히 no-op인 API가 생긴다.
+  코어에 두면 "최소 코어 + 선택적 helper" 구조가 깨진다. 경로가 곧 적용 범위 표시가 된다.
 
 ## 8. 설계 ↔ 검증 연결
 
@@ -409,8 +464,9 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D1 yield | low flush 도중 발생한 sync 갱신이 잔여 low보다 먼저 커밋 |
 | D2 우선순위 표현 | C3 회귀 (기존 helper 테스트 무수정 통과) ✅ |
 | D2 lane 복원 | `startTransition` 스코프가 throw해도 이전 레인 복원 / 중첩 |
-| D3 deferred API | RC-2·RC-3 (Phase 2), 수동 B-2 |
-| D11 `whenIdle` | BC-4, 수동 B-9 |
+| D3 deferred API | RC-2·RC-3 (Phase 2) ✅, 수동 B-2 |
+| D12b helper 소재 | `helper/` 무변경(`git status helper/`) + concurrent helper 스위트 7개 |
+| D11 `whenIdle` | BC-4 (Phase 2) ✅, 수동 B-9 |
 | D4 커밋 이펙트 리스트 | Phase 4 동치성 테스트, RC-5 |
 | D5 커밋 경계 단일화 | RC-5, 수동 C-1~C-6 |
 | D6 store 버전 | RC-6 (Phase 6), 수동 F |
@@ -427,11 +483,13 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 ## 9. 상태 / 핸드오프
 
 - done: 배포 구조 설계(alias + Fragment 함정), D1~D11, DC-1~DC-9 전부 확정, 설계↔검증 매핑.
-  **Phase 0 구현 완료** — D12~D15 / DC-10~DC-12 추가.
-  **Phase 1 구현 완료 (2026-08-31)** — D1·D2에 구현 반영 절 추가. 전환의 상태 의미론
-  한계(§4 D2)와 sync 우선 규칙의 성격(§4 D1)을 명시했다.
-- next: [IMPLEMENT.md](./IMPLEMENT.md) Phase 2 (값 단위 deferred API + `whenIdle`, D3·D11).
-  - **D3의 함정**: helper는 기본 코어에서도 import 가능해야 하므로 `startTransition`을
-    정적 import할 수 없다. concurrent 전용 심볼에 대한 옵셔널 접근 경로를 먼저 정할 것.
+  **Phase 0** — D12~D15 / DC-10~DC-12 추가.
+  **Phase 1** — D1·D2에 구현 반영. 전환의 상태 의미론 한계, sync 우선 규칙의 성격 명시.
+  **Phase 2 (2026-08-31)** — D3·D11에 구현 반영, **D12b / DC-13** 추가
+  (concurrent 전용 helper는 `lithent-concurrent/helper`에 둔다. `helper/`는 무변경).
+- next: T1 출하 게이트(Phase 3)의 수동 확인 후, 계속한다면 Phase 4 (커밋 이펙트 리스트, D4).
+  - **Phase 4부터 `diff.ts`·`wDom.ts`가 base와 갈라진다.** Phase 0~2 동안 두 파일은
+    바이트 동일이었고, 그래서 지금까지의 동치성 증명이 값쌌다. Phase 4 이후로는
+    동치성을 테스트로만 지켜야 한다 (4-9의 존재 이유).
 - blockers: 없음.
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / **Phase 1: `16d9e74`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: 미커밋**

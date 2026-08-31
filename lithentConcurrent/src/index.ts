@@ -2,7 +2,12 @@ import type { Props } from '@/types';
 
 export { h, Fragment, portal, mount, lmount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
-export { componentUpdate, startTransition } from '@/utils/redraw';
+export {
+  componentUpdate,
+  startTransition,
+  hasPending,
+  whenIdle,
+} from '@/utils/redraw';
 export {
   getComponentKey,
   componentMap,

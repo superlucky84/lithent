@@ -11,13 +11,20 @@
 > **B~F는 `lithent` → `lithent-concurrent` alias를 적용한 앱에서 수행한다.**
 > 기본 코어는 동결이므로 동작 변화가 없어야 한다 (A-7).
 >
-> **현재 상태 (2026-08-31)**: Phase 0(빌드 인프라) + Phase 1(2레인 스케줄러) 완료.
-> **C·E·F는 `N/A`** (T1.5 / T2 미착수). A·B·D가 수행 대상이며, B 중에서도
-> `isPending`(B-3)과 `whenIdle`(B-9)은 Phase 2 완료 후에 가능하다.
+> **현재 상태 (2026-08-31)**: Phase 0~2 완료 = **T1 기능 완성**. 자동 검증(A-1~A-4,
+> A-7~A-9)은 통과 상태이며, 이 체크리스트는 **T1 출하 판정(3-4)** 을 위한 것이다.
+> **C·E·F는 `N/A`** (T1.5 / T2 미착수). 수행 대상은 A·B·D.
 >
 > **B-2 판정 시 주의**: 전환은 렌더를 미루지 상태를 미루지 않는다. 같은 컴포넌트가
 > 전환 도중 급한 갱신으로도 렌더되면 전환 값이 즉시 보이는 것이 **정상**이다
 > (REQUIREMENTS §8 "RC-2의 단서").
+>
+> **B-3 판정 시 주의**: `isPending`은 조회일 뿐 스스로 리렌더를 일으키지 않는다.
+> pending 표시는 sync로 렌더되는 부모·형제에 두고 확인할 것 (§8 "RC-3의 단서").
+>
+> **import 경로**: 코어는 alias(`lithent` → `lithent-concurrent`)로 바꾸고,
+> `deferred`/`ldeferred`/`isPending`은 `lithent-concurrent/helper`에서 가져온다.
+> `lithent/helper`(기본)는 무변경이므로 `lstate`/`computed` 등은 그대로 쓴다.
 
 ## A. 자동 검증 + 빌드 무결성 (릴리스 직전 1회)
 
@@ -41,6 +48,8 @@
 - [ ] A-10. **소비자 alias 시나리오**: 번들러에서 `lithent` → `lithent-concurrent`로 바꾼
   앱이 동작하고, 서브패스(`lithent/helper`, `lithent/jsx-runtime`)는 **실제 패키지로 남는다**
   (DESIGN D14 — anchored 매칭)
+- [ ] A-11. **`lithent-concurrent/helper` 해석**: 위 alias 상태에서
+  `import { ldeferred } from 'lithent-concurrent/helper'`가 동작한다
 
 ## B. 스케줄러 동작 (실브라우저) — T1부터
 

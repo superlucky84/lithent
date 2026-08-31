@@ -1,5 +1,6 @@
 packages:
   - 'lithentConcurrent'
+  - 'lithentConcurrent/helper'
   - 'helper'
   - 'devHelper'
   - 'ssr'
