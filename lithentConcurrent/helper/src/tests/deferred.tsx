@@ -150,6 +150,79 @@ if (import.meta.vitest) {
     });
   });
 
+  describe('coalescing — what makes a transition worth using', () => {
+    it('renders once for a burst of updates, where sync renders every time', async () => {
+      // This is the property the manual demo is built to show, pinned here so
+      // it does not depend on anyone's typing speed or machine. At T1 the win
+      // is not that a render is interruptible — it is that intermediate
+      // updates never render at all, because a newer entry replaces the queued
+      // one under the same compKey.
+      const KEYSTROKES = 8;
+
+      let syncRenders = 0;
+      let deferredRenders = 0;
+      let typeSync = () => {};
+      let typeDeferred = () => {};
+
+      const SyncList = lmount(() => {
+        let query = '';
+        const renew = useRenew();
+        typeSync = () => {
+          query += 'x';
+          renew();
+        };
+        return () => {
+          syncRenders += 1;
+          return <span>{query}</span>;
+        };
+      });
+
+      const DeferredList = lmount(() => {
+        const query = ldeferred('');
+        typeDeferred = () => {
+          query.value += 'x';
+        };
+        return () => {
+          deferredRenders += 1;
+          return <span>{query.v}</span>;
+        };
+      });
+
+      const host = mountApp(
+        lmount(() => () => (
+          <>
+            <SyncList />
+            <DeferredList />
+          </>
+        ))
+      );
+
+      syncRenders = 0;
+      deferredRenders = 0;
+
+      // A burst within one turn — the browser equivalent is typing faster than
+      // the low lane drains.
+      for (let i = 0; i < KEYSTROKES; i += 1) {
+        typeSync();
+        typeDeferred();
+        // eslint-disable-next-line no-await-in-loop
+        await nextTick();
+      }
+
+      await whenIdle();
+      await nextTick();
+
+      expect(syncRenders, 'sync renders every keystroke').toBe(KEYSTROKES);
+      expect(
+        deferredRenders,
+        'deferred coalesces the burst into far fewer renders'
+      ).toBeLessThan(KEYSTROKES);
+      expect(host.textContent, 'and still lands on the final value').toBe(
+        'xxxxxxxx' + 'xxxxxxxx'
+      );
+    });
+  });
+
   describe('isPending', () => {
     it('RC-3: true while a deferred render waits, false once it commits', async () => {
       let bump = () => {};

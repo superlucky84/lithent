@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **Phase 2 완료 (2026-08-31) — T1 기능 완성. 출하 게이트(Phase 3) 대기**
+- 상태: **T1 기능 완성 + 출하 게이트 자동 항목 통과 (2026-08-31) — 수동 확인·릴리스 판정 대기**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -287,7 +287,9 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`isPending`/`whenIdle`.
     RC-3·BC-4 통과, concurrent br 5,057 / 5,400. concurrent 공개 export는 값 **24개**
     (`startTransition`·`hasPending`·`whenIdle` 추가), helper는 **가산적**으로 4개 추가.
-  - **Phase 3 자동 항목(3-1~3-3) 통과.** 수동 확인(3-4)과 릴리스 판정(3-5)이 남았다.
+  - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b).
+    소스가 아니라 **출하 번들·선언 파일**을 보는 검증을 추가했다 (`pnpm verify:concurrent`).
+    섹션 B 수행용 데모 페이지 신설 (`pnpm dev:concurrent`).
 - Phase 0 판정:
 
   | 수용 기준 | 결과 |
@@ -297,9 +299,9 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   | RC-9 인프라 | `pnpm test:dual` 통과 — helper 37 / devHelper 2 / ftags 10 / ssr 8, 양쪽 동일 |
   | N2 (`src/` 동결) | `git status src/` 비어 있음 |
 
-- next: T1 출하 게이트(Phase 3)의 수동 확인. 계속한다면 Phase 4 (커밋 이펙트 리스트).
+- next: 3-4 수동 확인 + 3-5 릴리스 판정 (사람 몫). 계속한다면 Phase 4 (커밋 이펙트 리스트).
 - blockers: 없음.
 - 미결(경미):
   - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
     npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: 미커밋**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: `3ebf375`**

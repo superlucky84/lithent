@@ -3,6 +3,8 @@
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
 - 대상: `feat/concurrentRendering` — `lithent-concurrent` 별도 빌드 (T1 스케줄러 / T1.5 순수화·tearing / T2 파이버)
 - 사전 조건: `pnpm build && pnpm test` 전량 통과 상태에서 수행
+- 자동화된 부분: `pnpm size` · `pnpm test:dual` · `pnpm verify:concurrent`
+- 섹션 B 수행: `pnpm dev:concurrent` → `/html/transition.html`
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 > **단계별 적용 범위**: A·B·D는 T1부터, C·F는 T1.5부터, E는 T2부터.
@@ -28,6 +30,14 @@
 
 ## A. 자동 검증 + 빌드 무결성 (릴리스 직전 1회)
 
+> **A-1·A-4·A-5·A-7~A-11은 스크립트로 자동화되어 있다.** 아래 3개를 돌리고
+> 전부 exit 0이면 그 항목들은 확인된 것으로 본다. 남는 것은 A-2·A-3(측정)과
+> A-6(T2 항목, 현재 N/A)이다.
+>
+> ```bash
+> pnpm size && pnpm test:dual && pnpm verify:concurrent
+> ```
+
 - [ ] A-1. `pnpm build && pnpm test` 전량 통과 (0 실패)
 - [ ] A-2. `node docs/performance-improvement/bench/verify-order.mjs` → ALL PASS
 - [ ] A-3. `node docs/performance-improvement/bench/bench10k.mjs` → 회귀 판정
@@ -39,7 +49,7 @@
   > Phase 0에서 `concurrent-aliasFragment.tsx`로 자동화됨. 여기서는 **소스가 아니라
   > `dist/lithentConcurrent.mjs`를 import해서** 확인하는 것이 목적이다.
 - [ ] A-6. **`getParent` shim**: concurrent 빌드에서 `helper/context`·`lcontext`의
-  Provider 탐색이 동작 (파이버 `return` 포인터 경유)
+  Provider 탐색이 동작 (파이버 `return` 포인터 경유) — **T2 항목. 현재 `N/A`**
 - [ ] A-7. **기본 코어 무회귀**: `pnpm size` 통과 (`dist/lithent.umd.js` br ≤ 4,800 B) **이고**
   기본 코어로 빌드한 예제 앱의 동작이 이전 릴리스와 동일
 - [ ] A-8. **RC-9 이중 실행**: `pnpm test:dual` 통과 — 위성 스위트가 양쪽 코어에서 동일 결과
@@ -53,13 +63,24 @@
 
 ## B. 스케줄러 동작 (실브라우저) — T1부터
 
+> `pnpm dev:concurrent` → `/html/transition.html`.
+> 세 섹션이 각각 어떤 항목을 덮는지, 무엇이 기대 동작인지 화면에 적혀 있다.
+> B-6~B-8은 기존 앱(`pnpm dev` / `dev:examples` / `dev:docs`)에서 확인한다.
+>
+> **B-1·B-2·B-5는 렌더 횟수로 판정한다.** 첫 패널(sync)과 둘째 패널(deferred)에
+> 같은 문장을 빠르게 입력한 뒤 각 패널의 `renders` 숫자를 비교한다.
+> sync는 타자 수만큼, deferred는 그보다 훨씬 적게 나와야 한다.
+> **두 패널이 비슷해 보이면 행 수를 올린다** (1k → 12k). 기계가 빠르면 3k로는
+> 저우선순위 렌더가 한 프레임에 끝나 차이가 안 보인다.
+
 - [ ] B-1. **입력 응답성**: 무거운 저우선순위 갱신 대기 중 텍스트 입력이 끊기지 않는다
+  (sync 패널은 끊기고 deferred 패널은 안 끊기는 대조로 판정)
 - [ ] B-2. **이전 화면 유지**: `startTransition` 갱신 완료 전까지 이전 내용이 그대로 보인다
   (빈 화면·깜빡임 없음)
 - [ ] B-3. **isPending**: 전환 중 pending 표시가 켜지고 완료 시 꺼진다
 - [ ] B-4. **급한 갱신 우선**: 저우선순위 대기 중 급한 갱신이 먼저 반영된다
 - [ ] B-5. **낡은 전환 폐기**: 전환 중 값을 연속 변경해도 최종 값 1개만 렌더되고
-  중간 값이 화면에 나타나지 않는다
+  중간 값이 화면에 나타나지 않는다 (deferred 패널의 `renders` ≪ 타자 수)
 - [ ] B-6. `pnpm dev` (html/portal.html) — portal 데모가 저우선순위 갱신 후에도 위치·내용 정상
 - [ ] B-7. `pnpm dev:examples` — 예제 전반 인터랙션 정상, 콘솔 에러 0건
 - [ ] B-8. `pnpm dev:docs` — 문서 사이트 이동·코드 데모 정상

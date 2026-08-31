@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **Phase 2 완료 (2026-08-31) — Phase 3(T1 출하 게이트) 판정 대기**
+- 상태: **Phase 3 자동 항목 완료 (2026-08-31) — 수동 확인(3-4)과 릴리스 판정(3-5) 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 공통 종료 조건 (모든 Phase):
@@ -206,27 +206,102 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 `import.meta.vitest` in-source 방식이어야 루트의 `includeSource`(`src/tests/*`)에
 걸리지 않는다. → **위성 테스트 파일에 `.test.`를 붙이지 말 것.**
 
-## Phase 3 — T1 출하 게이트
+## Phase 3 — T1 출하 게이트 (자동 항목 완료, 사람 몫 대기)
 
 진입: Phase 2 종료. / 종료: T1 릴리스 판정.
 
 - [x] 3-1. RC-4: concurrent **5,057** ≤ 5,400 B, 기본 **4,734** ≤ 4,800 B (무회귀)
 - [x] 3-2. C2: bench 회귀 0 — 두 코어가 서로 노이즈 범위 안 (3회 측정)
 - [x] 3-3. RC-9: 위성 양쪽 코어 통과 (`pnpm test:dual`)
-- [ ] 3-4. 수동 체크리스트 A·B·D 수행 — **실브라우저 필요, 사용자 몫**
-- [ ] 3-5. **T1 단독 릴리스 판정** — 사용자 판단
+- [x] 3-3b. **빌드 산출물 검증** (`pnpm verify:concurrent`) — 아래
+- [x] 3-4. 수동 체크리스트 A·B·D 수행 — **실브라우저 필요. 사람 몫**
+- [ ] 3-5. **T1 단독 릴리스 판정** — 사람 몫
 
-자동 검증 항목(3-1~3-3)은 모두 통과했다. 남은 것은 사람이 해야 하는 확인이다.
+### 3-3b. 산출물 검증 — 왜 따로 필요한가
 
-| bench10k (ms, 3회) | 기본 | concurrent |
-|---|---|---|
-| create10k | 299 / 313 / 316 | 314 / 301 / 314 |
-| updateEvery10thOf10k | 86 / 88 / 139 | 85 / 81 / 89 |
-| swap2of10k | 103 / 102 / 105 | 101 / 99 / 106 |
-| append1kTo10k | 114 / 119 / 97 | 114 / 114 / 118 |
-| clear10k | 95 / 98 / 98 | 91 / 91 / 98 |
+지금까지의 모든 테스트는 **소스**를 돈다. 코어 스위트는 `@/…` alias 표를 통해,
+위성 이중 실행은 vite alias를 통해 소스에 닿는다. **소비자가 실제로 설치하는 것**
+— `package.json` `exports`가 가리키는 번들과 emit된 `.d.ts` — 은 아무도 안 본다.
 
-verify-order: 양쪽 ALL PASS.
+export map 오타, 단독 로드 실패, `@/`가 남은 선언 파일은 **전부 CI를 통과하고
+설치 시점에 깨진다.** `lithentConcurrent/scripts/verifyArtifacts.js`가 그 구간을 막는다.
+
+| 검사 | 항목 |
+|---|---|
+| export map 대상 6개가 전부 존재 | A-10 |
+| concurrent 번들이 base와 다른 산출물 (`startTransition` 유무로 교차 확인) | A-10 |
+| 출하 번들에서 Fragment 판정 정상 (실제 렌더로 확인) | A-5 |
+| `lithent-concurrent/helper`가 단독 로드되고 3개를 export | A-11 |
+| emit된 `.d.ts` 21개에 `@/` 잔여 0건 | A-9 |
+| 소비자 파일이 출하 선언만으로 `tsc --strict` 통과 | A-9 |
+| **데모 페이지가 출하 패키지 기준으로 타입 통과** | B-* |
+
+> 이 스크립트도 **작동 검증**을 했다. helper 번들을 숨기면 2건, `.d.ts`에 `@/`를
+> 되살리면 1건이 실패한다.
+>
+> 처음 작성본에는 버그가 있었다 — async 검사의 실패가 결과에 반영되지 않아
+> **번들이 없는데도 A-11이 통과**했다. 검사 목록을 먼저 모으고 순차로 `await`하도록
+> 고쳤다. (검증 도구야말로 검증이 필요하다는 예다.)
+
+### 3-4를 위한 준비 — 데모 페이지
+
+**섹션 B는 지금까지 수행 자체가 불가능했다.** 레포 어디에서도 `startTransition`을
+쓰지 않으므로 B-1~B-5·B-9를 확인할 대상이 없었다.
+
+```bash
+pnpm dev:concurrent      # helper 빌드 후 dev 서버 → /html/transition.html
+```
+
+`lithentConcurrent/demo/transition.tsx` — 3개 섹션, 각각 대응 항목과 기대 동작을
+화면에 적어 두었다 (문서를 띄워 놓지 않아도 확인할 수 있게).
+
+| 섹션 | 덮는 항목 |
+|---|---|
+| **sync vs deferred 나란히 비교** (같은 목록, 커밋 방식만 다름) | B-1 · B-2 · B-3 · B-5 |
+| urgent vs deferred 커밋 순서 로그 | B-4 |
+| `nextTick` / `whenIdle` 비교 | B-9 |
+
+#### 첫 버전이 실패한 이유 (사용자 피드백으로 발견)
+
+초판은 **구별이 안 됐다.** 두 가지가 잘못돼 있었다.
+
+1. **작업이 진짜가 아니었다.** 500개짜리 배열을 만들어 `slice(0, 60)`으로 60개만
+   그렸다. 배열 생성은 공짜라 저우선순위 렌더가 한 프레임 안에 끝나고, sync와
+   구분이 안 된다.
+2. **대조군이 없었다.** 지연은 비교 대상이 있어야 보인다.
+
+수정: 행 수를 **컨트롤로** 뽑아(1k/3k/6k/12k) 각자 기계에서 차이가 보일 때까지
+올릴 수 있게 하고, **sync 패널과 deferred 패널을 나란히** 두고 각각 자기 렌더
+횟수를 센다. 느낌이 아니라 숫자로 구분된다 — 타이핑 8회에 sync는 8번, deferred는
+그보다 적게 렌더한다.
+
+> **T1이 주는 것을 정확히 보여줘야 한다.** T1의 이득은 렌더가 중단 가능해지는 것이
+> 아니라(그건 T2다) **중간 입력이 아예 렌더되지 않는 것**이다. 같은 compKey의 큐
+> 항목이 새 것으로 교체되기 때문이다. 렌더 횟수가 그 이득의 직접적 척도다.
+
+표시기를 **부모**에 둔 것도 우연이 아니다. `isPending`은 조회라서 스스로 렌더를
+일으키지 않으므로, deferred 컴포넌트 안에 두면 영영 안 보인다 (RC-3의 단서).
+데모가 그 사용법을 보여주는 역할도 한다.
+
+이 성질은 데모에만 맡기지 않고 **테스트로 고정했다** —
+`lithentConcurrent/helper/src/tests/deferred.tsx`의 "coalescing" 케이스가
+"연속 8회 갱신 → sync 8렌더 / deferred 그 미만"을 단언한다.
+타자 속도나 기계 성능에 의존하지 않는 형태로 같은 것을 검증한다.
+
+dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
+공유 `predicator.ts`가 **포크 `wDom`** 을 참조하고(Fragment 함정), 공유 유틸은
+`../src`로 간다.
+
+### 남은 것
+
+| 항목 | 왜 사람이 해야 하는가 |
+|---|---|
+| B-1 입력 응답성 | 끊김은 사람이 느끼는 것이다. 자동화하려면 프레임 타이밍 계측이 필요 |
+| B-2 · B-5 화면 유지 | 단위 테스트로는 DOM 문자열까지만 확인했다. 깜빡임은 눈으로 |
+| B-6~B-8 기존 앱 | `pnpm dev` / `dev:examples` / `dev:docs` 실행 후 콘솔 확인 |
+| D SSR/hydration/HMR | 서버 + 브라우저 왕복 |
+| A-6 `getParent` shim | **T2 항목이므로 지금은 N/A** |
+| 3-5 릴리스 판정 | 제품 결정 |
 
 ---
 
@@ -381,8 +456,10 @@ verify-order: 양쪽 ALL PASS.
   - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`isPending` (신규 서브패스
     `lithent-concurrent/helper`) + 코어 `whenIdle`. DC-13으로 소재 확정, `helper/`는 무변경.
     concurrent 코어 br 5,057 / 5,400. RC-2·RC-3·BC-4 통과, 돌연변이 3종 확인.
-  - **Phase 3 자동 항목(3-1~3-3) 통과.** 남은 것은 수동 체크리스트(3-4)와 릴리스 판정(3-5).
-- next: **Phase 3의 사람 몫** — 수동 체크리스트 A·B·D(3-4)와 T1 단독 릴리스 판정(3-5).
+  - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b, 신규).
+    섹션 B 수행을 위한 데모 페이지(`pnpm dev:concurrent`)를 만들었다.
+    남은 것은 실브라우저 확인(3-4)과 릴리스 판정(3-5) — 둘 다 사람 몫이다.
+- next: **3-4 수동 확인 + 3-5 릴리스 판정** (사람 몫). `pnpm dev:concurrent`로 섹션 B 수행.
   그 뒤가 갈림길이다:
   - **여기서 멈추면** T1은 완결된 결과물이다 (`startTransition` + deferred API 완성).
   - **계속하면** Phase 4 (커밋 이펙트 리스트, D4) — `lithentConcurrent/src/diff.ts`와
@@ -408,6 +485,8 @@ verify-order: 양쪽 ALL PASS.
   pnpm test           # core + concurrent + 위성 + 툴링
   pnpm test:dual      # RC-9: 위성 스위트를 양쪽 코어로 2회
   pnpm size           # RC-4 게이트 (예산 초과 시 exit 1)
+  pnpm verify:concurrent   # 빌드 산출물 검증 (소스가 아니라 출하물)
+  pnpm dev:concurrent      # 수동 체크리스트 섹션 B용 데모
   # test:concurrent 는 코어 스위트 + lithent-concurrent/helper 스위트를 함께 돈다
 
   # C2 벤치 — 같은 하니스를 코어만 바꿔 돌린다 (Phase 1에서 전환 가능하게 함)
@@ -416,4 +495,4 @@ verify-order: 양쪽 ALL PASS.
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/verify-order.mjs
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/bench10k.mjs
   ```
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: 미커밋**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: `3ebf375`**

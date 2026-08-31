@@ -8,6 +8,7 @@
   "module": "./dist/lithent.mjs",
   "scripts": {
     "dev:core": "vite",
+    "dev:concurrent": "pnpm build:concurrentHelper && pnpm --filter lithent-concurrent dev",
     "dev": "vite",
     "dev:examples": "pnpm watch:core & pnpm watch:helper & pnpm watch:devHelper & pnpm --filter lithent-examples dev",
     "dev:helper": "pnpm watch:core & pnpm --filter lithent-helper dev",
@@ -16,6 +17,7 @@
     "dev:docs": "pnpm watch:core & pnpm watch:helper & pnpm --filter lithent-docs dev",
     "build:core": "vite build && node scripts/build-skills.js",
     "size": "node scripts/size-report.js",
+    "verify:concurrent": "node lithentConcurrent/scripts/verifyArtifacts.js",
     "build:concurrent": "pnpm --filter lithent-concurrent build",
     "build:concurrentHelper": "pnpm --filter lithent-concurrent-helper build",
     "build:skills": "node scripts/build-skills.js",

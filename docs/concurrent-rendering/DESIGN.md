@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-13 확정. Phase 2 완료 (2026-08-31), T1 출하 게이트 대기**
+- 상태: **DC-1~DC-13 확정. T1 완성, 출하 게이트 자동 항목 통과 (2026-08-31)**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -478,6 +478,7 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D13 타입 선언 생성 | `emitTypes.js`의 잔여 `@/` exit 1 + 외부 소비자 `tsc --strict` 통과 |
 | D14 위성 코어 전환 | **RC-9** — `pnpm test:dual`, 번들 은닉 시 실패 확인 |
 | D15 크기 게이트 | **RC-4** — `pnpm size` (exit 1) |
+| 출하 산출물 (export map · 번들 · `.d.ts`) | `pnpm verify:concurrent` — 소스가 아닌 설치물을 본다 |
 | C3 export 표면 | `concurrent-exportSurface.test.ts` (빌드된 기본 번들과 이름 집합 비교) |
 
 ## 9. 상태 / 핸드오프
@@ -492,4 +493,4 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
     바이트 동일이었고, 그래서 지금까지의 동치성 증명이 값쌌다. Phase 4 이후로는
     동치성을 테스트로만 지켜야 한다 (4-9의 존재 이유).
 - blockers: 없음.
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: 미커밋**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / **Phase 2: `3ebf375`**
