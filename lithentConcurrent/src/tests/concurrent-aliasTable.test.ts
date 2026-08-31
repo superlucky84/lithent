@@ -14,14 +14,13 @@
  */
 import { describe, it, expect } from 'vitest';
 import { concurrentAlias, forkModules } from '../../alias.js';
+import { loadFromBaseCore } from './baseCore';
 
 import { makeNewWDomTree as diffViaAlias } from '@/diff';
 import { makeNewWDomTree as diffViaRelative } from '../diff';
-import { makeNewWDomTree as diffInBaseCore } from '../../../src/diff';
 
 import { wDomUpdate as renderViaAlias } from '@/render';
 import { wDomUpdate as renderViaRelative } from '../render';
-import { wDomUpdate as renderInBaseCore } from '../../../src/render';
 
 import { Fragment as wDomViaAlias } from '@/wDom';
 import { Fragment as wDomViaRelative } from '../wDom';
@@ -52,11 +51,15 @@ describe('concurrent alias table', () => {
   });
 
   it.each([
-    ['@/diff', diffViaAlias, diffViaRelative, diffInBaseCore],
-    ['@/render', renderViaAlias, renderViaRelative, renderInBaseCore],
+    ['@/diff', 'diff', 'makeNewWDomTree', diffViaAlias, diffViaRelative],
+    ['@/render', 'render', 'wDomUpdate', renderViaAlias, renderViaRelative],
   ])(
     '%s resolves to the fork, not the base core',
-    (_name, viaAlias, viaRelative, inBase) => {
+    async (_name, modulePath, exportName, viaAlias, viaRelative) => {
+      const inBase = (await loadFromBaseCore(modulePath as string))[
+        exportName as string
+      ];
+
       expect(viaAlias).toBe(viaRelative);
       expect(viaAlias).not.toBe(inBase);
     }

@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-13 확정. T1 완성, 출하 게이트 자동 항목 통과 (2026-08-31)**
+- 상태: **DC-1~DC-14 확정. T1 완성, T1.5 진행 중 (Phase 4 완료, 2026-08-31)**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -276,8 +276,17 @@ type CommitEffect =
 
 - `makeNewWDomTree(newWDom, originalWDom, effects)` — 수집기를 **인자로** 넘긴다
   (모듈 전역이면 중첩 렌더에서 섞인다).
-- 커밋 순서: `unmount` → `detach` → `delete` → `wDomUpdate(tree)` → `splice`/`syncAncestor` → `retire`.
-  기존 동작과 동치여야 하며 Phase 4에서 테스트로 고정한다.
+- 커밋 순서 — **DC-14 확정: 태그된 유니온 대신 thunk 배열 + 수집 순서 재생.**
+
+  위 유니온과 그룹별 순서는 설계 스케치였고, 구현은 `Effects = (() => void)[]`를
+  수집 순서 그대로 재생한다. 수집 순서가 **base 코어의 실행 순서 그 자체**이므로
+  동치성이 구성상 보장되고, 어떤 재배치가 안전한지 매번 논증할 필요가 없다.
+
+  > 스케치한 그룹 순서도 **실제로 넣어보고 확인했다 — 통과한다.**
+  > 넓어진 순회가 중복 실행할 수 있는 두 효과가 멱등이기 때문이다:
+  > `runUnmountEffects`는 실행 후 `umts`를 비우고, `removeEventListener`는
+  > 이미 뗀 핸들러에 대해 무동작이다. 그러므로 그룹핑이 틀린 것은 아니고,
+  > 효과가 추가될 때마다 그 논증을 다시 해야 한다는 것이 차이다.
 - **`retire`를 커밋으로 미루는 것이 폐기 능력의 핵심.** 원본 `children`이 커밋 전까지
   살아있어야 WIP를 버리고 원본으로 되돌아갈 수 있다.
 
@@ -453,6 +462,9 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 - [x] **DC-13**: concurrent 전용 helper의 소재 → **`lithent-concurrent/helper` 별도 서브패스** (D12b).
   근거: `lithent/helper`에 두면 기본 코어 사용자에게 조용히 no-op인 API가 생긴다.
   코어에 두면 "최소 코어 + 선택적 helper" 구조가 깨진다. 경로가 곧 적용 범위 표시가 된다.
+- [x] **DC-14**: 커밋 이펙트 표현·순서 → **thunk 배열 + 수집 순서 재생** (D4).
+  근거: 수집 순서 = base의 실행 순서이므로 동치성이 구성상 보장된다.
+  그룹 순서도 통과하지만(효과들이 멱등), 효과가 늘 때마다 안전성을 재논증해야 한다.
 
 ## 8. 설계 ↔ 검증 연결
 
@@ -467,7 +479,8 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D3 deferred API | RC-2·RC-3 (Phase 2) ✅, 수동 B-2 |
 | D12b helper 소재 | `helper/` 무변경(`git status helper/`) + concurrent helper 스위트 7개 |
 | D11 `whenIdle` | BC-4 (Phase 2) ✅, 수동 B-9 |
-| D4 커밋 이펙트 리스트 | Phase 4 동치성 테스트, RC-5 |
+| D4 커밋 이펙트 리스트 | `concurrent-commitEquivalence.test.ts` — DOM + 라이프사이클 순서를 **양쪽 빌드 산출물**로 비교 |
+| D4 폐기 능력 (더블 버퍼링) | `concurrent-abandon.test.tsx` — 빌드 후 미커밋 시 원본 무손상 |
 | D5 커밋 경계 단일화 | RC-5, 수동 C-1~C-6 |
 | D6 store 버전 | RC-6 (Phase 6), 수동 F |
 | D7 파이버 work loop | RC-7·RC-10 (Phase 8), 수동 E-1·E-4 |
@@ -483,14 +496,15 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 
 ## 9. 상태 / 핸드오프
 
-- done: 배포 구조 설계(alias + Fragment 함정), D1~D11, DC-1~DC-9 전부 확정, 설계↔검증 매핑.
-  **Phase 0** — D12~D15 / DC-10~DC-12 추가.
-  **Phase 1** — D1·D2에 구현 반영. 전환의 상태 의미론 한계, sync 우선 규칙의 성격 명시.
-  **Phase 2 (2026-08-31)** — D3·D11에 구현 반영, **D12b / DC-13** 추가
-  (concurrent 전용 helper는 `lithent-concurrent/helper`에 둔다. `helper/`는 무변경).
-- next: T1 출하 게이트(Phase 3)의 수동 확인 후, 계속한다면 Phase 4 (커밋 이펙트 리스트, D4).
-  - **Phase 4부터 `diff.ts`·`wDom.ts`가 base와 갈라진다.** Phase 0~2 동안 두 파일은
-    바이트 동일이었고, 그래서 지금까지의 동치성 증명이 값쌌다. Phase 4 이후로는
-    동치성을 테스트로만 지켜야 한다 (4-9의 존재 이유).
-- blockers: 없음.
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / Phase 2: `3ebf375` / **Phase 3: `299d4cd`**
+- done: 배포 구조 설계, D1~D11, DC-1~DC-9 확정, 설계↔검증 매핑.
+  **Phase 0** — D12~D15 / DC-10~DC-12.
+  **Phase 1** — D1·D2 구현 반영 (전환의 상태 의미론 한계, sync 우선 규칙의 성격).
+  **Phase 2** — D3·D11 구현 반영, D12b / DC-13.
+  **Phase 4 (2026-08-31)** — D4 구현 반영, **DC-14**. diff 단계가 순수해졌다.
+- next: Phase 5 (커밋 경계 단일화, D5 / BC-1).
+  - **BC-1은 의도된 관측 가능한 변화다.** 지금까지와 달리 "기존 테스트 무수정 통과"가
+    목표가 아니며, 4-9의 라이프사이클 순서 비교도 함께 재검토해야 한다.
+  - `render.ts`는 아직 base와 바이트 동일하다. Phase 5에서 갈라진다.
+- blockers: 없음. (3-4 수동 확인과 3-5 릴리스 판정은 미완이며 사람 몫)
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
+  Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: 미커밋**

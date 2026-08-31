@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **Phase 3 자동 항목 완료 (2026-08-31) — 수동 확인(3-4)과 릴리스 판정(3-5) 대기**
+- 상태: **Phase 4 완료 (2026-08-31) — T1.5 진행 중. Phase 5 착수 가능**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 공통 종료 조건 (모든 Phase):
@@ -307,34 +307,135 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
 
 # 단계 T1.5 — 순수화 + tearing (concurrent br ≤ 6,200)
 
-## Phase 4 — 커밋 이펙트 리스트 (D4)
+## Phase 4 — 커밋 이펙트 리스트 (D4) ✅ 완료 (2026-08-31)
 
 진입: Phase 3 종료. / 종료: diff 단계에서 DOM·원본 트리 변형 0.
 
-- [ ] 4-1. `CommitEffect` 타입 정의
-- [ ] 4-2. `makeNewWDomTree`에 effects 수집기 **인자** 추가 (전역 금지 — 중첩 렌더 오염)
-- [ ] 4-3. `diff.ts:81-82` unmount·detach → effect
-- [ ] 4-4. `diff.ts:237` `typeDeleteUnused` → `delete` effect
-- [ ] 4-5. `diff.ts:57-58` `il`/`delete children` → `retire` effect (**폐기 능력의 핵심**)
-- [ ] 4-6. `wDom.ts:155,158` splice·syncAncestor → effect
-- [ ] 4-7. `replaceWDom`에 커밋 함수 도입, DESIGN D4 순서대로 실행
-- [ ] 4-8. 기준 테스트 — 특히 `core-destroy`, `core-destroyForLoop`, `core-unmount`,
-      `core-nestedUnmount`, `core-loopkey`, `core-loopMoveOrder`
-- [ ] 4-9. 신규 테스트 — 동치성: effect 리스트 실행 결과가 기본 코어 DOM과 동일
-- [ ] 4-10. 신규 테스트 — WIP 폐기 후 원본 트리로 정상 렌더 (**더블 버퍼링 확보 증명**)
-- [ ] 4-11. 크기 실측
+- [x] 4-1. 이펙트 타입 정의 — `Effects = (() => void)[]` (DC-14, 아래)
+- [x] 4-2. `makeNewWDomTree`에 effects 수집기 **인자** 추가 (전역 금지 — 중첩 렌더 오염)
+- [x] 4-3. `diff.ts:81-82` unmount·detach → effect
+- [x] 4-4. `diff.ts:237` `typeDeleteUnused` → `delete` effect
+- [x] 4-5. `diff.ts:57-58` `il`/`delete children` → `retire` effect (**폐기 능력의 핵심**)
+- [x] 4-6. `wDom.ts:155,158` splice·syncAncestor → effect
+- [x] 4-7. `replaceWDom`에 `commit()` 도입 — `commitEffects(effects)` → `wDomUpdate(tree)`
+- [x] 4-8. 기준 테스트 — 공유 core 스위트 79개 **무수정 통과**
+- [x] 4-9. 신규 테스트 — 동치성 (`concurrent-commitEquivalence.test.ts`)
+- [x] 4-10. 신규 테스트 — WIP 폐기 (`concurrent-abandon.test.tsx`)
+- [x] 4-11. 크기 실측 — concurrent br **5,104** / 6,200 (Phase 3 대비 **+47 B**)
+
+### Phase 4 실측 결과
+
+| 항목 | 기본 `lithent` | `lithent-concurrent` |
+|---|---|---|
+| **brotli** | **4,734** / 4,800 (무변동) | **5,104** / 6,200 (1,096 B 여유) |
+| core 스위트 | 45파일 195테스트 | 43파일 110테스트 |
+| bench10k `create10k` | 293 / 298 | 294 / 299 |
+| verify-order | ALL PASS | ALL PASS |
+
+### 포크가 처음으로 갈라졌다
+
+Phase 0~3 동안 `diff.ts`·`render.ts`·`wDom.ts`는 base와 **바이트 동일**이었다.
+그래서 동치성 증명이 공짜였다. Phase 4부터는 아니다.
+
+| 파일 | base 대비 |
+|---|---|
+| `diff.ts` | **96줄** — effects 인자 스레딩 + 부수효과 5곳을 push로 |
+| `wDom.ts` | **30줄** — splice/syncAncestor를 effect로, `commit()` 도입 |
+| `render.ts` | 바이트 동일 (아직) |
+
+**동치성은 이제 테스트로만 지킨다** — 4-9가 그 역할이다.
+
+### DC-14 — 이펙트 순서: 태그된 유니온이 아니라 수집 순서
+
+설계(D4)는 태그된 유니온과 그룹별 실행 순서를 스케치했다
+(`unmount` → `detach` → `delete` → `wDomUpdate` → `splice`/`syncAncestor` → `retire`).
+구현은 **thunk 배열 + 수집 순서 그대로 재생**으로 갔다.
+
+근거: 수집 순서가 **base 코어의 실행 순서 그 자체**다. 그대로 재생하면 동치성이
+구성상 보장되고, "어떤 재배치가 안전한가"를 매번 따질 필요가 없다.
+
+> **처음에 잘못된 근거를 적었다가 검증하고 고쳤다.**
+> "자식의 retire가 부모의 unmount 순회를 잘라주므로 그룹핑하면 깨진다"고 썼는데,
+> **실제로 그룹핑해서 돌려보니 통과한다.** 이유를 확인했다: 넓은 순회가 중복
+> 실행할 수 있는 두 효과가 모두 멱등이다 — `runUnmountEffects`는 실행 후
+> `umts`를 비우고(`universalRef.ts:57`), `removeEventListener`는 이미 뗀 핸들러에
+> 대해 아무 일도 하지 않는다.
+>
+> 그래서 그룹핑이 **틀린 것은 아니다.** 다만 효과가 하나 추가될 때마다 그 논증을
+> 다시 해야 하고, 수집 순서는 그럴 필요가 없다. 그것이 채택 이유다.
+
+### 테스트 유효성 검증 (돌연변이)
+
+| 돌연변이 | 결과 |
+|---|---|
+| 효과 순서 전체 역순 | ✓ 동치성 4건 실패 |
+| unmount/detach 효과 누락 | ✓ 동치성 4건 + 기존 `core-mountreadycallback` 2건 실패 |
+| retire를 다시 diff 중 즉시 실행 (Phase 4 이전 동작) | ✓ 폐기 테스트 2건 실패 |
+| retire만 마지막으로 그룹핑 (D4 원안) | **통과** — 위 DC-14 참조 |
+
+### 부수적으로 고친 것 — 가드 테스트의 타입 오염
+
+`concurrent-aliasFragment` / `aliasScheduler` / `aliasTable`이 base 모듈을
+**정적 import**해서 distinctness를 단언하고 있었다. 포크가 갈라지자 base `wDom.ts`가
+포크의 새 `makeNewWDomTree` 시그니처로 타입 검사를 받아 빌드가 깨졌다.
+
+가드가 원하는 것은 **런타임 모듈 동일성**이지 타입 결합이 아니므로,
+`src/tests/baseCore.ts`의 계산된 specifier 동적 import로 바꿨다.
+Phase 5 이후 포크가 더 갈라져도 같은 문제가 재발하지 않는다.
 
 ## Phase 5 — 커밋 경계 단일화 (D5, BC-1)
 
 진입: Phase 4 종료. / 종료: RC-5 통과.
 
-- [ ] 5-1. `render.ts:185, 200, 284, 429`의 `execMountedQueue()` 제거
-- [ ] 5-2. 커밋 종료 1곳으로 통합 (`:43` 위치 재정의)
-- [ ] 5-3. **기대값 재검토** (통과 여부만 보지 말 것): `core-loopLifecycleOrder`,
-      `core-mountreadycallback`, `core-callback`, `core-nestedUnmount`, `core-destroy`
+- [ ] 5-1. `render.ts`의 내부 `execMountedQueue()` 4곳 제거 (typeAdd 2곳, typeReplace, updateChildren)
+- [ ] 5-2. 커밋 종료 1곳으로 통합 — **`commit()`에 넣을 것. `wDomUpdate` 아님** (아래)
+- [ ] 5-3. **기대값 재검토**: `core-loopLifecycleOrder`, `core-mountreadycallback`,
+      `core-callback`, `core-nestedUnmount`, `core-destroy`
 - [ ] 5-4. 변경된 순서 문서화 — BC-1 체인지로그 초안
 - [ ] 5-5. 기준 테스트 전량 통과
-- [ ] 5-6. 크기 실측
+- [ ] 5-6. 4-9 동치성 테스트 재검토 — 라이프사이클 순서 차이는 **의도된 것**이므로,
+      어떤 차이가 의도된 것인지 그 파일에 명시할 것
+- [ ] 5-7. 크기 실측
+
+### 예비 실험 (Phase 4 중, 2026-08-31)
+
+Phase 5를 실험적으로 적용해서 blast radius를 먼저 쟀다. 실험 코드는 원복했다.
+
+**⚠ 구현 함정 — flush를 `wDomUpdate` 끝에 넣으면 안 된다.**
+`wDomUpdate`는 **재귀 함수**다 (`render.ts:343`, `:366`에서 자식마다 자기를 부른다).
+거기 넣으면 노드마다 flush되어 **지금보다 더 흩어진다.** 커밋 경계는 재귀 밖,
+`wDom.ts`의 `commit()`이어야 한다. 실험에서 실제로 이 순서로 틀렸다가 고쳤다.
+
+**실측된 순서 변화** (새 노드 삽입이 기존 노드 갱신보다 앞 위치에 있을 때):
+
+```
+[현재]                              [BC-1 이후]
+UPDATE existing (빌드 단계)          UPDATE existing (빌드 단계)
+MOUNT  new1     DOM에 요소 2개        UPDATE existing (커밋 단계)
+UPDATE existing (커밋 단계)           MOUNT  new1     DOM에 요소 3개
+MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
+```
+
+| | BC-1 영향 |
+|---|---|
+| `mountCallback`끼리의 상대 순서 | **없음** — 큐가 FIFO이고 push 순서(DOM 생성 순서)가 그대로다 |
+| `updateCallback`끼리의 상대 순서 | **없음** — `runUpdatedQueueFromWDom`은 `typeUpdate` 안이라 범위 밖 |
+| `mountCallback` ↔ `updateCallback` 교차 | **바뀜** (위 실측) |
+| `mountCallback`이 보는 DOM 상태 | 부분 완성 → **커밋 완료 상태**. 대체로 개선 |
+| keyed 리스트 경로 | 거의 없음 — `updateChildren`은 이미 마지막에 한 번만 flush한다 |
+| unmount 계열 | **없음** — cleanup은 `runUnmountEffects` 경로이고 `execMountedQueue`가 아니다 |
+
+**예상보다 영향이 작다.** 실험 적용 상태에서 **core 스위트 110개가 전량 통과**했다.
+5-3이 지목한 5개 파일도 기대값이 바뀌지 않았다. 흩어진 flush의 실질 영향 범위가
+비루프 삽입·교체 경로에 한정되기 때문으로 보인다.
+
+> 5-3을 삭제하지는 말 것. "통과했다"와 "기대값이 옳다"는 다른 문제이고,
+> 위 표의 교차 순서 변화는 실재한다. 다만 착수 전 예상보다 부담이 작다는 것은
+> 판단에 반영할 수 있다.
+
+**docs 예제 영향**: `lithentDocs`의 Example14(3단 중첩 unmount 순서)를 양쪽 코어로
+돌려 비교했고, Phase 4 상태와 BC-1 실험 적용 상태 **모두 base와 완전히 동일**했다.
+서브트리가 한 번에 삽입되는 형태라 flush 지점 수와 무관하다.
 
 ## Phase 6 — store tearing (D6)
 
@@ -492,13 +593,19 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
     concurrent 코어 br 5,057 / 5,400. RC-2·RC-3·BC-4 통과, 돌연변이 3종 확인.
   - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b, 신규).
     섹션 B 수행을 위한 데모 페이지(`pnpm dev:concurrent`)를 만들었다.
-    남은 것은 실브라우저 확인(3-4)과 릴리스 판정(3-5) — 둘 다 사람 몫이다.
-- next: **3-4 수동 확인 + 3-5 릴리스 판정** (사람 몫). `pnpm dev:concurrent`로 섹션 B 수행.
-  그 뒤가 갈림길이다:
-  - **여기서 멈추면** T1은 완결된 결과물이다 (`startTransition` + deferred API 완성).
-  - **계속하면** Phase 4 (커밋 이펙트 리스트, D4) — `lithentConcurrent/src/diff.ts`와
-    `wDom.ts`가 base와 갈라지기 시작한다. Phase 0~2에서 두 파일은 아직 **바이트 동일**이다.
-  - `scripts/size-report.js` 예산은 T1.5 진입 시 **6,200**, `CONCURRENT_PHASE`도 함께.
+    남은 것은 실브라우저 확인(3-4)과 릴리스 판정(3-5) — 둘 다 사람 몫이며 **미완**이다.
+  - **Phase 4 완료 (2026-08-31)** — diff 단계가 순수해졌다. 부수효과 6종이 전부
+    커밋 이펙트로 옮겨졌고, 폐기 능력(더블 버퍼링)을 테스트로 증명했다.
+    이펙트 순서는 DC-14로 확정. concurrent br 5,104 / 6,200.
+    **포크가 처음으로 base와 갈라졌다** — 동치성은 이제 4-9 테스트가 지킨다.
+- next: **Phase 5 — 커밋 경계 단일화 (D5, BC-1)**. 예비 실험을 마쳤다 (§Phase 5).
+  - **flush는 `commit()`에 넣을 것.** `wDomUpdate`는 재귀 함수라 거기 넣으면 더 흩어진다.
+  - `render.ts`는 아직 base와 바이트 동일하다. Phase 5에서 갈라진다.
+  - 실험 결과 **기존 테스트 110개가 전량 통과**했고 5-3이 지목한 5개도 기대값이
+    바뀌지 않았다. 그래도 5-3은 남겨둘 것 — 교차 순서 변화는 실재한다.
+  - **4-9 동치성 테스트도 함께 재검토**해야 한다. BC-1은 의도된 차이이므로
+    어떤 차이가 의도된 것인지 그 파일에 명시할 것.
+- 미완 (사람 몫): 3-4 수동 체크리스트 A·B·D, 3-5 T1 릴리스 판정.
 - blockers: 없음.
 - 진행 원칙:
   - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.
@@ -529,4 +636,5 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/verify-order.mjs
   LITHENT_CORE=concurrent node docs/performance-improvement/bench/bench10k.mjs
   ```
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / Phase 2: `3ebf375` / **Phase 3: `299d4cd`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
+  Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: 미커밋**

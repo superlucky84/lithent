@@ -13,17 +13,50 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { keys, entries } from '@/utils';
 
 /**
+ * Side effects the diff pass would have performed inline, recorded to run at
+ * commit instead (D4). Plain thunks in COLLECTION ORDER — see `commitEffects`.
+ */
+export type Effects = (() => void)[];
+
+/**
  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
+ *
+ * `effects` collects what the pass would otherwise do immediately. Passing it
+ * as an argument rather than holding it in a module-level variable matters:
+ * a render can start while another is in progress (a `renew()` raised from an
+ * updater), and a shared collector would splice the two together.
  */
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
-  originalWDom?: WDom
+  originalWDom: WDom | undefined,
+  effects: Effects
 ) =>
   remakeNewWDom(
     newWDom,
     checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+    effects,
     originalWDom
   );
+
+/**
+ * Runs the recorded effects, in collection order.
+ *
+ * Collection order is the base core's own execution order, so replaying it
+ * makes the two cores equivalent by construction — no case analysis needed
+ * about which reorderings happen to be safe. Order does matter: reversing the
+ * list fails the equivalence suite.
+ *
+ * The design sketched a grouped order instead (unmount → detach → delete →
+ * update → splice → retire). That was checked and it also passes, because the
+ * two effects a wider walk could double-run are idempotent: `runUnmountEffects`
+ * empties `umts` after running it, and `removeEventListener` on an already
+ * detached handler does nothing. So grouping is not wrong — it is merely a
+ * claim that has to be re-argued every time an effect is added, and this order
+ * is one that never has to be. See DC-14.
+ */
+export const commitEffects = (effects: Effects) => {
+  effects.forEach(effect => effect());
+};
 
 /**
  * Create a new virtual DOM after comparing with the previous virtual DOM
@@ -31,6 +64,7 @@ export const makeNewWDomTree = (
 const remakeNewWDom = (
   newWDom: WDom | TagFunctionResolver,
   isSameType: boolean,
+  effects: Effects,
   originalWDom?: WDom
 ) => {
   const remakeWDom = generalize(newWDom, isSameType, originalWDom);
@@ -45,17 +79,23 @@ const remakeNewWDom = (
     remakeWDom.children = remakeChildrenForDiff(
       remakeWDom,
       isSameType,
+      effects,
       originalWDom
     );
   }
 
   // NOTE: short-key metadata (nr = needRerender) keeps bundle size down
   remakeWDom.nr = needRerender;
-  inheritPropForRender(remakeWDom, originalWDom, needRerender);
+  inheritPropForRender(remakeWDom, originalWDom, effects, needRerender);
 
   if (!isNoting && originalWDom) {
-    originalWDom.il = true;
-    delete originalWDom.children;
+    // Deferring this is what makes the WIP tree abandonable: the original keeps
+    // its children until the commit lands, so the pass can be thrown away and
+    // the previous tree still rendered.
+    effects.push(() => {
+      originalWDom.il = true;
+      delete originalWDom.children;
+    });
   }
   if (originalWDom?.tag === 'portal') {
     remakeWDom.tag = 'portal';
@@ -69,7 +109,8 @@ const remakeNewWDom = (
  */
 const inheritPropForRender = (
   remakeWDom: WDom,
-  originalWDom?: WDom,
+  originalWDom: WDom | undefined,
+  effects: Effects,
   needRerender?: RenderType
 ) => {
   if (needRerender !== 'A' && originalWDom) {
@@ -78,8 +119,10 @@ const inheritPropForRender = (
 
   if (needRerender === 'D' || needRerender === 'R' || needRerender === 'S') {
     if (originalWDom) {
-      runUnmountQueueFromWDom(originalWDom);
-      recursiveRemoveEvent(originalWDom);
+      effects.push(() => {
+        runUnmountQueueFromWDom(originalWDom);
+        recursiveRemoveEvent(originalWDom);
+      });
     }
     remakeWDom.oc = originalWDom && originalWDom.children;
   }
@@ -187,20 +230,21 @@ const generalize = (
 const remakeChildrenForDiff = (
   newWDom: WDom,
   isSameType: boolean,
+  effects: Effects,
   originalWDom?: WDom
 ) =>
   isSameType && originalWDom
-    ? remakeChildrenForUpdate(newWDom, originalWDom)
-    : remakeChildrenForAdd(newWDom);
+    ? remakeChildrenForUpdate(newWDom, originalWDom, effects)
+    : remakeChildrenForAdd(newWDom, effects);
 
 /**
  * Recursive handling for the creation of a new virtual DOM.
  */
-const remakeChildrenForAdd = (newWDom: WDom) => {
+const remakeChildrenForAdd = (newWDom: WDom, effects: Effects) => {
   const getParent = () => newWDom;
 
   return (newWDom.children || []).map((item: WDom) => {
-    const child = makeNewWDomTree(item);
+    const child = makeNewWDomTree(item, undefined, effects);
     child.getParent = getParent;
     return child;
   });
@@ -210,16 +254,20 @@ const remakeChildrenForAdd = (newWDom: WDom) => {
  * Recursive handling for updates, not additions.
  * Uses key-based diffing for loops, index-based for others
  */
-const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
+const remakeChildrenForUpdate = (
+  newWDom: WDom,
+  originalWDom: WDom,
+  effects: Effects
+) => {
   if (newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0])) {
-    return remakeChildrenForLoopUpdate(newWDom, originalWDom);
+    return remakeChildrenForLoopUpdate(newWDom, originalWDom, effects);
   }
 
   const origChildren = originalWDom.children || [];
   const getParent = () => newWDom;
 
   return (newWDom.children || []).map((item: WDom, index: number) => {
-    const child = makeNewWDomTree(item, origChildren[index]);
+    const child = makeNewWDomTree(item, origChildren[index], effects);
     child.getParent = getParent;
     return child;
   });
@@ -228,13 +276,18 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
 /**
  * Handling virtual DOM of loop-type elements.
  */
-const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
+const remakeChildrenForLoopUpdate = (
+  newWDom: WDom,
+  originalWDom: WDom,
+  effects: Effects
+) => {
   const [remakedChildren, unUsedChildren] = diffLoopChildren(
     newWDom,
-    originalWDom
+    originalWDom,
+    effects
   );
 
-  typeDeleteUnused(unUsedChildren);
+  effects.push(() => typeDeleteUnused(unUsedChildren));
 
   return remakedChildren;
 };
@@ -245,7 +298,11 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
  * records each match's original index (oi) for the render phase to
  * minimize moves via LIS.
  */
-const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
+const diffLoopChildren = (
+  newWDom: WDom,
+  originalWDom: WDom,
+  effects: Effects
+) => {
   const origChildren = originalWDom.children || [];
   const keyMap = new Map<unknown, number>();
   origChildren.forEach((item, index) => {
@@ -267,7 +324,8 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
 
     const child = makeNewWDomTree(
       item,
-      matched ? origChildren[origIndex] : undefined
+      matched ? origChildren[origIndex] : undefined,
+      effects
     );
     if (matched) {
       child.oi = origIndex;

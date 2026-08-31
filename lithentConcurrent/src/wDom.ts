@@ -10,7 +10,8 @@ import {
   LComponent,
 } from '@/types';
 
-import { makeNewWDomTree } from '@/diff';
+import { makeNewWDomTree, commitEffects } from '@/diff';
+import type { Effects } from '@/diff';
 import { wDomUpdate } from '@/render';
 import {
   initUpdateHookState,
@@ -139,8 +140,12 @@ export const replaceWDom = (
   }
   needDiffRef.value = true;
 
+  // Build phase. Nothing outside the new tree is touched: every mutation the
+  // pass would have made is recorded in `effects` instead (D4). That is what
+  // leaves the previous tree whole and the work-in-progress one abandonable.
+  const effects: Effects = [];
   const newWDom = makeWDomResolver(tag, props, children);
-  const newWDomTree = makeNewWDomTree(newWDom, originalWDom);
+  const newWDomTree = makeNewWDomTree(newWDom, originalWDom, effects);
   // NOTE: we/ae are short for wrapElement/afterElement
   const { isRoot, getParent, we, ae } = originalWDom;
 
@@ -151,12 +156,15 @@ export const replaceWDom = (
     const brothers = (parent && parent.children) || [];
     const index = brothers.indexOf(originalWDom);
 
-    if (index !== -1) {
-      brothers.splice(index, 1, newWDomTree);
-    }
+    effects.push(() => {
+      if (index !== -1) {
+        brothers.splice(index, 1, newWDomTree);
+      }
 
-    syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
+      syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
+    });
   } else {
+    // Root fields live on the new tree, which nothing else can observe yet.
     newWDomTree.isRoot = true;
     newWDomTree.we = we;
     newWDomTree.ae = ae;
@@ -164,6 +172,14 @@ export const replaceWDom = (
 
   needDiffRef.value = false;
 
+  commit(effects, newWDomTree);
+};
+
+/**
+ * Commit phase — the single point where a render becomes observable.
+ */
+const commit = (effects: Effects, newWDomTree: WDom) => {
+  commitEffects(effects);
   wDomUpdate(newWDomTree);
 };
 

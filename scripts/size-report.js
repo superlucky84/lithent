@@ -15,8 +15,8 @@ import { brotliCompressSync, gzipSync } from 'zlib';
 
 /** Budgets in brotli bytes. Baseline at f3921cc: base = 4,734. */
 const BASE_BUDGET = 4800;
-const CONCURRENT_PHASE = 'T1 (scheduler + deferred API)';
-const CONCURRENT_BUDGET = 5400; // Phase 0 was 4800; T1.5 -> 6200, T2 -> 9000
+const CONCURRENT_PHASE = 'T1.5 (commit effect list)';
+const CONCURRENT_BUDGET = 6200; // Phase 0 was 4800, T1 5400; T2 -> 9000
 
 const targets = [
   {

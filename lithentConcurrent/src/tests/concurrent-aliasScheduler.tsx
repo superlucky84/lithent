@@ -13,9 +13,9 @@
 import { h, render, lmount, useRenew } from '../index';
 import { componentUpdate as viaRedrawSpecifier } from '@/utils/redraw';
 import { componentUpdate as viaSchedulerSpecifier } from '@/scheduler';
-import { componentUpdate as baseComponentUpdate } from '../../../src/utils/redraw';
 import { componentUpdate as entryComponentUpdate } from '../index';
 import { nextTick } from '@/hook/ref';
+import { loadFromBaseCore } from './baseCore';
 
 const testWrap = document.createElement('div');
 
@@ -45,7 +45,10 @@ if (import.meta.vitest) {
       expect(viaRedrawSpecifier).toBe(entryComponentUpdate);
     });
 
-    it('resolves to the fork, not the frozen base core redraw queue', () => {
+    it('resolves to the fork, not the frozen base core redraw queue', async () => {
+      const { componentUpdate: baseComponentUpdate } =
+        await loadFromBaseCore('utils/redraw');
+
       expect(viaRedrawSpecifier).not.toBe(baseComponentUpdate);
     });
 

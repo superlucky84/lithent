@@ -14,8 +14,8 @@
  * Keep this file permanently as a regression guard.
  */
 import { h, Fragment, render } from '../index';
-import { Fragment as baseFragment } from '../../../src/wDom';
 import { checkFragmentFunction } from '@/utils/predicator';
+import { loadFromBaseCore } from './baseCore';
 
 const testWrap = document.createElement('div');
 
@@ -41,7 +41,9 @@ if (import.meta.vitest) {
       expect(checkFragmentFunction('Fragment')).toBe(false);
     });
 
-    it('resolves to the fork, not the frozen base core', () => {
+    it('resolves to the fork, not the frozen base core', async () => {
+      const { Fragment: baseFragment } = await loadFromBaseCore('wDom');
+
       expect(Fragment).not.toBe(baseFragment);
       expect(checkFragmentFunction(baseFragment)).toBe(false);
     });

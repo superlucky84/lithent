@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **T1 기능 완성 + 출하 게이트 자동 항목 통과 (2026-08-31) — 수동 확인·릴리스 판정 대기**
+- 상태: **T1 완성 / T1.5 진행 중 — Phase 4 완료 (2026-08-31)**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -152,7 +152,12 @@ child/sibling/return 포인터 + 명시적 work loop + alternate(current/WIP) �
 
 ## 7. 현행 코드 분석 (concurrent 구현의 substrate)
 
-### 7.1 렌더 단계가 순수하지 않음 (T1.5에서 해소)
+### 7.1 렌더 단계가 순수하지 않음 (T1.5에서 해소) — **Phase 4에서 해소됨**
+
+> **완료 (2026-08-31).** 아래 5곳이 전부 커밋 이펙트로 옮겨졌다
+> (`lithentConcurrent/src/{diff,wDom}.ts`). diff 단계는 이제 새 트리 밖의
+> 어떤 것도 건드리지 않으며, 원본 트리는 커밋 전까지 온전하다 —
+> 즉 **더블 버퍼링이 성립한다**. `concurrent-abandon.test.tsx`가 이를 고정한다.
 
 | 위치 | 하는 일 | 영향 |
 |---|---|---|
@@ -239,7 +244,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **기본 `lithent`** | 전 기간 | **≤ 4,800 B** | 현재 4,734 B. **회귀 가드** — 철학 보호선 |
 | concurrent | Phase 0 (순수 포크) | ≤ 4,800 B | **실측 4,742 B** — 기본과 8 B 차이 (UMD 전역 이름 문자열) |
 | concurrent | T1 | **≤ 5,400 B** | **실측 5,057 B** (Phase 0 대비 +315 B) |
-| concurrent | T1.5 | **≤ 6,200 B** | |
+| concurrent | T1.5 | **≤ 6,200 B** | Phase 4 실측 **5,104 B** |
 | concurrent | T2 (파이버) | **≤ 9,000 B** | 파이버 raw +4.5~7KB 반영 |
 
 > 선행 작업(performance-improvement)의 예산 5,120 B는 기본 코어에 한해 유효하며,
@@ -300,6 +305,10 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b).
     소스가 아니라 **출하 번들·선언 파일**을 보는 검증을 추가했다 (`pnpm verify:concurrent`).
     섹션 B 수행용 데모 페이지 신설 (`pnpm dev:concurrent`).
+  - **Phase 4 완료 (2026-08-31)** — §7.1의 순수성 문제 해소. 커밋 이펙트 리스트 도입,
+    이펙트 표현·순서를 DC-14로 확정. concurrent br 5,104 / 6,200.
+    **포크가 처음으로 base와 갈라졌다** (`diff.ts` 96줄, `wDom.ts` 30줄) —
+    동치성은 이제 테스트로만 지킨다.
 - Phase 0 판정:
 
   | 수용 기준 | 결과 |
@@ -309,9 +318,10 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   | RC-9 인프라 | `pnpm test:dual` 통과 — helper 37 / devHelper 2 / ftags 10 / ssr 8, 양쪽 동일 |
   | N2 (`src/` 동결) | `git status src/` 비어 있음 |
 
-- next: 3-4 수동 확인 + 3-5 릴리스 판정 (사람 몫). 계속한다면 Phase 4 (커밋 이펙트 리스트).
+- next: Phase 5 (커밋 경계 단일화, BC-1). 3-4 수동 확인과 3-5 릴리스 판정은 미완이며 사람 몫.
 - blockers: 없음.
 - 미결(경미):
   - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
     npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
-- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` / Phase 2: `3ebf375` / **Phase 3: `299d4cd`**
+- 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
+  Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: 미커밋**
