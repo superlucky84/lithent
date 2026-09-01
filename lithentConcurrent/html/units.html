@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lithent-concurrent — unit timing (RC-7)</title>
+    <style>
+      body {
+        font:
+          13px/1.5 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+        margin: 0;
+        padding: 24px;
+        max-width: 1000px;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 4px;
+      }
+      p.lede {
+        margin: 0 0 16px;
+        color: #666;
+      }
+      ul.hint {
+        margin: 0 0 16px;
+        padding-left: 18px;
+        color: #666;
+        font-size: 12px;
+      }
+      ul.hint li {
+        margin-bottom: 3px;
+      }
+      button {
+        font: inherit;
+        padding: 5px 12px;
+        margin-right: 8px;
+      }
+      button[disabled] {
+        opacity: 0.5;
+      }
+      #status {
+        color: #666;
+        font-size: 12px;
+        margin: 12px 0;
+        min-height: 18px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 4px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 5px 10px;
+        border-bottom: 1px solid #eee;
+      }
+      th {
+        font-weight: 600;
+        border-bottom: 1px solid #ccc;
+      }
+      td.n,
+      th:nth-child(n + 3) {
+        text-align: right;
+      }
+      .note {
+        color: #999;
+        font-size: 11px;
+      }
+      tr.over td {
+        background: #fff6e5;
+      }
+      /* The workloads render here. Kept out of view so layout cost does not
+         dominate; script time is what a frame budget is spent on. */
+      #stage {
+        position: absolute;
+        left: -10000px;
+        top: 0;
+        width: 800px;
+        height: 600px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>lithent-concurrent — unit timing (RC-7 / IMPLEMENT Phase 7)</h1>
+    <p class="lede">
+      One unit = one <code>replaceWDom</code>. The question 7-3 asks is whether
+      the target workload produces units that exceed a frame (16ms).
+    </p>
+    <ul class="hint">
+      <li>
+        Both cores are the <b>built bundles</b> — run
+        <code>pnpm build</code> first.
+      </li>
+      <li>
+        Close other tabs and leave this one focused; background throttling skews
+        the tail.
+      </li>
+      <li>
+        Run it two or three times and take the steadier one. The first run pays
+        for JIT.
+      </li>
+      <li>
+        Highlighted rows are the ones with a sample over 16ms — that is the 7-3
+        answer.
+      </li>
+    </ul>
+    <button id="run">run</button>
+    <button id="copy" disabled>copy as markdown</button>
+    <div id="status"></div>
+    <div id="output"></div>
+    <div id="stage"></div>
+    <script type="module" src="/bench/units.ts"></script>
+  </body>
+</html>

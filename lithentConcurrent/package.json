@@ -33,6 +33,7 @@
     "dev": "vite --config vitedev.config.js",
     "build": "vite build && node scripts/emitTypes.js",
     "verify": "node scripts/verifyArtifacts.js",
+    "bench": "vite --config vitebench.config.js",
     "watch": "vite build --watch",
     "test": "vitest run --reporter verbose -c vitest.config.js",
     "test:dev": "vitest -c vitest.config.js"
