@@ -21,11 +21,11 @@
 > 전환 도중 급한 갱신으로도 렌더되면 전환 값이 즉시 보이는 것이 **정상**이다
 > (REQUIREMENTS §8 "RC-2의 단서").
 >
-> **B-3 판정 시 주의**: `isPending`은 조회일 뿐 스스로 리렌더를 일으키지 않는다.
+> **B-3 판정 시 주의**: `hasPendingRender`는 조회일 뿐 스스로 리렌더를 일으키지 않는다.
 > pending 표시는 sync로 렌더되는 부모·형제에 두고 확인할 것 (§8 "RC-3의 단서").
 >
 > **import 경로**: 코어는 alias(`lithent` → `lithent-concurrent`)로 바꾸고,
-> `deferred`/`ldeferred`/`isPending`은 `lithent-concurrent/helper`에서 가져온다.
+> `deferred`/`ldeferred`/`hasPendingRender`는 `lithent-concurrent/helper`에서 가져온다.
 > `lithent/helper`(기본)는 무변경이므로 `lstate`/`computed` 등은 그대로 쓴다.
 
 ## A. 자동 검증 + 빌드 무결성 (릴리스 직전 1회)
@@ -75,9 +75,9 @@
 
 - [ ] B-1. **입력 응답성**: 무거운 저우선순위 갱신 대기 중 텍스트 입력이 끊기지 않는다
   (sync 패널은 끊기고 deferred 패널은 안 끊기는 대조로 판정)
-- [ ] B-2. **이전 화면 유지**: `startTransition` 갱신 완료 전까지 이전 내용이 그대로 보인다
+- [ ] B-2. **이전 화면 유지**: `deferRender` 갱신 완료 전까지 이전 내용이 그대로 보인다
   (빈 화면·깜빡임 없음)
-- [ ] B-3. **isPending**: 전환 중 pending 표시가 켜지고 완료 시 꺼진다
+- [ ] B-3. **hasPendingRender**: 전환 중 pending 표시가 켜지고 완료 시 꺼진다
 - [ ] B-4. **급한 갱신 우선**: 저우선순위 대기 중 급한 갱신이 먼저 반영된다
 - [ ] B-5. **낡은 전환 폐기**: 전환 중 값을 연속 변경해도 최종 값 1개만 렌더되고
   중간 값이 화면에 나타나지 않는다 (deferred 패널의 `renders` ≪ 타자 수)
@@ -116,6 +116,9 @@
   유실되지도 중복되지도 않는다
 - [ ] E-4. **입력 비차단**: 단일 컴포넌트의 무거운 렌더(10k행) 진행 중에도 텍스트 입력이
   프레임 드랍 없이 반영된다 — **RC-10. T2의 존재 이유이므로 필수 통과**
+  > 이 항목이 **"concurrent rendering"이라는 서술의 명명 근거**다 (REQUIREMENTS §2.1).
+  > 파이버 코드가 들어간 시점이 아니라 여기가 통과하는 시점에 그 주장이 참이 된다.
+  > 그래도 `concurrent mode`라는 표현은 쓰지 않는다 — 그건 React의 기능 묶음 이름이다.
 - [ ] E-5. 중단 중 페이지 이탈·컴포넌트 언마운트 시 에러 없음
 - [ ] E-6. **클로저 상태 보존**: 중단·폐기·재시작을 반복해도 `state`/`lstate` 값이
   리셋되지 않는다 (current·WIP가 같은 인스턴스 클로저를 공유하는지 — DESIGN D8 / Phase 9-2)

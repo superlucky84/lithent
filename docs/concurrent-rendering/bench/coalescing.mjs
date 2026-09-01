@@ -49,7 +49,7 @@ for (const k of [
 const core = await import(
   root + '/lithentConcurrent/dist/lithentConcurrent.mjs'
 );
-const { h, render, useRenew, lmount, startTransition, whenIdle } = core;
+const { h, render, useRenew, lmount, deferRender, whenIdle } = core;
 
 const [, , MODE, R, G] = process.argv;
 const RENDER_MS = Number(R),
@@ -68,7 +68,7 @@ const C = lmount(() => {
   const renew = useRenew();
   bump = () => {
     value += 1;
-    deferredMode ? startTransition(renew) : renew();
+    deferredMode ? deferRender(renew) : renew();
   };
   return () => {
     renders += 1;

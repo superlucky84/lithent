@@ -1,4 +1,4 @@
-import { useRenew, startTransition } from 'lithent-concurrent';
+import { useRenew, deferRender } from 'lithent-concurrent';
 import type { State } from '@/types';
 
 /**
@@ -18,11 +18,11 @@ export const ldeferred = <T>(value: T): State<T> => {
     },
     set value(newValue: T) {
       result = newValue;
-      startTransition(renew);
+      deferRender(renew);
     },
     set v(newValue: T) {
       result = newValue;
-      startTransition(renew);
+      deferRender(renew);
     },
   };
 };

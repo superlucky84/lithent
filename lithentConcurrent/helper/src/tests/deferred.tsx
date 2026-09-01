@@ -8,7 +8,7 @@ import {
   whenIdle,
   useRenew,
 } from 'lithent-concurrent';
-import { deferred, ldeferred, isPending } from '@/index';
+import { deferred, ldeferred, hasPendingRender } from '@/index';
 
 /**
  * Phase 2 — value-level deferred API (D3, D11).
@@ -231,14 +231,14 @@ if (import.meta.vitest) {
     });
   });
 
-  describe('isPending', () => {
+  describe('hasPendingRender', () => {
     it('RC-3: true while a deferred render waits, false once it commits', async () => {
       let bump = () => {};
       let pendingNow = () => false;
 
       const Component = lmount(() => {
         const label = ldeferred('a');
-        const pending = isPending();
+        const pending = hasPendingRender();
 
         bump = () => {
           label.value = 'b';
@@ -265,14 +265,14 @@ if (import.meta.vitest) {
       let pendingB = () => false;
 
       const B = lmount(() => {
-        const pending = isPending();
+        const pending = hasPendingRender();
         pendingB = () => pending.value;
         return () => <span>b</span>;
       });
 
       const A = lmount(() => {
         const label = ldeferred('a');
-        const pending = isPending();
+        const pending = hasPendingRender();
         bumpA = () => {
           label.value = 'z';
         };
@@ -302,7 +302,7 @@ if (import.meta.vitest) {
 
       const Component = lmount(() => {
         const label = ldeferred('a');
-        const pending = isPending();
+        const pending = hasPendingRender();
         bump = () => {
           label.value = 'b';
         };

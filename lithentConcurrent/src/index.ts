@@ -4,7 +4,7 @@ export { h, Fragment, portal, mount, lmount, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
 export {
   componentUpdate,
-  startTransition,
+  deferRender,
   hasPending,
   whenIdle,
 } from '@/utils/redraw';

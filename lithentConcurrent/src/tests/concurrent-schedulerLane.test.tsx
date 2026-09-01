@@ -4,7 +4,7 @@ import {
   render,
   mount,
   nextTick,
-  startTransition,
+  deferRender,
   getComponentKey,
 } from '../index';
 import type { Props, Renew } from '../index';
@@ -101,7 +101,7 @@ describe('scheduler lanes', () => {
     const sync = makeRow('sync');
     mountRows([low, sync]);
 
-    startTransition(low.bump);
+    deferRender(low.bump);
     sync.bump();
 
     await nextTick();
@@ -115,7 +115,7 @@ describe('scheduler lanes', () => {
     const row = makeRow('deferred');
     const host = mountRows([row]);
 
-    startTransition(row.bump);
+    deferRender(row.bump);
 
     await nextTick();
     expect(host.textContent).toBe('deferred:0');
@@ -146,7 +146,7 @@ describe('scheduler lanes', () => {
     mountRows([...rows, urgent]);
     cutIn = urgent.bump;
 
-    startTransition(() => rows.forEach(row => row.bump()));
+    deferRender(() => rows.forEach(row => row.bump()));
 
     await vi.waitFor(() => expect(commitLog).toHaveLength(4));
     expect(commitLog).toEqual(['a', 'urgent', 'b', 'c']);
@@ -161,7 +161,7 @@ describe('scheduler lanes', () => {
     );
     mountRows(rows);
 
-    startTransition(() => rows.forEach(row => row.bump()));
+    deferRender(() => rows.forEach(row => row.bump()));
 
     await vi.waitFor(() => expect(commitLog).toHaveLength(6));
     await settle();
@@ -176,7 +176,7 @@ describe('sync wins over low for the same component', () => {
     mountRows([row]);
     const compKey = row.compKey();
 
-    startTransition(row.bump);
+    deferRender(row.bump);
     expect(hasPending(compKey, 'low')).toBe(true);
 
     row.bump();
@@ -194,7 +194,7 @@ describe('sync wins over low for the same component', () => {
     const compKey = row.compKey();
 
     row.bump();
-    startTransition(row.bump);
+    deferRender(row.bump);
 
     expect(hasPending(compKey, 'low'), 'low entry must not be added').toBe(
       false
@@ -206,13 +206,13 @@ describe('sync wins over low for the same component', () => {
   });
 });
 
-describe('startTransition', () => {
+describe('deferRender', () => {
   it('restores the previous lane when the scope throws', async () => {
     const row = makeRow('after-throw');
     const host = mountRows([row]);
 
     expect(() =>
-      startTransition(() => {
+      deferRender(() => {
         throw new Error('boom');
       })
     ).toThrow('boom');
@@ -227,8 +227,8 @@ describe('startTransition', () => {
     const row = makeRow('nested');
     const host = mountRows([row]);
 
-    startTransition(() => {
-      startTransition(() => {});
+    deferRender(() => {
+      deferRender(() => {});
       row.bump();
     });
 

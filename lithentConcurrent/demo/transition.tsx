@@ -1,7 +1,7 @@
 /**
  * Manual scheduler checks — MANUAL_TEST_CHECKLIST section B.
  *
- * Nothing else in the repo uses `startTransition`, so B-1..B-5 and B-9 could not
+ * Nothing else in the repo uses `deferRender`, so B-1..B-5 and B-9 could not
  * be performed at all without a page like this.
  *
  *   pnpm dev:concurrent
@@ -29,7 +29,7 @@ import {
   nextTick,
   whenIdle,
 } from 'lithent-concurrent';
-import { ldeferred, isPending } from 'lithent-concurrent-helper';
+import { ldeferred, hasPendingRender } from 'lithent-concurrent-helper';
 
 const ROW_CHOICES = [1000, 3000, 6000, 12000];
 let rowCount = 3000;
@@ -58,7 +58,7 @@ const createPane = (label: string, deferredMode: boolean): Pane => {
   const List = lmount(() => {
     const renew = useRenew();
     const deferredRows = ldeferred(buildRows('', rowCount));
-    const pending = isPending();
+    const pending = hasPendingRender();
     let plainRows = buildRows('', rowCount);
 
     pendingNow = () => pending.value;

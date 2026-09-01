@@ -29,16 +29,21 @@ const lanes: Record<Lane, Map<Props, () => void>> = {
 /**
  * Runs `scope` with updates routed to the low lane.
  *
- * Only synchronous work inside `scope` is covered — anything deferred to a
- * later task queues at the lane in effect then.
+ * `scope` itself runs synchronously, right now — only the renders it triggers
+ * are deferred. Anything `scope` defers to a later task queues at whatever lane
+ * is in effect then, not this one.
  *
  * NOTE: this defers the RENDER, not the state. Lithent keeps state in the
  * component's closure and the setter mutates it eagerly, so a component that
- * also renders at sync priority in the meantime observes the transition value
- * right away. Deferring the state as well would require a per-lane copy of it,
- * which the closure model rules out (P2).
+ * also renders at sync priority in the meantime observes the new value right
+ * away. Deferring the state as well would require a per-lane copy of it, which
+ * the closure model rules out (P2).
+ *
+ * Named for that contract rather than after React's `startTransition`, which
+ * promises a state snapshot and a reactive `isPending` — neither of which this
+ * has (DC-15).
  */
-export const startTransition = (scope: () => void) => {
+export const deferRender = (scope: () => void) => {
   const previous = laneRef.value;
   laneRef.value = 'low';
   try {
@@ -167,7 +172,7 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
 /**
  * Whether `compKey` is waiting in a lane — in either one when `lane` is omitted.
  *
- * Phase 2 wraps this as the helper-level `isPending` (RC-3). It lands here
+ * Phase 2 wraps this as the helper-level `hasPendingRender` (RC-3). It lands here
  * already because the sync-wins rule above is otherwise unobservable: a stale
  * queue entry is also caught by `replaceWDom`'s `il` guard, so render counts
  * alone cannot tell the two mechanisms apart.

@@ -2,7 +2,7 @@
   "type": "module",
   "name": "lithent-concurrent",
   "version": "0.0.0",
-  "description": "Concurrent rendering build of lithent. Interface-compatible drop-in for large sites.",
+  "description": "Priority-scheduled rendering build of lithent for large sites. Interface-compatible drop-in; interruptible rendering lands in T2.",
   "private": true,
   "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithentConcurrent.umd.js",

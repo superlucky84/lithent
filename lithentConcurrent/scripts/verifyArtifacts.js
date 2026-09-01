@@ -85,12 +85,12 @@ check(
       'base and concurrent bundles are identical'
     );
     assert(
-      concurrent.includes('startTransition'),
-      'concurrent bundle has no startTransition'
+      concurrent.includes('deferRender'),
+      'concurrent bundle has no deferRender'
     );
     assert(
-      !base.includes('startTransition'),
-      'the frozen base bundle should not contain startTransition'
+      !base.includes('deferRender'),
+      'the frozen base bundle should not contain deferRender'
     );
 
     return 'distinct';
@@ -135,7 +135,7 @@ check('A-5', 'the shipped bundle keeps Fragment identity', async () => {
 
 check('A-11', 'lithent-concurrent/helper loads standalone', async () =>
   import(join(pkgDir, 'helper/dist/lithentConcurrentHelper.mjs')).then(mod => {
-    for (const name of ['deferred', 'ldeferred', 'isPending']) {
+    for (const name of ['deferred', 'ldeferred', 'hasPendingRender']) {
       assert(typeof mod[name] === 'function', `${name} is not exported`);
     }
     return Object.keys(mod).join(', ');
@@ -175,13 +175,13 @@ check('A-9', 'a consumer type-checks against the shipped declarations', () => {
   writeFileSync(
     join(dir, 'consumer.ts'),
     [
-      `import { h, Fragment, mount, render, startTransition, whenIdle } from '${corePath.replace(/\.d\.ts$/, '')}';`,
-      `import { ldeferred, isPending } from '${helperPath.replace(/\.d\.ts$/, '')}';`,
+      `import { h, Fragment, mount, render, deferRender, whenIdle } from '${corePath.replace(/\.d\.ts$/, '')}';`,
+      `import { ldeferred, hasPendingRender } from '${helperPath.replace(/\.d\.ts$/, '')}';`,
       `import type { WDom, Renew } from '${corePath.replace(/\.d\.ts$/, '')}';`,
       `export const App = mount((renew: Renew) => {`,
       `  const label = ldeferred('a');`,
-      `  const pending = isPending();`,
-      `  const bump = () => startTransition(() => { label.value = 'b'; renew(); });`,
+      `  const pending = hasPendingRender();`,
+      `  const bump = () => deferRender(() => { label.value = 'b'; renew(); });`,
       `  return (): WDom => h('button', { onClick: bump }, pending.value ? '...' : label.v);`,
       `});`,
       `export const boot = (el: HTMLElement) => { render(h(App, {}), el); return whenIdle(); };`,

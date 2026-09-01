@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-14 확정. T1 완성, T1.5 진행 중 (Phase 4 완료, 2026-08-31)**
+- 상태: **DC-1~DC-16 확정. T1 완성, T1.5 진행 중 (Phase 4 완료, 2026-08-31)**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -156,7 +156,7 @@ scheduleFlush(low)  → port.postMessage(null)     // MessageChannel
 
 ### D2. 우선순위 표현 — **DC-1 확정: (A) ambient**
 
-`laneRef: { value: Lane }`를 모듈 전역으로 두고 `startTransition`이 세운다.
+`laneRef: { value: Lane }`를 모듈 전역으로 두고 `deferRender`가 세운다.
 `Renew = () => boolean` 시그니처 변경 0 → helper 파급 없음 (REQUIREMENTS C3).
 기존 `needDiffRef`/`compKeyRef` 관행과 일치.
 
@@ -164,7 +164,7 @@ scheduleFlush(low)  → port.postMessage(null)     // MessageChannel
 
 React는 레인마다 상태 큐를 따로 들고 있어서, 전환 중인 값과 현재 값이 동시에 존재한다.
 Lithent는 상태가 컴포넌트 클로저에 있고 setter가 그 자리에서 값을 바꾼다 (P2, N6).
-`startTransition`이 미룰 수 있는 것은 **언제 렌더할지**뿐이다.
+`deferRender`가 미룰 수 있는 것은 **언제 렌더할지**뿐이다.
 
 관측 가능한 차이:
 
@@ -191,26 +191,26 @@ export const ldeferred = <T>(value: T): State<T> => {
   const renew = useRenew();
   return {
     get value() { return result; },
-    set value(v) { result = v; startTransition(renew); }
+    set value(v) { result = v; deferRender(renew); }
   };
 };
 ```
 
-`isPending` (RC-3): 스케줄러가 `hasPending(compKey, 'low')` 노출 → helper가 감싼다.
+`hasPendingRender` (RC-3): 스케줄러가 `hasPending(compKey, 'low')` 노출 → helper가 감싼다.
 
 #### Phase 2 구현 반영
 
 - `deferred(value, renew)` / `ldeferred(value)` — `state`/`lstate`와 같은 모양,
-  setter만 `startTransition`을 통과한다.
-- `isPending()`은 **`Computed<boolean>`** 모양으로 돌려준다.
+  setter만 `deferRender`를 통과한다.
+- `hasPendingRender()`은 **`Computed<boolean>`** 모양으로 돌려준다.
   마운터에서 호출해 compKey를 캡처하므로 컴포넌트 인스턴스에 묶인다 — `useRenew`와 같은 방식.
-- **`isPending`은 그 자체로 리렌더를 일으키지 않는다.** 반응성이 아니라 조회다.
+- **`hasPendingRender`는 그 자체로 리렌더를 일으키지 않는다.** 반응성이 아니라 조회다.
   pending 표시는 sync로 렌더되는 곳(부모·형제의 `state`/`lstate`)에 두고,
   무거운 쪽만 `deferred`로 미루는 조합으로 쓴다. RC-3의 "조회할 수 있다"가 이 의미다.
 
 ### D12b. concurrent 전용 helper의 소재 — **DC-13 확정: 별도 서브패스 패키지**
 
-`deferred`·`ldeferred`·`isPending`은 low 레인이 있어야 의미가 있다. 어디에 둘 것인가.
+`deferred`·`ldeferred`·`hasPendingRender`는 low 레인이 있어야 의미가 있다. 어디에 둘 것인가.
 
 **확정**: `lithent-concurrent/helper` (워크스페이스 패키지 `lithent-concurrent-helper`).
 `lithent` ↔ `lithent/helper` 관계를 그대로 복제한다. `helper/`는 **한 줄도 건드리지 않는다.**
@@ -223,9 +223,9 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 소비자 관점:
 
 ```ts
-import { h, mount, startTransition } from 'lithent';   // 번들러에서 concurrent로 alias
+import { h, mount, deferRender } from 'lithent';   // 번들러에서 concurrent로 alias
 import { lstate, computed } from 'lithent/helper';      // 기존 helper 그대로
-import { ldeferred, isPending } from 'lithent-concurrent/helper';  // concurrent 전용
+import { ldeferred, hasPendingRender } from 'lithent-concurrent/helper';  // concurrent 전용
 ```
 
 경로가 곧 "이건 concurrent에서만 동작한다"는 표시가 된다.
@@ -241,7 +241,7 @@ const concurrent = core as unknown as ConcurrentCore;  // 없는 이름은 undef
 
 동작은 한다. 기본 코어 폴백도 "참인 답"으로 만들 수 있다 (레인이 없으면 전환은 즉시,
 pending인 것은 없음). 문제는 **기본 코어 사용자의 `lithent/helper`에 조용히 아무것도
-하지 않는 API가 생긴다**는 것이다. `ldeferred`가 미루지 않고 `isPending`이 늘 false인
+하지 않는 API가 생긴다**는 것이다. `ldeferred`가 미루지 않고 `hasPendingRender`가 늘 false인
 API를 API 목록에 두는 것은, 크기가 아니라 **약속의 문제**다.
 부수적으로 테스트도 한 파일에서 두 코어를 분기 단언해야 해서 읽기 어려워진다.
 
@@ -253,7 +253,7 @@ concurrent 코어는 `lithent`의 드롭인 대체다. 기본 코어가 `state`/
 
 #### 레인 관련 코어 export는 코어에 남는다
 
-`startTransition`·`hasPending`·`whenIdle`은 스케줄러 기능이므로 **코어**에 있다.
+`deferRender`·`hasPending`·`whenIdle`은 스케줄러 기능이므로 **코어**에 있다.
 concurrent helper는 이것들을 `lithent-concurrent`에서 **external로** import한다 —
 번들에 스케줄러 사본이 들어가면 레인 큐가 둘로 갈라지기 때문이다
 (`helper/`가 `lithent`를 external로 두는 것과 같은 이유).
@@ -395,7 +395,7 @@ node.getParent = () => node.return;   // 1줄 shim, 기존 인터페이스 보�
 - 검증: 이 선언만으로 외부 소비자 파일이 `tsc --strict`를 통과하는 것을 확인했다.
 
 > 대안으로 "concurrent는 기본 코어의 `.d.ts`를 그대로 쓴다"도 검토했다. C3(인터페이스 동일)
-> 때문에 Phase 0에서는 성립하지만, T1에서 `startTransition`이 추가되는 순간 거짓이 된다.
+> 때문에 Phase 0에서는 성립하지만, T1에서 `deferRender`가 추가되는 순간 거짓이 된다.
 > 계약을 문서가 아니라 **생성물로** 유지하는 쪽을 택했다.
 
 ### D14. 위성 스위트의 코어 전환 — **DC-12 확정: `LITHENT_CORE` + 빌드 산출물 alias**
@@ -430,7 +430,7 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 
 ## 7. 결정 체크리스트
 
-- [x] **DC-1**: 우선순위 API 표현 → **(A) ambient `startTransition`**.
+- [x] **DC-1**: 우선순위 API 표현 → **(A) ambient `deferRender`**.
   근거: `Renew` 시그니처 변경 0, helper 파급 없음, 기존 전역 플래그 관행과 일치.
 - [x] **DC-2**: 레인 개수 → **2단계 (sync / low)**.
   근거: 3단계의 실이득 미검증. 후속 추가는 하위 호환.
@@ -465,6 +465,23 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 - [x] **DC-14**: 커밋 이펙트 표현·순서 → **thunk 배열 + 수집 순서 재생** (D4).
   근거: 수집 순서 = base의 실행 순서이므로 동치성이 구성상 보장된다.
   그룹 순서도 통과하지만(효과들이 멱등), 효과가 늘 때마다 안전성을 재논증해야 한다.
+- [x] **DC-15**: 저우선순위 API 이름 → **`deferRender`** (구 `startTransition`),
+  helper의 pending 조회는 **`hasPendingRender`** (구 `isPending`). 확정 2026-09-01.
+  근거: React의 `startTransition`은 (1) 새 UI가 준비될 때까지 이전 상태가 보인다는
+  전환 의미론과 (2) 반응성 `isPending`을 함께 뜻한다. 여기엔 **둘 다 없다** —
+  값은 즉시 쓰이고(RC-2의 단서), pending은 조회다(RC-3의 단서). 이름이 없는 보장을
+  끌어오면 그 오해는 조용히 잘못된 UI로 나타나므로, 실제 계약("렌더를 미룬다")을 이름에 둔다.
+  코어의 저수준 `hasPending(compKey, lane?)`은 **그대로 둔다**. helper 쪽에 같은 이름을
+  쓰면 시그니처·반환 타입이 다른 동명 API가 두 패키지에 생겨 문서가 모호해진다.
+  → 같은 규칙을 프로젝트 이름에도 적용한 것이 REQUIREMENTS **§2.1**이다
+  (T2 완주 전까지 "concurrent rendering"이라 서술하지 않고, 완주 후에도 `concurrent mode`는
+  쓰지 않는다). 명명 근거는 RC-10(수동 E-4) 통과다.
+- [x] **DC-16**: T1을 기본 `lithent`에 통합할 것인가 → **통합하지 않는다. 별도 빌드 유지.**
+  확정 2026-09-01 (사용자 결정).
+  근거: T1.5/T2를 계속하므로 지금 통합해도 아끼는 것이 없고 기본 코어만 무거워진다
+  (BC-1은 T1.5, 파이버는 +4~7 KB). 이중 빌드 기계장치(DC-10~DC-13)는 그 전제 위에서
+  값을 한다. §1.1의 제품 결정과 REQUIREMENTS §"T1의 이득 구간" 실측이 그대로 유효하다.
+  → 이 결정으로 P1(`src/` 동결)은 T2까지 유지된다.
 
 ## 8. 설계 ↔ 검증 연결
 
@@ -475,7 +492,7 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D1 sync 우선 규칙 | `hasPending` 기반 큐 상태 단언 (렌더 횟수로는 관측 불가) |
 | D1 yield | low flush 도중 발생한 sync 갱신이 잔여 low보다 먼저 커밋 |
 | D2 우선순위 표현 | C3 회귀 (기존 helper 테스트 무수정 통과) ✅ |
-| D2 lane 복원 | `startTransition` 스코프가 throw해도 이전 레인 복원 / 중첩 |
+| D2 lane 복원 | `deferRender` 스코프가 throw해도 이전 레인 복원 / 중첩 |
 | D3 deferred API | RC-2·RC-3 (Phase 2) ✅, 수동 B-2 |
 | D12b helper 소재 | `helper/` 무변경(`git status helper/`) + concurrent helper 스위트 7개 |
 | D11 `whenIdle` | BC-4 (Phase 2) ✅, 수동 B-9 |

@@ -17,6 +17,12 @@ concurrent 모드는 벗어나며, 대부분의 사용 환경(SSR 페이지에 �
 따라서 concurrent는 **기존 코어를 수정하지 않고**, 인터페이스 호환되는
 **대규모 사이트용 별도 빌드**로 만든다. 같은 레포에서 2중 빌드한다 (§3).
 
+> **재확인 (2026-09-01, DC-16)** — T1 완성 후 "T1만이라도 기본 `lithent`에 합칠까"를
+> 다시 검토했고, **합치지 않기로 확정**했다. T1.5/T2를 계속하므로 지금 통합해도 아끼는
+> 것이 없고 기본 코어만 무거워진다. 아래 §1.2의 "기본 코어 동결"은 T2까지 유효하다.
+> 같은 검토에서 저우선순위 API 이름을 `startTransition` → **`deferRender`**,
+> pending 조회를 `isPending` → **`hasPendingRender`** 로 바꿨다 (DC-15).
+
 ### 1.2 지켜야 할 것
 
 1. **기본 코어 동결** — `src/`는 이 작업에서 한 줄도 변경하지 않는다.
@@ -39,6 +45,52 @@ concurrent 모드는 벗어나며, 대부분의 사용 환경(SSR 페이지에 �
 
 **중요**: 더블 버퍼링은 *폐기*의 조건이지 *중단*의 조건이 아니다.
 중단의 조건은 **재개 가능한 순회 구조**다.
+
+### 2.1 언제 "concurrent"라 부를 수 있는가 (2026-09-01 확정)
+
+이름은 DC-15와 같은 규칙을 따른다 — **없는 보장을 이름이 끌어오지 않게 한다.**
+
+정의가 두 갈래다. 느슨하게 "우선순위 기반 스케줄링"을 concurrent라 부르면 T1도 해당하고,
+엄격하게 "렌더가 중단 가능하다"를 뜻하면 T2부터다. **사용자의 기대치는 React가 정해놨으므로
+실무에서 유효한 것은 엄격한 쪽이다.**
+
+| 속성 | 채워지는 단계 | 현재 |
+|---|---|---|
+| 우선순위 | T1 (Phase 1) | ✅ |
+| 폐기 (원본 트리 불변) | T1.5 (Phase 4) | ✅ |
+| tearing 방지 | T1.5 (Phase 6) | 미착수 |
+| **중단** | T2 (Phase 8) | 미착수 |
+| **재개** | T2 (Phase 8) | 미착수 |
+| 폐기 시 훅 상태 정합 | T2 (Phase 9, §7.4) | 미착수 |
+
+**T1 현재 상태는 concurrent rendering이 아니다.** `flushLow`의 `shouldYield()`는 큐 항목
+*사이*에서만 확인되고 항목 하나는 컴포넌트 렌더 전체다 — 즉 yield 입자가 "컴포넌트 1개"이며
+트리 순회 도중에 멈추는 지점이 없다. §8 "T1의 이득 구간" 실측이 이것의 지문이다:
+렌더 60ms / 입력 100ms에서 이득이 **정확히 0**인 이유는 그 60ms를 쪼갤 수 없기 때문이다.
+
+**T2 완주 후에는 "concurrent rendering"이 정확한 서술이 된다.** 위 표에 빈 칸이 없어진다.
+
+**그때도 `concurrent mode`라는 표현은 쓰지 않는다.** 그것은 React가 특정 *기능 묶음*
+(transition + Suspense + `useDeferredValue` + 선택적 하이드레이션)에 붙였던 고유명사이고,
+우리가 갖는 것은 그 묶음이 아니라 **그 아래의 렌더러 속성**이다. 이 표현을 쓰면
+`startTransition`을 썼을 때와 같은 오해를 산다 (DC-15).
+
+- 사용자 대면 문구: **"중단 가능한 렌더링(interruptible rendering)"** 또는
+  "우선순위 기반 concurrent rendering"
+- README·릴리스 노트에 `concurrent mode`를 넣지 않는다. 내부 코드네임으로는 무해하다.
+- 패키지명 `lithent-concurrent`는 **T2 완주를 전제로** 정직하다 (DC-16이 그 전제를 확정했다).
+  T1만 단독 릴리스한다면 이름을 재검토한다 (IMPLEMENT 3-5).
+
+**T2 완주 후에도 없는 것** — 결함이 아니라 다른 제품이다:
+
+1. **transition 의미론.** 파이버는 순회를 중단 가능하게 만들지 상태를 버전화하지 않는다.
+   상태가 컴포넌트 클로저에 있는 한(N6) "새 UI가 준비될 때까지 이전 값이 보인다"와
+   반응성 pending은 T2 이후에도 없다. §8 "RC-2의 단서"·"RC-3의 단서"는 임시 제약이 아니라
+   이 아키텍처의 영구 속성이다.
+2. **Suspense / `use()`.** N1은 목표 미달이 아니라 **불변 조건**이다 (§5).
+
+**이름은 코드가 아니라 측정으로 번다.** 파이버 자료구조가 들어간 시점이 아니라
+**RC-10(수동 E-4)이 통과하는 시점**에 위 주장이 참이 된다.
 
 ## 3. 배포 구조 — 모노레포 2중 빌드
 
@@ -80,7 +132,7 @@ lithentConcurrent/          ← 워크스페이스 패키지 (name: lithent-conc
   vitest.config.js                                 ← 공유 core 스위트를 concurrent 코어로 실행
 
   helper/                   ← 워크스페이스 패키지 (name: lithent-concurrent-helper). Phase 2
-    src/hook/{deferred,ldeferred,isPending}.ts     ← 레인이 있어야 의미 있는 helper (DC-13)
+    src/hook/{deferred,ldeferred,hasPendingRender}.ts     ← 레인이 있어야 의미 있는 helper (DC-13)
     src/types.ts  src/index.ts  src/tests/
     package.json  tsconfig.json  vite.config.js    ← 코어는 external
 ```
@@ -98,7 +150,7 @@ lithentConcurrent/          ← 워크스페이스 패키지 (name: lithent-conc
 ## 4. 범위 — 3단계
 
 ### T1 — 스케줄러
-우선순위 큐(2레인), 저우선순위 유휴 실행, ambient `startTransition`, 값 단위 deferred state.
+우선순위 큐(2레인), 저우선순위 유휴 실행, ambient `deferRender`, 값 단위 deferred state.
 작업 단위(컴포넌트 1개의 `replaceWDom`)는 **원자적으로 유지**한다.
 
 ### T1.5 — diff 순수화 + tearing
@@ -226,14 +278,14 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 |---|---|---|
 | **RC-1** | 급한 업데이트가 저우선순위 업데이트보다 먼저 커밋된다 | 단위 테스트 (큐 순서) — **Phase 1 통과** |
 | **RC-2** | 저우선순위 렌더 진행 전까지 이전 화면이 유지된다 | 단위 테스트 + 수동 B-2 — **Phase 1 통과** (단서는 아래) |
-| **RC-3** | `isPending` 상당 상태를 조회할 수 있다 | 단위 테스트 — **Phase 2 통과** (조회 전용, 아래 단서) |
+| **RC-3** | `hasPendingRender` 상당 상태를 조회할 수 있다 | 단위 테스트 — **Phase 2 통과** (조회 전용, 아래 단서) |
 | **RC-4** | 크기 예산 준수 (기본 가드 + concurrent 단계별) | 각 Phase 종료 시 실측 |
 | **RC-5** | 라이프사이클 콜백이 커밋 경계 1곳에서만 flush된다 | `core-loopLifecycleOrder` 등 재검토 |
 | **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 |
 | **RC-7** | 단일 작업 단위가 프레임(16ms)을 초과하는 시나리오가 실재한다 | Phase 7 프로파일링 (예비 측정은 IMPLEMENT Phase 7) |
 | **RC-8** | 폐기된 렌더가 이펙트 유실·중복을 일으키지 않는다 | 단위 테스트 |
 | **RC-9** | **위성 패키지가 양쪽 코어에서 무수정 통과한다** | `pnpm test:dual` (Phase 0에서 인프라 완성) |
-| **RC-10** | 단일 컴포넌트의 무거운 렌더(10k행) 중 입력이 차단되지 않는다 | 수동 E-4 — **T2의 존재 이유** |
+| **RC-10** | 단일 컴포넌트의 무거운 렌더(10k행) 중 입력이 차단되지 않는다 | 수동 E-4 — **T2의 존재 이유이자 "concurrent" 명명 근거** (§2.1) |
 
 ### RC-4 크기 예산
 
@@ -244,7 +296,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **기본 `lithent`** | 전 기간 | **≤ 4,800 B** | 현재 4,734 B. **회귀 가드** — 철학 보호선 |
 | concurrent | Phase 0 (순수 포크) | ≤ 4,800 B | **실측 4,742 B** — 기본과 8 B 차이 (UMD 전역 이름 문자열) |
 | concurrent | T1 | **≤ 5,400 B** | **실측 5,057 B** (Phase 0 대비 +315 B) |
-| concurrent | T1.5 | **≤ 6,200 B** | Phase 4 실측 **5,104 B** |
+| concurrent | T1.5 | **≤ 6,200 B** | Phase 4 실측 5,104 B → DC-15 rename 후 **5,102 B** |
 | concurrent | T2 (파이버) | **≤ 9,000 B** | 파이버 raw +4.5~7KB 반영 |
 
 > 선행 작업(performance-improvement)의 예산 5,120 B는 기본 코어에 한해 유효하며,
@@ -252,7 +304,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 
 ### RC-2의 단서 (Phase 1에서 확정)
 
-`startTransition`은 **렌더를 미루지 상태를 미루지 않는다.** 상태가 컴포넌트 클로저에
+`deferRender`는 **렌더를 미루지 상태를 미루지 않는다.** 상태가 컴포넌트 클로저에
 있고 setter가 그 자리에서 바꾸기 때문이며(P2·N6), 레인별 상태 사본을 두는 것은 N6 위반이다.
 
 → RC-2는 **"전환 중 같은 컴포넌트의 sync 렌더가 끼어들지 않는 한"** 성립한다.
@@ -265,12 +317,12 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 모두 10렌더, 총시간 동일. 렌더 400ms → 10렌더 4.1초 vs 4렌더 1.7초).
 
 이는 §1.1의 제품 판단 — "대부분의 사용 환경에서 체감 이득이 없다" — 을
-측정으로 확인해 준다. 통합 여부를 재검토한다면 이 표가 근거다
-([IMPLEMENT.md](./IMPLEMENT.md) Phase 7 예비 측정).
+측정으로 확인해 준다. 2026-09-01 통합 여부 재검토에서 이 표가 근거였고,
+**별도 빌드 유지로 확정**했다 (DC-16, [IMPLEMENT.md](./IMPLEMENT.md) Phase 7 예비 측정).
 
 ### RC-3의 단서 (Phase 2에서 확정)
 
-`isPending`은 `lithent-concurrent/helper`에 있으며, **조회**이지 반응성 상태가 아니다. `.value`를 읽는 것만으로는 리렌더가
+`hasPendingRender`는 `lithent-concurrent/helper`에 있으며, **조회**이지 반응성 상태가 아니다. `.value`를 읽는 것만으로는 리렌더가
 일어나지 않는다. pending 표시는 sync로 렌더되는 곳(부모·형제의 `state`/`lstate`)에 두고
 무거운 쪽만 `deferred`/`ldeferred`로 미루는 조합으로 쓴다.
 
@@ -297,11 +349,11 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
     RC-9 이중 실행 인프라, RC-4 게이트 스크립트. 구현 중 드러난 3건을
     DC-10~DC-12로 확정 ([DESIGN.md](./DESIGN.md) §6.5).
   - 실측 갱신: 위성 import 41건 / 공개 export 값 21 + 타입 16 (본문 §3.1 반영).
-  - **Phase 1 완료 (2026-08-31)** — 2레인 스케줄러 + ambient `startTransition`.
+  - **Phase 1 완료 (2026-08-31)** — 2레인 스케줄러 + ambient `deferRender`.
     RC-1·RC-2 통과, C2 회귀 없음, concurrent br 4,989 / 5,400.
-  - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`isPending`/`whenIdle`.
+  - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`hasPendingRender`/`whenIdle`.
     RC-3·BC-4 통과, concurrent br 5,057 / 5,400. concurrent 공개 export는 값 **24개**
-    (`startTransition`·`hasPending`·`whenIdle` 추가), helper는 **가산적**으로 4개 추가.
+    (`deferRender`·`hasPending`·`whenIdle` 추가), helper는 **가산적**으로 4개 추가.
   - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b).
     소스가 아니라 **출하 번들·선언 파일**을 보는 검증을 추가했다 (`pnpm verify:concurrent`).
     섹션 B 수행용 데모 페이지 신설 (`pnpm dev:concurrent`).

@@ -95,7 +95,7 @@ Phase 0 착수 중 DESIGN에 없던 문제 3건이 드러났고 DC-10~DC-12로 �
       유지했다. 이 순서가 "렌더 중 발생한 갱신이 같은 flush에 합류한다"는 기존 동작을 만든다.
 - [x] 1-4. `shouldYield()` — low flush가 예산(5 ms) 초과 시 다음 태스크로 이월
 - [x] 1-5. 같은 compKey가 두 레인에 있을 때 sync 우선 + low에서 제거
-- [x] 1-6. `startTransition` export (DC-1 ambient) + `CONCURRENT_ONLY`에 동시 등록
+- [x] 1-6. `deferRender` export (DC-1 ambient) + `CONCURRENT_ONLY`에 동시 등록
 - [x] 1-7. 기준 테스트: 양쪽 코어 전량 무수정 통과 (기본 우선순위 타이밍 불변)
 - [x] 1-8. 신규 테스트 `concurrent-schedulerLane.test.tsx` — RC-1 + RC-2
 - [x] 1-9. 신규 테스트 — low 항목이 sync 갱신으로 무효화되는 경로 (양방향)
@@ -149,13 +149,13 @@ sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
 - [x] 2-1. `ldeferred` — `lithentConcurrent/helper/src/hook/ldeferred.ts`
 - [x] 2-2. `deferred(value, renew)` — mount 모드용
 - [x] 2-3a. 스케줄러 `hasPending(compKey, lane)` 노출 — **Phase 1에서 선행 완료**
-- [x] 2-3b. `isPending()` — `Computed<boolean>` 모양, 마운터에서 compKey 캡처
+- [x] 2-3b. `hasPendingRender()` — `Computed<boolean>` 모양, 마운터에서 compKey 캡처
 - [x] 2-4. 스케줄러 `whenIdle(): Promise<void>` 노출 (DC-9) — `nextTick` 의미 변경 없음
 - [x] 2-5. export — `lithent-concurrent/helper` 서브패스 신설 (DC-13).
       `helper/src/index.ts`는 **건드리지 않았다**
 - [x] 2-6. 기준 테스트: helper 스위트 양쪽 코어 통과 (37개, 기존 그대로)
 - [x] 2-7. 신규 테스트 — RC-2
-- [x] 2-8. 신규 테스트 — RC-3 (`isPending` 전이 + 컴포넌트별 격리 + 비반응성)
+- [x] 2-8. 신규 테스트 — RC-3 (`hasPendingRender` 전이 + 컴포넌트별 격리 + 비반응성)
 - [x] 2-9. 신규 테스트 — BC-4 (`nextTick` 미반영 / `whenIdle` 반영)
 - [x] 2-10. 크기 실측 — concurrent 코어 br **5,057** / 5,400 (`whenIdle` 몫 +68 B)
 
@@ -169,7 +169,7 @@ sync 경로에 추가된 것은 `comp.up`의 분기 하나뿐이다.
 
 ### DC-13 — concurrent 전용 helper는 어디에 사는가
 
-`deferred`·`ldeferred`·`isPending`은 low 레인이 있어야 의미가 있다.
+`deferred`·`ldeferred`·`hasPendingRender`는 low 레인이 있어야 의미가 있다.
 `lithent-concurrent/helper`에 두고, `lithent` ↔ `lithent/helper` 구조를 복제했다.
 
 ```
@@ -187,7 +187,7 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 부수 효과로 테스트가 훨씬 단순해졌다. 한 파일에서 두 코어를 분기 단언할 필요가 없어져
 `if (concurrent)` 분기가 전부 사라졌다.
 
-레인 관련 export(`startTransition`·`hasPending`·`whenIdle`)는 스케줄러 기능이므로
+레인 관련 export(`deferRender`·`hasPending`·`whenIdle`)는 스케줄러 기능이므로
 **코어에 남는다.** concurrent helper는 이를 **external**로 가져간다 — 번들에 스케줄러
 사본이 들어가면 레인 큐가 둘로 갈라진다.
 
@@ -195,8 +195,8 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 
 | 돌연변이 | 결과 |
 |---|---|
-| `ldeferred`가 `startTransition` 대신 `renew()` | ✓ 4개 실패 |
-| `isPending`이 항상 false | ✓ 2개 실패 |
+| `ldeferred`가 `deferRender` 대신 `renew()` | ✓ 4개 실패 |
+| `hasPendingRender`가 항상 false | ✓ 2개 실패 |
 | 코어 `whenIdle`이 항상 즉시 resolve | ✓ 5개 실패 |
 
 ### 파일 명명 규약 함정
@@ -216,6 +216,11 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 - [x] 3-3b. **빌드 산출물 검증** (`pnpm verify:concurrent`) — 아래
 - [x] 3-4. 수동 체크리스트 A·B·D 수행 — **실브라우저 필요. 사람 몫**
 - [ ] 3-5. **T1 단독 릴리스 판정** — 사람 몫
+- [ ] 3-5b. **T1 단독 릴리스 시 패키지명 재검토** — `lithent-concurrent`라는 이름은
+      **T2 완주를 전제로만** 정직하다. T1은 우선순위 스케줄링이지 concurrent rendering이
+      아니다 (REQUIREMENTS §2.1). T1만 내보낸다면 스케줄러 쪽 이름을 쓰거나
+      릴리스를 T2까지 미룬다. DC-16으로 T2까지 가기로 했으므로 **현재는 유지**이며,
+      이 항목은 그 전제가 바뀔 때만 발동한다.
 
 ### 3-3b. 산출물 검증 — 왜 따로 필요한가
 
@@ -229,7 +234,7 @@ export map 오타, 단독 로드 실패, `@/`가 남은 선언 파일은 **전�
 | 검사 | 항목 |
 |---|---|
 | export map 대상 6개가 전부 존재 | A-10 |
-| concurrent 번들이 base와 다른 산출물 (`startTransition` 유무로 교차 확인) | A-10 |
+| concurrent 번들이 base와 다른 산출물 (`deferRender` 유무로 교차 확인) | A-10 |
 | 출하 번들에서 Fragment 판정 정상 (실제 렌더로 확인) | A-5 |
 | `lithent-concurrent/helper`가 단독 로드되고 3개를 export | A-11 |
 | emit된 `.d.ts` 21개에 `@/` 잔여 0건 | A-9 |
@@ -245,7 +250,7 @@ export map 오타, 단독 로드 실패, `@/`가 남은 선언 파일은 **전�
 
 ### 3-4를 위한 준비 — 데모 페이지
 
-**섹션 B는 지금까지 수행 자체가 불가능했다.** 레포 어디에서도 `startTransition`을
+**섹션 B는 지금까지 수행 자체가 불가능했다.** 레포 어디에서도 `deferRender`를
 쓰지 않으므로 B-1~B-5·B-9를 확인할 대상이 없었다.
 
 ```bash
@@ -279,7 +284,7 @@ pnpm dev:concurrent      # helper 빌드 후 dev 서버 → /html/transition.htm
 > 아니라(그건 T2다) **중간 입력이 아예 렌더되지 않는 것**이다. 같은 compKey의 큐
 > 항목이 새 것으로 교체되기 때문이다. 렌더 횟수가 그 이득의 직접적 척도다.
 
-표시기를 **부모**에 둔 것도 우연이 아니다. `isPending`은 조회라서 스스로 렌더를
+표시기를 **부모**에 둔 것도 우연이 아니다. `hasPendingRender`는 조회라서 스스로 렌더를
 일으키지 않으므로, deferred 컴포넌트 안에 두면 영영 안 보인다 (RC-3의 단서).
 데모가 그 사용법을 보여주는 역할도 한다.
 
@@ -301,7 +306,7 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
 | B-6~B-8 기존 앱 | `pnpm dev` / `dev:examples` / `dev:docs` 실행 후 콘솔 확인 |
 | D SSR/hydration/HMR | 서버 + 브라우저 왕복 |
 | A-6 `getParent` shim | **T2 항목이므로 지금은 N/A** |
-| 3-5 릴리스 판정 | 제품 결정 |
+| 3-5 릴리스 판정 | 제품 결정 (3-5b 패키지명 조건 포함) |
 
 ---
 
@@ -507,6 +512,13 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
 
 진입: Phase 7 판정 통과. / 종료: 중단·재개 동작 + RC-9 유지.
 
+> **⚠ Phase 9가 끝나기 전에 "중단 가능"을 주장하지 말 것** (REQUIREMENTS §2.1).
+> T2는 Phase 8만이 아니라 **8 + 9 + 10 전부**다. §7.4가 걸려 있다 — WIP 훅 슬롯 없이
+> 파이버만 넣고 중단하면 `upD`에 새 deps가 먼저 박혀 재시도 비교가 "같음"이 되고
+> **이펙트가 유실**되며 `upCB`는 중복 누적된다. *중단은 되는데 결과가 틀리는* 중간 지점이
+> 실재하고, 그것이 이름만 얻고 정확성을 잃는 최악의 상태다.
+> 명명 근거는 코드가 아니라 **RC-10(수동 E-4) 통과**다 — Phase 9-11이 그 자동 대응물이다.
+
 - [ ] 8-1. 노드에 `child`/`sibling`/`return`/`ci`(child cursor) 필드 추가 — **가산적**
 - [ ] 8-2. `getParent` 호환 접근자 유지: `() => node.return` (**C3 필수**, D10)
 - [ ] 8-3. `makeNewWDomTree` 재귀를 `beginWork`/`completeWork`로 분해
@@ -552,7 +564,7 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
       (`replaceWDom`의 `il` 가드, `componentMap.get` 실패 경로)
 - [ ] 10-5. `cacheUpdate`·`nextTickRender`·`computed`·`effect` 상호작용
 - [ ] 10-6. `context`/`lcontext` 갱신이 레인을 넘어 전파 (**`getParent` shim 경로 집중**)
-- [ ] 10-7. 엣지: 렌더 중 `startTransition` 중첩 호출
+- [ ] 10-7. 엣지: 렌더 중 `deferRender` 중첩 호출
 - [ ] 10-8. 엣지: 커밋 중 발생한 갱신 요청
 - [ ] 10-9. 엣지: 파이버 중단 중 컴포넌트 언마운트
 - [ ] 10-10. **N1 경계 회귀 감시**: 렌더 중 throw가 언와인딩으로 처리되지 **않는지**
@@ -574,6 +586,9 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
 - [ ] 11-9. 수동 체크리스트 전량 수행
 - [ ] 11-10. 최종 크기 실측 + RC-4 판정 (**기본 코어 무회귀 포함**)
 - [ ] 11-11. 체인지로그 (BC-1~BC-4) + concurrent 패키지 README (alias 설정법 포함)
+      - **README·`package.json` description·릴리스 노트는 REQUIREMENTS §2.1을 따른다** —
+        `concurrent mode`를 쓰지 않고, "중단 가능한 렌더링"은 RC-10 통과 후에만 서술한다.
+        (`package.json`의 description은 2026-09-01에 현재 단계에 맞게 이미 고쳤다.)
 
 ---
 
@@ -585,10 +600,10 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
     바이트 동일성 + 양쪽 테스트 동일 통과 + 크기 8 B 차이로 증명.
   - Phase 0 중 발견된 3건을 DC-10~DC-12로 확정 (DESIGN §D12~D14).
   - **Phase 1 완료 (2026-08-31)** — 1-1~1-10 전부 + 2-3a 선행. 2레인 스케줄러,
-    ambient `startTransition`, 5 ms 예산 yield. concurrent br 4,989 / 5,400,
+    ambient `deferRender`, 5 ms 예산 yield. concurrent br 4,989 / 5,400,
     기본 코어 4,734 무변동, bench 노이즈 범위 (C2 충족).
   - Phase 1 테스트는 **돌연변이로 유효성을 확인**했다 (1차 작성본은 무의미했음).
-  - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`isPending` (신규 서브패스
+  - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`hasPendingRender` (신규 서브패스
     `lithent-concurrent/helper`) + 코어 `whenIdle`. DC-13으로 소재 확정, `helper/`는 무변경.
     concurrent 코어 br 5,057 / 5,400. RC-2·RC-3·BC-4 통과, 돌연변이 3종 확인.
   - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b, 신규).
@@ -598,6 +613,13 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
     커밋 이펙트로 옮겨졌고, 폐기 능력(더블 버퍼링)을 테스트로 증명했다.
     이펙트 순서는 DC-14로 확정. concurrent br 5,104 / 6,200.
     **포크가 처음으로 base와 갈라졌다** — 동치성은 이제 4-9 테스트가 지킨다.
+  - **API 이름 확정 (2026-09-01, DC-15/DC-16)** — `startTransition` → `deferRender`,
+    helper `isPending` → `hasPendingRender`. 코어의 `hasPending(compKey, lane?)`은 불변.
+    같은 검토에서 **T1을 기본 `lithent`에 통합하지 않기로 확정**했다 (DC-16) —
+    `lithent-concurrent`는 별도 빌드로 남고 P1(`src/` 동결)은 T2까지 유효하다.
+    `lithent-concurrent`가 `private: true`라 rename 비용이 0인 지금 처리했다.
+    `pnpm test` / `test:dual` / `size` / `verify:concurrent` 전부 통과, `git status src/ helper/`
+    비어 있음. concurrent br **5,102** / 6,200 (이름이 짧아져 −2 B), 기본 4,734 무변동.
 - next: **Phase 5 — 커밋 경계 단일화 (D5, BC-1)**. 예비 실험을 마쳤다 (§Phase 5).
   - **flush는 `commit()`에 넣을 것.** `wDomUpdate`는 재귀 함수라 거기 넣으면 더 흩어진다.
   - `render.ts`는 아직 base와 바이트 동일하다. Phase 5에서 갈라진다.
@@ -609,7 +631,7 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
 - blockers: 없음.
 - 진행 원칙:
   - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.
-  - **Phase 3에서 멈춰도 완결된 결과물이다** (startTransition 완성).
+  - **Phase 3에서 멈춰도 완결된 결과물이다** (deferRender 완성).
   - **Phase 0의 가드 4종을 지우지 말 것.** alias 함정은 증상이 엉뚱한 곳에서 터진다.
   - **10-10을 유지할 것.** N1 경계는 코드가 아니라 테스트로 지킨다.
   - **스케줄러 테스트는 작성 후 돌연변이로 검증할 것.** 레인 동작은 통과하는 테스트를

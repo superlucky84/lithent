@@ -13,7 +13,7 @@ import type { Computed } from '@/types';
  * sync priority: a parent or sibling driven by ordinary `state`/`lstate`, with
  * the heavy work behind `deferred`/`ldeferred`.
  */
-export const isPending = (): Computed<boolean> => {
+export const hasPendingRender = (): Computed<boolean> => {
   const compKey = getComponentKey();
   const read = () => (compKey ? hasPending(compKey, 'low') : false);
 
