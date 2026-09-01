@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **T1 완성 / T1.5 진행 중 — Phase 6 완료 (2026-09-01). 다음은 Phase 7 (T2 진입 게이트, 사람 몫)**
+- 상태: **T1·T1.5 완성 / T2 진입 승인 — Phase 7 완료 (2026-09-01). 다음은 Phase 8 (파이버)**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -284,7 +284,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **RC-4** | 크기 예산 준수 (기본 가드 + concurrent 단계별) | 각 Phase 종료 시 실측 |
 | **RC-5** | 라이프사이클 콜백이 커밋 경계 1곳에서만 flush된다 | `core-loopLifecycleOrder` 등 재검토 — **Phase 5 통과** (5개 파일 기대값 유지, 근거는 IMPLEMENT §Phase 5) |
 | **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 — **Phase 6 통과** (단서: DC-18의 폐기 자격) |
-| **RC-7** | 단일 작업 단위가 프레임(16ms)을 초과하는 시나리오가 실재한다 | Phase 7 프로파일링 (예비 측정은 IMPLEMENT Phase 7) |
+| **RC-7** | 단일 작업 단위가 프레임(16ms)을 초과하는 시나리오가 실재한다 | **Phase 7 통과 (2026-09-01)** — 10k행 시나리오 8종 전 샘플 초과, 최대 97ms (IMPLEMENT §Phase 7) |
 | **RC-8** | 폐기된 렌더가 이펙트 유실·중복을 일으키지 않는다 | 단위 테스트 |
 | **RC-9** | **위성 패키지가 양쪽 코어에서 무수정 통과한다** | `pnpm test:dual` (Phase 0에서 인프라 완성) |
 | **RC-10** | 단일 컴포넌트의 무거운 렌더(10k행) 중 입력이 차단되지 않는다 | 수동 E-4 — **T2의 존재 이유이자 "concurrent" 명명 근거** (§2.1) |
@@ -372,8 +372,12 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
     움직이면 그 빌드를 폐기하고 다시 짓는다. DC-17(단방향·선택적 배선),
     DC-18(관측 가능한 일을 하지 않은 빌드만 폐기)로 확정. RC-6 통과.
     `helper/`를 처음 수정했고 기본 코어에서는 무동작이다.
-    concurrent br 5,433 / 6,200 (+347 B), 기본 4,734 무변동.
-    → **T1.5 완료. 다음은 Phase 7 — T2 진입 판정(사람 몫)이다.**
+    concurrent br 5,433 / 6,200 (+347 B), 기본 4,734 무변동. → **T1.5 완료.**
+  - **Phase 7 완료 (2026-09-01)** — RC-7 실브라우저 실측(`pnpm bench:units`).
+    **T2 진입 승인.** 10k행 워크로드의 단위가 18~60ms로 프레임을 1~4배 넘는다.
+    1,000행은 4~8ms로 한 건도 넘지 않아 **경계가 1k~10k 사이**임이 드러났고,
+    이는 §1.1의 제품 판단과 DC-16(통합하지 않음)을 다시 뒷받침한다.
+    깊이 400단 트리는 0.2ms — **비용은 깊이가 아니라 너비에 있다.**
 - Phase 0 판정:
 
   | 수용 기준 | 결과 |

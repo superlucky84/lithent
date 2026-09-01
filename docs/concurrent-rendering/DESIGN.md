@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-18 확정. T1 완성, T1.5 진행 중 (Phase 6 완료, 2026-09-01)**
+- 상태: **DC-1~DC-18 확정. T1·T1.5 완성, T2 진입 승인 (Phase 7 완료, 2026-09-01)**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -349,6 +349,13 @@ Phase 6에 포함했다.
 제너레이터안 폐기. 근거: 유일한 장점이 크기(+1~1.5KB vs +4.5~7KB)였는데 별도 빌드에서
 예산이 풀렸고, `yield*` 위임 오버헤드는 정확히 대규모 시나리오에서 아프다.
 
+> **yield 입자는 형제 사이다 — Phase 7 실측이 정한다.**
+> 400단 중첩 트리의 리프 갱신이 **0.2~0.6ms**인 반면 형제 10,000개를 훑는 단위는
+> **18~60ms**다 (IMPLEMENT §Phase 7). 즉 **컴포넌트 경계나 깊이 방향에서만 yield하는
+> 설계는 아무것도 사지 못한다.** 쪼개야 하는 곳은 `updateChildren` /
+> `remakeChildrenForDiff`의 자식 루프 안이고, `child`/`sibling` 포인터 + work loop가
+> 정확히 그 입자를 준다. 이 측정이 DC-6을 사후 정당화한다.
+
 노드에 추가하는 필드 (모두 **가산적** — 기존 `WDom` 소비자 무영향):
 
 | 필드 | 의미 |
@@ -539,6 +546,7 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D3 deferred API | RC-2·RC-3 (Phase 2) ✅, 수동 B-2 |
 | D5 커밋 경계 | RC-5 (Phase 5) ✅, 4-9 BC-1 블록(양쪽 코어 상이값 고정), 수동 C-1·C-6 |
 | D6 store tearing | RC-6 (Phase 6) ✅ `concurrent-storeTearing`, 배선은 `helper/…/storeVersion` × `test:dual` |
+| D7 yield 입자 | RC-7 (Phase 7) ✅ `pnpm bench:units` — 형제 10k 18~60ms vs 깊이 400단 0.2ms |
 | D12b helper 소재 | `helper/` 무변경(`git status helper/`) + concurrent helper 스위트 7개 |
 | D11 `whenIdle` | BC-4 (Phase 2) ✅, 수동 B-9 |
 | D4 커밋 이펙트 리스트 | `concurrent-commitEquivalence.test.ts` — DOM + 라이프사이클 순서를 **양쪽 빌드 산출물**로 비교 |
