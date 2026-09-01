@@ -388,19 +388,86 @@ Phase 0~3 동안 `diff.ts`·`render.ts`·`wDom.ts`는 base와 **바이트 동일
 `src/tests/baseCore.ts`의 계산된 specifier 동적 import로 바꿨다.
 Phase 5 이후 포크가 더 갈라져도 같은 문제가 재발하지 않는다.
 
-## Phase 5 — 커밋 경계 단일화 (D5, BC-1)
+## Phase 5 — 커밋 경계 단일화 (D5, BC-1) ✅ 완료 (2026-09-01)
 
 진입: Phase 4 종료. / 종료: RC-5 통과.
 
-- [ ] 5-1. `render.ts`의 내부 `execMountedQueue()` 4곳 제거 (typeAdd 2곳, typeReplace, updateChildren)
-- [ ] 5-2. 커밋 종료 1곳으로 통합 — **`commit()`에 넣을 것. `wDomUpdate` 아님** (아래)
-- [ ] 5-3. **기대값 재검토**: `core-loopLifecycleOrder`, `core-mountreadycallback`,
-      `core-callback`, `core-nestedUnmount`, `core-destroy`
-- [ ] 5-4. 변경된 순서 문서화 — BC-1 체인지로그 초안
-- [ ] 5-5. 기준 테스트 전량 통과
-- [ ] 5-6. 4-9 동치성 테스트 재검토 — 라이프사이클 순서 차이는 **의도된 것**이므로,
-      어떤 차이가 의도된 것인지 그 파일에 명시할 것
-- [ ] 5-7. 크기 실측
+- [x] 5-1. `render.ts`의 내부 `execMountedQueue()` 4곳 제거 (typeAdd 2곳, typeReplace, updateChildren)
+- [x] 5-2. 커밋 종료 1곳으로 통합 — **`commit()`에 넣을 것. `wDomUpdate` 아님** (아래)
+- [x] 5-3. **기대값 재검토**: `core-loopLifecycleOrder`, `core-mountreadycallback`,
+      `core-callback`, `core-nestedUnmount`, `core-destroy` → **전부 기대값 유지** (근거 아래)
+- [x] 5-4. 변경된 순서 문서화 — BC-1 체인지로그 초안 (아래)
+- [x] 5-5. 기준 테스트 전량 통과
+- [x] 5-6. 4-9 동치성 테스트 재검토 — 의도된 차이를 **실행 가능한 주장으로** 고정했다 (아래)
+- [x] 5-7. 크기 실측 — concurrent br **5,086** / 6,200 (Phase 4 대비 **−16 B**)
+
+### Phase 5 실측 결과
+
+| | 기본 (동결) | concurrent |
+|---|---|---|
+| **brotli** | **4,734** / 4,800 (무변동) | **5,086** / 6,200 (1,114 B 여유) |
+| 코어 스위트 | — | 110개 전량 통과 |
+| 동치성 (4-9) | — | 8개 통과 (기존 5 + BC-1 3) |
+| `test:dual` · `verify:concurrent` | 통과 | 통과 |
+
+호출 지점이 4개 줄고 1개 늘어 **−16 B**. `render.ts`가 **Phase 5에서 처음 base와 갈라졌다**
+(제거 4곳). `wDom.ts`의 `commit()`이 이제 마운트 큐 flush까지 책임진다.
+
+### 5-3 기대값 재검토 결과 — 5개 파일 전부 변경 없음
+
+예비 실험의 예측대로였고, "통과했다"가 아니라 **왜 옳은지**로 확인했다.
+
+| 파일 | 무엇을 단언하는가 | BC-1 영향 |
+|---|---|---|
+| `core-loopLifecycleOrder` | mount끼리·unmount끼리의 **상대 순서**만 | 없음 — 큐가 FIFO이고 push 순서(DOM 생성 순서)가 그대로 |
+| `core-mountreadycallback` | `mountReadyCallback`의 실행과 `dom-not-exists` 타이밍 | 없음 — **다른 경로**다. `runWDomCallbacksFromWDom`은 `wDomToDom()` 안에서 돌고 `execMountedQueue`와 무관 |
+| `core-callback` | `console.log`만 하고 단언이 없다 | 해당 없음 |
+| `core-nestedUnmount` | 마운트·언마운트 **횟수**와 최종 DOM | 없음 — 횟수는 flush 지점 수와 무관 |
+| `core-destroy` | 최종 DOM 문자열 | 없음 |
+
+### 5-6 동치성 테스트 — 의도된 차이를 테스트로 못 박았다
+
+기존 5개 시나리오는 **그대로 통과한다.** mount↔mount, unmount↔unmount 상대 순서는
+BC-1이 건드리지 않기 때문이다. 그래서 주석만 달면 "동치성이 아직 완전하다"는 인상을 준다.
+
+`concurrent-commitEquivalence.test.ts`에 **양쪽 코어를 서로 다른 값에 고정하는** 블록을 넣었다
+— 형제 컴포넌트 둘이 한 갱신에서 마운트될 때 각자가 본 부모의 자식 수:
+
+| | base | concurrent |
+|---|---|---|
+| 첫 형제가 본 DOM | `A:1` (절반만 지어진 상태) | `A:2` (커밋 완료 상태) |
+| 둘째 형제가 본 DOM | `B:2` | `B:2` |
+| 결과 DOM | 동일 | 동일 |
+
+**돌연변이로 검증했다** (규약):
+
+| 돌연변이 | 결과 |
+|---|---|
+| `typeAdd`에 flush 되살리기 (Phase 5 부분 원복) | ✓ 실패 — `['A:1','B:2']` |
+| `commit()`의 flush 제거 (전부 원복) | ✓ 실패 2건 — 로그가 비고, 기존 keyed 시나리오도 깨짐 |
+
+### 5-4 BC-1 체인지로그 초안
+
+> **BC-1 — `mountCallback` flush 시점이 커밋 경계 1곳으로 통일** (T1.5, semver **minor** + 명시)
+>
+> `mountCallback`은 이제 DOM 삽입 지점마다가 아니라 **커밋이 끝난 뒤 1회** 실행된다.
+>
+> **바뀌는 것**
+> - 한 갱신에서 여러 형제가 마운트될 때, 앞선 형제의 `mountCallback`이 보는 DOM이
+>   *절반만 지어진 상태* → **완성된 커밋 상태**. (대체로 개선이다.)
+> - `mountCallback` ↔ `updateCallback`의 **교차 순서**. 갱신 콜백이 먼저 몰리고
+>   마운트 콜백이 뒤따른다.
+>
+> **바뀌지 않는 것**
+> - `mountCallback`끼리의 상대 순서 (FIFO, DOM 생성 순서)
+> - `updateCallback`끼리의 상대 순서 (`typeUpdate` 안이라 범위 밖)
+> - 언마운트 계열 전부 (`runUnmountEffects` 경로, `execMountedQueue`가 아니다)
+> - `mountReadyCallback` (`wDomToDom()` 안에서 실행, 별개 경로)
+> - 결과 DOM — BC-1은 콜백이 트리를 *언제 보는지*를 바꾸지 트리가 *무엇이 되는지*는 바꾸지 않는다
+>
+> **영향받는 코드**: `mountCallback` 안에서 형제 노드의 존재를 가정하던 코드는 이제
+> 더 완성된 DOM을 본다. 반대로 "아직 없을 것"을 가정했다면 깨진다.
+> keyed 리스트 경로는 이미 마지막에 한 번만 flush했으므로 사실상 영향이 없다.
 
 ### 예비 실험 (Phase 4 중, 2026-08-31)
 
@@ -620,14 +687,20 @@ MOUNT  new2     DOM에 요소 3개        MOUNT  new2     DOM에 요소 3개
     `lithent-concurrent`가 `private: true`라 rename 비용이 0인 지금 처리했다.
     `pnpm test` / `test:dual` / `size` / `verify:concurrent` 전부 통과, `git status src/ helper/`
     비어 있음. concurrent br **5,102** / 6,200 (이름이 짧아져 −2 B), 기본 4,734 무변동.
-- next: **Phase 5 — 커밋 경계 단일화 (D5, BC-1)**. 예비 실험을 마쳤다 (§Phase 5).
-  - **flush는 `commit()`에 넣을 것.** `wDomUpdate`는 재귀 함수라 거기 넣으면 더 흩어진다.
-  - `render.ts`는 아직 base와 바이트 동일하다. Phase 5에서 갈라진다.
-  - 실험 결과 **기존 테스트 110개가 전량 통과**했고 5-3이 지목한 5개도 기대값이
-    바뀌지 않았다. 그래도 5-3은 남겨둘 것 — 교차 순서 변화는 실재한다.
-  - **4-9 동치성 테스트도 함께 재검토**해야 한다. BC-1은 의도된 차이이므로
-    어떤 차이가 의도된 것인지 그 파일에 명시할 것.
-- 미완 (사람 몫): 3-4 수동 체크리스트 A·B·D, 3-5 T1 릴리스 판정.
+  - **Phase 5 완료 (2026-09-01)** — 커밋 경계 단일화(BC-1). `render.ts`의 내부 flush 4곳을
+    빼고 `wDom.ts`의 `commit()` 1곳으로 모았다. **`render.ts`가 처음 base와 갈라졌다.**
+    5-3의 5개 파일은 전부 기대값이 유지됐고, 그 이유를 파일별로 기록했다.
+    4-9에는 의도된 차이를 **양쪽 코어를 서로 다른 값에 고정하는** 블록으로 못 박았고
+    돌연변이 2종으로 검증했다. concurrent br 5,086 / 6,200 (−16 B), 기본 4,734 무변동.
+- next: **Phase 6 — store tearing (D6, DC-5)**. RC-6이 종료 조건이다.
+  - `helper/`는 **동결 대상이 아니다** — `store.ts`/`lstore.ts`에 `version`을 넣는 것이
+    6-1·6-2다. 다만 **기본 코어에서도 그대로 빌드·동작해야 한다** (버전 필드는 가산적이며
+    concurrent 코어만 그 값을 읽는다). DC-13의 "no-op API 금지"와 혼동하지 말 것 —
+    여기서 추가되는 것은 API가 아니라 내부 필드다.
+  - 재시도 상한 초과 시 sync 폴백까지가 DC-5의 범위다.
+- 미완 (사람 몫): 3-4 수동 체크리스트 A·B·D, 3-5 T1 릴리스 판정(+3-5b 패키지명),
+  C 섹션(BC-1 라이프사이클 순서) — **C-6은 이제 수행 가능하다.** 체인지로그 초안이
+  §Phase 5에 있다.
 - blockers: 없음.
 - 진행 원칙:
   - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.

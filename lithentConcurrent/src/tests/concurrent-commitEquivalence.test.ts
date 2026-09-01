@@ -22,6 +22,12 @@ import { resolve } from 'path';
  * missing unmount callbacks rather than as wrong DOM.
  *
  * Requires `pnpm build` (both bundles).
+ *
+ * PHASE 5 (BC-1) — equivalence is no longer total, and that is deliberate.
+ * `mountCallback` now flushes once at the commit boundary instead of at each of
+ * the four DOM-insertion sites the base core flushes from. What that does and
+ * does NOT change is pinned by the last describe block in this file; everything
+ * above it must still match the base core exactly.
  */
 
 type Core = {
@@ -224,5 +230,72 @@ describe('commit effect list ≡ base core', () => {
 
       return host.innerHTML;
     });
+  });
+});
+
+/**
+ * BC-1 — the one intended divergence, stated as an executable claim.
+ *
+ * The base core flushes the mount queue at every insertion site, so the first
+ * of two sibling components sees a DOM that is still being built. The commit
+ * boundary makes both of them see the finished tree.
+ *
+ * The two cores are pinned to DIFFERENT values on purpose. Re-adding a flush
+ * inside `typeAdd`/`typeReplace`/`updateChildren` makes the concurrent side
+ * read `A:1` again and fails here; dropping the flush altogether empties the
+ * log and also fails. The DOM is asserted identical either way — BC-1 changes
+ * when callbacks observe the tree, never what the tree ends up as.
+ */
+describe('BC-1 — commit-boundary flush (intended divergence)', () => {
+  /** Two sibling components appear in one update; each reports what it sees. */
+  const siblingsSeenAtMount = async (core: Core) => {
+    const { h, render, mount, mountCallback, nextTick } = core;
+    const host = document.createElement('div');
+    const log: string[] = [];
+    let reveal = () => {};
+
+    const reporter = (name: string) =>
+      mount(() => {
+        mountCallback(() => {
+          const parent = host.firstChild as HTMLElement | null;
+          log.push(`${name}:${parent ? parent.childElementCount : 0}`);
+        });
+        return () => h('i', {}, name);
+      });
+
+    const A = reporter('A');
+    const B = reporter('B');
+
+    const App = mount((renew: () => void) => {
+      let shown = false;
+      reveal = () => {
+        shown = true;
+        renew();
+      };
+      return () =>
+        h('div', {}, shown ? h(A, {}) : null, shown ? h(B, {}) : null);
+    });
+
+    render(h(App, {}), host);
+    reveal();
+    await nextTick();
+
+    return { log, html: host.innerHTML };
+  };
+
+  it('base: the first sibling sees a half-built DOM', async () => {
+    const { log } = await siblingsSeenAtMount(base);
+    expect(log).toEqual(['A:1', 'B:2']);
+  });
+
+  it('concurrent: both siblings see the finished commit', async () => {
+    const { log } = await siblingsSeenAtMount(concurrent);
+    expect(log).toEqual(['A:2', 'B:2']);
+  });
+
+  it('the resulting DOM is identical', async () => {
+    const fromBase = await siblingsSeenAtMount(base);
+    const fromConcurrent = await siblingsSeenAtMount(concurrent);
+    expect(fromConcurrent.html).toBe(fromBase.html);
   });
 });

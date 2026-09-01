@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-16 확정. T1 완성, T1.5 진행 중 (Phase 4 완료, 2026-08-31)**
+- 상태: **DC-1~DC-16 확정. T1 완성, T1.5 진행 중 (Phase 5 완료, 2026-09-01)**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -290,13 +290,22 @@ type CommitEffect =
 - **`retire`를 커밋으로 미루는 것이 폐기 능력의 핵심.** 원본 `children`이 커밋 전까지
   살아있어야 WIP를 버리고 원본으로 되돌아갈 수 있다.
 
-### D5. 커밋 경계 단일화 (BC-1)
+### D5. 커밋 경계 단일화 (BC-1) — **Phase 5 완료 (2026-09-01)**
 
 `execMountedQueue()` 5곳(`render.ts:43, 185, 200, 284, 429`)을 커밋 종료 1곳으로 통합.
 
 **BC-1** — 관측 가능한 순서 변화. `core-loopLifecycleOrder.tsx`, `core-mountreadycallback.tsx`,
 `core-callback.tsx`, `core-nestedUnmount.tsx`, `core-destroy.tsx`는 통과 여부가 아니라
 **기대값 자체를 재검토**한다.
+
+**구현 결과.** 내부 4곳을 제거하고 `wDom.ts`의 `commit()`에 넣었다. `render()`(초기 마운트)의
+flush 1곳은 남는다 — `commit()`을 거치지 않는 별도 진입점이고 그 자체가 커밋 경계다.
+`wDomUpdate` 끝은 **오답**이다: 재귀 함수라 노드마다 flush되어 지금보다 더 흩어진다
+(예비 실험에서 실제로 이 순서로 틀렸다).
+
+재검토 결과 5개 파일의 기대값은 **전부 유지**됐다. 근거는 파일별로
+IMPLEMENT §Phase 5에 있다. 의도된 차이(형제 마운트 콜백이 보는 DOM 완성도)는
+`concurrent-commitEquivalence.test.ts`가 **양쪽 코어를 서로 다른 값에 고정**해 못 박는다.
 
 ### D6. store tearing — **DC-5 확정: (A) 버전 체크 후 재시작**
 
@@ -494,6 +503,7 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D2 우선순위 표현 | C3 회귀 (기존 helper 테스트 무수정 통과) ✅ |
 | D2 lane 복원 | `deferRender` 스코프가 throw해도 이전 레인 복원 / 중첩 |
 | D3 deferred API | RC-2·RC-3 (Phase 2) ✅, 수동 B-2 |
+| D5 커밋 경계 | RC-5 (Phase 5) ✅, 4-9 BC-1 블록(양쪽 코어 상이값 고정), 수동 C-1·C-6 |
 | D12b helper 소재 | `helper/` 무변경(`git status helper/`) + concurrent helper 스위트 7개 |
 | D11 `whenIdle` | BC-4 (Phase 2) ✅, 수동 B-9 |
 | D4 커밋 이펙트 리스트 | `concurrent-commitEquivalence.test.ts` — DOM + 라이프사이클 순서를 **양쪽 빌드 산출물**로 비교 |

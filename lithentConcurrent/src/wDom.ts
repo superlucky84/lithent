@@ -13,6 +13,7 @@ import {
 import { makeNewWDomTree, commitEffects } from '@/diff';
 import type { Effects } from '@/diff';
 import { wDomUpdate } from '@/render';
+import { execMountedQueue } from '@/hook/mountCallback';
 import {
   initUpdateHookState,
   initMountHookState,
@@ -177,10 +178,19 @@ export const replaceWDom = (
 
 /**
  * Commit phase — the single point where a render becomes observable.
+ *
+ * `mountCallback` flushes here, once per commit, rather than at each of the
+ * four DOM-insertion sites the base core flushes from (BC-1). A mount callback
+ * therefore observes the finished commit instead of a partially built DOM.
+ *
+ * It has to be HERE and not at the end of `wDomUpdate`: that function recurses
+ * into every child (`render.ts` `updateChildren`), so flushing there would fire
+ * once per node — more scattered than what this replaces, not less.
  */
 const commit = (effects: Effects, newWDomTree: WDom) => {
   commitEffects(effects);
   wDomUpdate(newWDomTree);
+  execMountedQueue();
 };
 
 // ============================================================================

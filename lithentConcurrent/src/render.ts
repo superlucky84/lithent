@@ -182,7 +182,6 @@ const typeAdd = (
       } else {
         newWDom.we.appendChild(newElement);
       }
-      execMountedQueue();
     }
     return;
   }
@@ -197,7 +196,6 @@ const typeAdd = (
     if (newWDom.tag !== 'portal') {
       parentEl.insertBefore(newElement, nextEl || null);
     }
-    execMountedQueue();
   }
 };
 
@@ -281,7 +279,6 @@ const typeReplace = (newWDom: WDom) => {
       if (parentElement && newWDom.tag !== 'portal') {
         parentElement.replaceChild(newElement, orignalElement);
       }
-      execMountedQueue();
     }
   }
 };
@@ -426,7 +423,6 @@ const updateChildren = (newWDom: WDom) => {
   }
 
   children.forEach(clearDiffMeta);
-  execMountedQueue();
 };
 
 const clearDiffMeta = (item: WDom) => {
