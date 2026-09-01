@@ -7,6 +7,8 @@ export {
   deferRender,
   hasPending,
   whenIdle,
+  notifyStoreWrite,
+  storeVersion,
 } from '@/utils/redraw';
 export {
   getComponentKey,

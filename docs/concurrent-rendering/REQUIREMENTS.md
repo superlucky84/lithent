@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **T1 완성 / T1.5 진행 중 — Phase 5 완료 (2026-09-01)**
+- 상태: **T1 완성 / T1.5 진행 중 — Phase 6 완료 (2026-09-01). 다음은 Phase 7 (T2 진입 게이트, 사람 몫)**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -238,9 +238,11 @@ component.upCB.push(callback);        // 렌더 중 누적
 폐기 시 `upD`에 새 deps가 이미 박혀 재시도 비교가 "같음"이 되어 **이펙트 유실**,
 `upCB`는 **중복 누적**된다.
 
-### 7.5 store에 스냅샷 없음 (T1.5에서 해소)
+### 7.5 store에 스냅샷 없음 (T1.5에서 해소 — Phase 6 완료)
 
-`helper/src/hook/store.ts` / `lstore.ts`는 Proxy로 `value`를 직통 읽으며 버전이 없다.
+`helper/src/hook/store.ts` / `lstore.ts`는 Proxy로 `value`를 직통 읽으며 버전이 없었다.
+Phase 6에서 **쓰기 통지**를 넣었다 — 스냅샷이 아니라 단조 증가 카운터이며, 코어가
+빌드 시작/커밋 직전에 비교한다. 배선은 DC-17, 폐기 자격은 DC-18.
 
 ### 7.6 유리한 조건
 
@@ -281,7 +283,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **RC-3** | `hasPendingRender` 상당 상태를 조회할 수 있다 | 단위 테스트 — **Phase 2 통과** (조회 전용, 아래 단서) |
 | **RC-4** | 크기 예산 준수 (기본 가드 + concurrent 단계별) | 각 Phase 종료 시 실측 |
 | **RC-5** | 라이프사이클 콜백이 커밋 경계 1곳에서만 flush된다 | `core-loopLifecycleOrder` 등 재검토 — **Phase 5 통과** (5개 파일 기대값 유지, 근거는 IMPLEMENT §Phase 5) |
-| **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 |
+| **RC-6** | 한 렌더 패스 내 store 읽기 값이 일관된다 (tearing 없음) | 단위 테스트 — **Phase 6 통과** (단서: DC-18의 폐기 자격) |
 | **RC-7** | 단일 작업 단위가 프레임(16ms)을 초과하는 시나리오가 실재한다 | Phase 7 프로파일링 (예비 측정은 IMPLEMENT Phase 7) |
 | **RC-8** | 폐기된 렌더가 이펙트 유실·중복을 일으키지 않는다 | 단위 테스트 |
 | **RC-9** | **위성 패키지가 양쪽 코어에서 무수정 통과한다** | `pnpm test:dual` (Phase 0에서 인프라 완성) |
@@ -296,7 +298,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **기본 `lithent`** | 전 기간 | **≤ 4,800 B** | 현재 4,734 B. **회귀 가드** — 철학 보호선 |
 | concurrent | Phase 0 (순수 포크) | ≤ 4,800 B | **실측 4,742 B** — 기본과 8 B 차이 (UMD 전역 이름 문자열) |
 | concurrent | T1 | **≤ 5,400 B** | **실측 5,057 B** (Phase 0 대비 +315 B) |
-| concurrent | T1.5 | **≤ 6,200 B** | Phase 4 5,104 B → rename 5,102 B → **Phase 5 실측 5,086 B** |
+| concurrent | T1.5 | **≤ 6,200 B** | Phase 4 5,104 → Phase 5 5,086 → **Phase 6 실측 5,433 B** |
 | concurrent | T2 (파이버) | **≤ 9,000 B** | 파이버 raw +4.5~7KB 반영 |
 
 > 선행 작업(performance-improvement)의 예산 5,120 B는 기본 코어에 한해 유효하며,
@@ -366,6 +368,12 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   - **Phase 5 완료 (2026-09-01)** — §7.2의 흩어진 커밋 경계 해소. `render.ts`의 내부
     flush 4곳을 `wDom.ts`의 `commit()` 1곳으로 통합(BC-1). `render.ts`도 갈라졌다.
     RC-5 통과. concurrent br 5,086 / 6,200 (−16 B), 기본 4,734 무변동.
+  - **Phase 6 완료 (2026-09-01)** — §7.5의 store 버전 부재 해소. 빌드 도중 store가
+    움직이면 그 빌드를 폐기하고 다시 짓는다. DC-17(단방향·선택적 배선),
+    DC-18(관측 가능한 일을 하지 않은 빌드만 폐기)로 확정. RC-6 통과.
+    `helper/`를 처음 수정했고 기본 코어에서는 무동작이다.
+    concurrent br 5,433 / 6,200 (+347 B), 기본 4,734 무변동.
+    → **T1.5 완료. 다음은 Phase 7 — T2 진입 판정(사람 몫)이다.**
 - Phase 0 판정:
 
   | 수용 기준 | 결과 |

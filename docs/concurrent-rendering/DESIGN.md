@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-16 확정. T1 완성, T1.5 진행 중 (Phase 5 완료, 2026-09-01)**
+- 상태: **DC-1~DC-18 확정. T1 완성, T1.5 진행 중 (Phase 6 완료, 2026-09-01)**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -307,11 +307,36 @@ flush 1곳은 남는다 — `commit()`을 거치지 않는 별도 진입점이�
 IMPLEMENT §Phase 5에 있다. 의도된 차이(형제 마운트 콜백이 보는 DOM 완성도)는
 `concurrent-commitEquivalence.test.ts`가 **양쪽 코어를 서로 다른 값에 고정**해 못 박는다.
 
-### D6. store tearing — **DC-5 확정: (A) 버전 체크 후 재시작**
+### D6. store tearing — **DC-5 확정: (A) 버전 체크 후 재시작** — Phase 6 완료 (2026-09-01)
 
 렌더 시작 시 `version` 기록, 커밋 직전 재비교, 다르면 폐기·재실행.
 `useSyncExternalStore`와 동일 발상. 재시도 상한 초과 시 sync 폴백.
 `helper/src/hook/store.ts`·`lstore.ts`의 `updater` Proxy set에서 버전 증가.
+
+**구현하며 좁혀진 두 가지.**
+
+1. **배선은 단방향·선택적이다 (DC-17).** 코어는 helper를 import할 수 없고(의존성 역전),
+   helper는 동결된 base 코어에서도 빌드·동작해야 한다. 그래서 helper가
+   `import * as lithentCore from 'lithent'` 후 `notifyStoreWrite`를 **있으면 호출**한다.
+   named import였다면 base에서 링크 에러가 나지만, 모듈 네임스페이스의 없는 속성은
+   그냥 `undefined`다. base에서는 무동작이고 store는 이전과 완전히 같다.
+
+2. **폐기 자격 (DC-18).** `useUpdated`는 이펙트를 **커밋이 아니라 빌드 중에** 실행한다.
+   이미 실행된 사용자 이펙트는 폐기로 되돌릴 수 없으므로, 그런 빌드를 다시 지으면
+   이펙트가 두 번 돈다. 규칙은 한 문장이다 —
+   **관측 가능한 일을 아무것도 하지 않은 빌드만 폐기한다.**
+   마운트를 포함한 빌드(DC-7)와 `updateCallback`이 발화한 빌드는 그대로 커밋한다.
+   그 대가로 그 빌드는 tearing인 채 남는다. 테스트가 이 대가를 명시적으로 단언한다.
+
+**훅 슬롯 스냅샷/복원은 Phase 9-3에서 앞당겨 왔다.** `useUpdated`가 빌드 중에
+`upD`를 쓰고 `upS`를 전진시키는데 `upS`는 커밋에서만 0으로 돌아간다(§7.4).
+복원 없이 두 번째 빌드를 돌리면 어긋난 슬롯을 읽는다. 재시도의 전제 조건이라
+Phase 6에 포함했다.
+
+**T1.5에서 이 체크가 실제로 잡는 것.** 빌드가 동기이므로 store 쓰기는 그 빌드
+*안에서* 시작된 것만 끼어들 수 있다(렌더 중 store에 쓰는 컴포넌트). 값은 그때도
+실재하며 테스트가 그것을 잡는다. 다만 **본래의 이득은 T2**다 — 렌더가 태스크를
+가로지르는 순간 외부 쓰기가 빌드 중간에 들어올 수 있게 된다.
 
 > Lithent는 `replaceWDom`이 컴포넌트 단위 bottom-up이라 tearing 노출 구간이
 > **한 컴포넌트의 서브트리 안**으로 제한된다 (React는 루트 단위). 그럼에도 T1에서
@@ -485,6 +510,15 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   → 같은 규칙을 프로젝트 이름에도 적용한 것이 REQUIREMENTS **§2.1**이다
   (T2 완주 전까지 "concurrent rendering"이라 서술하지 않고, 완주 후에도 `concurrent mode`는
   쓰지 않는다). 명명 근거는 RC-10(수동 E-4) 통과다.
+- [x] **DC-17**: 코어↔helper store 배선 방향 → **helper가 코어 네임스페이스에서 선택적 호출**
+  (`notifyStoreWrite`). 확정 2026-09-01 (Phase 6).
+  근거: 코어는 helper를 import할 수 없고 helper는 동결된 base에서도 돌아야 한다.
+  named import는 base에서 링크 에러, 네임스페이스의 없는 속성은 `undefined`다.
+- [x] **DC-18**: 무엇을 폐기해도 되는가 → **관측 가능한 일을 하지 않은 빌드만.**
+  확정 2026-09-01 (Phase 6).
+  근거: `useUpdated`가 이펙트를 빌드 중에 실행하므로 폐기가 그것을 되돌리지 못한다.
+  마운트 포함(DC-7)과 `updateCallback` 발화 빌드는 그대로 커밋하고, 그 빌드가
+  tearing인 채 남는 것을 대가로 받아들인다. T2 Phase 9에서 재검토 대상.
 - [x] **DC-16**: T1을 기본 `lithent`에 통합할 것인가 → **통합하지 않는다. 별도 빌드 유지.**
   확정 2026-09-01 (사용자 결정).
   근거: T1.5/T2를 계속하므로 지금 통합해도 아끼는 것이 없고 기본 코어만 무거워진다
@@ -504,6 +538,7 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D2 lane 복원 | `deferRender` 스코프가 throw해도 이전 레인 복원 / 중첩 |
 | D3 deferred API | RC-2·RC-3 (Phase 2) ✅, 수동 B-2 |
 | D5 커밋 경계 | RC-5 (Phase 5) ✅, 4-9 BC-1 블록(양쪽 코어 상이값 고정), 수동 C-1·C-6 |
+| D6 store tearing | RC-6 (Phase 6) ✅ `concurrent-storeTearing`, 배선은 `helper/…/storeVersion` × `test:dual` |
 | D12b helper 소재 | `helper/` 무변경(`git status helper/`) + concurrent helper 스위트 7개 |
 | D11 `whenIdle` | BC-4 (Phase 2) ✅, 수동 B-9 |
 | D4 커밋 이펙트 리스트 | `concurrent-commitEquivalence.test.ts` — DOM + 라이프사이클 순서를 **양쪽 빌드 산출물**로 비교 |

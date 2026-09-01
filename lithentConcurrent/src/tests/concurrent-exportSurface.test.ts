@@ -21,7 +21,13 @@ import * as concurrentCore from '../index';
  * widening: add them to `CONCURRENT_ONLY` in the same commit that exports them,
  * which keeps the diff visible in review instead of silent.
  */
-const CONCURRENT_ONLY: string[] = ['deferRender', 'hasPending', 'whenIdle'];
+const CONCURRENT_ONLY: string[] = [
+  'deferRender',
+  'hasPending',
+  'whenIdle',
+  'notifyStoreWrite',
+  'storeVersion',
+];
 
 const baseBundle = resolve(__dirname, '../../../dist/lithent.mjs');
 

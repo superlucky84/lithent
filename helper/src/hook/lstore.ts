@@ -1,4 +1,5 @@
 import { useRenew } from 'lithent';
+import * as lithentCore from 'lithent';
 
 /**
  * DataStore for lmount components
@@ -127,6 +128,18 @@ export function lstore<V>(initialValue: V) {
 }
 
 /**
+ * Tells a concurrent-capable core that store data moved (D6, DC-5).
+ *
+ * Deliberately a namespace lookup rather than a named import: this file has to
+ * keep building and running against the frozen base core, which does not export
+ * `notifyStoreWrite`. A named import would fail to link there; a missing
+ * property on a module namespace is simply `undefined`, so on the base core
+ * this is a no-op and the store behaves exactly as it always did.
+ */
+const notifyStoreWrite = () =>
+  (lithentCore as { notifyStoreWrite?: () => void }).notifyStoreWrite?.();
+
+/**
  * 사용자에게 노출될 프록시 개체 생성
  */
 function updater<T extends { [key: string | symbol]: unknown }>(
@@ -158,6 +171,7 @@ function updater<T extends { [key: string | symbol]: unknown }>(
 
       target[prop] = value;
 
+      notifyStoreWrite();
       execDependentCallbacks(storeRenderList, storeRenderObserveList, prop);
 
       return true;

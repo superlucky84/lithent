@@ -200,6 +200,29 @@ export const whenIdle = (): Promise<void> =>
       })
     : Promise.resolve();
 
+// ============================================================================
+// Store consistency (D6 — DC-5 version check)
+// ============================================================================
+
+/**
+ * Monotonic counter bumped by `lithent/helper`'s store on every write.
+ *
+ * The wiring is one-directional and optional on purpose. The core cannot import
+ * the helper (that would invert the dependency), and the helper has to keep
+ * building and running against the FROZEN base core, which has no such counter.
+ * So the helper reaches for `notifyStoreWrite` on the core's module namespace
+ * and calls it only if it is there — `undefined` on the base core, where the
+ * store then behaves exactly as it always did.
+ */
+const storeVersionRef = { value: 0 };
+
+/** Read by the build/commit pair in `wDom.ts` to detect a write mid-build. */
+export const storeVersion = () => storeVersionRef.value;
+
+export const notifyStoreWrite = () => {
+  storeVersionRef.value += 1;
+};
+
 export const componentUpdate = (compKey: Props) => () => {
   const comp = componentMap.get(compKey);
   const up = comp && comp.up;

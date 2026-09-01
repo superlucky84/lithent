@@ -18,11 +18,12 @@ import {
   initUpdateHookState,
   initMountHookState,
   needDiffRef,
+  componentMap,
   getComponentSubInfo,
   wdomSymbol,
   lmountComponentSet,
 } from '@/utils/universalRef';
-import { setRedrawAction, componentUpdate } from '@/utils/redraw';
+import { setRedrawAction, componentUpdate, storeVersion } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,
@@ -127,8 +128,122 @@ const syncAncestorComponentChildren = (
   walk(parent, new Set<WDom>());
 };
 
+// ============================================================================
+// Store consistency bookkeeping (D6, DC-5)
+// ============================================================================
+
+/** Builds discarded before one is committed regardless of the store version. */
+const MAX_STORE_RETRY = 2;
+
+type HookSnapshot = {
+  compKey: Props;
+  upD: unknown[][];
+  upCB: (() => void)[];
+  upS: number;
+  mts: (() => void)[];
+};
+
+type BuildTrace = { snapshots: HookSnapshot[]; mounted: boolean };
+
+/**
+ * Non-null only while a retryable build is running, so the initial `render()`
+ * path and anything resolving outside `replaceWDom` pays nothing for this.
+ */
+let buildTrace: BuildTrace | null = null;
+
+/** Marks the running build as one that mounts — those are never discarded. */
+const markBuildMounted = () => {
+  if (buildTrace) {
+    buildTrace.mounted = true;
+  }
+};
+
+/**
+ * Records a component's hook state before its updater runs.
+ *
+ * `useUpdated` writes `upD`/`upCB` and advances `upS` during the build, and
+ * `upS` is reset only by a commit (`runUpdatedQueueFromWDom`). A second build
+ * without this restore would read shifted slots and silently lose or duplicate
+ * update callbacks — REQUIREMENTS §7.4, which T2 Phase 9 addresses in general.
+ * Here it is what makes the D6 retry sound rather than corrupting.
+ */
+const traceHookState = (compKey: Props) => {
+  if (!buildTrace) {
+    return;
+  }
+
+  const comp = componentMap.get(compKey);
+
+  if (comp) {
+    buildTrace.snapshots.push({
+      compKey,
+      // `upD` slots are replaced wholesale, never mutated in place, so copying
+      // the outer array is enough.
+      upD: [...comp.upD],
+      upCB: [...comp.upCB],
+      upS: comp.upS.value,
+      mts: [...comp.mts],
+    });
+  }
+};
+
+/**
+ * Whether the build already ran a user `updateCallback` effect.
+ *
+ * `useUpdated` runs the effect DURING the build, not at commit, so a discard
+ * cannot take it back — running it again in the rebuild would double it. Such a
+ * build is therefore committed as it is, exactly like a mounting one: **a build
+ * is discarded only when it performed nothing observable.**
+ *
+ * The predicate mirrors `checkNeedPushQueue` in `src/hook/internal/useUpdate.ts`
+ * against (deps before the build, deps after it). Duplicated rather than shared
+ * because that file is in the frozen base core (P1) and cannot grow an export;
+ * for the same reason it cannot drift.
+ */
+const buildRanUpdateEffects = (snapshots: HookSnapshot[]) =>
+  snapshots.some(snapshot => {
+    const comp = componentMap.get(snapshot.compKey);
+
+    if (!comp) {
+      return false;
+    }
+
+    for (let slot = 0; slot < comp.upS.value; slot++) {
+      const before = snapshot.upD[slot];
+      const after = comp.upD[slot] || [];
+
+      if (
+        before &&
+        (!before.length || before.some((dep, i) => dep !== after[i]))
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  });
+
+const restoreHookState = (snapshots: HookSnapshot[]) => {
+  for (let i = snapshots.length - 1; i >= 0; i--) {
+    const snapshot = snapshots[i];
+    const comp = componentMap.get(snapshot.compKey);
+
+    if (comp) {
+      comp.upD = snapshot.upD;
+      comp.upCB = snapshot.upCB;
+      comp.upS.value = snapshot.upS;
+      comp.mts = snapshot.mts;
+    }
+  }
+};
+
 /**
  * It re-renders starting from a specific component.
+ *
+ * The build runs under a store-version check (D6, DC-5): if a store was written
+ * while the tree was being built, the tree describes two different versions of
+ * the same data and is thrown away rather than committed. Phase 4 is what makes
+ * that legal — the build performs nothing, it only records effects.
  */
 export const replaceWDom = (
   tag: TagFunction,
@@ -139,11 +254,62 @@ export const replaceWDom = (
   if (originalWDom.il) {
     return;
   }
+
+  const trace: BuildTrace = { snapshots: [], mounted: false };
+  const outerTrace = buildTrace;
+  buildTrace = trace;
+
+  try {
+    for (let attempt = 0; ; attempt++) {
+      const startVersion = storeVersion();
+
+      trace.snapshots = [];
+      trace.mounted = false;
+
+      const { effects, newWDomTree } = buildWDomTree(
+        tag,
+        props,
+        children,
+        originalWDom
+      );
+
+      // A build that already did something observable is committed as it is.
+      // Mounting one (DC-7): its new components are registered in
+      // `componentMap`, and discarding it would orphan those entries or run the
+      // mounters twice. One that fired an `updateCallback`: the effect ran
+      // during the build and a rebuild would run it a second time.
+      const retryable =
+        !trace.mounted &&
+        attempt < MAX_STORE_RETRY &&
+        !buildRanUpdateEffects(trace.snapshots);
+
+      if (retryable && storeVersion() !== startVersion) {
+        restoreHookState(trace.snapshots);
+        continue;
+      }
+
+      commit(effects, newWDomTree);
+      return;
+    }
+  } finally {
+    buildTrace = outerTrace;
+  }
+};
+
+/**
+ * Build phase. Nothing outside the new tree is touched: every mutation the pass
+ * would have made is recorded in `effects` instead (D4). That is what leaves the
+ * previous tree whole, the work-in-progress one abandonable, and this function
+ * safe to run more than once against the same original.
+ */
+const buildWDomTree = (
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  originalWDom: WDom
+) => {
   needDiffRef.value = true;
 
-  // Build phase. Nothing outside the new tree is touched: every mutation the
-  // pass would have made is recorded in `effects` instead (D4). That is what
-  // leaves the previous tree whole and the work-in-progress one abandonable.
   const effects: Effects = [];
   const newWDom = makeWDomResolver(tag, props, children);
   const newWDomTree = makeNewWDomTree(newWDom, originalWDom, effects);
@@ -173,7 +339,7 @@ export const replaceWDom = (
 
   needDiffRef.value = false;
 
-  commit(effects, newWDomTree);
+  return { effects, newWDomTree };
 };
 
 /**
@@ -287,6 +453,7 @@ const createComponentResolver = (
     const prevNeedDiff = needDiffRef.value;
     needDiffRef.value = false;
 
+    markBuildMounted();
     initMountHookState(compKey);
 
     const initialComponent = tag(props, wrappedChildren);
@@ -387,6 +554,7 @@ const wDomMaker = (
   children: WDom[],
   reRender: () => WDom
 ) => {
+  traceHookState(compKey);
   initUpdateHookState(compKey);
   runUpdateCallback();
 
