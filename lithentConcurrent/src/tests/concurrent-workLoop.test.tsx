@@ -169,6 +169,36 @@ describe('work loop', () => {
   });
 });
 
+describe('elements are built during the build phase', () => {
+  it('a fresh subtree already has its DOM when the build finishes', () => {
+    // Phase 8 measured that on a creation-heavy render 71% of the commit was
+    // `wDomToDom` — pure allocation of detached nodes. Doing it here moves that
+    // share into the part that can be interrupted. Nothing is committed in this
+    // test: `advance()` is called and the effects are dropped on the floor.
+    const built = startWork(
+      (
+        <ul>
+          <li key="a">a</li>
+          <li key="b">b</li>
+        </ul>
+      ) as unknown as WDom,
+      undefined,
+      []
+    ).advance() as WDom;
+
+    const rows = built.children || [];
+
+    expect(rows.length).toBe(2);
+    expect(rows[0].el, 'the row element exists before any commit').toBeTruthy();
+    expect((rows[0].el as HTMLElement).tagName).toBe('LI');
+    expect((rows[0].el as HTMLElement).textContent).toBe('a');
+
+    // Attached to its own parent element, which is itself detached — building
+    // creates the subtree, committing is what puts it in the document.
+    expect(document.body.contains(rows[0].el as HTMLElement)).toBe(false);
+  });
+});
+
 describe('sync lane is never interrupted', () => {
   it('commits within the microtask nextTick promises', async () => {
     const app = rowsApp(200);

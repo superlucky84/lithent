@@ -15,6 +15,80 @@ import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
 import { getParent, isObject } from '@/utils';
 
 const DF = () => new DocumentFragment();
+
+/**
+ * Elements built during the BUILD phase, waiting for their commit (D7).
+ *
+ * Phase 8 measured where a unit's time goes: on a creation-heavy render 71% of
+ * the commit is `wDomToDom`, which only allocates detached nodes. Doing it in
+ * the build makes that share interruptible; the commit is then left with the
+ * part that really is atomic — putting the nodes in the document.
+ *
+ * A WeakMap rather than a field on the node: `WDom` lives in the frozen base
+ * core and cannot be widened (P1, same reason as DC-19). Abandoning a build
+ * needs no cleanup — nothing takes the entry, the recorded callbacks never run,
+ * and both the entry and the elements are collected.
+ */
+/**
+ * Recorded instead of run while an element tree is built early.
+ *
+ * Node references, not thunks: a 10,000 row create walks ~20,000 nodes and two
+ * closures each is a measurable tax the base core does not pay. Replaying keeps
+ * each list's own order — the two lists do not have to interleave the way they
+ * did originally, because `addMountedQueue` only appends to a queue that is
+ * flushed later and nothing can observe it in between.
+ */
+type Prepared = { el: HTMLElement; ready: WDom[]; mounted: WDom[] };
+
+const preparedDom = new WeakMap<WDom, Prepared>();
+
+/** Builds a new subtree's elements ahead of time. Nothing observable happens. */
+export const prepareDom = (wDom: WDom) => {
+  // `wDomToDom` claims `el` for the node it builds. On a replace the OLD element
+  // still has to be findable at commit — `typeReplace` reads it as the node to
+  // swap out and `typeDelete` as the node to remove — so it is put back here and
+  // handed over only when the commit takes the prepared one.
+  const previousEl = wDom.el;
+  const ready: WDom[] = [];
+  const mounted: WDom[] = [];
+  const el = wDomToDom(wDom, false, { ready, mounted });
+
+  wDom.el = previousEl;
+  preparedDom.set(wDom, { el, ready, mounted });
+};
+
+/**
+ * Claims a prepared subtree and runs what its creation deferred.
+ *
+ * Called from exactly where `wDomToDom` used to be called, so the deferred
+ * callbacks land at the same point in the commit as before.
+ */
+/**
+ * An insertion anchor is only usable if it is actually a child of the parent.
+ *
+ * Since elements are built during the build phase (D7), a sibling that has not
+ * been committed yet already HAS an element — one that is not in the document.
+ * The anchor search happily returns it, and `insertBefore` then throws
+ * NotFoundError. Falling back to `null` appends, which is what the base core
+ * does in that situation: the sibling did not exist there yet either.
+ */
+const anchorIn = (parentEl: Node, node?: unknown) =>
+  node && (node as Node).parentNode === parentEl ? (node as Node) : null;
+
+const takeDom = (wDom: WDom) => {
+  const prepared = preparedDom.get(wDom);
+
+  if (!prepared) {
+    return undefined;
+  }
+
+  preparedDom.delete(wDom);
+  wDom.el = prepared.el;
+  prepared.ready.forEach(runWDomCallbacksFromWDom);
+  prepared.mounted.forEach(addMountedQueue);
+
+  return prepared.el;
+};
 const CE = (t: string) => document.createElement(t);
 
 export const render = (
@@ -164,7 +238,7 @@ const typeAdd = (
   newElement?: HTMLElement | DocumentFragment | Text
 ) => {
   if (!newElement) {
-    newElement = wDomToDom(newWDom) as HTMLElement;
+    newElement = (takeDom(newWDom) || wDomToDom(newWDom)) as HTMLElement;
   }
 
   const parentWDom = getParent(newWDom);
@@ -194,7 +268,7 @@ const typeAdd = (
 
   if (newElement && parentEl) {
     if (newWDom.tag !== 'portal') {
-      parentEl.insertBefore(newElement, nextEl || null);
+      parentEl.insertBefore(newElement, anchorIn(parentEl, nextEl));
     }
   }
 };
@@ -274,7 +348,7 @@ const typeReplace = (newWDom: WDom) => {
       typeSortedReplace(newWDom);
     } else {
       const parentElement = findRealParentElement(parentWDom);
-      const newElement = wDomToDom(newWDom);
+      const newElement = takeDom(newWDom) || wDomToDom(newWDom);
 
       if (parentElement && newWDom.tag !== 'portal') {
         parentElement.replaceChild(newElement, orignalElement);
@@ -358,7 +432,7 @@ const updateChildren = (newWDom: WDom) => {
       if (nr === 'S') {
         typeDelete(item);
       }
-      created[index] = wDomToDom(item);
+      created[index] = takeDom(item) || wDomToDom(item);
       createdCount++;
     } else if (nr === 'T') {
       typeUpdate(item);
@@ -389,7 +463,7 @@ const updateChildren = (newWDom: WDom) => {
     const el = created[i];
 
     if (el && parentEl && children[i].tag !== 'portal') {
-      parentEl.insertBefore(el, baseAnchor || null);
+      parentEl.insertBefore(el, anchorIn(parentEl, baseAnchor));
     }
   }
 
@@ -411,7 +485,7 @@ const updateChildren = (newWDom: WDom) => {
         const el = isNew ? created[i] : getElementFromFragment(item);
 
         if (el) {
-          parentEl.insertBefore(el, anchor || null);
+          parentEl.insertBefore(el, anchorIn(parentEl, anchor));
         }
       }
 
@@ -584,12 +658,31 @@ const setAttr = (k: string, el: HTMLElement, v: string) =>
     ? el.setAttributeNS(null, k, v)
     : el.setAttribute(k, v);
 
-const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
+type Recorder = { ready: WDom[]; mounted: WDom[] };
+
+const wDomToDom = (
+  wDom: WDom,
+  isHydration?: boolean,
+  record?: Recorder
+): HTMLElement => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
 
-  runWDomCallbacksFromWDom(wDom);
+  // With a collector the two observable parts — the user's `mountReadyCallback`
+  // and the mount queue entry — are recorded instead of run, so that creating
+  // the elements early (during the build, D7) stays unobservable. They are
+  // replayed at exactly the commit point that used to call this function, which
+  // is what keeps the order identical to the base core.
+  // Only component nodes carry these — both callees no-op without a `compKey`.
+  // A 10,000 row list of plain elements therefore records nothing at all.
+  if (record) {
+    if (wDom.compKey) {
+      record.ready.push(wDom);
+    }
+  } else {
+    runWDomCallbacksFromWDom(wDom);
+  }
 
   if (tag === 'svg') {
     xmlnsRef.value = String(props && props.xmlns);
@@ -621,11 +714,17 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
     element = wDom.el;
   }
 
-  wDomChildrenToDom(children, element, isHydration);
+  wDomChildrenToDom(children, element, isHydration, record);
 
   updateProps(props, element, null, isHydration);
 
-  addMountedQueue(wDom);
+  if (record) {
+    if (wDom.compKey) {
+      record.mounted.push(wDom);
+    }
+  } else {
+    addMountedQueue(wDom);
+  }
 
   if (tag === 'svg') {
     xmlnsRef.value = '';
@@ -637,13 +736,14 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
 const wDomChildrenToDom = (
   children: WDom[],
   parentElement?: HTMLElement | Element | DocumentFragment | Text,
-  isHydration?: boolean
+  isHydration?: boolean,
+  record?: Recorder
 ) => {
   // The parent is not attached to the document yet, so children can be
   // appended directly (no intermediate fragment allocation).
   children.forEach((childItem: WDom) => {
     if (childItem.type) {
-      const childElement = wDomToDom(childItem, isHydration);
+      const childElement = wDomToDom(childItem, isHydration, record);
       if (childItem.tag !== 'portal' && !isHydration && parentElement) {
         parentElement.appendChild(childElement);
       }

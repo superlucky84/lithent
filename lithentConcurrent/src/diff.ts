@@ -1,7 +1,7 @@
 import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent } from '@/utils';
-import { typeDeleteUnused, recursiveRemoveEvent } from '@/render';
+import { typeDeleteUnused, recursiveRemoveEvent, prepareDom } from '@/render';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
@@ -230,7 +230,25 @@ const completeWork = (frame: Frame, effects: Effects) => {
   if (originalWDom && originalWDom.tag === 'portal') {
     wip.tag = 'portal';
   }
+
+  // Build this subtree's elements now rather than at commit — but only at the
+  // TOP of a fresh subtree, because `prepareDom` recurses. A node whose parent
+  // is also being created is reached by that recursion, and preparing it again
+  // would build it twice.
+  if (
+    buildsFreshDom(needRerender) &&
+    wip.type &&
+    !buildsFreshDom(parentNr(frame))
+  ) {
+    prepareDom(wip);
+  }
 };
+
+/** The render types whose commit creates elements from scratch. */
+const buildsFreshDom = (nr?: RenderType) =>
+  nr === 'A' || nr === 'R' || nr === 'S';
+
+const parentNr = (frame: Frame) => frame.parent && frame.parent.needRerender;
 
 /** Hands a finished child to its parent and advances the parent's cursor. */
 const attachToParent = (frame: Frame) => {
