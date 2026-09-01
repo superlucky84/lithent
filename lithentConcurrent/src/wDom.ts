@@ -30,6 +30,7 @@ import {
   shouldYield,
   isFlushingLow,
   scheduleWork,
+  cancelWork,
   drainPendingWork,
 } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
@@ -291,25 +292,20 @@ export const replaceWDom = (
     return;
   }
 
-  // At most one build is ever parked. Finish it before starting another, so
-  // commit order stays equal to render order and the parked slot never has to
-  // be a queue.
-  //
-  // Dropping the parked build instead was tried and is not safe here: it has
-  // already run component updaters, which sync `compProps`/`compChild` in
-  // place, so a fresh build over that half-consumed state throws. Undoing it
-  // properly is Phase 9's alternate/rollback work (D8/D9) — until then the
-  // older build finishes.
+  // At most one build is ever parked, and this render decides its fate.
   if (pausedPass) {
-    drainPendingWork();
+    if (pausedPass.props === props) {
+      // Same component. This render is newer, so the parked build is stale
+      // before it ever resumes. Sync-before-low (RC-1) says the same thing.
+      discardPaused();
+    } else {
+      // A different component. Finishing it first keeps commit order equal to
+      // render order, and means the parked slot never has to be a queue.
+      drainPendingWork();
 
-    if (originalWDom.il) {
-      // The build that just finished retired this node. This render still has
-      // to happen — its state is newer — so it is re-raised against whatever
-      // node that commit installed. Returning here instead would silently drop
-      // the update.
-      componentUpdate(props)();
-      return;
+      if (originalWDom.il) {
+        return;
+      }
     }
   }
 
@@ -446,10 +442,37 @@ const interruptible = (pass: Pass) => isFlushingLow() && !pass.originalWDom.il;
 const wantsPause = (pass: Pass) =>
   shouldYield() && !buildRanUpdateEffects(pass.trace.snapshots);
 
+/**
+ * Drops the parked build and puts back the hook slots it wrote.
+ *
+ * Everything else it did is invisible: the tree it was building is its own,
+ * the elements it created early (D16) are never claimed, and since Phase 9 the
+ * component's redraw closure and live node are published at COMMIT, so nothing
+ * outside ever pointed at the half-built tree.
+ */
+const discardPaused = () => {
+  const pass = pausedPass as Pass;
+
+  pausedPass = null;
+  cancelWork();
+  restoreHookState(pass.trace.snapshots);
+};
+
+/**
+ * Where a build records what has to happen at commit.
+ *
+ * Non-null only while a pass is building, so the initial `render()` path — which
+ * has no commit phase to defer to — keeps publishing straight away.
+ */
+let buildEffects: Effects | null = null;
+
 /** Puts the module-level build context in place for one slice. */
 const withBuildContext = <T>(pass: Pass, run: () => T): T => {
   const outerTrace = buildTrace;
+  const outerEffects = buildEffects;
+
   buildTrace = pass.trace;
+  buildEffects = pass.effects;
   needDiffRef.value = true;
 
   try {
@@ -457,6 +480,7 @@ const withBuildContext = <T>(pass: Pass, run: () => T): T => {
   } finally {
     needDiffRef.value = false;
     buildTrace = outerTrace;
+    buildEffects = outerEffects;
   }
 };
 
@@ -759,16 +783,35 @@ const addComponentProps = (
     reRender,
   });
 
-  setRedrawAction(compKey, () =>
-    replaceWDom(
-      tag,
-      (wDom.compProps as Props) || props,
-      (wDom.compChild as WDom[]) || children,
-      wDom
-    )
-  );
+  // These two point the OUTSIDE WORLD at this node — the redraw closure a
+  // future `renew()` will run, and the live node `componentMap` hands out. Doing
+  // them while the tree is still being built means a render that arrives mid
+  // build targets a half-finished node, whose `children` still hold resolvers.
+  // Until Phase 8 a build always ran to completion in one go, so it never
+  // showed; now it is the same D4 rule as everything else — record it, replay it
+  // at commit.
+  const publish = () => {
+    setRedrawAction(compKey, () =>
+      replaceWDom(
+        tag,
+        (wDom.compProps as Props) || props,
+        (wDom.compChild as WDom[]) || children,
+        wDom
+      )
+    );
 
-  if (getComponentSubInfo(compKey, 'vd')) {
-    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
+    const live = getComponentSubInfo(compKey, 'vd') as
+      | { value: WDom }
+      | undefined;
+
+    if (live) {
+      live.value = wDom;
+    }
+  };
+
+  if (buildEffects) {
+    buildEffects.push(publish);
+  } else {
+    publish();
   }
 };

@@ -1,5 +1,13 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { h, render, mount, deferRender, whenIdle, nextTick } from '@/index';
+import {
+  h,
+  render,
+  mount,
+  updateCallback,
+  deferRender,
+  whenIdle,
+  nextTick,
+} from '@/index';
 import { startWork, commitEffects } from '@/diff';
 import type { Effects } from '@/diff';
 import { hasPendingWork, setLowLaneBudget, workResumeCount } from '@/scheduler';
@@ -294,6 +302,59 @@ describe('a low-lane build that really pauses', () => {
     expect(host.querySelectorAll('li').length).toBe(1);
     expect(host.textContent).toBe('99t');
     expect(hasPendingWork()).toBe(false);
+  });
+
+  it('leaves the hook slots where they were when it is dropped (RC-8)', async () => {
+    let bump = () => {};
+    let updates = 0;
+    let dep = 0;
+    let armed = false;
+
+    // Renders inside the deferred build and, from there, moves the dependency
+    // and raises a sync renew. That sync render supersedes the parked build,
+    // which is therefore dropped after having already walked `useUpdated` once.
+    const Trigger = mount(() => () => {
+      if (armed) {
+        armed = false;
+        dep = 1;
+        bump();
+      }
+      return <i>t</i>;
+    });
+
+    const App = mount((renew: () => void) => {
+      bump = renew;
+
+      updateCallback(
+        () => {
+          updates++;
+        },
+        () => [dep]
+      );
+
+      return () => (
+        <div>
+          <b>{String(dep)}</b>
+          <Trigger />
+        </div>
+      );
+    });
+
+    const host = document.createElement('div');
+    render(<App />, host);
+
+    updates = 0;
+    setLowLaneBudget(0);
+    armed = true;
+    deferRender(() => bump());
+
+    await whenIdle();
+
+    // The dropped build read `dep` as 0 and fired nothing, but it still advanced
+    // the hook cursor. Without putting that back, the render that replaces it
+    // reads a shifted slot and the effect is lost.
+    expect(updates, 'exactly one effect for the one commit').toBe(1);
+    expect(host.textContent).toBe('1t');
   });
 
   it('matches what the same render produces without pausing', async () => {

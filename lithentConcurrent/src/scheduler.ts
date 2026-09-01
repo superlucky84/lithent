@@ -111,6 +111,11 @@ let workResumes = 0;
 
 export const workResumeCount = () => workResumes;
 
+/** Throws away a parked build — its owner decided it is no longer wanted. */
+export const cancelWork = () => {
+  pendingWork = null;
+};
+
 /** Runs a paused build to completion right now, outside the slice. */
 export const drainPendingWork = () => {
   if (pendingWork) {
