@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-18 확정. T1·T1.5 완성, T2 진입 승인 (Phase 7 완료, 2026-09-01)**
+- 상태: **DC-1~DC-20 확정. T1·T1.5 완성, T2 진행 중 (Phase 8 완료, 2026-09-01)**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -517,6 +517,13 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   → 같은 규칙을 프로젝트 이름에도 적용한 것이 REQUIREMENTS **§2.1**이다
   (T2 완주 전까지 "concurrent rendering"이라 서술하지 않고, 완주 후에도 `concurrent mode`는
   쓰지 않는다). 명명 근거는 RC-10(수동 E-4) 통과다.
+- [x] **DC-19**: 순회 상태의 소재 → **명시적 스택** (노드 포인터 폐기). 확정 2026-09-01 (Phase 8).
+  근거: `WDom`이 동결 코어에 있고 인덱스 시그니처가 없어 포크가 넓힐 수 없다(P1).
+  스택은 O(깊이)이고 노드 모양을 안 바꾸므로 C3가 유지되며 D10 shim도 필요 없다.
+- [x] **DC-20**: 무엇을 중단할 수 있는가 → **low 레인 빌드만.** 확정 2026-09-01 (Phase 8).
+  근거: sync 플러시는 마이크로태스크이고 `await nextTick()` = "커밋 완료" 계약에
+  44개 파일·72곳이 의존한다. `flushSync`는 자기 주변에서 low 표시를 끈다 —
+  안 끄면 low 슬라이스에서 올라온 sync 렌더가 스스로 멈춰 서고 두 갱신이 모두 유실된다.
 - [x] **DC-17**: 코어↔helper store 배선 방향 → **helper가 코어 네임스페이스에서 선택적 호출**
   (`notifyStoreWrite`). 확정 2026-09-01 (Phase 6).
   근거: 코어는 helper를 import할 수 없고 helper는 동결된 base에서도 돌아야 한다.
@@ -547,6 +554,7 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D5 커밋 경계 | RC-5 (Phase 5) ✅, 4-9 BC-1 블록(양쪽 코어 상이값 고정), 수동 C-1·C-6 |
 | D6 store tearing | RC-6 (Phase 6) ✅ `concurrent-storeTearing`, 배선은 `helper/…/storeVersion` × `test:dual` |
 | D7 yield 입자 | RC-7 (Phase 7) ✅ `pnpm bench:units` — 형제 10k 18~60ms vs 깊이 400단 0.2ms |
+| D7 work loop 중단·재개 | Phase 8 ✅ `concurrent-workLoop` — `shouldPause` 주입 + `setLowLaneBudget(0)` 강제 |
 | D12b helper 소재 | `helper/` 무변경(`git status helper/`) + concurrent helper 스위트 7개 |
 | D11 `whenIdle` | BC-4 (Phase 2) ✅, 수동 B-9 |
 | D4 커밋 이펙트 리스트 | `concurrent-commitEquivalence.test.ts` — DOM + 라이프사이클 순서를 **양쪽 빌드 산출물**로 비교 |

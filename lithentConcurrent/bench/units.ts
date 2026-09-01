@@ -125,6 +125,49 @@ const deepApp = (core: Core, host: HTMLElement) => {
   };
 };
 
+/** Same list, but every row is a component — the shape a real app has. */
+const componentListApp = (core: Core, host: HTMLElement) => {
+  let rows: Row[] = [];
+  let renew = () => {};
+
+  const RowComp = core.mount(
+    (_r: unknown, props: { row: Row }) => () =>
+      core.h(
+        'tr',
+        { class: props.row.selected ? 'danger' : '' },
+        core.h('td', {}, String(props.row.id)),
+        core.h('td', {}, core.h('a', {}, props.row.label))
+      )
+  );
+
+  const App = core.mount((r: () => void) => {
+    renew = r;
+    return () =>
+      core.h(
+        'table',
+        {},
+        core.h(
+          'tbody',
+          {},
+          rows.map(row => core.h(RowComp, { key: row.id, row }))
+        )
+      );
+  });
+
+  const destroy = core.render(core.h(App, {}), host);
+
+  return {
+    get rows() {
+      return rows;
+    },
+    set rows(next: Row[]) {
+      rows = next;
+    },
+    renew: () => renew(),
+    destroy,
+  };
+};
+
 type Scenario = {
   name: string;
   note: string;
@@ -265,6 +308,46 @@ const SCENARIOS: Scenario[] = [
       app.rows = [];
     }
   ),
+  {
+    name: 'component rows: create 10,000',
+    note: 'every row is a component — build phase carries the render cost',
+    make: (core, host) => {
+      const app = componentListApp(core, host);
+      return {
+        reset: async () => {
+          app.rows = [];
+          app.renew();
+          await core.nextTick();
+        },
+        act: () => {
+          app.rows = makeRows(10000);
+          app.renew();
+        },
+        destroy: app.destroy,
+      };
+    },
+  },
+  {
+    name: 'component rows: update every 10th',
+    note: 'same keys, 1,000 labels change',
+    make: (core, host) => {
+      const app = componentListApp(core, host);
+      return {
+        reset: async () => {
+          app.rows = makeRows(10000);
+          app.renew();
+          await core.nextTick();
+        },
+        act: () => {
+          app.rows = app.rows.map((row, i) =>
+            i % 10 === 0 ? { ...row, label: `${row.label} !` } : row
+          );
+          app.renew();
+        },
+        destroy: app.destroy,
+      };
+    },
+  },
   {
     name: 'deep tree x400',
     note: '400 nested elements, leaf text changes',

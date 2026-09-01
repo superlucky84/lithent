@@ -10,8 +10,8 @@ import {
   LComponent,
 } from '@/types';
 
-import { makeNewWDomTree, commitEffects } from '@/diff';
-import type { Effects } from '@/diff';
+import { startWork, commitEffects } from '@/diff';
+import type { Effects, Work } from '@/diff';
 import { wDomUpdate } from '@/render';
 import { execMountedQueue } from '@/hook/mountCallback';
 import {
@@ -23,7 +23,15 @@ import {
   wdomSymbol,
   lmountComponentSet,
 } from '@/utils/universalRef';
-import { setRedrawAction, componentUpdate, storeVersion } from '@/utils/redraw';
+import {
+  setRedrawAction,
+  componentUpdate,
+  storeVersion,
+  shouldYield,
+  isFlushingLow,
+  scheduleWork,
+  drainPendingWork,
+} from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,
@@ -238,12 +246,40 @@ const restoreHookState = (snapshots: HookSnapshot[]) => {
 };
 
 /**
+ * The one build that is currently parked mid-tree, if any.
+ *
+ * Kept here rather than in the scheduler because deciding what happens to it is
+ * a rendering question — whether the render that just arrived supersedes it.
+ */
+let pausedPass: Pass | null = null;
+
+/**
+ * One render pass in flight. It outlives a single task when the build pauses.
+ */
+type Pass = {
+  tag: TagFunction;
+  props: Props;
+  children: WDom[];
+  originalWDom: WDom;
+  trace: BuildTrace;
+  attempt: number;
+  startVersion: number;
+  effects: Effects;
+  work: Work;
+};
+
+/**
  * It re-renders starting from a specific component.
  *
  * The build runs under a store-version check (D6, DC-5): if a store was written
  * while the tree was being built, the tree describes two different versions of
  * the same data and is thrown away rather than committed. Phase 4 is what makes
  * that legal — the build performs nothing, it only records effects.
+ *
+ * Inside a low-lane flush the build may also stop partway and continue in a
+ * later task (D7). It never does so in the sync lane: that flush is a
+ * microtask, and `await nextTick()` promising a finished commit is a contract
+ * 72 call sites across the suites depend on.
  */
 export const replaceWDom = (
   tag: TagFunction,
@@ -255,64 +291,181 @@ export const replaceWDom = (
     return;
   }
 
-  const trace: BuildTrace = { snapshots: [], mounted: false };
-  const outerTrace = buildTrace;
-  buildTrace = trace;
+  // At most one build is ever parked. Finish it before starting another, so
+  // commit order stays equal to render order and the parked slot never has to
+  // be a queue.
+  //
+  // Dropping the parked build instead was tried and is not safe here: it has
+  // already run component updaters, which sync `compProps`/`compChild` in
+  // place, so a fresh build over that half-consumed state throws. Undoing it
+  // properly is Phase 9's alternate/rollback work (D8/D9) — until then the
+  // older build finishes.
+  if (pausedPass) {
+    drainPendingWork();
 
-  try {
-    for (let attempt = 0; ; attempt++) {
-      const startVersion = storeVersion();
-
-      trace.snapshots = [];
-      trace.mounted = false;
-
-      const { effects, newWDomTree } = buildWDomTree(
-        tag,
-        props,
-        children,
-        originalWDom
-      );
-
-      // A build that already did something observable is committed as it is.
-      // Mounting one (DC-7): its new components are registered in
-      // `componentMap`, and discarding it would orphan those entries or run the
-      // mounters twice. One that fired an `updateCallback`: the effect ran
-      // during the build and a rebuild would run it a second time.
-      const retryable =
-        !trace.mounted &&
-        attempt < MAX_STORE_RETRY &&
-        !buildRanUpdateEffects(trace.snapshots);
-
-      if (retryable && storeVersion() !== startVersion) {
-        restoreHookState(trace.snapshots);
-        continue;
-      }
-
-      commit(effects, newWDomTree);
+    if (originalWDom.il) {
+      // The build that just finished retired this node. This render still has
+      // to happen — its state is newer — so it is re-raised against whatever
+      // node that commit installed. Returning here instead would silently drop
+      // the update.
+      componentUpdate(props)();
       return;
     }
+  }
+
+  runPass(startPass(tag, props, children, originalWDom));
+};
+
+const startPass = (
+  tag: TagFunction,
+  props: Props,
+  children: WDom[],
+  originalWDom: WDom
+): Pass => {
+  const pass: Pass = {
+    tag,
+    props,
+    children,
+    originalWDom,
+    trace: { snapshots: [], mounted: false },
+    attempt: 0,
+    startVersion: 0,
+    effects: [],
+    work: { advance: () => null },
+  };
+
+  beginAttempt(pass);
+
+  return pass;
+};
+
+/** (Re)starts the build from the root, discarding whatever the last try made. */
+const beginAttempt = (pass: Pass) => {
+  pass.startVersion = storeVersion();
+  pass.trace.snapshots = [];
+  pass.trace.mounted = false;
+  pass.effects = [];
+
+  withBuildContext(pass, () => {
+    pass.work = startWork(
+      makeWDomResolver(pass.tag, pass.props, pass.children),
+      pass.originalWDom,
+      pass.effects
+    );
+  });
+};
+
+/**
+ * Runs the pass until it commits, is abandoned, or runs out of slice.
+ *
+ * `needDiffRef` and the hook-state trace are module-level, so they are put in
+ * place around each slice rather than once around the whole build — between two
+ * slices the build is not running and neither should be set.
+ */
+const runPass = (pass: Pass) => {
+  for (;;) {
+    const built = withBuildContext(pass, () =>
+      pass.work.advance(
+        interruptible(pass) ? () => wantsPause(pass) : undefined
+      )
+    );
+
+    if (!built) {
+      // Out of slice. The stack holds the resume point.
+      pausedPass = pass;
+      scheduleWork(() => {
+        pausedPass = null;
+        resumePass(pass);
+      });
+      return;
+    }
+
+    const newWDomTree = finishTree(pass, built);
+
+    // A build that already did something observable is committed as it is.
+    // Mounting one (DC-7): its new components are registered in `componentMap`,
+    // and discarding it would orphan those entries or run the mounters twice.
+    // One that fired an `updateCallback`: the effect ran during the build and a
+    // rebuild would run it a second time.
+    const retryable =
+      !pass.trace.mounted &&
+      pass.attempt < MAX_STORE_RETRY &&
+      !buildRanUpdateEffects(pass.trace.snapshots);
+
+    if (retryable && storeVersion() !== pass.startVersion) {
+      restoreHookState(pass.trace.snapshots);
+      pass.attempt += 1;
+      beginAttempt(pass);
+      continue;
+    }
+
+    commit(pass.effects, newWDomTree);
+    return;
+  }
+};
+
+/**
+ * Continues a paused build in a later task.
+ *
+ * The one thing that can have happened in between is a sync render of the same
+ * component: it builds from the same original, commits, and retires it. This
+ * build is then stale and is dropped — the newer tree already on screen wins.
+ * Dropping is safe precisely because pausing was refused once the build had
+ * done anything observable (see `wantsPause`).
+ */
+const resumePass = (pass: Pass) => {
+  if (pass.originalWDom.il) {
+    restoreHookState(pass.trace.snapshots);
+    return;
+  }
+
+  runPass(pass);
+};
+
+/**
+ * Whether this build may be interrupted.
+ *
+ * Only inside a low-lane flush — and `flushSync` clears that marker around
+ * itself, so a sync render raised from within a low slice is correctly seen as
+ * sync work and runs straight through. Without that clearing it inherited the
+ * low marker, parked itself, and was then discarded by the render behind it:
+ * the deferred AND the urgent update were both lost, leaving the screen showing
+ * the state from before either.
+ */
+const interruptible = (pass: Pass) => isFlushingLow() && !pass.originalWDom.il;
+
+/**
+ * Whether this build may stop here.
+ *
+ * Refuses once the build has fired an `updateCallback`, for the same reason
+ * DC-18 refuses to discard such a build: the effect already ran, so if the
+ * pause later has to be dropped (a sync render preempting it) there would be no
+ * way to take it back. A build that only mounted may pause — BC-2 already says
+ * a mounter can be attempted more than once.
+ */
+const wantsPause = (pass: Pass) =>
+  shouldYield() && !buildRanUpdateEffects(pass.trace.snapshots);
+
+/** Puts the module-level build context in place for one slice. */
+const withBuildContext = <T>(pass: Pass, run: () => T): T => {
+  const outerTrace = buildTrace;
+  buildTrace = pass.trace;
+  needDiffRef.value = true;
+
+  try {
+    return run();
   } finally {
+    needDiffRef.value = false;
     buildTrace = outerTrace;
   }
 };
 
 /**
- * Build phase. Nothing outside the new tree is touched: every mutation the pass
- * would have made is recorded in `effects` instead (D4). That is what leaves the
- * previous tree whole, the work-in-progress one abandonable, and this function
- * safe to run more than once against the same original.
+ * Root bookkeeping, once the tree is whole: it reads the finished node, so it
+ * cannot run before the last slice.
  */
-const buildWDomTree = (
-  tag: TagFunction,
-  props: Props,
-  children: WDom[],
-  originalWDom: WDom
-) => {
-  needDiffRef.value = true;
-
-  const effects: Effects = [];
-  const newWDom = makeWDomResolver(tag, props, children);
-  const newWDomTree = makeNewWDomTree(newWDom, originalWDom, effects);
+const finishTree = (pass: Pass, newWDomTree: WDom) => {
+  const { originalWDom, effects } = pass;
   // NOTE: we/ae are short for wrapElement/afterElement
   const { isRoot, getParent, we, ae } = originalWDom;
 
@@ -337,9 +490,7 @@ const buildWDomTree = (
     newWDomTree.ae = ae;
   }
 
-  needDiffRef.value = false;
-
-  return { effects, newWDomTree };
+  return newWDomTree;
 };
 
 /**

@@ -30,13 +30,68 @@ export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
   originalWDom: WDom | undefined,
   effects: Effects
-) =>
-  remakeNewWDom(
-    newWDom,
-    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
-    effects,
-    originalWDom
-  );
+) => startWork(newWDom, originalWDom, effects).advance() as WDom;
+
+/**
+ * A build that can be walked a slice at a time.
+ *
+ * `advance` returns the finished tree, or `null` when it stopped early because
+ * `shouldPause` asked it to. Calling it again picks up from the same node — the
+ * stack IS the resume point, so nothing has to be recomputed and no work is
+ * repeated.
+ *
+ * The pause check sits between units, which after `planChildren` means BETWEEN
+ * SIBLINGS as well as between depth levels. Phase 7 measured why that matters:
+ * a 400-deep tree costs 0.2ms while 10,000 siblings cost 18~60ms, so a loop
+ * that could only stop at component or depth boundaries would leave every
+ * expensive case unbroken.
+ */
+export type Work = { advance: (shouldPause?: () => boolean) => WDom | null };
+
+export const startWork = (
+  newWDom: WDom | TagFunctionResolver,
+  originalWDom: WDom | undefined,
+  effects: Effects
+): Work => {
+  const stack: Frame[] = [beginWork(newWDom, originalWDom)];
+
+  return {
+    advance: shouldPause => {
+      for (;;) {
+        const frame = stack[stack.length - 1];
+
+        if (frame.cursor < frame.children.length) {
+          stack.push(
+            beginWork(
+              frame.children[frame.cursor],
+              frame.originals[frame.cursor],
+              frame
+            )
+          );
+        } else {
+          completeWork(frame, effects);
+          stack.pop();
+
+          if (!stack.length) {
+            return frame.wip;
+          }
+
+          attachToParent(frame);
+        }
+
+        if (shouldPause && shouldPause()) {
+          return null;
+        }
+      }
+    },
+  };
+};
+
+/** Whether a node lines up with its counterpart from the previous tree. */
+const sameTypeAs = (
+  newWDom: WDom | TagFunctionResolver,
+  originalWDom: WDom | undefined
+) => checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom);
 
 /**
  * Runs the recorded effects, in collection order.
@@ -59,34 +114,108 @@ export const commitEffects = (effects: Effects) => {
 };
 
 /**
- * Create a new virtual DOM after comparing with the previous virtual DOM
+ * One node's worth of in-progress work.
+ *
+ * The recursion this replaces held the same state on the JS call stack, where
+ * it died the moment the function returned. Holding it in an explicit stack is
+ * what makes a build pausable: `cursor` is the resume point, and the stack
+ * itself is the traversal.
+ *
+ * D7 sketched `child`/`sibling`/`return`/`ci` pointers on the node instead.
+ * That is not available here — `WDom` lives in the frozen base core (P1) and
+ * has no index signature, so the fork cannot widen it. An explicit stack turns
+ * out to be the better trade anyway: it is O(depth) rather than O(nodes), it
+ * leaves the node shape untouched (so every `WDom` consumer outside the core is
+ * unaffected, C3), and `getParent` keeps working without the D10 shim. See DC-19.
  */
-const remakeNewWDom = (
+type Frame = {
+  /** The node being built — already generalized (the component has rendered). */
+  wip: WDom;
+  needRerender?: RenderType;
+  isSameType: boolean;
+  originalWDom?: WDom;
+  /** New children still to walk, and the originals they pair with. */
+  children: WDom[];
+  originals: (WDom | undefined)[];
+  /** Matched keyed position, per child. `undefined` where there is no match. */
+  matchedIndexes: (number | undefined)[];
+  /** Keyed leftovers, deleted at commit. `null` when this is not a keyed loop. */
+  unused: WDom[] | null;
+  /** Finished children, filled in as each child completes. */
+  built: WDom[];
+  /** How many children are done — the resume point (D7's `ci`). */
+  cursor: number;
+  /** Shared by every child of this node. Absent on leaves — nothing asks. */
+  getParent?: () => WDom;
+  parent?: Frame;
+};
+
+/**
+ * The pre-children half of the old `remakeNewWDom`: render the component,
+ * decide the render type, and work out which new child pairs with which
+ * original. Pairing happens HERE, once, so the keyed Map is built once per node
+ * exactly as before — and so a pause between children cannot re-run it.
+ */
+const beginWork = (
   newWDom: WDom | TagFunctionResolver,
-  isSameType: boolean,
-  effects: Effects,
-  originalWDom?: WDom
-) => {
-  const remakeWDom = generalize(newWDom, isSameType, originalWDom);
-  const needRerender = addReRenderTypeProperty(
-    remakeWDom,
+  originalWDom: WDom | undefined,
+  parent?: Frame
+): Frame => {
+  const isSameType = sameTypeAs(newWDom, originalWDom);
+  const wip = generalize(newWDom, isSameType, originalWDom);
+  const needRerender = addReRenderTypeProperty(wip, isSameType, originalWDom);
+
+  const frame: Frame = {
+    wip,
+    needRerender,
     isSameType,
-    originalWDom
-  );
+    originalWDom,
+    children: NO_CHILDREN,
+    originals: NO_CHILDREN,
+    matchedIndexes: NO_CHILDREN,
+    unused: null,
+    built: NO_CHILDREN,
+    cursor: 0,
+    getParent: undefined,
+    parent,
+  };
+
+  if (needRerender !== 'N') {
+    planChildren(frame);
+  }
+
+  return frame;
+};
+
+/**
+ * Shared stand-in for "this node has no children".
+ *
+ * Most nodes in a real tree are leaves — every text node is one — and the walk
+ * allocates a frame for each. Handing them all the same frozen empty array
+ * instead of four fresh ones is what keeps the explicit stack from costing more
+ * than the recursion it replaced, where a leaf allocated nothing at all.
+ */
+const NO_CHILDREN: never[] = [];
+
+/**
+ * The post-children half. Effects are pushed only from here, which is what
+ * keeps the collection order identical to the recursion's: a node's own effects
+ * land after every effect its subtree produced (DC-14).
+ */
+const completeWork = (frame: Frame, effects: Effects) => {
+  const { wip, originalWDom, needRerender } = frame;
   const isNoting = needRerender === 'N';
 
   if (!isNoting) {
-    remakeWDom.children = remakeChildrenForDiff(
-      remakeWDom,
-      isSameType,
-      effects,
-      originalWDom
-    );
+    if (frame.unused) {
+      const unused = frame.unused;
+      effects.push(() => typeDeleteUnused(unused));
+    }
+    wip.children = frame.built;
   }
 
-  // NOTE: short-key metadata (nr = needRerender) keeps bundle size down
-  remakeWDom.nr = needRerender;
-  inheritPropForRender(remakeWDom, originalWDom, effects, needRerender);
+  wip.nr = needRerender;
+  inheritPropForRender(wip, originalWDom, effects, needRerender);
 
   if (!isNoting && originalWDom) {
     // Deferring this is what makes the WIP tree abandonable: the original keeps
@@ -97,11 +226,25 @@ const remakeNewWDom = (
       delete originalWDom.children;
     });
   }
-  if (originalWDom?.tag === 'portal') {
-    remakeWDom.tag = 'portal';
+
+  if (originalWDom && originalWDom.tag === 'portal') {
+    wip.tag = 'portal';
+  }
+};
+
+/** Hands a finished child to its parent and advances the parent's cursor. */
+const attachToParent = (frame: Frame) => {
+  const parent = frame.parent as Frame;
+  const slot = parent.cursor;
+  const matched = parent.matchedIndexes[slot];
+
+  if (matched !== undefined) {
+    frame.wip.oi = matched;
   }
 
-  return remakeWDom;
+  frame.wip.getParent = parent.getParent as () => WDom;
+  parent.built[slot] = frame.wip;
+  parent.cursor = slot + 1;
 };
 
 /**
@@ -225,115 +368,66 @@ const generalize = (
 };
 
 /**
- * 자식 가상돔들도 전부 재귀처리하며 똑같은 처리를 해준다.
+ * Works out, for one node, which new child pairs with which original — and for
+ * a keyed loop, which originals nothing claimed.
+ *
+ * This is the diff algorithm carried over unchanged (8-5): first-occurrence key
+ * Map in O(n), `oi` recorded for the render phase's LIS, index pairing
+ * otherwise. What moved is only WHEN it runs: the recursion decided pairing and
+ * descended in the same pass, whereas this decides for all children at once and
+ * lets the work loop descend. Deciding up front is what makes a pause between
+ * two children safe — there is no half-consumed key Map to resume into.
  */
-const remakeChildrenForDiff = (
-  newWDom: WDom,
-  isSameType: boolean,
-  effects: Effects,
-  originalWDom?: WDom
-) =>
-  isSameType && originalWDom
-    ? remakeChildrenForUpdate(newWDom, originalWDom, effects)
-    : remakeChildrenForAdd(newWDom, effects);
+const planChildren = (frame: Frame) => {
+  const { wip, isSameType, originalWDom } = frame;
+  const children = wip.children;
 
-/**
- * Recursive handling for the creation of a new virtual DOM.
- */
-const remakeChildrenForAdd = (newWDom: WDom, effects: Effects) => {
-  const getParent = () => newWDom;
-
-  return (newWDom.children || []).map((item: WDom) => {
-    const child = makeNewWDomTree(item, undefined, effects);
-    child.getParent = getParent;
-    return child;
-  });
-};
-
-/**
- * Recursive handling for updates, not additions.
- * Uses key-based diffing for loops, index-based for others
- */
-const remakeChildrenForUpdate = (
-  newWDom: WDom,
-  originalWDom: WDom,
-  effects: Effects
-) => {
-  if (newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0])) {
-    return remakeChildrenForLoopUpdate(newWDom, originalWDom, effects);
+  if (!children || !children.length) {
+    return;
   }
 
+  // Not copied: `wip.children` is only replaced at this frame's `completeWork`,
+  // which happens after the cursor has consumed every entry.
+  frame.children = children;
+  frame.built = new Array(children.length);
+  frame.getParent = () => wip;
+
+  if (!isSameType || !originalWDom) {
+    // Nothing to pair against — `originals` and `matchedIndexes` stay the
+    // shared empty array and read as `undefined`, which is what they mean.
+    return;
+  }
+
+  frame.originals = new Array(children.length);
   const origChildren = originalWDom.children || [];
-  const getParent = () => newWDom;
 
-  return (newWDom.children || []).map((item: WDom, index: number) => {
-    const child = makeNewWDomTree(item, origChildren[index], effects);
-    child.getParent = getParent;
-    return child;
+  if (wip.type === 'l' && checkExistyKey(children[0])) {
+    frame.matchedIndexes = new Array(children.length);
+    const keyMap = new Map<unknown, number>();
+
+    origChildren.forEach((item, index) => {
+      const key = getKey(item);
+      if (!keyMap.has(key)) {
+        keyMap.set(key, index);
+      }
+    });
+
+    children.forEach((item, index) => {
+      const key = getKey(item);
+      const origIndex = keyMap.get(key);
+
+      if (origIndex !== undefined) {
+        keyMap.delete(key);
+        frame.originals[index] = origChildren[origIndex];
+        frame.matchedIndexes[index] = origIndex;
+      }
+    });
+
+    frame.unused = [...keyMap.values()].map(index => origChildren[index]);
+    return;
+  }
+
+  children.forEach((_item, index) => {
+    frame.originals[index] = origChildren[index];
   });
-};
-
-/**
- * Handling virtual DOM of loop-type elements.
- */
-const remakeChildrenForLoopUpdate = (
-  newWDom: WDom,
-  originalWDom: WDom,
-  effects: Effects
-) => {
-  const [remakedChildren, unUsedChildren] = diffLoopChildren(
-    newWDom,
-    originalWDom,
-    effects
-  );
-
-  effects.push(() => typeDeleteUnused(unUsedChildren));
-
-  return remakedChildren;
-};
-
-/**
- * Recursive handling of loop-type virtual DOM elements.
- * Matches children against the originals by key via a Map in O(n) and
- * records each match's original index (oi) for the render phase to
- * minimize moves via LIS.
- */
-const diffLoopChildren = (
-  newWDom: WDom,
-  originalWDom: WDom,
-  effects: Effects
-) => {
-  const origChildren = originalWDom.children || [];
-  const keyMap = new Map<unknown, number>();
-  origChildren.forEach((item, index) => {
-    const key = getKey(item);
-    if (!keyMap.has(key)) {
-      keyMap.set(key, index);
-    }
-  });
-
-  const getParent = () => newWDom;
-  const remaked = (newWDom.children || []).map(item => {
-    const key = getKey(item);
-    const origIndex = keyMap.get(key);
-    const matched = origIndex !== undefined;
-
-    if (matched) {
-      keyMap.delete(key);
-    }
-
-    const child = makeNewWDomTree(
-      item,
-      matched ? origChildren[origIndex] : undefined,
-      effects
-    );
-    if (matched) {
-      child.oi = origIndex;
-    }
-    child.getParent = getParent;
-
-    return child;
-  });
-
-  return [remaked, [...keyMap.values()].map(index => origChildren[index])];
 };

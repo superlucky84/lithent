@@ -62,11 +62,63 @@ export const deferRender = (scope: () => void) => {
 /** Time slice a low-lane flush may hold the main thread, in ms. */
 const LOW_LANE_BUDGET = 5;
 
+let lowLaneBudget = LOW_LANE_BUDGET;
+
+/**
+ * Shrinks the slice so a build is forced to pause.
+ *
+ * A deliberate seam, not a feature: it is not exported from `index.ts` and so
+ * is not part of the public surface. Without it the resume path is only reached
+ * when a machine happens to be slow enough, which makes the test that covers it
+ * pass for the wrong reason — dropping `scheduleWork` entirely did not fail a
+ * single test before this existed.
+ */
+export const setLowLaneBudget = (ms?: number) => {
+  lowLaneBudget = ms === undefined ? LOW_LANE_BUDGET : ms;
+};
+
 let syncScheduled = false;
 let lowScheduled = false;
 let lowDeadline = 0;
 let lowPort: MessagePort | null = null;
 let idleWaiters: (() => void)[] = [];
+
+/**
+ * A build that ran out of slice and has to be continued (D7, Phase 8-6).
+ *
+ * There is at most one. A second interruptible render cannot start while one is
+ * paused — `wDom.ts` finishes the paused build first — so this never has to be
+ * a queue, and "which paused build resumes next" is never a question.
+ */
+let pendingWork: (() => void) | null = null;
+
+/** Hands a paused build back to the low lane. */
+export const scheduleWork = (resume: () => void) => {
+  pendingWork = resume;
+  scheduleFlush('low');
+};
+
+export const hasPendingWork = () => pendingWork !== null;
+
+/**
+ * How many times a parked build has been picked up again.
+ *
+ * Observability for the tests, same role as `hasPendingWork`: "it committed the
+ * right thing" is true whether or not it ever stopped, so the test needs a way
+ * to say that it did.
+ */
+let workResumes = 0;
+
+export const workResumeCount = () => workResumes;
+
+/** Runs a paused build to completion right now, outside the slice. */
+export const drainPendingWork = () => {
+  if (pendingWork) {
+    const work = pendingWork;
+    pendingWork = null;
+    work();
+  }
+};
 
 /**
  * Whether the current low-lane flush has used up its slice. Phase 8's work loop
@@ -109,12 +161,23 @@ const scheduleFlush = (lane: Lane) => {
  * clear-after-forEach ordering is what the existing suite already pins down.
  */
 const flushSync = () => {
-  lanes.sync.forEach((item: () => void) => {
-    item();
-  });
+  // Whatever runs here is sync work, even if a low flush is somewhere up the
+  // stack. Without this a sync render raised from inside a low slice would look
+  // like low-lane work and be allowed to pause — and `await nextTick()` would
+  // stop meaning "committed".
+  const outerLow = flushingLow;
+  flushingLow = false;
 
-  lanes.sync.clear();
-  syncScheduled = false;
+  try {
+    lanes.sync.forEach((item: () => void) => {
+      item();
+    });
+
+    lanes.sync.clear();
+    syncScheduled = false;
+  } finally {
+    flushingLow = outerLow;
+  }
 };
 
 /**
@@ -122,9 +185,50 @@ const flushSync = () => {
  * task. Entries are removed before running so the carried-over remainder is
  * exactly what has not run yet.
  */
+/**
+ * Whether the code running right now was started by a low-lane flush.
+ *
+ * A build may only be interrupted when this is true. The sync lane is a
+ * microtask, and 72 call sites across the suites rely on `await nextTick()`
+ * landing after the sync commit — pausing there would break that contract, and
+ * RC-1 (sync commits before low) with it. Interruption is a low-lane feature.
+ */
+let flushingLow = false;
+
+export const isFlushingLow = () => flushingLow;
+
 const flushLow = () => {
   lowScheduled = false;
-  lowDeadline = performance.now() + LOW_LANE_BUDGET;
+  flushingLow = true;
+
+  try {
+    flushLowSlice();
+  } finally {
+    flushingLow = false;
+  }
+};
+
+const flushLowSlice = () => {
+  lowDeadline = performance.now() + lowLaneBudget;
+
+  // A build paused mid-tree owns the rest of this slice. It goes first: it is
+  // older than anything in the queue, and finishing it frees the DOM state the
+  // queued renders will diff against.
+  if (pendingWork) {
+    const work = pendingWork;
+    pendingWork = null;
+    workResumes += 1;
+    work();
+
+    // Same shape as the queue loop below: only bail out when there is still
+    // something to come back for. Returning unconditionally here skips the idle
+    // waiters at the tail, and a resume that happens to finish on the slice
+    // boundary then leaves `whenIdle()` unresolved forever.
+    if ((lanes.low.size || pendingWork) && shouldYield()) {
+      scheduleFlush('low');
+      return;
+    }
+  }
 
   const queue = lanes.low;
 
@@ -136,6 +240,12 @@ const flushLow = () => {
       scheduleFlush('low');
       return;
     }
+  }
+
+  if (pendingWork) {
+    // A render in this flush paused. The lane is empty but the work is not.
+    scheduleFlush('low');
+    return;
   }
 
   // Drained. Entries queued by the renders above were picked up by the loop,
@@ -194,7 +304,7 @@ export const hasPending = (compKey: Props, lane?: Lane) =>
  * immediately — which is the truthful answer there, not a stub.
  */
 export const whenIdle = (): Promise<void> =>
-  lanes.low.size || lowScheduled
+  lanes.low.size || lowScheduled || pendingWork
     ? new Promise<void>(resolve => {
         idleWaiters.push(resolve);
       })
