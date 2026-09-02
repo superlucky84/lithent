@@ -301,7 +301,15 @@ export const replaceWDom = (
       // Dropping it is only allowed while it has done nothing observable
       // (DC-18); otherwise it has to be finished, and this render then aims at
       // whatever node that commit installed.
-      if (buildRanUpdateEffects(pausedPass.trace.snapshots)) {
+      //
+      // "Observable" covers mounting too (DC-7 (B)): a discarded mounting build
+      // has already registered its components and run their mounter bodies, and
+      // rebuilding would run them a second time. BC-2 permits that in principle,
+      // but the scheduler avoids it where it cheaply can — which is here.
+      if (
+        pausedPass.trace.mounted ||
+        buildRanUpdateEffects(pausedPass.trace.snapshots)
+      ) {
         drainPendingWork();
         originalWDom = liveNodeOf(props) || originalWDom;
 

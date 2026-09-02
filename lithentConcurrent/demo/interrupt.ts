@@ -191,11 +191,15 @@ const buildPanel = (panel: Panel) => {
     const sorted = gaps.slice().sort((a, b) => a - b);
     const longest = sorted.length ? sorted[sorted.length - 1] : 0;
     const overFrame = gaps.filter(gap => gap > 32).length;
+    // Work that ran in one shot shows up as a single long gap. Several medium
+    // ones mean the build stopped and came back — which is what E-1 needs to
+    // know before comparing the result against an uninterrupted render.
+    const blocks = gaps.filter(gap => gap > 8).length;
     const lat = latencies.slice().sort((a, b) => a - b);
 
     stats.innerHTML =
       `<b class="${longest > 50 ? 'bad' : 'good'}">최장 블록 ${longest.toFixed(0)}ms</b>` +
-      ` · 32ms 초과 프레임 ${overFrame}개 · 총 ${total.toFixed(0)}ms` +
+      ` · 8ms 초과 블록 ${blocks}개 · 32ms 초과 ${overFrame}개 · 총 ${total.toFixed(0)}ms` +
       `<br>살아있는 마운트 ${counters.mounts} / 행 ${list.rows.length}` +
       ` (E-2: 같아야 함) · updateCallback ${counters.updates} (E-3)` +
       (lat.length
@@ -225,8 +229,142 @@ const buildPanel = (panel: Panel) => {
     report(stopRecording(), performance.now() - started);
   };
 
+  /**
+   * E-2 — start a mount-heavy deferred update, then cut in with an urgent one
+   * while it is still building.
+   *
+   * The invariant is the live mount count: every mounter that ran must belong to
+   * a row that is on screen. If the interrupted build's mounters ran and its
+   * commit was then thrown away, those components were registered and never
+   * unmounted, and the count comes out higher than the row count.
+   */
+  const race = async () => {
+    startRecording();
+    const started = performance.now();
+
+    const heavy = makeRows(rowCount());
+
+    if (panel.deferred && panel.core.deferRender) {
+      panel.core.deferRender(() => {
+        list.setRows(heavy);
+        list.renew();
+      });
+    } else {
+      list.setRows(heavy);
+      list.renew();
+    }
+
+    // One macrotask in: the deferred build has started and parked at least once.
+    await new Promise(resolve => {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = () => resolve(null);
+      channel.port2.postMessage(null);
+    });
+
+    // The urgent one. Sync lane, three rows.
+    list.setRows(makeRows(3));
+    list.renew();
+    await panel.core.nextTick();
+
+    if (panel.core.whenIdle) {
+      await panel.core.whenIdle();
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 120));
+    report(stopRecording(), performance.now() - started);
+
+    return { mounts: counters.mounts, rows: list.rows.length };
+  };
+
+  /**
+   * E-3 + E-6 — a build that is genuinely DISCARDED, then replaced.
+   *
+   * The deferred pass re-renders without moving any dependency, so it fires no
+   * `updateCallback` and is therefore droppable (DC-18). The urgent one that
+   * cuts in does move them. Afterwards exactly one effect must have fired per
+   * changed row: fewer means the dropped build left the hook cursor shifted and
+   * the effect was lost, more means it ran twice.
+   *
+   * The rows keep their keys throughout, so their instance numbers must not
+   * change either — that is E-6, closure preservation across a discard.
+   */
+  const discardAndReplace = async () => {
+    // Seed it here. Reading whatever happens to be on screen let this run
+    // against an empty list, where "0 effects for 0 changed rows" and
+    // "undefined === undefined" both report as a pass — the exact vacuous pass
+    // the rest of this project keeps warning about.
+    if (!list.rows.length) {
+      list.setRows(makeRows(rowCount()));
+      list.renew();
+      await panel.core.nextTick();
+
+      if (panel.core.whenIdle) {
+        await panel.core.whenIdle();
+      }
+    }
+    const before = (host.querySelector('.n') as HTMLElement | null)
+      ?.textContent;
+
+    counters.updates = 0;
+    startRecording();
+    const started = performance.now();
+
+    // Same labels: nothing to fire, so this build can be dropped.
+    if (panel.deferred && panel.core.deferRender) {
+      panel.core.deferRender(() => {
+        list.setRows(list.rows.map(row => ({ ...row })));
+        list.renew();
+      });
+    }
+
+    await new Promise(resolve => {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = () => resolve(null);
+      channel.port2.postMessage(null);
+    });
+
+    // Urgent, and it does move the dependency.
+    const changed = list.rows.map((row, i) =>
+      i % 10 === 0 ? { ...row, label: `${row.label} !` } : row
+    );
+    const expected = changed.filter((_row, i) => i % 10 === 0).length;
+
+    list.setRows(changed);
+    list.renew();
+    await panel.core.nextTick();
+
+    if (panel.core.whenIdle) {
+      await panel.core.whenIdle();
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 120));
+    report(stopRecording(), performance.now() - started);
+
+    return {
+      updates: counters.updates,
+      expected,
+      before,
+      after: (host.querySelector('.n') as HTMLElement | null)?.textContent,
+    };
+  };
+
+  /** E-5 — tear down while a build is still parked. */
+  const destroyMidFlight = () => {
+    if (panel.deferred && panel.core.deferRender) {
+      panel.core.deferRender(() => {
+        list.setRows(makeRows(rowCount()));
+        list.renew();
+      });
+    }
+
+    list.destroy();
+  };
+
   return {
     run,
+    race,
+    discardAndReplace,
+    destroyMidFlight,
     rows: () => list.rows,
     html: () => host.innerHTML,
     resetLatency: () => {
@@ -295,12 +433,74 @@ const both = async (fresh: boolean) => {
   }
 );
 
+(document.getElementById('race') as HTMLButtonElement).addEventListener(
+  'click',
+  async () => {
+    verdict.textContent = '마운트 중 급한 갱신 …';
+
+    const result = await panels.concurrent.race();
+
+    if (!result.rows) {
+      verdict.innerHTML =
+        '<b class="bad">측정 불가</b> — 행이 하나도 없습니다.';
+      return;
+    }
+
+    const ok = result.mounts === result.rows;
+
+    verdict.innerHTML = ok
+      ? `<b class="good">E-2 통과</b> — 살아있는 마운트 ${result.mounts}개 = 행 ${result.rows}개. ` +
+        '중단된 마운트 빌드가 버려지지 않고 완주했다는 뜻입니다 (DC-7).'
+      : `<b class="bad">E-2 실패</b> — 살아있는 마운트 ${result.mounts}개인데 행은 ${result.rows}개입니다. ` +
+        '커밋되지 않은 mounter가 실행됐고 언마운트되지 않았습니다.';
+  }
+);
+
+(document.getElementById('effects') as HTMLButtonElement).addEventListener(
+  'click',
+  async () => {
+    verdict.textContent = '갱신 중 급한 갱신 …';
+
+    const r = await panels.concurrent.discardAndReplace();
+
+    if (!r.expected || !r.before) {
+      verdict.innerHTML =
+        '<b class="bad">측정 불가</b> — 바뀐 행이 없거나 행이 렌더되지 않았습니다. ' +
+        '이 상태의 "통과"는 아무것도 검증하지 않습니다.';
+      return;
+    }
+
+    const effectsOk = r.updates === r.expected;
+    const closureOk = r.before === r.after;
+
+    verdict.innerHTML =
+      (effectsOk
+        ? `<b class="good">E-3 통과</b> — updateCallback ${r.updates}회 = 바뀐 행 ${r.expected}개.`
+        : `<b class="bad">E-3 실패</b> — updateCallback ${r.updates}회인데 바뀐 행은 ${r.expected}개입니다.`) +
+      '<br>' +
+      (closureOk
+        ? `<b class="good">E-6 통과</b> — 첫 행의 인스턴스 번호가 ${r.after}로 그대로입니다.`
+        : `<b class="bad">E-6 실패</b> — 인스턴스 번호가 ${r.before} → ${r.after}로 바뀌었습니다.`);
+  }
+);
+
 (document.getElementById('compare') as HTMLButtonElement).addEventListener(
   'click',
   () => {
-    const same = panels.base.html() === panels.concurrent.html();
+    const baseHtml = panels.base.html();
+    const concurrentHtml = panels.concurrent.html();
+
+    if (!baseHtml || !concurrentHtml) {
+      verdict.innerHTML =
+        '<b class="bad">측정 불가</b> — 한쪽이 비어 있습니다. ' +
+        '먼저 위 버튼으로 한 번 측정한 뒤 눌러주세요.';
+      return;
+    }
+
+    const same = baseHtml === concurrentHtml;
     verdict.innerHTML = same
-      ? '<b class="good">E-1 통과</b> — 두 코어의 DOM이 완전히 같습니다.'
+      ? '<b class="good">E-1 통과</b> — 중단된 렌더(오른쪽)와 무중단 렌더(왼쪽)의 ' +
+        'DOM이 완전히 같습니다. 오른쪽 "8ms 초과 블록"이 2개 이상이면 실제로 중단된 것입니다.'
       : '<b class="bad">E-1 실패</b> — 두 코어의 DOM이 다릅니다. ' +
         '(먼저 위 버튼으로 한 번 측정한 뒤 눌러주세요)';
   }
@@ -309,11 +509,12 @@ const both = async (fresh: boolean) => {
 (document.getElementById('unmount') as HTMLButtonElement).addEventListener(
   'click',
   () => {
-    // E-5: tearing down while work may still be parked must not throw.
+    // E-5: the deferred build is started and then torn down in the same turn,
+    // so the teardown lands while work is still parked.
+    panels.concurrent.destroyMidFlight();
     panels.base.destroy();
-    panels.concurrent.destroy();
     verdict.innerHTML =
-      '<b class="good">E-5</b> — 언마운트했습니다. 콘솔에 에러가 없으면 통과. ' +
-      '다시 측정하려면 새로고침하세요.';
+      '<b class="good">E-5</b> — <b>빌드가 멈춰 있는 상태에서</b> 언마운트했습니다. ' +
+      '콘솔에 에러가 없으면 통과. 다시 측정하려면 새로고침하세요.';
   }
 );
