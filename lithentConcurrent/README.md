@@ -86,6 +86,36 @@ input.oninput = e => {
 > 상태는 컴포넌트 클로저에 있고 setter가 그 자리에서 바꾸므로, 같은 컴포넌트가 그 사이
 > 급한 우선순위로도 렌더되면 새 값이 즉시 보인다. 이름을 `deferRender`로 둔 이유다.
 
+### ⚠ 급한 것과 미룰 것은 **다른 컴포넌트**에 두어야 한다
+
+이것이 이 API를 쓸 때 가장 흔히 밟는 함정이다. 둘이 같은 컴포넌트에 있으면
+**미루는 의미가 사라진다.**
+
+```jsx
+// ✗ 아무 효과 없음 — query와 rows가 같은 컴포넌트다
+const App = mount(renew => {
+  const query = state('', renew);
+  const rows = state([], renew);
+
+  const type = e => {
+    query.value = e.target.value;                    // 급한 렌더가 큐에 들어가고
+    deferRender(() => { rows.value = heavy(); });    // 미룬 갱신은 그 큐에 흡수된다
+  };                                                 // → 급한 렌더가 새 rows를 그대로 그린다
+  ...
+});
+```
+
+```jsx
+// ✓ 무거운 쪽을 분리한다
+const HeavyList = mount(renew => { /* rows를 소유 */ });
+const Filter    = mount(renew => { /* query를 소유, deferRender로 HeavyList만 갱신 */ });
+```
+
+`deferRender`가 미루는 것은 **렌더**뿐이다. 값은 그 자리에서 쓰이므로, 같은 컴포넌트가
+급한 우선순위로 렌더되는 순간 미룬 값도 함께 화면에 나온다.
+`lithentConcurrent/consumer/`의 앱이 이 형태를 그대로 보여준다 —
+처음에는 한 컴포넌트에 몰아넣었다가 자체 검사에서 걸렸다.
+
 ### `whenIdle(): Promise<void>`
 
 저우선순위 레인이 비면 resolve된다. `await nextTick()`은 **동기 커밋까지만** 보장한다
