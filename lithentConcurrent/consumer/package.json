@@ -1,0 +1,15 @@
+{
+  "type": "module",
+  "name": "lithent-consumer-check",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Phase 11-6 — an app that imports lithent the way a consumer does, so the core swap can be checked as a drop-in.",
+  "scripts": {
+    "dev": "vite",
+    "dev:concurrent": "LITHENT_CORE=concurrent vite"
+  },
+  "devDependencies": {
+    "lithent": "workspace:*",
+    "lithent-helper": "workspace:*"
+  }
+}

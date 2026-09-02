@@ -1246,14 +1246,42 @@ wrapper가 상태 소유, `useContext(ctx, renew, [key])`, `ctx.key?.value`, 그
 | 남은 것 | 왜 자동이 아닌가 |
 |---|---|
 | 11-4 devHelper HMR | 실행 중 모듈 교체다. 스위트는 `test:dual`에서 통과하지만 그것은 바운더리 로직이지 HMR 동작이 아니다 |
-| 11-6 소비자 alias 시나리오 | 별도 프로젝트에서 번들러 alias를 걸고 앱을 띄워야 한다 |
+| 11-6 소비자 alias 시나리오 | **앱은 만들어 뒀다** (`pnpm check:consumer`). 브라우저에서 두 번 돌리는 것만 남았다 |
 | 11-7 `examples`·`lithentDocs` 실행 | 빌드는 `pnpm build`가 하지만 실행·확인은 브라우저다 |
 | 11-8 `createLithent` 보일러플레이트 | `npx create-lithent`로 새 프로젝트를 만들어 SSR+hydration까지 |
 | 11-9 수동 체크리스트 전량 | 섹션 E는 끝났고 A·B·C·D·F·G가 남았다 |
 
-**11-6은 사실상 이미 한 번 검증됐다** — `pnpm verify:concurrent`가 출하 선언 파일로
+### 11-6 — 소비자 앱 (`lithentConcurrent/consumer/`)
+
+```bash
+pnpm check:consumer        # lithent -> lithent-concurrent
+pnpm check:consumer:base   # alias 없음
+```
+
+**두 번 다 검사표가 전부 통과해야 11-6이다.** 페이지가 스스로 검사하고 결과를 표로
+띄운다 — "화면이 멀쩡해 보인다"가 판정이 되지 않게 했다.
+
+앱이 지키는 조건:
+
+- 모든 import가 **bare specifier**다 (`lithent`, `lithent/helper`). 워크스페이스 패키지로
+  등록해 실제 소비자와 같은 해소 경로를 탄다.
+- **소스는 한 글자도 바뀌지 않는다.** 바뀌는 것은 vite alias 한 줄뿐이다.
+- alias는 **anchored** (`/^lithent$/`)이고 **빌드 산출물**을 가리킨다. 확인해 보면
+  `lithent` → concurrent 번들, **`lithent/helper` → base helper 그대로**다 —
+  접두사 매칭이었다면 여기가 함께 망가진다 (Phase 0에서 실제로 ssr이 그렇게 깨졌다).
+
+검사 항목: 코어 판별 · `lithent/helper` 서브패스 · keyed 리스트 2,000행 · Fragment ·
+portal · store 초기값과 **갱신** · context 초기값과 **갱신** · (concurrent일 때)
+`deferRender`가 실제로 미루는지와 `whenIdle` 뒤 반영되는지.
+
+> 초기 렌더만 확인하면 아무것도 증명하지 못하므로 store와 context는 **버튼을 눌러
+> 갱신까지** 확인한다. 컨텍스트 해소는 `render()` 다음 틱에 끝나므로 검사 전에
+> `await nextTick()`을 한다 — 10-6에서 이것을 빠뜨려 양쪽 코어에서 실패했었다.
+
+**절반은 이미 자동으로 덮여 있다** — `pnpm verify:concurrent`가 출하 선언 파일로
 소비자 파일을 `tsc --strict` 통과시키고, `pnpm test:dual`이 위성 전체를
-"`lithent` → concurrent 번들 alias" 상태로 돌린다. 남은 것은 **실제 앱을 띄워 보는 것**이다.
+"`lithent` → concurrent 번들 alias" 상태로 돌린다. 이 앱이 더하는 것은
+**실제 앱이 실제 브라우저에서 도는가**다.
 
 진입: Phase 10 종료. / 종료: 릴리스 판정.
 
@@ -1265,7 +1293,7 @@ wrapper가 상태 소유, `useContext(ctx, renew, [key])`, `ctx.key?.value`, 그
       통과하지만 **HMR 자체는 실행 중 교체라 자동 확인 불가**. 사람 몫 (아래)
       (`componentMap`/`replaceWDom` 직접 호출 경로)
 - [x] 11-5. `ftags`·`tag`(HTM) 문법 동일 동작 — `test:dual`에 포함, 전량 통과
-- [ ] 11-6. 소비자 alias 시나리오 — `lithent` → `lithent-concurrent` 치환 후 예제 앱 동작
+- [ ] 11-6. 소비자 alias 시나리오 — **앱은 준비됐다. 브라우저에서 두 번 돌리면 된다** (아래)
 - [ ] 11-7. `examples`·`lithentDocs` 빌드·실행
 - [ ] 11-8. `createLithent` 보일러플레이트로 신규 프로젝트 → SSR+hydration
 - [ ] 11-9. 수동 체크리스트 전량 수행

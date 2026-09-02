@@ -298,6 +298,15 @@ importers:
 
   lithentConcurrent: {}
 
+  lithentConcurrent/consumer:
+    devDependencies:
+      lithent:
+        specifier: workspace:*
+        version: link:../..
+      lithent-helper:
+        specifier: workspace:*
+        version: link:../../helper
+
   lithentConcurrent/helper:
     devDependencies:
       lithent-concurrent:

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lithent — 소비자 alias 시나리오 (11-6)</title>
+    <style>
+      body { font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0; padding: 24px; max-width: 900px; }
+      h1 { font-size: 16px; margin: 0 0 4px; }
+      p.lede { margin: 0 0 14px; color: #666; }
+      .bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+      input, button { font: inherit; padding: 4px 8px; }
+      .rows { height: 160px; overflow: auto; border: 1px solid #eee; margin: 0; padding: 4px 8px; list-style: none; }
+      .rows li { white-space: nowrap; }
+      .rows .id { color: #999; }
+      #checks { margin-top: 18px; }
+      #checks table { border-collapse: collapse; }
+      #checks td { padding: 2px 10px 2px 0; vertical-align: top; }
+      #checks .detail { color: #777; }
+      .good { color: #1b7f3b; font-weight: 600; }
+      .bad { color: #b3261e; font-weight: 600; }
+      #toast-host { margin-top: 10px; }
+      .toast { display: inline-block; background: #eef4ff; padding: 3px 8px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <h1>소비자 alias 시나리오 (IMPLEMENT 11-6)</h1>
+    <p class="lede">
+      이 앱은 <code>lithent</code>와 <code>lithent/helper</code>를 <b>bare specifier로만</b>
+      import한다. 코어 교체는 vite alias 한 줄이고 <b>소스는 한 글자도 바뀌지 않는다</b>.
+      아래 검사표가 두 실행에서 모두 전부 통과해야 11-6이다.
+    </p>
+    <div id="app"></div>
+    <div id="toast-host"></div>
+    <div id="checks">검사 중 …</div>
+  </body>
+</html>

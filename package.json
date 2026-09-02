@@ -18,6 +18,8 @@
     "build:core": "vite build && node scripts/build-skills.js",
     "size": "node scripts/size-report.js",
   "bench:units": "pnpm build:core && pnpm build:concurrent && pnpm --filter lithent-concurrent bench",
+  "check:consumer": "pnpm build:core && pnpm build:helper && pnpm build:concurrent && LITHENT_CORE=concurrent vite --config lithentConcurrent/consumer/vite.config.js",
+  "check:consumer:base": "pnpm build:core && pnpm build:helper && vite --config lithentConcurrent/consumer/vite.config.js",
   "check:interrupt": "pnpm build:core && pnpm build:concurrent && LITHENT_PAGE=/html/interrupt.html pnpm --filter lithent-concurrent bench",
     "verify:concurrent": "node lithentConcurrent/scripts/verifyArtifacts.js",
     "build:concurrent": "pnpm --filter lithent-concurrent build",
