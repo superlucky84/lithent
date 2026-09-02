@@ -1189,7 +1189,8 @@ Phase 8 전에는 빌드가 항상 한 번에 끝나서 드러날 수 없었다.
       (`replaceWDom`의 `il` 가드, `componentMap.get` 실패 경로)
 - [x] 10-5. `computed`·`effect`·`cacheUpdate` 상호작용 — `helper/src/tests/laneInteraction.tsx`,
       `test:dual`로 양쪽 코어. `nextTickRender`는 미포함 (아래)
-- [ ] 10-6. `context`/`lcontext` 갱신이 레인을 넘어 전파 (**미완 — 아래**)
+- [x] 10-6. `context` 갱신이 레인을 넘어 전파 (`getParent` 경로) — `laneInteraction.tsx`,
+      `test:dual`로 양쪽 코어. `lcontext`는 미포함 (아래)
 - [x] 10-7. 엣지: 렌더 중 `deferRender` 중첩 호출
 - [x] 10-8. 엣지: 커밋 중 발생한 갱신 요청
 - [x] 10-9. 엣지: 파이버 중단 중 컴포넌트 언마운트
@@ -1198,14 +1199,14 @@ Phase 8 전에는 빌드가 항상 한 번에 끝나서 드러날 수 없었다.
 
 ### Phase 10 실측 결과 (2026-09-02)
 
-10개 중 **8개 완료, 1개 부분(10-5), 1개 미완(10-6).**
+10개 중 **9개 완료, 1개 부분(10-5의 `nextTickRender` 제외).**
 
 | | 어디에 |
 |---|---|
 | 10-1·10-2·10-3·10-4·10-7·10-8·10-9·10-10 | `concurrent-hardening.test.tsx` (신규 12개) |
-| 10-5 | `helper/src/tests/laneInteraction.tsx` — `test:dual`로 양쪽 코어 |
+| 10-5·10-6 | `helper/src/tests/laneInteraction.tsx` — `test:dual`로 양쪽 코어 |
 
-코어 스위트 **141개**, helper **42개** (양쪽 코어).
+코어 스위트 **141개**, helper **43개** (양쪽 코어).
 
 **저우선순위 경로는 예산 0(`setLowLaneBudget(0)`)으로 강제 중단시킨 뒤 확인한다.**
 그러지 않으면 jsdom에서 5ms를 넘는 일이 없어 새 경로가 한 번도 실행되지 않는다 —
@@ -1217,21 +1218,17 @@ Phase 8에서 겪은 그대로다.
 얹혀 있고 그것은 DC-9/BC-4에서 이미 다뤘으므로(`whenIdle`이 레인 인지 대기다)
 여기서 다시 세우는 것이 중복이라 뺐다. 필요해지면 같은 파일에 추가하면 된다.
 
-#### 10-6은 미완이다 — 정직하게
+#### 10-6 — 한 번 실패하고 나서 닫았다
 
-컨텍스트 소비자가 provider를 찾지 못해 `useContext`가 빈 상태를 돌려주는 테스트밖에
-쓰지 못했고, 그것이 **양쪽 코어에서 똑같이 실패**했다. 즉 concurrent 회귀가 아니라
-테스트 작성 문제다. 이해하지 못한 테스트를 넣는 것이 더 나쁘므로 넣지 않았다.
+처음 쓴 것은 소비자가 provider를 찾지 못해 **양쪽 코어에서 똑같이 실패**했다.
+concurrent 회귀가 아니라 테스트 작성 문제였고, 원인은 하나였다 —
+**`render()` 뒤에 `await nextTick()`을 넣지 않았다.** 컨텍스트 해소는 그 틱 뒤에 끝난다.
+`helper/src/tests/context.tsx`의 동작하는 형태(모듈 스코프 `createContext`,
+wrapper가 상태 소유, `useContext(ctx, renew, [key])`, `ctx.key?.value`, 그리고 그 틱)를
+그대로 베끼고 나서 통과했다.
 
-지금 덮여 있는 것과 아닌 것:
-
-- **덮여 있다**: `context`/`lcontext`가 concurrent 코어에서 동작하는 것 —
-  `pnpm test:dual`이 helper의 기존 context 스위트를 양쪽 코어로 돌린다.
-- **덮여 있지 않다**: provider 갱신이 **저우선순위로 올라갔을 때** 소비자에게 전파되는가.
-
-다음에 쓸 때는 `helper/src/tests/context.tsx`의 동작하는 형태
-(모듈 스코프 `createContext`, wrapper 컴포넌트가 상태를 소유, `useContext(ctx, renew, [key])`,
-소비자에서 `ctx.key?.value`)를 그대로 베껴서 시작할 것. 내가 그 형태를 재현하지 못했다.
+`lcontext`(lmount용)는 넣지 않았다. `context`와 같은 `getParent` 경로를 쓰므로
+레인 관점에서 새로 덮이는 것이 없다 — 필요하면 같은 파일에 같은 모양으로 추가하면 된다.
 
 #### 10-1이 스스로 못 잡는 것
 

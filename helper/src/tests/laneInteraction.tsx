@@ -1,6 +1,6 @@
 import * as lithentCore from 'lithent';
-import { h, render, mount, nextTick } from 'lithent';
-import { state, computed, effect, cacheUpdate } from '@/index';
+import { h, render, mount, nextTick, type WDom } from 'lithent';
+import { state, computed, effect, cacheUpdate, createContext } from '@/index';
 
 /**
  * Phase 10-5 — helper features across the concurrent core's two lanes.
@@ -42,6 +42,13 @@ const settle = async () => {
 };
 
 const host = () => document.createElement('div');
+
+const laneContext = createContext<{ label: string }>();
+const {
+  Provider: LaneProvider,
+  contextState: laneContextState,
+  useContext: useLaneContext,
+} = laneContext;
 
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
@@ -137,6 +144,57 @@ if (import.meta.vitest) {
 
       expect(bodyRuns).toBe(1);
       expect(el.textContent).toBe('1-1');
+    });
+  });
+
+  describe('10-6. context across lanes (getParent path)', () => {
+    it('a low-lane provider update reaches its consumer', async () => {
+      let setLabel = (_next: string) => {};
+
+      // Shape copied from the suite's working context test: a wrapper owns the
+      // state and hands it to the Provider, the consumer subscribes by key, and
+      // the first assertion waits a tick. Skipping that tick is what made an
+      // earlier version of this fail on BOTH cores.
+      const Wrapper = mount((_renew, _props, kids: WDom[]) => {
+        const label = laneContextState('first');
+        setLabel = next => {
+          label.value = next;
+        };
+
+        return () => <LaneProvider label={label}>{kids}</LaneProvider>;
+      });
+
+      const Leaf = mount<{ id: number }>(renew => {
+        // Reaching the provider walks `getParent` all the way up — the accessor
+        // D10 called out as C3-critical.
+        const ctx = useLaneContext(laneContext, renew, ['label']);
+        return () => <i>{ctx.label?.value ?? 'none'}</i>;
+      });
+
+      const App = mount(() => () => (
+        <Wrapper>
+          <Leaf id={1} />
+        </Wrapper>
+      ));
+
+      const el = host();
+      render(<App />, el);
+      await nextTick();
+
+      expect(el.textContent).toBe('first');
+
+      push(() => setLabel('second'));
+
+      if (lanes) {
+        await nextTick();
+        expect(el.textContent, 'not yet — it is queued at low priority').toBe(
+          'first'
+        );
+      }
+
+      await settle();
+
+      expect(el.textContent, 'the consumer got it').toBe('second');
     });
   });
 }
