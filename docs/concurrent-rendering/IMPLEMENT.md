@@ -1239,20 +1239,38 @@ wrapper가 상태 소유, `useContext(ctx, renew, [key])`, `ctx.key?.value`, 그
 
 ## Phase 11 — 통합 테스트
 
+### Phase 11 진행 상황 (2026-09-02)
+
+11개 중 **6개 완료**(11-1·11-2·11-3·11-5·11-10·11-11), **5개는 사람 몫**이다.
+
+| 남은 것 | 왜 자동이 아닌가 |
+|---|---|
+| 11-4 devHelper HMR | 실행 중 모듈 교체다. 스위트는 `test:dual`에서 통과하지만 그것은 바운더리 로직이지 HMR 동작이 아니다 |
+| 11-6 소비자 alias 시나리오 | 별도 프로젝트에서 번들러 alias를 걸고 앱을 띄워야 한다 |
+| 11-7 `examples`·`lithentDocs` 실행 | 빌드는 `pnpm build`가 하지만 실행·확인은 브라우저다 |
+| 11-8 `createLithent` 보일러플레이트 | `npx create-lithent`로 새 프로젝트를 만들어 SSR+hydration까지 |
+| 11-9 수동 체크리스트 전량 | 섹션 E는 끝났고 A·B·C·D·F·G가 남았다 |
+
+**11-6은 사실상 이미 한 번 검증됐다** — `pnpm verify:concurrent`가 출하 선언 파일로
+소비자 파일을 `tsc --strict` 통과시키고, `pnpm test:dual`이 위성 전체를
+"`lithent` → concurrent 번들 alias" 상태로 돌린다. 남은 것은 **실제 앱을 띄워 보는 것**이다.
+
 진입: Phase 10 종료. / 종료: 릴리스 판정.
 
-- [ ] 11-1. `pnpm build && pnpm test` 전량 통과 (core + concurrent + 위성 + 툴링)
-- [ ] 11-2. **RC-9 최종**: 위성 스위트 양쪽 코어 전량 통과
-- [ ] 11-3. SSR → hydration 경로에서 스케줄러 동작 (`ssr/src/tests`)
-- [ ] 11-4. `devHelper` HMR 바운더리가 concurrent 코어에서 동작
+- [x] 11-1. `pnpm build && pnpm test` 전량 통과 — 2026-09-02 확인
+- [x] 11-2. **RC-9 최종**: `pnpm test:dual` 전량 통과 — 2026-09-02 확인
+- [x] 11-3. SSR → hydration 경로에서 스케줄러 동작 — `ssr/src/tests/laneHydration.tsx`,
+      `test:dual`로 양쪽 코어. 돌연변이 2종 검증(deferRender 무시 / 노드 재사용 깨기)
+- [ ] 11-4. `devHelper` HMR 바운더리가 concurrent 코어에서 동작 — 스위트는 `test:dual`에서
+      통과하지만 **HMR 자체는 실행 중 교체라 자동 확인 불가**. 사람 몫 (아래)
       (`componentMap`/`replaceWDom` 직접 호출 경로)
-- [ ] 11-5. `ftags`·`tag`(HTM) 문법 동일 동작
+- [x] 11-5. `ftags`·`tag`(HTM) 문법 동일 동작 — `test:dual`에 포함, 전량 통과
 - [ ] 11-6. 소비자 alias 시나리오 — `lithent` → `lithent-concurrent` 치환 후 예제 앱 동작
 - [ ] 11-7. `examples`·`lithentDocs` 빌드·실행
 - [ ] 11-8. `createLithent` 보일러플레이트로 신규 프로젝트 → SSR+hydration
 - [ ] 11-9. 수동 체크리스트 전량 수행
-- [ ] 11-10. 최종 크기 실측 + RC-4 판정 (**기본 코어 무회귀 포함**)
-- [ ] 11-11. 체인지로그 (BC-1~BC-4) + concurrent 패키지 README (alias 설정법 포함)
+- [x] 11-10. 최종 크기 실측 + RC-4 판정 — 기본 **4,734**/4,800 (무회귀), concurrent **6,149**/9,000
+- [x] 11-11. 체인지로그(BC-1~BC-4) + README — `lithentConcurrent/README.md` 하나에 합쳤다
       - **README·`package.json` description·릴리스 노트는 REQUIREMENTS §2.1을 따른다** —
         `concurrent mode`를 쓰지 않고, "중단 가능한 렌더링"은 RC-10 통과 후에만 서술한다.
         (`package.json`의 description은 2026-09-01에 현재 단계에 맞게 이미 고쳤다.)
