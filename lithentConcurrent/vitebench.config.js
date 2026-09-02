@@ -30,10 +30,12 @@ export default defineConfig({
   // demo, which imports the concurrent helper this config deliberately does not
   // alias — a resolve error for a page that is not even being served here.
   optimizeDeps: {
-    entries: ['html/units.html'],
+    entries: ['html/units.html', 'html/interrupt.html'],
   },
   server: {
-    open: process.env.LITHENT_NO_OPEN ? false : '/html/units.html',
+    open: process.env.LITHENT_NO_OPEN
+      ? false
+      : process.env.LITHENT_PAGE || '/html/units.html',
     fs: { allow: [resolve(__dirname, '..')] },
   },
 });

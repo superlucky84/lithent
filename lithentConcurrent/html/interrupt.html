@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lithent-concurrent — 중단 동작 (섹션 E)</title>
+    <style>
+      body {
+        font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+        margin: 0;
+        padding: 24px;
+        max-width: 1100px;
+      }
+      h1 { font-size: 16px; margin: 0 0 4px; }
+      p.lede { margin: 0 0 14px; color: #666; }
+      ul.hint { margin: 0 0 16px; padding-left: 18px; color: #666; font-size: 12px; }
+      ul.hint li { margin-bottom: 3px; }
+      .bar { margin-bottom: 14px; }
+      button, select { font: inherit; padding: 5px 10px; margin-right: 8px; }
+      #verdict {
+        margin: 12px 0 18px;
+        padding: 10px 12px;
+        background: #f6f6f6;
+        border-left: 3px solid #bbb;
+        min-height: 20px;
+      }
+      .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .pane { border: 1px solid #ddd; border-radius: 6px; padding: 12px 14px; min-width: 0; }
+      .pane h2 { font-size: 13px; margin: 0 0 8px; }
+      .pane input { font: inherit; width: 100%; box-sizing: border-box; padding: 4px 6px; }
+      .stats { margin-top: 10px; font-size: 12px; color: #444; }
+      .stats b { font-size: 14px; }
+      .good { color: #1b7f3b; }
+      .bad { color: #b3261e; }
+      .host { height: 180px; overflow: auto; border-top: 1px solid #eee; margin-top: 10px; }
+      .host ul { margin: 0; padding: 0 0 0 4px; list-style: none; }
+      .host li { white-space: nowrap; }
+      .host .n { color: #999; }
+    </style>
+  </head>
+  <body>
+    <h1>lithent-concurrent — 중단 동작 (MANUAL_TEST_CHECKLIST 섹션 E)</h1>
+    <p class="lede">
+      E-4가 &quot;concurrent rendering&quot;이라는 서술의 명명 근거입니다
+      (REQUIREMENTS §2.1). 느낌이 아니라 <b>최장 블록</b>으로 판정합니다.
+    </p>
+    <ul class="hint">
+      <li>두 코어 모두 <b>빌드 산출물</b>입니다 — <code>pnpm build</code> 후 열어주세요.</li>
+      <li>왼쪽은 오늘의 동작(base + <code>renew()</code>), 오른쪽이 T2(concurrent + <code>deferRender</code>)입니다.</li>
+      <li><b>최장 블록</b> = 애니메이션 프레임 사이의 최대 공백. 그 시간 동안 브라우저는 아무것도 못 그립니다.</li>
+      <li><b>총 시간은 비슷한 게 정상입니다.</b> 중단은 빨라지는 게 아니라 쪼개지는 것입니다.</li>
+      <li>각 패널 입력창에 타이핑하면서 버튼을 눌러보세요 — 입력→페인트 지연이 함께 측정됩니다.</li>
+      <li>다른 탭을 닫고 이 탭을 포커스에 두세요. 2~3회 돌려 안정된 쪽을 취합니다.</li>
+    </ul>
+
+    <div class="bar">
+      행 수:
+      <select id="rows">
+        <option value="1000">1,000</option>
+        <option value="5000">5,000</option>
+        <option value="10000" selected>10,000</option>
+        <option value="20000">20,000</option>
+      </select>
+      <button id="replace">전체 교체 (E-4)</button>
+      <button id="update">10개당 1개 갱신 (E-4)</button>
+      <button id="compare">DOM 동일 확인 (E-1)</button>
+      <button id="unmount">언마운트 (E-5)</button>
+    </div>
+
+    <div id="verdict">버튼을 눌러 측정을 시작하세요.</div>
+
+    <div class="panes">
+      <div class="pane" id="panel-base">
+        <h2>base — sync <code>renew()</code></h2>
+        <input placeholder="여기에 타이핑해 보세요" />
+        <div class="stats">아직 측정 없음</div>
+        <div class="host"></div>
+      </div>
+      <div class="pane" id="panel-concurrent">
+        <h2>concurrent — <code>deferRender()</code></h2>
+        <input placeholder="여기에 타이핑해 보세요" />
+        <div class="stats">아직 측정 없음</div>
+        <div class="host"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/demo/interrupt.ts"></script>
+  </body>
+</html>

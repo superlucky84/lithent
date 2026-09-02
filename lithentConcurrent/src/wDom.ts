@@ -286,8 +286,10 @@ export const replaceWDom = (
   tag: TagFunction,
   props: Props,
   children: WDom[],
-  originalWDom: WDom
+  original: WDom
 ) => {
+  let originalWDom = original;
+
   if (originalWDom.il) {
     return;
   }
@@ -295,9 +297,20 @@ export const replaceWDom = (
   // At most one build is ever parked, and this render decides its fate.
   if (pausedPass) {
     if (pausedPass.props === props) {
-      // Same component. This render is newer, so the parked build is stale
-      // before it ever resumes. Sync-before-low (RC-1) says the same thing.
-      discardPaused();
+      // Same component, so the parked build is stale before it ever resumes.
+      // Dropping it is only allowed while it has done nothing observable
+      // (DC-18); otherwise it has to be finished, and this render then aims at
+      // whatever node that commit installed.
+      if (buildRanUpdateEffects(pausedPass.trace.snapshots)) {
+        drainPendingWork();
+        originalWDom = liveNodeOf(props) || originalWDom;
+
+        if (originalWDom.il) {
+          return;
+        }
+      } else {
+        discardPaused();
+      }
     } else {
       // A different component. Finishing it first keeps commit order equal to
       // render order, and means the parked slot never has to be a queue.
@@ -361,9 +374,7 @@ const beginAttempt = (pass: Pass) => {
 const runPass = (pass: Pass) => {
   for (;;) {
     const built = withBuildContext(pass, () =>
-      pass.work.advance(
-        interruptible(pass) ? () => wantsPause(pass) : undefined
-      )
+      pass.work.advance(interruptible(pass) ? wantsPause : undefined)
     );
 
     if (!built) {
@@ -407,7 +418,7 @@ const runPass = (pass: Pass) => {
  * component: it builds from the same original, commits, and retires it. This
  * build is then stale and is dropped — the newer tree already on screen wins.
  * Dropping is safe precisely because pausing was refused once the build had
- * done anything observable (see `wantsPause`).
+ * done anything observable (checked by the caller, DC-18).
  */
 const resumePass = (pass: Pass) => {
   if (pass.originalWDom.il) {
@@ -431,16 +442,18 @@ const resumePass = (pass: Pass) => {
 const interruptible = (pass: Pass) => isFlushingLow() && !pass.originalWDom.il;
 
 /**
- * Whether this build may stop here.
+ * Whether this build may stop here — nothing more than "the slice is spent".
  *
- * Refuses once the build has fired an `updateCallback`, for the same reason
- * DC-18 refuses to discard such a build: the effect already ran, so if the
- * pause later has to be dropped (a sync render preempting it) there would be no
- * way to take it back. A build that only mounted may pause — BC-2 already says
- * a mounter can be attempted more than once.
+ * This also used to refuse once the build had fired an `updateCallback`, which
+ * confused two different questions. **Pausing is always safe**; it is
+ * DISCARDING that a fired effect rules out (DC-18), and a parked build that
+ * cannot be discarded is drained instead. Tying them together made every render
+ * containing a live `updateCallback` — most of them — uninterruptible for its
+ * whole remaining length, and made the check O(components) per unit on top.
+ * Measured on the section E page: the concurrent core's longest block came out
+ * WORSE than the base core's.
  */
-const wantsPause = (pass: Pass) =>
-  shouldYield() && !buildRanUpdateEffects(pass.trace.snapshots);
+const wantsPause = () => shouldYield();
 
 /**
  * Drops the parked build and puts back the hook slots it wrote.
@@ -450,6 +463,14 @@ const wantsPause = (pass: Pass) =>
  * component's redraw closure and live node are published at COMMIT, so nothing
  * outside ever pointed at the half-built tree.
  */
+const liveNodeOf = (compKey: Props) => {
+  const live = getComponentSubInfo(compKey, 'vd') as
+    | { value: WDom }
+    | undefined;
+
+  return live && live.value;
+};
+
 const discardPaused = () => {
   const pass = pausedPass as Pass;
 
