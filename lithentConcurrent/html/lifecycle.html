@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lithent — 라이프사이클 순서(C)와 tearing(F)</title>
+    <style>
+      body { font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0; padding: 24px; max-width: 1000px; }
+      h1 { font-size: 16px; margin: 0 0 4px; }
+      p.lede { margin: 0 0 12px; color: #666; }
+      ul.hint { margin: 0 0 16px; padding-left: 18px; color: #666; font-size: 12px; }
+      ul.hint li { margin-bottom: 3px; }
+      button { font: inherit; padding: 5px 12px; }
+      #checks { margin-top: 16px; }
+      #checks table { border-collapse: collapse; width: 100%; }
+      #checks td { padding: 3px 10px 3px 0; vertical-align: top; border-bottom: 1px solid #f0f0f0; }
+      #checks .detail { color: #777; }
+      .good { color: #1b7f3b; font-weight: 600; }
+      .bad { color: #b3261e; font-weight: 600; }
+      /* 시나리오는 여기서 렌더되고 매번 정리된다. */
+      #stage { position: absolute; left: -10000px; top: 0; width: 600px; }
+    </style>
+  </head>
+  <body>
+    <h1>라이프사이클 순서(섹션 C)와 tearing(섹션 F)</h1>
+    <p class="lede">
+      판정 기준이 명확한 항목들이라 눈으로 볼 이유가 없다. 페이지가 스스로 검사한다.
+    </p>
+    <ul class="hint">
+      <li>두 코어 모두 <b>빌드 산출물</b>이다 — <code>pnpm build</code> 후 열 것.</li>
+      <li><b>C-6은 "같아야 통과"가 아니다.</b> BC-1은 의도된 차이이므로
+        <b>정확히 이렇게 달라야</b> 통과다 — base는 첫 형제가 절반만 지어진 DOM을 보고,
+        concurrent는 완성된 커밋을 본다. 결과 DOM은 같아야 한다.</li>
+      <li><b>F는 concurrent 쪽만</b> 의미가 있다. store는 <code>lithent/helper</code>가 아니라
+        같은 계약(DC-17)으로 페이지 안에서 만든다 — helper 번들은 bare
+        <code>lithent</code>를 가리켜 한 페이지에서 두 코어에 물릴 수 없다.</li>
+      <li>F-1·F-2는 <b>마운트도 updateCallback도 없는 구성</b>이다. 그래야 빌드가 폐기
+        가능하고 버전 체크가 실제로 일한다 (DC-18).</li>
+    </ul>
+    <button id="run">다시 검사</button>
+    <div id="checks">검사 중 …</div>
+    <div id="stage"></div>
+    <script type="module" src="/demo/lifecycle.ts"></script>
+  </body>
+</html>
