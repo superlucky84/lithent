@@ -57,6 +57,13 @@ resolve: {
 
 `lithent/helper`, `lithent/jsx-runtime` 등 서브패스는 **그대로 둔다.** 교체 대상은 코어뿐이다.
 
+> **`lithent`를 external로 두는 빌드라면 파일 경로가 아니라 패키지 이름으로 건다.**
+> 라이브러리 빌드나 SSR 보일러플레이트처럼 코어를 번들에 넣지 않는 설정에서는,
+> alias의 replacement가 그대로 **최종 import 문에 남는다.** 파일 경로를 넣으면
+> 서버(node)는 읽지만 브라우저는 그 경로를 가져올 수 없다.
+> `replacement: 'lithent-concurrent'`처럼 **패키지 이름**을 쓰고, 그 패키지가
+> 실제로 설치돼 있게 한다.
+
 ## 늘어난 API
 
 기본 코어의 export는 전부 그대로 있고, 아래가 더해진다.

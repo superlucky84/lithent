@@ -1241,13 +1241,12 @@ wrapper가 상태 소유, `useContext(ctx, renew, [key])`, `ctx.key?.value`, 그
 
 ### Phase 11 진행 상황 (2026-09-02)
 
-11개 중 **7개 완료**(11-1·11-2·11-3·11-5·11-6·11-10·11-11), **4개는 사람 몫**이다.
+11개 중 **8개 완료**(11-1·11-2·11-3·11-5·11-6·11-8·11-10·11-11), **3개는 사람 몫**이다.
 
 | 남은 것 | 왜 자동이 아닌가 |
 |---|---|
 | 11-4 devHelper HMR | 실행 중 모듈 교체다. 스위트는 `test:dual`에서 통과하지만 그것은 바운더리 로직이지 HMR 동작이 아니다 |
 | 11-7 `examples`·`lithentDocs` 실행 | 빌드는 `pnpm build`가 하지만 실행·확인은 브라우저다 |
-| 11-8 `createLithent` 보일러플레이트 | `npx create-lithent`로 새 프로젝트를 만들어 SSR+hydration까지 |
 | 11-9 수동 체크리스트 전량 | 섹션 E는 끝났고 A·B·C·D·F·G가 남았다 |
 
 ### 11-6 — 소비자 앱 (`lithentConcurrent/consumer/`)
@@ -1276,6 +1275,43 @@ portal · store 초기값과 **갱신** · context 초기값과 **갱신** · (c
 > 초기 렌더만 확인하면 아무것도 증명하지 못하므로 store와 context는 **버튼을 눌러
 > 갱신까지** 확인한다. 컨텍스트 해소는 `render()` 다음 틱에 끝나므로 검사 전에
 > `await nextTick()`을 한다 — 10-6에서 이것을 빠뜨려 양쪽 코어에서 실패했었다.
+
+### 11-8 — 스캐폴드 확인 (`scripts/check-scaffold.mjs`)
+
+```bash
+pnpm check:scaffold              # 기본 코어
+pnpm check:scaffold:concurrent   # lithent -> lithent-concurrent
+```
+
+손으로 하면 매번 다르게 하게 되는 절차를 고정한다 — 템플릿 복사 → alias 주입 → 빌드 →
+SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리지 않고
+`.scaffold-check/`에서만 작업하며, 설치 대신 워크스페이스 `node_modules`를 링크해
+`lithent-concurrent`만 하나 더 얹는다 (소비자가 `npm i` 한 상태를 흉내낸다).
+
+**여기서 알게 된 것: external인 코어는 파일 경로가 아니라 패키지 이름으로 alias해야 한다.**
+이 템플릿은 `lithent`를 external로 두므로 alias의 replacement가 **최종 import 문에 그대로
+남는다.** 처음에 절대 파일 경로를 넣었더니 빌드는 통과했지만 브라우저가 가져올 수 없는
+것이 나왔다. README의 alias 절에 경고로 올렸다.
+
+자동 확인까지의 결과(2026-09-02, concurrent): 빌드 통과, `http://localhost:3000/` 200,
+21,794 bytes, SSR 마크업 채워짐.
+
+**"어느 코어인가"도 자동으로 판정한다 — 두 가지 신호로.**
+
+1. 번들된 JS에 **`MessageChannel`**이 있는가. 저우선순위 레인의 스케줄링 수단이며
+   기본 코어에는 없다 (0회 vs 2회). **전역 이름이라 minify를 견딘다** — 코어가 실제로
+   출하 번들에 들어갔다는 증거다.
+2. 생성된 `.d.ts`가 `lithent-concurrent`를 가리키는가.
+
+처음에는 사람에게 "DevTools Network에서 확인하세요"라고 미뤘는데, **볼 것이 없어서
+애매하다는 지적을 받고 파보니 실제로 볼 수 없었다** — 이 템플릿은 코어를
+`jsxRuntime-*.js` 청크에 **번들**하므로 JS의 import 문에 이름이 남지 않는다
+(이름은 `.d.ts`에만 남는다). 애매하다는 감각이 맞았고, minify를 견디는 마커를 찾아
+자동 판정으로 옮겼다.
+
+**사람 몫으로 남는 것은 하이드레이션 자체뿐이다** — 서버 마크업을 재사용했는지는
+실행 중 DOM 동일성 문제라 브라우저에서만 볼 수 있다.
+**2026-09-02 확인: 마크업 유지·링크/버튼 동작·콘솔 에러 0건 — 통과.**
 
 #### 결과 (2026-09-02) — 통과
 
@@ -1323,7 +1359,9 @@ portal · store 초기값과 **갱신** · context 초기값과 **갱신** · (c
 - [x] 11-5. `ftags`·`tag`(HTM) 문법 동일 동작 — `test:dual`에 포함, 전량 통과
 - [x] 11-6. 소비자 alias 시나리오 — **통과 (2026-09-02)**. concurrent 13/13, base 10/10 (아래)
 - [ ] 11-7. `examples`·`lithentDocs` 빌드·실행
-- [ ] 11-8. `createLithent` 보일러플레이트로 신규 프로젝트 → SSR+hydration
+- [x] 11-8. `createLithent` 보일러플레이트로 신규 프로젝트 → SSR+hydration
+      — **통과 (2026-09-02)**. `pnpm check:scaffold[:concurrent]`가 자동 구간을,
+      브라우저에서 하이드레이션을 확인했다 (아래)
 - [ ] 11-9. 수동 체크리스트 전량 수행
 - [x] 11-10. 최종 크기 실측 + RC-4 판정 — 기본 **4,734**/4,800 (무회귀), concurrent **6,149**/9,000
 - [x] 11-11. 체인지로그(BC-1~BC-4) + README — `lithentConcurrent/README.md` 하나에 합쳤다
