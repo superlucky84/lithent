@@ -1182,18 +1182,63 @@ Phase 8 전에는 빌드가 항상 한 번에 끝나서 드러날 수 없었다.
 
 진입: 착수한 마지막 단계의 종료. / 종료: 커버리지 공백 0.
 
-- [ ] 10-1. 레인 경합 — sync·low가 같은 컴포넌트를 동시 큐잉
-- [ ] 10-2. 중첩 컴포넌트에서 부모·자식이 서로 다른 레인
-- [ ] 10-3. `portal`·`Fragment`·keyed 리스트 각각 저우선순위 경로
-- [ ] 10-4. 낡은 큐 항목 가드 — 언마운트된 컴포넌트가 큐에 남은 경우
+- [x] 10-1. 레인 경합 — sync·low가 같은 컴포넌트를 동시 큐잉 (렌더 횟수로 단언)
+- [x] 10-2. 중첩 컴포넌트에서 부모·자식이 서로 다른 레인
+- [x] 10-3. `portal`·`Fragment`·keyed 리스트 각각 저우선순위 경로 (예산 0으로 강제 중단)
+- [x] 10-4. 낡은 큐 항목 가드 — 언마운트된 컴포넌트가 큐에 남은 경우
       (`replaceWDom`의 `il` 가드, `componentMap.get` 실패 경로)
-- [ ] 10-5. `cacheUpdate`·`nextTickRender`·`computed`·`effect` 상호작용
-- [ ] 10-6. `context`/`lcontext` 갱신이 레인을 넘어 전파 (**`getParent` shim 경로 집중**)
-- [ ] 10-7. 엣지: 렌더 중 `deferRender` 중첩 호출
-- [ ] 10-8. 엣지: 커밋 중 발생한 갱신 요청
-- [ ] 10-9. 엣지: 파이버 중단 중 컴포넌트 언마운트
-- [ ] 10-10. **N1 경계 회귀 감시**: 렌더 중 throw가 언와인딩으로 처리되지 **않는지**
-      (Suspense가 슬금슬금 들어오지 않았음을 보증하는 테스트)
+- [x] 10-5. `computed`·`effect`·`cacheUpdate` 상호작용 — `helper/src/tests/laneInteraction.tsx`,
+      `test:dual`로 양쪽 코어. `nextTickRender`는 미포함 (아래)
+- [ ] 10-6. `context`/`lcontext` 갱신이 레인을 넘어 전파 (**미완 — 아래**)
+- [x] 10-7. 엣지: 렌더 중 `deferRender` 중첩 호출
+- [x] 10-8. 엣지: 커밋 중 발생한 갱신 요청
+- [x] 10-9. 엣지: 파이버 중단 중 컴포넌트 언마운트
+- [x] 10-10. **N1 경계 회귀 감시**: 렌더 중 throw가 언와인딩으로 처리되지 **않는지**
+      — 일반 예외 / 던져진 Promise가 그대로 나오는지 / 공개 표면에 Suspense형 API 없음
+
+### Phase 10 실측 결과 (2026-09-02)
+
+10개 중 **8개 완료, 1개 부분(10-5), 1개 미완(10-6).**
+
+| | 어디에 |
+|---|---|
+| 10-1·10-2·10-3·10-4·10-7·10-8·10-9·10-10 | `concurrent-hardening.test.tsx` (신규 12개) |
+| 10-5 | `helper/src/tests/laneInteraction.tsx` — `test:dual`로 양쪽 코어 |
+
+코어 스위트 **141개**, helper **42개** (양쪽 코어).
+
+**저우선순위 경로는 예산 0(`setLowLaneBudget(0)`)으로 강제 중단시킨 뒤 확인한다.**
+그러지 않으면 jsdom에서 5ms를 넘는 일이 없어 새 경로가 한 번도 실행되지 않는다 —
+Phase 8에서 겪은 그대로다.
+
+#### 10-5가 `nextTickRender`를 빼놓은 이유
+
+`computed`·`effect`·`cacheUpdate`는 넣었다. `nextTickRender`는 `nextTick` 의미론에
+얹혀 있고 그것은 DC-9/BC-4에서 이미 다뤘으므로(`whenIdle`이 레인 인지 대기다)
+여기서 다시 세우는 것이 중복이라 뺐다. 필요해지면 같은 파일에 추가하면 된다.
+
+#### 10-6은 미완이다 — 정직하게
+
+컨텍스트 소비자가 provider를 찾지 못해 `useContext`가 빈 상태를 돌려주는 테스트밖에
+쓰지 못했고, 그것이 **양쪽 코어에서 똑같이 실패**했다. 즉 concurrent 회귀가 아니라
+테스트 작성 문제다. 이해하지 못한 테스트를 넣는 것이 더 나쁘므로 넣지 않았다.
+
+지금 덮여 있는 것과 아닌 것:
+
+- **덮여 있다**: `context`/`lcontext`가 concurrent 코어에서 동작하는 것 —
+  `pnpm test:dual`이 helper의 기존 context 스위트를 양쪽 코어로 돌린다.
+- **덮여 있지 않다**: provider 갱신이 **저우선순위로 올라갔을 때** 소비자에게 전파되는가.
+
+다음에 쓸 때는 `helper/src/tests/context.tsx`의 동작하는 형태
+(모듈 스코프 `createContext`, wrapper 컴포넌트가 상태를 소유, `useContext(ctx, renew, [key])`,
+소비자에서 `ctx.key?.value`)를 그대로 베껴서 시작할 것. 내가 그 형태를 재현하지 못했다.
+
+#### 10-1이 스스로 못 잡는 것
+
+`lanes.low.delete`를 지워도 10-1은 통과한다. 낡은 low 항목의 클로저가 sync 커밋이
+은퇴시킨 노드를 가리키고 `replaceWDom`의 `il` 가드가 되돌려보내기 때문이다 —
+**방어선이 두 겹**이라는 뜻이고, 드롭 자체는 `concurrent-schedulerLane`의 큐 상태
+단언이 잡는다. 테스트 주석에 적어 뒀다.
 
 ## Phase 11 — 통합 테스트
 
