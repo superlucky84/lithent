@@ -4,6 +4,7 @@ import {
   render,
   mount,
   updateCallback,
+  mountCallback,
   deferRender,
   whenIdle,
   nextTick,
@@ -355,6 +356,63 @@ describe('a low-lane build that really pauses', () => {
     // reads a shifted slot and the effect is lost.
     expect(updates, 'exactly one effect for the one commit').toBe(1);
     expect(host.textContent).toBe('1t');
+  });
+
+  it('never discards a build that has mounted (9-10, DC-7)', async () => {
+    let bump = () => {};
+    let rows = [1, 2, 3];
+    let armed = false;
+    let mounterRuns = 0;
+    let cleanups = 0;
+
+    const Row = mount<{ key: number; id: number }>(() => {
+      mounterRuns++;
+      mountCallback(() => () => {
+        cleanups++;
+      });
+      return (p: { id: number }) => <li>{String(p.id)}</li>;
+    });
+
+    // Fires a sync renew from inside the deferred build, i.e. while that build
+    // is parked mid-mount. If the parked build were dropped, its mounters would
+    // have run for components that never commit and never unmount.
+    const Trigger = mount(() => () => {
+      if (armed) {
+        armed = false;
+        rows = [7, 8];
+        bump();
+      }
+      return <i>t</i>;
+    });
+
+    const App = mount((renew: () => void) => {
+      bump = renew;
+      return () => (
+        <ul>
+          {rows.map(id => (
+            <Row key={id} id={id} />
+          ))}
+          <Trigger />
+        </ul>
+      );
+    });
+
+    const host = document.createElement('div');
+    render(<App />, host);
+
+    setLowLaneBudget(0);
+    rows = [10, 11, 12, 13, 14, 15];
+    armed = true;
+    deferRender(() => bump());
+
+    await whenIdle();
+
+    const live = mounterRuns - cleanups;
+
+    expect(live, 'every mounter that ran belongs to a row on screen').toBe(
+      host.querySelectorAll('li').length
+    );
+    expect(host.textContent).toBe('78t');
   });
 
   it('matches what the same render produces without pausing', async () => {
