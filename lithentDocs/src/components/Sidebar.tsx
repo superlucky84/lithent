@@ -80,6 +80,19 @@ const menuData: MenuSection[] = [
     ],
   },
   {
+    text: { en: 'Concurrent Rendering', ko: 'Concurrent 렌더링' },
+    items: [
+      {
+        text: { en: 'Rendering & Scheduling', ko: '렌더링과 스케줄링' },
+        link: '/guide/concurrent-rendering',
+      },
+      {
+        text: { en: 'Deferred State Helpers', ko: '미룬 상태 헬퍼' },
+        link: '/guide/concurrent-helpers',
+      },
+    ],
+  },
+  {
     text: { en: 'JSX & Templates', ko: 'JSX & 템플릿' },
     items: [
       {

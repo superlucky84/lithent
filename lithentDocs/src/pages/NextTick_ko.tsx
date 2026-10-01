@@ -1,11 +1,13 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
+import { ConcurrentNote } from '@/components/ConcurrentNote';
 
 export const NextTickKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       nextTick
     </h1>
+    <ConcurrentNote kind="nextTick" language="ko" />
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
@@ -32,9 +34,9 @@ export const NextTickKo = () => (
       에 특정 작업을 수행해야 할 때 유용합니다.
       <br />
       <br />
-      renew()를 호출하면 Virtual DOM이 생성되고 실제 DOM이 업데이트됩니다. 이
-      과정은 동기적으로 실행되지만, nextTick을 사용하면 DOM 업데이트가 완전히
-      끝난 후의 시점을 보장받을 수 있습니다.
+      일반 renew()는 마이크로태스크에 렌더를 예약합니다. nextTick을 기다리면
+      예약된 동기 갱신이 커밋된 뒤 DOM을 읽을 수 있습니다. Concurrent 코어의
+      미룬 렌더까지 기다리려면 whenIdle을 사용합니다.
     </p>
 
     <CodeBlock
@@ -432,7 +434,7 @@ test('counter updates correctly', async () => {
 
   count += 1;
   renew();
-  // DOM 업데이트는 동기적으로 완료됨
+  // 마이크로태스크에 렌더가 예약됨
 
   console.log('2. After renew');
 
@@ -440,7 +442,7 @@ test('counter updates correctly', async () => {
   // 마이크로태스크 큐가 처리될 때까지 대기
 
   console.log('3. After nextTick');
-  // 여기서는 모든 DOM 업데이트와 브라우저 렌더링이 완료됨
+  // 예약된 동기 DOM 갱신은 커밋됐지만 페인트는 아직일 수 있음
 };
 
 // 출력 순서:
@@ -566,10 +568,10 @@ const Example = mount((renew) => {
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ 동기적 DOM 업데이트:</span> Lithent의
-        renew()는 DOM을 동기적으로 업데이트합니다. nextTick이 필요한 이유는
-        브라우저 렌더링이 완료될 때까지 기다리기 위함이 아니라, 마이크로태스크
-        큐를 활용하여 현재 실행 컨텍스트 이후를 보장받기 위함입니다.
+        <span class="font-medium">⚠️ 예약된 DOM 업데이트:</span> renew()는
+        마이크로태스크에 렌더를 예약합니다. nextTick은 예약된 동기 작업을
+        기다리며 브라우저 페인트나 concurrent의 미룬 렌더까지 기다리지는
+        않습니다.
         <br />
         <br />
         <span class="font-medium">⚠️ 과도한 사용 지양:</span> 대부분의 경우

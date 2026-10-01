@@ -1,11 +1,13 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
+import { ConcurrentNote } from '@/components/ConcurrentNote';
 
 export const UpdateHooksKo = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       Update Hooks
     </h1>
+    <ConcurrentNote kind="update" language="ko" />
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 

@@ -1,9 +1,8 @@
 {
   "type": "module",
   "name": "lithent-concurrent",
-  "version": "0.0.0",
-  "description": "Priority-scheduled rendering build of lithent for large sites. Interface-compatible drop-in; interruptible rendering lands in T2.",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Interface-compatible rendering build of Lithent with priority scheduling and interruptible low-priority builds.",
   "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithentConcurrent.umd.js",
   "module": "./dist/lithentConcurrent.mjs",
@@ -29,6 +28,9 @@
     "helper/package.json"
   ],
   "sideEffects": false,
+  "peerDependencies": {
+    "lithent": "^1.22.1"
+  },
   "scripts": {
     "dev": "vite --config vitedev.config.js",
     "build": "vite build && node scripts/emitTypes.js",

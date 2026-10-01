@@ -122,7 +122,16 @@ const Counter = lmount(() => {
 | [lithent/ssr](https://www.npmjs.com/package/lithent) | Server‑side rendering |
 | [lithent/ftags](https://www.npmjs.com/package/lithent) | Function‑style tag API |
 | [lithent/tag](https://www.npmjs.com/package/lithent) | HTM template support |
+| [lithent-concurrent](./lithentConcurrent/README.md) | Separate core with priority scheduling and interruptible low-priority builds |
+| [lithent-concurrent/helper](./lithentConcurrent/README.md#lithent-concurrenthelper) | Deferred state and component-local pending queries |
 | [create-lithent](https://www.npmjs.com/package/create-lithent) | Project scaffolding tool |
+
+For expensive component trees, select the concurrent core with an exact
+`/^lithent$/` bundler alias. `deferRender` defers rendering while state writes
+remain immediate; `whenIdle` waits for deferred work. Keep urgent input and
+heavy rendering in separate components. See the [concurrent rendering
+guide](https://superlucky84.github.io/lithent/#/guide/concurrent-rendering) and
+[prepared release notes](./CHANGELOG.md).
 
 <br />
 

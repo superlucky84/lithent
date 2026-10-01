@@ -3,8 +3,9 @@
 `lithent`의 **인터페이스 호환 별도 빌드**. 큰 목록을 다루는 화면에서 **무거운 렌더가 입력을
 통째로 막는 시간**을 줄인다.
 
-기본 `lithent`는 이 패키지를 위해 **한 줄도 바뀌지 않았다.** 두 빌드는 같은 레포에서
-같은 공개 인터페이스로 나오며, 소비자는 번들러 alias 한 줄로 갈아끼운다.
+기본 런타임 `src/`는 동결을 유지한다. 두 빌드는 같은 레포에서 같은 코어 인터페이스로
+나오며 소비자는 번들러 alias로 선택한다. 공유 helper의 store 쓰기 통지와 JSX keyed 목록
+수정은 `lithent 1.22.1`에 포함되므로 함께 설치한다.
 
 > **이름에 대하여.** 이 패키지는 렌더의 **빌드 단계**를 중단 가능하게 만든다.
 > 그것을 `concurrent mode`라고 부르지 않는다 — 그 말은 React가 특정 기능 묶음
@@ -13,7 +14,7 @@
 
 ## 언제 값을 하는가 — 그리고 언제 안 하는가
 
-실측이다 (10,000행, 실브라우저):
+2026-09-02의 실측이다 (10,000행, 실브라우저). 실행 기기와 워크로드에 따라 달라진다:
 
 | 워크로드                          | 한 단위 | 이 빌드가 돕는가                                  |
 | --------------------------------- | ------: | ------------------------------------------------- |
@@ -31,7 +32,7 @@
 ## 쓰는 법
 
 ```bash
-npm install lithent-concurrent
+npm install lithent@^1.22.1 lithent-concurrent@^0.1.0
 ```
 
 번들러에서 코어만 바꾼다. **정규식으로 정확히 `lithent`만** 걸어야 한다 —
@@ -50,12 +51,16 @@ export default {
 // webpack
 resolve: {
   alias: {
-    lithent$: 'lithent-concurrent';
+    lithent$: 'lithent-concurrent',
   }
 }
 ```
 
 `lithent/helper`, `lithent/jsx-runtime` 등 서브패스는 **그대로 둔다.** 교체 대상은 코어뿐이다.
+
+새 API는 `lithent-concurrent`에서 직접 import하면 TypeScript에서도 타입 선언을 찾는다.
+기존 `lithent` import의 런타임 선택은 위 alias가 맡으며, SSR은 서버와 클라이언트 양쪽에
+같은 설정을 적용한다.
 
 > **`lithent`를 external로 두는 빌드라면 파일 경로가 아니라 패키지 이름으로 건다.**
 > 라이브러리 빌드나 SSR 보일러플레이트처럼 코어를 번들에 넣지 않는 설정에서는,
@@ -73,7 +78,7 @@ resolve: {
 `scope` 안에서 발생한 갱신을 **저우선순위 레인**으로 보낸다.
 
 ```js
-import { deferRender } from 'lithent'; // 번들러에서 concurrent로 alias
+import { deferRender } from 'lithent-concurrent';
 
 input.oninput = e => {
   query = e.target.value; // 급한 것: 입력창은 즉시
@@ -114,8 +119,12 @@ const App = mount(renew => {
 
 ```jsx
 // ✓ 무거운 쪽을 분리한다
-const HeavyList = mount(renew => { /* rows를 소유 */ });
-const Filter    = mount(renew => { /* query를 소유, deferRender로 HeavyList만 갱신 */ });
+const HeavyList = mount(renew => {
+  /* rows를 소유 */
+});
+const Filter = mount(renew => {
+  /* query를 소유, deferRender로 HeavyList만 갱신 */
+});
 ```
 
 `deferRender`가 미루는 것은 **렌더**뿐이다. 값은 그 자리에서 쓰이므로, 같은 컴포넌트가
@@ -134,7 +143,8 @@ const Filter    = mount(renew => { /* query를 소유, deferRender로 HeavyList�
 
 ### `lithent-concurrent/helper`
 
-레인이 있어야 의미가 있는 helper. `lithent/helper`는 **무변경**이며 그대로 쓴다.
+레인이 있어야 의미가 있는 helper. 기존 공개 helper는 `lithent/helper`에서 그대로 쓴다.
+`lithent 1.22.1`의 `store`·`lstore`는 concurrent 코어에 쓰기를 통지하며 기본 코어에서는 무동작이다.
 
 ```js
 import {
@@ -176,11 +186,11 @@ DOM 삽입 지점마다가 아니라 **커밋이 끝난 뒤 1회** 실행된다.
 
 기준이 되는 순서는 이렇다 (3단 중첩, **두 코어 동일** — 실측):
 
-| 시점 | 방향 |
-|---|---|
-| 마운트 | 자식 → 부모 |
-| 갱신 — `updateCallback` 본문 | 부모 → 자식 |
-| 갱신 — `updateCallback` 반환값 | 자식 → 부모 |
+| 시점                              | 방향                           |
+| --------------------------------- | ------------------------------ |
+| 마운트                            | 자식 → 부모                    |
+| 갱신 — `updateCallback` 본문      | 부모 → 자식                    |
+| 갱신 — `updateCallback` 반환값    | 자식 → 부모                    |
 | 언마운트 — `mountCallback` 반환값 | **부모 → 자식** (React와 동일) |
 
 > **`updateCallback`의 반환값은 클린업이 아니다.** 갱신마다 새로 등록되고

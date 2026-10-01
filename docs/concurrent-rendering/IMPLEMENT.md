@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-10-01)
-- 상태: **E2E-0~4 검증 완료. Chromium 20개·돌연변이 5종·CLI 통과. Phase 11 10/11 완료. A-3/A-7/B-1, 11-9 및 릴리스·npm 공개 미결.**
+- 상태: **E2E-0~4 완료·Phase 11 10/11 완료. DC-22의 버전업·pack·영문/국문 기능 문서 준비(PREP-0~3) 승인, 새 결과 대기. A-3/A-7/B-1·11-9·실제 publish 미완.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 기존 구현 Phase 0~11의 공통 종료 조건:
@@ -208,7 +208,7 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 `import.meta.vitest` in-source 방식이어야 루트의 `includeSource`(`src/tests/*`)에
 걸리지 않는다. → **위성 테스트 파일에 `.test.`를 붙이지 말 것.**
 
-## Phase 3 — T1 출하 게이트 (기존 검증 기록, 사용자 릴리스 결정 대기)
+## Phase 3 — T1 단독 출하 게이트 (기존 검증 기록, 현재 T2 범위 N/A)
 
 진입: Phase 2 종료. / 종료: T1 릴리스 판정.
 
@@ -218,8 +218,8 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 - [x] 3-3b. **빌드 산출물 검증** (`pnpm verify:concurrent`) — 아래
 - [x] 3-4. T1 당시의 A·B·D 수행 기록. **최종 T2 릴리스 재검증 완료를 뜻하지 않는다.**
       2026-10-01의 최신 항목별 결과는 E2E 단계와 MANUAL_TEST_CHECKLIST에서 별도로 기록한다.
-- [ ] 3-5. **T1 단독 릴리스 판정** — 사람 몫
-- [ ] 3-5b. **T1 단독 릴리스 시 패키지명 재검토** — `lithent-concurrent`라는 이름은
+- **N/A (현재 T2 범위)** 3-5. **T1 단독 릴리스 판정** — T1만 내보내는 계획으로 바뀔 때 사용자 판단
+- **N/A (현재 T2 범위)** 3-5b. **T1 단독 릴리스 시 패키지명 재검토** — `lithent-concurrent`라는 이름은
       **T2 완주를 전제로만** 정직하다. T1은 우선순위 스케줄링이지 concurrent rendering이
       아니다 (REQUIREMENTS §2.1). T1만 내보낸다면 스케줄러 쪽 이름을 쓰거나
       릴리스를 T2까지 미룬다. DC-16으로 T2까지 가기로 했으므로 **현재는 유지**이며,
@@ -309,7 +309,7 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
 | B-6~B-8 기존 앱 | `pnpm dev` / `dev:examples` / `dev:docs` 실행 후 콘솔 확인 |
 | D SSR/hydration/HMR | 서버 + 브라우저 왕복 |
 | A-6 기존 `getParent` 계약 | 당시 T1 구간에서는 미적용. 현재 T2는 DC-19에 따라 shim 없이 유지하며 E2E-2에서 검사 |
-| 3-5 릴리스 판정 | 제품 결정 (3-5b 패키지명 조건 포함) |
+| 3-5 릴리스 판정 | T1 단독일 때의 제품 결정 (3-5b 이름 조건 포함); 현재 T2 준비에는 N/A |
 
 ---
 
@@ -1379,7 +1379,8 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
 이 단계는 Phase 11의 미완 브라우저 검증을 수행한다. `src/`를 변경하지 않고
 `e2e/`, `playwright.config.ts`, 테스트용 스크립트·의존성 및 문서를 확장한다.
 실행 중 재현된 automatic JSX keyed 회귀는 공유 `jsx-runtime/src/index.ts`에서 수정한다 (DESIGN D18).
-커밋·릴리스·npm 공개·3-5/3-5b 판정은 사용자 요청·결정으로 남긴다.
+이 단계 당시 커밋·릴리스·npm 공개 결정은 별도였다. 현재 3-5/3-5b는 T2 배포 준비 범위에 N/A다.
+실제 publish와 추가 커밋은 별도 요청으로 남긴다 (DC-22).
 
 명령 계약: `pnpm test:e2e`는 준비된 빌드로 실행, `pnpm test:e2e:build`는 빌드 후 실행.
 구성: `e2e/server.mjs`, `e2e/fixtures`, `e2e/*.spec.ts`, `playwright.config.ts`.
@@ -1498,7 +1499,68 @@ mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 scre
 - G-3은 REQUIREMENTS §5의 N1 불변 조건과 DESIGN P6를 확인했다.
 
 남은 판정은 A-3/B-1 반복 성능 측정과 A-7 과거 릴리스 동작 비교 기준이다.
-24개 체크리스트 완료와 11-4/11-7 완료를 기록하되 **11-9·3-5·3-5b·릴리스·npm 공개는 닫지 않는다**.
+24개 체크리스트 완료와 11-4/11-7 완료를 기록하되 **11-9·릴리스·npm 공개는 닫지 않는다**.
+3-5/3-5b는 T1 단독 출시 조건으로 현재 T2 준비 범위에 N/A다.
+
+## 배포 준비 단계 (2026-10-01, DC-22 / PREP-0~3)
+
+사용자 요청은 필요한 버전업·배포 산출물 준비·`lithentDocs`의 관련 기능 안내를 포함한다.
+이 단계의 종료는 검토 가능한 버전·pack·사용자 문서와 검사 근거다. **실제 publish와 추가 커밋은 수행하지 않는다.**
+기본 `src/`를 동결하고 A-3/A-7/B-1·11-9를 미완 유지한다. 3-5/3-5b는 현재 T2 범위에 N/A다.
+작업 기준 HEAD는 `5a9f148fbe964e993b3aba12cc26ff86bf415370`이다.
+
+정확한 버전/유지 근거는 DESIGN D19의 표를 단일 원본으로 사용한다. 아래 항목은 계획이며
+버전 변경·사이트 구현·최신 검증의 실제 결과를 받은 뒤에만 체크한다.
+
+### PREP-0 — 버전·의존성·pack 설정
+
+진입: DC-22 / D19 계획 확정. / baseline: 공통 base `f3921cc` 이후 배포 변경과 npm 현재 버전 확인.
+종료: 필요한 패키지만 목표 버전·peer·템플릿·lockfile을 정렬하고 pack 대상/포함 경로 확인.
+
+- [ ] P0-1. 루트 `lithent` 1.22.1, private helper/JSX 0.21.1로 필요한 patch 반영
+- [ ] P0-2. concurrent 0.1.0·private 해제·peer `lithent ^1.22.1`, private concurrent helper 0.1.0 정렬
+- [ ] P0-3. `create-lithent` 0.3.4와 양쪽 템플릿 `lithent ^1.22.1`, private docs 0.6.0 반영
+- [ ] P0-4. 플러그인/SSR/devHelper/ftags/tag 버전 유지 및 변경 이유·lockfile 정합 확인
+- [ ] P0-5. 루트·concurrent·create-lithent의 pack 대상과 exports·타입·helper/JSX 포함 경로 확인
+
+### PREP-1 — 영문/국문 공개 기능 문서·실행 데모
+
+진입: PREP-0의 버전 계획 반영. / baseline: 기존 docs 사이트 build·탐색과 공개 export 목록.
+종료: 두 언어 가이드·내비게이션·실제 concurrent 데모·계약·릴리스 변경 내역이 일관되게 노출됨.
+
+- [ ] P1-1. concurrent rendering와 helpers 영문/국문 가이드·메뉴·경로 연결
+- [ ] P1-2. 실제 concurrent 코어의 실행 데모와 입력/미룬 갱신/pending 조회/완료 대기 확인 수단 추가
+- [ ] P1-3. 코어 API 3개와 helper 런타임 export 3개·타입·import 경로 및 alias/서브패스 설명
+- [ ] P1-4. nextTick/MountHooks/UpdateHooks/ManualJSX의 기본·concurrent 계약과 JSX 동적 배열 수정 보완
+- [ ] P1-5. 버전·변경 내역·BC-1/BC-2 조건·N1·상태/pending/중단/커밋 제한을 두 언어에서 정렬
+
+### PREP-2 — 테스트 하드닝
+
+진입: PREP-1 문서·데모 구현. / baseline: 기존 consumer·scheduler·SSR/JSX·HMR 검사와 새 docs 모듈 실행.
+종료: 새 경로·데모가 기대 코어·동작을 검사하고 타입/코드 품질·기존 회귀 검사가 통과.
+
+- [ ] P2-1. 새 영문/국문 가이드·helpers·변경 내역 경로의 정확한 내용·heading·메뉴 이동 단언
+- [ ] P2-2. 새 데모의 실제 concurrent 선택과 시점별 DOM/값·pending 조회·완료 후 결과 검증
+- [ ] P2-3. 기존 nextTick·라이프사이클·JSX 설명과 실제 동작/서브패스/type 결과 정합 확인
+- [ ] P2-4. 새 검사에도 모듈 미실행·누락·잘못된 코어·예상하지 않은 브라우저 오류 실패 가드 적용
+- [ ] P2-5. 변경 범위 타입·lint·format 및 필요한 핵심 검사/기존 돌연변이 근거 확인
+
+### PREP-3 — 통합·pack·핸드오프
+
+진입: PREP-2 종료. / baseline: 빌드 산출물·lockfile·버전/템플릿 정합 및 새 사이트 검사 결과 확보.
+종료: build/unit/dual/size/artifact/E2E 및 pack 목록 통과, 실제 준비 상태·외부 publish 미실행·잔여 조건 기록.
+
+- [ ] P3-1. 최신 build/unit/dual/size/artifact 결과와 `src/` 무변경 확인
+- [ ] P3-2. 두 출시 코어의 기존 E2E와 새 사용자 문서·데모 통합 결과 기록
+- [ ] P3-3. pack 목록의 package version·exports 대상·번들·선언·helper/JSX·템플릿 포함 여부 확인
+- [ ] P3-4. 네 문서·새 사용자 문서·버전/변경 내역·실제 검사 결과의 정합 및 실행 명령/개수/HEAD 기록
+- [ ] P3-5. A-3/A-7/B-1·11-9 잔여, T1 조건 N/A, publish/추가 커밋 미실행을 명시해 핸드오프
+
+### 배포 준비 실행 기록
+
+| 기준 HEAD | 단계 | 실제 변경·명령·결과 | 상태 |
+|---|---|---|---|
+| `5a9f148` | PREP-0~3 | 루트의 최종 구현·검증 보고 후 기록 | 대기 |
 
 ---
 
@@ -1519,7 +1581,7 @@ mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 scre
   - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b, 신규).
     섹션 B 수행을 위한 데모 페이지(`pnpm dev:concurrent`)를 만들었다.
     당시에는 실브라우저 확인(3-4)과 릴리스 판정(3-5)이 남았다. 3-4의 T1 수행 기록과
-    현재 T2 재검증은 구분하며, 3-5/3-5b는 사용자 결정으로 계속 남긴다.
+    현재 T2 재검증은 구분한다. 3-5/3-5b는 T1 단독 조건으로 현재 T2 준비에 N/A다.
   - **Phase 4 완료 (2026-08-31)** — diff 단계가 순수해졌다. 부수효과 6종이 전부
     커밋 이펙트로 옮겨졌고, 폐기 능력(더블 버퍼링)을 테스트로 증명했다.
     이펙트 순서는 DC-14로 확정. concurrent br 5,104 / 6,200.
@@ -1573,12 +1635,13 @@ mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 scre
   - **E2E-0~4 완료 (2026-10-01)** — Chromium 20개(base 9/concurrent 11, skip 0),
     5종 돌연변이의 예상 단언 실패 6개, CLI·타입·스타일 검증 통과. 공유 JSX keyed 회귀를 수정했다.
     기존 미완 체크리스트 27개 중 24개를 닫았고 Phase 11은 11-4/11-7 완료로 **10/11**이다.
-- next: A-3/B-1 반복 성능 측정 및 A-7 과거 릴리스 앱 동작 비교 기준 확정.
+- next: PREP-0~3의 버전·배포 산출물·사용자 문서를 구현하고 최신 검증을 기록한다.
 - 미완: 11-9 및 A-3/A-7/B-1. 기능 E2E 통과와 성능·과거 동등성 판정은 구분한다.
-  3-5 T1 단독 릴리스 및 3-5b 조건부 이름 검토, npm 공개는 사용자 결정으로 남긴다.
+  3-5/3-5b는 현재 T2 범위에 N/A이며 T1만 내보내는 계획으로 바뀔 때 재검토한다. 실제 npm publish는 별도 요청이다.
 - blockers: 기능 검증에는 없음. A-7 과거 릴리스 기준 미확정, A-3/B-1 별도 실측 잔여로 최종 릴리스 게이트는 미완이다.
-- 검증 기준: `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리 (2026-10-01). 커밋하지 않았다.
-- 커밋 원칙: 사용자 요청 시에만 커밋한다.
+- 현재 HEAD: `5a9f148fbe964e993b3aba12cc26ff86bf415370` (2026-10-01, 배포 준비 전).
+  앞선 E2E 검증 기준은 역사적 실행 기록으로 유지한다.
+- 커밋 원칙: 추가 커밋은 사용자 요청 시에만 한다.
 - 진행 원칙:
   - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.
   - **Phase 3에서 멈춰도 완결된 결과물이다** (deferRender 완성).

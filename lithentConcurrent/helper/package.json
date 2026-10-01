@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "lithent-concurrent-helper",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Lane-aware state helpers for lithent-concurrent. Meaningless on the base core, so they ship here rather than in lithent/helper.",
   "private": true,
   "packageManager": "pnpm@9.12.3",

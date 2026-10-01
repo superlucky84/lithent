@@ -44,6 +44,10 @@ import { CacheUpdate } from '@/pages/CacheUpdate';
 import { CacheUpdateKo } from '@/pages/CacheUpdate_ko';
 import { NextTick } from '@/pages/NextTick';
 import { NextTickKo } from '@/pages/NextTick_ko';
+import { ConcurrentRendering } from '@/pages/ConcurrentRendering';
+import { ConcurrentRenderingKo } from '@/pages/ConcurrentRendering_ko';
+import { ConcurrentHelpers } from '@/pages/ConcurrentHelpers';
+import { ConcurrentHelpersKo } from '@/pages/ConcurrentHelpers_ko';
 import { VitePlugin } from '@/pages/VitePlugin';
 import { VitePluginKo } from '@/pages/VitePlugin_ko';
 import { ManualJSX } from '@/pages/ManualJSX';
@@ -150,6 +154,10 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/inner-html': InnerHTMLKo,
   '/guide/next-tick': NextTick,
   '/ko/guide/next-tick': NextTickKo,
+  '/guide/concurrent-rendering': ConcurrentRendering,
+  '/ko/guide/concurrent-rendering': ConcurrentRenderingKo,
+  '/guide/concurrent-helpers': ConcurrentHelpers,
+  '/ko/guide/concurrent-helpers': ConcurrentHelpersKo,
   '/guide/mount-hooks': MountHooks,
   '/ko/guide/mount-hooks': MountHooksKo,
   '/guide/update-hooks': UpdateHooks,

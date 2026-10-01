@@ -16,12 +16,14 @@ pnpm exec tsc -p e2e/tsconfig.json
 pnpm test:e2e:mutations
 ```
 
-The two projects use the actual built base and concurrent cores. The 20 tests
+The two projects use the actual built base and concurrent cores. The 22 tests
 cover the consumer checks, lifecycle/tearing checks, scheduler contracts,
 context/lcontext, portal placement, real server rendering and hydration, keyed
 row state and DOM identity, and real Vite boundary replacement. They also
 exercise all five examples pages and all 42 English/Korean docs example routes,
 including computed, shared store, keyed list, context and portal interactions.
+The release documentation checks both languages of the concurrent guides,
+their live concurrent demo, language switching, navigation and cleanup.
 
 Each project starts fixture, examples and docs Vite servers on fixed loopback
 ports 43130–43135. Existing servers are never reused. HMR edits an isolated copy

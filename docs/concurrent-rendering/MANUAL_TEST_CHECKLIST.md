@@ -6,6 +6,7 @@
 - 자동화: 기존 CLI·산출물 검사 + Playwright/Chromium 실제 브라우저 검사 (DC-21, 20개 통과)
 - 섹션 B 수행: `pnpm dev:concurrent` → `/html/transition.html`
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
+- 배포 준비: DC-22의 버전·영문/국문 기능 문서·pack 검사(H) 진행 예정. 실제 publish와 추가 커밋은 별도 요청.
 
 > **단계별 적용 범위**: A·B·D는 T1부터, C·F는 T1.5부터, E는 T2부터.
 > 착수하지 않은 단계의 섹션은 `N/A`로 표기한다.
@@ -16,6 +17,7 @@
 > **현재 상태 (2026-10-01)**: 기존 미완 27개 중 **24개를 이번 CLI/E2E 근거로 완료**했다.
 > 남은 것은 **A-3 성능 회귀, A-7 과거 릴리스 비교, B-1 입력 응답성 측정**이다.
 > C/F는 이번 E2E로 재확인했고 E는 2026-09-02 기록을 유지한다. 이번에 E의 새 성능 측정은 하지 않았다.
+> 새 배포 준비의 H 항목은 구현·검증 결과를 받은 뒤 별도로 체크한다. T1 단독 3-5/3-5b는 현재 T2 범위에 N/A다.
 >
 > **B-2 판정 시 주의**: 전환은 렌더를 미루지 상태를 미루지 않는다. 같은 컴포넌트가
 > 전환 도중 급한 갱신으로도 렌더되면 전환 값이 즉시 보이는 것이 **정상**이다
@@ -296,6 +298,21 @@ pnpm check:interrupt      # 두 코어를 빌드하고 섹션 E 페이지를 연
 - [x] G-2. 공개 API에 `use`·`Suspense` 상당물이 노출되어 있지 않다 — 2026-10-01 기존 10-10 및 export 검사
 - [x] G-3. 문서에 N1 불변 조건이 명시되어 있다 — 2026-10-01 REQUIREMENTS §5 / DESIGN P6 확인
 
+## H. 버전·배포 준비·사용자 문서 (2026-10-01, DC-22)
+
+DESIGN D19의 버전 표와 IMPLEMENT PREP-0~3를 따른다. 아직 이번 버전/문서 변경의 최종 결과를
+기록하지 않았으며, 앞선 E2E 20개 통과 기록을 새 가이드·데모 검사로 대신 쓰지 않는다.
+
+- [ ] H-1. 루트 1.22.1, private helper/JSX 0.21.1, concurrent/private concurrent helper 0.1.0,
+  create-lithent 0.3.4, private docs 0.6.0이 manifest/lockfile에 정렬되고 유지 패키지 버전은 움직이지 않는다
+- [ ] H-2. concurrent private 해제·peer `lithent ^1.22.1`, helper/JSX/타입/export 대상의 실제 pack 포함 확인
+- [ ] H-3. create-lithent 양쪽 템플릿이 `lithent ^1.22.1`을 사용하고 pack에 올바른 템플릿이 포함된다
+- [ ] H-4. 영문/국문 concurrent rendering·helpers·변경 내역의 경로·내용·메뉴 이동 확인
+- [ ] H-5. 새 데모가 실제 concurrent 코어를 실행하고 입력/미룬 DOM/pending 조회/완료 대기 결과를 검사한다
+- [ ] H-6. nextTick/MountHooks/UpdateHooks/ManualJSX 보완과 API 런타임 helper 3개·타입·BC 조건·N1이 실제 동작과 일치한다
+- [ ] H-7. 최신 build/unit/dual/size/artifact/브라우저 및 범위 타입/lint/format·pack 검사 근거를 기록한다
+- [ ] H-8. 기본 `src/` 동결, A-3/A-7/B-1·11-9 미완, T1 조건 N/A, 실제 publish/추가 커밋 미실행을 기록한다
+
 ## 통과 기준
 
 - **T1 릴리스**: A·B·D 전 항목 + 콘솔 에러 0건.
@@ -306,6 +323,8 @@ pnpm check:interrupt      # 두 코어를 빌드하고 섹션 E 페이지를 연
 - **모든 단계 공통**: **A-7(기본 코어 무회귀) 미달 시 무조건 릴리스 보류.**
   기본 코어 동결이 이 작업의 전제다.
 - A-3 벤치 회귀는 단계별 기준을 적용하며, 미달 시 DESIGN DC-6 재협의 대상.
+- **현재 배포 준비 종료**: H 전 항목의 구현·검증 근거 확보. 이는 실제 공개 완료나 T2 릴리스 게이트 통과와 별개다.
+  3-5/3-5b는 T1 단독 조건이므로 현재 T2 준비에 N/A이며, A-3/A-7/B-1·11-9는 그대로 남긴다.
 
 ## 기록
 
@@ -353,7 +372,10 @@ JSON 보고서는 `test-results/mutations`, 실패 screenshot/trace는 `test-res
 
 - done: 기존 미완 27개 중 24개 완료. Chromium 20개·돌연변이 5종·CLI 검사 통과.
   C/F는 이번 E2E 재확인, E는 2026-09-02 기록 유지. 공유 JSX keyed 회귀 수정 및 양쪽 코어 검사 통과.
-- next: A-3/B-1 반복 성능 측정 및 A-7 과거 릴리스 비교 기준 확정. 11-9는 이 세 항목이 남아 미완이다.
+- 준비 설계: DC-22에 따라 H / PREP-0~3의 버전·사용자 문서·pack 검사를 추가했다. 실제 새 결과는 대기 중이다.
+- next: 새 버전/영문·국문 가이드·실행 데모/pack의 실제 근거로 H를 닫는다.
+  A-3/B-1 반복 측정·A-7 과거 릴리스 기준은 별도 잔여이며, 11-9는 이 세 항목 때문에 미완이다.
 - blockers: A-7 과거 릴리스 기준 미확정. A-3/B-1 반복 성능 측정은 기능 E2E와 별도 작업이다.
-- 검증 기준: `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리 (2026-10-01). 커밋하지 않았다.
-- 커밋·릴리스·npm 공개는 사용자 요청/결정으로 남긴다.
+- 현재 HEAD: `5a9f148fbe964e993b3aba12cc26ff86bf415370` (2026-10-01, 배포 준비 전).
+  앞선 E2E 검증 기준은 위 역사적 실행 기록에 보존한다.
+- 실제 publish·추가 커밋은 별도 사용자 요청으로 남긴다. 3-5/3-5b는 현재 T2 범위에 N/A다.

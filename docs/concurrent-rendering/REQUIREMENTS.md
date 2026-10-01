@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-10-01)
-- 상태: **T2 및 Playwright 브라우저 검증 완료. Phase 10 범위 제외 기록·Phase 11 10/11 완료. 기존 미완 27개 중 24개 완료; A-3/A-7/B-1과 릴리스·npm 공개 미결.**
+- 상태: **T2/E2E 완료·Phase 11 10/11 완료. 필요한 패키지 버전업·배포 준비·영문/국문 사용자 문서 확장 승인(DC-22), 구현/검증 예정. A-3/A-7/B-1과 실제 publish 미완.**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -136,7 +136,7 @@ lithentConcurrent/          ← 워크스페이스 패키지 (name: lithent-conc
   src/
     diff.ts  render.ts  wDom.ts                    ← 순수화·커밋 경계·work loop 분기본
     scheduler.ts                                   ← 분기본 (Phase 1에서 2레인으로 재작성)
-    index.ts                                       ← base와 동일 + concurrent 전용 3개
+    index.ts                                       ← base와 동일 + concurrent API 3개·내부 store 배선 2개
     tests/                                         ← alias 함정 가드 + export 계약 가드 + 레인 테스트
   alias.js  alias.d.ts                             ← 분기 표 단일 원본 (DESIGN D12)
   scripts/emitTypes.js                             ← 타입 선언 생성 (DESIGN D13)
@@ -235,7 +235,35 @@ diff 단계의 부수효과를 커밋 이펙트 리스트로 분리, 커밋 경�
   과거 릴리스 기준이 미확정이면 A-7 전체를 완료 처리하지 않는다.
 - **BR-6. 변경 범위:** 테스트 설정·fixture·스크립트·문서를 확장하고, E2E에서 재현된
   공유 JSX 어댑터 회귀는 `jsx-runtime/src/index.ts`에서 수정한다. 기본 `src/`는 동결하며,
-  3-5/3-5b·릴리스·npm 공개에 대한 사용자 결정 보류를 유지하고 커밋은 요청 시에만 한다.
+  실제 publish와 추가 커밋은 요청 시에만 한다. 현재 T2의 버전·배포 준비 범위와
+  T1 단독 조건(3-5/3-5b N/A)은 §6.2를 따른다.
+
+### 6.2 배포 준비와 사용자 문서 요구사항 (2026-10-01, DC-22)
+
+이번 사용자 승인은 관련 패키지의 필요한 버전업·배포 가능한 산출물 준비·`lithentDocs` 기능 안내를
+포함한다. 실제 npm publish와 추가 커밋은 별도 요청으로 남긴다. T2를 준비하므로
+3-5/3-5b의 **T1 단독 출시 조건은 현재 N/A**이며, T1만 내보내는 계획으로 바뀔 때 다시 판단한다.
+
+- **PR-1. 버전 범위:** 변경된 런타임·포함 산출물·템플릿·사용자 문서에 필요한 패키지만 버전업한다.
+  기준은 `origin/master`/`main` 공통 base `f3921cc`; 실제 배포 변경은 새 concurrent 빌드,
+  기본 helper store/lstore의 내부 통지와 공유 JSX keyed 회귀 수정이다.
+- **PR-2. 배포 산출물:** `lithent-concurrent` 0.1.0 최초 배포를 준비하며 `private`를 해제하고
+  `lithent` peer 범위를 `^1.22.1`로 맞춘다. `lithent/helper`·JSX 런타임 및
+  `lithent-concurrent/helper`의 export map·타입·번들·외부 코어 참조가 실제 pack에 들어가야 한다.
+- **PR-3. 사용자 기능:** 영문/국문 concurrent rendering·helpers 가이드, 실제 concurrent 실행 데모,
+  내비게이션과 배포 변경 내역을 추가한다. 코어의 `deferRender`/`whenIdle`/저수준 `hasPending`,
+  helper의 런타임 export **3개**(`deferred`/`ldeferred`/`hasPendingRender`) 및 `State`/`Computed` 타입을 안내한다.
+- **PR-4. 계약 설명:** low 빌드만 중단 가능·커밋 원자성·즉시 바뀌는 클로저 상태·비반응성 pending·
+  `nextTick`/`whenIdle` 차이·BC-1/BC-2 조건·N1을 설명한다. 기존 nextTick/MountHooks/UpdateHooks/ManualJSX
+  문서를 보완하고 JSX 동적 배열의 keyed 상태 보존 수정도 변경 내역에 기록한다.
+  내부 `notifyStoreWrite`/`storeVersion` 배선은 사용자 기능으로 소개하지 않는다.
+- **PR-5. 검증:** manifest/lockfile/템플릿 버전 정합, 영문/국문 가이드·탐색·실행 데모·기존 페이지 보완,
+  build/unit/dual/size/artifact/E2E 및 pack 내용을 검사한다. 검증 결과가 나오기 전에는 완료 표시하지 않는다.
+  이전 E2E 20개 통과 기록만으로 새 가이드·데모 검증을 대신하지 않는다.
+- **PR-6. 잔여 출시 근거:** A-3/A-7/B-1과 11-9는 실제 새 측정·과거 릴리스 기준이 없으면 미완 유지한다.
+  패키지가 pack 가능해졌다는 사실은 이 출시 게이트 통과나 외부 공개 완료를 뜻하지 않는다.
+
+선택된 버전 및 유지 패키지의 근거는 DESIGN D19를 따른다. 기본 `src/`는 계속 동결한다.
 
 **E2E가 발견하고 수정한 회귀 (2026-10-01):** automatic JSX 어댑터가
 동적 단일 children 배열도 펼쳐 `h`의 loop 정보를 잃는다. SSR 초기 노드 재사용과 단일 갱신은
@@ -406,7 +434,10 @@ React의 `useTransition`이 `isPending` 변화로 sync 렌더를 일으키는 �
 | **BC-3** | 저우선순위 렌더의 flush가 마이크로태스크 → 유휴 프레임 | T1 | 기본 우선순위를 마이크로태스크로 유지하면 기존 코드 무영향 |
 | **BC-4** | **`nextTick()`의 DOM 갱신 보장이 sync 레인에 한정** | T1 | `nextTick = () => Promise.resolve()` (`src/hook/ref.ts:2`), 위성에서 12회 사용. 저우선순위 렌더 완료 대기에는 별도 수단 필요 |
 
-BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 프로미스 제공으로 완화 (DC-9).
+BC-1·BC-2는 concurrent 계약에 대한 minor + 체인지로그 명시 결정(DC-8)이며,
+새 `lithent-concurrent`는 0.1.0 최초 배포를 준비한다. 기본 `lithent`의 이번 1.22.1은
+helper 내부 배선·JSX 버그 수정에 대한 patch이고 기존 기본 코어의 콜백 계약은 바꾸지 않는다 (DC-22).
+BC-4는 `whenIdle()` 완료 대기로 완화한다 (DC-9).
 
 ## 10. 상태 / 핸드오프
 
@@ -421,7 +452,8 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
     RC-1·RC-2 통과, C2 회귀 없음, concurrent br 4,989 / 5,400.
   - **Phase 2 완료 (2026-08-31)** — `deferred`/`ldeferred`/`hasPendingRender`/`whenIdle`.
     RC-3·BC-4 통과, concurrent br 5,057 / 5,400. concurrent 공개 export는 값 **24개**
-    (`deferRender`·`hasPending`·`whenIdle` 추가), helper는 **가산적**으로 4개 추가.
+    (`deferRender`·`hasPending`·`whenIdle` 추가). helper의 현재 런타임 export는 **3개**이고
+    `State`/`Computed` 타입을 제공한다. Phase 6의 store 내부 배선 export는 별도다.
   - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b).
     소스가 아니라 **출하 번들·선언 파일**을 보는 검증을 추가했다 (`pnpm verify:concurrent`).
     섹션 B 수행용 데모 페이지 신설 (`pnpm dev:concurrent`).
@@ -464,12 +496,12 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   Phase 11은 **10/11 완료**(11-4·11-7 완료, 11-9 미완), A/B/D/G의 기존 미완 27개 중 24개를 닫았다.
   Chromium **20개(base 9/concurrent 11), skip 0**와 돌연변이 **5종의 예상 실패 6개**를 확인했다.
   C/F는 이번 E2E 재확인, E는 2026-09-02 기록 유지이며 새 성능 측정은 하지 않았다.
-- next: A-3/B-1 반복 성능 측정, A-7 과거 릴리스 앱 동작 비교 기준 확정.
+- next: DC-22 / PREP-0~3에 따라 버전·pack·사용자 문서를 준비하고 새 변경을 검증한다.
 - blockers: 기능 검증에는 없음. A-7의 비교 기준과 A-3/B-1 실측이 남아 11-9와 릴리스 게이트는 미완이다.
-- 미결(경미):
-  - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
-    npm 공개 여부를 정해야 한다. Phase 11-11의 README 완료는 공개·릴리스 승인이 아니다.
-- 검증 기준: `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리 (2026-10-01). 커밋하지 않았다.
+- 준비 결정: `lithent-concurrent` 0.1.0·private 해제·peer `^1.22.1` 계획 확정. 실제 publish는 수행하지 않는다.
+  3-5/3-5b는 현재 T2 범위에 N/A이며 조건이 바뀌면 다시 판단한다.
+- 현재 HEAD: `5a9f148fbe964e993b3aba12cc26ff86bf415370` (2026-10-01, 배포 준비 전).
+  앞선 E2E 검증 기준은 IMPLEMENT의 역사적 실행 기록에 보존한다. 추가 커밋은 요청 시에만 한다.
 - 실행 안내: [e2e/README.md](../../e2e/README.md). 상세 결과는 IMPLEMENT의 브라우저 재검증 실행 기록을 따른다.
 - 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
   Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: `d094a4e`**

@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-10-01)
-- 상태: **DC-1~DC-21 확정. Playwright 20개·돌연변이 5종 검증 완료. Phase 11 10/11 완료, A-3/A-7/B-1 및 릴리스·공개 판단 미완.**
+- 상태: **DC-1~DC-22 확정. T2/E2E 완료·Phase 11 10/11 완료. 버전·배포 산출물·영문/국문 기능 문서 준비 설계 확정, 새 검증 결과 대기. A-3/A-7/B-1·publish 미완.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -520,6 +520,50 @@ SSR E2E에서 `jsx-runtime/src/index.ts`의 `createWNode`가 동적 단일 child
 `jsxs`의 기존 6인자 호출과 3인자 호출을 모두 유지했고, 두 호출 형태의 fixture·타입 검사 및
 최종 Chromium 20개 재실행이 통과했다.
 
+### D19. 필요한 패키지 버전업·배포 준비·사용자 문서 (DC-22)
+
+기준: 공통 base `f3921cc` 이후 배포 런타임 변경은 새 concurrent 빌드,
+helper store/lstore의 내부 통지와 공유 JSX 버그 수정이다. 루트의 2026-10-01 npm 조회는
+`lithent` 1.22.0, `create-lithent` 0.3.3을 확인했고 `lithent-concurrent`는 E404로 미공개였다.
+새 concurrent의 계약 차이를 기본 lithent의 minor 변경으로 계산하지 않는다.
+
+| 패키지·경로 | 목표 버전 | 공개/포함 방식·근거 |
+|---|---|---|
+| `lithent` (루트) | **1.22.1** | 기존 공개 패키지 patch: helper 내부 배선·automatic JSX keyed 수정 |
+| `helper/` | **0.21.1** | private 내부 패키지, 루트 `lithent/helper` 포함 산출물의 변경 기록 |
+| `jsx-runtime/` | **0.21.1** | private 내부 패키지, 루트 JSX 서브패스의 버그 수정 기록 |
+| `lithentConcurrent/` | **0.1.0** | 최초 배포 준비, private 해제, peer `lithent: ^1.22.1` |
+| `lithentConcurrent/helper/` | **0.1.0** | private 유지, concurrent의 `/helper` export 산출물로 제공 |
+| `createLithent/` (`create-lithent`) | **0.3.4** | 양쪽 템플릿의 `lithent` 의존성을 `^1.22.1`로 정렬 |
+| `lithentDocs/` | **0.6.0** | private 문서 앱, 신규 concurrent 가이드·helpers·실행 데모 기록 |
+
+`@lithent/lithent-vite`·hmr-parser·MDX 플러그인·SSR·devHelper·ftags·tag는 변경된 런타임이 없어
+버전을 유지한다. 테스트용 alias 설정 변경만으로 이 패키지들을 버전업하지 않는다.
+npm 확인 값은 lithent-vite 0.3.3, hmr-parser 0.2.2, MDX 0.2.6이며 버전/레지스트리 조사는 루트가 담당한다.
+
+산출물은 루트/helper/JSX 서브패스와 concurrent/helper의 export map·번들·타입이 포함되는지
+pack 목록에서 확인한다. private 해제와 pack 검증은 배포 준비 상태이며 npm publish를 수행하지 않는다.
+lockfile·peer·create-lithent 템플릿은 같은 버전 계획을 따라야 한다.
+
+사용자 문서:
+
+- concurrent rendering 및 helpers 가이드를 영문/국문으로 추가하고 내비게이션에 연결한다.
+  실행 데모는 실제 concurrent 코어를 사용하며 기본 `lithent`로 바뀌어도 같은 화면이 보여 통과하는 검사를 피한다.
+- 코어 `deferRender`/`whenIdle`/저수준 `hasPending`과 helper `deferred`/`ldeferred`/`hasPendingRender`의
+  런타임 export 3개 및 `State`/`Computed` 타입·import 경로를 설명한다.
+  `notifyStoreWrite`/`storeVersion`은 내부 배선으로 남긴다.
+- low 빌드만 중단, 커밋 원자성, 클로저 값 즉시 변경, 동일 컴포넌트 sync 예외,
+  비반응성 pending, `nextTick`/`whenIdle` 대기를 설명한다. Suspense/use·선택적 hydration·스트리밍을 약속하지 않는다.
+- MountHooks/UpdateHooks는 기본과 concurrent의 관측 계약 차이를 구분한다.
+  BC-2는 예약된 계약이며 현재 마운트한 빌드를 폐기하지 않는 정책임을 명시한다.
+- ManualJSX와 배포 변경 내역에 동적 child 배열·정적 형제 구분 및 keyed 상태 보존 수정,
+  `jsx`/`jsxs`/`jsxDEV` 호출 호환성을 기록한다.
+
+검증은 PREP-0 패키징 → PREP-1 사용자 문서 → PREP-2 테스트 하드닝 → PREP-3 통합/pack 순서다.
+기존 E2E 근거는 유지하고 새 페이지·실행 데모·버전 정합에는 새로운 검사 근거를 남긴다.
+T1 단독 출시의 3-5/3-5b는 **현재 T2 범위 N/A**다. A-3/A-7/B-1 및 11-9는 그대로 미완이며
+실제 publish·추가 커밋은 별도 사용자 요청으로 남긴다.
+
 ---
 
 ## 7. 결정 체크리스트
@@ -597,6 +641,11 @@ SSR E2E에서 `jsx-runtime/src/index.ts`의 `createWNode`가 동적 단일 child
   근거: 기존 CLI 검사표를 재사용하고 실제 DOM·이벤트·hydration·HMR 결과를 재현할 수 있다.
   기존 "사람 몫"은 자동화 금지가 아니라 당시 도구 범위를 반영한 설명이다.
   성능(A-3/B-1)과 과거 릴리스 기준(A-7), 릴리스·공개 판단은 별도 근거·결정으로 남긴다.
+- [x] **DC-22**: 배포 준비 범위 → **변경된 런타임/포함 산출물/템플릿/사용자 문서만 필요한 버전업**.
+  확정 2026-10-01 (사용자의 배포 준비·버전업·문서 확장 요청에 따른 실행 계획).
+  루트 1.22.1 patch, concurrent 0.1.0 최초 배포 준비 및 관련 private 패키지·템플릿·문서 버전은 D19를 따른다.
+  private 해제·pack까지 준비하며 실제 publish와 추가 커밋은 포함하지 않는다.
+  T1 단독 조건은 현재 N/A, A-3/A-7/B-1·11-9는 새 근거 없이 닫지 않는다.
 
 ## 8. 설계 ↔ 검증 연결
 
@@ -634,6 +683,8 @@ SSR E2E에서 `jsx-runtime/src/index.ts`의 `createWNode`가 동적 단일 child
 | D17 SSR/hydration·실제 HMR 교체 | D-1~4 / Phase 11-4, E2E-3 |
 | D17 examples/docs·오류 수집·돌연변이 | B-7~8 / Phase 11-7·11-9, E2E-4 |
 | D18 automatic JSX 동적 배열의 keyed 상태 보존 | D-1~3 / E2E-3·E2E-4, base/concurrent SSR 회귀 검사 |
+| D19 버전·peer·템플릿·포함 산출물 | PR-1·PR-2 / PREP-0·PREP-3 pack·export·외부 타입 검사 |
+| D19 영문/국문 가이드·실행 데모·계약·변경 내역 | PR-3·PR-4·PR-5 / PREP-1~3 브라우저 검사 |
 
 ## 9. 상태 / 핸드오프
 
@@ -645,10 +696,12 @@ SSR E2E에서 `jsx-runtime/src/index.ts`의 `createWNode`가 동적 단일 child
 - 현재 (2026-10-01): D17의 Chromium 20개(base 9/concurrent 11, skip 0), 5종 돌연변이의 예상 실패 6개,
   D18 공유 JSX 회귀 및 CLI 검증 완료. Phase 11은 10/11 완료이다.
   C/F는 이번 E2E 재확인, E는 기존 기록 유지. 상세 실행 근거는 IMPLEMENT에 기록했다.
-- next: A-3/B-1 반복 성능 측정과 A-7 과거 릴리스 비교 기준을 확정한다.
+- 준비 설계: DC-22 / D19의 필요한 버전업·산출물 및 영문/국문 기능 문서 계획을 확정했다.
+- next: PREP-0~3 구현·새 검사 결과를 기록한다. 성능/과거 동등성은 별도 잔여다.
 - blockers: 기능 검증에는 없음. 비교 기준 미확정·미실측 때문에 11-9와 릴리스 게이트는 계속 미완이다.
-- 검증 기준: `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리 (2026-10-01). 커밋하지 않았다.
+- 현재 HEAD: `5a9f148fbe964e993b3aba12cc26ff86bf415370` (2026-10-01, 배포 준비 전).
+  앞선 E2E의 검증 기준은 IMPLEMENT의 실행 기록에 보존한다.
 - 실행 안내: [e2e/README.md](../../e2e/README.md).
-- 커밋은 사용자 요청 시에만 한다. 릴리스·npm 공개·3-5/3-5b는 미결로 유지한다.
+- 추가 커밋과 실제 npm publish는 사용자 요청 시에만 한다. 3-5/3-5b는 현재 T2 범위에 N/A다.
 - 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
   Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: `d094a4e`**
