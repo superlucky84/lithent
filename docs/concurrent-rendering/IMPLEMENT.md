@@ -1,10 +1,10 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
-- 작성일: 2026-08-28 (최종 수정: 2026-08-28)
-- 상태: **Phase 4 완료 (2026-08-31) — T1.5 진행 중. Phase 5 착수 가능**
+- 작성일: 2026-08-28 (최종 수정: 2026-10-01)
+- 상태: **E2E-0~4 검증 완료. Chromium 20개·돌연변이 5종·CLI 통과. Phase 11 10/11 완료. A-3/A-7/B-1, 11-9 및 릴리스·npm 공개 미결.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
-공통 종료 조건 (모든 Phase):
+기존 구현 Phase 0~11의 공통 종료 조건:
 `pnpm build && pnpm test` 전량 통과 + **위성 스위트 양쪽 코어 2회 실행(RC-9)** +
 양쪽 빌드 brotli 실측 기록 + `docs/performance-improvement/bench/` 재측정 기록.
 
@@ -17,8 +17,10 @@ node -e "const z=require('zlib'),f=require('fs');for(const p of ['dist/lithent.u
 
 예산 (RC-4): 기본 **≤ 4,800 B 전 기간 고정** / concurrent T1 ≤ 5,400 · T1.5 ≤ 6,200 · T2 ≤ 9,000
 
-> **P1 원칙**: `src/`는 이 작업에서 수정하지 않는다. 모든 코드 변경은
-> `lithentConcurrent/` 또는 `helper/`(가산적)에서 일어난다.
+> **P1 원칙**: `src/`는 이 작업에서 수정하지 않는다. 기존 런타임 변경은
+> `lithentConcurrent/` 또는 `helper/`(가산적)에서 일어났으며, 이번 확장은 테스트 설정·fixture·스크립트·문서 범위다.
+> E2E에서 재현한 공유 automatic JSX 회귀는 `jsx-runtime/src/index.ts`에서 수정한다 (D18).
+> E2E 단계별 baseline/종료 조건은 아래 E2E-0~4를 따른다. A-3/B-1 성능 측정과 A-7 과거 릴리스 비교는 별도 판정이다.
 
 ---
 
@@ -206,7 +208,7 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 `import.meta.vitest` in-source 방식이어야 루트의 `includeSource`(`src/tests/*`)에
 걸리지 않는다. → **위성 테스트 파일에 `.test.`를 붙이지 말 것.**
 
-## Phase 3 — T1 출하 게이트 (자동 항목 완료, 사람 몫 대기)
+## Phase 3 — T1 출하 게이트 (기존 검증 기록, 사용자 릴리스 결정 대기)
 
 진입: Phase 2 종료. / 종료: T1 릴리스 판정.
 
@@ -214,7 +216,8 @@ lithent-concurrent ↔  lithent-concurrent/helper   ← 신규
 - [x] 3-2. C2: bench 회귀 0 — 두 코어가 서로 노이즈 범위 안 (3회 측정)
 - [x] 3-3. RC-9: 위성 양쪽 코어 통과 (`pnpm test:dual`)
 - [x] 3-3b. **빌드 산출물 검증** (`pnpm verify:concurrent`) — 아래
-- [x] 3-4. 수동 체크리스트 A·B·D 수행 — **실브라우저 필요. 사람 몫**
+- [x] 3-4. T1 당시의 A·B·D 수행 기록. **최종 T2 릴리스 재검증 완료를 뜻하지 않는다.**
+      2026-10-01의 최신 항목별 결과는 E2E 단계와 MANUAL_TEST_CHECKLIST에서 별도로 기록한다.
 - [ ] 3-5. **T1 단독 릴리스 판정** — 사람 몫
 - [ ] 3-5b. **T1 단독 릴리스 시 패키지명 재검토** — `lithent-concurrent`라는 이름은
       **T2 완주를 전제로만** 정직하다. T1은 우선순위 스케줄링이지 concurrent rendering이
@@ -305,7 +308,7 @@ dev 서버의 모듈 그래프가 빌드와 같은지 확인했다:
 | B-2 · B-5 화면 유지 | 단위 테스트로는 DOM 문자열까지만 확인했다. 깜빡임은 눈으로 |
 | B-6~B-8 기존 앱 | `pnpm dev` / `dev:examples` / `dev:docs` 실행 후 콘솔 확인 |
 | D SSR/hydration/HMR | 서버 + 브라우저 왕복 |
-| A-6 `getParent` shim | **T2 항목이므로 지금은 N/A** |
+| A-6 기존 `getParent` 계약 | 당시 T1 구간에서는 미적용. 현재 T2는 DC-19에 따라 shim 없이 유지하며 E2E-2에서 검사 |
 | 3-5 릴리스 판정 | 제품 결정 (3-5b 패키지명 조건 포함) |
 
 ---
@@ -1239,15 +1242,16 @@ wrapper가 상태 소유, `useContext(ctx, renew, [key])`, `ctx.key?.value`, 그
 
 ## Phase 11 — 통합 테스트
 
-### Phase 11 진행 상황 (2026-09-02)
+### Phase 11 진행 상황 (2026-10-01)
 
-11개 중 **8개 완료**(11-1·11-2·11-3·11-5·11-6·11-8·11-10·11-11), **3개는 사람 몫**이다.
+2026-09-02에는 8/11 완료였다. 이번 Playwright 실행으로 11-4·11-7을 닫아 **10/11 완료**다.
+11-9는 A-3/A-7/B-1이 남아 미완으로 유지한다. README 완료는 릴리스·npm 공개 결정과 별개다.
 
-| 남은 것 | 왜 자동이 아닌가 |
+| 남은 것 | 필요한 근거 / 현재 계획 |
 |---|---|
-| 11-4 devHelper HMR | 실행 중 모듈 교체다. 스위트는 `test:dual`에서 통과하지만 그것은 바운더리 로직이지 HMR 동작이 아니다 |
-| 11-7 `examples`·`lithentDocs` 실행 | 빌드는 `pnpm build`가 하지만 실행·확인은 브라우저다 |
-| 11-9 수동 체크리스트 전량 | 섹션 E는 끝났고 A·B·C·D·F·G가 남았다 |
+| 11-4 devHelper HMR | 완료: 실제 플러그인·임시 파일 수정·reload 없는 바운더리 교체와 이벤트를 양쪽 코어에서 확인 |
+| 11-7 `examples`·`lithentDocs` 실행 | 완료: examples 5개 페이지, docs 42개 경로와 대표 데모를 양쪽 출시 코어에서 확인 |
+| 11-9 체크리스트 전량 | 미완: 기존 A/B/D/G 27개 중 24개 완료, A-3/A-7/B-1 잔여. C/F 재확인, E는 기존 기록 유지 |
 
 ### 11-6 — 소비자 앱 (`lithentConcurrent/consumer/`)
 
@@ -1309,8 +1313,8 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
 (이름은 `.d.ts`에만 남는다). 애매하다는 감각이 맞았고, minify를 견디는 마커를 찾아
 자동 판정으로 옮겼다.
 
-**사람 몫으로 남는 것은 하이드레이션 자체뿐이다** — 서버 마크업을 재사용했는지는
-실행 중 DOM 동일성 문제라 브라우저에서만 볼 수 있다.
+**브라우저 확인이 필요한 것은 하이드레이션 자체다** — 서버 마크업을 재사용했는지는
+실행 중 DOM 동일성 문제다. 이번에는 Playwright가 기존 노드 참조의 동일성과 이벤트를 검사한다.
 **2026-09-02 확인: 마크업 유지·링크/버튼 동작·콘솔 에러 0건 — 통과.**
 
 #### 결과 (2026-09-02) — 통과
@@ -1353,21 +1357,148 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
 - [x] 11-2. **RC-9 최종**: `pnpm test:dual` 전량 통과 — 2026-09-02 확인
 - [x] 11-3. SSR → hydration 경로에서 스케줄러 동작 — `ssr/src/tests/laneHydration.tsx`,
       `test:dual`로 양쪽 코어. 돌연변이 2종 검증(deferRender 무시 / 노드 재사용 깨기)
-- [ ] 11-4. `devHelper` HMR 바운더리가 concurrent 코어에서 동작 — 스위트는 `test:dual`에서
-      통과하지만 **HMR 자체는 실행 중 교체라 자동 확인 불가**. 사람 몫 (아래)
+- [x] 11-4. `devHelper` HMR 바운더리가 concurrent 코어에서 동작 — `test:dual`의
+      바운더리 로직 검사에 더해 E2E-3에서 파일 수정 후 실제 교체·이벤트·reload 부재를 검증
       (`componentMap`/`replaceWDom` 직접 호출 경로)
+      — 2026-10-01, 실제 플러그인과 `.e2e-work/<core>` 전용 fixture, 두 코어 통과
 - [x] 11-5. `ftags`·`tag`(HTM) 문법 동일 동작 — `test:dual`에 포함, 전량 통과
 - [x] 11-6. 소비자 alias 시나리오 — **통과 (2026-09-02)**. concurrent 13/13, base 10/10 (아래)
-- [ ] 11-7. `examples`·`lithentDocs` 빌드·실행
+- [x] 11-7. `examples`·`lithentDocs` 빌드·실행 — 2026-10-01 examples 5개/docs 42개 경로 및 대표 데모, 두 코어 통과
 - [x] 11-8. `createLithent` 보일러플레이트로 신규 프로젝트 → SSR+hydration
       — **통과 (2026-09-02)**. `pnpm check:scaffold[:concurrent]`가 자동 구간을,
       브라우저에서 하이드레이션을 확인했다 (아래)
-- [ ] 11-9. 수동 체크리스트 전량 수행
+- [ ] 11-9. 체크리스트 전량 근거 기록 — CLI/E2E/성능 측정 및 A-7 비교 기준을 각각 연결
 - [x] 11-10. 최종 크기 실측 + RC-4 판정 — 기본 **4,734**/4,800 (무회귀), concurrent **6,149**/9,000
 - [x] 11-11. 체인지로그(BC-1~BC-4) + README — `lithentConcurrent/README.md` 하나에 합쳤다
       - **README·`package.json` description·릴리스 노트는 REQUIREMENTS §2.1을 따른다** —
         `concurrent mode`를 쓰지 않고, "중단 가능한 렌더링"은 RC-10 통과 후에만 서술한다.
         (`package.json`의 description은 2026-09-01에 현재 단계에 맞게 이미 고쳤다.)
+
+## 브라우저 재검증 단계 (2026-10-01, DC-21)
+
+이 단계는 Phase 11의 미완 브라우저 검증을 수행한다. `src/`를 변경하지 않고
+`e2e/`, `playwright.config.ts`, 테스트용 스크립트·의존성 및 문서를 확장한다.
+실행 중 재현된 automatic JSX keyed 회귀는 공유 `jsx-runtime/src/index.ts`에서 수정한다 (DESIGN D18).
+커밋·릴리스·npm 공개·3-5/3-5b 판정은 사용자 요청·결정으로 남긴다.
+
+명령 계약: `pnpm test:e2e`는 준비된 빌드로 실행, `pnpm test:e2e:build`는 빌드 후 실행.
+구성: `e2e/server.mjs`, `e2e/fixtures`, `e2e/*.spec.ts`, `playwright.config.ts`.
+설치·실행·trace·돌연변이 안내: [e2e/README.md](../../e2e/README.md).
+서버 포트는 앱 base/concurrent 43130/43131, examples 43132/43133, docs 43134/43135다.
+HMR은 `.e2e-work/<core>`에 복사한 파일만 수정한다.
+검사 완료 기록에는 실행일·HEAD·코어·명령·검사 개수·성공/실패·trace 위치·체크리스트 대응을 포함한다.
+아래 체크박스는 2026-10-01의 실제 결과로 닫았다. 기능 검증 완료와 A-3/A-7/B-1의 잔여 판정은 구분한다.
+
+### E2E-0 — 환경·출시 산출물·실패 가드
+
+진입: DC-21 승인 및 설계 문서 정렬. / baseline: 의존성 설치·테스트 수집·각 출시 빌드 로드.
+종료: Chromium 기동, base/concurrent 기대 코어 확인 및 빈 검사·모듈 미실행의 실패 확인.
+
+- [x] E0-1. `@playwright/test` 및 Chromium 준비, `playwright.config.ts`·`e2e/`·두 명령 배선
+- [x] E0-2. base/concurrent 출시 번들을 명시적으로 선택; helper·jsx-runtime 서브패스 유지
+- [x] E0-3. 모듈 실행 완료·예상 검사 목록/개수를 단언; 0개·누락·wrong-core는 실패
+- [x] E0-4. `pageerror`·예상하지 않은 콘솔 오류·시간초과 수집, 실패 trace 보존
+- [x] E0-5. baseline과 실행 완료 가드를 확인하고 wrong-core 돌연변이 실패 근거 기록
+
+### E2E-1 — consumer·C/F·레인 계약
+
+진입: E2E-0 종료. / baseline: 같은 consumer를 양쪽 코어에서 실행하고 검사 목록 확인.
+종료: 공통 DOM/이벤트·C/F와 concurrent B-4/B-9가 모두 실제로 실행되어 통과.
+
+- [x] E1-1. consumer 공통 검사(base/concurrent), bare import·서브패스·갱신 검증 (A-10/A-11)
+- [x] E1-2. 기존 C/F 페이지 재사용; 라이프사이클 순서·store·재시도 근거 재검증
+- [x] E1-3. sync 갱신 선행과 `nextTick` 미반영→`whenIdle` 반영을 페이지 내부 순서로 단언 (B-4/B-9)
+- [x] E1-4. concurrent 기대 검사에서 API 부재를 실패 처리; 기능 탐지로 분기 축소 금지
+- [x] E1-5. 레인 동작을 무효화한 테스트 fixture/설정 돌연변이의 실패 확인
+
+### E2E-2 — 이전 DOM·pending·최신 값·context·portal
+
+진입: E2E-1 종료. / baseline: consumer의 공통 동작 및 레인 검사가 계속 통과.
+종료: B-2/B-3/B-5/B-6 및 A-6의 관측 계약을 브라우저에서 확인.
+
+- [x] E2-1. 다른 컴포넌트의 sync 입력과 deferred 목록으로 이전 DOM 유지 검사 (B-2 / RC-2 단서)
+- [x] E2-2. 비반응성 pending 조회의 시작/완료 상태와 표시 갱신 조건 검사 (B-3)
+- [x] E2-3. 1,000행 연속 갱신의 최종 값·이전 DOM·commit 1회 확인; 이번 큐 병합 검사와 별도 빌드 폐기 계약 구분 (B-5 / DC-18)
+- [x] E2-4. context와 lcontext의 Provider 탐색 및 갱신, 기존 `getParent` 계약 확인 (A-6)
+- [x] E2-5. 전용 integration fixture의 portal host 위치·내용·deferred 갱신·앱 본문 중복 부재 확인 (B-6)
+- [x] E2-6. baseline 및 핵심 단언을 깨는 돌연변이 실패 근거 기록
+
+### E2E-3 — SSR/hydration·실제 HMR
+
+진입: E2E-2 종료. / baseline: SSR HTML 생성 및 양쪽 출시 코어의 앱 모듈 실행 확인.
+종료: D-1~4 및 Phase 11-4를 실제 노드·이벤트·파일 교체로 증명.
+
+- [x] E3-1. hydration 전후 노드 동일성·마크업·이벤트 확인 (D-1)
+- [x] E3-2. hydration 뒤 deferred 및 keyed 추가/삭제/정렬, 기존 Row의 로컬 상태·DOM 동일성 확인 (D-2/D-3)
+- [x] E3-3. 임시 fixture에 실제 `@lithent/lithent-vite` 배선, 파일 수정 후 바운더리 교체·이벤트·reload 부재 확인 (D-4/11-4)
+- [x] E3-4. hydration 노드 재생성·HMR 전체 reload 돌연변이 실패 확인 및 임시 파일 정리
+
+### E2E-4 — 테스트 하드닝·통합 검사·근거 집계
+
+진입: E2E-3 종료. / baseline: 앞 단계 브라우저 계약 검사와 빌드·단위 검증의 최신 결과 확보.
+종료: 대표 examples/docs의 페이지·탐색·인터랙션 목록 통과, 실패 가드·돌연변이 확인,
+체크리스트별 근거와 남은 측정/결정 기록. A-3/B-1 또는 A-7 기준이 미완이면 11-9도 미완 유지.
+
+- [x] E4-1. examples/docs의 대상 페이지·행동 목록 및 명시적 출시 코어 배선 (B-7/B-8/11-7)
+      docs 42개 경로는 경로별 정확한 기대 heading을 확인하고 computed/store/keyed/context/portal 대표 데모를 조작한다.
+- [x] E4-2. 실제 이동·이벤트·데모 갱신 및 브라우저 오류 0건 확인
+- [x] E4-3. 검사 누락·미실행·wrong-core·timeout·에러 실패 가드와 trace 설정 확인, 대표 5종 돌연변이의 예상 단언 실패·보고서 기록
+- [x] E4-4. A/G의 기존 CLI·산출물·문서 검사 재실행 및 항목별 근거 연결
+- [x] E4-5. A-3/B-1 반복 측정과 A-7 과거 릴리스 기준의 잔여·결과 기록 (기능 E2E 통과와 분리)
+- [x] E4-6. Phase 11·체크리스트·네 문서 상태 정렬 및 done/next/blockers/HEAD 기록
+- [x] E4-7. 동적 단일 children 배열의 loop 의미를 공유 JSX 어댑터에서 보존하고 양쪽 코어의 SSR/keyed 상태 회귀와 전체 통합 검사를 재확인 (D18)
+
+### 브라우저 재검증 실행 기록
+
+검증 기준은 2026-10-01의 `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리다. 커밋하지 않았다.
+`@playwright/test` 1.63.0 / Chromium으로 실행했고, 아래 결과는 루트 에이전트의 최종 실행 보고를 반영했다.
+
+| 명령 | 실제 결과 | 체크리스트 근거 |
+|---|---|---|
+| `pnpm build` | exit 0 | A-1, 양쪽 출시 산출물 |
+| `pnpm test` | exit 0, 413회 실행 | A-1 / G-1·G-2(기존 10-10 N1 검사 2개 포함) |
+| `pnpm test:dual` | exit 0, 472회 실행; 위성 helper 43/devHelper 2/ftags 10/ssr 9 양쪽 동일 | A-8 / RC-9 |
+| `pnpm test:e2e` | exit 0, Chromium **20 PASS**, base 9/concurrent 11, **skip 0**, 11.9s | A-6·A-10·A-11 / B-2~9 / C·F / D-1~4 |
+| `pnpm test:e2e:mutations` | exit 0, 5종의 예상 단언 실패 6개, skip 0·startup 오류 0 | 아래 돌연변이 결과표 |
+| `pnpm exec tsc -p e2e/tsconfig.json` | exit 0 | 독립 strict 타입 검사 |
+| E2E 범위 eslint·prettier | PASS | 테스트 설정·fixture 품질 검사 |
+| `pnpm size` | base **4,734/4,800 B**, concurrent **6,149/9,000 B** | A-4, A-7 크기 부분만 통과 |
+| `pnpm verify:concurrent` | ALL PASS, 빌드 Fragment·선언 22개·외부 strict 소비자·export map·helper | A-5·A-9·A-11 |
+| `node docs/performance-improvement/bench/verify-order.mjs` | ALL PASS | A-2; 성능 측정(A-3)을 대신하지 않음 |
+| `git diff --check`, `src/` 변경 확인 | PASS, 기본 `src/` 무변경 | 변경 범위 유지 |
+
+| 실제 fault 주입 | 예상 실패 수 | 잡은 계약 |
+|---|---|---|
+| `wrong-core` | 1 | concurrent 기대 프로젝트에 base가 연결되면 실패 |
+| `scheduler-sync` | 2 | B-4/B-9 및 B-2/B-3/B-5의 저우선순위 미루기 계약 |
+| `hydration-rebuild` | 1 | D-1 서버 DOM 재사용 |
+| `hmr-reload` | 1 | D-4 페이지 reload 없는 실제 바운더리 교체 |
+| `jsx-flatten` | 1 | D18 동적 배열의 keyed 상태·DOM 보존 |
+
+mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 screenshot/trace는 `test-results`에 보존한다.
+
+브라우저 범위와 발견한 회귀:
+
+- consumer는 base 10/concurrent 13개 검사표·store/context/입력/portal 갱신을 확인했다.
+- C/F는 검사표 12개·C-1~6/F-1~3 이름·의도된 라이프사이클 차이와 재실행으로 **이번에 재확인**했다.
+  E의 중단·성능 항목은 2026-09-02의 통과 기록을 유지하며 이번에 새 측정을 하지 않았다.
+- B-4/B-9와 B-2/B-3/B-5는 concurrent 전용 fixture에서 시점별 DOM·pending·commit 순서를 단언했다.
+- A-6/B-6은 전용 integration fixture의 context/lcontext 갱신과 portal host 위치·deferred 내용·중복 부재를 확인했다.
+  기존 `html/portal.html`을 직접 실행한 결과라고 주장하지 않는다.
+- D-1~3은 전용 SSR fixture의 실제 서버 HTML·hydration·이벤트·keyed 추가/삭제/정렬을 확인했다.
+  동적 children 배열을 펼치던 공유 JSX 어댑터를 수정한 후 Row 로컬 상태와 원래 서버 Row1 DOM 참조가 유지됐다.
+  `jsx`/`jsxs` 및 `jsxDEV`/`jsxs` 동적 배열·정적 형제 조합도 양쪽 코어에서 통과했다.
+  마지막에 `jsxs`의 기존 6인자 호출과 3인자 호출을 모두 유지하도록 타입을 보강했고,
+  `pnpm build:jsxruntime`, E2E strict tsc, 범위 lint/prettier 및 전체 E2E 20개를 재확인했다 (11.8s, skip 0).
+- D-4는 실제 `@lithent/lithent-vite`를 연결한 `.e2e-work/<core>` 복사본에서 파일 수정·복원,
+  reload 토큰 유지·바운더리 리마운트 후 이벤트를 확인했다. 원본 examples 소스는 수정하지 않았다.
+- examples는 HTM·MDX·sharedStore·JSX·complex의 **5개 페이지 × 두 코어** 인터랙션을 확인했다.
+- docs는 영문/국문 예제 **42개 경로 × 두 코어**의 exact heading·hash 탐색, computed/guide 이동,
+  양방향 store, keyed 추가/재생/역순, context theme, portal lightbox 인터랙션을 확인했다.
+- G-3은 REQUIREMENTS §5의 N1 불변 조건과 DESIGN P6를 확인했다.
+
+남은 판정은 A-3/B-1 반복 성능 측정과 A-7 과거 릴리스 동작 비교 기준이다.
+24개 체크리스트 완료와 11-4/11-7 완료를 기록하되 **11-9·3-5·3-5b·릴리스·npm 공개는 닫지 않는다**.
 
 ---
 
@@ -1387,7 +1518,8 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
     concurrent 코어 br 5,057 / 5,400. RC-2·RC-3·BC-4 통과, 돌연변이 3종 확인.
   - **Phase 3 자동 항목 완료 (2026-08-31)** — 3-1~3-3 + 산출물 검증(3-3b, 신규).
     섹션 B 수행을 위한 데모 페이지(`pnpm dev:concurrent`)를 만들었다.
-    남은 것은 실브라우저 확인(3-4)과 릴리스 판정(3-5) — 둘 다 사람 몫이며 **미완**이다.
+    당시에는 실브라우저 확인(3-4)과 릴리스 판정(3-5)이 남았다. 3-4의 T1 수행 기록과
+    현재 T2 재검증은 구분하며, 3-5/3-5b는 사용자 결정으로 계속 남긴다.
   - **Phase 4 완료 (2026-08-31)** — diff 단계가 순수해졌다. 부수효과 6종이 전부
     커밋 이펙트로 옮겨졌고, 폐기 능력(더블 버퍼링)을 테스트로 증명했다.
     이펙트 순서는 DC-14로 확정. concurrent br 5,104 / 6,200.
@@ -1414,11 +1546,11 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
     **7-3 통과**: 10k행 시나리오 8종이 전 샘플 16ms 초과(p50 18~60ms, 최대 97ms).
     1,000행은 한 건도 넘지 않아 경계가 1k~10k 사이임이 드러났다. C2 유지(두 코어 구별 불가).
     **깊이는 공짜, 너비가 비싸다**(400단 트리 0.2ms) — Phase 8의 yield 입자를 가르는 실측이다.
-  - **Phase 8 완료 (2026-09-01, 8-10 제외)** — 재귀를 명시적 스택 순회로 바꾸고
+  - **Phase 8 초기 완료 기록 (2026-09-01)** — 재귀를 명시적 스택 순회로 바꾸고
     (DC-19: 노드 포인터 불가 — `WDom`이 동결 코어에 있다) low 레인 빌드가 슬라이스마다
     멈췄다 이어가게 했다 (DC-20: 중단은 low 전용, `nextTick` 계약 때문). 코어 126개 통과,
     concurrent br 5,909 / 9,000. 8-10 실측 결과 처리량 대가가 **+12%p**로 나왔고,
-    노드당 할당을 줄여(빌드 단독 −33%) 되돌리는 중이다 — **재확인 1회 필요**.
+    노드당 할당을 줄였다(빌드 단독 −33%). 이후 재측정과 D16 브라우저 확정으로 8-10을 닫았다 (§Phase 8).
   - **D16 완료 (2026-09-01)** — `wDomToDom`을 빌드 단계로 옮겼다. 생성 경로의 중단 가능
     비중 **16% → 74%**, 처리량 대가는 노이즈 범위(3차 구현). 부수효과 2종은 커밋의 원래
     자리에서 재생하고, 준비된 형제 엘리먼트를 삽입 앵커로 집는 버그를 `anchorIn`으로
@@ -1434,24 +1566,19 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
   - **Phase 9 완료 (2026-09-02)** — 9-6(BC-2 체인지로그 초안)과 9-10(마운트 빌드 폐기
     금지 테스트)까지 닫혔다. **BC-2는 예약해 뒀지만 오늘 발동하지 않는다** — 그 보장이
     구조가 아니라 스케줄러 정책(DC-7 (B))에 기대므로 계약은 열어 둔다.
-- next: **Phase 10 — 테스트 하드닝 (10-1 ~ 10-10)**.
-  - 지금 통과하는 129개는 정상 경로 위주다. 저우선순위 렌더가 portal·Fragment·keyed
-    리스트·`context`를 지날 때 어떻게 되는지는 **한 번도 확인하지 않았다.**
-  - **10-9(중단 중 언마운트)와 10-6(`getParent` shim 경로)이 특히 새 경로다.**
-  - 10-10(N1 경계 회귀 감시)은 지우지 말 것 — 파이버 이후 그 선을 지키는 것이 그 테스트다.
-  - Phase 10(하드닝 10개)과 Phase 11(통합 11개)은 그대로 남아 있다.
-  - Phase 9가 덮어야 할 것 두 가지가 Phase 8에서 드러났다:
-    (a) 멈춘 빌드를 **안전하게 버리는** 방법 — 지금은 반쯤 소비된 상태 때문에 못 버리고
-    끝까지 돌린다. (b) 그 경로의 테스트 — jsdom에서 인터리브를 못 만들었다.
-  - **아직 "중단 가능"을 주장하지 말 것** (REQUIREMENTS §2.1). RC-10(수동 E-4)이 명명 근거다.
-  - 실재하지 않으면 T2 보류하고 근거를 REQUIREMENTS §10에 기록한다(7-4).
-  - **판정은 사람 몫이다.** 자동으로 넘길 수 있는 단계가 아니다.
-  - 7-3을 통과해 Phase 8에 들어가면 §Phase 8 진입부의 경고를 먼저 읽을 것 —
-    Phase 9 전에 "중단 가능"을 주장하지 말 것 (REQUIREMENTS §2.1).
-- 미완 (사람 몫): 3-4 수동 체크리스트 A·B·D, 3-5 T1 릴리스 판정(+3-5b 패키지명),
-  C 섹션(BC-1 라이프사이클 순서) — **C-6은 이제 수행 가능하다.** 체인지로그 초안이
-  §Phase 5에 있다. **7-1~7-3 T2 진입 판정**도 사람 몫이다.
-- blockers: 없음.
+  - **Phase 10 (2026-09-02)** — 체크박스 모두 완료. 실측 요약은 9개 완료·1개 부분이며
+    10-5 `nextTickRender`와 10-6 `lcontext` 제외 근거를 기록했다. 10-10은 유지한다.
+  - **Phase 11 (2026-09-02)** — 8/11 완료. 남은 11-4·11-7·11-9는 실제 브라우저 근거가 필요하다.
+  - **DC-21 설계 정렬 (2026-10-01)** — 네 문서에 E2E 요구사항·설계·단계·체크리스트 대응을 기록했다.
+  - **E2E-0~4 완료 (2026-10-01)** — Chromium 20개(base 9/concurrent 11, skip 0),
+    5종 돌연변이의 예상 단언 실패 6개, CLI·타입·스타일 검증 통과. 공유 JSX keyed 회귀를 수정했다.
+    기존 미완 체크리스트 27개 중 24개를 닫았고 Phase 11은 11-4/11-7 완료로 **10/11**이다.
+- next: A-3/B-1 반복 성능 측정 및 A-7 과거 릴리스 앱 동작 비교 기준 확정.
+- 미완: 11-9 및 A-3/A-7/B-1. 기능 E2E 통과와 성능·과거 동등성 판정은 구분한다.
+  3-5 T1 단독 릴리스 및 3-5b 조건부 이름 검토, npm 공개는 사용자 결정으로 남긴다.
+- blockers: 기능 검증에는 없음. A-7 과거 릴리스 기준 미확정, A-3/B-1 별도 실측 잔여로 최종 릴리스 게이트는 미완이다.
+- 검증 기준: `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리 (2026-10-01). 커밋하지 않았다.
+- 커밋 원칙: 사용자 요청 시에만 커밋한다.
 - 진행 원칙:
   - **`src/`는 수정하지 않는다** (P1). Phase 0에서 `git status src/`가 비어 있음을 확인했다.
   - **Phase 3에서 멈춰도 완결된 결과물이다** (deferRender 완성).
@@ -1475,6 +1602,8 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
   pnpm size           # RC-4 게이트 (예산 초과 시 exit 1)
   pnpm verify:concurrent   # 빌드 산출물 검증 (소스가 아니라 출하물)
   pnpm dev:concurrent      # 수동 체크리스트 섹션 B용 데모
+  pnpm test:e2e            # 준비된 출시 빌드의 Chromium 브라우저 검사
+  pnpm test:e2e:build      # 빌드 후 같은 브라우저 검사
   # test:concurrent 는 코어 스위트 + lithent-concurrent/helper 스위트를 함께 돈다
 
   # C2 벤치 — 같은 하니스를 코어만 바꿔 돌린다 (Phase 1에서 전환 가능하게 함)

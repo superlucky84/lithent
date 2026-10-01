@@ -10,15 +10,16 @@ function createWNode(
   type: TagFunction | FragmentFunction | string,
   orgProps: Props,
   key: unknown,
-  _isStaticChildren: boolean,
+  isStaticChildren: boolean,
   _source: unknown,
   _self: unknown
 ) {
   const { children, ...props } = orgProps;
   if (children !== null && children !== undefined) {
-    const newChildren: MiddleStateWDomChildren = !Array.isArray(children)
-      ? [children]
-      : children;
+    // A dynamic array is one keyed loop child of h(). Only jsxs/JSXDEV's
+    // static siblings may be spread; flattening a loop loses key matching.
+    const newChildren: MiddleStateWDomChildren =
+      isStaticChildren && Array.isArray(children) ? children : [children];
 
     return h(type, { ...props, key } as Props, ...newChildren);
   }
@@ -26,9 +27,20 @@ function createWNode(
   return h(type, { ...props, key } as Props);
 }
 
+function createStaticWNode(
+  type: TagFunction | FragmentFunction | string,
+  orgProps: Props,
+  key: unknown,
+  _isStaticChildren?: boolean,
+  _source?: unknown,
+  _self?: unknown
+) {
+  return createWNode(type, orgProps, key, true, undefined, undefined);
+}
+
 export {
   createWNode as jsx,
-  createWNode as jsxs,
+  createStaticWNode as jsxs,
   createWNode as jsxDEV,
   Fragment,
 };

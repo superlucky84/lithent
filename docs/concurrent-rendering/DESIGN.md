@@ -1,7 +1,7 @@
 # DESIGN — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
-- 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **DC-1~DC-20 확정. T1·T1.5 완성, T2 진행 중 (Phase 8 완료, 2026-09-01)**
+- 작성일: 2026-08-28 (최종 수정: 2026-10-01)
+- 상태: **DC-1~DC-21 확정. Playwright 20개·돌연변이 5종 검증 완료. Phase 11 10/11 완료, A-3/A-7/B-1 및 릴리스·공개 판단 미완.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 1. 설계 원칙
@@ -17,7 +17,7 @@
 - **P4. 단계 독립성.** T1 / T1.5 / T2는 각각 단독 머지 가능.
 - **P5. 순수화 우선.** 중단 능력보다 diff 순수화를 먼저 한다. 순수화는 그 자체로 품질 개선이고,
   폐기 능력(더블 버퍼링)이 부산물로 따라온다.
-- **P6. N1 경계 사수.** 파이버 완성 후 Suspense-throw는 기계장치의 80%가 갖춰져 유혹적이 된다.
+- **P6. N1 경계 사수.** work loop의 중단·재개 기능과 Suspense-throw 계약은 별개다.
   넘는 순간 클로저 모델이 무너진다. 별도의 명시적 결정 없이는 넘지 않는다.
 
 ## 2. 배포 구조 설계
@@ -103,9 +103,9 @@ alias: [
          ↑ 트리 2개 공존 = 더블 버퍼링 성립 (폐기 가능)
 
 [T2 파이버]  순회를 work loop로. 중단·재개·폐기.
-  workLoop: while (wip && !shouldYield()) wip = performUnitOfWork(wip)
-            노드에 child/sibling/return + alt(alternate) 포인터
-            폐기 시 wip 버리고 훅 스냅샷 롤백
+  workLoop: 명시적 스택의 beginWork / completeWork + 형제 사이 yield
+            low 레인의 빌드만 중단 (DC-19 / DC-20)
+            폐기 시 WIP를 버리고 훅 스냅샷 롤백; 노드 포인터·alt 불필요
 ```
 
 ## 4. 상세 설계 — T1 (스케줄러)
@@ -356,7 +356,8 @@ Phase 6에 포함했다.
 > `remakeChildrenForDiff`의 자식 루프 안이고, `child`/`sibling` 포인터 + work loop가
 > 정확히 그 입자를 준다. 이 측정이 DC-6을 사후 정당화한다.
 
-노드에 추가하는 필드 (모두 **가산적** — 기존 `WDom` 소비자 무영향):
+초기 스케치는 다음 노드 필드를 제안했지만 **DC-19에서 명시적 스택으로 대체**했다.
+`WDom`은 동결 코어에 있으므로 넓히지 않으며, Phase 9에서 `alt`도 불필요함을 확인했다.
 
 | 필드 | 의미 |
 |---|---|
@@ -401,12 +402,10 @@ N1(Suspense-throw)에서만 필요하고, 폐기·재시작만으로는 props를
 
 ### D10. `getParent` 호환 접근자 (C3 필수)
 
-파이버는 부모 접근을 `return` 포인터로 바꾸지만, 외부 소비자 2곳이 `getParent()`를 호출한다
-(`helper/context.tsx:100`, `lcontext.tsx:99`). 시그니처를 유지한다:
-
-```ts
-node.getParent = () => node.return;   // 1줄 shim, 기존 인터페이스 보존
-```
+외부 소비자 2곳(`helper/context.tsx:100`, `lcontext.tsx:99`)이 `getParent()`를 호출한다.
+DC-19의 명시적 스택은 노드 모양을 바꾸지 않으므로 **기존 `getParent()`를 그대로 유지**한다.
+`return` 포인터 및 shim은 초기 스케치였으며 구현하지 않았다.
+검증은 양쪽 코어의 context/lcontext Provider 탐색과 갱신 결과를 확인한다.
 
 이것 외에 코어 밖에서 읽는 WDom 필드(`compProps`, `el`)는 파이버가 그대로 유지한다
 (REQUIREMENTS §7.7 표).
@@ -466,6 +465,60 @@ RC-9은 위성 스위트를 양쪽 코어에서 돌릴 것을 요구한다. 순�
 `scripts/size-report.js`가 두 빌드의 brotli를 재고 예산 초과 시 **exit 1**. 기본 코어 예산은
 목표가 아니라 **회귀 가드**다 — `src/`가 동결(P1)이므로 움직였다면 경계를 넘어 뭔가 샌 것이다.
 concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린다.
+
+## 6.6 브라우저 검증 설계 (2026-10-01)
+
+### D17. 출시 산출물의 Playwright E2E — DC-21
+
+- `@playwright/test` + Chromium, 루트 `playwright.config.ts`, 테스트 루트 `e2e/`를 사용한다.
+  `pnpm test:e2e`는 준비된 빌드를 검사하고 `pnpm test:e2e:build`는 빌드 후 같은 검사를 실행한다.
+  `e2e/server.mjs`는 base/concurrent Vite 서버(43130/43131), examples(43132/43133),
+  docs(43134/43135)를 준비한다. `e2e/fixtures`에 계약별 앱을 두고 `e2e/*.spec.ts`에서 검사한다.
+- 각 시나리오는 기대 코어를 base/concurrent로 명시한다. bare `lithent`의 anchored alias는
+  출시 번들을 가리키고 helper·jsx-runtime 서브패스는 실제 패키지로 남긴다.
+  concurrent 기대 프로젝트에서는 API 부재가 실패다. 기능 탐지로 base 분기에 떨어져 통과시키지 않는다.
+- 기존 consumer/C/F 검사 페이지를 재사용하되 모듈 실행 완료와 **검사 항목의 이름·개수·결과**를
+  단언한다. 빈 표, 일부 검사만 실행됨, 단순 HTTP 200은 통과 근거가 아니다.
+- B-4/B-9를 먼저 확인하고 B-2/B-3/B-5·context/lcontext·portal을 추가한다.
+  `nextTick` 전후·`whenIdle` 완료 시점의 값을 페이지 안에서 순서대로 기록한다.
+  RC-2의 동일 컴포넌트 sync 예외, pending의 비반응성, DC-18의 폐기 자격을 fixture에 반영한다.
+- hydration은 서버 마크업의 기존 노드 참조를 보관하고 hydration 후 동일성을 비교한다.
+  이어 실제 이벤트, deferred 갱신, keyed 추가·삭제·정렬을 검증한다. 기존 Row의 로컬 상태를
+  먼저 바꾸고 갱신 후 같은 key의 상태·DOM 참조가 유지되는지도 확인한다.
+- HMR은 `@lithent/lithent-vite`를 연결한 전용 임시 fixture에서 파일을 수정한다.
+  수정 대상은 `.e2e-work/<core>`에 복사한 파일로 한정한다.
+  페이지를 새로고침하지 않은 채 바운더리 교체와 교체 후 이벤트를 단언하고 작업 파일을 정리한다.
+  기본 examples/docs 설정만 실행한 것을 concurrent HMR 검사로 세지 않는다.
+- examples/docs는 별도 서버로 실행하고 테스트가 대표 페이지·탐색·데모 인터랙션을 명시한다.
+  기존 설정에 concurrent 전환이 없으면 테스트 설정에서 출시 코어를 명시적으로 선택한다.
+  docs의 42개 경로는 각 경로의 정확한 기대 heading을 비교한다. 임의 heading 하나가 보이는 것만으로
+  다른 경로가 열려도 통과시키지 않는다. computed/store/keyed/context/portal 대표 데모의 갱신도 검사한다.
+- 브라우저 `pageerror`·예상하지 않은 콘솔 오류·시간초과·미실행 모듈은 실패로 수집한다.
+  오류 자체가 계약인 N1 검사는 기대 오류를 정확히 단언한다. 실패 trace는 보존한다.
+- 핵심 검사는 wrong-core alias, 렌더 미루기 무시, hydration 노드 재생성, HMR 전체 reload 등의
+  돌연변이로 실제 실패를 확인한다. 돌연변이는 임시 fixture·설정에서 주입하고 `src/`는 수정하지 않는다.
+- 기능 E2E와 성능 측정을 분리한다. A-3/B-1은 동일 조건 반복 측정·상대 비교 근거가 필요하고,
+  A-7은 크기 가드와 과거 릴리스 동작 비교를 각각 기록한다. 비교 기준이 없으면 미완으로 남긴다.
+
+검사 결과는 IMPLEMENT의 단계별 기록과 수동 체크리스트 항목에 연결한다.
+E2E 실행 자체로 릴리스·npm 공개·3-5/3-5b 결정을 닫지 않는다.
+
+### D18. automatic JSX children의 keyed 계약 회귀 (2026-10-01, 수정·검증 완료)
+
+SSR E2E에서 `jsx-runtime/src/index.ts`의 `createWNode`가 동적 단일 children 배열을
+`...children`으로 펼쳐 `h`의 loop 정보를 잃는 문제를 재현했다. 그 결과 keyed 비교 대신
+위치 기반 비교가 되어 Row의 로컬 상태가 재정렬 후 리셋된다. 양쪽 코어에서 같게 발생하며
+초기 hydration 노드 재사용·단일 갱신만 검사하면 드러나지 않는다.
+
+수정은 공유 automatic JSX 어댑터에서 `jsx`/`jsxs`/`jsxDEV`의 동적 단일 child와 정적 형제 목록을
+구분해 동적 배열의 loop 의미를 보존한다. 기존 공개 호출 표면은 유지하고 기본 `src/`는 수정하지 않는다.
+검증은 D-1~3에서 실제 SSR 마크업 재사용, keyed 추가·삭제·재정렬, 기존 Row의 로컬 상태·DOM 동일성을
+양쪽 출시 빌드로 확인한다. E2E-4에서 공유 어댑터 회귀와 전체 통합 검사를 다시 확인한다.
+양쪽 코어의 SSR 노드 재사용·keyed 추가/삭제/정렬·Row 로컬 상태·원래 서버 Row DOM 참조 유지가
+통과했고 `jsx`/`jsxDEV` 동적 배열과 `jsxs` 정적 형제의 조합 회귀도 통과했다.
+`jsx-flatten` 돌연변이는 원래 버그를 다시 주입해 관련 단언이 실패함을 확인했다.
+`jsxs`의 기존 6인자 호출과 3인자 호출을 모두 유지했고, 두 호출 형태의 fixture·타입 검사 및
+최종 Chromium 20개 재실행이 통과했다.
 
 ---
 
@@ -539,6 +592,11 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   (BC-1은 T1.5, 파이버는 +4~7 KB). 이중 빌드 기계장치(DC-10~DC-13)는 그 전제 위에서
   값을 한다. §1.1의 제품 결정과 REQUIREMENTS §"T1의 이득 구간" 실측이 그대로 유효하다.
   → 이 결정으로 P1(`src/` 동결)은 T2까지 유지된다.
+- [x] **DC-21**: 수동 브라우저 확인을 에이전트가 실행 가능한 E2E로 확장 →
+  **Playwright Test + Chromium, 출시 산출물의 명시적 base/concurrent 검사**. 확정 2026-10-01 (사용자 승인).
+  근거: 기존 CLI 검사표를 재사용하고 실제 DOM·이벤트·hydration·HMR 결과를 재현할 수 있다.
+  기존 "사람 몫"은 자동화 금지가 아니라 당시 도구 범위를 반영한 설명이다.
+  성능(A-3/B-1)과 과거 릴리스 기준(A-7), 릴리스·공개 판단은 별도 근거·결정으로 남긴다.
 
 ## 8. 설계 ↔ 검증 연결
 
@@ -564,13 +622,18 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
 | D7 파이버 work loop | RC-7·RC-10 (Phase 8), 수동 E-1·E-4 |
 | D8 훅 스냅샷 | RC-8 (Phase 9), 수동 E-3 |
 | D9 마운트 정책 | RC-8, 수동 E-2 |
-| D10 `getParent` shim | **RC-9** (양쪽 코어 위성 통과), 수동 A-6 |
+| D10 기존 `getParent` 계약 유지 | **RC-9** (양쪽 코어 위성 통과), 브라우저 A-6 (context/lcontext) |
 | D12 분기 표 단일 원본 | `concurrent-aliasTable.test.ts` (Phase 0-4) |
 | D13 타입 선언 생성 | `emitTypes.js`의 잔여 `@/` exit 1 + 외부 소비자 `tsc --strict` 통과 |
 | D14 위성 코어 전환 | **RC-9** — `pnpm test:dual`, 번들 은닉 시 실패 확인 |
 | D15 크기 게이트 | **RC-4** — `pnpm size` (exit 1) |
 | 출하 산출물 (export map · 번들 · `.d.ts`) | `pnpm verify:concurrent` — 소스가 아닌 설치물을 본다 |
 | C3 export 표면 | `concurrent-exportSurface.test.ts` (빌드된 기본 번들과 이름 집합 비교) |
+| D17 출시 빌드·명시적 코어 선택 | BR-1~BR-3 / RC-11, E2E-0·E2E-1 |
+| D17 스케줄링·pending·context·portal | B-2~6·B-9 / A-6, E2E-1·E2E-2 |
+| D17 SSR/hydration·실제 HMR 교체 | D-1~4 / Phase 11-4, E2E-3 |
+| D17 examples/docs·오류 수집·돌연변이 | B-7~8 / Phase 11-7·11-9, E2E-4 |
+| D18 automatic JSX 동적 배열의 keyed 상태 보존 | D-1~3 / E2E-3·E2E-4, base/concurrent SSR 회귀 검사 |
 
 ## 9. 상태 / 핸드오프
 
@@ -579,10 +642,13 @@ concurrent 예산 상수(`CONCURRENT_BUDGET`)는 단계 진입 시에만 올린�
   **Phase 1** — D1·D2 구현 반영 (전환의 상태 의미론 한계, sync 우선 규칙의 성격).
   **Phase 2** — D3·D11 구현 반영, D12b / DC-13.
   **Phase 4 (2026-08-31)** — D4 구현 반영, **DC-14**. diff 단계가 순수해졌다.
-- next: Phase 5 (커밋 경계 단일화, D5 / BC-1).
-  - **BC-1은 의도된 관측 가능한 변화다.** 지금까지와 달리 "기존 테스트 무수정 통과"가
-    목표가 아니며, 4-9의 라이프사이클 순서 비교도 함께 재검토해야 한다.
-  - `render.ts`는 아직 base와 바이트 동일하다. Phase 5에서 갈라진다.
-- blockers: 없음. (3-4 수동 확인과 3-5 릴리스 판정은 미완이며 사람 몫)
+- 현재 (2026-10-01): D17의 Chromium 20개(base 9/concurrent 11, skip 0), 5종 돌연변이의 예상 실패 6개,
+  D18 공유 JSX 회귀 및 CLI 검증 완료. Phase 11은 10/11 완료이다.
+  C/F는 이번 E2E 재확인, E는 기존 기록 유지. 상세 실행 근거는 IMPLEMENT에 기록했다.
+- next: A-3/B-1 반복 성능 측정과 A-7 과거 릴리스 비교 기준을 확정한다.
+- blockers: 기능 검증에는 없음. 비교 기준 미확정·미실측 때문에 11-9와 릴리스 게이트는 계속 미완이다.
+- 검증 기준: `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리 (2026-10-01). 커밋하지 않았다.
+- 실행 안내: [e2e/README.md](../../e2e/README.md).
+- 커밋은 사용자 요청 시에만 한다. 릴리스·npm 공개·3-5/3-5b는 미결로 유지한다.
 - 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
   Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: `d094a4e`**

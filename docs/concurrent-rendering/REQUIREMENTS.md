@@ -1,8 +1,8 @@
 # REQUIREMENTS — Lithent Concurrent 렌더링 (별도 빌드)
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
-- 작성일: 2026-08-28 (최종 수정: 2026-08-31)
-- 상태: **T1·T1.5 완성 / T2 진입 승인 — Phase 7 완료 (2026-09-01). 다음은 Phase 8 (파이버)**
+- 작성일: 2026-08-28 (최종 수정: 2026-10-01)
+- 상태: **T2 및 Playwright 브라우저 검증 완료. Phase 10 범위 제외 기록·Phase 11 10/11 완료. 기존 미완 27개 중 24개 완료; A-3/A-7/B-1과 릴리스·npm 공개 미결.**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -58,12 +58,12 @@ concurrent 모드는 벗어나며, 대부분의 사용 환경(SSR 페이지에 �
 |---|---|---|
 | 우선순위 | T1 (Phase 1) | ✅ |
 | 폐기 (원본 트리 불변) | T1.5 (Phase 4) | ✅ |
-| tearing 방지 | T1.5 (Phase 6) | 미착수 |
-| **중단** | T2 (Phase 8) | 미착수 |
-| **재개** | T2 (Phase 8) | 미착수 |
-| 폐기 시 훅 상태 정합 | T2 (Phase 9, §7.4) | 미착수 |
+| tearing 방지 | T1.5 (Phase 6) | ✅ 폐기 가능한 빌드에 한함 (DC-18) |
+| **중단** | T2 (Phase 8) | ✅ low 레인의 빌드 단계 (DC-20) |
+| **재개** | T2 (Phase 8) | ✅ |
+| 폐기 시 훅 상태 정합 | T2 (Phase 9, §7.4) | ✅ |
 
-**T1 현재 상태는 concurrent rendering이 아니다.** `flushLow`의 `shouldYield()`는 큐 항목
+**T1만의 상태는 concurrent rendering이 아니다.** T1의 `flushLow`의 `shouldYield()`는 큐 항목
 *사이*에서만 확인되고 항목 하나는 컴포넌트 렌더 전체다 — 즉 yield 입자가 "컴포넌트 1개"이며
 트리 순회 도중에 멈추는 지점이 없다. §8 "T1의 이득 구간" 실측이 이것의 지문이다:
 렌더 60ms / 입력 100ms에서 이득이 **정확히 0**인 이유는 그 60ms를 쪼갤 수 없기 때문이다.
@@ -74,8 +74,8 @@ concurrent 모드는 벗어나며, 대부분의 사용 환경(SSR 페이지에 �
 > 그 비중은 시나리오마다 다르다 — **갱신 48%, 생성 17%** (IMPLEMENT §Phase 8 실측).
 > 생성 커밋의 71%였던 `wDomToDom`은 **D16에서 빌드 단계로 옮겼다** (2026-09-01) —
 > 생성 경로의 중단 가능 비중이 **16% → 74%**가 됐고 처리량 대가는 없었다.
-> 남은 질문은 **커밋에 남은 ~19ms 중 얼마가 진짜 원자적이어야 하는가**이며,
-> **RC-10 판정은 그 답 이후에 해야 의미가 있다.**
+> 당시의 질문은 **커밋에 남은 ~19ms 중 얼마가 진짜 원자적이어야 하는가**였다.
+> 2026-09-02 E-4를 수행하고 RC-10을 "빌드 단계 비차단"으로 좁혔다 (§8).
 
 **그때도 `concurrent mode`라는 표현은 쓰지 않는다.** 그것은 React가 특정 *기능 묶음*
 (transition + Suspense + `useDeferredValue` + 선택적 하이드레이션)에 붙였던 고유명사이고,
@@ -134,7 +134,7 @@ src/                        ← 동결. 기본 코어
 
 lithentConcurrent/          ← 워크스페이스 패키지 (name: lithent-concurrent). Phase 0에서 생성
   src/
-    diff.ts  render.ts  wDom.ts                    ← 분기본 (아직 base와 바이트 동일)
+    diff.ts  render.ts  wDom.ts                    ← 순수화·커밋 경계·work loop 분기본
     scheduler.ts                                   ← 분기본 (Phase 1에서 2레인으로 재작성)
     index.ts                                       ← base와 동일 + concurrent 전용 3개
     tests/                                         ← alias 함정 가드 + export 계약 가드 + 레인 테스트
@@ -150,8 +150,8 @@ lithentConcurrent/          ← 워크스페이스 패키지 (name: lithent-conc
     package.json  tsconfig.json  vite.config.js    ← 코어는 external
 ```
 
-`helper/`(기본)는 **이 작업에서 무변경**이다. 기본 코어에서 no-op이 되는 API를
-거기 두지 않는다는 것이 DC-13의 요지다.
+`helper/`(기본)에 concurrent 전용 공개 API를 넣지 않는다 (DC-13).
+Phase 6의 내부 store 쓰기 통지는 기본 코어에서 무동작이며 공개 표면을 늘리지 않는다 (DC-17).
 
 소비자 측은 preact/compat과 동일한 패턴 — 번들러에서 `lithent` → `lithent-concurrent` alias.
 
@@ -171,7 +171,8 @@ diff 단계의 부수효과를 커밋 이펙트 리스트로 분리, 커밋 경�
 **파이버의 전제**이기도 하다 (원본 트리 불변성 = 폐기 능력).
 
 ### T2 — 파이버 중단
-child/sibling/return 포인터 + 명시적 work loop + alternate(current/WIP) 도입.
+명시적 스택 기반 work loop와 훅 슬롯 스냅샷/복원으로 빌드를 중단·재개·폐기한다.
+노드 포인터는 DC-19에서 폐기했고, alternate는 Phase 9에서 불필요함을 확인했다.
 크기 예산이 해제되었으므로 제너레이터가 아닌 **진짜 파이버**로 간다 (DC-6).
 
 > 제너레이터안(구 "T2-lite")은 폐기되었다. 유일한 장점이 크기(+1~1.5KB vs +4.5~7KB)였는데
@@ -184,8 +185,8 @@ child/sibling/return 포인터 + 명시적 work loop + alternate(current/WIP) �
   렌더 중 Promise를 던지고 언와인딩하는 패턴. mounter를 본문 중간에서 끊었다가
   처음부터 재호출해야 하는데, 클로저 상태 모델과 근본적으로 충돌한다
   (JS는 throw로 빠져나간 일반 함수를 재개할 수 없다).
-  > **⚠ 파이버 도입 후 특히 주의.** 언와인딩은 "throw 잡고 `return` 포인터 타고 올라가기"인데
-  > 파이버가 그 포인터를 이미 깔아준다. 기계장치의 80%가 공짜로 생기므로 유혹이 커진다.
+  > **⚠ work loop 도입 후 특히 주의.** 중단·재개 장치가 생겨도 throw를 잡아
+  > Suspense처럼 처리하는 계약은 추가하지 않는다. 노드 `return` 포인터는 사용하지 않는다 (DC-19).
   > **N1을 넘는 것은 아키텍처 변경이 아니라 사용자 인터페이스 파괴**이며,
   > 원한다면 별도의 명시적 결정으로 다뤄야 한다. 슬금슬금 넘어가서는 안 되는 선이다.
   >
@@ -214,6 +215,34 @@ child/sibling/return 포인터 + 명시적 work loop + alternate(current/WIP) �
 - **C5. 단계별 독립 출하** — T1, T1.5, T2는 각각 단독 머지·릴리스 가능해야 한다.
 - **C6. 테스트 통과** — `pnpm build && pnpm test` 전량 통과 + 위성 스위트를 **양쪽 코어에서**
   실행 (`pnpm test:dual`). Phase 0에서 이 인프라가 완성되었다.
+
+### 6.1 브라우저 검증 요구사항 (2026-10-01, 사용자 승인 / DC-21)
+
+- **BR-1. 실행 환경:** `@playwright/test`와 Chromium을 도입하고 출시 빌드의 base/concurrent를
+  명시적으로 선택한다. 소스 alias 데모만 통과한 것을 출시 산출물 검증으로 세지 않는다.
+- **BR-2. 범위:** consumer 및 C/F → B-4/B-9 → B-2/B-3/B-5와 context/lcontext·portal →
+  SSR/hydration/HMR → examples/docs 순서로 실제 브라우저 검증을 확장한다.
+  모든 시나리오에 조작·기대 DOM/이벤트·해당 체크리스트 항목을 기록한다.
+  keyed 갱신은 기존 Row의 로컬 상태와 DOM 동일성까지 확인한다. docs는 경로별 기대 heading을
+  비교하고 computed/store/keyed/context/portal 대표 데모의 인터랙션을 검사한다.
+- **BR-3. 실패 기준:** 예상 코어 불일치, 검사 0개·누락, 모듈 미실행, `pageerror`,
+  예상하지 않은 콘솔 오류, 시간초과는 실패다. 기능 탐지로 concurrent 검사를 건너뛰어
+  잘못 연결된 base 코어를 통과시키지 않는다. N1처럼 오류가 계약인 검사는 기대 오류를 별도로 단언한다.
+- **BR-4. 재현성:** 실패 trace를 보존하고 핵심 검사에는 돌연변이 확인을 붙인다.
+  기능 검사는 상태·실행 순서로 대기하며 기기 속도에 따른 고정 시간 판정을 피한다.
+- **BR-5. 판정 경계:** A/G는 기존 CLI·산출물·문서 근거로 재검증하고 A-3/B-1은
+  별도 반복 성능 측정으로 판정한다. A-7의 크기 가드와 과거 릴리스 동작 비교를 구분하며,
+  과거 릴리스 기준이 미확정이면 A-7 전체를 완료 처리하지 않는다.
+- **BR-6. 변경 범위:** 테스트 설정·fixture·스크립트·문서를 확장하고, E2E에서 재현된
+  공유 JSX 어댑터 회귀는 `jsx-runtime/src/index.ts`에서 수정한다. 기본 `src/`는 동결하며,
+  3-5/3-5b·릴리스·npm 공개에 대한 사용자 결정 보류를 유지하고 커밋은 요청 시에만 한다.
+
+**E2E가 발견하고 수정한 회귀 (2026-10-01):** automatic JSX 어댑터가
+동적 단일 children 배열도 펼쳐 `h`의 loop 정보를 잃는다. SSR 초기 노드 재사용과 단일 갱신은
+통과하지만 keyed 추가/재정렬 후 Row의 로컬 상태가 0으로 리셋되며 base/concurrent 모두 재현된다.
+동적 배열과 정적 형제 목록을 구분하는 어댑터 수정 및 D-1~3의 회귀 검증을 완료했다.
+SSR 노드 재사용, keyed 추가·삭제·정렬 후 로컬 상태와 원래 서버 Row DOM 참조가 양쪽 코어에서 유지된다.
+초기 hydration 성공만으로 keyed 상태 보존까지 통과한 것으로 보지 않는다.
 
 ## 7. 현행 코드 분석 (concurrent 구현의 substrate)
 
@@ -280,12 +309,13 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 
 | 위치 | 필드 | 파이버 영향 |
 |---|---|---|
-| `helper/context.tsx:100`, `lcontext.tsx:99` | `wdom.getParent?.()` | **유일** — `return` 포인터로 바뀜 |
+| `helper/context.tsx:100`, `lcontext.tsx:99` | `wdom.getParent?.()` | **유지** — 스택 순회라 노드 모양 불변 (DC-19) |
 | `helper/context.tsx:93-96`, `lcontext.tsx` | `wdom.compProps` | 없음 |
 | `devHelper/createBoundary.ts:127` | `currentWDom.el` | 없음 |
 | `ssr/hydration.ts:26,84,119,136` | `item.el` 대입 | 없음 |
 
-→ **호환 접근자 1줄로 해소** (C3): `getParent: () => node.return`
+→ **기존 `getParent` 계약을 그대로 유지** (C3 / DC-19). context와 lcontext의 Provider 탐색은
+단위 검사와 브라우저 갱신 검사로 확인한다. `return` 포인터나 별도 shim은 사용하지 않는다.
 
 ## 8. 수용 기준 (Acceptance Criteria)
 
@@ -301,6 +331,7 @@ alternate가 추가로 요구하는 것은 폐기 시 `upD`/`upCB` 롤백뿐이�
 | **RC-8** | 폐기된 렌더가 이펙트 유실·중복을 일으키지 않는다 | 단위 테스트 |
 | **RC-9** | **위성 패키지가 양쪽 코어에서 무수정 통과한다** | `pnpm test:dual` (Phase 0에서 인프라 완성) |
 | **RC-10** | 미룬 렌더의 **빌드 단계**가 입력을 차단하지 않는다. 커밋은 원자적이며, 커밋이 지배적인 워크로드에서는 이득이 없다 | 수동 E-4 — **T2의 존재 이유이자 "concurrent" 명명 근거** (§2.1). **2026-09-02 실측으로 범위를 좁혔다 — 아래 RC-10의 단서** |
+| **RC-11** | 출시 산출물의 base/concurrent 브라우저 검사가 모두 실제로 실행되고 체크리스트별 근거가 남는다 | BR-1~BR-6, Playwright 단계 E2E-0~E2E-4 (IMPLEMENT) |
 
 ### RC-4 크기 예산
 
@@ -413,12 +444,12 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
     1,000행은 4~8ms로 한 건도 넘지 않아 **경계가 1k~10k 사이**임이 드러났고,
     이는 §1.1의 제품 판단과 DC-16(통합하지 않음)을 다시 뒷받침한다.
     깊이 400단 트리는 0.2ms — **비용은 깊이가 아니라 너비에 있다.**
-  - **Phase 8 완료 (2026-09-01, 8-10 제외)** — §7.3의 "재개 가능한 순회 구조 없음" 해소.
+  - **Phase 8 초기 완료 기록 (2026-09-01)** — §7.3의 "재개 가능한 순회 구조 없음" 해소.
     재귀를 명시적 스택 순회로 바꾸고 low 레인 빌드가 슬라이스마다 멈췄다 이어간다.
     DC-19(노드 포인터 대신 스택 — `WDom`이 동결 코어라 넓힐 수 없다),
     DC-20(중단은 low 전용 — `nextTick` 계약)로 확정.
-    concurrent br 5,909 / 9,000. work loop의 처리량 대가는 +12%p로 측정됐고(8-10, DC-6 허용폭 안) 할당을 줄여 되돌리는 중이다. **§7.4(WIP 훅 슬롯)는 아직 Phase 9 몫이므로
-    "중단 가능"을 주장하지 않는다** (§2.1).
+    concurrent br 5,909 / 9,000. 초기 처리량 대가 +12%p를 확인하고 할당을 줄였다.
+    이후 8-10 재측정·D16 브라우저 확정과 Phase 9를 완료했다 (IMPLEMENT 상세 기록).
 - Phase 0 판정:
 
   | 수용 기준 | 결과 |
@@ -428,10 +459,17 @@ BC-1·BC-2는 minor + 체인지로그 명시 (DC-8). BC-4는 transition 완료 �
   | RC-9 인프라 | `pnpm test:dual` 통과 — helper 37 / devHelper 2 / ftags 10 / ssr 8, 양쪽 동일 |
   | N2 (`src/` 동결) | `git status src/` 비어 있음 |
 
-- next: Phase 5 (커밋 경계 단일화, BC-1). 3-4 수동 확인과 3-5 릴리스 판정은 미완이며 사람 몫.
-- blockers: 없음.
+- 현재 상태 (2026-10-01): Phase 9 완료, Phase 10 체크박스 전부 완료이나 10-5의
+  `nextTickRender`는 기존 계약 검증과 중복이라 제외했고 실측 요약은 9개 완료·1개 부분이다.
+  Phase 11은 **10/11 완료**(11-4·11-7 완료, 11-9 미완), A/B/D/G의 기존 미완 27개 중 24개를 닫았다.
+  Chromium **20개(base 9/concurrent 11), skip 0**와 돌연변이 **5종의 예상 실패 6개**를 확인했다.
+  C/F는 이번 E2E 재확인, E는 2026-09-02 기록 유지이며 새 성능 측정은 하지 않았다.
+- next: A-3/B-1 반복 성능 측정, A-7 과거 릴리스 앱 동작 비교 기준 확정.
+- blockers: 기능 검증에는 없음. A-7의 비교 기준과 A-3/B-1 실측이 남아 11-9와 릴리스 게이트는 미완이다.
 - 미결(경미):
   - `lithent-concurrent`는 현재 `private: true`. 배포 시 `dist/types/` 경로와
-    npm 공개 여부를 정해야 한다 (Phase 11-11 범위).
+    npm 공개 여부를 정해야 한다. Phase 11-11의 README 완료는 공개·릴리스 승인이 아니다.
+- 검증 기준: `f8677a0411748c8ea0d9103a97aefaf33eff5705` + 현재 작업 트리 (2026-10-01). 커밋하지 않았다.
+- 실행 안내: [e2e/README.md](../../e2e/README.md). 상세 결과는 IMPLEMENT의 브라우저 재검증 실행 기록을 따른다.
 - 기준 커밋: `f3921cc` (설계 기준) / Phase 0: `95ae243` / Phase 1: `16d9e74` /
   Phase 2: `3ebf375` / Phase 3: `299d4cd` / **Phase 4: `d094a4e`**
