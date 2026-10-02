@@ -131,7 +131,7 @@ For expensive component trees, select the concurrent core with an exact
 remain immediate; `whenIdle` waits for deferred work. Keep urgent input and
 heavy rendering in separate components. See the [concurrent rendering
 guide](https://superlucky84.github.io/lithent/#/guide/concurrent-rendering) and
-[prepared release notes](./CHANGELOG.md).
+[release notes](./CHANGELOG.md).
 
 <br />
 

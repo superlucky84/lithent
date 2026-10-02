@@ -1,6 +1,6 @@
 # Release notes
 
-## Unreleased — release preparation
+## 2026-10-02
 
 ### lithent 1.22.1
 
@@ -50,8 +50,8 @@ exact `lithent` core import; keep `lithent/*` subpaths unchanged. See
 ### create-lithent 0.3.4
 
 - Update the SPA and SSR templates to require `lithent ^1.22.1`.
-  The generator downloads templates from the repository, so merge the updated
-  templates before publishing this version.
+  The generator downloads templates from the repository's default branch, so
+  this version expects the updated templates to be merged there.
 - Remove an unused interval cleanup and obsolete type-error suppressions so
   the generator passes the current TypeScript build.
 
@@ -65,7 +65,3 @@ exact `lithent` core import; keep `lithent/*` subpaths unchanged. See
 - Update the private `lithent-docs` site to 0.6.0, with English/Korean concurrent
   rendering and helper guides, a live demo and related API notes.
 - Keep unchanged HMR, MDX, template and other private runtime package versions.
-
-These are prepared versions. Publishing and site deployment require completing
-the remaining release checks in
-[`MANUAL_TEST_CHECKLIST.md`](./docs/concurrent-rendering/MANUAL_TEST_CHECKLIST.md).
