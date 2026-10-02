@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/concurrentRendering` / 기준 커밋 `f3921cc`
 - 작성일: 2026-08-28 (최종 수정: 2026-10-01)
-- 상태: **T2/E2E 완료·Phase 11 10/11 완료. 필요한 패키지 버전업·배포 준비·영문/국문 사용자 문서 확장 승인(DC-22), 구현/검증 예정. A-3/A-7/B-1과 실제 publish 미완.**
+- 상태: **T2/E2E 완료·Phase 11 11/11 완료. 필요한 패키지 버전업·배포 준비·영문/국문 사용자 문서 확장 승인(DC-22), 구현/검증 예정. A-3/A-7/B-1과 실제 publish 미완.**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 선행 작업: [../performance-improvement/](../performance-improvement/) (keyed diff Map+LIS, `f185dd2`~`f3921cc`)
 
@@ -493,7 +493,7 @@ BC-4는 `whenIdle()` 완료 대기로 완화한다 (DC-9).
 
 - 현재 상태 (2026-10-01): Phase 9 완료, Phase 10 체크박스 전부 완료이나 10-5의
   `nextTickRender`는 기존 계약 검증과 중복이라 제외했고 실측 요약은 9개 완료·1개 부분이다.
-  Phase 11은 **10/11 완료**(11-4·11-7 완료, 11-9 미완), A/B/D/G의 기존 미완 27개 중 24개를 닫았다.
+  Phase 11은 **11/11 완료**(11-4·11-7·11-9 완료), A/B/D/G의 기존 미완 27개 중 24개를 닫았다.
   Chromium **20개(base 9/concurrent 11), skip 0**와 돌연변이 **5종의 예상 실패 6개**를 확인했다.
   C/F는 이번 E2E 재확인, E는 2026-09-02 기록 유지이며 새 성능 측정은 하지 않았다.
 - next: DC-22 / PREP-0~3에 따라 버전·pack·사용자 문서를 준비하고 새 변경을 검증한다.
