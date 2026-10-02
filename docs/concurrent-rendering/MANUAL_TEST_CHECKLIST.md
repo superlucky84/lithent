@@ -66,9 +66,13 @@ SSR/hydration/HMR → examples/docs·하드닝이다 (IMPLEMENT E2E-0~4).
 
 - [x] A-1. `pnpm build && pnpm test` 전량 통과 (0 실패) — 2026-10-01, build exit 0 / test 413회 실행
 - [x] A-2. `node docs/performance-improvement/bench/verify-order.mjs` → ALL PASS — 2026-10-01
-- [ ] A-3. `node docs/performance-improvement/bench/bench10k.mjs` → 회귀 판정
-  - T1·T1.5: 회귀 0
-  - T2: DC-6 기준(대규모 시나리오 총 체감) 적용
+- [x] A-3. `node docs/performance-improvement/bench/bench10k.mjs` → 회귀 판정 — 2026-10-02
+  - T1·T1.5: 회귀 0 — 기본 코어 번들이 발행된 `lithent@1.22.0`과 **바이트 동일**(A-7)
+  - T2: jsdom `bench10k` 7회 중앙값 concurrent/base — 생성 0.98 · 10번째마다 갱신 1.01 ·
+    두 행 교체 1.17 · 1,000행 추가 1.19 · 삭제 0.99
+  - 실브라우저 동기 갱신 11회 중앙값 — 생성 0.96~1.10, 삭제 0.91~1.05, **갱신 1.02~1.36**
+    (1,000행 update10th 1.36, 10,000행 updateAll 1.29). 생성·삭제는 같고 갱신 경로는 비용이 든다.
+    문서(README)에 그대로 적었다
 - [x] A-4. 크기 실측 — 2026-10-01 concurrent **6,149 B / T2 9,000 B**, base **4,734 B / 4,800 B**
 - [x] A-5. **Fragment 동일성**: concurrent 빌드에서 `checkFragmentFunction(Fragment) === true`
   (alias 함정 — DESIGN §2.2. 자동 테스트 0-5가 있어도 릴리스 빌드 산출물로 1회 확인)
@@ -76,7 +80,10 @@ SSR/hydration/HMR → examples/docs·하드닝이다 (IMPLEMENT E2E-0~4).
   > `lithentConcurrent/dist/lithentConcurrent.mjs`를 import해서** 확인하는 것이 목적이다.
 - [x] A-6. **기존 `getParent` 계약**: 양쪽 출시 빌드에서 `context`·`lcontext`의
   Provider 탐색과 갱신이 동작 — DC-19의 스택 순회이므로 노드 `return` 포인터·shim은 사용하지 않는다
-- [ ] A-7. **기본 코어 무회귀**: `pnpm size` 통과 (`dist/lithent.umd.js` br ≤ 4,800 B) **이고**
+- [x] A-7. **기본 코어 무회귀** — 2026-10-02: `pnpm size` 4,734 / 4,800 B, 그리고 `dist/lithent.mjs`·`lithent.umd.js`가
+  npm의 `lithent@1.22.0`과 `cmp` 바이트 동일 (과거 릴리스 기준 = 발행된 1.22.0). 달라진 것은 helper store/lstore의
+  통지 14줄과 jsx-runtime keyed 수정뿐이다.
+  <!-- 아래는 이전 기록 -->: `pnpm size` 통과 (`dist/lithent.umd.js` br ≤ 4,800 B) **이고**
   기본 코어로 빌드한 예제 앱의 동작이 이전 릴리스와 동일
   > 과거 릴리스/행동 기준은 미확정. 현행 base 앱 E2E가 성공해도 과거 동등성을 단독으로 증명하지 못한다.
   > 2026-10-01 크기 가드 4,734 / 4,800 B와 `src/` 무변경은 확인했지만 전체 항목은 미완이다.
@@ -101,7 +108,12 @@ SSR/hydration/HMR → examples/docs·하드닝이다 (IMPLEMENT E2E-0~4).
 > B-1은 렌더 횟수만으로 입력 응답성을 판정하지 않고, 큰 워크로드의 입력 지연·최장 블록을
 > 동일 조건에서 반복 측정한다. 커밋이 지배적인 대량 교체는 이득이 없는 것이 허용된다 (RC-10).
 
-- [ ] B-1. **입력 응답성**: 무거운 저우선순위 갱신 대기 중 텍스트 입력이 끊기지 않는다
+- [ ] B-1. **입력 응답성** — 측정 완료·판정 보류 (2026-10-02, `bench/input-latency.mjs`, 구성별 5회 중앙값, 입력→페인트 p50):
+  1,000행 base 38 / concurrent 동기 36 / `deferRender` 21 ms · 5,000행 134 / 142 / **27** ms ·
+  10,000행 280 / 287 / 262 ms(-6%) · 20,000행 552 / 580 / **1,092** ms(약 2배 나쁨).
+  단발 갱신의 최장 블록은 base와 같다(20,000행 289 vs 279 ms) — 커밋 지배(RC-10).
+  **5,000행 부근은 통과, 10,000행은 이득 없음, 20,000행은 퇴행.** 릴리스 허용 범위는 사용자 판단
+  <!-- 아래는 이전 기록 -->: 무거운 저우선순위 갱신 대기 중 텍스트 입력이 끊기지 않는다
   (빌드가 지배적인 시나리오의 base/concurrent 상대 비교로 판정. 별도 성능 측정 필요)
 - [x] B-2. **이전 화면 유지**: `deferRender` 갱신 완료 전까지 이전 내용이 그대로 보인다
   (빈 화면·깜빡임 없음)

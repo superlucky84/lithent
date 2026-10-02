@@ -264,9 +264,23 @@ const flushLowSlice = () => {
 // Public wiring (same names the base core exports)
 // ============================================================================
 
+/**
+ * The redraw closure of the node a component currently has on screen.
+ *
+ * A queued entry must not run the closure that was current when it was queued:
+ * a build parked between two slices commits when it resumes, which retires that
+ * node, and the stale closure is then dropped by `replaceWDom`'s `il` guard. The
+ * committed tree was produced by an updater that ran BEFORE the write this entry
+ * stands for, so dropping it loses the update and leaves the old value on screen
+ * with nothing pending. Entries therefore look the closure up when they run.
+ */
+const latestExec = new WeakMap<Props, () => void>();
+
 export const setRedrawAction = (compKey: Props, exec: () => void) => {
   const comp = componentMap.get(compKey);
   if (comp) {
+    latestExec.set(compKey, exec);
+
     comp.up = () => {
       const lane = laneRef.value;
 
@@ -278,7 +292,7 @@ export const setRedrawAction = (compKey: Props, exec: () => void) => {
         return;
       }
 
-      lanes[lane].set(compKey, exec);
+      lanes[lane].set(compKey, () => (latestExec.get(compKey) || exec)());
       scheduleFlush(lane);
     };
   }

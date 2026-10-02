@@ -1,0 +1,45 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script type="importmap">{"imports":{"bench-core-base":"/dist/lithent.mjs","bench-core-concurrent":"/lithentConcurrent/dist/lithentConcurrent.mjs"}}</script>
+</head><body><div id="root"></div>
+<script type="module">
+const q = new URLSearchParams(location.search);
+const coreName = q.get('core'), mode = q.get('mode'), rows = +q.get('rows');
+const core = await import(coreName === 'base' ? 'bench-core-base' : 'bench-core-concurrent');
+const { h, mount, render } = core;
+const defer = core.deferRender;
+let listRenew, inputRenew, query = '', text = '';
+const List = mount(renew => { listRenew = renew;
+  return () => h('ul', {}, Array.from({ length: rows }, (_, i) =>
+    h('li', { key: i, class: 'row' }, h('b', {}, String(i)), h('span', {}, ' ' + query + ' '), h('i', {}, 'x'))));
+});
+const Input = mount(renew => { inputRenew = renew;
+  return () => h('input', { id: 'in', value: text, onInput: onInput });
+});
+const App = mount(() => () => h('div', {}, h(Input, {}), h(List, {})));
+const lat = [];
+function onInput(e) {
+  const t0 = e.timeStamp; text = e.target.value; query = text;
+  inputRenew();
+  if (mode === 'defer') defer(() => { listRenew(); }); else listRenew();
+  requestAnimationFrame(() => setTimeout(() => lat.push(performance.now() - t0), 0));
+}
+render(h(App, {}), document.getElementById('root'));
+// observers
+const longtasks = []; const gaps = []; let last = performance.now(); let running = true;
+new PerformanceObserver(l => l.getEntries().forEach(e => longtasks.push([e.startTime, e.duration]))).observe({ type: 'longtask', buffered: true });
+const tick = () => { const n = performance.now(); gaps.push([n, n - last]); last = n; if (running) requestAnimationFrame(tick); };
+requestAnimationFrame(tick);
+let mark = 0; window.__mark = () => { mark = performance.now(); lat.length = 0; };
+window.__result = async (finalText) => {
+  const LT = longtasks.filter(x => x[0] >= mark).map(x => x[1]); const GP = () => gaps.filter(x => x[0] >= mark).map(x => x[1]);
+  const t0 = performance.now();
+  const matches = () => document.querySelector('.row span')?.textContent === ' ' + finalText + ' '
+    && document.querySelector('.row:last-child span')?.textContent === ' ' + finalText + ' ';
+  while (!matches()) await new Promise(r => setTimeout(r, 5));
+  const settle = performance.now() - t0; running = false;
+  const s = [...lat].sort((a, b) => a - b);
+  return { lat, p50: s[Math.floor(s.length * .5)], p95: s[Math.floor(s.length * .95)], max: s[s.length - 1],
+    maxLong: Math.max(0, ...LT), nLong: LT.length, maxGap: Math.max(0, ...GP()), settle };
+};
+window.__ready = true;
+</script></body></html>

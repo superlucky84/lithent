@@ -23,6 +23,9 @@ workspace versions are 0.21.1; they are not separate npm releases.
 - Interrupt and resume low-priority build work. DOM commits remain synchronous.
 - Flush mount callbacks after the complete commit. Relative callback order,
   unmount cleanup order and final DOM remain compatible with the base core.
+- Fix a `deferRender` raised while an earlier low-priority build of the same
+  component was in flight being dropped, which left the older value on screen
+  with nothing pending. Found by the real-browser input measurement.
 - Keep state writes immediate. Pending queries do not schedule renders;
   `nextTick` waits for synchronous work and `whenIdle` waits for deferred work.
 - Do not provide Suspense, Promise-based render suspension or state snapshots

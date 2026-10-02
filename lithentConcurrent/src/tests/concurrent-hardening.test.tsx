@@ -218,6 +218,64 @@ describe('stale and re-entrant work', () => {
     expect(el.textContent).toBe('gone');
   });
 
+  it('10-11. a deferRender raised while the first build is in flight is not lost', async () => {
+    // Found by the real-browser input measurement (B-1): at 10,000 rows, two
+    // deferred writes 90ms apart left the list showing the FIRST value for good,
+    // with nothing pending and `whenIdle()` resolved.
+    //
+    // The second entry is queued with the redraw closure of the node that is on
+    // screen at that moment. The in-flight build then commits, which retires that
+    // node, and `replaceWDom`'s `il` guard turned the entry away. The committed
+    // tree came from an updater that ran before the second write, so nothing
+    // re-rendered it.
+    //
+    // The write is raised from inside a row's updater so it lands while the
+    // build is between slices without depending on timing.
+    let value = 'one';
+    let armed = true;
+    let list = { bump: () => {} };
+
+    const Row = mount(
+      (_renew: () => void, props: { i: number; key?: number }) => () => {
+        if (props.i === 5 && armed) {
+          armed = false;
+          value = 'two';
+          deferRender(() => list.bump());
+        }
+
+        return <li>{value}</li>;
+      }
+    );
+    const rows = Array.from({ length: 12 }, (_, i) => i);
+    const driver = driven(() => (
+      <ul>
+        {rows.map(i => (
+          <Row key={i} i={i} />
+        ))}
+      </ul>
+    ));
+    list = driver;
+
+    armed = false;
+    const el = host();
+    render(<driver.Comp />, el);
+
+    setLowLaneBudget(0);
+    armed = true;
+    value = 'one';
+
+    deferRender(() => driver.bump());
+    await whenIdle();
+
+    expect(armed, 'the second write was raised mid-build').toBe(false);
+    const shown = Array.from(el.querySelectorAll('li')).map(
+      li => li.textContent
+    );
+    expect(new Set(shown), 'every row shows the latest value').toEqual(
+      new Set(['two'])
+    );
+  });
+
   it('10-7. deferRender nested inside a render routes to the low lane', async () => {
     // The target lives in its own tree, so the render that calls `deferRender`
     // does not re-render it. Otherwise the value would land with that render's

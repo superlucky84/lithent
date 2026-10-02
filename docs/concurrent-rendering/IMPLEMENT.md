@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-10-01)
-- 상태: **E2E-0~4 완료·Phase 11 10/11 완료. PREP-0~3 완료(2026-10-02): 자동 검증 통과, 사용자 문서·AI 스킬 문서 정독 검토와 보완 완료. A-3/A-7/B-1·11-9·실제 publish 미완.**
+- 상태: **E2E-0~4 완료·Phase 11 10/11 완료. PREP-0~3 완료(2026-10-02): 자동 검증 통과, 사용자 문서·AI 스킬 문서 정독 검토와 보완 완료. A-3·A-7 완료(2026-10-02). B-1은 측정 완료·판정 보류(20,000행 퇴행), 11-9·실제 publish 미완.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 기존 구현 Phase 0~11의 공통 종료 조건:
@@ -412,6 +412,7 @@ Phase 5 이후 포크가 더 갈라져도 같은 문제가 재발하지 않는�
 | 코어 스위트 | — | 110개 전량 통과 |
 | 동치성 (4-9) | — | 8개 통과 (기존 5 + BC-1 3) |
 | `test:dual` · `verify:concurrent` | 통과 | 통과 |
+| 수정 후 | 성능 측정 (A-3/A-7/B-1) | 실브라우저 입력 지연 측정 중 **버그 발견·수정**: 첫 `deferRender`의 빌드가 진행 중일 때 같은 컴포넌트의 두 번째 `deferRender`가 `il` 가드에 걸려 유실(10,000행에서 화면이 첫 값에 고정, 큐는 비어 있음). 원인=큐 항목이 큐잉 시점의 낡은 redraw 클로저를 잡음. 수정=`scheduler.ts`가 실행 시점의 최신 클로저를 조회. 회귀 테스트 10-11(수정 전 실패 확인), 단위 142·dual·`verify:concurrent`·크기 6,177 B 통과. 측정 결과는 MANUAL A-3/A-7/B-1과 README 참조 | B-1 보류 |
 | `d4ef0c9`+문서 | PREP-1/2 보완 | 문서 정독 검토: 가이드 EN/KO에 크기 기준(1,000행 무이득/10,000행 부근) 추가, AI 스킬(`skills/lithent/reference/concurrent.md`·SKILL.md·constraints)·agent addon·`MANUAL.md` 추가, `mountReadyCallback` 설명 정정(WDom 생성 직후·DOM 삽입 전). 재검증: `verify:release` PASS(tarball에 skills/addon 포함 확인), docs `tsc`·build PASS, Playwright 22 PASS | 통과 |
 
 호출 지점이 4개 줄고 1개 늘어 **−16 B**. `render.ts`가 **Phase 5에서 처음 base와 갈라졌다**
