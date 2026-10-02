@@ -1,60 +1,62 @@
 # lithent-concurrent
 
-`lithent`의 **인터페이스 호환 별도 빌드**. 큰 목록을 다루는 화면에서 **무거운 렌더가 입력을
-통째로 막는 시간**을 줄인다.
+An **interface-compatible alternative build** of `lithent`. On screens that deal with large lists,
+it shortens the time **a heavy render blocks input as a whole**.
 
-기본 런타임 `src/`는 이번 릴리스에서 **버그 수정 한 건만** 바뀐다(제거된 컴포넌트의 뒤늦은 재렌더가 DOM에 되살아나던 문제, `lithent 1.22.1`). 새 기능은 넣지 않는다. 두 빌드는 같은 레포에서 같은 코어 인터페이스로
-나오며 소비자는 번들러 alias로 선택한다. 공유 helper의 store 쓰기 통지와 JSX keyed 목록
-수정은 `lithent 1.22.1`에 포함되므로 함께 설치한다.
+The base runtime `src/` changes by **exactly one bug fix** in this release (a late redraw of a removed component used to bring it back into the DOM, `lithent 1.22.1`). No new features go into it. Both builds come from the same repo with the same core interface, and consumers pick one with a bundler alias. The store write notification in the shared helper and the JSX keyed-list fix ship in `lithent 1.22.1`, so install it alongside.
 
-> **이름에 대하여.** 이 패키지는 렌더의 **빌드 단계**를 중단 가능하게 만든다.
-> 그것을 `concurrent mode`라고 부르지 않는다 — 그 말은 React가 특정 기능 묶음
-> (transition + Suspense + `useDeferredValue` + 선택적 하이드레이션)에 붙인 고유명사이고,
-> 여기에는 그 묶음이 없다. 있는 것은 그 아래의 렌더러 속성뿐이다.
+> **About the name.** This package makes the **build phase** of a render interruptible.
+> We do not call it `concurrent mode` — that term is React's proper noun for a specific bundle
+> of features (transitions + Suspense + `useDeferredValue` + selective hydration), and that
+> bundle is not here. What is here is only the renderer property underneath it.
 
-## 언제 값을 하는가 — 그리고 언제 안 하는가
+## When it pays off — and when it doesn't
 
-두 가지를 따로 쟀다. 실브라우저(headless Chromium), 두 코어의 **빌드 산출물**, 중앙값이다.
-기기와 워크로드에 따라 달라진다.
+Two things were measured separately: real browser (headless Chromium), the **built bundles** of
+both cores, medians. Results vary by device and workload.
 
-**① 입력 지연** — 2026-10-02. 목록 전체가 입력마다 바뀌는 화면에서 12글자를 90ms 간격으로
-타이핑하고, 입력 이벤트부터 다음 페인트까지의 시간(p50)을 쟀다 (5회 중앙값).
-base는 `renew()`, concurrent는 입력창과 목록을 **다른 컴포넌트**에 두고 목록만 `deferRender`했다.
+**① Input latency** — 2026-10-02. On a screen where the whole list changes on every keystroke,
+12 characters were typed 90 ms apart, and the time from the input event to the next paint (p50)
+was measured (median of 5 runs). Base used `renew()`; concurrent put the input and the list in
+**different components** and wrapped only the list in `deferRender`.
 
-| 행 수  | base 동기 | concurrent 동기 | concurrent `deferRender` |
+| Rows   | base sync | concurrent sync | concurrent `deferRender` |
 | ------ | --------: | --------------: | -----------------------: |
 | 1,000  |     39 ms |           38 ms |                    21 ms |
 | 5,000  |    143 ms |          146 ms |                **25 ms** |
 | 10,000 |    275 ms |          284 ms |                **35 ms** |
 | 20,000 |    515 ms |          560 ms |                **46 ms** |
 
-입력이 목록 빌드에 막히지 않는다. 다만 **커밋은 쪼갤 수 없다**(RC-10). 미룬 빌드가 끝나 커밋되는
-순간에는 그 목록 크기만큼의 블록이 생기고(20,000행 p95 444 ms, 가장 긴 블록 325 ms),
-한 번의 갱신만 보면 가장 긴 블록은 base와 같다. 이득은 빌드가 입력 사이사이로 나뉘고,
-연달아 오는 키 입력이 앞선 빌드를 대체하는 데서 나온다.
+Input is no longer blocked by the list build. However, **the commit cannot be split** (RC-10).
+When a deferred build finishes and commits, it blocks for as long as that list size takes
+(20,000 rows: p95 444 ms, longest block 325 ms), and for a single update the longest block is
+the same as base. The gain comes from the build being sliced between inputs, and from
+consecutive keystrokes replacing the previous build.
 
-**② 처리량** — 같은 날, 동기 갱신 11회 중앙값, concurrent / base. 생성(0.96~1.10)과
-삭제(0.91~1.05)는 사실상 같고, **갱신은 1.02~1.36배**다 (행 수·갱신 범위에 따라 다르다).
-jsdom에서 `bench10k`로 잰 값도 같은 경향이다 (생성 0.98, 10번째마다 갱신 1.01, 두 행 교체 1.17,
-1,000행 추가 1.19, 삭제 0.99).
+**② Throughput** — same day, median of 11 synchronous updates, concurrent / base. Create
+(0.96–1.10) and clear (0.91–1.05) are effectively equal; **update is 1.02–1.36x** (depending on
+row count and update range). Measurements with `bench10k` in jsdom show the same trend (create
+0.98, update every 10th row 1.01, swap two rows 1.17, append 1,000 rows 1.19, clear 0.99).
 
-**결론.** 이 빌드는 **입력이 큰 목록 렌더에 막히는 화면**(수천 행 이상)에 쓴다. 1,000행 이하는
-둘 다 프레임 안이라 차이가 작다. 입력창과 무거운 목록을 **서로 다른 컴포넌트**에 두어야 하며,
-같은 컴포넌트에 두면 효과가 없다. 중단은 **빨라지는 것이 아니라 쪼개지는 것**이므로 총 시간은 줄지 않고,
-동기 갱신 경로는 base보다 조금 느리다(②). SSR 페이지에 인터랙티브 컴포넌트를 몇 개 꽂는 용도라면
-기본 `lithent`를 쓰면 된다.
+**Bottom line.** Use this build for **screens where input gets blocked by rendering a large
+list** (thousands of rows or more). At 1,000 rows or fewer both fit in a frame and the
+difference is small. The input and the heavy list must live in **different components**; in the
+same component it has no effect. Interruption **splits work, it does not speed it up**, so total
+time does not go down, and the synchronous update path is slightly slower than base (②). If you
+are sprinkling a few interactive components onto an SSR page, use the base `lithent`.
 
-2026-09-02의 작업 단위 측정(10,000행 신규 마운트의 74%, 갱신의 약 50%가 중단 가능)은 그대로
-유효하지만, 그것은 "빌드 구간 중 중단 가능한 비율"이지 입력 지연이 줄어든다는 보장이 아니다.
+The 2026-09-02 work-unit measurement (74% of a fresh 10,000-row mount and about 50% of an update
+are interruptible) still holds, but it is "the share of the build phase that can be interrupted",
+not a guarantee of lower input latency.
 
-## 쓰는 법
+## Usage
 
 ```bash
 npm install lithent@^1.22.1 lithent-concurrent@^0.1.0
 ```
 
-번들러에서 코어만 바꾼다. **정규식으로 정확히 `lithent`만** 걸어야 한다 —
-접두사 매칭을 쓰면 `lithent/jsx-dev-runtime` 같은 서브패스가 함께 망가진다.
+Swap only the core in your bundler. **Match exactly `lithent` with a regex** — a prefix match
+also breaks subpaths such as `lithent/jsx-dev-runtime`.
 
 ```js
 // vite.config.js
@@ -74,95 +76,97 @@ resolve: {
 }
 ```
 
-`lithent/helper`, `lithent/jsx-runtime` 등 서브패스는 **그대로 둔다.** 교체 대상은 코어뿐이다.
+**Leave subpaths** such as `lithent/helper` and `lithent/jsx-runtime` **as they are.** Only the
+core is replaced.
 
-새 API는 `lithent-concurrent`에서 직접 import하면 TypeScript에서도 타입 선언을 찾는다.
-기존 `lithent` import의 런타임 선택은 위 alias가 맡으며, SSR은 서버와 클라이언트 양쪽에
-같은 설정을 적용한다.
+Import the new APIs directly from `lithent-concurrent` so TypeScript finds their type
+declarations. The alias above decides the runtime for existing `lithent` imports; for SSR, apply
+the same setting on both server and client.
 
-> **`lithent`를 external로 두는 빌드라면 파일 경로가 아니라 패키지 이름으로 건다.**
-> 라이브러리 빌드나 SSR 보일러플레이트처럼 코어를 번들에 넣지 않는 설정에서는,
-> alias의 replacement가 그대로 **최종 import 문에 남는다.** 파일 경로를 넣으면
-> 서버(node)는 읽지만 브라우저는 그 경로를 가져올 수 없다.
-> `replacement: 'lithent-concurrent'`처럼 **패키지 이름**을 쓰고, 그 패키지가
-> 실제로 설치돼 있게 한다.
+> **If your build keeps `lithent` external, alias to the package name, not a file path.**
+> In setups that do not bundle the core — library builds, or the SSR boilerplate — the alias
+> replacement **ends up verbatim in the final import statement.** A file path works on the
+> server (node) but the browser cannot fetch it. Use a **package name** such as
+> `replacement: 'lithent-concurrent'`, and make sure that package is actually installed.
 
-## 늘어난 API
+## Added APIs
 
-기본 코어의 export는 전부 그대로 있고, 아래가 더해진다.
+Every export of the base core is still there; the following are added.
 
 ### `deferRender(scope)`
 
-`scope` 안에서 발생한 갱신을 **저우선순위 레인**으로 보낸다.
+Sends updates triggered inside `scope` to the **low-priority lane**.
 
 ```js
 import { deferRender } from 'lithent-concurrent';
 
 input.oninput = e => {
-  query = e.target.value; // 급한 것: 입력창은 즉시
+  query = e.target.value; // urgent: the input updates immediately
   renewInput();
   deferRender(() => {
-    // 무거운 것: 미룬다
+    // heavy: defer it
     rows = filter(query);
     renewList();
   });
 };
 ```
 
-**`scope`는 지금 동기로 실행된다.** 미뤄지는 것은 그것이 일으킨 **렌더**뿐이다.
+**`scope` runs synchronously, right now.** Only the **renders** it triggers are deferred.
 
-> **React의 `startTransition`과 다르다.** 그 이름은 (1) 새 UI가 준비될 때까지 이전 상태가
-> 보인다는 전환 의미론과 (2) 반응성 `isPending`을 함께 뜻한다. **여기엔 둘 다 없다.**
-> 상태는 컴포넌트 클로저에 있고 setter가 그 자리에서 바꾸므로, 같은 컴포넌트가 그 사이
-> 급한 우선순위로도 렌더되면 새 값이 즉시 보인다. 이름을 `deferRender`로 둔 이유다.
+> **This is not React's `startTransition`.** That name implies both (1) transition semantics,
+> where the previous state stays visible until the new UI is ready, and (2) a reactive
+> `isPending`. **Neither exists here.** State lives in component closures and setters change it
+> in place, so if the same component also renders at urgent priority in the meantime, the new
+> value shows up immediately. That is why it is named `deferRender`.
 
-### ⚠ 급한 것과 미룰 것은 **다른 컴포넌트**에 두어야 한다
+### ⚠ Urgent and deferred work must live in **different components**
 
-이것이 이 API를 쓸 때 가장 흔히 밟는 함정이다. 둘이 같은 컴포넌트에 있으면
-**미루는 의미가 사라진다.**
+This is the most common pitfall with this API. If both are in the same component,
+**deferring has no effect.**
 
 ```jsx
-// ✗ 아무 효과 없음 — query와 rows가 같은 컴포넌트다
+// ✗ No effect — query and rows are in the same component
 const App = mount(renew => {
   const query = state('', renew);
   const rows = state([], renew);
 
   const type = e => {
-    query.value = e.target.value;                    // 급한 렌더가 큐에 들어가고
-    deferRender(() => { rows.value = heavy(); });    // 미룬 갱신은 그 큐에 흡수된다
-  };                                                 // → 급한 렌더가 새 rows를 그대로 그린다
+    query.value = e.target.value;                    // an urgent render is queued
+    deferRender(() => { rows.value = heavy(); });    // the deferred update is absorbed into that queue
+  };                                                 // → the urgent render draws the new rows as-is
   ...
 });
 ```
 
 ```jsx
-// ✓ 무거운 쪽을 분리한다
+// ✓ Split out the heavy part
 const HeavyList = mount(renew => {
-  /* rows를 소유 */
+  /* owns rows */
 });
 const Filter = mount(renew => {
-  /* query를 소유, deferRender로 HeavyList만 갱신 */
+  /* owns query, updates only HeavyList via deferRender */
 });
 ```
 
-`deferRender`가 미루는 것은 **렌더**뿐이다. 값은 그 자리에서 쓰이므로, 같은 컴포넌트가
-급한 우선순위로 렌더되는 순간 미룬 값도 함께 화면에 나온다.
-`lithentConcurrent/consumer/`의 앱이 이 형태를 그대로 보여준다 —
-처음에는 한 컴포넌트에 몰아넣었다가 자체 검사에서 걸렸다.
+`deferRender` defers only the **render**. Values are written in place, so the moment the same
+component renders at urgent priority, the deferred value appears on screen too.
+The app in `lithentConcurrent/consumer/` shows exactly this shape — it originally put everything
+in one component and was caught by its own self-check.
 
 ### `whenIdle(): Promise<void>`
 
-저우선순위 레인이 비면 resolve된다. `await nextTick()`은 **동기 커밋까지만** 보장한다
-(BC-4) — 미룬 렌더까지 기다리려면 이쪽을 쓴다.
+Resolves when the low-priority lane is empty. `await nextTick()` only guarantees the
+**synchronous commit** (BC-4) — use this to wait for deferred renders as well.
 
 ### `hasPending(compKey, lane?)`
 
-해당 컴포넌트가 레인에 대기 중인지. 저수준 조회다.
+Whether the component is waiting in a lane. A low-level query.
 
 ### `lithent-concurrent/helper`
 
-레인이 있어야 의미가 있는 helper. 기존 공개 helper는 `lithent/helper`에서 그대로 쓴다.
-`lithent 1.22.1`의 `store`·`lstore`는 concurrent 코어에 쓰기를 통지하며 기본 코어에서는 무동작이다.
+Helpers that only make sense with lanes. Keep using existing public helpers from `lithent/helper`.
+In `lithent 1.22.1`, `store` and `lstore` notify the concurrent core of writes and are no-ops on
+the base core.
 
 ```js
 import {
@@ -172,83 +176,88 @@ import {
 } from 'lithent-concurrent/helper';
 ```
 
-- `deferred(value, renew)` / `ldeferred(value)` — 저우선순위로 렌더되는 `state`/`lstate`
-- `hasPendingRender()` — 이 컴포넌트에 미룬 렌더가 대기 중인지
+- `deferred(value, renew)` / `ldeferred(value)` — a `state` / `lstate` that renders at low priority
+- `hasPendingRender()` — whether this component has a deferred render waiting
 
-> **`hasPendingRender`는 조회이지 반응성이 아니다.** `.value`를 읽는 것만으로는 리렌더가
-> 일어나지 않는다. pending 표시는 **동기로 렌더되는 부모나 형제**에 두고, 무거운 쪽만
-> `deferred`로 미루는 조합으로 쓴다.
+> **`hasPendingRender` is a query, not reactive.** Reading `.value` alone does not trigger a
+> re-render. Put the pending indicator in a **parent or sibling that renders synchronously**,
+> and defer only the heavy part with `deferred`.
 
-## 하지 않는 것
+## What it does not do
 
-- **transition 의미론** — "새 UI가 준비될 때까지 이전 값이 보인다"는 보장이 없다.
-  상태가 클로저에 있어 레인별 사본을 둘 수 없기 때문이며, 이것은 영구 속성이다.
-- **Suspense / `use()`** — 렌더 중 Promise를 던지고 언와인딩하는 패턴은 **비목표**다.
-  클로저 상태 모델과 근본적으로 충돌한다 (JS는 throw로 빠져나간 함수를 재개할 수 없다).
-- **커밋 중단** — 커밋은 원자적이다. 중간에 멈추면 반쯤 갱신된 화면이 보인다.
-  React도 커밋은 동기다.
+- **Transition semantics** — there is no guarantee that "the previous value stays visible until
+  the new UI is ready". State lives in closures, so per-lane copies are impossible; this is a
+  permanent property.
+- **Suspense / `use()`** — throwing a Promise during render and unwinding is a **non-goal**.
+  It fundamentally conflicts with the closure state model (JS cannot resume a function that
+  exited via throw).
+- **Interrupting the commit** — the commit is atomic. Stopping midway would show a half-updated
+  screen. React's commit is synchronous too.
 
-## 호환성
+## Compatibility
 
-기본 코어에서 이 빌드로 갈아탈 때 관측 가능하게 달라지는 것들이다.
-전부 **minor**이며 아래에 명시한다 (DC-8).
+These are the observable differences when switching from the base core to this build.
+All are **minor** and listed below (DC-8).
 
-### BC-1 — `mountCallback` flush 시점이 커밋 경계 1곳으로
+### BC-1 — `mountCallback` flushes at a single commit boundary
 
-DOM 삽입 지점마다가 아니라 **커밋이 끝난 뒤 1회** 실행된다.
+It runs **once after the commit finishes**, not at each DOM insertion point.
 
-- **바뀜**: 한 갱신에서 여러 형제가 마운트될 때, 앞선 형제의 `mountCallback`이 보는 DOM이
-  _절반만 지어진 상태_ → **완성된 커밋 상태**. `mountCallback` ↔ `updateCallback`의 교차 순서.
-- **안 바뀜**: `mountCallback`끼리의 상대 순서, `updateCallback`끼리의 상대 순서,
-  언마운트 계열 전부, `mountReadyCallback`, **결과 DOM**.
+- **Changed**: when several siblings mount in one update, the DOM seen by an earlier sibling's
+  `mountCallback` goes from _half-built_ → **the completed commit state**. The interleaving
+  order between `mountCallback` and `updateCallback`.
+- **Unchanged**: relative order among `mountCallback`s, relative order among `updateCallback`s,
+  everything on the unmount side, `mountReadyCallback`, and the **resulting DOM**.
 
-기준이 되는 순서는 이렇다 (3단 중첩, **두 코어 동일** — 실측):
+The reference order is as follows (three levels of nesting, **identical on both cores** — measured):
 
-| 시점                              | 방향                           |
-| --------------------------------- | ------------------------------ |
-| 마운트                            | 자식 → 부모                    |
-| 갱신 — `updateCallback` 본문      | 부모 → 자식                    |
-| 갱신 — `updateCallback` 반환값    | 자식 → 부모                    |
-| 언마운트 — `mountCallback` 반환값 | **부모 → 자식** (React와 동일) |
+| Phase                                  | Direction                          |
+| -------------------------------------- | ---------------------------------- |
+| Mount                                  | child → parent                     |
+| Update — `updateCallback` body         | parent → child                     |
+| Update — `updateCallback` return value | child → parent                     |
+| Unmount — `mountCallback` return value | **parent → child** (same as React) |
 
-> **`updateCallback`의 반환값은 클린업이 아니다.** 갱신마다 새로 등록되고
-> **그 갱신의 커밋 끝에** 실행된다 — "다음 실행 전에 정리하는" React `useEffect`의
-> 반환값과 다른 물건이다. 정리가 필요하면 `mountCallback`의 반환값을 쓰거나,
-> `lithent/helper`의 `effect()`처럼 본문 첫 줄에서 직접 부른다.
+> **The return value of `updateCallback` is not a cleanup.** It is registered anew on every
+> update and runs **at the end of that update's commit** — a different thing from React's
+> `useEffect` return value, which "cleans up before the next run". If you need cleanup, use the
+> return value of `mountCallback`, or call it yourself at the top of the body as `effect()` in
+> `lithent/helper` does.
 >
-> 언마운트가 **부모 → 자식**이라는 점도 실무에서 걸린다 — 부모의 정리는 자식이 아직
-> 정리되지 않았다고 가정해야 한다. 부모가 공유 자원을 먼저 닫으면 뒤이어 도는 자식
-> 정리가 그것을 건드린다.
+> Unmounting **parent → child** also bites in practice — a parent's cleanup must assume its
+> children have not been cleaned up yet. If a parent closes a shared resource first, the child
+> cleanups that run afterwards will touch it.
 
-### BC-2 — mounter 계약 (예약, 현재 미발동)
+### BC-2 — The mounter contract (reserved, not triggered today)
 
-계약이 "mounter 정확히 1회"에서 **"커밋된 mounter만 유효, 시도는 여러 번 가능"**으로 넓어진다.
+The contract widens from "the mounter runs exactly once" to **"only committed mounters count;
+there may be several attempts"**.
 
-**오늘 이 완화는 발동하지 않는다.** 스케줄러가 마운트를 한 빌드를 폐기하지 않으므로
-mounter 본문은 커밋되는 컴포넌트마다 정확히 한 번 실행된다. 계약을 넓혀 두는 이유는
-그 보장이 이제 구조가 아니라 스케줄러 정책에 기대기 때문이다.
+**This relaxation does not trigger today.** The scheduler never discards a build that mounts,
+so the mounter body runs exactly once per committed component. The contract is widened because
+that guarantee now rests on scheduler policy rather than on structure.
 
-영향받는 것은 **mounter 본문에서 직접 일으키는 부수효과**뿐이다. `mountCallback`은
-커밋에서만 돌므로 지금도 앞으로도 안전하다 — 부수효과는 `mountCallback`에 두는 것이
-어차피 옳다.
+Only **side effects run directly in the mounter body** are affected. `mountCallback` runs only
+at commit, so it is safe now and in the future — side effects belong in `mountCallback` anyway.
 
-### BC-3 — 저우선순위 렌더는 유휴 태스크에서 flush된다
+### BC-3 — Low-priority renders flush in idle tasks
 
-기본 우선순위는 여전히 마이크로태스크다. `deferRender`를 쓰지 않으면 무영향이다.
+The default priority is still a microtask. If you do not use `deferRender`, nothing changes.
 
-### BC-4 — `nextTick()`의 보장은 sync 레인에 한정된다
+### BC-4 — The `nextTick()` guarantee is limited to the sync lane
 
-`await nextTick()`은 **동기 커밋**까지만 보장한다. 미룬 렌더 완료를 기다리려면
-`whenIdle()`을 쓴다. `nextTick` 자체의 의미는 바뀌지 않았다 (DC-9).
+`await nextTick()` guarantees only the **synchronous commit**. To wait for deferred renders to
+finish, use `whenIdle()`. The meaning of `nextTick` itself is unchanged (DC-9).
 
-## 크기
+## Size
 
-| 빌드                 |  brotli |
+| Build                |  brotli |
 | -------------------- | ------: |
-| `lithent` (기본)     | 4,739 B |
+| `lithent` (base)     | 4,739 B |
 | `lithent-concurrent` | 6,221 B |
 
-## 더 읽을 것
+## Further reading
 
-설계 근거·측정·결정 기록은 레포의 `docs/concurrent-rendering/`에 있다 —
+Design rationale, measurements, and decision records live in the repo under
+`docs/concurrent-rendering/` —
 `REQUIREMENTS.md` → `DESIGN.md` → `IMPLEMENT.md` → `MANUAL_TEST_CHECKLIST.md`.
