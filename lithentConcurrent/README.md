@@ -45,9 +45,10 @@ same component it has no effect. Interruption **splits work, it does not speed i
 time does not go down, and the synchronous update path is slightly slower than base (②). If you
 are sprinkling a few interactive components onto an SSR page, use the base `lithent`.
 
-The 2026-09-02 work-unit measurement (74% of a fresh 10,000-row mount and about 50% of an update
-are interruptible) still holds, but it is "the share of the build phase that can be interrupted",
-not a guarantee of lower input latency.
+The input-latency gain above (515 → 46 ms at 20,000 rows) comes from the 2026-10-02
+measurement. The earlier 2026-09-02 work-unit measurement (74% of a fresh 10,000-row mount and
+about 50% of an update are interruptible) only shows how much of the build _can_ be paused; that
+ratio alone does not predict input latency.
 
 ## Usage
 
