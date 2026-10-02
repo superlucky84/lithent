@@ -1,5 +1,5 @@
 import * as lithentCore from 'lithent';
-import { h, render, mount, nextTick, type WDom } from 'lithent';
+import { h, render, mount, nextTick, portal, type WDom } from 'lithent';
 import { state, computed, effect, cacheUpdate, createContext } from '@/index';
 
 /**
@@ -195,6 +195,130 @@ if (import.meta.vitest) {
       await settle();
 
       expect(el.textContent, 'the consumer got it').toBe('second');
+    });
+  });
+
+  describe('10-14. urgent renders landing between slices of a parked build', () => {
+    // An urgent render beside a parked low build may leave that build parked
+    // only when the two components are unrelated. Context walks `getParent` and a
+    // portal puts DOM somewhere the tree does not, so those are the shapes where
+    // "related" could be misjudged. Every row burns more than a slice, which
+    // parks the build without the private budget seam, and the urgent work is
+    // raised from inside a row so it lands mid-build.
+    const busy = (ms: number) => {
+      const end = performance.now() + ms;
+      while (performance.now() < end);
+    };
+
+    it('context consumers and portals end up exactly where a straight render puts them', async () => {
+      const dockHost = document.createElement('div');
+      const rowHost = document.createElement('div');
+      const el = host();
+
+      let fire: (() => void) | null = null;
+      let setLabelNow = (_next: string) => {};
+      let bumpList = () => {};
+      let bumpDock = () => {};
+      let dockText = 'dock-0';
+      let committedWhenFired = -1;
+      let rows: number[] = [1, 2, 3];
+
+      const Wrapper = mount((_renew, _props, kids: WDom[]) => {
+        const label = laneContextState('first');
+        setLabelNow = next => {
+          label.value = next;
+        };
+
+        return () => <LaneProvider label={label}>{kids}</LaneProvider>;
+      });
+
+      const Leaf = mount<{ n: number; key?: number }>((renew, props) => {
+        const ctx = useLaneContext(laneContext, renew, ['label']);
+
+        return () => {
+          busy(6);
+
+          if (fire && props.n === 4) {
+            const go = fire;
+            fire = null;
+            committedWhenFired = el.querySelectorAll('i').length;
+            go();
+          }
+
+          return (
+            <i>
+              {props.n}:{ctx.label?.value ?? 'none'}
+              {props.n % 3 === 0 ? portal(<u>{props.n}</u>, rowHost) : null}
+            </i>
+          );
+        };
+      });
+
+      const List = mount(renew => {
+        bumpList = renew;
+        return () => (
+          <div class="list">
+            {rows.map(n => (
+              <Leaf key={n} n={n} />
+            ))}
+          </div>
+        );
+      });
+
+      // Unrelated to the list: a sibling that reads the context and owns a
+      // portal of its own.
+      const Side = mount(renew => {
+        bumpDock = renew;
+        const ctx = useLaneContext(laneContext, renew, ['label']);
+
+        return () => (
+          <section>
+            {ctx.label?.value ?? 'none'}
+            {portal(<b>{dockText}</b>, dockHost)}
+          </section>
+        );
+      });
+
+      const App = mount(() => () => (
+        <Wrapper>
+          <List />
+          <Side />
+        </Wrapper>
+      ));
+
+      render(<App />, el);
+      await nextTick();
+
+      // The urgent work: the context value changes, so every consumer — in the
+      // list and beside it — renders at sync priority, and the side portal's
+      // text changes with it.
+      fire = () => {
+        dockText = 'dock-1';
+        setLabelNow('second');
+        bumpDock();
+      };
+
+      // Rows are only ever added: a consumer removed in the same pass is told about
+      // the context change afterwards and re-renders itself on BOTH cores, which is
+      // a base-core behaviour this test is not about.
+      rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+      push(() => bumpList());
+      await settle();
+
+      expect(fire, 'the urgent work ran').toBe(null);
+      expect(
+        committedWhenFired,
+        'it fired while the list was still the old one'
+      ).toBe(3);
+      expect(
+        Array.from(el.querySelectorAll('i')).map(n => n.textContent),
+        'every row, new and old alike, reads the new context value'
+      ).toEqual(rows.map(n => `${n}:second`));
+      expect(el.querySelector('section')?.textContent).toBe('second');
+      expect(dockHost.innerHTML, 'the side portal').toBe('<b>dock-1</b>');
+      expect(rowHost.innerHTML, 'row portals follow the rows').toBe(
+        '<u>3</u><u>6</u><u>9</u><u>12</u>'
+      );
     });
   });
 }

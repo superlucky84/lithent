@@ -7,6 +7,11 @@
 - Preserve dynamic JSX arrays as keyed lists in `jsx`, `jsxs` and `jsxDEV`.
   Adding, removing or reordering rows now preserves the state and DOM of
   existing keys, including after hydration.
+- Fix a removed component being drawn back into the DOM. A redraw queued for a
+  component earlier in the same tick (for example a `useContext` consumer or a
+  `renew` call) ran after the component's removal and re-inserted its old row.
+  Removed components are now marked retired so such redraws are skipped. This is
+  the only change to the base core; `lithent` grows by 5 B (brotli 4,739 B).
 - Notify a concurrent core when `store` or `lstore` writes occur. The base
   core keeps its existing store behavior and public API.
 - Add browser regression coverage for both built cores, hydration, HMR,
@@ -23,6 +28,9 @@ workspace versions are 0.21.1; they are not separate npm releases.
 - Interrupt and resume low-priority build work. DOM commits remain synchronous.
 - Flush mount callbacks after the complete commit. Relative callback order,
   unmount cleanup order and final DOM remain compatible with the base core.
+- Finish a parked low-priority build before an urgent render of a component
+  inside it, and aim that render at the node the commit installed instead of
+  dropping it (a consumer could keep the old context value).
 - Fix a `deferRender` raised while an earlier low-priority build of the same
   component was in flight being dropped, which left the older value on screen
   with nothing pending. Found by the real-browser input measurement.

@@ -12,7 +12,7 @@
 > 착수하지 않은 단계의 섹션은 `N/A`로 표기한다.
 >
 > **B~F는 `lithent` → `lithent-concurrent` alias를 적용한 앱에서 수행한다.**
-> 기본 코어는 동결이므로 동작 변화가 없어야 한다 (A-7).
+> 기본 코어는 동결이다. 예외는 2026-10-02의 버그 수정 한 건(제거된 컴포넌트의 뒤늦은 재렌더 부활)뿐이며 +5 B다 (A-7).
 >
 > **현재 상태 (2026-10-01)**: 기존 미완 27개 중 **24개를 이번 CLI/E2E 근거로 완료**했다.
 > 남은 것은 **A-3 성능 회귀, A-7 과거 릴리스 비교, B-1 입력 응답성 측정**이다.
@@ -67,7 +67,8 @@ SSR/hydration/HMR → examples/docs·하드닝이다 (IMPLEMENT E2E-0~4).
 - [x] A-1. `pnpm build && pnpm test` 전량 통과 (0 실패) — 2026-10-01, build exit 0 / test 413회 실행
 - [x] A-2. `node docs/performance-improvement/bench/verify-order.mjs` → ALL PASS — 2026-10-01
 - [x] A-3. `node docs/performance-improvement/bench/bench10k.mjs` → 회귀 판정 — 2026-10-02
-  - T1·T1.5: 회귀 0 — 기본 코어 번들이 발행된 `lithent@1.22.0`과 **바이트 동일**(A-7)
+  - T1·T1.5: 회귀 0 — 성능 측정 시점의 기본 코어 번들은 발행된 `lithent@1.22.0`과 바이트 동일했고,
+    이후 버그 수정 한 건으로 +5 B(4,739 B)가 됐다. 성능 경로(diff/render)는 건드리지 않았다(A-7)
   - T2: jsdom `bench10k` 7회 중앙값 concurrent/base — 생성 0.98 · 10번째마다 갱신 1.01 ·
     두 행 교체 1.17 · 1,000행 추가 1.19 · 삭제 0.99
   - 실브라우저 동기 갱신 11회 중앙값 — 생성 0.96~1.10, 삭제 0.91~1.05, **갱신 1.02~1.36**
@@ -80,9 +81,12 @@ SSR/hydration/HMR → examples/docs·하드닝이다 (IMPLEMENT E2E-0~4).
   > `lithentConcurrent/dist/lithentConcurrent.mjs`를 import해서** 확인하는 것이 목적이다.
 - [x] A-6. **기존 `getParent` 계약**: 양쪽 출시 빌드에서 `context`·`lcontext`의
   Provider 탐색과 갱신이 동작 — DC-19의 스택 순회이므로 노드 `return` 포인터·shim은 사용하지 않는다
-- [x] A-7. **기본 코어 무회귀** — 2026-10-02: `pnpm size` 4,734 / 4,800 B, 그리고 `dist/lithent.mjs`·`lithent.umd.js`가
+- [x] A-7. **기본 코어 무회귀** — 2026-10-02: 비교 시점 `pnpm size` 4,734 / 4,800 B, 그리고 `dist/lithent.mjs`·`lithent.umd.js`가
   npm의 `lithent@1.22.0`과 `cmp` 바이트 동일 (과거 릴리스 기준 = 발행된 1.22.0). 달라진 것은 helper store/lstore의
   통지 14줄과 jsx-runtime keyed 수정뿐이다.
+  > 같은 날 이후 base `src/hook/internal/unmount.ts`에 한 줄(`il = true`)이 들어가 4,739 / 4,800 B가 됐다.
+  > 지워진 컴포넌트의 큐잉된 재렌더가 DOM에 부활하던 base 버그 수정이며, 회귀 테스트
+  > `src/tests/core-removedRedraw.test.tsx`·`helper/src/tests/contextRemoval.tsx`(수정 되돌리면 실패 확인)가 지킨다.
   <!-- 아래는 이전 기록 -->: `pnpm size` 통과 (`dist/lithent.umd.js` br ≤ 4,800 B) **이고**
   기본 코어로 빌드한 예제 앱의 동작이 이전 릴리스와 동일
   > 과거 릴리스/행동 기준은 미확정. 현행 base 앱 E2E가 성공해도 과거 동등성을 단독으로 증명하지 못한다.

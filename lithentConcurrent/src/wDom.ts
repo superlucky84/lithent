@@ -333,8 +333,17 @@ export const replaceWDom = (
       if (relatedComponents(pausedPass.props, props)) {
         drainPendingWork();
 
+        // Finishing the parked build may have replaced this component's node:
+        // it sits inside that subtree and was rebuilt from an updater that ran
+        // before the write this render stands for. Aim at the node the commit
+        // installed instead of dropping the render — dropping it left a
+        // consumer showing the old context value.
         if (originalWDom.il) {
-          return;
+          originalWDom = liveNodeOf(props) || originalWDom;
+
+          if (originalWDom.il) {
+            return;
+          }
         }
       }
     }
