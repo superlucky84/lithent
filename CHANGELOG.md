@@ -2,6 +2,10 @@
 
 ## 2026-10-02
 
+### lithent-concurrent 0.1.1
+
+- Rewrite the package README in English. No code changes.
+
 ### lithent 1.22.1
 
 - Preserve dynamic JSX arrays as keyed lists in `jsx`, `jsxs` and `jsxDEV`.
