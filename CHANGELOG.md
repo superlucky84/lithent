@@ -43,6 +43,11 @@ exact `lithent` core import; keep `lithent/*` subpaths unchanged. See
 
 ### Documentation
 
+- Add concurrent-rendering guidance to the AI agent skill (`skills/lithent`:
+  new `reference/concurrent.md`, SKILL.md section, constraints) and the agent
+  addon, and a section to `MANUAL.md`. Correct the `mountReadyCallback` note:
+  it runs right after the WDom is created, before DOM insertion.
+
 - Update the private `lithent-docs` site to 0.6.0, with English/Korean concurrent
   rendering and helper guides, a live demo and related API notes.
 - Keep unchanged HMR, MDX, template and other private runtime package versions.

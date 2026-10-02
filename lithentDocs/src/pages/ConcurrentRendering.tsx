@@ -6,7 +6,7 @@ const copy = {
   en: {
     title: 'Concurrent Rendering',
     intro:
-      'lithent-concurrent is a separate rendering build for screens with expensive component trees. It schedules urgent work first and can pause low-priority builds between units of work. Use the base lithent core for ordinary screens and small interactive islands.',
+      'lithent-concurrent is a separate rendering build for screens with expensive component trees. It schedules urgent work first and can pause low-priority builds between units of work. Use the base lithent core for ordinary screens and small interactive islands. In a 2026-09-02 browser measurement, 1,000 rows already fit inside one frame and gained nothing; the benefit starts near 10,000 rows, and bulk replacement that mostly unmounts remains commit-bound.',
     install: 'Install and select the core',
     setup:
       'Keep lithent installed for JSX, helper and SSR subpaths. Match the core import exactly: a prefix alias would also rewrite lithent/helper and lithent/jsx-runtime. In library builds that externalize the core, keep the package-name replacement.',
@@ -39,7 +39,7 @@ const copy = {
   ko: {
     title: 'Concurrent 렌더링',
     intro:
-      'lithent-concurrent는 큰 컴포넌트 트리를 다루는 별도 렌더링 빌드입니다. 급한 갱신을 먼저 처리하고 저우선순위 빌드를 작업 단위 사이에서 중단·재개합니다. 일반적인 화면이나 작은 인터랙티브 영역에는 기본 lithent 코어를 사용하세요.',
+      'lithent-concurrent는 큰 컴포넌트 트리를 다루는 별도 렌더링 빌드입니다. 급한 갱신을 먼저 처리하고 저우선순위 빌드를 작업 단위 사이에서 중단·재개합니다. 일반적인 화면이나 작은 인터랙티브 영역에는 기본 lithent 코어를 사용하세요. 2026-09-02 브라우저 실측에서 1,000행은 한 프레임 안에 들어와 이득이 없었고, 이득은 10,000행 부근부터 나타나며 언마운트가 대부분인 대량 교체는 커밋이 지배해 효과가 거의 없습니다.',
     install: '설치와 코어 선택',
     setup:
       'JSX·helper·SSR 서브패스를 위해 lithent도 설치합니다. 코어 이름만 정확히 매칭하세요. 접두사 alias는 lithent/helper와 lithent/jsx-runtime까지 바꿉니다. 코어를 external로 두는 라이브러리 빌드에서는 패키지 이름을 replacement로 유지합니다.',

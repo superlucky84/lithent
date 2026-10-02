@@ -33,6 +33,7 @@ Lithent는 JSX를 기반으로 만들어진 경량(zip 3kb) 가상돔 UI 라이�
     * effect 헬퍼
     * computed 헬퍼
     * nextTick 헬퍼
+    * Concurrent 렌더링 (lithent-concurrent)
 * lTag (Tagged templates 를 이용한 마크업 지원)
 * fTags (함수 호출방식 마크업 지원)
 
@@ -456,6 +457,37 @@ nextTick().then(() => {
   );
 });
 ```
+
+### Concurrent 렌더링 (lithent-concurrent)
+
+`lithent-concurrent`는 `lithent`와 인터페이스가 같은 별도 코어입니다. 큰 컴포넌트 트리(수천 행 이상)에서 무거운 렌더가 입력을 막을 때, 저우선순위 렌더의 빌드 단계를 중간에 멈췄다 이어갑니다. 일반적인 화면에서는 기본 `lithent`를 사용하세요.
+
+번들러 alias로 코어를 선택합니다. 정규식으로 정확히 `lithent`만 매칭해야 `lithent/helper` 같은 서브패스가 바뀌지 않습니다.
+
+```ts
+// vite.config.ts
+export default {
+  resolve: {
+    alias: [{ find: /^lithent$/, replacement: 'lithent-concurrent' }],
+  },
+};
+```
+
+```tsx
+import { mount, deferRender, whenIdle } from 'lithent-concurrent';
+
+// 급한 입력 상태와 무거운 목록은 서로 다른 컴포넌트에 둡니다.
+// deferRender의 scope는 동기로 실행되고, 미뤄지는 것은 렌더뿐입니다.
+deferRender(() => {
+  query = next;
+  renew();
+});
+
+await nextTick(); // 동기 커밋까지만 기다립니다.
+await whenIdle(); // 미룬 렌더까지 기다립니다.
+```
+
+상세 설명은 [lithentConcurrent/README.md](./lithentConcurrent/README.md)와 문서 사이트의 Concurrent 렌더링 가이드를 참고하세요.
 
 ## lTag (Tagged templates 지원)
 

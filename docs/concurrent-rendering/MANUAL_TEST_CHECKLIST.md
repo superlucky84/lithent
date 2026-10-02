@@ -301,15 +301,15 @@ pnpm check:interrupt      # 두 코어를 빌드하고 섹션 E 페이지를 연
 ## H. 버전·배포 준비·사용자 문서 (2026-10-01, DC-22)
 
 DESIGN D19의 버전 표와 IMPLEMENT PREP-0~3를 따른다. 2026-10-02에 `d4ef0c9` 기준 자동 검증 결과를 IMPLEMENT 실행 기록에 남겼다.
-H-4·H-6은 문서 본문 정독 검토가 남아 열어 둔다.
+H-4·H-6은 문서 정독 검토 후 닫았다. AI 스킬·agent addon·MANUAL.md에도 같은 계약을 반영했다.
 
 - [x] H-1. 루트 1.22.1, private helper/JSX 0.21.1, concurrent/private concurrent helper 0.1.0,
   create-lithent 0.3.4, private docs 0.6.0이 manifest/lockfile에 정렬되고 유지 패키지 버전은 움직이지 않는다
 - [x] H-2. concurrent private 해제·peer `lithent ^1.22.1`, helper/JSX/타입/export 대상의 실제 pack 포함 확인
 - [x] H-3. create-lithent 양쪽 템플릿(`createLithent/basic`, `express`)이 `lithent ^1.22.1`을 사용한다. 템플릿은 pack이 아니라 GitHub에서 내려받으므로, 갱신된 템플릿이 upstream에 반영된 뒤 generator를 발행한다 (2026-10-02, `d4ef0c9`)
-- [ ] H-4. 영문/국문 concurrent rendering·helpers·변경 내역의 경로·내용·메뉴 이동 확인
+- [x] H-4. 영문/국문 concurrent rendering·helpers·변경 내역의 경로·내용·메뉴 이동 확인
 - [x] H-5. 새 데모가 실제 concurrent 코어를 실행하고 입력/미룬 DOM/pending 조회/완료 대기 결과를 검사한다
-- [ ] H-6. nextTick/MountHooks/UpdateHooks/ManualJSX 보완과 API 런타임 helper 3개·타입·BC 조건·N1이 실제 동작과 일치한다
+- [x] H-6. nextTick/MountHooks/UpdateHooks/ManualJSX 보완과 API 런타임 helper 3개·타입·BC 조건·N1이 실제 동작과 일치한다
 - [x] H-7. 최신 build/unit/dual/size/artifact/브라우저 및 범위 타입/lint/format·pack 검사 근거를 기록한다
 - [x] H-8. 기본 `src/` 동결, A-3/A-7/B-1·11-9 미완, T1 조건 N/A, 실제 publish/추가 커밋 미실행을 기록한다
 

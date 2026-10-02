@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-10-01)
-- 상태: **E2E-0~4 완료·Phase 11 10/11 완료. PREP-0~3은 자동 검증 통과(`d4ef0c9`, 2026-10-02). 기능 문서 정독 검토(P1-3~5, P2-3)·A-3/A-7/B-1·11-9·실제 publish 미완.**
+- 상태: **E2E-0~4 완료·Phase 11 10/11 완료. PREP-0~3 완료(2026-10-02): 자동 검증 통과, 사용자 문서·AI 스킬 문서 정독 검토와 보완 완료. A-3/A-7/B-1·11-9·실제 publish 미완.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 기존 구현 Phase 0~11의 공통 종료 조건:
@@ -412,6 +412,7 @@ Phase 5 이후 포크가 더 갈라져도 같은 문제가 재발하지 않는�
 | 코어 스위트 | — | 110개 전량 통과 |
 | 동치성 (4-9) | — | 8개 통과 (기존 5 + BC-1 3) |
 | `test:dual` · `verify:concurrent` | 통과 | 통과 |
+| `d4ef0c9`+문서 | PREP-1/2 보완 | 문서 정독 검토: 가이드 EN/KO에 크기 기준(1,000행 무이득/10,000행 부근) 추가, AI 스킬(`skills/lithent/reference/concurrent.md`·SKILL.md·constraints)·agent addon·`MANUAL.md` 추가, `mountReadyCallback` 설명 정정(WDom 생성 직후·DOM 삽입 전). 재검증: `verify:release` PASS(tarball에 skills/addon 포함 확인), docs `tsc`·build PASS, Playwright 22 PASS | 통과 |
 
 호출 지점이 4개 줄고 1개 늘어 **−16 B**. `render.ts`가 **Phase 5에서 처음 base와 갈라졌다**
 (제거 4곳). `wDom.ts`의 `commit()`이 이제 마운트 큐 flush까지 책임진다.
@@ -1530,9 +1531,9 @@ mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 scre
 
 - [x] P1-1. concurrent rendering와 helpers 영문/국문 가이드·메뉴·경로 연결
 - [x] P1-2. 실제 concurrent 코어의 실행 데모와 입력/미룬 갱신/pending 조회/완료 대기 확인 수단 추가
-- [ ] P1-3. 코어 API 3개와 helper 런타임 export 3개·타입·import 경로 및 alias/서브패스 설명
-- [ ] P1-4. nextTick/MountHooks/UpdateHooks/ManualJSX의 기본·concurrent 계약과 JSX 동적 배열 수정 보완
-- [ ] P1-5. 버전·변경 내역·BC-1/BC-2 조건·N1·상태/pending/중단/커밋 제한을 두 언어에서 정렬
+- [x] P1-3. 코어 API 3개와 helper 런타임 export 3개·타입·import 경로 및 alias/서브패스 설명
+- [x] P1-4. nextTick/MountHooks/UpdateHooks/ManualJSX의 기본·concurrent 계약과 JSX 동적 배열 수정 보완
+- [x] P1-5. 버전·변경 내역·BC-1/BC-2 조건·N1·상태/pending/중단/커밋 제한을 두 언어에서 정렬
 
 ### PREP-2 — 테스트 하드닝
 
@@ -1541,7 +1542,7 @@ mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 scre
 
 - [x] P2-1. 새 영문/국문 가이드·helpers·변경 내역 경로의 정확한 내용·heading·메뉴 이동 단언
 - [x] P2-2. 새 데모의 실제 concurrent 선택과 시점별 DOM/값·pending 조회·완료 후 결과 검증
-- [ ] P2-3. 기존 nextTick·라이프사이클·JSX 설명과 실제 동작/서브패스/type 결과 정합 확인
+- [x] P2-3. 기존 nextTick·라이프사이클·JSX 설명과 실제 동작/서브패스/type 결과 정합 확인
 - [x] P2-4. 새 검사에도 모듈 미실행·누락·잘못된 코어·예상하지 않은 브라우저 오류 실패 가드 적용
 - [x] P2-5. 변경 범위 타입·lint·format 및 필요한 핵심 검사/기존 돌연변이 근거 확인
 
@@ -1635,7 +1636,7 @@ mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 scre
   - **E2E-0~4 완료 (2026-10-01)** — Chromium 20개(base 9/concurrent 11, skip 0),
     5종 돌연변이의 예상 단언 실패 6개, CLI·타입·스타일 검증 통과. 공유 JSX keyed 회귀를 수정했다.
     기존 미완 체크리스트 27개 중 24개를 닫았고 Phase 11은 11-4/11-7 완료로 **10/11**이다.
-- next: 새 가이드(P1-3~5)와 기존 NextTick/UpdateHooks 설명(P2-3)을 정독 검토한다. 이후 A-3/B-1 성능 측정·A-7 기준을 정하고, 요청 시 publish를 준비한다.
+- next: A-3/B-1 성능 측정·A-7 기준을 정하고, 요청 시 publish를 준비한다 (발행 순서는 lithent → lithent-concurrent → 템플릿 반영 후 create-lithent).
 - 미완: 11-9 및 A-3/A-7/B-1. 기능 E2E 통과와 성능·과거 동등성 판정은 구분한다.
   3-5/3-5b는 현재 T2 범위에 N/A이며 T1만 내보내는 계획으로 바뀔 때 재검토한다. 실제 npm publish는 별도 요청이다.
 - blockers: 기능 검증에는 없음. A-7 과거 릴리스 기준 미확정, A-3/B-1 별도 실측 잔여로 최종 릴리스 게이트는 미완이다.

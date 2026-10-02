@@ -147,7 +147,7 @@ const Component = mount((renew) => {
     console.log('Will update');
   });
 
-  // After initial render complete
+  // Right after the WDom is created, before DOM insertion
   mountReadyCallback(() => {
     console.log('Initial render done');
   });
@@ -346,6 +346,31 @@ const Card = mount((renew, props: { title: string }, children) => {
 <Card title="Title"><p>Content</p></Card>
 ```
 
+## Concurrent Rendering (optional)
+
+Separate package `lithent-concurrent` for very large trees. Select the core with an
+exact `/^lithent$/` bundler alias; keep `lithent/*` subpaths unchanged.
+
+```tsx
+import { mount, deferRender, whenIdle } from 'lithent-concurrent';
+
+// Urgent input and heavy list must be different components.
+let setQuery: (next: string) => void = () => {};
+
+const HeavyList = mount((renew) => {
+  let query = '';
+  setQuery = (next) => deferRender(() => { query = next; renew(); });
+  return () => (
+    <ul>{rows.map((row) => <li key={row.id}>{row.text}{query}</li>)}</ul>
+  );
+});
+
+// In an input handler: setQuery(value) is deferred; renew() is urgent.
+await whenIdle(); // deferred renders committed (nextTick covers sync only)
+```
+
+See `reference/concurrent.md` for setup rules, helpers and lifecycle differences.
+
 ## Import Reference
 
 ```tsx
@@ -364,6 +389,10 @@ import {
   cacheUpdate, nextTickRender,     // Performance
   unwrapChildren                    // Utility
 } from 'lithent/helper';
+
+// Concurrent (optional package)
+import { deferRender, whenIdle, hasPending } from 'lithent-concurrent';
+import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper';
 
 // SSR
 import { renderToString, hydration } from 'lithent/ssr';
