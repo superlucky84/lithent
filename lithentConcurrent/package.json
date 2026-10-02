@@ -1,0 +1,57 @@
+{
+  "type": "module",
+  "name": "lithent-concurrent",
+  "version": "0.1.0",
+  "description": "Interface-compatible rendering build of Lithent with priority scheduling and interruptible low-priority builds.",
+  "packageManager": "pnpm@9.12.3",
+  "main": "./dist/lithentConcurrent.umd.js",
+  "module": "./dist/lithentConcurrent.mjs",
+  "types": "./dist/types/lithentConcurrent/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/lithentConcurrent/src/index.d.ts",
+      "import": "./dist/lithentConcurrent.mjs",
+      "require": "./dist/lithentConcurrent.umd.js"
+    },
+    "./helper": {
+      "types": "./helper/dist/types/index.d.ts",
+      "import": "./helper/dist/lithentConcurrentHelper.mjs",
+      "require": "./helper/dist/lithentConcurrentHelper.umd.js"
+    }
+  },
+  "files": [
+    "src",
+    "dist",
+    "package.json",
+    "helper/src",
+    "helper/dist",
+    "helper/package.json"
+  ],
+  "sideEffects": false,
+  "peerDependencies": {
+    "lithent": "^1.22.1"
+  },
+  "scripts": {
+    "dev": "vite --config vitedev.config.js",
+    "build": "vite build && node scripts/emitTypes.js",
+    "verify": "node scripts/verifyArtifacts.js",
+    "bench": "vite --config vitebench.config.js",
+    "watch": "vite build --watch",
+    "test": "vitest run --reporter verbose -c vitest.config.js",
+    "test:dev": "vitest -c vitest.config.js"
+  },
+  "author": "superlucky84",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent",
+    "concurrent"
+  ],
+  "volta": {
+    "node": "20.3.0"
+  }
+}

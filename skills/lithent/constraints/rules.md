@@ -14,3 +14,4 @@ version: {{VERSION}}
 - Don’t rely on `props.children`; use the separate `children` argument.
 - Argument order is `mount(renew, props, children)` and `lmount(props, children)`.
 - Avoid destructuring props in the mounter if you need live updates.
+- With `lithent-concurrent`, alias only the exact `lithent` import and keep urgent state and heavy lists in separate components.

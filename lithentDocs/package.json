@@ -2,7 +2,7 @@
   "type": "module",
   "private": true,
   "name": "lithent-docs",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "lithent-docs",
   "main": "./dist/lithentDocs.umd.js",
   "module": "./dist/lithentDocs.mjs",
@@ -31,6 +31,7 @@
     "autoprefixer": "^10.4.14",
     "highlight.js": "^11.8.0",
     "lithent": "workspace:*",
+    "lithent-concurrent": "workspace:*",
     "lithent-helper": "workspace:*",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2"

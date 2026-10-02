@@ -18,6 +18,9 @@ export const runUnmountQueueFromWDom = (newWDom: WDom) => {
   const { compKey } = newWDom;
 
   if (compKey) {
+    // A redraw queued before this removal still holds the node. Marking it
+    // retired makes that stale redraw a no-op instead of drawing it back in.
+    newWDom.il = true;
     removeItem(compKey);
   }
   recursiveRunUnmount(newWDom);

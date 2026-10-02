@@ -47,7 +47,7 @@ CODING GUIDELINES:
 4. LIFECYCLE HOOKS
    - Use `mountCallback` for setup after mount (return cleanup function)
    - Use `updateCallback` for logic before each update
-   - Use `mountReadyCallback` for logic after initial render
+   - Use `mountReadyCallback` for logic right after the WDom is created (before DOM insertion)
    - Place hooks in mounter function, not in updater
 
 5. LIST RENDERING
@@ -82,12 +82,22 @@ CODING GUIDELINES:
     - Access children as third parameter in mounter function
     - Don't modify children directly, wrap or filter them
 
+11. CONCURRENT RENDERING (only when `lithent-concurrent` is installed or requested)
+    - Suggest it only for very large trees (thousands of rows); plain `lithent` otherwise
+    - Select the core with an exact `/^lithent$/` alias; never alias `lithent/*` subpaths
+    - Keep urgent input state and the heavy list in separate components
+    - `deferRender` runs its scope synchronously; only rendering is deferred
+    - `await nextTick()` covers sync commits; use `await whenIdle()` for deferred renders
+    - `hasPendingRender` is a query, not reactive; show pending from a sync parent
+    - No Suspense or `use()`; updateCallback's return value is not an unmount cleanup
+
 IMPORT PATHS:
 - Core: `import { mount, lmount, render, h, Fragment, portal, ref, nextTick } from 'lithent'`
 - Lifecycle: `import { mountCallback, updateCallback, mountReadyCallback } from 'lithent'`
 - Helper (manual): `import { state, store, createContext, computed, effect } from 'lithent/helper'`
 - Helper (light): `import { lstate, lstore, createLContext } from 'lithent/helper'`
 - Helper (utils): `import { cacheUpdate, nextTickRender, unwrapChildren } from 'lithent/helper'`
+- Concurrent (optional): `import { deferRender, whenIdle } from 'lithent-concurrent'` and `import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper'`
 - SSR: `import { renderToString, hydration } from 'lithent/ssr'`
 - FTags: `import { fTags, fFragment, fMount } from 'lithent/ftags'`
 - HTM: `import { lTag } from 'lithent/tag'`
@@ -116,11 +126,14 @@ COMMON MISTAKES TO CATCH:
 - Missing `key` prop in list iterations
 - Calling hooks inside updater instead of mounter
 - Mutating state directly instead of using `.value`
+- Using `deferRender` while the urgent state and heavy list share one component
+- Aliasing `lithent` with a prefix match so `lithent/helper` is rewritten too
 
 REFERENCE MATERIALS (NOT PART OF BEHAVIORAL RULES):
 
 For detailed code examples and API usage, refer to:
 node_modules/lithent/dist/skills/lithent/SKILL.md
+(concurrent details: node_modules/lithent/dist/skills/lithent/reference/concurrent.md)
 
 This reference material provides comprehensive examples, patterns,
 and import references that complement the behavioral guidelines above.

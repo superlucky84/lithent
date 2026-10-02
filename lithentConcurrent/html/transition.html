@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lithent-concurrent — scheduler</title>
+    <style>
+      body {
+        font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        margin: 0;
+        padding: 24px;
+        max-width: 1100px;
+      }
+      h1 { font-size: 16px; margin: 0 0 4px; }
+      p.lede { margin: 0 0 20px; color: #666; }
+      section {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+      }
+      h2 { font-size: 13px; margin: 0 0 10px; }
+      h2 code { background: #f2f2f2; padding: 1px 5px; border-radius: 3px; }
+      .hint { color: #666; font-size: 12px; margin: 0 0 10px; }
+      input { font: inherit; padding: 4px 6px; width: 260px; }
+      button { font: inherit; padding: 4px 10px; margin-right: 6px; }
+      .rows {
+        height: 200px;
+        overflow: auto;
+        border-top: 1px solid #eee;
+        margin-top: 8px;
+      }
+      .rows div { padding: 1px 0; white-space: nowrap; }
+      .panes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .pane { border: 1px solid #e2e2e2; border-radius: 5px; padding: 10px 12px; min-width: 0; }
+      .pane h3 { font-size: 12px; margin: 0 0 8px; }
+      .pane input { width: 100%; box-sizing: border-box; }
+      .stats { margin: 8px 0 0; font-size: 12px; color: #444; }
+      .stats b { font-size: 14px; }
+      ul.hint { margin: 0 0 10px; padding-left: 18px; }
+      ul.hint li { margin-bottom: 3px; }
+      button.on { background: #1a1a1a; color: #fff; }
+      .pending { color: #b26a00; }
+      .idle { color: #2e7d32; }
+      table { border-collapse: collapse; margin-top: 8px; }
+      td { padding: 1px 12px 1px 0; }
+    </style>
+  </head>
+  <body>
+    <h1>lithent-concurrent — scheduler</h1>
+    <p class="lede">
+      MANUAL_TEST_CHECKLIST section B. Each block names the item it covers.
+    </p>
+    <div id="root"></div>
+    <script type="module" src="/demo/transition.tsx"></script>
+  </body>
+</html>

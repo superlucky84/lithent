@@ -1,12 +1,23 @@
 import { createRequire } from 'module';
-const require = createRequire('/Users/n250109005/project/lithent/package.json');
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const require = createRequire(root + '/package.json');
 const { JSDOM } = require('jsdom');
 const dom = new JSDOM('<!DOCTYPE html><html><body><div id="root"></div></body></html>');
 globalThis.window = dom.window; globalThis.document = dom.window.document;
 globalThis.DocumentFragment = dom.window.DocumentFragment;
 globalThis.HTMLElement = dom.window.HTMLElement; globalThis.Element = dom.window.Element;
 globalThis.Text = dom.window.Text; globalThis.Node = dom.window.Node;
-const { h, mount, render } = await import('/Users/n250109005/project/lithent/dist/lithent.mjs');
+// Core under test: the base build by default; set LITHENT_CORE=concurrent to
+// point the same benchmark at lithent-concurrent (C2 — the concurrent build is
+// judged on the same scenarios, not on a separate harness).
+const coreBundle =
+  process.env.LITHENT_CORE === 'concurrent'
+    ? root + '/lithentConcurrent/dist/lithentConcurrent.mjs'
+    : root + '/dist/lithent.mjs';
+const { h, mount, render } = await import(coreBundle);
 let idCounter = 1;
 const buildData = n => Array.from({ length: n }, () => ({ id: idCounter++, label: 'row ' + Math.random().toString(36).slice(2, 8) }));
 let data = []; let renewFn;

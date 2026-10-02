@@ -1,11 +1,13 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
+import { ConcurrentNote } from '@/components/ConcurrentNote';
 
 export const NextTick = () => (
   <div class="prose prose-lg dark:prose-invert max-w-none">
     <h1 class="text-3xl md:text-4xl font-semibold text-gray-900 dark:text-white mb-6">
       nextTick
     </h1>
+    <ConcurrentNote kind="nextTick" language="en" />
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
@@ -32,10 +34,9 @@ export const NextTick = () => (
       </strong>
       .
       <br />
-      <br />
-      When renew() is called, a Virtual DOM is created and the actual DOM is
-      updated. This process runs synchronously, but nextTick guarantees a point
-      in time after the DOM update has fully заверш.
+      <br />A normal renew() queues a synchronous render in a microtask.
+      Awaiting nextTick lets that queued update commit before reading the DOM.
+      Deferred renders in the concurrent core require whenIdle instead.
     </p>
 
     <CodeBlock
@@ -435,7 +436,7 @@ test('counter updates correctly', async () => {
 
   count += 1;
   renew();
-  // DOM update completes synchronously
+  // Render is queued in a microtask.
 
   console.log('2. After renew');
 
@@ -443,7 +444,7 @@ test('counter updates correctly', async () => {
   // Wait until the microtask queue is processed
 
   console.log('3. After nextTick');
-  // At this point, all DOM updates and browser rendering are complete
+  // Queued synchronous DOM updates have committed; paint may still be pending.
 };
 
 // Output order:
@@ -569,10 +570,9 @@ const Example = mount((renew) => {
 
     <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 mb-6 rounded-r">
       <p class="text-sm md:text-base text-yellow-800 dark:text-yellow-200 leading-relaxed">
-        <span class="font-medium">⚠️ Synchronous DOM updates:</span> In Lithent,
-        renew() updates the DOM synchronously. nextTick is not for waiting on
-        browser painting, but for guaranteeing execution after the current
-        execution context using the microtask queue.
+        <span class="font-medium">⚠️ Queued DOM updates:</span> renew() queues
+        its render in a microtask. nextTick waits for synchronous queued work,
+        rather than browser paint or deferred concurrent renders.
         <br />
         <br />
         <span class="font-medium">⚠️ Avoid overuse:</span> In most cases, the

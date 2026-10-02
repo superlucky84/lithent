@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "paths": {
+      "lithent-concurrent": [
+        "../lithentConcurrent/dist/types/lithentConcurrent/src/index.d.ts"
+      ],
+      "lithent-concurrent/helper": [
+        "../lithentConcurrent/helper/dist/types/index.d.ts"
+      ]
+    },
+    "types": ["node"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "lithent",
+    "noUnusedLocals": true
+  },
+  "include": ["./**/*.ts", "./**/*.tsx", "../playwright.config.ts"],
+  "exclude": []
+}

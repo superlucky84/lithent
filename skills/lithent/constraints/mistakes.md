@@ -13,3 +13,6 @@ version: {{VERSION}}
 - Using `state` with `lmount` or `lstate` with `mount`.
 - Creating `store`/`lstore` inside components (new store per render).
 - Mutating arrays or nested objects directly instead of replacing references.
+- Calling `deferRender` for state that lives in the same component as the urgent input (the sync render absorbs it).
+- Using a prefix alias for `lithent-concurrent`, which also rewrites `lithent/helper` and `lithent/jsx-runtime`.
+- Treating `updateCallback`'s returned function as an unmount cleanup.

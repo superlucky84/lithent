@@ -19,7 +19,14 @@ globalThis.Element = dom.window.Element;
 globalThis.Text = dom.window.Text;
 globalThis.Node = dom.window.Node;
 
-const { h, mount, render } = await import(root + '/dist/lithent.mjs');
+// Core under test: the base build by default; set LITHENT_CORE=concurrent to
+// point the same benchmark at lithent-concurrent (C2 — the concurrent build is
+// judged on the same scenarios, not on a separate harness).
+const coreBundle =
+  process.env.LITHENT_CORE === 'concurrent'
+    ? root + '/lithentConcurrent/dist/lithentConcurrent.mjs'
+    : root + '/dist/lithent.mjs';
+const { h, mount, render } = await import(coreBundle);
 
 let data = [];
 let renewFn;
