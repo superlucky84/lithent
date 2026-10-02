@@ -1,7 +1,7 @@
 # IMPLEMENT — Lithent Concurrent 렌더링 (별도 빌드 + 파이버)
 
 - 작성일: 2026-08-28 (최종 수정: 2026-10-01)
-- 상태: **E2E-0~4 완료·Phase 11 10/11 완료. PREP-0~3 완료(2026-10-02): 자동 검증 통과, 사용자 문서·AI 스킬 문서 정독 검토와 보완 완료. A-3·A-7·B-1 완료(2026-10-02, 성능 측정 중 버그 2건 수정). 11-9·실제 publish 미완.**
+- 상태: **E2E-0~4 완료·Phase 11 10/11 완료. PREP-0~3 완료(2026-10-02): 자동 검증 통과, 사용자 문서·AI 스킬 문서 정독 검토와 보완 완료. A-3·A-7·B-1 완료(2026-10-02, 성능 측정 중 버그 2건 수정). **Phase 11 11/11 완료**(11-9 포함). 실제 publish·배포만 미실행.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 기존 구현 Phase 0~11의 공통 종료 조건:
@@ -1371,7 +1371,7 @@ SSR 응답 확인 → 서버 기동. 원본 `createLithent/express`는 건드리
 - [x] 11-8. `createLithent` 보일러플레이트로 신규 프로젝트 → SSR+hydration
       — **통과 (2026-09-02)**. `pnpm check:scaffold[:concurrent]`가 자동 구간을,
       브라우저에서 하이드레이션을 확인했다 (아래)
-- [ ] 11-9. 체크리스트 전량 근거 기록 — CLI/E2E/성능 측정 및 A-7 비교 기준을 각각 연결
+- [x] 11-9. 체크리스트 전량 근거 기록 — CLI/E2E/성능 측정 및 A-7 비교 기준을 각각 연결 (2026-10-02: MANUAL_TEST_CHECKLIST 미체크 0개, A-3·A-7·B-1은 실측 수치와 함께 기록)
 - [x] 11-10. 최종 크기 실측 + RC-4 판정 — 기본 **4,734**/4,800 (무회귀), concurrent **6,149**/9,000
 - [x] 11-11. 체인지로그(BC-1~BC-4) + README — `lithentConcurrent/README.md` 하나에 합쳤다
       - **README·`package.json` description·릴리스 노트는 REQUIREMENTS §2.1을 따른다** —
@@ -1640,7 +1640,7 @@ mutation JSON 보고서는 `test-results/mutations`에 저장한다. 실패 scre
     5종 돌연변이의 예상 단언 실패 6개, CLI·타입·스타일 검증 통과. 공유 JSX keyed 회귀를 수정했다.
     기존 미완 체크리스트 27개 중 24개를 닫았고 Phase 11은 11-4/11-7 완료로 **10/11**이다.
 - next: A-3/B-1 성능 측정·A-7 기준을 정하고, 요청 시 publish를 준비한다 (발행 순서는 lithent → lithent-concurrent → 템플릿 반영 후 create-lithent).
-- 미완: 11-9 및 A-3/A-7/B-1. 기능 E2E 통과와 성능·과거 동등성 판정은 구분한다.
+- 미완: 없음(2026-10-02, 11-9·A-3·A-7·B-1 완료). 남은 것은 CHANGELOG 제목 확정과 실제 publish/문서 배포다.
   3-5/3-5b는 현재 T2 범위에 N/A이며 T1만 내보내는 계획으로 바뀔 때 재검토한다. 실제 npm publish는 별도 요청이다.
 - blockers: 기능 검증에는 없음. A-7 과거 릴리스 기준 미확정, A-3/B-1 별도 실측 잔여로 최종 릴리스 게이트는 미완이다.
 - 현재 HEAD: `d4ef0c9c3eb241f13de02882eda5d71300c19eb6` (2026-10-02, PREP 자동 검증 통과).
