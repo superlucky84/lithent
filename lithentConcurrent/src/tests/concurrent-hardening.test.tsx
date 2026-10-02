@@ -411,3 +411,205 @@ describe('N1 boundary (10-10)', () => {
     expect(names.filter(name => /suspen|lazy/i.test(name))).toEqual([]);
   });
 });
+
+describe('urgent render beside a parked build (B-1)', () => {
+  type Shape = { a: boolean; b: boolean; items: number[] };
+
+  // Three siblings under one parent: A and B change their root element type on
+  // an urgent render, the list in the middle is rebuilt in the low lane. Rows can
+  // raise those urgent renders from inside the build (`onRow`), which is the only
+  // dependable way to land one between two slices.
+  const makeApp = (
+    init: Shape,
+    onRow: (
+      n: number,
+      bump: { a: () => void; b: () => void }
+    ) => void = () => {}
+  ) => {
+    const state: Shape = { ...init, items: [...init.items] };
+    const bump = { a: () => {}, b: () => {}, list: () => {} };
+
+    const A = mount((renew: () => void) => {
+      bump.a = renew;
+      return () => (state.a ? <section>A</section> : <p>A</p>);
+    });
+    const B = mount((renew: () => void) => {
+      bump.b = renew;
+      return () => (state.b ? <section>B</section> : <p>B</p>);
+    });
+    const Row = mount(
+      (_renew: () => void, props: { n: number; key?: number }) => {
+        return () => {
+          onRow(props.n, bump);
+          return <i>{props.n}</i>;
+        };
+      }
+    );
+    const List = mount((renew: () => void) => {
+      bump.list = renew;
+      return () => (
+        <>
+          {state.items.map(n => (
+            <Row key={n} n={n} />
+          ))}
+        </>
+      );
+    });
+    const App = mount(() => () => (
+      <div>
+        <A />
+        <List />
+        <B />
+      </div>
+    ));
+
+    return { state, bump, App };
+  };
+
+  const settled = (shape: Shape) => {
+    const ref = makeApp(shape);
+    const el = host();
+    render(<ref.App />, el);
+    return el.innerHTML;
+  };
+
+  it('10-12. an unrelated urgent render does not finish a parked build', async () => {
+    // The urgent render is raised from inside a row of the list, so it lands
+    // exactly between two slices without depending on timer or channel order,
+    // and A's own updater records what is on screen when it runs. If the parked
+    // build had been finished first, the whole new list would already be there.
+    const state: Shape = {
+      a: true,
+      b: true,
+      items: Array.from({ length: 40 }, (_, i) => 40 - i),
+    };
+    let bumpA = () => {};
+    let bumpList = () => {};
+    let armed = false;
+    let listCountSeenByA = -1;
+    const el = host();
+
+    const A = mount((renew: () => void) => {
+      bumpA = renew;
+      return () => {
+        if (armed) {
+          listCountSeenByA = el.querySelectorAll('i').length;
+          armed = false;
+        }
+
+        return state.a ? <section>A</section> : <p>A</p>;
+      };
+    });
+    const Row = mount(
+      (_renew: () => void, props: { n: number; key?: number }) => {
+        return () => {
+          if (props.n === 20 && fireAt) {
+            fireAt = false;
+            armed = true;
+            state.a = false;
+            bumpA();
+          }
+
+          return <i>{props.n}</i>;
+        };
+      }
+    );
+    let fireAt = false;
+    const List = mount((renew: () => void) => {
+      bumpList = renew;
+      return () => (
+        <>
+          {state.items.map(n => (
+            <Row key={n} n={n} />
+          ))}
+        </>
+      );
+    });
+    const App = mount(() => () => (
+      <div>
+        <A />
+        <List />
+      </div>
+    ));
+
+    state.items = [1, 2, 3];
+    render(<App />, el);
+
+    setLowLaneBudget(0);
+    state.items = Array.from({ length: 40 }, (_, i) => 40 - i);
+    fireAt = true;
+    deferRender(() => bumpList());
+    await whenIdle();
+
+    expect(armed, 'the urgent render ran').toBe(false);
+    expect(
+      listCountSeenByA,
+      'the list was still the old one when the urgent render built'
+    ).toBe(3);
+    expect(el.querySelector('p')?.textContent).toBe('A');
+    expect(
+      el.querySelectorAll('i').length,
+      'and the list landed afterwards'
+    ).toBe(40);
+  });
+
+  it('10-13. random urgent renders between slices converge on the same DOM', async () => {
+    // Insertion anchors are computed at build time. An urgent render of a
+    // neighbour that swaps its root element while the list is parked is the way
+    // to make one of them go stale, so this walks many such interleavings and
+    // compares each final DOM with one rendered from the final state alone.
+    let seed = 12345;
+    const rand = (n: number) => {
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      return seed % n;
+    };
+    let urgentRan = 0;
+
+    for (let round = 0; round < 60; round++) {
+      const fires = new Map<number, 'a' | 'b'>();
+      const app = makeApp(
+        { a: true, b: true, items: [1, 2, 3, 4] },
+        (n, bump) => {
+          const which = fires.get(n);
+
+          if (which) {
+            fires.delete(n);
+            urgentRan++;
+            app.state[which] = !app.state[which];
+            bump[which]();
+          }
+        }
+      );
+      const el = host();
+      render(<app.App />, el);
+
+      setLowLaneBudget(0);
+
+      for (let step = 0; step < 3; step++) {
+        const items = Array.from({ length: 4 + rand(24) }, (_, i) => i).sort(
+          () => rand(3) - 1
+        );
+        for (let k = 0; k < 2 + rand(3); k++) {
+          fires.set(items[rand(items.length)], rand(2) ? 'a' : 'b');
+        }
+
+        app.state.items = items;
+        deferRender(() => app.bump.list());
+        await whenIdle();
+      }
+
+      expect(el.innerHTML, `round ${round}`).toBe(
+        settled({
+          a: app.state.a,
+          b: app.state.b,
+          items: app.state.items,
+        })
+      );
+    }
+
+    expect(
+      urgentRan,
+      'urgent renders really landed between slices'
+    ).toBeGreaterThan(60);
+  });
+});

@@ -6,7 +6,7 @@ const copy = {
   en: {
     title: 'Concurrent Rendering',
     intro:
-      'lithent-concurrent is a separate rendering build for screens with expensive component trees. It schedules urgent work first and can pause low-priority builds between units of work. Use the base lithent core for ordinary screens and small interactive islands. In a 2026-10-02 browser measurement of typing into a filter, a 5,000-row list cut input-to-paint latency from about 134 ms to 27 ms. At 1,000 rows both fit in a frame, at 10,000 rows the gain nearly vanished, and at 20,000 rows deferring was slower. Commits cannot be split, so measure your own screen.',
+      'lithent-concurrent is a separate rendering build for screens with expensive component trees. It schedules urgent work first and can pause low-priority builds between units of work. Use the base lithent core for ordinary screens and small interactive islands. In a 2026-10-02 browser measurement of typing into a filter, deferring the list cut input-to-paint latency from about 143 ms to 25 ms at 5,000 rows and from 515 ms to 46 ms at 20,000 rows. At 1,000 rows both fit in a frame. Commits cannot be split, so a finished build still lands as one block; measure your own screen.',
     install: 'Install and select the core',
     setup:
       'Keep lithent installed for JSX, helper and SSR subpaths. Match the core import exactly: a prefix alias would also rewrite lithent/helper and lithent/jsx-runtime. In library builds that externalize the core, keep the package-name replacement.',
@@ -39,7 +39,7 @@ const copy = {
   ko: {
     title: 'Concurrent 렌더링',
     intro:
-      'lithent-concurrent는 큰 컴포넌트 트리를 다루는 별도 렌더링 빌드입니다. 급한 갱신을 먼저 처리하고 저우선순위 빌드를 작업 단위 사이에서 중단·재개합니다. 일반적인 화면이나 작은 인터랙티브 영역에는 기본 lithent 코어를 사용하세요. 2026-10-02 브라우저 실측(필터 입력 중 목록 갱신)에서 5,000행은 입력→페인트 지연이 약 134ms에서 27ms로 줄었습니다. 1,000행은 둘 다 한 프레임 안이라 차이가 작고, 10,000행에서는 이득이 거의 사라졌으며, 20,000행에서는 오히려 느렸습니다. 커밋은 쪼갤 수 없으니 실제 화면에서 직접 측정하세요.',
+      'lithent-concurrent는 큰 컴포넌트 트리를 다루는 별도 렌더링 빌드입니다. 급한 갱신을 먼저 처리하고 저우선순위 빌드를 작업 단위 사이에서 중단·재개합니다. 일반적인 화면이나 작은 인터랙티브 영역에는 기본 lithent 코어를 사용하세요. 2026-10-02 브라우저 실측(필터 입력 중 목록 갱신)에서 목록을 미루면 입력→페인트 지연이 5,000행에서 약 143ms→25ms, 20,000행에서 약 515ms→46ms로 줄었습니다. 1,000행은 둘 다 한 프레임 안입니다. 커밋은 쪼갤 수 없어서 완성된 빌드는 한 번의 블록으로 반영되니, 실제 화면에서 직접 측정하세요.',
     install: '설치와 코어 선택',
     setup:
       'JSX·helper·SSR 서브패스를 위해 lithent도 설치합니다. 코어 이름만 정확히 매칭하세요. 접두사 alias는 lithent/helper와 lithent/jsx-runtime까지 바꿉니다. 코어를 external로 두는 라이브러리 빌드에서는 패키지 이름을 replacement로 유지합니다.',

@@ -10,9 +10,9 @@ Optional, separate package. It is an interface-compatible build of the core that
 can pause low-priority render work. Suggest it only when the user has a screen
 with very large component trees (thousands of rows) where heavy rendering blocks
 input, or when `lithent-concurrent` is already installed. Measured on 2026-10-02
-(typing into a filter): 1,000 rows no real benefit; 5,000 rows input latency about
-5x lower; 10,000 rows almost no gain; 20,000 rows slower. Commits cannot be split,
-so tell the user to measure. For ordinary screens use plain `lithent`.
+(typing into a filter): input latency 143 -> 25 ms at 5,000 rows and 515 -> 46 ms at
+20,000 rows; no real benefit at 1,000 rows. Commits cannot be split, so tell the user
+to measure. For ordinary screens use plain `lithent`.
 
 ## Setup
 

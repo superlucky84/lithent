@@ -38,7 +38,7 @@ import {
   checkFragmentFunction,
   checkCustemComponentFunction,
 } from '@/utils/predicator';
-import { assign } from '@/utils';
+import { assign, getParent } from '@/utils';
 
 // ============================================================================
 // Public API - Highest Level (User-facing API)
@@ -320,18 +320,47 @@ export const replaceWDom = (
         discardPaused();
       }
     } else {
-      // A different component. Finishing it first keeps commit order equal to
-      // render order, and means the parked slot never has to be a queue.
-      drainPendingWork();
+      // A different component. When it sits above or below the parked one the
+      // two renders touch the same subtree, so the parked build is finished
+      // first: commit order stays equal to render order and the parked slot
+      // never has to be a queue.
+      //
+      // When the two are unrelated they build and commit disjoint subtrees, and
+      // the parked build keeps its place. Draining it here made every urgent
+      // render of an unrelated component (typing in an input next to a heavy
+      // list) run the rest of that list's build and its commit synchronously,
+      // which is exactly the block deferring is supposed to avoid.
+      if (relatedComponents(pausedPass.props, props)) {
+        drainPendingWork();
 
-      if (originalWDom.il) {
-        return;
+        if (originalWDom.il) {
+          return;
+        }
       }
     }
   }
 
   runPass(startPass(tag, props, children, originalWDom));
 };
+
+/** Whether `ancestor` renders a subtree that contains `descendant`. */
+const isAncestorOf = (ancestor: Props, descendant: Props) => {
+  let node = liveNodeOf(descendant);
+
+  while (node) {
+    node = getParent(node);
+
+    if (node && node.compKey === ancestor) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+/** Two components are related when one renders inside the other. */
+const relatedComponents = (a: Props, b: Props) =>
+  isAncestorOf(a, b) || isAncestorOf(b, a);
 
 const startPass = (
   tag: TagFunction,

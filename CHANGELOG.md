@@ -26,6 +26,9 @@ workspace versions are 0.21.1; they are not separate npm releases.
 - Fix a `deferRender` raised while an earlier low-priority build of the same
   component was in flight being dropped, which left the older value on screen
   with nothing pending. Found by the real-browser input measurement.
+- Do not finish a parked low-priority build when an unrelated component (not an
+  ancestor or descendant) renders urgently. Typing in an input next to a heavy
+  list no longer runs the rest of that list's build inside each keystroke.
 - Keep state writes immediate. Pending queries do not schedule renders;
   `nextTick` waits for synchronous work and `whenIdle` waits for deferred work.
 - Do not provide Suspense, Promise-based render suspension or state snapshots
