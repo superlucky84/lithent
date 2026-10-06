@@ -317,9 +317,19 @@ test('docs: the element guide renders and its demo widget works', async ({
   page,
 }, info) => {
   const origin = `http://127.0.0.1:${info.project.name === 'concurrent' ? 43135 : 43134}`;
-  for (const [route, title, last] of [
-    ['/guide/element', 'Custom Elements', 'Last pay event:'],
-    ['/ko/guide/element', '커스텀 엘리먼트', '마지막 pay 이벤트:'],
+  for (const [route, title, last, how] of [
+    [
+      '/guide/element',
+      'Custom Elements',
+      'Last pay event:',
+      'amount +1000 only changes a property',
+    ],
+    [
+      '/ko/guide/element',
+      '커스텀 엘리먼트',
+      '마지막 pay 이벤트:',
+      'amount +1000은 프로퍼티만 바꿉니다',
+    ],
   ]) {
     await page.goto(`${origin}/lithent/#${route}`);
     const main = page.locator('main');
@@ -331,9 +341,12 @@ test('docs: the element guide renders and its demo widget works', async ({
     await expect(widget).toHaveText('Pay 2000 KRW · 0');
     await widget.click();
     await expect(widget).toHaveText('Pay 2000 KRW · 1');
-    await expect(main.getByText(last)).toContainText(
+    await expect(main.getByText(last).first()).toContainText(
       '{"amount":2000,"clicks":1}'
     );
+    // The demo's behavior is explained, and its code is shown under it.
+    await expect(main.getByText(how)).toBeVisible();
+    await expect(main).toContainText('let clicks = 0; // the widget');
   }
 });
 

@@ -16,6 +16,8 @@ const copy = {
     demo: 'Try it',
     demoText:
       'The button below is the element. The page around it only sets the amount and listens to the pay event.',
+    demoHow:
+      'amount +1000 only changes a property: the page re-renders <docs-pay-button amount={amount}>, lithent assigns the value to the element’s amount property, and the widget re-renders with it. The click count is the widget’s own closure state, so it stays. Each click also reaches the page as a pay event. This is the demo’s code, without its styling classes:',
     props: 'Attributes and properties',
     propsRows: [
       ['String', 'the attribute value', 'undefined'],
@@ -86,6 +88,8 @@ const copy = {
     demo: '직접 해보기',
     demoText:
       '아래 버튼이 엘리먼트입니다. 바깥 페이지는 amount를 설정하고 pay 이벤트를 받기만 합니다.',
+    demoHow:
+      'amount +1000은 프로퍼티만 바꿉니다. 페이지가 <docs-pay-button amount={amount}>를 다시 그리면 lithent가 그 값을 엘리먼트의 amount 프로퍼티에 대입하고, 위젯은 새 값으로 다시 렌더됩니다. 클릭 수는 위젯 자신의 클로저 상태라서 그대로 남습니다. 클릭할 때마다 페이지에는 pay 이벤트가 도착합니다. 아래는 스타일 클래스만 뺀 이 데모의 코드입니다:',
     props: '속성과 프로퍼티',
     propsRows: [
       ['String', '속성 값 그대로', 'undefined'],
@@ -207,6 +211,50 @@ defineElement('pay-button', PayButton, {
       <h2>{t.demo}</h2>
       <p>{t.demoText}</p>
       <ElementDemo language={language} />
+      <p>{t.demoHow}</p>
+      <CodeBlock
+        language="tsx"
+        code={`// The widget
+const PayButton = mount<{ amount?: number; currency?: string; host: HTMLElement }>(
+  (renew, props) => {
+    let clicks = 0; // the widget's own state
+    return () => (
+      <button
+        part="button"
+        onClick={() => {
+          clicks++;
+          renew();
+          emit(props.host, 'pay', { amount: props.amount, clicks });
+        }}
+      >
+        Pay {props.amount ?? 0} {props.currency ?? 'KRW'} · {clicks}
+      </button>
+    );
+  }
+);
+
+defineElement('docs-pay-button', PayButton, {
+  props: { amount: Number, currency: String },
+  styles: ['button { background: var(--pay-color, #42b883); color: white; }'],
+});
+
+// The page around it
+const Demo = mount(renew => {
+  let amount = 1000;
+  let last = '';
+  const onPay = (event: Event) => {
+    last = JSON.stringify((event as CustomEvent).detail);
+    renew();
+  };
+  return () => (
+    <div>
+      <docs-pay-button amount={amount} onPay={onPay} />
+      <button onClick={() => { amount += 1000; renew(); }}>amount +1000</button>
+      <p>Last pay event: <code>{last || 'none yet'}</code></p>
+    </div>
+  );
+});`}
+      />
 
       <h2>{t.props}</h2>
       {table(t.propsHead, t.propsRows)}
