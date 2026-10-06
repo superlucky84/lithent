@@ -342,8 +342,10 @@
     }
   }
 </style>
-<style id="css-bomb" disabled>
-  /* "Host page CSS bomb": aggressive page styles. They hit the light-DOM
+<style id="css-bomb" media="not all">
+  /* Off until the checkbox turns it on. <style> has no disabled attribute
+     (only <link> does), so media="not all" keeps it inactive at load.
+     "Host page CSS bomb": aggressive page styles. They hit the light-DOM
      sticker but cannot reach inside the cats' shadow roots. */
   .stage button,
   .stage p,
@@ -354,7 +356,7 @@
     transform: rotate(-2deg);
   }
 </style>
-<style id="part-style" disabled>
+<style id="part-style" media="not all">
   /* Allowed theming: ::part() reaches the parts the widget exposes. */
   cat-card::part(pet-button) {
     border-radius: 999px;

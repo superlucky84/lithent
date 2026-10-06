@@ -379,9 +379,23 @@ test('playground: every step of the cat widget playground passes', async ({
   await expect(nabi.locator('.avatar')).toHaveText('😾');
   await page.locator('#block-meow').uncheck();
 
+  // Off at load: the light-DOM sticker and the pet button are untouched.
+  const sticker = page.locator('#sticker p');
+  const petButton = nabi.locator('button');
+  const style = (locator: typeof sticker, prop: string) =>
+    locator.evaluate((el, p) => getComputedStyle(el).getPropertyValue(p), prop);
+  expect(await style(sticker, 'background-color')).not.toBe('rgb(255, 45, 85)');
+  expect(await style(petButton, 'border-top-left-radius')).toBe('8px');
+
   await page.locator('#bomb').check();
   await ok('#v5');
+  expect(await style(sticker, 'background-color')).toBe('rgb(255, 45, 85)');
   await page.locator('#bomb').uncheck();
+  expect(await style(sticker, 'background-color')).not.toBe('rgb(255, 45, 85)');
+
+  await page.locator('#part').check();
+  expect(await style(petButton, 'border-top-left-radius')).toBe('999px');
+  await page.locator('#part').uncheck();
 
   await page.locator('#caption-input').fill('상자 안을 좋아해요');
   await expect(page.locator('#nabi [slot="caption"]')).toHaveText(

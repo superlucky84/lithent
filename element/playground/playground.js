@@ -261,7 +261,7 @@
 
   // 5. CSS isolation and theming
   $('#bomb').addEventListener('change', e => {
-    $('#css-bomb').disabled = !e.target.checked;
+    $('#css-bomb').media = e.target.checked ? 'all' : 'not all';
     const inside = nabi.shadowRoot?.querySelector('h3');
     const outside = $('#sticker p');
     if (!inside || !outside) return;
@@ -277,7 +277,7 @@
     );
   });
   $('#part').addEventListener('change', e => {
-    $('#part-style').disabled = !e.target.checked;
+    $('#part-style').media = e.target.checked ? 'all' : 'not all';
   });
   $('#fur').addEventListener('input', e => {
     nabi.style.setProperty('--cat-color', e.target.value);
