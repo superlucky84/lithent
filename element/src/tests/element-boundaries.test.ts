@@ -188,8 +188,10 @@ describe('found in the second review', () => {
     defineElement('bd-has-own', probe(seen), {
       props: { hasOwnProperty: Object },
     });
-    const el = document.createElement('bd-has-own') as HTMLElement & Seen;
-    el.hasOwnProperty = { x: 1 };
+    const el = document.createElement('bd-has-own');
+    // The prop replaces Object.prototype.hasOwnProperty on this element.
+    // Object.assign sets it through the accessor like `el.x = ...`.
+    Object.assign(el, { hasOwnProperty: { x: 1 } });
     expect(() => document.body.appendChild(el)).not.toThrow();
     expect(seen[seen.length - 1]).toEqual({ hasOwnProperty: { x: 1 } });
   });
