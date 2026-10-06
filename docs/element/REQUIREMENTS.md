@@ -2,7 +2,7 @@
 
 - 브랜치: `claude/ecstatic-sagan-xyu35m` / 기준 커밋 `285d8f8`
 - 작성일: 2026-10-06
-- 상태: **설계 단계. 코드 없음. DESIGN의 DC-1~DC-9 사용자 확정 대기.**
+- 상태: **구현·자동 검증 완료 (2026-10-06), lithent 1.23.0으로 출하 준비. 수동 체크리스트(Safari·Firefox) 남음.**
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.1, §3.1
 

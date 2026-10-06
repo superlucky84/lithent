@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 10 중 버전 결정(10-4, 10-7)만 남음 (2026-10-06). 그 외 전부 완료.**
+- 상태: **Phase 0~10 전부 완료 (2026-10-06). 출하 대상: lithent 1.23.0, lithent-concurrent 0.1.2. 남은 것은 MANUAL_TEST_CHECKLIST 수동 확인(Safari·Firefox)과 publish.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -482,10 +482,13 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
       생명주기, 타입, 주의(host 예약, 네이티브 이름, React 18은 ref, keyed 리스트는 배열)
 - [x] 10-2 README: Key features에 "Custom Elements" 소개 + Ecosystem 표 항목
 - [x] 10-3 `skills/lithent/SKILL.md` 섹션·import, `reference/element.md` 신규, `lithent-agent-addon.md` 규칙 12·import·참조. `pnpm build:skills` 확인
-- [ ] 10-4 CHANGELOG 항목 — **작성 완료(Unreleased)**. 버전 결정은 10-7과 함께 사용자 대기
+- [x] 10-4 CHANGELOG 항목 — `## 2026-10-06` 아래 `lithent 1.23.0`, `lithent-concurrent 0.1.2` 절로 정리
 - [x] 10-5 IDEAS.md §4 상태 갱신
 - [x] 10-6 `scripts/verify-release.mjs` 공개 import 경로 10 → **11개**, `lithent/element` export 목록과 DOM 없는 환경의 `undefined` 반환 검사 추가
-- [ ] 10-7 B-1 수정(`98db595`) 포함 릴리스의 버전 결정 (CHANGELOG Unreleased → 버전 절) — **사용자 결정 대기**
+- [x] 10-7 버전 결정 (사용자, 권장안): **lithent 1.22.1 → 1.23.0** (새 서브패스 = 마이너), **lithent-concurrent 0.1.1 → 0.1.2**
+      (B-1 수정만 = 패치). concurrent의 수정은 자체 포크 안에 있어 `lithent ^1.22.1` 피어 범위는 유지. 문서의 "1.22.1 이상"·
+      설치 예시·템플릿 의존성은 여전히 맞으므로 바꾸지 않음. 재검증: `pnpm build`(skill 버전 1.23.0), `test`·`test:dual` 실패 0,
+      `verify:release` ALL PASS (packed lithent@1.23.0, lithent-concurrent@0.1.2), E2E 42/42. **npm publish는 하지 않음**
 
 ### Phase 10 실측 결과 (2026-10-06)
 
@@ -515,3 +518,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | Phase 9 완료 (실브라우저 E2E 16건, 음성 대조 3종, 전체 E2E 38/38) | Phase 10 (문서·출하) | 없음 (MT-4는 `9497b68`) | `6d915f4` |
 | 2026-10-06 | MT-4 React 호스트 E2E (react 18.3.1 devDep, 속성·프로퍼티 경로 분리 검증), E2E 40/40 | Phase 10 (문서·출하) | 없음 | `9497b68` |
 | 2026-10-06 | Phase 10 문서·출하 준비 (가이드+데모, README, skill, verify-release 11경로, CHANGELOG), E2E 42/42 | 버전 결정 → CHANGELOG 버전 절, 수동 체크리스트(Safari·Firefox) | 버전 결정 대기 | `865179d` |
+| 2026-10-06 | 버전 확정 (lithent 1.23.0, lithent-concurrent 0.1.2), CHANGELOG 버전 절 — **Phase 0~10 완료** | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | (버전 커밋) |

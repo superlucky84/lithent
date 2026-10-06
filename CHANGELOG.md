@@ -1,13 +1,13 @@
 # Release notes
 
-## Unreleased
+## 2026-10-06
 
-### lithent/element (new subpath of lithent)
+### lithent 1.23.0
 
-- Add `lithent/element`: `defineElement(name, component, options)` registers a
-  `mount` or `lmount` component as a standard Custom Element, so it can be
-  embedded in any page with a script and a tag. UMD global `lithentElement`;
-  under 1 KB brotli (935 B) on top of the core, which is unchanged.
+- Add the `lithent/element` subpath: `defineElement(name, component, options)`
+  registers a `mount` or `lmount` component as a standard Custom Element, so it
+  can be embedded in any page with a script and a tag. UMD global
+  `lithentElement`; 935 B brotli on top of the core.
 - Declared props (`String`, `Number`, `Boolean`, `Object`) are observed as
   kebab-case attributes with conversion and exposed as properties without it.
   Changes in one task render once; values assigned before the element is
@@ -21,18 +21,24 @@
   `defineElement` returns `undefined` without `customElements` (SSR).
 - TypeScript infers the component's props from the declaration and rejects
   components that require or mistype them.
-- Works with both cores; covered by unit tests on both, and by browser tests in
-  a plain page, next to a host app on another lithent copy, and inside React 18.
-
-### lithent and lithent-concurrent
-
 - Fix `render()`'s destroy function skipping unmount callbacks. It ran them
   only when the root component had re-rendered at least once, so a fresh
   component root, or components rendered under an element root, never saw the
-  cleanup returned from `mountCallback`. Both cores now run unmount for the
-  whole removed tree, once per component. `lithent` shrinks by 1 B (brotli
-  4,738 B), `lithent-concurrent` by 5 B (6,228 B). Found while building
+  cleanup returned from `mountCallback`. It now runs unmount for the whole
+  removed tree, once per component. This is the only change to the base core;
+  `lithent` shrinks by 1 B (brotli 4,738 B). Found while building
   `lithent/element`.
+
+`lithent/element` ships inside this package; its private workspace version is
+0.1.0. It works with both cores and is covered by unit tests on both and by
+browser tests in a plain page, next to a host app on another lithent copy, and
+inside React 18.
+
+### lithent-concurrent 0.1.2
+
+- Fix the same `render()` destroy bug in the concurrent core: unmount callbacks
+  now run for the whole removed tree. Brotli 6,228 B (−5 B). Still works with
+  `lithent ^1.22.1`; use `lithent ^1.23.0` for `lithent/element`.
 
 ## 2026-10-02
 
