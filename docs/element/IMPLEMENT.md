@@ -259,4 +259,4 @@
 | 2026-10-06 | 문서 4종 초안, IDEAS.md | DC-1~DC-9 사용자 확정 → Phase 0 | DC 미확정 | `deea8c6` |
 | 2026-10-06 | DC-1~DC-9 확정, Phase 0 완료 (스캐폴딩, exports, size gate, R-1 E2E) | Phase 1 (등록·마운트/언마운트) | 없음 | `a811b16` |
 | 2026-10-06 | 코어 B-1 수정, Phase 1 완료 (등록·마운트/언마운트·렌더 루트) | Phase 2 (속성 → props) | 없음 | `98db595`, `6e7f0ae` |
-| 2026-10-06 | Phase 2 완료 (속성 → props, Boolean 기본 false, dev 경고 철회) | Phase 3 (프로퍼티 → props) | 없음 | (Phase 2 커밋) |
+| 2026-10-06 | Phase 2 완료 (속성 → props, Boolean 기본 false, dev 경고 철회) | Phase 3 (프로퍼티 → props) | 없음 | `19597be` |
