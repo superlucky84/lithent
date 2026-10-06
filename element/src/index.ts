@@ -70,7 +70,11 @@ export const defineElement = <S extends PropSpec = PropSpec>(
   const existing = customElements.get(name);
   if (existing) return existing;
 
-  const { shadow = true, props: spec = {} as S } = options;
+  const { shadow = true, props: spec = {} as S, styles } = options;
+  // FR-6: styles apply only inside a shadow root (DESIGN §5); one sheet per
+  // definition, shared by every instance and created on first use.
+  const css = shadow && styles ? styles.join('\n') : '';
+  let sheet: CSSStyleSheet | undefined;
 
   // FR-3: kebab-case attribute -> camelCase prop key.
   const keyOf: Record<string, string> = {};
@@ -122,7 +126,25 @@ export const defineElement = <S extends PropSpec = PropSpec>(
           ? this.attachShadow({ mode: shadow === 'closed' ? 'closed' : 'open' })
           : this;
         roots.set(this, root);
+        // Styles go in once per root: the root, and a fallback <style> in it,
+        // outlive disconnects (DESIGN §5, R-2).
+        if (css) {
+          if ('adoptedStyleSheets' in root) {
+            if (!sheet) {
+              sheet = new CSSStyleSheet();
+              sheet.replaceSync(css);
+            }
+            (root as ShadowRoot).adoptedStyleSheets = [sheet];
+          } else {
+            const style = document.createElement('style');
+            style.textContent = css;
+            root.appendChild(style);
+          }
+        }
       }
+      // DC-6: in light DOM the element owns its children; drop server
+      // fallback content (or anything added while detached) before rendering.
+      if (!shadow) this.textContent = '';
 
       const Host = mount(renew => {
         this.r = renew;

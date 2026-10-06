@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 3 완료 (2026-10-06). 다음: Phase 4.**
+- 상태: **Phase 4 완료 (2026-10-06). 다음: Phase 5.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -215,13 +215,42 @@
 진입 조건: DC-6, DC-8 확정.
 
 - [x] 4-1 `shadow` 옵션에 따라 `attachShadow({mode})` 또는 호스트 자신을 렌더 루트로 — **Phase 1에서 완료**
-- [ ] 4-2 `styles`: 정의당 `CSSStyleSheet` 1회 생성 + `adoptedStyleSheets`, 미지원 시 `<style>` 폴백
-- [ ] 4-3 non-shadow 모드: 첫 렌더 전 기존 자식 비움 (DC-6), `styles` 무시 (경고 없음, DESIGN §4.4)
-- [ ] 4-4 **R-2 회귀 가드**: 폴백 `<style>`이 있는 shadowRoot에서 내부 컴포넌트가
+- [x] 4-2 `styles`: 정의당 `CSSStyleSheet` 1회 생성(첫 사용 시) + `adoptedStyleSheets`, 미지원 시 `<style>` 폴백
+- [x] 4-3 non-shadow 모드: 마운트 전 기존 자식 비움 (DC-6), `styles` 무시 (경고 없음, DESIGN §4.4)
+- [x] 4-4 **R-2 회귀 가드**: 폴백 `<style>`이 있는 shadowRoot에서 내부 컴포넌트가
       0개 ↔ N개 자식으로 바뀌고 언마운트돼도 `<style>`이 남는지
 
-**기본 테스트** (`element-shadow.test.ts`): 위 4개 + shadow 내부 `<slot>` 렌더 시 light DOM 자식 투영
-(jsdom의 `assignedNodes()`로 확인).
+**기본 테스트** (`element-shadow.test.ts` 11건):
+- 폴백: 스타일 배열을 합친 `<style>` 1개가 루트 첫 자식, 인스턴스마다 / 스타일 없으면 없음 / light DOM 모드는 무시
+- R-2: 루트 자식 2 → 0 → 3 → 언마운트 → 재마운트 내내 `<style>` 정확히 1개, 첫 자식
+- adopted: `ShadowRoot.prototype.adoptedStyleSheets`·`CSSStyleSheet` 스텁으로 정의당 시트 1개 공유, `<style>` 없음, 스타일 없으면 시트 생성 안 함
+- slot: 기본 slot 투영 + 이후 추가된 자식, 이름 있는 slot
+- DC-6: 서버 폴백 콘텐츠 교체, 분리 중 추가된 자식 제거, shadow 모드는 light 자식 유지
+
+### Phase 4 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 / BG-2 | element 45/45 (base), 45/45 (concurrent) |
+| BG-3 | `98db595` 이후 코어 diff 없음 |
+| BG-4 | 빌드·타입체크·eslint 통과 (테스트의 `h(Fragment…)`는 ftags와 같은 `FragmentFunction` 캐스트) |
+| RC-3 크기 | **br 835 B / 1,000 B** (+116 B). 남은 여유 165 B로 Phase 5·6 |
+| 전체 회귀 | `pnpm test` 실패 0, `test:satellites:concurrent` 통과 |
+
+### Phase 4 돌연변이 검증
+
+| 돌연변이 | 결과 |
+|---|---|
+| 스타일을 루트 생성 때가 아니라 매 연결마다 추가 | **1/11 실패** (R-2: `<style>` 2개) → 복구 |
+| light DOM 비우기 제거 | **2/11 실패** → 복구 |
+| 시트 공유 제거 (인스턴스마다 생성) | **1/11 실패** → 복구 |
+
+### Phase 4에서 드러난 것
+
+- jsdom에는 `adoptedStyleSheets`가 없고 `CSSStyleSheet.replaceSync`도 없다 → 단위 테스트는 폴백 경로가 기본,
+  adopted 경로는 스텁으로 공유 로직만 확인. **실제 브라우저 적용은 Phase 9-1에서 반드시 확인**.
+- 시트를 정의 시점에 만들면 jsdom에서 `replaceSync` 부재로 정의가 실패한다 → 첫 사용 시 생성 (DESIGN §5).
+- 크기: adopted 분기가 약 60 B. 예산 초과 시 첫 축소 후보 (DESIGN §5 크기 메모).
 
 ## Phase 5 — 이벤트 발행 (FR-5)
 
@@ -290,3 +319,4 @@
 | 2026-10-06 | 코어 B-1 수정, Phase 1 완료 (등록·마운트/언마운트·렌더 루트) | Phase 2 (속성 → props) | 없음 | `98db595`, `6e7f0ae` |
 | 2026-10-06 | Phase 2 완료 (속성 → props, Boolean 기본 false, dev 경고 철회) | Phase 3 (프로퍼티 → props) | 없음 | `19597be` |
 | 2026-10-06 | Phase 3 완료 (프로퍼티 접근자, 생성자에서 업그레이드 흡수, 네이티브 이름 제약 문서화) | Phase 4 (스타일·slot·non-shadow 자식) | 없음 | `d537013` |
+| 2026-10-06 | Phase 4 완료 (스타일 adopted+폴백, slot, light DOM 비움, R-2 가드) | Phase 5 (이벤트 발행) | 없음 | (Phase 4 커밋) |

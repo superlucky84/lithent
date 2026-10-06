@@ -157,12 +157,18 @@ non-shadow 모드의 `styles`는 조용히 무시한다. 이 규칙이 §5와 IM
 defineElement('pay-button', PayButton, { styles: [css] });
 ```
 
-- 정의 시점에 `CSSStyleSheet`를 **1회** 생성해 모든 인스턴스가 공유한다(`adoptedStyleSheets`).
+- 정의당 `CSSStyleSheet`를 **1회** 만들어 모든 인스턴스가 공유한다(`adoptedStyleSheets`). 생성 시점은 정의가 아니라
+  **첫 인스턴스의 루트 생성 시**다 — 정의만 하고 쓰지 않으면 시트를 만들지 않고, `replaceSync`가 없는 환경(jsdom)에서
+  정의 단계가 예외를 내지 않는다.
+- 스타일은 **루트당 1회**, 루트를 만들 때 넣는다. 루트와 그 안의 폴백 `<style>`은 분리·재연결 후에도 남는다.
 - `adoptedStyleSheets` 미지원(jsdom, 구형 Safari)이면 렌더 루트 맨 앞에 `<style>`을 삽입한다.
 - **주의 — 폴백 `<style>`과 lithent의 일괄 삭제 경로.** `findChildWithRemoveElement`
   (`src/render.ts:96-115`)는 "부모의 자식 수 == 루트 자식 수"일 때 `textContent = ''`로 일괄 삭제한다.
   `<style>`이 있으면 개수가 달라 이 경로를 타지 않으므로 `<style>`은 보존된다.
   단, **이 판단은 코어 내부 동작에 의존**하므로 Phase 4에 회귀 테스트(4-4)로 고정한다.
+  → **확인됨 (Phase 4):** 루트 자식 2 → 0 → 3, 언마운트, 재마운트를 거쳐도 `<style>`은 정확히 1개, 항상 첫 자식.
+- **크기 메모:** `adoptedStyleSheets` 분기는 br 약 60 B다(`<style>`만 쓰면 775 B, 현재 835 B). 예산이 넘치면
+  첫 번째 축소 후보로 사용자에게 올린다 — 브라우저가 같은 텍스트의 `<style>`을 캐시하므로 기능상 손실은 작다.
 - non-shadow 모드에서 `styles`는 무시한다 (전역 오염 방지, 경고 없음 §4.4).
 
 ## 6. 이벤트 발행 (DC-5)
@@ -196,6 +202,8 @@ const PayButton = mount<{ amount: number; host: HTMLElement }>((_r, props) =>
 ### 7.1 non-shadow 모드의 기존 자식 (DC-6)
 
 권장안: 첫 렌더 직전에 호스트의 기존 자식을 비운다(서버 폴백 콘텐츠 교체 용도).
+**구현 (Phase 4):** non-shadow 모드는 *매 마운트* 직전에 비운다. 분리된 동안 누가 자식을 넣었어도 재마운트가 깨끗하다.
+shadow 모드의 light DOM 자식은 건드리지 않는다(slot 투영 대상).
 자식을 props로 넘기는 기능은 v2.
 
 ## 8. 타입 (RC-5)
