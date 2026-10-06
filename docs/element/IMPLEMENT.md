@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 9 완료 (MT-4 React 호스트 자동화 포함, 2026-10-06). 다음: Phase 10.**
+- 상태: **Phase 10 중 버전 결정(10-4, 10-7)만 남음 (2026-10-06). 그 외 전부 완료.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -475,13 +475,26 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 
 ## Phase 10 — 문서와 출하 준비
 
-- [ ] 10-1 `lithentDocs`에 Element 가이드 (en/ko 페이지 쌍, 기존 `*_ko.tsx` 규약)
-- [ ] 10-2 README Ecosystem 표에 `lithent/element` 추가
-- [ ] 10-3 `skills/lithent`와 `lithent-agent-addon.md`에 API 추가 (`pnpm build:skills`)
-- [ ] 10-4 CHANGELOG 항목, 버전 결정(마이너 업)
-- [ ] 10-5 IDEAS.md §4 상태 갱신
-- [ ] 10-6 `scripts/verify-release.mjs`의 공개 import 경로 검사(현재 10개)에 `lithent/element` 추가
-- [ ] 10-7 B-1 수정(`98db595`) 포함 릴리스의 버전 결정 (CHANGELOG Unreleased → 버전 절)
+- [x] 10-1 `lithentDocs`에 Element 가이드 — `pages/Element.tsx`(en/ko를 한 컴포넌트에서, concurrent 가이드와 같은 방식),
+      `Element_ko.tsx`, 라우트 `/guide/element`·`/ko/guide/element`, 사이드바 새 섹션 "Web Components / 웹 컴포넌트".
+      **실제 동작하는 데모** (`components/ElementDemo.tsx`): 문서 안에서 `docs-pay-button`을 정의하고 바깥에서 속성 변경·`pay` 수신.
+      내용: 정의, CDN 사용, 속성 변환 표, 프로퍼티, 이벤트(`cancelable`), 스타일과 CSS 변수·`::part()`, 옵션, slot,
+      생명주기, 타입, 주의(host 예약, 네이티브 이름, React 18은 ref, keyed 리스트는 배열)
+- [x] 10-2 README: Key features에 "Custom Elements" 소개 + Ecosystem 표 항목
+- [x] 10-3 `skills/lithent/SKILL.md` 섹션·import, `reference/element.md` 신규, `lithent-agent-addon.md` 규칙 12·import·참조. `pnpm build:skills` 확인
+- [ ] 10-4 CHANGELOG 항목 — **작성 완료(Unreleased)**. 버전 결정은 10-7과 함께 사용자 대기
+- [x] 10-5 IDEAS.md §4 상태 갱신
+- [x] 10-6 `scripts/verify-release.mjs` 공개 import 경로 10 → **11개**, `lithent/element` export 목록과 DOM 없는 환경의 `undefined` 반환 검사 추가
+- [ ] 10-7 B-1 수정(`98db595`) 포함 릴리스의 버전 결정 (CHANGELOG Unreleased → 버전 절) — **사용자 결정 대기**
+
+### Phase 10 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| 문서 E2E | `docs: the element guide renders and its demo widget works` — en/ko 두 경로, base·concurrent 두 프로젝트 통과 |
+| 문서 확인 | 스크린샷으로 레이아웃 확인. 처음엔 표에 칸 간격·테두리가 없어 다른 페이지(CacheUpdate)의 표 클래스와 맞춤 |
+| 전체 | `pnpm build` 통과, `pnpm test`·`test:dual` 실패 0, `verify:release` ALL PASS (11개 경로), **E2E 42/42** |
+| 크기 | base 4,738 B / concurrent 6,228 B / element 935 B (brotli) |
 
 ---
 
@@ -501,3 +514,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | Phase 8 완료 (예외·반복·중첩·R-4 하드닝, 돌연변이 8종 양쪽 코어 재확인) | Phase 9 (E2E 통합) | 없음 | `c326393` |
 | 2026-10-06 | Phase 9 완료 (실브라우저 E2E 16건, 음성 대조 3종, 전체 E2E 38/38) | Phase 10 (문서·출하) | 없음 (MT-4는 `9497b68`) | `6d915f4` |
 | 2026-10-06 | MT-4 React 호스트 E2E (react 18.3.1 devDep, 속성·프로퍼티 경로 분리 검증), E2E 40/40 | Phase 10 (문서·출하) | 없음 | `9497b68` |
+| 2026-10-06 | Phase 10 문서·출하 준비 (가이드+데모, README, skill, verify-release 11경로, CHANGELOG), E2E 42/42 | 버전 결정 → CHANGELOG 버전 절, 수동 체크리스트(Safari·Firefox) | 버전 결정 대기 | (Phase 10 커밋) |

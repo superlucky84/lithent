@@ -276,3 +276,28 @@ test('MT-4: a React app renders, updates, listens to and unmounts the widget', a
     )
   ).toEqual(['mount', 'unmount', 'mount']);
 });
+
+// Phase 10: the docs guide and its live demo, in both languages.
+test('docs: the element guide renders and its demo widget works', async ({
+  page,
+}, info) => {
+  const origin = `http://127.0.0.1:${info.project.name === 'concurrent' ? 43135 : 43134}`;
+  for (const [route, title, last] of [
+    ['/guide/element', 'Custom Elements', 'Last pay event:'],
+    ['/ko/guide/element', '커스텀 엘리먼트', '마지막 pay 이벤트:'],
+  ]) {
+    await page.goto(`${origin}/lithent/#${route}`);
+    const main = page.locator('main');
+    await expect(main.getByRole('heading', { level: 1 })).toContainText(title);
+
+    const widget = main.locator('docs-pay-button button');
+    await expect(widget).toHaveText('Pay 1000 KRW · 0');
+    await main.getByRole('button', { name: 'amount +1000' }).click();
+    await expect(widget).toHaveText('Pay 2000 KRW · 0');
+    await widget.click();
+    await expect(widget).toHaveText('Pay 2000 KRW · 1');
+    await expect(main.getByText(last)).toContainText(
+      '{"amount":2000,"clicks":1}'
+    );
+  }
+});

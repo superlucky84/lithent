@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### lithent/element (new subpath of lithent)
+
+- Add `lithent/element`: `defineElement(name, component, options)` registers a
+  `mount` or `lmount` component as a standard Custom Element, so it can be
+  embedded in any page with a script and a tag. UMD global `lithentElement`;
+  under 1 KB brotli (935 B) on top of the core, which is unchanged.
+- Declared props (`String`, `Number`, `Boolean`, `Object`) are observed as
+  kebab-case attributes with conversion and exposed as properties without it.
+  Changes in one task render once; values assigned before the element is
+  defined are kept.
+- Renders into an open shadow root by default (`'closed'` or `false` for light
+  DOM). `styles` are shared by every instance through one adopted style sheet,
+  with a `<style>` fallback. Slots project the element's children.
+- The component receives the element as `props.host`; `emit(host, name,
+  detail)` dispatches a bubbling, composed, cancelable `CustomEvent`.
+- Moving an element keeps its state; removing it unmounts after a microtask.
+  `defineElement` returns `undefined` without `customElements` (SSR).
+- TypeScript infers the component's props from the declaration and rejects
+  components that require or mistype them.
+- Works with both cores; covered by unit tests on both, and by browser tests in
+  a plain page, next to a host app on another lithent copy, and inside React 18.
+
 ### lithent and lithent-concurrent
 
 - Fix `render()`'s destroy function skipping unmount callbacks. It ran them

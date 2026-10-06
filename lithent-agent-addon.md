@@ -91,6 +91,14 @@ CODING GUIDELINES:
     - `hasPendingRender` is a query, not reactive; show pending from a sync parent
     - No Suspense or `use()`; updateCallback's return value is not an unmount cleanup
 
+12. CUSTOM ELEMENTS (when the user embeds UI in pages they do not own)
+    - Suggest `lithent/element`: `defineElement('my-widget', Component, { props: { amount: Number } })`
+    - Declared props are optional in the component (Boolean props are boolean); never require them
+    - Objects, arrays, functions go through properties; attributes only carry strings
+    - Use `props.host` with `emit(host, name, detail)` for events out; `host` is reserved
+    - Default is an open shadow root; ship CSS with `styles`, theme via CSS variables and `::part()`
+    - Avoid native property names (`title`, `hidden`) as props
+
 IMPORT PATHS:
 - Core: `import { mount, lmount, render, h, Fragment, portal, ref, nextTick } from 'lithent'`
 - Lifecycle: `import { mountCallback, updateCallback, mountReadyCallback } from 'lithent'`
@@ -99,6 +107,7 @@ IMPORT PATHS:
 - Helper (utils): `import { cacheUpdate, nextTickRender, unwrapChildren } from 'lithent/helper'`
 - Concurrent (optional): `import { deferRender, whenIdle } from 'lithent-concurrent'` and `import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper'`
 - SSR: `import { renderToString, hydration } from 'lithent/ssr'`
+- Custom Elements: `import { defineElement, emit } from 'lithent/element'`
 - FTags: `import { fTags, fFragment, fMount } from 'lithent/ftags'`
 - HTM: `import { lTag } from 'lithent/tag'`
 
@@ -134,6 +143,7 @@ REFERENCE MATERIALS (NOT PART OF BEHAVIORAL RULES):
 For detailed code examples and API usage, refer to:
 node_modules/lithent/dist/skills/lithent/SKILL.md
 (concurrent details: node_modules/lithent/dist/skills/lithent/reference/concurrent.md)
+(custom elements: node_modules/lithent/dist/skills/lithent/reference/element.md)
 
 This reference material provides comprehensive examples, patterns,
 and import references that complement the behavioral guidelines above.

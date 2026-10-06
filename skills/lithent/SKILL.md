@@ -371,6 +371,25 @@ await whenIdle(); // deferred renders committed (nextTick covers sync only)
 
 See `reference/concurrent.md` for setup rules, helpers and lifecycle differences.
 
+## Custom Elements (optional)
+
+`lithent/element` registers a component as a standard Custom Element, for
+widgets embedded in pages the user does not own (any framework or none).
+
+```tsx
+import { defineElement, emit } from 'lithent/element';
+
+const PayButton = mount<{ amount?: number; host: HTMLElement }>(
+  (_renew, props) => () => (
+    <button onClick={() => emit(props.host, 'pay', props.amount)}>Pay</button>
+  )
+);
+defineElement('pay-button', PayButton, { props: { amount: Number } });
+// <pay-button amount="1000"></pay-button>
+```
+
+See `reference/element.md` for prop conversion, events, styles and lifecycle.
+
 ## Import Reference
 
 ```tsx
@@ -397,6 +416,9 @@ import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper
 // SSR
 import { renderToString, hydration } from 'lithent/ssr';
 
+// Custom Elements
+import { defineElement, emit } from 'lithent/element';
+
 // FTags
 import { fTags, fFragment, fMount } from 'lithent/ftags';
 
@@ -407,5 +429,5 @@ import { lTag } from 'lithent/tag';
 ## Additional materials (optional)
 
 - `constraints/` (rules, mistakes, troubleshooting)
-- `reference/` (props types, children types, lstore inference)
+- `reference/` (props types, children types, lstore inference, concurrent, element)
 - `examples/` (quick examples)
