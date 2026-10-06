@@ -526,4 +526,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | Phase 10 문서·출하 준비 (가이드+데모, README, skill, verify-release 11경로, CHANGELOG), E2E 42/42 | 버전 결정 → CHANGELOG 버전 절, 수동 체크리스트(Safari·Firefox) | 버전 결정 대기 | `865179d` |
 | 2026-10-06 | 버전 확정 (lithent 1.23.0, lithent-concurrent 0.1.2), CHANGELOG 버전 절 — **Phase 0~10 완료** | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | `6855f1e` |
 | 2026-10-06 | 문서 연결 보강 (Home·Introduction·QuickStart 영/국, README CDN·표, element/README.md), E2E 44/44 | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | `a73d7d5` |
-| 2026-10-06 | 수동 확인용 놀이터 (`element/playground/`, 단일 HTML 빌드 base·concurrent, `pnpm playground:element`, element 빌드에 포함), 0~9단계 자동 판정, E2E로 전 단계 검증 | Safari·Firefox에서 놀이터로 수동 확인, publish (사용자) | 없음 | (놀이터 커밋) |
+| 2026-10-06 | 수동 확인용 놀이터 (`element/playground/`, 단일 HTML 빌드 base·concurrent, `pnpm playground:element`, element 빌드에 포함), 0~9단계 자동 판정, E2E로 전 단계 검증 | Safari·Firefox에서 놀이터로 수동 확인, publish (사용자) | 없음 | `f7afcf5` |
