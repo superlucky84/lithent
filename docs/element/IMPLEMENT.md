@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 2 완료 (2026-10-06). 다음: Phase 3.**
+- 상태: **Phase 3 완료 (2026-10-06). 다음: Phase 4.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -172,14 +172,43 @@
 
 ## Phase 3 — 프로퍼티 → props (FR-4)
 
-- [ ] 3-1 선언 키마다 prototype get/set 접근자
-- [ ] 3-2 업그레이드 전 할당 흡수 (DESIGN §4.2)
-- [ ] 3-3 프로퍼티 값은 변환하지 않음 (객체·함수 그대로)
+- [x] 3-1 선언 키마다 prototype get/set 접근자
+- [x] 3-2 업그레이드 전 할당 흡수 (DESIGN §4.2) — **생성자에서** (문서의 `connectedCallback`에서 변경, 근거 §4.2)
+- [x] 3-3 프로퍼티 값은 변환하지 않음 (객체·함수 그대로)
 
-**기본 테스트** (`element-properties.test.ts`):
-- `el.options = {a:1}` → 내부 props가 같은 참조
-- 정의 전 할당 → 정의 후 반영
-- 속성과 프로퍼티를 섞어 쓰면 마지막 쓰기가 이긴다
+**기본 테스트** (`element-properties.test.ts` 9건):
+- `el.options = {…}` → 내부 props가 같은 참조, 문자열을 숫자 prop에 넣어도 변환 없음
+- 선언되지 않은 이름은 그냥 expando (props에 안 들어감)
+- getter는 현재 prop (속성으로 들어온 변환 값 포함)
+- 프로퍼티가 속성으로 반영되지 않음 (DC-3)
+- 속성·프로퍼티를 섞으면 마지막 쓰기가 이김
+- 같은 태스크에 프로퍼티 3개 → 렌더 1회
+- 연결 전 할당 → 첫 렌더 반영
+- 정의 전 할당: `createElement` 후 할당 → 정의 시 흡수 / 파싱된 요소에 할당 → 정의 시 흡수, 이후 접근자 동작
+- 네이티브 이름(`title`) 특성화: prop이 이기고 속성은 설정되지 않음 (DESIGN §4.2.1)
+
+### Phase 3 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 / BG-2 | element 34/34 (base), 34/34 (concurrent) |
+| BG-3 | `98db595` 이후 코어 diff 없음 |
+| BG-4 | 빌드·타입체크·eslint 통과 |
+| RC-3 크기 | **br 719 B / 1,000 B** (+62 B). 남은 여유 281 B로 Phase 4~6 |
+| 전체 회귀 | `pnpm test` 실패 0, `test:satellites:concurrent` 통과 |
+
+### Phase 3 돌연변이 검증
+
+| 돌연변이 | 결과 |
+|---|---|
+| 업그레이드 흡수 블록 무력화 | **2/9 실패** (정의 전 할당 2건) → 복구 |
+| setter의 `this.r()` 제거 | **4/9 실패** → 복구 |
+| getter가 `undefined` 반환 | **3/9 실패** → 복구 |
+
+### Phase 3에서 드러난 것
+
+- jsdom도 정의 전 `createElement`·파싱된 요소를 `define` 시 업그레이드한다. 실제 브라우저 확인은 Phase 9 E2E.
+- 네이티브 이름 충돌은 막지 않고 제약으로 문서화 (DESIGN §4.2.1, R-5).
 
 ## Phase 4 — Shadow DOM, 스타일, slot (FR-6, FR-7)
 
@@ -260,3 +289,4 @@
 | 2026-10-06 | DC-1~DC-9 확정, Phase 0 완료 (스캐폴딩, exports, size gate, R-1 E2E) | Phase 1 (등록·마운트/언마운트) | 없음 | `a811b16` |
 | 2026-10-06 | 코어 B-1 수정, Phase 1 완료 (등록·마운트/언마운트·렌더 루트) | Phase 2 (속성 → props) | 없음 | `98db595`, `6e7f0ae` |
 | 2026-10-06 | Phase 2 완료 (속성 → props, Boolean 기본 false, dev 경고 철회) | Phase 3 (프로퍼티 → props) | 없음 | `19597be` |
+| 2026-10-06 | Phase 3 완료 (프로퍼티 접근자, 생성자에서 업그레이드 흡수, 네이티브 이름 제약 문서화) | Phase 4 (스타일·slot·non-shadow 자식) | 없음 | (Phase 3 커밋) |

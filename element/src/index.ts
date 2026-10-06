@@ -99,6 +99,15 @@ export const defineElement = <S extends PropSpec = PropSpec>(
       this.p = {};
       for (const key in spec) {
         if (spec[key] === Boolean) this.p[key] = false;
+        // FR-4: a value assigned before the element was defined is an own
+        // property that hides the prototype accessor. Move it through the
+        // accessor (DESIGN §4.2). Upgrades run this constructor on that object.
+        const self = this as unknown as Props;
+        if (Object.prototype.hasOwnProperty.call(self, key)) {
+          const value = self[key];
+          delete self[key];
+          self[key] = value;
+        }
       }
     }
 
@@ -142,6 +151,20 @@ export const defineElement = <S extends PropSpec = PropSpec>(
       // renew is batched per microtask, so N changes in one task render once.
       if (this.r) this.r();
     }
+  }
+
+  // FR-4: every declared prop is also a property. Values pass through
+  // unconverted (objects, arrays, functions) and are not reflected (DC-3).
+  for (const key in spec) {
+    Object.defineProperty(LithentElement.prototype, key, {
+      get(this: LithentElement) {
+        return this.p[key];
+      },
+      set(this: LithentElement, value: unknown) {
+        this.p[key] = value;
+        if (this.r) this.r();
+      },
+    });
   }
 
   customElements.define(name, LithentElement);

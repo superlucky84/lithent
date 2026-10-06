@@ -43,7 +43,6 @@ class LithentElement extends HTMLElement {
 
   connectedCallback() {
     if (this.d) return;                       // DC-4: 이동이면 아무것도 안 함
-    upgradeProps(this);                       // FR-4: 정의 전 할당 흡수
     const root = getRenderRoot(this);         // DC-8
     applyStyles(root);                        // §5
     const Host = mount(renew => {
@@ -128,8 +127,19 @@ defineElement('pay-button', PayButton, {
 ### 4.2 업그레이드 전 할당 (FR-4)
 
 호스트 페이지가 스크립트 로드 전에 `el.items = [...]`를 할당하면 인스턴스 own property로 남아
-접근자를 가린다. `connectedCallback` 첫 진입에서 선언된 키마다
-`hasOwnProperty`면 값을 꺼내 `delete` 후 접근자로 다시 할당한다 (Web Components 표준 관용구).
+접근자를 가린다. 선언된 키마다 `hasOwnProperty`면 값을 꺼내 `delete` 후 접근자로 다시 할당한다
+(Web Components 표준 관용구).
+
+**위치는 생성자다 (Phase 3에서 변경).** 처음엔 `connectedCallback` 첫 진입으로 적었지만, 업그레이드는 *기존 객체 위에서*
+생성자를 실행하므로 그 시점에 own property가 이미 있다. 생성자에서 흡수하면 연결 전에 `el.items`를 읽어도 접근자를 거친
+일관된 값이 나오고, 연결 여부를 따로 추적할 필요가 없다.
+
+### 4.2.1 네이티브 프로퍼티와 같은 이름 (제약)
+
+`title`, `hidden`, `id`처럼 `HTMLElement`에 이미 있는 이름을 prop으로 선언하면 prototype 접근자가 네이티브 접근자를
+가린다. `el.title = 'x'`는 prop만 바꾸고 `title` 속성은 설정하지 않는다(툴팁 등 네이티브 효과 없음). 속성 쪽
+(`setAttribute('title', …)`)은 여전히 prop으로 들어온다. 검사 코드는 넣지 않는다(RC-3). 사용자 문서에
+"네이티브 이름은 피할 것"으로 안내한다 (Phase 10). 동작은 `element-properties.test.ts`의 특성화 테스트로 고정.
 
 ### 4.3 반영(reflect) (DC-3)
 
@@ -227,6 +237,7 @@ declare function defineElement<S extends Spec>(
 | R-1 | 한 페이지에 lithent가 2벌(호스트 앱 + 위젯 UMD) 로드될 때 `Symbol.for('lithentWDomSymbol')`(`src/utils/universalRef.ts:3`)이 **전역 공유**된다. 한쪽 WDom을 다른 쪽이 자기 것으로 오인할 수 있다 | **해소 (2026-10-06, Phase 0).** `e2e/element.spec.ts`: base 2벌, base 호스트 + concurrent 위젯 모두 통과. 위젯을 호스트가 관리하는 DOM 안에 마운트하고 양쪽을 번갈아 갱신해도 서로의 DOM·keyed 노드 동일성이 유지됐다. 심볼 공유는 *WDom 객체를 번들 사이로 넘길 때만* 문제가 되며, element는 그런 경로가 없다 (경계는 DOM 속성·이벤트뿐). 이 가정은 Phase 9 E2E에서 실제 Custom Element로 다시 확인한다 |
 | R-2 | §5의 `<style>` 보존이 코어 내부 삭제 경로에 의존 | 회귀 테스트 4-4. 코어가 바뀌면 렌더 루트를 내부 컨테이너로 전환 |
 | R-3 | 사용자가 `props.host`를 다른 의미로 이미 쓰는 컴포넌트를 넘김 | 정의 시 `props` 선언 충돌만 검사 가능. 문서에 명시 |
+| R-5 | prop 이름이 네이티브 프로퍼티와 겹침 (§4.2.1) | 검사하지 않음. 특성화 테스트 + Phase 10 문서 안내 |
 | R-4 | concurrent 코어의 deferred 렌더 중 분리 | Phase 8 하드닝 테스트에 포함 |
 
 ### 10.1 발견된 코어 버그
