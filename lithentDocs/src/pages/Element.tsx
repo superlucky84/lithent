@@ -35,6 +35,8 @@ const copy = {
     events: 'Events out of the element',
     eventsText:
       'The component receives the element as props.host. emit dispatches a CustomEvent on it that bubbles, is composed and is cancelable; it returns false when a listener called preventDefault(), so a widget can offer "before" events. A fourth argument overrides those defaults, for example { bubbles: false } for a frequent event that only listeners on the element itself should hear.',
+    eventsDetail:
+      'Put the data in detail as an object, even when there is a single value: { amount } rather than amount. Listeners read e.detail.amount, and you can add fields later without breaking them. detail is the one field the DOM standard gives CustomEvent for your data.',
     eventsDirect:
       'emit is only a helper around the standard API. Dispatching your own event from props.host works the same, including an Event subclass with its own fields.',
     styles: 'Styles and customization',
@@ -105,6 +107,8 @@ const copy = {
     events: '엘리먼트 밖으로 이벤트 보내기',
     eventsText:
       '컴포넌트는 엘리먼트 자신을 props.host로 받습니다. emit은 그 위에서 bubbles·composed·cancelable인 CustomEvent를 발생시킵니다. 리스너가 preventDefault()를 호출하면 false를 반환하므로 "실행 전" 이벤트를 만들 수 있습니다. 네 번째 인자로 이 기본값을 바꿀 수 있습니다. 예를 들어 자주 발생하는 이벤트를 엘리먼트에 직접 붙은 리스너만 듣게 하려면 { bubbles: false }를 넘깁니다.',
+    eventsDetail:
+      '데이터는 값이 하나뿐이어도 detail에 객체로 감싸서 넣으세요. amount 대신 { amount }처럼요. 받는 쪽은 e.detail.amount로 읽고, 나중에 필드를 추가해도 기존 코드가 깨지지 않습니다. detail은 DOM 표준이 CustomEvent에 사용자 데이터용으로 정해 둔 유일한 칸입니다.',
     eventsDirect:
       'emit은 표준 API를 감싼 도움 함수일 뿐입니다. props.host에서 직접 이벤트를 발생시켜도 똑같이 동작하고, 필드를 가진 Event 하위 클래스도 쓸 수 있습니다.',
     styles: '스타일과 커스터마이즈',
@@ -290,6 +294,7 @@ button.addEventListener('pay', e => {
 // a frequent event that should not bubble to the page
 emit(props.host, 'tick', { t }, { bubbles: false });`}
       />
+      <p>{t.eventsDetail}</p>
       <p>{t.eventsDirect}</p>
       <CodeBlock
         language="typescript"

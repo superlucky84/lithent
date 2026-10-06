@@ -48,6 +48,8 @@ defineElement('pay-button', PayButton, {
   CustomEvent and returns `false` if the page called `preventDefault()`;
   `init` overrides those defaults (e.g. `{ bubbles: false }`). `emit` is only
   a helper: `props.host.dispatchEvent(new CustomEvent(...))` works the same.
+  Put event data in `detail` as an object even for one value (`{ amount }`,
+  not `amount`) so fields can be added later without breaking listeners.
 - Styles apply only in shadow mode; one sheet is shared by all instances. Host
   pages theme via CSS custom properties and `::part()`.
 - Shadow mode: render `<slot />` to show the element's children. `shadow: false`
