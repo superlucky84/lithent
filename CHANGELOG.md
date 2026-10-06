@@ -26,9 +26,16 @@
   only when the root component had re-rendered at least once, so a fresh
   component root, or components rendered under an element root, never saw the
   cleanup returned from `mountCallback`. It now runs unmount for the whole
-  removed tree, once per component. This is the only change to the base core;
-  `lithent` shrinks by 1 B (brotli 4,738 B). Found while building
-  `lithent/element`.
+  removed tree, once per component. Found while building `lithent/element`.
+- Fix props on a custom element that was rendered before its definition. The
+  property-or-attribute decision was cached per tag name, so after the upgrade
+  lithent kept setting attributes: objects arrived as `"[object Object]"` and
+  `false` as a present (true) attribute. The decision is now cached per
+  prototype, so renders after the upgrade assign properties. Built-in elements
+  and elements defined before rendering behave as before.
+
+These two fixes are the only changes to the base core; `lithent` grows by 1 B
+net (brotli 4,740 B).
 
 `lithent/element` ships inside this package; its private workspace version is
 0.1.0. It works with both cores and is covered by unit tests on both and by
@@ -38,8 +45,11 @@ inside React 18.
 ### lithent-concurrent 0.1.2
 
 - Fix the same `render()` destroy bug in the concurrent core: unmount callbacks
-  now run for the whole removed tree. Brotli 6,228 B (−5 B). Still works with
-  `lithent ^1.22.1`; use `lithent ^1.23.0` for `lithent/element`.
+  now run for the whole removed tree.
+- Fix the same stale property-or-attribute decision for custom elements
+  rendered before their definition.
+- Brotli 6,229 B (−4 B). Still works with `lithent ^1.22.1`; use
+  `lithent ^1.23.0` for `lithent/element`.
 
 ## 2026-10-02
 

@@ -129,21 +129,22 @@ export const checkRefData = (
   value: HTMLElement | Element | DocumentFragment | Text | undefined;
 } => dataKey === 'ref' && isObject(dataValue);
 
-// Descriptor lookups are cached per nodeName+key (HTML nodeName is uppercase,
-// SVG lowercase, so the two prototypes never collide on the same cache key).
-const accessorCache = new Map<string, boolean>();
+// Descriptor lookups are cached per prototype+key. Keying by prototype
+// rather than nodeName matters for custom elements: one rendered before its
+// definition is upgraded later and gets a new prototype, which must be looked
+// up again instead of reusing the "no accessor" answer for its tag name.
+const accessorCache = new WeakMap<object, Map<string, boolean>>();
 
 export const hasAccessorMethods = (target: unknown, dataKey: string) => {
-  const cacheKey = (target as HTMLElement).nodeName + '|' + dataKey;
-  let result = accessorCache.get(cacheKey);
+  const proto = target!.constructor.prototype;
+  let byKey = accessorCache.get(proto);
+  if (!byKey) accessorCache.set(proto, (byKey = new Map()));
+  let result = byKey.get(dataKey);
 
   if (result === undefined) {
-    const descriptor = Object.getOwnPropertyDescriptor(
-      target!.constructor.prototype,
-      dataKey
-    );
+    const descriptor = Object.getOwnPropertyDescriptor(proto, dataKey);
     result = !!(descriptor && descriptor.get && descriptor.set);
-    accessorCache.set(cacheKey, result);
+    byKey.set(dataKey, result);
   }
 
   return result;

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as core from 'lithent';
-import { h, mount, mountCallback } from 'lithent';
+import { h, mount, mountCallback, render } from 'lithent';
 import { defineElement } from '@/index';
 
 /**
@@ -225,5 +225,44 @@ describe.runIf(concurrent)('concurrent core: deferred renders (R-4)', () => {
     expect(log).toEqual(['mount heavy']);
     expect(el.shadowRoot!.querySelector('li')!.textContent).toBe('1:0');
     expect(el.parentElement!.id).toBe('b');
+  });
+});
+
+describe('a lithent host that renders the tag before the widget is defined', () => {
+  it('passes objects and false as properties after the definition (B-2)', async () => {
+    type LateProps = { options?: unknown; open: boolean; host: HTMLElement };
+    const seen: { options?: unknown; open: boolean }[] = [];
+    const Widget = mount<LateProps>((_r, props) => () => {
+      seen.push({ options: props.options, open: props.open });
+      return h('i', {}, '');
+    });
+
+    const control: { set: (o: unknown, open: boolean) => void } = {
+      set: () => {},
+    };
+    const Host = mount(renew => {
+      let options: unknown = { first: true };
+      let open = true;
+      control.set = (o, next) => {
+        options = o;
+        open = next;
+        renew();
+      };
+      return () => h('hd-late', { options, open });
+    });
+    const wrap = document.createElement('div');
+    document.body.appendChild(wrap);
+    render(h(Host, {}), wrap);
+
+    // The widget script arrives later.
+    defineElement('hd-late', Widget, {
+      props: { options: Object, open: Boolean },
+    });
+    const next = { second: true };
+    control.set(next, false);
+    await nextTask();
+
+    expect(seen[seen.length - 1]).toEqual({ options: next, open: false });
+    expect(seen[seen.length - 1].options).toBe(next);
   });
 });
