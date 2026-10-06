@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 1 완료 (2026-10-06). 코어 버그 B-1 수정 포함. 다음: Phase 2.**
+- 상태: **Phase 2 완료 (2026-10-06). 다음: Phase 3.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -129,16 +129,46 @@
 
 진입 조건: DC-2 확정.
 
-- [ ] 2-1 `observedAttributes` = 선언 키의 kebab-case
-- [ ] 2-2 타입 변환 표(DESIGN §4.1) 구현
-- [ ] 2-3 연결 전 속성 → 첫 렌더 반영
-- [ ] 2-4 연결 후 속성 변경 → renew
+- [x] 2-1 `observedAttributes` = 선언 키의 kebab-case (static getter)
+- [x] 2-2 타입 변환 표(DESIGN §4.1) 구현
+- [x] 2-3 연결 전 속성 → 첫 렌더 반영
+- [x] 2-4 연결 후 속성 변경 → renew (Host가 `renew`를 `this.r`에 보관, 분리 시 해제)
 
-**기본 테스트** (`element-attributes.test.ts`):
-- 타입별 변환·제거 시 값 (표의 모든 행)
-- `max-count` ↔ `maxCount`
+**기본 테스트** (`element-attributes.test.ts` 11건):
+- 타입별 변환·제거 시 값 (표의 모든 행, 잘못된 숫자·JSON)
+- Boolean: 처음부터 없음 → `false`, `"false"` → `true`, 제거 → `false`
+- `max-count` ↔ `maxCount`, `observedAttributes` 목록
 - 같은 태스크에 속성 3개 변경 → 내부 updater 실행 1회 (FR-3 배치)
 - 선언되지 않은 속성 변경은 렌더를 일으키지 않는다
+- 갱신 시 DOM 노드 유지 (`<p>` 동일성)
+- 연결 전 속성 → 첫 렌더, 분리 중 변경 → 렌더 없음 → 재연결 시 최신 값
+- `lmount` 컴포넌트도 setup 시점의 `props` 참조로 새 값을 본다 (DESIGN §2.1의 제자리 갱신 확인)
+
+### Phase 2 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 / BG-2 | element 25/25 (base), 25/25 (concurrent) |
+| BG-3 | `git diff --stat 98db595 -- src lithentConcurrent/src` 출력 없음 |
+| BG-4 | 빌드·타입체크·eslint 통과 |
+| RC-3 크기 | **br 657 B / 1,000 B** (Phase 1 444 B → +213 B) |
+| 전체 회귀 | `pnpm test` 실패 0, `test:satellites:concurrent` 통과 |
+
+### Phase 2 돌연변이 검증
+
+| 돌연변이 | 결과 |
+|---|---|
+| 속성 변경 시 `this.r()` 호출 제거 | **7/11 실패** → 복구 |
+| kebab 변환 제거 (`keyOf[key] = key`) | **2/11 실패** → 복구 |
+| Boolean 변환을 `value === ''`로 | **1/11 실패** (`"false"` 케이스) → 복구 |
+
+### Phase 2에서 드러난 것
+
+- **Boolean 초기값 불일치**: 처음엔 "처음부터 없는 Boolean = `undefined`, 넣었다 빼면 `false`"였다. 브라우저가 없는 속성에
+  콜백을 부르지 않기 때문. 생성자에서 Boolean을 `false`로 채워 일관시켰다 (DESIGN §4.1).
+- **dev 경고 철회**: 저장소에 개발 전용 빌드 규약이 없어 경고를 넣지 않기로 했다 (DESIGN §4.4).
+- **크기 경고**: 남은 여유 343 B로 Phase 3(접근자·업그레이드), 4(스타일·slot·자식 비움), 5(`host`·`emit`), 6(지연 destroy)를 해야 한다.
+  각 Phase에서 측정하고, 초과가 보이면 Phase 8-4 전에 예산 재검토를 사용자에게 올린다.
 
 ## Phase 3 — 프로퍼티 → props (FR-4)
 
@@ -157,7 +187,7 @@
 
 - [x] 4-1 `shadow` 옵션에 따라 `attachShadow({mode})` 또는 호스트 자신을 렌더 루트로 — **Phase 1에서 완료**
 - [ ] 4-2 `styles`: 정의당 `CSSStyleSheet` 1회 생성 + `adoptedStyleSheets`, 미지원 시 `<style>` 폴백
-- [ ] 4-3 non-shadow 모드: 첫 렌더 전 기존 자식 비움 (DC-6), `styles` 무시 + dev 경고
+- [ ] 4-3 non-shadow 모드: 첫 렌더 전 기존 자식 비움 (DC-6), `styles` 무시 (경고 없음, DESIGN §4.4)
 - [ ] 4-4 **R-2 회귀 가드**: 폴백 `<style>`이 있는 shadowRoot에서 내부 컴포넌트가
       0개 ↔ N개 자식으로 바뀌고 언마운트돼도 `<style>`이 남는지
 
@@ -229,3 +259,4 @@
 | 2026-10-06 | 문서 4종 초안, IDEAS.md | DC-1~DC-9 사용자 확정 → Phase 0 | DC 미확정 | `deea8c6` |
 | 2026-10-06 | DC-1~DC-9 확정, Phase 0 완료 (스캐폴딩, exports, size gate, R-1 E2E) | Phase 1 (등록·마운트/언마운트) | 없음 | `a811b16` |
 | 2026-10-06 | 코어 B-1 수정, Phase 1 완료 (등록·마운트/언마운트·렌더 루트) | Phase 2 (속성 → props) | 없음 | `98db595`, `6e7f0ae` |
+| 2026-10-06 | Phase 2 완료 (속성 → props, Boolean 기본 false, dev 경고 철회) | Phase 3 (프로퍼티 → props) | 없음 | (Phase 2 커밋) |

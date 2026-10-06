@@ -114,12 +114,16 @@ defineElement('pay-button', PayButton, {
 | 선언 | 속성 → 값 | 속성 제거 시 |
 |---|---|---|
 | `String` | 그대로 | `undefined` |
-| `Number` | `Number(v)` (`NaN`이면 `undefined`) | `undefined` |
-| `Boolean` | 속성 존재 = `true` (`"false"` 문자열도 `true`, HTML 관례) | `false` |
-| `Object` | `JSON.parse(v)`, 실패 시 `undefined` + dev 경고 | `undefined` |
+| `Number` | `+v` (`NaN`이면 `undefined`. 빈 문자열 `amount=""`은 JS 규칙대로 `0`) | `undefined` |
+| `Boolean` | 속성 존재 = `true` (`"false"` 문자열도 `true`, HTML 관례) | `false` — **처음부터 속성이 없을 때도 `false`** (생성자에서 초기화) |
+| `Object` | `JSON.parse(v)`, 실패 시 `undefined` (경고 없음, §4.4) | `undefined` |
 
 - 이름 변환: `max-count` 속성 ↔ `maxCount` prop. `observedAttributes`는 kebab-case 목록.
 - 프로퍼티 할당은 **변환 없이** 그대로 props에 들어간다 (객체·함수 전달 경로).
+
+- 처음부터 없는 String·Number·Object 속성은 props에 키가 없다(`undefined`로 읽힘). 브라우저는 존재하지 않는 속성에
+  `attributeChangedCallback`을 부르지 않으므로 Boolean만 생성자에서 `false`로 채운다.
+- `observedAttributes`는 static 필드가 아니라 getter다 (static 필드는 다운레벨 헬퍼를 만든다, RC-3).
 
 ### 4.2 업그레이드 전 할당 (FR-4)
 
@@ -130,6 +134,12 @@ defineElement('pay-button', PayButton, {
 ### 4.3 반영(reflect) (DC-3)
 
 v1은 프로퍼티 → 속성 반영을 하지 않는다 (권장). 필요하면 v2에서 prop별 `reflect` 옵션.
+
+### 4.4 개발 모드 경고를 두지 않는다 (Phase 2에서 확정)
+
+런타임 패키지(core·helper·ssr)에는 개발 전용 빌드나 `NODE_ENV` 분기가 없고, 경고는 devHelper(HMR)에만 있다.
+element에 경고를 넣으면 프로덕션에도 문자열이 그대로 실린다(RC-3). 그래서 잘못된 JSON·숫자는 조용히 `undefined`,
+non-shadow 모드의 `styles`는 조용히 무시한다. 이 규칙이 §5와 IMPLEMENT 4-3의 "dev 경고"를 대체한다.
 
 ## 5. 스타일 (FR-6)
 
@@ -143,7 +153,7 @@ defineElement('pay-button', PayButton, { styles: [css] });
   (`src/render.ts:96-115`)는 "부모의 자식 수 == 루트 자식 수"일 때 `textContent = ''`로 일괄 삭제한다.
   `<style>`이 있으면 개수가 달라 이 경로를 타지 않으므로 `<style>`은 보존된다.
   단, **이 판단은 코어 내부 동작에 의존**하므로 Phase 4에 회귀 테스트(4-4)로 고정한다.
-- non-shadow 모드에서 `styles`는 무시하고 dev 경고 (전역 오염 방지).
+- non-shadow 모드에서 `styles`는 무시한다 (전역 오염 방지, 경고 없음 §4.4).
 
 ## 6. 이벤트 발행 (DC-5)
 

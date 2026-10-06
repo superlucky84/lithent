@@ -34,6 +34,25 @@ export type DefineElementOptions<S extends PropSpec = PropSpec> = {
 const roots = new WeakMap<HTMLElement, ShadowRoot | HTMLElement>();
 
 /**
+ * Attribute string -> prop value (DESIGN §4.1). `null` means the attribute is
+ * absent. Invalid numbers and JSON become `undefined` without a warning: the
+ * runtime packages have no dev-only build to keep warnings out of production.
+ */
+const convert = (type: PropSpec[string], value: string | null): unknown => {
+  if (type === Boolean) return value !== null;
+  if (value === null) return undefined;
+  if (type === Number) return isNaN(+value) ? undefined : +value;
+  if (type === Object) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return undefined;
+    }
+  }
+  return value;
+};
+
+/**
  * Register a lithent component as a Custom Element.
  *
  * The element owns the props and renders a small Host component that holds
@@ -51,7 +70,14 @@ export const defineElement = <S extends PropSpec = PropSpec>(
   const existing = customElements.get(name);
   if (existing) return existing;
 
-  const { shadow = true } = options;
+  const { shadow = true, props: spec = {} as S } = options;
+
+  // FR-3: kebab-case attribute -> camelCase prop key.
+  const keyOf: Record<string, string> = {};
+  for (const key in spec) {
+    keyOf[key.replace(/[A-Z]/g, c => '-' + c.toLowerCase())] = key;
+  }
+  const observed = Object.keys(keyOf);
 
   class LithentElement extends HTMLElement {
     // `declare` keeps these out of the emitted class-field helpers (RC-3).
@@ -59,10 +85,21 @@ export const defineElement = <S extends PropSpec = PropSpec>(
     declare p: Props;
     /** `destroy` returned by `render`, set while mounted. */
     declare d?: () => void;
+    /** The Host component's `renew`, set while mounted. */
+    declare r?: () => void;
+
+    // A getter rather than a static field: static fields compile to helpers.
+    static get observedAttributes() {
+      return observed;
+    }
 
     constructor() {
       super();
+      // An absent Boolean attribute is `false`, before any attribute callback.
       this.p = {};
+      for (const key in spec) {
+        if (spec[key] === Boolean) this.p[key] = false;
+      }
     }
 
     connectedCallback() {
@@ -78,9 +115,10 @@ export const defineElement = <S extends PropSpec = PropSpec>(
         roots.set(this, root);
       }
 
-      const Host = mount(
-        () => () => h(component as TagFunction, { ...this.p })
-      );
+      const Host = mount(renew => {
+        this.r = renew;
+        return () => h(component as TagFunction, { ...this.p });
+      });
 
       // DC-9: `render` only appends into its wrapper, so a ShadowRoot works.
       this.d = render(h(Host, {}), root as unknown as HTMLElement);
@@ -89,8 +127,20 @@ export const defineElement = <S extends PropSpec = PropSpec>(
     disconnectedCallback() {
       if (this.d) {
         this.d();
-        this.d = undefined;
+        this.d = this.r = undefined;
       }
+    }
+
+    attributeChangedCallback(
+      attr: string,
+      _old: string | null,
+      value: string | null
+    ) {
+      const key = keyOf[attr];
+      this.p[key] = convert(spec[key], value);
+      // Before the first connect there is no renew: the first render reads p.
+      // renew is batched per microtask, so N changes in one task render once.
+      if (this.r) this.r();
     }
   }
 
