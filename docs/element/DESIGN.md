@@ -285,7 +285,7 @@ declare function defineElement<S extends PropSpec & { host?: never } = Record<ne
 | R-2 | §5의 `<style>` 보존이 코어 내부 삭제 경로에 의존 | 회귀 테스트 4-4. 코어가 바뀌면 렌더 루트를 내부 컨테이너로 전환 |
 | R-3 | 사용자가 `props.host`를 다른 의미로 이미 쓰는 컴포넌트를 넘김 | 정의 시 `props` 선언 충돌만 검사 가능. 문서에 명시 |
 | R-5 | prop 이름이 네이티브 프로퍼티와 겹침 (§4.2.1) | 검사하지 않음. 특성화 테스트 + Phase 10 문서 안내 |
-| R-4 | concurrent 코어의 deferred 렌더 중 분리 | Phase 8 하드닝 테스트에 포함 |
+| R-4 | concurrent 코어의 deferred 렌더 중 분리 | **해소 (Phase 8)**: 실행 전·시작 후 제거 모두 다시 그려지지 않고 unmount 1회, 이동 시 새 위치에서 커밋. `element-hardening.test.ts` |
 
 ### 10.1 발견된 코어 버그
 

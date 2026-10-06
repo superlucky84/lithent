@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 7 완료 (2026-10-06). 다음: Phase 8.**
+- 상태: **Phase 8 완료 (2026-10-06). 다음: Phase 9.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -377,11 +377,52 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 
 ## Phase 8 — 테스트 하드닝
 
-- [ ] 8-1 경계 케이스: 렌더 중 예외를 던지는 내부 컴포넌트, 연결→분리→연결 빠른 반복 100회(누수 없음),
-      `Object` 타입에 잘못된 JSON, 같은 요소에 대한 중첩 정의
-- [ ] 8-2 concurrent 코어에서 `deferRender` 진행 중 분리 (R-4)
-- [ ] 8-3 각 Phase 핵심 테스트 돌연변이 재확인 (최소 5개 돌연변이, 결과 표로 기록)
-- [ ] 8-4 RC-3 크기 실측 기록, 초과 시 축소 작업
+- [x] 8-1 경계 케이스: 렌더 중 예외를 던지는 내부 컴포넌트, 연결→분리 100회(누수 없음), 이동 100회,
+      요소 안의 요소(객체 prop 전달·연쇄 언마운트). 잘못된 JSON은 Phase 2(`element-attributes.test.ts`)에서 이미 다룸
+- [x] 8-2 concurrent 코어에서 `deferRender` 진행 중 분리·이동 (R-4)
+- [x] 8-3 핵심 돌연변이 8종을 전체 스위트·양쪽 코어로 재확인
+- [x] 8-4 RC-3 크기 실측 기록
+
+**테스트** (`element-hardening.test.ts` 8건, concurrent 전용 3건은 base에서 `describe.runIf`로 제외):
+- 마운트 중 예외: 호출자에게 던지지 않고 브라우저 오류로 보고(CE 반응 규칙), 미마운트 상태 유지, 이후 속성 변경은 no-op,
+  원인 해소 후 재연결하면 정상 마운트
+- 연결→분리 100회: mount·unmount 각 100회, 루트에 렌더 결과 1벌·`<style>` 1개
+- 같은 태스크 이동 100회(2회 호출 이동 포함): mount 1회, 렌더 결과 1벌
+- 요소 안의 요소: 바깥 컴포넌트가 `h('hd-inner', { options })`로 넘긴 객체가 **같은 참조**로 도착 — lithent가 접근자가 있는
+  키는 프로퍼티로 대입하기 때문(`hasAccessorMethods`). 바깥 제거 시 안쪽도 언마운트
+- R-4 (concurrent): 지연 렌더 실행 전 제거 / 시작 후 제거 → 다시 그려지지 않음, unmount 1회, 오류 0 /
+  지연 렌더 중 이동 → 새 위치에서 커밋
+
+### Phase 8 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| element 테스트 | base 70 통과 + 3 제외(concurrent 전용), concurrent 73/73 |
+| BG-3 | `98db595` 이후 코어 diff 없음 |
+| RC-3 크기 (8-4) | **lithent/element br 935 B / 1,000 B** (65 B 여유). base 코어 4,738 B, concurrent 6,228 B |
+| 전체 회귀 | `pnpm test` 실패 0, `test:satellites:concurrent` 통과 |
+
+### 8-3 돌연변이 재확인 (전체 스위트, 실패 건수 base / concurrent)
+
+| # | 돌연변이 | base | concurrent |
+|---|---|---|---|
+| 1 | 속성 변경 시 renew 제거 | 9 | 9 |
+| 2 | `host` prop 주입 제거 | 8 | 8 |
+| 3 | 즉시 destroy (microtask 없음) | 4 | **5** |
+| 4 | `isConnected` 검사 제거 | 5 | **6** |
+| 5 | 업그레이드 전 할당 흡수 제거 | 2 | 2 |
+| 6 | 스타일을 매 연결마다 추가 | 2 | 2 |
+| 7 | light DOM 비우기 제거 | 2 | 2 |
+| 8 | kebab 변환 제거 | 2 | 2 |
+
+8종 모두 양쪽 코어에서 검출. concurrent의 +1은 R-4 테스트가 추가로 잡은 것.
+
+### Phase 8에서 드러난 것
+
+- **마운트 중 예외 후 상태**: Host의 setup이 먼저 돌아 `this.r`가 남지만 컴포넌트는 등록되지 않아 renew가 no-op이다.
+  별도 정리 코드 없이 안전 — 크기 0 B로 해결.
+- **객체 prop의 요소 간 전달**: lithent 코어가 접근자 있는 키를 프로퍼티로 대입하므로, element끼리 중첩해도 객체가
+  문자열화되지 않는다. 사용자 문서(Phase 10)에 "lithent 앱 안에서 element를 쓸 때 객체 prop이 그대로 전달된다"로 안내.
 
 ## Phase 9 — 통합 테스트
 
@@ -418,3 +459,4 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 2026-10-06 | `styles` 유지 결정, Phase 5 완료 (`host` prop, `emit` cancelable, composed 설명 정정) | Phase 6 (DOM 이동 보존) | 없음 | `0d533ce` |
 | 2026-10-06 | Phase 6 완료 (이동 시 인스턴스 보존, CE 반응 타이밍 확인) — 기능 Phase 종료 | Phase 7 (타입·UMD) | 없음 | `d707586` |
 | 2026-10-06 | Phase 7 완료 (props 타입 추론, host·미선언·불일치 컴파일 오류, UMD 전역 확인, NoInfer 불필요 확인) | Phase 8 (테스트 하드닝) | 없음 | `2220272` |
+| 2026-10-06 | Phase 8 완료 (예외·반복·중첩·R-4 하드닝, 돌연변이 8종 양쪽 코어 재확인) | Phase 9 (E2E 통합) | 없음 | (Phase 8 커밋) |
