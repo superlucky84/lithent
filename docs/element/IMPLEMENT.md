@@ -459,4 +459,4 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 2026-10-06 | `styles` 유지 결정, Phase 5 완료 (`host` prop, `emit` cancelable, composed 설명 정정) | Phase 6 (DOM 이동 보존) | 없음 | `0d533ce` |
 | 2026-10-06 | Phase 6 완료 (이동 시 인스턴스 보존, CE 반응 타이밍 확인) — 기능 Phase 종료 | Phase 7 (타입·UMD) | 없음 | `d707586` |
 | 2026-10-06 | Phase 7 완료 (props 타입 추론, host·미선언·불일치 컴파일 오류, UMD 전역 확인, NoInfer 불필요 확인) | Phase 8 (테스트 하드닝) | 없음 | `2220272` |
-| 2026-10-06 | Phase 8 완료 (예외·반복·중첩·R-4 하드닝, 돌연변이 8종 양쪽 코어 재확인) | Phase 9 (E2E 통합) | 없음 | (Phase 8 커밋) |
+| 2026-10-06 | Phase 8 완료 (예외·반복·중첩·R-4 하드닝, 돌연변이 8종 양쪽 코어 재확인) | Phase 9 (E2E 통합) | 없음 | `c326393` |
