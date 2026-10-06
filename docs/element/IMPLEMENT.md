@@ -514,4 +514,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | Phase 8 완료 (예외·반복·중첩·R-4 하드닝, 돌연변이 8종 양쪽 코어 재확인) | Phase 9 (E2E 통합) | 없음 | `c326393` |
 | 2026-10-06 | Phase 9 완료 (실브라우저 E2E 16건, 음성 대조 3종, 전체 E2E 38/38) | Phase 10 (문서·출하) | 없음 (MT-4는 `9497b68`) | `6d915f4` |
 | 2026-10-06 | MT-4 React 호스트 E2E (react 18.3.1 devDep, 속성·프로퍼티 경로 분리 검증), E2E 40/40 | Phase 10 (문서·출하) | 없음 | `9497b68` |
-| 2026-10-06 | Phase 10 문서·출하 준비 (가이드+데모, README, skill, verify-release 11경로, CHANGELOG), E2E 42/42 | 버전 결정 → CHANGELOG 버전 절, 수동 체크리스트(Safari·Firefox) | 버전 결정 대기 | (Phase 10 커밋) |
+| 2026-10-06 | Phase 10 문서·출하 준비 (가이드+데모, README, skill, verify-release 11경로, CHANGELOG), E2E 42/42 | 버전 결정 → CHANGELOG 버전 절, 수동 체크리스트(Safari·Firefox) | 버전 결정 대기 | `865179d` |
