@@ -142,6 +142,7 @@ export const defineElement = <S extends PropSpec = PropSpec>(
     }
 
     connectedCallback() {
+      // Still mounted: this is the reconnect half of a move (DC-4).
       if (this.d) return;
 
       // DC-8: open shadow root by default; `shadow: false` renders into the
@@ -182,10 +183,17 @@ export const defineElement = <S extends PropSpec = PropSpec>(
     }
 
     disconnectedCallback() {
-      if (this.d) {
-        this.d();
-        this.d = this.r = undefined;
-      }
+      // DC-4: keep the instance across a move. A single-call move
+      // (appendChild, insertBefore) runs this after the element is back, so
+      // isConnected is already true; a remove() then insert in the same task
+      // is caught by waiting a microtask. connectedCallback sees `d` and
+      // does nothing.
+      queueMicrotask(() => {
+        if (!this.isConnected && this.d) {
+          this.d();
+          this.d = this.r = undefined;
+        }
+      });
     }
 
     attributeChangedCallback(

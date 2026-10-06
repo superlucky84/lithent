@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 5 완료 (2026-10-06). 다음: Phase 6.**
+- 상태: **Phase 6 완료 (2026-10-06). 다음: Phase 7.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -301,13 +301,42 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 
 진입 조건: DC-4 확정.
 
-- [ ] 6-1 destroy를 microtask 지연, 재연결이면 취소
-- [ ] 6-2 분리된 상태에서의 속성 변경은 렌더하지 않음
+- [x] 6-1 destroy를 microtask 지연, 재연결이면 취소
+- [x] 6-2 분리된 상태에서의 속성 변경은 렌더하지 않음
 
-**기본 테스트** (`element-move.test.ts`):
-- `parentA.appendChild(el)` → `parentB.appendChild(el)` 같은 태스크 → 내부 상태(클로저 카운터) 보존, unmount 0회
-- 떼고 microtask 경과 → unmount 1회
-- 떼고 다음 태스크에 다시 붙임 → 새 인스턴스(상태 초기화)
+**기본 테스트** (`element-move.test.ts` 8건):
+- 한 번 호출 이동(`appendChild` 다른 부모, `insertBefore`, `replaceChildren`) → 상태 보존, unmount 0회, 이후 갱신도 동작
+- **두 번 호출 이동**(`remove()` → `appendChild`, 같은 태스크) → 상태 보존 (DESIGN §7.0)
+- light DOM 요소 이동 → 상태 보존, 렌더된 자식 유지 (DC-6 비우기가 이동에 걸리지 않음)
+- 떼고 microtask 경과 → unmount 1회 / 다음 태스크에 다시 붙임 → 새 인스턴스
+- 이동 후 같은 태스크에 제거 → unmount 1회
+- 분리 중 속성 변경·renew → 렌더 없음, 재연결 시 새 인스턴스
+
+기존 테스트 조정: 언마운트가 microtask 뒤로 밀려 Phase 1·4 테스트 5건이 "떼자마자 언마운트"를 가정하고 있었다.
+`beforeEach`에서 `body`를 비운 뒤 microtask를 기다리고, 해당 테스트는 `remove()` 뒤 microtask를 기다리도록 바꿨다.
+
+### Phase 6 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 / BG-2 | element 62/62 (base), 62/62 (concurrent) |
+| BG-3 | `98db595` 이후 코어 diff 없음 |
+| BG-4 | 빌드·타입체크·eslint 통과 |
+| RC-3 크기 | **br 935 B / 1,000 B** (+24 B). 기능 Phase(1~6) 종료 시점. 남은 여유 65 B |
+| 전체 회귀 | `pnpm test` 실패 0, `test:satellites:concurrent` 통과 |
+
+### Phase 6 돌연변이 검증
+
+| 돌연변이 | 결과 |
+|---|---|
+| 즉시 destroy (microtask 없이 `isConnected` 검사만) | 처음엔 **1/7만 실패** → 2회 호출 이동 테스트 추가 후 **2/8 실패** → 복구 |
+| `isConnected` 검사 제거 (microtask 후 무조건 destroy) | **3/7 실패** → 복구 |
+| `connectedCallback`의 `if (this.d) return` 제거 | **4/7 실패** → 복구 |
+
+### Phase 6에서 드러난 것
+
+- **CE 반응 타이밍** (DESIGN §7.0): 한 번 호출 이동은 `isConnected`만으로 충분했다. microtask가 지키는 건 2회 호출 이동이다.
+  돌연변이가 이걸 드러냈고 해당 테스트를 추가했다. jsdom도 표준 타이밍을 따른다 — 실제 브라우저는 Phase 9에서 확인.
 
 ## Phase 7 — 타입과 UMD (RC-5, RC-6)
 
@@ -356,3 +385,4 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 2026-10-06 | Phase 3 완료 (프로퍼티 접근자, 생성자에서 업그레이드 흡수, 네이티브 이름 제약 문서화) | Phase 4 (스타일·slot·non-shadow 자식) | 없음 | `d537013` |
 | 2026-10-06 | Phase 4 완료 (스타일 adopted+폴백, slot, light DOM 비움, R-2 가드) | Phase 5 (이벤트 발행) | 없음 | `1ad0f8d` |
 | 2026-10-06 | `styles` 유지 결정, Phase 5 완료 (`host` prop, `emit` cancelable, composed 설명 정정) | Phase 6 (DOM 이동 보존) | 없음 | `0d533ce` |
+| 2026-10-06 | Phase 6 완료 (이동 시 인스턴스 보존, CE 반응 타이밍 확인) — 기능 Phase 종료 | Phase 7 (타입·UMD) | 없음 | (Phase 6 커밋) |

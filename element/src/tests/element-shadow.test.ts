@@ -10,8 +10,10 @@ import { defineElement } from '@/index';
  * real browser in Phase 9.
  */
 
-beforeEach(() => {
+beforeEach(async () => {
   document.body.innerHTML = '';
+  // Let the previous test's deferred unmounts (DC-4) run first.
+  await new Promise<void>(resolve => queueMicrotask(resolve));
 });
 
 const flush = () => new Promise<void>(resolve => setTimeout(resolve, 0));
@@ -90,6 +92,7 @@ describe('styles: <style> fallback (FR-6)', () => {
     expect(root.firstChild!.nodeName).toBe('STYLE');
 
     el.remove();
+    await flush();
     expect(items()).toEqual([]);
     expect(styleTexts(root)).toEqual(['li { color: blue; }']);
 
@@ -197,11 +200,12 @@ describe('light DOM children (DC-6)', () => {
     expect(el.innerHTML).toBe('<p>body</p>');
   });
 
-  it('drops children added while detached before rendering again', () => {
+  it('drops children added while detached before rendering again', async () => {
     defineElement('light-again', Static, { shadow: false });
     const el = document.createElement('light-again');
     document.body.appendChild(el);
     el.remove();
+    await flush();
     el.appendChild(document.createElement('hr'));
 
     document.body.appendChild(el);

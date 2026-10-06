@@ -8,10 +8,11 @@ import { defineElement } from '@/index';
  */
 
 const log: string[] = [];
-beforeEach(() => {
-  // Detach the previous test's elements first: their unmount logs must not
-  // leak into this test's log.
+beforeEach(async () => {
+  // Detach the previous test's elements first and let their deferred
+  // unmount run (DC-4): its logs must not leak into this test's log.
   document.body.innerHTML = '';
+  await new Promise<void>(resolve => queueMicrotask(resolve));
   log.length = 0;
 });
 
@@ -126,7 +127,7 @@ describe('defineElement — mount and unmount (FR-2)', () => {
     expect(el.shadowRoot!.textContent).toBe('up 0');
   });
 
-  it('unmounts on disconnect, including nested components', () => {
+  it('unmounts on disconnect, including nested components', async () => {
     const Parent = mount(() => {
       mountCallback(() => {
         log.push('mount parent');
@@ -140,6 +141,9 @@ describe('defineElement — mount and unmount (FR-2)', () => {
     expect(el.shadowRoot!.textContent).toBe('child');
 
     el.remove();
+    // Unmount waits one microtask, in case this is a move (DC-4).
+    expect(log.some(entry => entry.startsWith('unmount'))).toBe(false);
+    await flush();
     expect(log.filter(entry => entry.startsWith('unmount')).sort()).toEqual([
       'unmount child',
       'unmount parent',
@@ -152,6 +156,7 @@ describe('defineElement — mount and unmount (FR-2)', () => {
     const el = document.createElement('mnt-again');
     document.body.appendChild(el);
     el.remove();
+    await flush();
     expect(log).toEqual(['mount again', 'unmount again']);
 
     // Closed root: reconnecting must reuse it, not call attachShadow twice.

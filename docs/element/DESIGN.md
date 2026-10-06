@@ -205,9 +205,18 @@ const PayButton = mount<{ amount: number; host: HTMLElement }>((_r, props) =>
 | 정의 전 요소가 이미 문서에 있음 | `customElements.define` 시 브라우저가 업그레이드 → `connectedCallback` |
 | 연결 | 첫 연결이면 렌더. `this.d`가 있으면(이동 직후) 무시 |
 | 분리 | microtask 후 `isConnected`가 여전히 false면 destroy (DC-4) |
+| 분리 후 같은 태스크에 재연결 (2회 호출 이동) | microtask가 돌 때 이미 연결돼 있으므로 destroy하지 않음. 상태 보존 |
 | 연결 전 속성/프로퍼티 변경 | `this.p`만 갱신. 첫 렌더에 반영 |
-| 분리 후 속성 변경 | `this.r`가 없으므로 무시. 재연결 시 최신 `this.p`로 새로 렌더 |
+| 분리 후 속성 변경 | destroy 대기 중엔 `this.r`가 남아 있어 renew가 예약되지만, 먼저 예약된 destroy가 컴포넌트를 retired로 표시해(B-1 경로의 `il`) 그 redraw는 건너뛴다. destroy 후엔 `this.r`가 없어 무시. 재연결 시 최신 `this.p`로 새로 렌더 |
 | 같은 이름 재정의 | 기존 생성자 반환 (DC-7) |
+
+### 7.0 이동과 Custom Element 반응 타이밍 (Phase 6에서 확인)
+
+표준상 `connectedCallback`/`disconnectedCallback`은 **DOM API 호출이 끝난 뒤** 실행된다(CE reactions).
+그래서 `appendChild`·`insertBefore`·`replaceChildren`처럼 **한 번의 호출로 하는 이동**은 `disconnectedCallback`이
+돌 때 요소가 이미 새 위치에 있다 — `isConnected` 검사만으로 처리된다. microtask 대기가 실제로 필요한 경우는
+`el.remove()` 후 같은 태스크에서 다시 삽입하는 **두 번의 호출로 나뉜 이동**이다(프레임워크·리스트 재정렬에 흔함).
+초기 테스트는 한 번 호출 이동만 다뤄서, "즉시 destroy" 돌연변이를 잡지 못했다 → 2회 호출 이동 테스트 추가.
 
 ### 7.1 non-shadow 모드의 기존 자식 (DC-6)
 
