@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>lithent/element in a React app</title>
+  </head>
+  <body>
+    <!--
+      lithent/element Phase 9, MT-4: a React 18 app hosts the widget.
+      React 18 passes props of custom elements as attributes (strings), so
+      numbers go through the attribute and objects through a ref property,
+      the way React 18 users wire custom elements. Development builds, so
+      React warnings surface as console errors and fail the test.
+      ?core=base|concurrent picks the widget's lithent core.
+    -->
+    <div id="react-root"></div>
+
+    <script>
+      const core = new URLSearchParams(location.search).get('core');
+      document.write(
+        core === 'concurrent'
+          ? '<script src="/lithentConcurrent/dist/lithentConcurrent.umd.js"><\/script>'
+          : '<script src="/dist/lithent.umd.js"><\/script>'
+      );
+    </script>
+    <script>
+      window.lithent = window.lithentConcurrent || window.lithent;
+    </script>
+    <script src="/element/dist/lithentElement.umd.js"></script>
+    <script src="/node_modules/react/umd/react.development.js"></script>
+    <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
+    <script>
+      // The widget: plain lithent, nothing React-specific.
+      const { h, mount, mountCallback } = window.lithent;
+      const { defineElement, emit } = window.lithentElement;
+      window.widgetLog = [];
+      const Widget = mount((renew, props) => {
+        let count = 0;
+        mountCallback(() => {
+          widgetLog.push('mount');
+          return () => widgetLog.push('unmount');
+        });
+        return () =>
+          h(
+            'div',
+            {},
+            h(
+              'button',
+              {
+                class: 'inc',
+                onClick: () => {
+                  count++;
+                  renew();
+                },
+              },
+              'count ' + count
+            ),
+            h('span', { class: 'amount' }, String(props.amount)),
+            h('span', { class: 'opts' }, JSON.stringify(props.options ?? null)),
+            h(
+              'button',
+              {
+                class: 'pay',
+                onClick: () =>
+                  emit(props.host, 'pay', { amount: props.amount }),
+              },
+              'pay'
+            )
+          );
+      });
+      defineElement('pay-widget', Widget, {
+        props: { amount: Number, options: Object },
+      });
+
+      // The host: a React app that knows nothing about lithent.
+      const e = React.createElement;
+      function App() {
+        const [n, setN] = React.useState(1);
+        const [show, setShow] = React.useState(true);
+        const [paid, setPaid] = React.useState('none');
+        const ref = React.useRef(null);
+
+        // Object prop through the ref, once per mount. Kept apart from the
+        // attribute updates below so each path is checked on its own.
+        React.useEffect(() => {
+          if (ref.current) ref.current.options = { fromReact: 'ref' };
+        }, [show]);
+
+        React.useEffect(() => {
+          const el = ref.current;
+          if (!el) return;
+          const onPay = ev => setPaid(String(ev.detail.amount));
+          el.addEventListener('pay', onPay);
+          return () => el.removeEventListener('pay', onPay);
+        }, [show]);
+
+        return e(
+          'main',
+          null,
+          e(
+            'button',
+            { id: 'react-inc', onClick: () => setN(n + 1) },
+            'react ' + n
+          ),
+          e(
+            'button',
+            { id: 'react-toggle', onClick: () => setShow(!show) },
+            'toggle'
+          ),
+          e('output', { id: 'react-paid' }, paid),
+          show ? e('pay-widget', { id: 'w', ref, amount: n * 100 }) : null
+        );
+      }
+      ReactDOM.createRoot(document.getElementById('react-root')).render(e(App));
+      document.documentElement.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 9 완료 — React 호스트(MT-4) 자동화만 사용자 결정 대기 (2026-10-06). 다음: Phase 10.**
+- 상태: **Phase 9 완료 (MT-4 React 호스트 자동화 포함, 2026-10-06). 다음: Phase 10.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -430,7 +430,11 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
   - [x] 순수 HTML + UMD (MT-1 자동화) — 빌드 단계 없음, `lithentElement` 전역 API
   - [x] 호스트 CSS ↔ 위젯 CSS 양방향 격리 (computed style 비교, MT-2 자동화)
   - [x] 실제 브라우저의 `adoptedStyleSheets` 경로 — 인스턴스 2개가 시트 1개 공유, `<style>` 0개
-  - [ ] **React 호스트 앱 (MT-4 자동화)** — 저장소에 React가 없다. 의존성 추가는 사용자 결정 (아래 "열린 결정")
+  - [x] **React 호스트 앱 (MT-4 자동화)** — `e2e/fixtures/element-react.html`. 사용자 결정으로 루트 devDependency에
+        `react`·`react-dom` **18.3.1** 추가 (React 19는 UMD가 없다). fixture 서버가 의존성 사전 번들링을 끄므로 CJS를 ESM으로
+        못 불러온다 → `node_modules/*/umd/*.development.js`를 `<script>`로 로드. 개발 빌드라 React 경고가 `console.error`로
+        나오면 하네스가 실패로 잡는다. React 18은 Custom Element prop을 속성(문자열)으로 넘기므로 숫자는 속성 경로, 객체는
+        `ref` 프로퍼티 경로로 검증
   - [x] lithent 2벌 동시 로드 (R-1 최종 확인) — **실제 Custom Element로**: 호스트 앱이 자기 lithent 사본으로
         `pay-widget`을 렌더하고 재렌더마다 새 prop을 넘김 → 위젯 상태 유지하며 갱신
   - [x] 정의 전 HTML에 있던 요소의 업그레이드 + 정의 전 프로퍼티 할당 흡수 (실브라우저)
@@ -457,12 +461,17 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 즉시 destroy | DC-4/MT-5 이동 테스트 1건 (두 번 호출 이동에서) |
 | 업그레이드 전 할당 흡수 제거 | MT-1/R-1, FR-3/4/5 2건 (가려진 own property 때문에 이후 대입도 무시됨) |
 
-### 열린 결정 — React 호스트 E2E (MT-4)
+### MT-4 React 호스트 E2E (사용자 결정: devDependency 추가)
 
-저장소에 React 의존성이 없다. 선택지:
-1. 루트 devDependency로 `react`·`react-dom` 추가 + Vite fixture (실제 React 동작 자동화, 의존성·lockfile 증가)
-2. 자동화하지 않고 MANUAL_TEST_CHECKLIST MT-4로만 수동 확인
-3. CDN UMD React를 fixture에서 로드 (의존성 없음, 하지만 E2E가 외부 네트워크에 의존 — 현재 하네스는 요청 실패를 테스트 실패로 본다)
+검증: React 렌더 → 속성 경로로 숫자(100), `ref`로 객체 / 위젯 내부 상태가 React 재렌더(prop 변경)를 견딤 /
+위젯의 `emit`이 React state를 갱신 / React가 요소를 언마운트하면 lithent 언마운트, 다시 마운트하면 새 인스턴스.
+
+| 음성 대조 | 결과 |
+|---|---|
+| 속성 변경 시 renew 제거 | 처음엔 **통과해 버림** — fixture의 effect가 매 렌더 `el.options`를 다시 넣어 프로퍼티 setter가 renew를 대신 호출했다. 객체는 마운트 시 한 번만 넣도록 분리 후 **실패함** |
+| 즉시 destroy | 통과 — React 토글은 이동이 아니라 실제 제거라 즉시·지연 모두 언마운트한다. 이동은 UMD 스위트가 검증 |
+
+E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:release` ALL PASS.
 
 ## Phase 10 — 문서와 출하 준비
 
@@ -490,4 +499,5 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 2026-10-06 | Phase 6 완료 (이동 시 인스턴스 보존, CE 반응 타이밍 확인) — 기능 Phase 종료 | Phase 7 (타입·UMD) | 없음 | `d707586` |
 | 2026-10-06 | Phase 7 완료 (props 타입 추론, host·미선언·불일치 컴파일 오류, UMD 전역 확인, NoInfer 불필요 확인) | Phase 8 (테스트 하드닝) | 없음 | `2220272` |
 | 2026-10-06 | Phase 8 완료 (예외·반복·중첩·R-4 하드닝, 돌연변이 8종 양쪽 코어 재확인) | Phase 9 (E2E 통합) | 없음 | `c326393` |
-| 2026-10-06 | Phase 9 완료 (실브라우저 E2E 16건, 음성 대조 3종, 전체 E2E 38/38) | Phase 10 (문서·출하) | React 호스트 E2E 방식 결정 대기 | `6d915f4` |
+| 2026-10-06 | Phase 9 완료 (실브라우저 E2E 16건, 음성 대조 3종, 전체 E2E 38/38) | Phase 10 (문서·출하) | 없음 (MT-4는 이후 커밋에서 자동화) | `6d915f4` |
+| 2026-10-06 | MT-4 React 호스트 E2E (react 18.3.1 devDep, 속성·프로퍼티 경로 분리 검증), E2E 40/40 | Phase 10 (문서·출하) | 없음 | (MT-4 커밋) |

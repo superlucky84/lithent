@@ -237,3 +237,42 @@ test.describe('lithent/element UMD in a plain page', () => {
     ]);
   });
 });
+
+// MT-4: a React 18 app hosts the widget (React UMD, development build).
+test('MT-4: a React app renders, updates, listens to and unmounts the widget', async ({
+  page,
+}, info) => {
+  await page.goto(`/e2e/fixtures/element-react.html?core=${info.project.name}`);
+  await expect(page.locator('html')).toHaveAttribute('data-ready', 'true');
+
+  // Number through the attribute React sets; object through the ref property.
+  await expect(page.locator('#w .amount')).toHaveText('100');
+  await expect(page.locator('#w .opts')).toHaveText('{"fromReact":"ref"}');
+
+  // Widget state survives React re-renders that change its props.
+  await page.locator('#w .inc').click();
+  await expect(page.locator('#w .inc')).toHaveText('count 1');
+  await page.locator('#react-inc').click();
+  // Only the attribute changed on this React render: the attribute path alone
+  // has to re-render the widget.
+  await expect(page.locator('#w .amount')).toHaveText('200');
+  await expect(page.locator('#w .inc')).toHaveText('count 1');
+
+  // An event from inside the widget updates React state.
+  await page.locator('#w .pay').click();
+  await expect(page.locator('#react-paid')).toHaveText('200');
+
+  // React unmounting the element unmounts the lithent component.
+  await page.locator('#react-toggle').click();
+  await expect(page.locator('#w')).toHaveCount(0);
+  await page.waitForFunction(() =>
+    (window as unknown as { widgetLog: string[] }).widgetLog.includes('unmount')
+  );
+  await page.locator('#react-toggle').click();
+  await expect(page.locator('#w .inc')).toHaveText('count 0');
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { widgetLog: string[] }).widgetLog
+    )
+  ).toEqual(['mount', 'unmount', 'mount']);
+});
