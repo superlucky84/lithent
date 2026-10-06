@@ -277,6 +277,41 @@ test('MT-4: a React app renders, updates, listens to and unmounts the widget', a
   ).toEqual(['mount', 'unmount', 'mount']);
 });
 
+// Phase 10: other docs pages point to the guide and list the CDN builds.
+test('docs: home, introduction and quick start link the element guide', async ({
+  page,
+}, info) => {
+  const origin = `http://127.0.0.1:${info.project.name === 'concurrent' ? 43135 : 43134}`;
+  const main = page.locator('main');
+  for (const [language, introLink, cdnLabel] of [
+    ['', 'Custom Elements guide', 'Custom Elements'],
+    ['/ko', '커스텀 엘리먼트 가이드', '커스텀 엘리먼트'],
+  ]) {
+    await page.goto(`${origin}/lithent/#${language}/guide/quick-start`);
+    const cdn = main.getByText(cdnLabel, { exact: true }).first();
+    await expect(cdn).toBeVisible();
+    await expect(main).toContainText(
+      'lithent/element/dist/lithentElement.umd.js'
+    );
+    await expect(main).toContainText('lithent/element/dist/lithentElement.mjs');
+
+    await page.goto(`${origin}/lithent/#${language}/guide/introduction`);
+    await main.getByRole('link', { name: introLink }).click();
+    await expect(page).toHaveURL(/guide\/element$/);
+    await expect(main.locator('docs-pay-button')).toHaveCount(1);
+  }
+
+  // The home page card (the sidebar has a collapsed link with the same text).
+  await page.goto(`${origin}/lithent/#/`);
+  await expect(
+    main.getByRole('heading', { name: 'Web Components', level: 2 })
+  ).toBeVisible();
+  await main
+    .getByRole('link', { name: 'Custom Elements', exact: true })
+    .click();
+  await expect(page).toHaveURL(/guide\/element$/);
+});
+
 // Phase 10: the docs guide and its live demo, in both languages.
 test('docs: the element guide renders and its demo widget works', async ({
   page,

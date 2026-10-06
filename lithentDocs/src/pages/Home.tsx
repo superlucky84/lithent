@@ -109,6 +109,21 @@ const categories: CategoryWithTheme[] = [
     ],
   },
   {
+    title: 'Web Components',
+    description: 'Embed lithent components in any page as Custom Elements',
+    icon: '🧩',
+    theme: {
+      gradient:
+        'from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20',
+      borderColor: 'border-teal-200 dark:border-teal-800',
+      hoverBorder: 'hover:border-teal-400 dark:hover:border-teal-600',
+      tagBg: 'bg-teal-100 dark:bg-teal-900/40',
+      tagHover: 'hover:bg-teal-200 dark:hover:bg-teal-800/60',
+      textColor: 'text-teal-900 dark:text-teal-100',
+    },
+    items: [{ text: 'Custom Elements', link: '/guide/element' }],
+  },
+  {
     title: 'JSX & Templates',
     description: 'Support for various template syntaxes',
     icon: '📝',

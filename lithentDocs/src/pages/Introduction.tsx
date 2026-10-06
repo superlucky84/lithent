@@ -180,6 +180,20 @@ const Counter = lmount((_props) => {
       <li>Progressively enhance static HTML—no build step required</li>
       <li>Single-page applications (SPA)</li>
       <li>Server-side rendering (SSR)</li>
+      <li>
+        Widgets in pages you do not own, as standard Custom Elements (
+        <a
+          href="/guide/element"
+          onClick={(e: Event) => {
+            e.preventDefault();
+            navigateTo('/guide/element');
+          }}
+          class="text-[#42b883] hover:underline"
+        >
+          Custom Elements guide
+        </a>
+        )
+      </li>
     </ul>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />

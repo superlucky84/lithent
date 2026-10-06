@@ -53,6 +53,8 @@ npm install lithent
 ```html
 <script src="https://cdn.jsdelivr.net/npm/lithent/dist/lithent.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lithent/ftags/dist/lithentFTags.umd.js"></script>
+<!-- Custom Elements (optional) -->
+<script src="https://cdn.jsdelivr.net/npm/lithent/element/dist/lithentElement.umd.js"></script>
 ```
 
 > **[📦 View all available CDN URLs](https://superlucky84.github.io/lithent/#/guide/quick-start)**
@@ -134,7 +136,7 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 | [lithent/ssr](https://www.npmjs.com/package/lithent) | Server‑side rendering |
 | [lithent/ftags](https://www.npmjs.com/package/lithent) | Function‑style tag API |
 | [lithent/tag](https://www.npmjs.com/package/lithent) | HTM template support |
-| [lithent/element](https://superlucky84.github.io/lithent/#/guide/element) | Register components as Custom Elements, embeddable in any page |
+| [lithent/element](./element/README.md) | Register components as Custom Elements, embeddable in any page ([guide](https://superlucky84.github.io/lithent/#/guide/element)) |
 | [lithent-concurrent](./lithentConcurrent/README.md) | Separate core with priority scheduling and interruptible low-priority builds |
 | [lithent-concurrent/helper](./lithentConcurrent/README.md#lithent-concurrenthelper) | Deferred state and component-local pending queries |
 | [create-lithent](https://www.npmjs.com/package/create-lithent) | Project scaffolding tool |

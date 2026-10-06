@@ -490,6 +490,12 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
       설치 예시·템플릿 의존성은 여전히 맞으므로 바꾸지 않음. 재검증: `pnpm build`(skill 버전 1.23.0), `test`·`test:dual` 실패 0,
       `verify:release` ALL PASS (packed lithent@1.23.0, lithent-concurrent@0.1.2), E2E 42/42. **npm publish는 하지 않음**
 
+- [x] 10-8 (사용자 요청) 기존 문서에서도 연결: Home 기능 카드 "Web Components"(영·국), Introduction "점진적 도입" 목록에
+      가이드 링크(영·국), Quick Start CDN 목록에 Element UMD·ESM(영·국). README CDN 예시에 element 스크립트, 생태계 표를
+      `element/README.md`로 연결(가이드 링크 병기), `element/README.md` 신설(영·국 가이드 링크, 요약표, 설계 문서 링크).
+      E2E `docs: home, introduction and quick start link the element guide` 추가 — 처음엔 홈에서 접힌 사이드바 링크를
+      먼저 잡아 실패 → `main` 범위로 좁힘. E2E 전체 **44/44**
+
 ### Phase 10 실측 결과 (2026-10-06)
 
 | 항목 | 결과 |
@@ -519,3 +525,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | MT-4 React 호스트 E2E (react 18.3.1 devDep, 속성·프로퍼티 경로 분리 검증), E2E 40/40 | Phase 10 (문서·출하) | 없음 | `9497b68` |
 | 2026-10-06 | Phase 10 문서·출하 준비 (가이드+데모, README, skill, verify-release 11경로, CHANGELOG), E2E 42/42 | 버전 결정 → CHANGELOG 버전 절, 수동 체크리스트(Safari·Firefox) | 버전 결정 대기 | `865179d` |
 | 2026-10-06 | 버전 확정 (lithent 1.23.0, lithent-concurrent 0.1.2), CHANGELOG 버전 절 — **Phase 0~10 완료** | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | `6855f1e` |
+| 2026-10-06 | 문서 연결 보강 (Home·Introduction·QuickStart 영/국, README CDN·표, element/README.md), E2E 44/44 | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | (문서 연결 커밋) |
