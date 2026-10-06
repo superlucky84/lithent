@@ -70,11 +70,22 @@ const copy = {
     types: 'TypeScript',
     typesText:
       'The props declaration types the component: Boolean props are boolean, the others are optional. A component that requires a declared prop, mistypes one or needs an undeclared one is a compile error.',
+    hosts: 'Using it inside other frameworks',
+    hostsText:
+      'The host only needs to do two things: pass values and listen to events. Strings and numbers can go through attributes. Objects, arrays and functions must be assigned as properties; frameworks differ in whether their template syntax does that for you.',
+    hostsItems: [
+      'Plain HTML / JavaScript: set attributes in markup, assign objects with el.prop = value, listen with addEventListener.',
+      'lithent: JSX props are assigned as properties when the element has them, and onPay listens to the pay event.',
+      'React 18: every prop on a custom element becomes a string attribute, so an object arrives as "[object Object]". Assign objects and add listeners through a ref.',
+      'React 19: props that match a property on the element are assigned as properties, so objects can be passed directly.',
+      'Vue 3: bindings are assigned as properties when the element has them (force it with .prop), and @pay listens to the event. Tell Vue the tag is a custom element with compilerOptions.isCustomElement.',
+    ],
+    hostsNote:
+      'The plain HTML, lithent and React 18 cases are covered by this package’s browser tests; the React 19 and Vue notes follow those frameworks’ documentation.',
     notes: 'Notes',
     notesItems: [
       'host is reserved for the element; declaring a prop named host throws.',
       'Avoid native property names such as title or hidden: the prop hides the native behavior.',
-      'React 18 passes custom element props as attributes; set objects through a ref. React 19 and lithent assign them as properties.',
       'Inside the component, pass keyed lists as arrays, as everywhere in lithent.',
     ],
     stateRefLink: 'Share state across widgets with stateRef →',
@@ -136,11 +147,22 @@ const copy = {
     types: 'TypeScript',
     typesText:
       'props 선언이 컴포넌트 타입을 정합니다. Boolean prop은 boolean, 나머지는 선택적입니다. 선언된 prop을 필수로 요구하거나, 타입이 다르거나, 선언하지 않은 prop을 요구하는 컴포넌트는 컴파일 오류입니다.',
+    hosts: '다른 프레임워크에서 쓰기',
+    hostsText:
+      '호스트가 할 일은 두 가지뿐입니다. 값을 넘기고, 이벤트를 듣는 것입니다. 문자열과 숫자는 속성으로 넘겨도 됩니다. 객체·배열·함수는 반드시 프로퍼티로 대입해야 하는데, 템플릿 문법이 이걸 대신 해주는지는 프레임워크마다 다릅니다.',
+    hostsItems: [
+      '순수 HTML / JavaScript: 마크업에 속성을 쓰고, 객체는 el.prop = 값으로 대입하고, addEventListener로 듣습니다.',
+      'lithent: 엘리먼트에 같은 이름의 프로퍼티가 있으면 JSX prop을 프로퍼티로 대입하고, onPay는 pay 이벤트를 듣습니다.',
+      'React 18: 커스텀 엘리먼트의 prop을 모두 문자열 속성으로 넘기므로 객체는 "[object Object]"가 됩니다. 객체 대입과 이벤트 리스너는 ref로 하세요.',
+      'React 19: 엘리먼트에 같은 이름의 프로퍼티가 있으면 프로퍼티로 대입하므로 객체를 바로 넘길 수 있습니다.',
+      'Vue 3: 엘리먼트에 프로퍼티가 있으면 바인딩을 프로퍼티로 대입하고(.prop으로 강제 가능), @pay로 이벤트를 듣습니다. compilerOptions.isCustomElement로 커스텀 엘리먼트임을 알려 주세요.',
+    ],
+    hostsNote:
+      '순수 HTML, lithent, React 18 경우는 이 패키지의 브라우저 테스트로 확인했습니다. React 19와 Vue 내용은 각 프레임워크 문서를 따른 것입니다.',
     notes: '주의할 점',
     notesItems: [
       'host는 엘리먼트용 예약어입니다. host라는 prop을 선언하면 예외가 납니다.',
       'title, hidden 같은 네이티브 프로퍼티 이름은 피하세요. prop이 네이티브 동작을 가립니다.',
-      'React 18은 커스텀 엘리먼트 prop을 속성으로 넘기므로 객체는 ref로 설정하세요. React 19와 lithent는 프로퍼티로 대입합니다.',
       '컴포넌트 안에서 keyed 리스트는 lithent 어디서나처럼 배열로 넘기세요.',
     ],
     stateRefLink: 'stateRef로 위젯 간 상태 공유 →',
@@ -351,6 +373,39 @@ type Props = ElementProps<typeof spec>;
 const Ctor = defineElement('my-panel', Panel, { props: spec });
 const el = new Ctor!(); // el.amount: number | undefined, el.open: boolean`}
       />
+
+      <h2>{t.hosts}</h2>
+      <p>{t.hostsText}</p>
+      <ul>
+        {t.hostsItems.map(text => (
+          <li>{text}</li>
+        ))}
+      </ul>
+      <CodeBlock
+        language="tsx"
+        code={`// React 18: objects and events through a ref
+function Orders({ filters }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    el.filters = filters;                     // property, not attribute
+    const onPay = e => console.log(e.detail);
+    el.addEventListener('pay', onPay);
+    return () => el.removeEventListener('pay', onPay);
+  }, [filters]);
+  return <order-table ref={ref} order-id="42" />; // strings and numbers are fine
+}
+
+// React 19: objects can be passed directly
+<order-table filters={filters} order-id={42} />`}
+      />
+      <CodeBlock
+        language="html"
+        code={`<!-- Vue 3 (vite.config: vue({ template: { compilerOptions: {
+       isCustomElement: tag => tag.includes('-') } } })) -->
+<order-table :filters.prop="filters" order-id="42" @pay="onPay" />`}
+      />
+      <p>{t.hostsNote}</p>
 
       <h2>{t.notes}</h2>
       <ul>
