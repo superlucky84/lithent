@@ -16,7 +16,8 @@
   DOM). `styles` are shared by every instance through one adopted style sheet,
   with a `<style>` fallback. Slots project the element's children.
 - The component receives the element as `props.host`; `emit(host, name,
-  detail)` dispatches a bubbling, composed, cancelable `CustomEvent`.
+  detail, init?)` dispatches a `CustomEvent` that bubbles, is composed and is
+  cancelable unless `init` says otherwise.
 - Moving an element keeps its state; removing it unmounts after a microtask.
   `defineElement` returns `undefined` without `customElements` (SSR).
 - TypeScript infers the component's props from the declaration and rejects

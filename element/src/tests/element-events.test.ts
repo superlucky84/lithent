@@ -147,3 +147,52 @@ describe('emit (FR-5)', () => {
     });
   });
 });
+
+describe('emit options (init)', () => {
+  it('keeps a non-bubbling event on the element itself', () => {
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const heard: string[] = [];
+    el.addEventListener('tick', () => heard.push('element'));
+    document.addEventListener('tick', () => heard.push('document'));
+
+    emit(el, 'tick', 1, { bubbles: false });
+    expect(heard).toEqual(['element']);
+  });
+
+  it('keeps a non-composed event inside an outer shadow root', () => {
+    const outer = document.createElement('div');
+    document.body.appendChild(outer);
+    const root = outer.attachShadow({ mode: 'open' });
+    const el = document.createElement('div');
+    root.appendChild(el);
+    const heard: string[] = [];
+    root.addEventListener('scoped', () => heard.push('outer root'));
+    document.addEventListener('scoped', () => heard.push('document'));
+
+    emit(el, 'scoped', null, { composed: false });
+    expect(heard).toEqual(['outer root']);
+  });
+
+  it('cannot be cancelled when cancelable is false', () => {
+    const el = document.createElement('div');
+    el.addEventListener('done', e => e.preventDefault());
+    expect(emit(el, 'done', null, { cancelable: false })).toBe(true);
+  });
+
+  it('keeps the other defaults and the detail argument', () => {
+    const el = document.createElement('div');
+    let event: CustomEvent | undefined;
+    el.addEventListener('ping', e => (event = e as CustomEvent));
+    emit(el, 'ping', { a: 1 }, {
+      bubbles: false,
+      detail: 'ignored',
+    } as EventInit);
+    expect(event).toMatchObject({
+      bubbles: false,
+      composed: true,
+      cancelable: true,
+      detail: { a: 1 },
+    });
+  });
+});

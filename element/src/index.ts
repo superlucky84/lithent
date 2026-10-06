@@ -78,7 +78,8 @@ const convert = (type: PropSpec[string], value: string | null): unknown => {
  * element itself, so it bubbles to the host page; `composed` lets it also
  * leave an outer shadow root when the element is nested in another
  * component. It is cancelable: returns `false` when a listener called
- * `preventDefault()`.
+ * `preventDefault()`. Pass `init` to change `bubbles`, `composed` or
+ * `cancelable`.
  *
  * ```ts
  * const PayButton = mount<{ amount: number; host: HTMLElement }>(
@@ -87,13 +88,21 @@ const convert = (type: PropSpec[string], value: string | null): unknown => {
  * );
  * ```
  */
-export const emit = (host: Element, name: string, detail?: unknown) =>
+export const emit = (
+  host: Element,
+  name: string,
+  detail?: unknown,
+  // Overrides the defaults, e.g. { bubbles: false } for a noisy event that
+  // only listeners on the element itself should hear. `detail` always wins.
+  init?: EventInit
+) =>
   host.dispatchEvent(
     new CustomEvent(name, {
-      detail,
       bubbles: true,
       composed: true,
       cancelable: true,
+      ...init,
+      detail,
     })
   );
 

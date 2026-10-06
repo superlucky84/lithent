@@ -192,6 +192,10 @@ const PayButton = mount<{ amount: number; host: HTMLElement }>((_r, props) =>
   Phase 5 돌연변이 검증에서 발견, 테스트를 중첩 shadow 상황으로 교체.)
 - `cancelable: true` (Phase 5 추가, br 11 B): 호스트 페이지가 `preventDefault()`하면 `emit`이 `false`를 반환한다.
   예: 결제 위젯의 `pay`를 고객사가 막는 "before" 이벤트 패턴.
+- **네 번째 인자 `init?: EventInit` (출하 전 추가, 사용자 요청, +1 B):** 기본값 위에 덮어쓴다
+  (`{ bubbles: true, composed: true, cancelable: true, ...init, detail }`). `detail`은 항상 세 번째 인자가 이긴다.
+  용도: 자주 발생하는 이벤트를 `bubbles: false`로 요소에만, 바깥 컴포넌트 안에만 머물 이벤트를 `composed: false`로.
+  `emit`은 편의 함수일 뿐이며 `props.host.dispatchEvent(...)`를 직접 써도 된다고 가이드에 명시.
 - `props.host` 이름은 예약어. `options.props`에 `host`를 선언하면 정의 시 예외 `Error('"host" is reserved')`.
   메시지를 짧게 한 이유는 크기(긴 메시지 대비 −18 B).
 - 기각한 대안: `useHost()` 훅 — 모듈 전역 "현재 호스트" 참조가 필요한데,

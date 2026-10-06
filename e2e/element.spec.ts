@@ -317,18 +317,20 @@ test('docs: the element guide renders and its demo widget works', async ({
   page,
 }, info) => {
   const origin = `http://127.0.0.1:${info.project.name === 'concurrent' ? 43135 : 43134}`;
-  for (const [route, title, last, how] of [
+  for (const [route, title, last, how, helper] of [
     [
       '/guide/element',
       'Custom Elements',
       'Last pay event:',
       'amount +1000 only changes a property',
+      'emit is only a helper around the standard API',
     ],
     [
       '/ko/guide/element',
       '커스텀 엘리먼트',
       '마지막 pay 이벤트:',
       'amount +1000은 프로퍼티만 바꿉니다',
+      'emit은 표준 API를 감싼 도움 함수일 뿐입니다',
     ],
   ]) {
     await page.goto(`${origin}/lithent/#${route}`);
@@ -347,6 +349,9 @@ test('docs: the element guide renders and its demo widget works', async ({
     // The demo's behavior is explained, and its code is shown under it.
     await expect(main.getByText(how)).toBeVisible();
     await expect(main).toContainText('let clicks = 0; // the widget');
+    // emit is presented as optional: the direct dispatch is shown too.
+    await expect(main.getByText(helper)).toBeVisible();
+    await expect(main).toContainText("new CustomEvent('tick'");
   }
 });
 

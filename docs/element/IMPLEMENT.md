@@ -527,3 +527,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | 버전 확정 (lithent 1.23.0, lithent-concurrent 0.1.2), CHANGELOG 버전 절 — **Phase 0~10 완료** | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | `6855f1e` |
 | 2026-10-06 | 문서 연결 보강 (Home·Introduction·QuickStart 영/국, README CDN·표, element/README.md), E2E 44/44 | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | `a73d7d5` |
 | 2026-10-06 | 수동 확인용 놀이터 (`element/playground/`, 단일 HTML 빌드 base·concurrent, `pnpm playground:element`, element 빌드에 포함), 0~9단계 자동 판정, E2E로 전 단계 검증 | Safari·Firefox에서 놀이터로 수동 확인, publish (사용자) | 없음 | `f7afcf5` |
+| 2026-10-06 | `emit` 네 번째 인자 `init`(기본값 덮어쓰기, detail은 항상 우선, +1 B, br 936 B), 가이드에 직접 `dispatchEvent` 안내(영/국), 테스트 4건·돌연변이 2종, E2E 46/46 | Safari·Firefox 수동 확인, publish (사용자) | 없음 | (emit 옵션 커밋) |

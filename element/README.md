@@ -35,14 +35,14 @@ defineElement('pay-button', PayButton, {
 
 ## At a glance
 
-|           |                                                                                                                 |
-| --------- | --------------------------------------------------------------------------------------------------------------- |
-| Props     | `String`, `Number`, `Boolean`, `Object` — kebab-case attributes (converted) and properties (as is)              |
-| Events    | `props.host` + `emit(host, name, detail)` — bubbling, composed, cancelable                                      |
-| Styles    | Open shadow root by default; `styles` shared through one adopted sheet; theme with CSS variables and `::part()` |
-| Children  | `<slot>` in shadow mode; `shadow: false` renders into the element itself                                        |
-| Lifecycle | Moves keep state; removal unmounts after a microtask; `undefined` without `customElements` (SSR)                |
-| Cores     | Base and `lithent-concurrent`                                                                                   |
+|           |                                                                                                                          |
+| --------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Props     | `String`, `Number`, `Boolean`, `Object` — kebab-case attributes (converted) and properties (as is)                       |
+| Events    | `props.host` + `emit(host, name, detail, init?)` — bubbling, composed, cancelable by default; or dispatch your own event |
+| Styles    | Open shadow root by default; `styles` shared through one adopted sheet; theme with CSS variables and `::part()`          |
+| Children  | `<slot>` in shadow mode; `shadow: false` renders into the element itself                                                 |
+| Lifecycle | Moves keep state; removal unmounts after a microtask; `undefined` without `customElements` (SSR)                         |
+| Cores     | Base and `lithent-concurrent`                                                                                            |
 
 ## Hand-test playground
 

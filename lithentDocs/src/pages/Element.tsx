@@ -34,7 +34,9 @@ const copy = {
       'Properties take any value without conversion, so pass objects, arrays and functions as properties. Properties are not reflected back to attributes. Changes made in the same task render once.',
     events: 'Events out of the element',
     eventsText:
-      'The component receives the element as props.host. emit dispatches a CustomEvent on it that bubbles, is composed and is cancelable; it returns false when a listener called preventDefault(), so a widget can offer "before" events.',
+      'The component receives the element as props.host. emit dispatches a CustomEvent on it that bubbles, is composed and is cancelable; it returns false when a listener called preventDefault(), so a widget can offer "before" events. A fourth argument overrides those defaults, for example { bubbles: false } for a frequent event that only listeners on the element itself should hear.',
+    eventsDirect:
+      'emit is only a helper around the standard API. Dispatching your own event from props.host works the same, including an Event subclass with its own fields.',
     styles: 'Styles and customization',
     stylesText:
       'By default the component renders into an open shadow root, so page CSS does not reach in and widget CSS does not leak out. That is why the widget brings its CSS: styles are shared by every instance through one adopted style sheet, with a <style> fallback where that API is missing. Let host pages theme the widget with CSS custom properties and ::part(), which cross the shadow boundary.',
@@ -102,7 +104,9 @@ const copy = {
       '프로퍼티는 변환 없이 어떤 값이든 받으므로 객체·배열·함수는 프로퍼티로 넘기세요. 프로퍼티는 속성으로 반영되지 않습니다. 같은 태스크 안의 여러 변경은 한 번만 렌더됩니다.',
     events: '엘리먼트 밖으로 이벤트 보내기',
     eventsText:
-      '컴포넌트는 엘리먼트 자신을 props.host로 받습니다. emit은 그 위에서 bubbles·composed·cancelable인 CustomEvent를 발생시킵니다. 리스너가 preventDefault()를 호출하면 false를 반환하므로 "실행 전" 이벤트를 만들 수 있습니다.',
+      '컴포넌트는 엘리먼트 자신을 props.host로 받습니다. emit은 그 위에서 bubbles·composed·cancelable인 CustomEvent를 발생시킵니다. 리스너가 preventDefault()를 호출하면 false를 반환하므로 "실행 전" 이벤트를 만들 수 있습니다. 네 번째 인자로 이 기본값을 바꿀 수 있습니다. 예를 들어 자주 발생하는 이벤트를 엘리먼트에 직접 붙은 리스너만 듣게 하려면 { bubbles: false }를 넘깁니다.',
+    eventsDirect:
+      'emit은 표준 API를 감싼 도움 함수일 뿐입니다. props.host에서 직접 이벤트를 발생시켜도 똑같이 동작하고, 필드를 가진 Event 하위 클래스도 쓸 수 있습니다.',
     styles: '스타일과 커스터마이즈',
     stylesText:
       '기본적으로 컴포넌트는 open shadow root에 렌더되므로 페이지 CSS가 안으로 들어오지 않고 위젯 CSS도 밖으로 새지 않습니다. 그래서 위젯이 자기 CSS를 가지고 들어갑니다. styles는 adopted style sheet 하나를 모든 인스턴스가 공유하고, 그 API가 없으면 <style>로 대체합니다. 호스트 페이지가 위젯을 테마링할 때는 shadow 경계를 통과하는 CSS 변수와 ::part()를 쓰세요.',
@@ -281,7 +285,18 @@ if (!allowed) return; // the page called preventDefault()
 // on the page
 button.addEventListener('pay', e => {
   if (!confirm('Pay?')) e.preventDefault();
-});`}
+});
+
+// a frequent event that should not bubble to the page
+emit(props.host, 'tick', { t }, { bubbles: false });`}
+      />
+      <p>{t.eventsDirect}</p>
+      <CodeBlock
+        language="typescript"
+        code={`// the same event without the helper
+props.host.dispatchEvent(
+  new CustomEvent('tick', { detail: { t }, bubbles: false })
+);`}
       />
 
       <h2>{t.styles}</h2>

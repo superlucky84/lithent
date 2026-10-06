@@ -44,8 +44,10 @@ defineElement('pay-button', PayButton, {
 - Types: Boolean props are `boolean`; others are optional (`amount?: number`).
   A component that requires a declared prop is a compile error.
 - `props.host` is the element (reserved; declaring `host` throws).
-  `emit(host, name, detail)` dispatches a bubbling, composed, cancelable
-  CustomEvent and returns `false` if the page called `preventDefault()`.
+  `emit(host, name, detail, init?)` dispatches a bubbling, composed, cancelable
+  CustomEvent and returns `false` if the page called `preventDefault()`;
+  `init` overrides those defaults (e.g. `{ bubbles: false }`). `emit` is only
+  a helper: `props.host.dispatchEvent(new CustomEvent(...))` works the same.
 - Styles apply only in shadow mode; one sheet is shared by all instances. Host
   pages theme via CSS custom properties and `::part()`.
 - Shadow mode: render `<slot />` to show the element's children. `shadow: false`
