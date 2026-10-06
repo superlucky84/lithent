@@ -355,4 +355,4 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 2026-10-06 | Phase 2 완료 (속성 → props, Boolean 기본 false, dev 경고 철회) | Phase 3 (프로퍼티 → props) | 없음 | `19597be` |
 | 2026-10-06 | Phase 3 완료 (프로퍼티 접근자, 생성자에서 업그레이드 흡수, 네이티브 이름 제약 문서화) | Phase 4 (스타일·slot·non-shadow 자식) | 없음 | `d537013` |
 | 2026-10-06 | Phase 4 완료 (스타일 adopted+폴백, slot, light DOM 비움, R-2 가드) | Phase 5 (이벤트 발행) | 없음 | `1ad0f8d` |
-| 2026-10-06 | `styles` 유지 결정, Phase 5 완료 (`host` prop, `emit` cancelable, composed 설명 정정) | Phase 6 (DOM 이동 보존) | 없음 | (Phase 5 커밋) |
+| 2026-10-06 | `styles` 유지 결정, Phase 5 완료 (`host` prop, `emit` cancelable, composed 설명 정정) | Phase 6 (DOM 이동 보존) | 없음 | `0d533ce` |
