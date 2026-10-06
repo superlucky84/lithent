@@ -1,0 +1,37 @@
+{
+  "type": "module",
+  "name": "lithent-element",
+  "version": "0.1.0",
+  "description": "Register lithent components as standard Custom Elements",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "main": "./dist/lithentElement.umd.js",
+  "module": "./dist/lithentElement.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest",
+    "watch": "vite build --watch",
+    "build": "vite build && node scripts/build-playground.mjs",
+    "playground": "node scripts/build-playground.mjs"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent",
+    "custom-elements",
+    "web-components"
+  ],
+  "peerDependencies": {
+    "lithent": "workspace:*"
+  },
+  "volta": {
+    "node": "20.3.0"
+  }
+}

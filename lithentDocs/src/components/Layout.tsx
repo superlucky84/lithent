@@ -46,6 +46,8 @@ import { NextTick } from '@/pages/NextTick';
 import { NextTickKo } from '@/pages/NextTick_ko';
 import { ConcurrentRendering } from '@/pages/ConcurrentRendering';
 import { ConcurrentRenderingKo } from '@/pages/ConcurrentRendering_ko';
+import { Element } from '@/pages/Element';
+import { ElementKo } from '@/pages/Element_ko';
 import { ConcurrentHelpers } from '@/pages/ConcurrentHelpers';
 import { ConcurrentHelpersKo } from '@/pages/ConcurrentHelpers_ko';
 import { VitePlugin } from '@/pages/VitePlugin';
@@ -156,6 +158,8 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/next-tick': NextTickKo,
   '/guide/concurrent-rendering': ConcurrentRendering,
   '/ko/guide/concurrent-rendering': ConcurrentRenderingKo,
+  '/guide/element': Element,
+  '/ko/guide/element': ElementKo,
   '/guide/concurrent-helpers': ConcurrentHelpers,
   '/ko/guide/concurrent-helpers': ConcurrentHelpersKo,
   '/guide/mount-hooks': MountHooks,

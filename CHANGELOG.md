@@ -1,5 +1,69 @@
 # Release notes
 
+## 2026-10-06
+
+### lithent 1.23.0
+
+- Add the `lithent/element` subpath: `defineElement(name, component, options)`
+  registers a `mount` or `lmount` component as a standard Custom Element, so it
+  can be embedded in any page with a script and a tag. UMD global
+  `lithentElement`; 998 B brotli on top of the core.
+- Declared props (`String`, `Number`, `Boolean`, `Object`) are observed as
+  kebab-case attributes with conversion and exposed as properties without it.
+  Changes in one task render once; values assigned before the element is
+  defined are kept.
+- Renders into an open shadow root by default (`'closed'` or `false` for light
+  DOM). `styles` are shared by every instance through one adopted style sheet,
+  with a `<style>` fallback. Slots project the element's children.
+- The component receives the element as `props.host`; `emit(host, name,
+  detail, init?)` dispatches a `CustomEvent` that bubbles, is composed and is
+  cancelable unless `init` says otherwise.
+- Moving an element keeps its state; removing it unmounts after a microtask.
+  `defineElement` returns `undefined` without `customElements` (SSR).
+- TypeScript infers the component's props from the declaration and rejects
+  components that require or mistype them.
+- Fix `render()`'s destroy function skipping unmount callbacks. It ran them
+  only when the root component had re-rendered at least once, so a fresh
+  component root, or components rendered under an element root, never saw the
+  cleanup returned from `mountCallback`. It now runs unmount for the whole
+  removed tree, once per component. Found while building `lithent/element`.
+- Fix props on a custom element that was rendered before its definition. The
+  property-or-attribute decision was cached per tag name, so after the upgrade
+  lithent kept setting attributes: objects arrived as `"[object Object]"` and
+  `false` as a present (true) attribute. The decision is now cached per
+  prototype, so renders after the upgrade assign properties. Built-in elements
+  and elements defined before rendering behave as before.
+- Keep the real value of every prop on a custom element that is not upgraded
+  yet, as an own property next to the attribute, for keys `HTMLElement` does
+  not have (so `textContent` or `offsetWidth` never run a DOM setter). The
+  element takes it over
+  when it is defined, so a parent that renders the same values again after the
+  upgrade no longer leaves an object as `"[object Object]"` or `false` as
+  true.
+- Unset a custom element property when the parent stops passing the prop.
+  Removing a prop only removed the attribute, so a value passed as a property
+  stayed on the element. lithent now assigns `undefined` through the upgraded
+  element's own accessor, or deletes the kept value before the upgrade. Built-in elements behave as before.
+
+These four fixes are the only changes to the base core; `lithent` grows by
+53 B net (brotli 4,792 B).
+
+`lithent/element` ships inside this package; its private workspace version is
+0.1.0. It works with both cores and is covered by unit tests on both and by
+browser tests in a plain page, next to a host app on another lithent copy, and
+inside React 18.
+
+### lithent-concurrent 0.1.2
+
+- Fix the same `render()` destroy bug in the concurrent core: unmount callbacks
+  now run for the whole removed tree.
+- Fix the same stale property-or-attribute decision for custom elements
+  rendered before their definition, and the same two boundaries: values are
+  kept as own properties until the upgrade, and removed props unset the
+  property.
+- Brotli 6,288 B (+55 B vs 0.1.1). Still works with `lithent ^1.22.1`; use
+  `lithent ^1.23.0` for `lithent/element`.
+
 ## 2026-10-02
 
 ### lithent-concurrent 0.1.1

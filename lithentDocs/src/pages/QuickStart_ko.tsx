@@ -356,6 +356,14 @@ $ npm run dev`}
               https://cdn.jsdelivr.net/npm/lithent/tag/dist/lithentTag.umd.js
             </code>
           </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">
+              커스텀 엘리먼트
+            </div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/element/dist/lithentElement.umd.js
+            </code>
+          </li>
         </ul>
       </div>
 
@@ -387,6 +395,14 @@ $ npm run dev`}
             <div class="text-gray-600 dark:text-gray-400 mb-1">HTM Tags</div>
             <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
               https://cdn.jsdelivr.net/npm/lithent/tag/dist/lithentTag.mjs
+            </code>
+          </li>
+          <li>
+            <div class="text-gray-600 dark:text-gray-400 mb-1">
+              커스텀 엘리먼트
+            </div>
+            <code class="block bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-200 dark:border-gray-700 text-[11px] break-all">
+              https://cdn.jsdelivr.net/npm/lithent/element/dist/lithentElement.mjs
             </code>
           </li>
         </ul>

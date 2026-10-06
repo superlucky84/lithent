@@ -183,6 +183,20 @@ const Counter = lmount((_props) => {
       <li>빌드 단계없이 정적 HTML을 강화</li>
       <li>싱글 페이지 애플리케이션(SPA)</li>
       <li>서버 사이드 렌더링(SSR)</li>
+      <li>
+        내가 소유하지 않은 페이지에 들어가는 위젯을 표준 Custom Element로 (
+        <a
+          href="/guide/element"
+          onClick={(e: Event) => {
+            e.preventDefault();
+            navigateTo('/guide/element');
+          }}
+          class="text-[#42b883] hover:underline"
+        >
+          커스텀 엘리먼트 가이드
+        </a>
+        )
+      </li>
     </ul>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />

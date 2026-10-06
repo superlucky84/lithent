@@ -46,6 +46,9 @@ export default defineConfig({
       // The concurrent build has its own runner (`pnpm test:concurrent`); its
       // specs only make sense under the concurrent alias table.
       '**/lithentConcurrent/**',
+      // lithent/element runs in its own package (`pnpm --filter
+      // lithent-element test`), where `@` points at element/src.
+      '**/element/**',
       // Browser contracts use Playwright's runner, not Vitest.
       '**/e2e/**',
     ],

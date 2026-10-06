@@ -93,6 +93,15 @@ const menuData: MenuSection[] = [
     ],
   },
   {
+    text: { en: 'Web Components', ko: '웹 컴포넌트' },
+    items: [
+      {
+        text: { en: 'Custom Elements', ko: '커스텀 엘리먼트' },
+        link: '/guide/element',
+      },
+    ],
+  },
+  {
     text: { en: 'JSX & Templates', ko: 'JSX & 템플릿' },
     items: [
       {

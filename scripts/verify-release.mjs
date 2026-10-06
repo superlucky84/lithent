@@ -98,7 +98,7 @@ await writeFile(
   join(consumer, 'imports.mjs'),
   `
 import assert from 'node:assert/strict';
-const paths = ['lithent', 'lithent/jsx-runtime', 'lithent/jsx-dev-runtime', 'lithent/helper', 'lithent/devHelper', 'lithent/ssr', 'lithent/tag', 'lithent/ftags', 'lithent-concurrent', 'lithent-concurrent/helper'];
+const paths = ['lithent', 'lithent/jsx-runtime', 'lithent/jsx-dev-runtime', 'lithent/helper', 'lithent/devHelper', 'lithent/ssr', 'lithent/tag', 'lithent/ftags', 'lithent/element', 'lithent-concurrent', 'lithent-concurrent/helper'];
 for (const path of paths) {
   const module = await import(path);
   assert(Object.keys(module).length > 0, path + ' has no exports');
@@ -110,7 +110,10 @@ assert(!('deferRender' in base));
 assert.equal(typeof concurrent.deferRender, 'function');
 assert.equal(typeof concurrent.whenIdle, 'function');
 assert.deepEqual(Object.keys(helper).sort(), ['deferred', 'hasPendingRender', 'ldeferred']);
-console.log('PASS isolated installed consumer: all 10 public import paths and distinct cores');
+const element = await import('lithent/element');
+assert.deepEqual(Object.keys(element).sort(), ['defineElement', 'emit']);
+assert.equal(element.defineElement('no-dom', () => null), undefined);
+console.log('PASS isolated installed consumer: all 11 public import paths and distinct cores');
 `
 );
 execFileSync(process.execPath, ['imports.mjs'], {

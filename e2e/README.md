@@ -25,6 +25,19 @@ including computed, shared store, keyed list, context and portal interactions.
 The release documentation checks both languages of the concurrent guides,
 their live concurrent demo, language switching, navigation and cleanup.
 
+`element.spec.ts` (lithent/element, not included in the count above) has two
+parts. The R-1 check loads two lithent bundles on one page — two base copies in
+the base project, a base host with a concurrent widget in the concurrent
+project — and checks that they render and update independently; `?second=same`
+on its fixture is the single-copy control used when diagnosing a failure. The
+UMD suite loads the built `lithentElement.umd.js` into a plain page with no
+build step, next to a host app on its own lithent copy, and checks upgrade,
+CSS isolation in both directions, the shared adopted style sheet, attributes,
+properties, cancelable events, slots and moves. The React test (MT-4) hosts
+the widget in a React 18 app loaded from the `react`/`react-dom` UMD
+development builds in `node_modules`, since the fixture server does not
+prebundle CommonJS. They need `pnpm build` (or `pnpm build:element`) first.
+
 Each project starts fixture, examples and docs Vite servers on fixed loopback
 ports 43130–43135. Existing servers are never reused. HMR edits an isolated copy
 under `.e2e-work`; application sources and built cores are not edited by tests.
