@@ -518,4 +518,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | Phase 9 완료 (실브라우저 E2E 16건, 음성 대조 3종, 전체 E2E 38/38) | Phase 10 (문서·출하) | 없음 (MT-4는 `9497b68`) | `6d915f4` |
 | 2026-10-06 | MT-4 React 호스트 E2E (react 18.3.1 devDep, 속성·프로퍼티 경로 분리 검증), E2E 40/40 | Phase 10 (문서·출하) | 없음 | `9497b68` |
 | 2026-10-06 | Phase 10 문서·출하 준비 (가이드+데모, README, skill, verify-release 11경로, CHANGELOG), E2E 42/42 | 버전 결정 → CHANGELOG 버전 절, 수동 체크리스트(Safari·Firefox) | 버전 결정 대기 | `865179d` |
-| 2026-10-06 | 버전 확정 (lithent 1.23.0, lithent-concurrent 0.1.2), CHANGELOG 버전 절 — **Phase 0~10 완료** | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | (버전 커밋) |
+| 2026-10-06 | 버전 확정 (lithent 1.23.0, lithent-concurrent 0.1.2), CHANGELOG 버전 절 — **Phase 0~10 완료** | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | `6855f1e` |
