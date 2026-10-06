@@ -34,17 +34,19 @@
   prototype, so renders after the upgrade assign properties. Built-in elements
   and elements defined before rendering behave as before.
 - Keep the real value of every prop on a custom element that is not upgraded
-  yet, as an own property next to the attribute. The element takes it over
+  yet, as an own property next to the attribute, for keys `HTMLElement` does
+  not have (so `textContent` or `offsetWidth` never run a DOM setter). The
+  element takes it over
   when it is defined, so a parent that renders the same values again after the
   upgrade no longer leaves an object as `"[object Object]"` or `false` as
   true.
 - Unset a custom element property when the parent stops passing the prop.
   Removing a prop only removed the attribute, so a value passed as a property
-  stayed on the element. lithent now assigns `undefined` to it, or deletes the
-  own property before the upgrade. Built-in elements behave as before.
+  stayed on the element. lithent now assigns `undefined` through the upgraded
+  element's own accessor, or deletes the kept value before the upgrade. Built-in elements behave as before.
 
 These four fixes are the only changes to the base core; `lithent` grows by
-35 B net (brotli 4,774 B).
+53 B net (brotli 4,792 B).
 
 `lithent/element` ships inside this package; its private workspace version is
 0.1.0. It works with both cores and is covered by unit tests on both and by
@@ -59,7 +61,7 @@ inside React 18.
   rendered before their definition, and the same two boundaries: values are
   kept as own properties until the upgrade, and removed props unset the
   property.
-- Brotli 6,279 B (+46 B vs 0.1.1). Still works with `lithent ^1.22.1`; use
+- Brotli 6,288 B (+55 B vs 0.1.1). Still works with `lithent ^1.22.1`; use
   `lithent ^1.23.0` for `lithent/element`.
 
 ## 2026-10-02

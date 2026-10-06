@@ -156,3 +156,41 @@ describe('a parent that renders the tag before the definition (B-3)', () => {
     });
   });
 });
+
+describe('found in the second review', () => {
+  it('keeps a Boolean default when a prop goes away between upgrade and connect', async () => {
+    const seen: Seen[] = [];
+    const container = document.createElement('div');
+    const control: { set: (next: Seen) => void } = { set: () => {} };
+    const Host = mount(renew => {
+      let props: Seen = { open: true, options: { a: 1 } };
+      control.set = next => {
+        props = next;
+        renew();
+      };
+      return () => h('bd-detached', props);
+    });
+    render(h(Host, {}), container);
+
+    defineElement('bd-detached', probe(seen), {
+      props: { open: Boolean, options: Object },
+    });
+    customElements.upgrade(container);
+    control.set({});
+    await flush();
+    document.body.appendChild(container);
+
+    expect(seen[seen.length - 1]).toEqual({ open: false, options: undefined });
+  });
+
+  it('works with a prop named hasOwnProperty', () => {
+    const seen: Seen[] = [];
+    defineElement('bd-has-own', probe(seen), {
+      props: { hasOwnProperty: Object },
+    });
+    const el = document.createElement('bd-has-own') as HTMLElement & Seen;
+    el.hasOwnProperty = { x: 1 };
+    expect(() => document.body.appendChild(el)).not.toThrow();
+    expect(seen[seen.length - 1]).toEqual({ hasOwnProperty: { x: 1 } });
+  });
+});

@@ -195,9 +195,13 @@ export const defineElement = <
       // the definition (B-3), so an object or `false` must not be turned back
       // into the attribute string.
       for (const key in spec) {
-        if (this.hasOwnProperty(key)) {
-          state.p[key] = (this as unknown as Props)[key];
+        // Object.hasOwn, not this.hasOwnProperty: a prop may be named that.
+        if (Object.hasOwn(this, key)) {
+          const value = (this as unknown as Props)[key];
           delete (this as unknown as Props)[key];
+          // Through the accessor, so `undefined` falls back to the attribute
+          // (or `false`) as everywhere else.
+          (this as unknown as Props)[key] = value;
         }
       }
 

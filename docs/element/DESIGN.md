@@ -311,4 +311,11 @@ declare function defineElement<S extends PropSpec & { host?: never } = Record<ne
 
 B-3·B-4 회귀 테스트: `core-accessorUpgrade.test.tsx`, `concurrent-accessorUpgrade.test.tsx` (각 +6건, 옛 코드에서 5건 실패), element `element-boundaries.test.ts` (이름 충돌·제거·같은 값 재렌더 5건; 코어 수정만 빼면 2건, element 수정을 빼면 4건 실패). 크기 base 4,740→4,774 B (예산 4,800), concurrent 6,229→6,279 B, element 936→998 B (예산 1,000).
 
+**2차 리뷰 보완 (2026-10-06):**
+- B-3 보존은 `HTMLElement`에 없는 키만 대상으로 한다(`!(key in HTMLElement.prototype)`). 그 전에는 `offsetWidth`(읽기 전용) 대입이 `TypeError`로 렌더를 깨고, `textContent` 대입이 이미 만든 자식 DOM을 지웠다. 이전 렌더에서 남긴 own property는 계속 갱신된다.
+- B-4의 `undefined` 대입은 업그레이드된 요소에만 한다. 업그레이드 전 요소는 `delete`만 하므로 `HTMLElement`의 `title` 등에 `"undefined"`를 쓰지 않는다.
+- element의 연결 시 흡수는 접근자를 거쳐 다시 대입한다. 연결 전에 업그레이드된 뒤 부모가 prop을 빼면 own property에 `undefined`가 남는데, 그대로 넣으면 Boolean이 `false`가 아니라 `undefined`가 됐다.
+- own property 검사는 `Object.hasOwn`. `this.hasOwnProperty`는 같은 이름의 prop이 가린다. (`Object.prototype.hasOwnProperty.call`은 크기 예산 3 B 초과라 동등한 `Object.hasOwn` 사용 — Safari 15.4+, 대상 에버그린 범위 안.)
+- 테스트: 코어 각 +4건(네이티브 키 2·재렌더 갱신·`title` 제거), element +2건 — 각 보호를 빼면 해당 테스트가 실패함을 확인. 크기 base 4,792 B, concurrent 6,288 B, element 998 B.
+
 **알려진 제약 (기존 동작, 이번 범위 밖):** destroy 중 `mountCallback` cleanup이 예외를 던지면 그 뒤 처리(이벤트·DOM 제거)가 멈춘다. B-1로 destroy가 unmount를 항상 실행하게 되면서 이 경로를 타는 경우가 늘었다. 예외 격리는 코어 전반의 정책 결정이라 별도 작업으로 남긴다.
