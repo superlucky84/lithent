@@ -5,6 +5,7 @@ import {
   checkExisty,
   checkVirtualType,
   hasAccessorMethods,
+  isPendingCustomElement,
 } from '@/utils/predicator';
 
 import { componentMap, xmlnsRef } from '@/utils/universalRef';
@@ -641,6 +642,13 @@ const updateProps = (
             element as HTMLElement,
             dataValue as string
           );
+          // Keep the real value too: once defined, the element absorbs own
+          // properties through its accessors, so an object or `false` is not
+          // left as the attribute string (B-3).
+          if (isPendingCustomElement(element)) {
+            (element as HTMLElement & Record<string, unknown>)[dataKey] =
+              dataValue;
+          }
         }
       }
 
@@ -650,6 +658,17 @@ const updateProps = (
 
   for (const dataKey in originalProps) {
     (element as HTMLElement).removeAttribute(dataKey);
+    // A prop that went in as a custom element property is unset there too
+    // (B-4). Only custom elements: `undefined` would read as "undefined" in
+    // built-in properties such as input.value.
+    if (isPendingCustomElement(element)) {
+      delete (element as HTMLElement & Record<string, unknown>)[dataKey];
+    } else if (
+      (element as Element).localName.includes('-') &&
+      hasAccessorMethods(element, dataKey)
+    ) {
+      (element as HTMLElement & Record<string, unknown>)[dataKey] = undefined;
+    }
   }
 };
 

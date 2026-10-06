@@ -150,6 +150,12 @@ export const hasAccessorMethods = (target: unknown, dataKey: string) => {
   return result;
 };
 
+// A custom element tag whose definition has not arrived, or whose instance
+// has not been upgraded yet: still a plain HTMLElement, with no accessors.
+export const isPendingCustomElement = (target: unknown) =>
+  (target as Element).localName.includes('-') &&
+  (target as Element).constructor === HTMLElement;
+
 /**
  * Get WDom type as a single character code
  * 'c': component, 'f': fragment, 'e': element, 'l': loop, 't': text, 'et': empty/null
