@@ -43,6 +43,7 @@ const copy = {
     stylesText:
       'By default the component renders into an open shadow root, so page CSS does not reach in and widget CSS does not leak out. That is why the widget brings its CSS: styles are shared by every instance through one adopted style sheet, with a <style> fallback where that API is missing. Let host pages theme the widget with CSS custom properties and ::part(), which cross the shadow boundary.',
     options: 'Options',
+    optionsHead: ['Option', 'What it does'],
     optionsRows: [
       [
         'props',
@@ -126,6 +127,7 @@ const copy = {
     stylesText:
       '기본적으로 컴포넌트는 open shadow root에 렌더되므로 페이지 CSS가 안으로 들어오지 않고 위젯 CSS도 밖으로 새지 않습니다. 그래서 위젯이 자기 CSS를 가지고 들어갑니다. styles는 adopted style sheet 하나를 모든 인스턴스가 공유하고, 그 API가 없으면 <style>로 대체합니다. 호스트 페이지가 위젯을 테마링할 때는 shadow 경계를 통과하는 CSS 변수와 ::part()를 쓰세요.',
     options: '옵션',
+    optionsHead: ['옵션', '설명'],
     optionsRows: [
       ['props', 'prop 선언: { 이름: String | Number | Boolean | Object }'],
       [
@@ -336,7 +338,7 @@ pay-button::part(button) { border-radius: 999px; }`}
       />
 
       <h2>{t.options}</h2>
-      {table(['', ''], t.optionsRows)}
+      {table(t.optionsHead, t.optionsRows)}
 
       <h2>{t.slots}</h2>
       <p>{t.slotsText}</p>
