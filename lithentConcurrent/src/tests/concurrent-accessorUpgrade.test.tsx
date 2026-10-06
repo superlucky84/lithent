@@ -247,3 +247,42 @@ describe('removing a prop from a custom element (B-4)', () => {
     expect(el.value).toBe('');
   });
 });
+
+describe('keeping values on a pending element never runs a DOM setter (B-3)', () => {
+  it('skips read-only and inherited native properties', () => {
+    const wrap = document.createElement('div');
+    expect(() =>
+      render(h('pend-native', { offsetWidth: 123 }), wrap)
+    ).not.toThrow();
+    const el = wrap.querySelector('pend-native')!;
+    expect(Object.prototype.hasOwnProperty.call(el, 'offsetWidth')).toBe(false);
+  });
+
+  it('keeps the children when a prop is named like a node setter', () => {
+    const wrap = document.createElement('div');
+    render(
+      h('pend-text', { textContent: 'value' }, h('span', {}, 'child')),
+      wrap
+    );
+    const el = wrap.querySelector('pend-text')!;
+    expect(el.querySelector('span')!.textContent).toBe('child');
+    expect(el.getAttribute('textContent')).toBe('value');
+  });
+
+  it('still updates its own kept value on the next render', async () => {
+    const { el, control } = hostWith('pend-again', { options: 1 });
+    control.set({ options: 2 });
+    await flush();
+    expect(Object.getOwnPropertyDescriptor(el, 'options')!.value).toBe(2);
+  });
+});
+
+describe('removing a native prop from a pending element (B-4)', () => {
+  it('does not write "undefined" through an HTMLElement accessor', async () => {
+    const { el, control } = hostWith('pend-title', { title: 'tip' });
+    expect(el.getAttribute('title')).toBe('tip');
+    control.set({});
+    await flush();
+    expect(el.hasAttribute('title')).toBe(false);
+  });
+});

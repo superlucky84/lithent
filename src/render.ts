@@ -575,7 +575,12 @@ const updateProps = (
           // Keep the real value too: once defined, the element absorbs own
           // properties through its accessors, so an object or `false` is not
           // left as the attribute string (B-3).
-          if (isPendingCustomElement(element)) {
+          // Only keys HTMLElement lacks: `textContent` or `offsetWidth` would
+          // run a DOM setter or throw.
+          if (
+            isPendingCustomElement(element) &&
+            !(dataKey in HTMLElement.prototype)
+          ) {
             (element as HTMLElement & Record<string, unknown>)[dataKey] =
               dataValue;
           }
@@ -589,8 +594,10 @@ const updateProps = (
   for (const dataKey in originalProps) {
     (element as HTMLElement).removeAttribute(dataKey);
     // A prop that went in as a custom element property is unset there too
-    // (B-4). Only custom elements: `undefined` would read as "undefined" in
-    // built-in properties such as input.value.
+    // (B-4). Not upgraded yet: drop the value kept for it (B-3); `delete`
+    // never touches an inherited DOM property such as `title`. Upgraded:
+    // only through the element's own accessors, never built-in ones such as
+    // input.value, where `undefined` would read as "undefined".
     if (isPendingCustomElement(element)) {
       delete (element as HTMLElement & Record<string, unknown>)[dataKey];
     } else if (
