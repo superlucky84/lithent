@@ -169,6 +169,10 @@ defineElement('pay-button', PayButton, { styles: [css] });
   → **확인됨 (Phase 4):** 루트 자식 2 → 0 → 3, 언마운트, 재마운트를 거쳐도 `<style>`은 정확히 1개, 항상 첫 자식.
 - **크기 메모:** `adoptedStyleSheets` 분기는 br 약 60 B다(`<style>`만 쓰면 775 B, 현재 835 B). 예산이 넘치면
   첫 번째 축소 후보로 사용자에게 올린다 — 브라우저가 같은 텍스트의 `<style>`을 캐시하므로 기능상 손실은 작다.
+- **유지 결정 (2026-10-06, 사용자):** `styles` 옵션과 `adoptedStyleSheets` 공유 분기를 그대로 둔다. 근거: shadow DOM이 CSS를
+  양방향으로 막으므로 위젯 CSS는 위젯이 가지고 들어가야 하고, "스크립트 한 줄 + 태그 하나로 스타일까지 완성된 위젯"이
+  제품 목표(REQUIREMENTS §1.1)와 맞는다. 컴포넌트 안에서 `h('style')`을 직접 렌더하는 방법도 동작하지만 편의·공유가 없다.
+  호스트 쪽 커스터마이즈는 CSS 변수와 `::part()`로 안내한다 (Phase 10).
 - non-shadow 모드에서 `styles`는 무시한다 (전역 오염 방지, 경고 없음 §4.4).
 
 ## 6. 이벤트 발행 (DC-5)
@@ -179,11 +183,17 @@ defineElement('pay-button', PayButton, { styles: [css] });
 import { emit } from 'lithent/element';
 const PayButton = mount<{ amount: number; host: HTMLElement }>((_r, props) =>
   () => <button onClick={() => emit(props.host, 'pay', { amount: props.amount })}>Pay</button>);
-// emit = (el, name, detail) => el.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }))
+// emit = (el, name, detail) => el.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true, cancelable: true }))
 ```
 
-- `composed: true`로 shadow 경계를 넘어 호스트 페이지까지 전달된다.
-- `props.host` 이름은 예약어. `options.props`에 `host`를 선언하면 정의 시 예외.
+- `emit`은 shadow **안**이 아니라 **호스트 요소 자체**에서 발행한다. 그래서 일반 버블링만으로 호스트 페이지에 닿는다.
+  `composed: true`가 필요한 경우는 **위젯 요소가 다른 컴포넌트의 shadow root 안에 있을 때**다(호스트 앱이 웹 컴포넌트로
+  만들어진 경우). 없으면 이벤트가 그 바깥 루트에서 멈춘다. (초안의 "composed로 shadow 경계를 넘는다"는 설명은 틀렸다 —
+  Phase 5 돌연변이 검증에서 발견, 테스트를 중첩 shadow 상황으로 교체.)
+- `cancelable: true` (Phase 5 추가, br 11 B): 호스트 페이지가 `preventDefault()`하면 `emit`이 `false`를 반환한다.
+  예: 결제 위젯의 `pay`를 고객사가 막는 "before" 이벤트 패턴.
+- `props.host` 이름은 예약어. `options.props`에 `host`를 선언하면 정의 시 예외 `Error('"host" is reserved')`.
+  메시지를 짧게 한 이유는 크기(긴 메시지 대비 −18 B).
 - 기각한 대안: `useHost()` 훅 — 모듈 전역 "현재 호스트" 참조가 필요한데,
   diff 모드에서 하위 컴포넌트가 나중에 resolve되는 경로(`src/wDom.ts:250-300`)에서 참조가 어긋날 수 있다.
   v2에서 context(`lithent/helper`)로 재검토.

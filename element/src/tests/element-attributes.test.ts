@@ -39,7 +39,7 @@ const mountProbe = (tag: `${string}-${string}`, attrs = '') => {
 
 describe('attribute conversion (DESIGN §4.1)', () => {
   it('converts every declared type from the initial attributes', () => {
-    mountProbe(
+    const el = mountProbe(
       'attr-initial',
       `label="hi" amount="12.5" disabled options='{"a":[1,2]}' max-count="3"`
     );
@@ -50,6 +50,7 @@ describe('attribute conversion (DESIGN §4.1)', () => {
         disabled: true,
         options: { a: [1, 2] },
         maxCount: 3,
+        host: el,
       },
     ]);
   });
@@ -143,7 +144,9 @@ describe('attribute updates (FR-3)', () => {
     expect(seen.length).toBe(0);
 
     document.body.appendChild(el);
-    expect(seen).toEqual([{ label: 'early', amount: 9, disabled: false }]);
+    expect(seen).toEqual([
+      { label: 'early', amount: 9, disabled: false, host: el },
+    ]);
   });
 
   it('ignores changes while disconnected and renders the latest on reconnect', async () => {

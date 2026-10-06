@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 4 완료 (2026-10-06). 다음: Phase 5.**
+- 상태: **Phase 5 완료 (2026-10-06). 다음: Phase 6.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -256,11 +256,46 @@
 
 진입 조건: DC-5 확정.
 
-- [ ] 5-1 Host가 내부 컴포넌트에 `host` prop 주입
-- [ ] 5-2 `emit(el, name, detail)` export (`bubbles`, `composed` true)
-- [ ] 5-3 `options.props`에 `host` 선언 시 정의 단계 예외
+- [x] 5-1 Host가 내부 컴포넌트에 `host` prop 주입
+- [x] 5-2 `emit(el, name, detail)` export (`bubbles`, `composed`, **`cancelable`** true, 반환값 = `dispatchEvent` 결과)
+- [x] 5-3 `options.props`에 `host` 선언 시 정의 단계 예외 (등록도 안 됨)
 
-**기본 테스트** (`element-events.test.ts`): shadow 내부 클릭 → 호스트 바깥 리스너가 `detail` 수신.
+**기본 테스트** (`element-events.test.ts` 9건):
+- `props.host`가 요소 자신, 재렌더 후에도
+- `host` 선언 → 예외, 미등록
+- 요소 리스너가 `detail` 수신 / 페이지·document까지 버블링 (target = 요소)
+- **중첩 shadow**: 다른 shadow root 안의 위젯이 보낸 이벤트가 document에 도달 (target = 바깥 호스트) — `composed` 검증
+- closed shadow 요소, light DOM 요소에서도 동작
+- 페이지가 `preventDefault()` → `emit`이 `false`
+- 이벤트 객체가 `CustomEvent`이고 `bubbles`·`composed`·`cancelable`
+
+Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `host: el`을 기대값에 추가했다 (의도된 변화).
+
+### Phase 5 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 / BG-2 | element 54/54 (base), 54/54 (concurrent) |
+| BG-3 | `98db595` 이후 코어 diff 없음 |
+| BG-4 | 빌드·타입체크·eslint 통과 |
+| RC-3 크기 | **br 911 B / 1,000 B** (+76 B). 내역: 예약어 검사 26 B(긴 메시지였으면 +18), `cancelable` 11 B. 남은 여유 89 B로 Phase 6 |
+| 전체 회귀 | `pnpm test` 실패 0, `test:satellites:concurrent` 통과 |
+
+### Phase 5 돌연변이 검증
+
+| 돌연변이 | 결과 |
+|---|---|
+| `host` 주입 제거 | **5/8 실패** → 복구 |
+| `composed: false` | 처음엔 **1/8만 실패** (속성 검사 테스트뿐) → 아래 참고, 테스트 교체 후 **2/9 실패** → 복구 |
+| `cancelable` 제거 | **2/8 실패** → 복구 |
+| 예약어 검사 제거 | **1/8 실패** → 복구 |
+
+### Phase 5에서 드러난 것
+
+- **`composed` 오해**: 초안은 "composed로 shadow 경계를 넘어 페이지에 닿는다"였지만 `emit`은 호스트 요소에서 발행하므로
+  버블링만으로 닿는다. 돌연변이에서 동작 테스트가 실패하지 않아 발견했다. `composed`가 실제로 필요한 상황(중첩 shadow)으로
+  테스트를 바꾸고 DESIGN §6을 고쳤다.
+- **`styles` 유지 결정** (사용자, DESIGN §5) — 이 Phase 시작 전에 확정.
 
 ## Phase 6 — DOM 이동 보존 (DC-4)
 
@@ -320,3 +355,4 @@
 | 2026-10-06 | Phase 2 완료 (속성 → props, Boolean 기본 false, dev 경고 철회) | Phase 3 (프로퍼티 → props) | 없음 | `19597be` |
 | 2026-10-06 | Phase 3 완료 (프로퍼티 접근자, 생성자에서 업그레이드 흡수, 네이티브 이름 제약 문서화) | Phase 4 (스타일·slot·non-shadow 자식) | 없음 | `d537013` |
 | 2026-10-06 | Phase 4 완료 (스타일 adopted+폴백, slot, light DOM 비움, R-2 가드) | Phase 5 (이벤트 발행) | 없음 | `1ad0f8d` |
+| 2026-10-06 | `styles` 유지 결정, Phase 5 완료 (`host` prop, `emit` cancelable, composed 설명 정정) | Phase 6 (DOM 이동 보존) | 없음 | (Phase 5 커밋) |

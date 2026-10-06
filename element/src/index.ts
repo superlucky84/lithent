@@ -53,6 +53,30 @@ const convert = (type: PropSpec[string], value: string | null): unknown => {
 };
 
 /**
+ * Dispatch a DOM event from the element (DC-5). It is dispatched on the
+ * element itself, so it bubbles to the host page; `composed` lets it also
+ * leave an outer shadow root when the element is nested in another
+ * component. It is cancelable: returns `false` when a listener called
+ * `preventDefault()`.
+ *
+ * ```ts
+ * const PayButton = mount<{ amount: number; host: HTMLElement }>(
+ *   (_renew, props) => () =>
+ *     h('button', { onClick: () => emit(props.host, 'pay', props.amount) }, 'Pay')
+ * );
+ * ```
+ */
+export const emit = (host: Element, name: string, detail?: unknown) =>
+  host.dispatchEvent(
+    new CustomEvent(name, {
+      detail,
+      bubbles: true,
+      composed: true,
+      cancelable: true,
+    })
+  );
+
+/**
  * Register a lithent component as a Custom Element.
  *
  * The element owns the props and renders a small Host component that holds
@@ -71,6 +95,8 @@ export const defineElement = <S extends PropSpec = PropSpec>(
   if (existing) return existing;
 
   const { shadow = true, props: spec = {} as S, styles } = options;
+  // DC-5: `host` is the prop that carries the element itself.
+  if ('host' in spec) throw Error('"host" is reserved');
   // FR-6: styles apply only inside a shadow root (DESIGN §5); one sheet per
   // definition, shared by every instance and created on first use.
   const css = shadow && styles ? styles.join('\n') : '';
@@ -148,7 +174,7 @@ export const defineElement = <S extends PropSpec = PropSpec>(
 
       const Host = mount(renew => {
         this.r = renew;
-        return () => h(component as TagFunction, { ...this.p });
+        return () => h(component as TagFunction, { ...this.p, host: this });
       });
 
       // DC-9: `render` only appends into its wrapper, so a ShadowRoot works.
