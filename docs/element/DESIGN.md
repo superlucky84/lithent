@@ -225,19 +225,39 @@ const PayButton = mount<{ amount: number; host: HTMLElement }>((_r, props) =>
 shadow 모드의 light DOM 자식은 건드리지 않는다(slot 투영 대상).
 자식을 props로 넘기는 기능은 v2.
 
-## 8. 타입 (RC-5)
+## 8. 타입 (RC-5) — Phase 7에서 확정
 
 ```ts
-type Spec = Record<string, StringConstructor | NumberConstructor | BooleanConstructor | ObjectConstructor>;
-type PropsOf<S extends Spec> = { [K in keyof S]?: S[K] extends NumberConstructor ? number
-  : S[K] extends BooleanConstructor ? boolean : S[K] extends StringConstructor ? string : unknown };
+type PropSpec = Record<string, StringConstructor | NumberConstructor | BooleanConstructor | ObjectConstructor>;
 
-declare function defineElement<S extends Spec>(
-  name: `${string}-${string}`,           // 하이픈 없는 이름을 컴파일 타임에 거부
-  component: ElementComponent,           // mount/lmount 결과 (§2.4)
+// Boolean만 항상 존재(기본 false, §4.1). 나머지는 없을 수 있으므로 선택적.
+type PropsOf<S> = { [K in keyof S as S[K] extends BooleanConstructor ? K : never]: boolean }
+                & { [K in keyof S as S[K] extends BooleanConstructor ? never : K]?: PropType<S[K]> };
+type ElementProps<S> = PropsOf<S> & { host: HTMLElement };   // 내부 컴포넌트가 받는 것
+type LithentElementOf<S> = HTMLElement & PropsOf<S>;         // 등록된 요소
+
+declare function defineElement<S extends PropSpec & { host?: never } = Record<never, never>>(
+  name: `${string}-${string}`,
+  component: (props: ElementProps<S>, children?: never) => unknown,
   options?: { props?: S; shadow?: boolean | 'open' | 'closed'; styles?: string[] }
-): CustomElementConstructor | undefined;
+): (new () => LithentElementOf<S>) | undefined;
 ```
+
+타입이 잡는 것 (모두 `element-types.test.ts`의 `@ts-expect-error`로 고정, 빌드 타입체크가 강제):
+
+| 상황 | 결과 |
+|---|---|
+| 컴포넌트가 선언된 prop을 **필수**로 받음 (`{ amount: number }`) | 오류 — 속성이 없을 수 있다 |
+| 타입 불일치 (`Number` 선언, 컴포넌트는 `string`) | 오류 |
+| 컴포넌트가 선언되지 않은 필수 prop을 요구 | 오류 |
+| 컴포넌트가 **선택적** prop만 갖는데 선언 안 함 | 오류 (TS weak type 검사) — 선언 누락을 잡아줌 |
+| `host` 선언, `host` 타입 불일치, 하이픈 없는 이름, `Date` 같은 미지원 생성자 | 오류 |
+| `mount`(제네릭 없음)·`lmount`·부분 일치 컴포넌트 | 통과 |
+
+- **`NoInfer`를 두지 않는다.** `S`는 key remapping mapped 타입 안에만 있어 TS가 컴포넌트에서 추론하지 않는다.
+  Phase 7에서 있을 때·없을 때 결과가 같음을 확인했다(돌연변이에서 테스트가 아무것도 잡지 못해 조사). 내장 `NoInfer`는
+  TS 5.4+ 전용이라 소비자 호환에도 불리했다.
+- 런타임은 그대로 — 컴포넌트를 `TagFunction`으로 캐스팅해 `h`에 넘긴다. 크기 변화 0 B.
 
 ## 9. 결정 체크리스트
 

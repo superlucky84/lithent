@@ -11,13 +11,34 @@ export type PropSpec = Record<
   StringConstructor | NumberConstructor | BooleanConstructor | ObjectConstructor
 >;
 
+/** The prop type a constructor declares (DESIGN §8). */
+type PropType<C> = C extends NumberConstructor
+  ? number
+  : C extends BooleanConstructor
+    ? boolean
+    : C extends StringConstructor
+      ? string
+      : unknown;
+
 /**
- * Any lithent component: the result of `mount` or `lmount`, with any props
- * type. Parameters are `never` so every component function is assignable;
- * the core `TagFunction` type does not cover `lmount` results. Props typing
- * from the `props` declaration comes in Phase 7 (RC-5).
+ * Props a declaration produces. Every prop can be absent (no attribute, no
+ * property yet) except Boolean ones, which start as `false` (DESIGN §4.1).
  */
-export type ElementComponent = (props: never, children?: never) => unknown;
+export type PropsOf<S extends PropSpec> = {
+  [K in keyof S as S[K] extends BooleanConstructor ? K : never]: boolean;
+} & {
+  [K in keyof S as S[K] extends BooleanConstructor ? never : K]?: PropType<
+    S[K]
+  >;
+};
+
+/** What the inner component receives: the declared props and `host`. */
+export type ElementProps<S extends PropSpec> = PropsOf<S> & {
+  host: HTMLElement;
+};
+
+/** The element `defineElement` registers, with a property per prop. */
+export type LithentElementOf<S extends PropSpec> = HTMLElement & PropsOf<S>;
 
 export type DefineElementOptions<S extends PropSpec = PropSpec> = {
   props?: S;
@@ -84,15 +105,20 @@ export const emit = (host: Element, name: string, detail?: unknown) =>
  * Returns `undefined` where Custom Elements do not exist (SSR, Node), and the
  * existing constructor when the name is already taken (DC-7).
  */
-export const defineElement = <S extends PropSpec = PropSpec>(
+export const defineElement = <
+  // `host` is reserved (DC-5): declaring it is a type error as well.
+  S extends PropSpec & { host?: never } = Record<never, never>,
+>(
   name: `${string}-${string}`,
-  component: ElementComponent,
+  // `S` is inferred from `props` only: it sits in a mapped type here, which
+  // TypeScript does not infer from (checked in Phase 7; no NoInfer needed).
+  component: (props: ElementProps<S>, children?: never) => unknown,
   options: DefineElementOptions<S> = {}
-): CustomElementConstructor | undefined => {
+): (new () => LithentElementOf<S>) | undefined => {
   if (typeof customElements === 'undefined') return undefined;
 
   const existing = customElements.get(name);
-  if (existing) return existing;
+  if (existing) return existing as new () => LithentElementOf<S>;
 
   const { shadow = true, props: spec = {} as S, styles } = options;
   // DC-5: `host` is the prop that carries the element itself.
@@ -175,7 +201,8 @@ export const defineElement = <S extends PropSpec = PropSpec>(
 
       const Host = mount(renew => {
         this.r = renew;
-        return () => h(component as TagFunction, { ...this.p, host: this });
+        return () =>
+          h(component as unknown as TagFunction, { ...this.p, host: this });
       });
 
       // DC-9: `render` only appends into its wrapper, so a ShadowRoot works.
@@ -224,5 +251,5 @@ export const defineElement = <S extends PropSpec = PropSpec>(
   }
 
   customElements.define(name, LithentElement);
-  return LithentElement;
+  return LithentElement as unknown as new () => LithentElementOf<S>;
 };

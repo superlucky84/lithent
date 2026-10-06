@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 6 완료 (2026-10-06). 다음: Phase 7.**
+- 상태: **Phase 7 완료 (2026-10-06). 다음: Phase 8.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -340,9 +340,40 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 
 ## Phase 7 — 타입과 UMD (RC-5, RC-6)
 
-- [ ] 7-1 DESIGN §8 타입 구현
-- [ ] 7-2 타입 테스트 (`element-types.test-d.ts` 또는 `expectTypeOf`)
-- [ ] 7-3 UMD 산출물에서 `window.lithentElement.defineElement` 확인
+- [x] 7-1 DESIGN §8 타입 구현 (`PropsOf`, `ElementProps`, `LithentElementOf` export)
+- [x] 7-2 타입 테스트 (`element-types.test.ts`: `expectTypeOf` + 컴파일 전용 `@ts-expect-error` 9건)
+- [x] 7-3 UMD 산출물에서 전역 `lithentElement` 확인 — `vm`에서 코어 UMD → element UMD 순서로 실행:
+      `defineElement`, `emit` 노출, `customElements` 없으면 `undefined`. 의존성 연결은 전역 `lithent`·CJS `require`·AMD 모두.
+      실제 브라우저 확인은 Phase 9 MT-1 자동화
+
+**기본 테스트**: `element-types.test.ts` 3건(런타임) + 컴파일 전용 함수. Phase 5 테스트의 `host` 선언 줄에도
+`@ts-expect-error` 추가 — 런타임 가드는 타입 없는 호출자용으로 계속 검증.
+
+### Phase 7 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 / BG-2 | element 65/65 (base), 65/65 (concurrent) |
+| BG-3 | `98db595` 이후 코어 diff 없음 |
+| BG-4 | 빌드·타입체크·eslint 통과, `dist/index.d.ts` 생성 확인 |
+| RC-3 크기 | **br 935 B** (변화 0) |
+| 전체 회귀 | `pnpm test` 실패 0, `test:satellites:concurrent` 통과 |
+
+### Phase 7 돌연변이 검증 (타입)
+
+빌드 타입체크가 실패해야 통과다 (`@ts-expect-error`가 "사용되지 않음"이 됨).
+
+| 돌연변이 | 결과 |
+|---|---|
+| `host?: never` 가드 제거 | **빌드 오류 2건** → 복구 |
+| 컴포넌트 매개변수를 `never`로 (검사 끔) | **빌드 오류 5건** → 복구 |
+| `NoInfer` 제거 | 미사용 선언 오류 1건뿐 — 동작 차이 없음 → **`NoInfer` 자체를 제거** (DESIGN §8) |
+
+### Phase 7에서 드러난 것
+
+- `NoInfer`는 필요 없었다 (위 표). 비교 실험: 선택적 prop만 가진 컴포넌트를 선언 없이 넘기면 weak type 검사로 오류 —
+  선언 누락을 잡아주는 바람직한 동작이라 타입 테스트에 고정.
+- Prettier가 긴 호출을 여러 줄로 나누면 `@ts-expect-error`가 오류 줄 바로 위에 있지 않게 된다 → 짧은 변수로 한 줄 유지.
 
 ## Phase 8 — 테스트 하드닝
 
@@ -386,3 +417,4 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 2026-10-06 | Phase 4 완료 (스타일 adopted+폴백, slot, light DOM 비움, R-2 가드) | Phase 5 (이벤트 발행) | 없음 | `1ad0f8d` |
 | 2026-10-06 | `styles` 유지 결정, Phase 5 완료 (`host` prop, `emit` cancelable, composed 설명 정정) | Phase 6 (DOM 이동 보존) | 없음 | `0d533ce` |
 | 2026-10-06 | Phase 6 완료 (이동 시 인스턴스 보존, CE 반응 타이밍 확인) — 기능 Phase 종료 | Phase 7 (타입·UMD) | 없음 | `d707586` |
+| 2026-10-06 | Phase 7 완료 (props 타입 추론, host·미선언·불일치 컴파일 오류, UMD 전역 확인, NoInfer 불필요 확인) | Phase 8 (테스트 하드닝) | 없음 | (Phase 7 커밋) |

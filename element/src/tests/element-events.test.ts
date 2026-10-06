@@ -55,7 +55,10 @@ describe('host prop (DC-5)', () => {
   });
 
   it('rejects a declared prop named host and registers nothing', () => {
+    // Rejected by the types too (Phase 7); this checks the runtime guard
+    // for untyped callers.
     expect(() =>
+      // @ts-expect-error host is reserved
       defineElement('evt-reserved', PayButton, { props: { host: String } })
     ).toThrow('"host" is reserved');
     expect(customElements.get('evt-reserved')).toBeUndefined();
