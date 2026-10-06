@@ -29,6 +29,8 @@ lithent 컴포넌트를 **표준 Custom Element**로 내보내서, 어떤 호스
 
 1. **코어 무수정** — `src/`와 `lithentConcurrent/src/`를 수정하지 않는다.
    공개 API(`h`, `render`, `mount`, `lmount`)만 사용한다.
+   **승인된 예외 1건 (2026-10-06, 사용자 결정):** Phase 1에서 찾은 코어 버그 B-1
+   (`render()`의 destroy가 unmount 콜백을 건너뜀, DESIGN §10.1) 수정. 커밋 `98db595`로 분리했다.
 2. **양쪽 코어 호환** — 다른 위성(ftags 등)과 같이 `LITHENT_CORE=concurrent`에서도 테스트 통과.
 3. **클로저 모델 유지** — 사용자는 기존 `mount`/`lmount` 컴포넌트를 *수정 없이* 넘긴다.
    element 전용 컴포넌트 작성법을 강요하지 않는다.
@@ -93,7 +95,7 @@ lithent 컴포넌트를 **표준 Custom Element**로 내보내서, 어떤 호스
 
 | ID | 요구사항 | 측정 |
 |---|---|---|
-| RC-1 | `src/`, `lithentConcurrent/src/` diff 0줄 | `git diff --stat` |
+| RC-1 | `src/`, `lithentConcurrent/src/` diff 0줄 — **B-1 수정(`98db595`, 양쪽 `render.ts` 1줄 + 회귀 테스트)만 예외** | `git diff --stat 98db595 -- src lithentConcurrent/src` |
 | RC-2 | base·concurrent 양쪽 코어에서 element 테스트 통과 | `pnpm --filter lithent-element test`, `LITHENT_CORE=concurrent` |
 | RC-3 | `lithent/element` UMD 단독 ≤ **1,000 B** brotli (코어 예산 4,800 B와 합산 ≤ 5,800 B) | `pnpm size` (`scripts/size-report.js` targets에 추가) |
 | RC-4 | 기존 테스트 전부 통과 (`pnpm test`) | CI |

@@ -1,12 +1,12 @@
 # DESIGN — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **DC-1~DC-9 확정 (2026-10-06, 사용자 승인: 권장안 일괄). R-1 해소 (Phase 0 E2E 통과).**
+- 상태: **DC-1~DC-9 확정 (2026-10-06, 사용자 승인: 권장안 일괄). R-1 해소 (Phase 0). B-1 코어 버그 수정 (Phase 1, §10.1).**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 1. 설계 원칙
 
-- **P1. 코어 무수정.** `h`, `render`, `mount`만 사용한다 (REQUIREMENTS §1.3-1).
+- **P1. 코어 무수정.** `h`, `render`, `mount`만 사용한다 (REQUIREMENTS §1.3-1). 예외: B-1 버그 수정 (§10.1).
 - **P2. 사용자 컴포넌트 무수정.** 기존 `mount`/`lmount` 컴포넌트를 그대로 넘긴다.
 - **P3. 작게.** 런타임 목표는 ≤ 1,000 B(brotli). 기능을 더할 때마다 RC-3을 다시 잰다.
 - **P4. 표준 그대로.** 호스트 페이지는 lithent를 몰라도 된다. 속성·프로퍼티·DOM 이벤트·slot만 쓴다.
@@ -36,9 +36,10 @@
 // 의사 코드 — 실제 구현은 IMPLEMENT Phase 1~6
 class LithentElement extends HTMLElement {
   static observedAttributes = attrNames;      // FR-3
-  p = {};                                     // 현재 props (호스트가 소유)
-  r?: () => void;                             // Host의 renew
-  d?: () => void;                             // render()가 돌려준 destroy
+  declare p: Props;                           // 현재 props (호스트가 소유, 생성자에서 {})
+  declare r?: () => void;                     // Host의 renew
+  declare d?: () => void;                     // render()가 돌려준 destroy
+  // 렌더 루트는 모듈 WeakMap `roots`에 보관 (§2.4)
 
   connectedCallback() {
     if (this.d) return;                       // DC-4: 이동이면 아무것도 안 함
@@ -74,6 +75,16 @@ class LithentElement extends HTMLElement {
 | B. 사용자 컴포넌트를 직접 render하고 props 객체를 바깥에서 변경 | 갱신 트리거가 없다 — 내부 renew에 접근 불가. `componentUpdate(compKey)`는 공개돼 있지만 compKey가 props 객체 동일성에 묶여 있어 깨지기 쉽다 | 기각 |
 | C. 속성 변경마다 destroy + render | 상태 유실, 비용 큼 | 기각 |
 | D. 코어에 element 지원 추가 | P1 위반 | 기각 |
+
+### 2.4 구현 메모 (Phase 1에서 확정)
+
+- **렌더 루트 보관**: closed shadow root는 `el.shadowRoot`가 `null`이라 재연결 시 다시 `attachShadow`하면
+  예외가 난다. 그래서 루트를 보관해야 하는데, 공개 필드면 closed root가 새어 나간다.
+  `#private` 필드는 esbuild가 WeakMap 헬퍼로 낮춰 **br 669 B**가 됐다. 모듈 수준 `WeakMap<HTMLElement, root>`와
+  `declare` 필드(생성자에서 대입)로 바꿔 **br 444 B**. 동작·은닉성은 같다.
+- **컴포넌트 매개변수 타입**: 코어 `TagFunction`은 `lmount` 결과를 포함하지 않는다. element는
+  `ElementComponent = (props: never, children?: never) => unknown`을 받아 mount·lmount·임의 props 타입을 모두 허용하고,
+  내부에서 `TagFunction`으로 캐스팅한다. props 타입 추론은 Phase 7.
 
 ## 3. 패키지 레이아웃 (DC-1)
 
@@ -176,7 +187,7 @@ type PropsOf<S extends Spec> = { [K in keyof S]?: S[K] extends NumberConstructor
 
 declare function defineElement<S extends Spec>(
   name: `${string}-${string}`,           // 하이픈 없는 이름을 컴파일 타임에 거부
-  component: TagFunction,                // mount/lmount 결과
+  component: ElementComponent,           // mount/lmount 결과 (§2.4)
   options?: { props?: S; shadow?: boolean | 'open' | 'closed'; styles?: string[] }
 ): CustomElementConstructor | undefined;
 ```
@@ -207,3 +218,9 @@ declare function defineElement<S extends Spec>(
 | R-2 | §5의 `<style>` 보존이 코어 내부 삭제 경로에 의존 | 회귀 테스트 4-4. 코어가 바뀌면 렌더 루트를 내부 컨테이너로 전환 |
 | R-3 | 사용자가 `props.host`를 다른 의미로 이미 쓰는 컴포넌트를 넘김 | 정의 시 `props` 선언 충돌만 검사 가능. 문서에 명시 |
 | R-4 | concurrent 코어의 deferred 렌더 중 분리 | Phase 8 하드닝 테스트에 포함 |
+
+### 10.1 발견된 코어 버그
+
+| ID | 내용 | 처리 |
+|---|---|---|
+| B-1 | `render()`가 돌려준 destroy가 **루트 컴포넌트가 한 번이라도 재렌더된 경우에만** unmount 큐를 실행했다 (`src/render.ts:48`, `lithentConcurrent/src/render.ts:122`의 `if (comp !== wDom)`). 갓 렌더한 컴포넌트 루트, 요소 루트 아래 컴포넌트는 `mountCallback` cleanup이 실행되지 않음. 순수 lithent로 base·concurrent 모두 재현. element의 FR-2를 직접 막음 | **수정 (2026-10-06, 사용자 승인 "코어 수정")**. 조건을 지워 항상 실행. `98db595`. 회귀 테스트 `src/tests/core-destroyUnmount.test.tsx`, `lithentConcurrent/src/tests/concurrent-destroyUnmount.test.tsx` (각 5건, 옛 코드에서 3건 실패). 크기 base 4,739→4,738, concurrent 6,233→6,228 B. `test:dual`·`verify:concurrent`·`verify:release`·E2E 24/24 통과. CHANGELOG Unreleased에 기록 |

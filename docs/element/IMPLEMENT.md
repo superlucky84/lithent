@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 0 완료 (2026-10-06). DC-1~DC-9 확정. 다음: Phase 1.**
+- 상태: **Phase 1 완료 (2026-10-06). 코어 버그 B-1 수정 포함. 다음: Phase 2.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -9,7 +9,7 @@
 - **모든 Phase의 기본 게이트(BG)**: 아래가 전부 통과해야 Phase를 닫는다.
   - BG-1 `pnpm --filter lithent-element test` (base 코어)
   - BG-2 `LITHENT_CORE=concurrent pnpm --filter lithent-element test` (사전: `pnpm build:concurrent`)
-  - BG-3 `git diff --stat -- src lithentConcurrent/src` 출력 없음 (RC-1)
+  - BG-3 `git diff --stat 98db595 -- src lithentConcurrent/src` 출력 없음 (RC-1. B-1 수정 커밋 이후 기준)
   - BG-4 `pnpm --filter lithent-element build` 성공, 타입체크·eslint 통과
 - **테스트 파일 명명**: `element/src/tests/element-<주제>.test.ts`.
   루트 `vite.config.js`의 vitest `exclude`에 `**/element/**`가 있어 루트 `test:core`는 이 파일들을
@@ -77,20 +77,53 @@
 
 진입 조건: DC-7, DC-8 확정.
 
-- [ ] 1-1 `customElements` 부재 시 `undefined` 반환 (SSR 안전)
-- [ ] 1-2 중복 정의 시 기존 생성자 반환 (DC-7)
-- [ ] 1-3 `connectedCallback`에서 Host 래퍼(DESIGN §2.2)로 렌더 루트에 render
-- [ ] 1-4 `disconnectedCallback`에서 destroy (이 단계는 즉시 destroy. 지연은 Phase 6)
-- [ ] 1-5 이름에 하이픈이 없으면 브라우저 예외를 그대로 전파 (자체 검사 코드 없이 크기 절약)
+- [x] 1-1 `customElements` 부재 시 `undefined` 반환 (SSR 안전)
+- [x] 1-2 중복 정의 시 기존 생성자 반환 (DC-7)
+- [x] 1-3 `connectedCallback`에서 Host 래퍼(DESIGN §2.2)로 렌더 루트에 render
+- [x] 1-4 `disconnectedCallback`에서 destroy (이 단계는 즉시 destroy. 지연은 Phase 6)
+- [x] 1-5 이름에 하이픈이 없으면 브라우저 예외를 그대로 전파 (자체 검사 코드 없이 크기 절약)
+- [x] (앞당김) 4-1 렌더 루트 선택 — 1-3이 렌더 루트를 필요로 해서 Phase 4에서 가져왔다.
+      기본 open shadow, `'closed'`, `false`(호스트 자신) 세 경우 모두 테스트
 
-**기본 테스트** (`element-lifecycle.test.ts`):
-- 요소를 붙이면 내부 DOM이 렌더 루트에 생긴다
-- 요소를 떼면 `mountCallback`이 돌려준 cleanup이 실행된다
+**기본 테스트** (`element-lifecycle.test.ts` 11건, `element-ssr.test.ts` 1건):
+- 요소를 붙이면 내부 DOM이 렌더 루트에 생긴다 (open / closed / `shadow: false`)
+- 요소를 떼면 `mountCallback`이 돌려준 cleanup이 **중첩 컴포넌트까지** 실행된다
+- 재연결하면 새 인스턴스 (closed root 재사용, `attachShadow` 재호출 없음)
+- 렌더 루트 안에서 renew·클로저 상태 유지
 - 정의 전 문서에 있던 요소가 정의 시 업그레이드돼 렌더된다
-- 같은 이름 2회 정의 → 예외 없음, 같은 생성자
-- `globalThis.customElements`를 지운 상태에서 import·호출 → 예외 없음
+- 같은 이름 2회 정의 → 예외 없음, 같은 생성자, 첫 컴포넌트 유지
+- 하이픈 없는 이름 → 브라우저 예외
+- `lmount` 컴포넌트 허용
+- **SSR**: `@vitest-environment node`에서 `HTMLElement`·`customElements`가 실제로 없는 상태로 import·호출 → `undefined`
 
 **종료 조건**: BG 통과 + 위 테스트 + 돌연변이 1회.
+
+### Phase 1 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 / BG-2 | element 14/14 (base), 14/14 (concurrent) |
+| BG-3 | B-1 수정(`98db595`) 외 코어 diff 없음 |
+| BG-4 | 빌드·타입체크·eslint 통과 |
+| RC-3 크기 | **br 444 B / 1,000 B** (`#private` 사용 시 669 B → DESIGN §2.4) |
+| 전체 회귀 | `pnpm test:dual` 실패 0, `verify:concurrent` ALL PASS, `verify:release` ALL PASS, **E2E 24/24** |
+
+### Phase 1 돌연변이 검증
+
+| 돌연변이 | 기대 | 결과 |
+|---|---|---|
+| 중복 이름 가드 제거 | DC-7 테스트 실패 | **실패함** (1건) → 복구 |
+| `disconnectedCallback`에서 `this.d()` 제거 | 언마운트·재연결 테스트 실패 | **실패함** (2건) → 복구 |
+| B-1 수정 되돌리기 (코어) | 코어 회귀 테스트 실패 | **base·concurrent 각 3/5 실패** → 복구 |
+
+### Phase 1에서 드러난 것
+
+- **코어 버그 B-1** (DESIGN §10.1). 언마운트 테스트가 실패해서 순수 lithent로 재현했고, 사용자 결정으로 코어를 고쳤다.
+  기존 코어 테스트는 destroy 후 DOM이 비는 것만 봤고 unmount 콜백은 검사하지 않았다.
+- **테스트 격리**: B-1을 고치자 unmount 로그가 실제로 찍히면서, `beforeEach`가 로그를 비운 *뒤* `body`를 비워
+  이전 테스트의 unmount 로그가 다음 테스트로 섞였다 → `body` 먼저 비우도록 수정.
+- **lmount 타입**: 코어 `TagFunction`이 `lmount` 결과를 받지 않아 빌드 타입체크가 실패 → `ElementComponent` 도입 (DESIGN §2.4).
+- **크기**: `#private` 필드의 다운레벨 헬퍼가 669 B 중 절반 이상 → WeakMap + `declare`로 444 B.
 
 ## Phase 2 — 속성 → props (FR-3)
 
@@ -122,7 +155,7 @@
 
 진입 조건: DC-6, DC-8 확정.
 
-- [ ] 4-1 `shadow` 옵션에 따라 `attachShadow({mode})` 또는 호스트 자신을 렌더 루트로
+- [x] 4-1 `shadow` 옵션에 따라 `attachShadow({mode})` 또는 호스트 자신을 렌더 루트로 — **Phase 1에서 완료**
 - [ ] 4-2 `styles`: 정의당 `CSSStyleSheet` 1회 생성 + `adoptedStyleSheets`, 미지원 시 `<style>` 폴백
 - [ ] 4-3 non-shadow 모드: 첫 렌더 전 기존 자식 비움 (DC-6), `styles` 무시 + dev 경고
 - [ ] 4-4 **R-2 회귀 가드**: 폴백 `<style>`이 있는 shadowRoot에서 내부 컴포넌트가
@@ -184,6 +217,8 @@
 - [ ] 10-3 `skills/lithent`와 `lithent-agent-addon.md`에 API 추가 (`pnpm build:skills`)
 - [ ] 10-4 CHANGELOG 항목, 버전 결정(마이너 업)
 - [ ] 10-5 IDEAS.md §4 상태 갱신
+- [ ] 10-6 `scripts/verify-release.mjs`의 공개 import 경로 검사(현재 10개)에 `lithent/element` 추가
+- [ ] 10-7 B-1 수정(`98db595`) 포함 릴리스의 버전 결정 (CHANGELOG Unreleased → 버전 절)
 
 ---
 
@@ -193,3 +228,4 @@
 |---|---|---|---|---|
 | 2026-10-06 | 문서 4종 초안, IDEAS.md | DC-1~DC-9 사용자 확정 → Phase 0 | DC 미확정 | `deea8c6` |
 | 2026-10-06 | DC-1~DC-9 확정, Phase 0 완료 (스캐폴딩, exports, size gate, R-1 E2E) | Phase 1 (등록·마운트/언마운트) | 없음 | `a811b16` |
+| 2026-10-06 | 코어 B-1 수정, Phase 1 완료 (등록·마운트/언마운트·렌더 루트) | Phase 2 (속성 → props) | 없음 | `98db595`, (Phase 1 커밋) |
