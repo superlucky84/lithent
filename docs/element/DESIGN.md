@@ -1,7 +1,7 @@
 # DESIGN — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **초안. DC-1~DC-9는 권장안만 기록했고 모두 `TBD`(사용자 확정 대기). R-1은 Phase 0에서 검증.**
+- 상태: **DC-1~DC-9 확정 (2026-10-06, 사용자 승인: 권장안 일괄). R-1 해소 (Phase 0 E2E 통과).**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [IMPLEMENT.md](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 1. 설계 원칙
@@ -183,27 +183,27 @@ declare function defineElement<S extends Spec>(
 
 ## 9. 결정 체크리스트
 
-각 항목은 사용자 확정 전까지 `TBD`. 확정 시 `[x]`, 날짜, 근거를 적는다.
+2026-10-06 사용자가 "권장안대로 확정"으로 전부 승인했다. 각 항목의 근거는 본문 해당 절에 있다.
 
-- [ ] **DC-1. 배포 위치** — 권장: `lithent/element` 서브패스(다른 위성과 동일). 대안: 별도 npm 패키지.
-  검증: Phase 0 0-4 (exports 해석). — `TBD`
-- [ ] **DC-2. props 선언 형식** — 권장: 생성자 기반 `{ amount: Number }` (Vue/Lit 관례, 런타임 최소).
-  대안: 문자열 `'number'`, 또는 변환 함수 `(v) => T`. 검증: Phase 2 테스트. — `TBD`
-- [ ] **DC-3. reflect** — 권장: v1 미지원. — `TBD`
-- [ ] **DC-4. DOM 이동 처리** — 권장: destroy를 microtask로 지연, 재연결이면 취소(상태 보존).
-  대안: 즉시 destroy(단순하나 이동 시 상태 유실). 검증: Phase 6, MT-5. — `TBD`
-- [ ] **DC-5. 이벤트 API** — 권장: 예약 prop `host` + `emit` 유틸 (§6). — `TBD`
-- [ ] **DC-6. non-shadow 기존 자식** — 권장: 첫 렌더 전 비움. — `TBD`
-- [ ] **DC-7. 중복 정의** — 권장: 조용히 기존 생성자 반환. 대안: dev 경고 추가. — `TBD`
-- [ ] **DC-8. shadow 기본값** — 권장: 기본 `open` shadow, `shadow: false`로 끔. — `TBD`
-- [ ] **DC-9. jsdom에서의 렌더 루트 캐스팅** — `render(wDom, shadowRoot as unknown as HTMLElement)`.
-  코어 타입 변경 없이 캐스팅으로 해결. 검증: Phase 1 1-3, Phase 4 4-1. — `TBD`
+- [x] **DC-1. 배포 위치** — 권장: `lithent/element` 서브패스(다른 위성과 동일). 대안: 별도 npm 패키지.
+  검증: Phase 0 0-4 (exports 해석). — **확정 2026-10-06 (권장안)**
+- [x] **DC-2. props 선언 형식** — 권장: 생성자 기반 `{ amount: Number }` (Vue/Lit 관례, 런타임 최소).
+  대안: 문자열 `'number'`, 또는 변환 함수 `(v) => T`. 검증: Phase 2 테스트. — **확정 2026-10-06 (권장안)**
+- [x] **DC-3. reflect** — 권장: v1 미지원. — **확정 2026-10-06 (권장안)**
+- [x] **DC-4. DOM 이동 처리** — 권장: destroy를 microtask로 지연, 재연결이면 취소(상태 보존).
+  대안: 즉시 destroy(단순하나 이동 시 상태 유실). 검증: Phase 6, MT-5. — **확정 2026-10-06 (권장안)**
+- [x] **DC-5. 이벤트 API** — 권장: 예약 prop `host` + `emit` 유틸 (§6). — **확정 2026-10-06 (권장안)**
+- [x] **DC-6. non-shadow 기존 자식** — 권장: 첫 렌더 전 비움. — **확정 2026-10-06 (권장안)**
+- [x] **DC-7. 중복 정의** — 권장: 조용히 기존 생성자 반환. 대안: dev 경고 추가. — **확정 2026-10-06 (권장안)**
+- [x] **DC-8. shadow 기본값** — 권장: 기본 `open` shadow, `shadow: false`로 끔. — **확정 2026-10-06 (권장안)**
+- [x] **DC-9. jsdom에서의 렌더 루트 캐스팅** — `render(wDom, shadowRoot as unknown as HTMLElement)`.
+  코어 타입 변경 없이 캐스팅으로 해결. 검증: Phase 1 1-3, Phase 4 4-1. — **확정 2026-10-06 (권장안)**
 
 ## 10. 리스크
 
 | ID | 리스크 | 대응 |
 |---|---|---|
-| R-1 | 한 페이지에 lithent가 2벌(호스트 앱 + 위젯 UMD) 로드될 때 `Symbol.for('lithentWDomSymbol')`(`src/utils/universalRef.ts:3`)이 **전역 공유**된다. 한쪽 WDom을 다른 쪽이 자기 것으로 오인할 수 있다 | 위젯끼리 WDom을 주고받지 않으므로 실제 충돌 경로는 없을 것으로 예상. **Phase 0에서 두 번들 동시 로드 E2E로 확인**하고 결과를 여기 기록 |
+| R-1 | 한 페이지에 lithent가 2벌(호스트 앱 + 위젯 UMD) 로드될 때 `Symbol.for('lithentWDomSymbol')`(`src/utils/universalRef.ts:3`)이 **전역 공유**된다. 한쪽 WDom을 다른 쪽이 자기 것으로 오인할 수 있다 | **해소 (2026-10-06, Phase 0).** `e2e/element.spec.ts`: base 2벌, base 호스트 + concurrent 위젯 모두 통과. 위젯을 호스트가 관리하는 DOM 안에 마운트하고 양쪽을 번갈아 갱신해도 서로의 DOM·keyed 노드 동일성이 유지됐다. 심볼 공유는 *WDom 객체를 번들 사이로 넘길 때만* 문제가 되며, element는 그런 경로가 없다 (경계는 DOM 속성·이벤트뿐). 이 가정은 Phase 9 E2E에서 실제 Custom Element로 다시 확인한다 |
 | R-2 | §5의 `<style>` 보존이 코어 내부 삭제 경로에 의존 | 회귀 테스트 4-4. 코어가 바뀌면 렌더 루트를 내부 컨테이너로 전환 |
 | R-3 | 사용자가 `props.host`를 다른 의미로 이미 쓰는 컴포넌트를 넘김 | 정의 시 `props` 선언 충돌만 검사 가능. 문서에 명시 |
 | R-4 | concurrent 코어의 deferred 렌더 중 분리 | Phase 8 하드닝 테스트에 포함 |

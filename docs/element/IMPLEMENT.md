@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 0 착수 전. DESIGN DC-1~DC-9 확정이 진입 조건.**
+- 상태: **Phase 0 완료 (2026-10-06). DC-1~DC-9 확정. 다음: Phase 1.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -12,6 +12,12 @@
   - BG-3 `git diff --stat -- src lithentConcurrent/src` 출력 없음 (RC-1)
   - BG-4 `pnpm --filter lithent-element build` 성공, 타입체크·eslint 통과
 - **테스트 파일 명명**: `element/src/tests/element-<주제>.test.ts`.
+  루트 `vite.config.js`의 vitest `exclude`에 `**/element/**`가 있어 루트 `test:core`는 이 파일들을
+  잡지 않는다 (루트에서는 `@`가 코어 `src`를 가리켜 import가 깨진다). element 테스트는 항상
+  패키지 단위로 실행된다 (`pnpm test`, `test:satellites`에 포함).
+- **E2E 실행 주의 (이 컨테이너 한정)**: 설치된 `@playwright/test`가 요구하는 chromium 빌드(1243)와
+  컨테이너의 `/opt/pw-browsers/chromium-1194`가 다르다. 저장소 설정을 바꾸지 않고, 커밋하지 않는 임시
+  설정(`launchOptions.executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'`)으로 실행했다.
 - **돌연변이 확인**: 각 Phase의 핵심 테스트는 구현 한 줄을 일부러 깨뜨려 실패하는지 1회 확인하고
   결과를 해당 Phase "실측 결과"에 적는다 (concurrent 작업과 같은 규약).
 - **Phase를 닫을 때** 상태 줄, 체크박스, 실측 결과, 커밋 SHA를 갱신한다.
@@ -22,18 +28,50 @@
 
 진입 조건: DC-1, DC-9 확정.
 
-- [ ] 0-1 `pnpm install` (현재 `node_modules` 없음)
-- [ ] 0-2 `element/` 생성: `package.json`(name `lithent-element`, private), `tsconfig.json`,
+- [x] 0-1 `pnpm install` (현재 `node_modules` 없음)
+- [x] 0-2 `element/` 생성: `package.json`(name `lithent-element`, private), `tsconfig.json`,
       `vite.config.js`(`ftags/vite.config.js` 복제, `coreAlias` 유지, lib name `lithentElement`)
-- [ ] 0-3 `element/src/index.ts`에 빈 `defineElement` 시그니처만 export
-- [ ] 0-4 루트 `package.json`: `exports["./element"]`, `files`, `build:element`/`watch:element`,
-      `build:parallel` 필터, `test:satellites`에 element 추가
-- [ ] 0-5 `scripts/size-report.js` targets에 `element/dist/lithentElement.umd.js` (예산 1,000 B)
-- [ ] 0-6 **R-1 확인**: 두 개의 lithent UMD 번들을 한 페이지에 로드하고 각자 render가 정상인지
-      Playwright 스모크 (`e2e/element.spec.ts` 초안). 결과를 DESIGN §10 R-1에 기록
+- [x] 0-3 `element/src/index.ts`에 빈 `defineElement` 시그니처만 export
+- [x] 0-4 루트 `package.json`: `exports["./element"]`, `files`, `build:element`/`watch:element`,
+      `test`·`test:satellites`에 element 추가. `pnpm-workspace.yaml`에 `element` 추가.
+      `build:parallel`은 제외 목록 방식이라 **수정 불필요** (element가 자동 포함됨, 전체 `pnpm build` 통과로 확인)
+- [x] 0-5 `scripts/size-report.js` targets에 `element/dist/lithentElement.umd.js` (예산 1,000 B)
+- [x] 0-6 **R-1 확인**: `e2e/fixtures/element-dual.html` + `e2e/element.spec.ts`. 결과는 DESIGN §10 R-1
 
-**기본 테스트**: `element-smoke.test.ts` — import 성공, `defineElement`가 함수.
+**기본 테스트**: `element-smoke.test.ts` — import 성공, `defineElement`가 함수,
+**실행 중인 코어가 의도한 코어인지**(`'deferRender' in core === (LITHENT_CORE === 'concurrent')`).
 **종료 조건**: BG-1~4 통과, `import 'lithent/element'`가 루트에서 해석됨, R-1 결과 기록.
+
+### Phase 0 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| BG-1 base | `element-smoke` 2/2 통과 |
+| BG-2 concurrent | 2/2 통과, "resolves the concurrent core" |
+| BG-3 코어 diff | `git diff --stat -- src lithentConcurrent/src` 출력 없음 |
+| BG-4 빌드 | 통과 (타입체크·eslint·prettier 포함). 처음엔 prettier 1건으로 실패 → 포맷 후 통과 |
+| `lithent/element` 해석 | ESM `import('lithent/element')` → `['defineElement']`, CJS `require.resolve` → `element/dist/lithentElement.umd.js` |
+| RC-3 크기 | 스캐폴드 UMD **br 221 B / 1,000 B** (base 코어 br 4,739 / 4,800 변화 없음) |
+| 전체 회귀 | `pnpm test` 통과, `test:satellites`·`test:satellites:concurrent` 통과, 전체 `pnpm build` 통과(1m37s) |
+| R-1 E2E | base(base 2벌)·concurrent(base 호스트 + concurrent 위젯) **2/2 통과** |
+| E2E 타입체크 | `pnpm exec tsc -p e2e/tsconfig.json` 통과 |
+
+### Phase 0 돌연변이 검증
+
+| 돌연변이 | 기대 | 결과 |
+|---|---|---|
+| `element/vite.config.js`에서 `...coreAlias` 제거 후 `LITHENT_CORE=concurrent` 실행 | smoke의 코어 판별 테스트 실패 | **실패함** (`expected false to be true`) → 복구 |
+| fixture에서 호스트 클릭 시 위젯 슬롯의 첫 자식을 제거 | R-1 스펙 실패 | **실패함** (위젯 항목 5개 기대 / 1개 수신) → 복구 |
+
+### Phase 0에서 드러난 것
+
+- **fixture 실수 → 코어 버그로 오인할 뻔했다.** R-1 첫 실행에서 "keyed 이동 시 DOM 노드 유지" 단언이
+  base·concurrent 모두 실패했다. 대조군(`?second=same`, lithent 1벌)에서도 똑같이 실패해 R-1과 무관함을
+  확인했고, 원인은 fixture가 리스트를 `h('ul', {}, ...items.map(...))`처럼 **펼쳐서** 넘긴 것이었다.
+  lithent의 keyed diff는 자식이 **배열**(loop 타입)일 때만 적용된다. 배열로 넘기면 같은 key의 노드가 보존된다
+  (component key·element key 둘 다 확인). → 대조 모드 `?second=same`은 진단용으로 fixture에 남겼다.
+  **Phase 10 문서에 "keyed 리스트는 배열로 넘길 것"을 element 가이드 예제에도 반영한다.**
+- 루트 vitest가 `.test.ts`를 자동 수집해 element 테스트를 잘못된 `@` alias로 실행했다 → 루트 exclude 추가 (위 공통 규칙).
 
 ## Phase 1 — 등록과 마운트/언마운트 (FR-1, FR-2 기본)
 
@@ -154,3 +192,4 @@
 | 날짜 | 완료 | 다음 | 블로커 | 커밋 |
 |---|---|---|---|---|
 | 2026-10-06 | 문서 4종 초안, IDEAS.md | DC-1~DC-9 사용자 확정 → Phase 0 | DC 미확정 | `deea8c6` |
+| 2026-10-06 | DC-1~DC-9 확정, Phase 0 완료 (스캐폴딩, exports, size gate, R-1 E2E) | Phase 1 (등록·마운트/언마운트) | 없음 | (Phase 0 커밋) |

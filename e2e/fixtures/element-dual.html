@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>R-1: two lithent copies on one page</title>
+  </head>
+  <body>
+    <!--
+      lithent/element DESIGN §10 R-1. A host app and an embedded widget each
+      bring their own lithent bundle. Both bundles share the global
+      Symbol.for('lithentWDomSymbol'); this page checks that the copies still
+      render and update independently, including a widget mounted inside DOM
+      that the host app owns and re-renders around.
+      ?second=base|concurrent picks the widget's bundle; ?second=same is the
+      single-copy control (widget uses the host's bundle).
+    -->
+    <div id="host"></div>
+    <script src="/dist/lithent.umd.js"></script>
+    <script>
+      window.hostCore = window.lithent;
+      delete window.lithent;
+      const second = new URLSearchParams(location.search).get('second');
+      if (second !== 'same')
+        document.write(
+          second === 'concurrent'
+            ? '<script src="/lithentConcurrent/dist/lithentConcurrent.umd.js"><\/script>'
+            : '<script src="/dist/lithent.umd.js?copy=2"><\/script>'
+        );
+    </script>
+    <script>
+      window.widgetCore =
+        window.lithentConcurrent || window.lithent || window.hostCore;
+
+      const makeApp = (core, label, extra) => {
+        const { h, mount } = core;
+        const Item = mount(
+          (_renew, props) => () =>
+            h('li', { class: 'item' }, `${label}:${props.v}`)
+        );
+        return mount(renew => {
+          let n = 0;
+          let items = [1, 2, 3];
+          return () =>
+            h(
+              'div',
+              { class: 'app' },
+              h(
+                'button',
+                {
+                  class: 'inc',
+                  onClick: () => {
+                    n++;
+                    items = [...items].reverse().concat(items.length + 1);
+                    renew();
+                  },
+                },
+                `${label} ${n}`
+              ),
+              h(
+                'ul',
+                {},
+                items.map(v => h(Item, { key: v, v }))
+              ),
+              ...(extra ? [extra(h)] : [])
+            );
+        });
+      };
+
+      // The host app owns #widget-slot; the widget renders into it with the
+      // other lithent copy, so host re-renders run around foreign DOM.
+      const HostApp = makeApp(window.hostCore, 'host', h =>
+        h('section', { id: 'widget-slot' })
+      );
+      window.hostCore.render(
+        window.hostCore.h(HostApp, {}),
+        document.getElementById('host')
+      );
+
+      const WidgetApp = makeApp(window.widgetCore, 'widget');
+      window.widgetCore.render(
+        window.widgetCore.h(WidgetApp, {}),
+        document.getElementById('widget-slot')
+      );
+
+      document.documentElement.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

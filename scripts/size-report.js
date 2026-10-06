@@ -17,6 +17,8 @@ import { brotliCompressSync, gzipSync } from 'zlib';
 const BASE_BUDGET = 4800;
 const CONCURRENT_PHASE = 'T2 (fiber work loop)';
 const CONCURRENT_BUDGET = 9000; // Phase 0 4800, T1 5400, T1.5 6200; T2 (D15)
+/** lithent/element RC-3 (docs/element/REQUIREMENTS.md §4). */
+const ELEMENT_BUDGET = 1000;
 
 const targets = [
   {
@@ -28,6 +30,11 @@ const targets = [
     label: `lithent-concurrent — ${CONCURRENT_PHASE}`,
     file: 'lithentConcurrent/dist/lithentConcurrent.umd.js',
     budget: CONCURRENT_BUDGET,
+  },
+  {
+    label: 'lithent/element',
+    file: 'element/dist/lithentElement.umd.js',
+    budget: ELEMENT_BUDGET,
   },
 ];
 

@@ -269,6 +269,12 @@ importers:
         specifier: workspace:*
         version: link:..
 
+  element:
+    dependencies:
+      lithent:
+        specifier: workspace:*
+        version: link:..
+
   examples:
     dependencies:
       '@mdx-js/rollup':

@@ -25,6 +25,12 @@ including computed, shared store, keyed list, context and portal interactions.
 The release documentation checks both languages of the concurrent guides,
 their live concurrent demo, language switching, navigation and cleanup.
 
+`element.spec.ts` (lithent/element R-1, not included in the count above) loads two
+lithent bundles on one page — two base copies in the base project, a base host
+with a concurrent widget in the concurrent project — and checks that they render
+and update independently. `?second=same` on its fixture is the single-copy
+control used when diagnosing a failure.
+
 Each project starts fixture, examples and docs Vite servers on fixed loopback
 ports 43130–43135. Existing servers are never reused. HMR edits an isolated copy
 under `.e2e-work`; application sources and built cores are not edited by tests.
