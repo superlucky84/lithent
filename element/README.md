@@ -2,7 +2,7 @@
 
 Register a lithent component as a standard Custom Element and embed it in any
 page — plain HTML, server-rendered templates, React, Vue — with a script and a
-tag. Ships inside the `lithent` package (since 1.23.0); 935 B brotli on top of
+tag. Ships inside the `lithent` package (since 1.23.0); 998 B brotli on top of
 the core.
 
 **📖 Guide with a live demo:** [English](https://superlucky84.github.io/lithent/#/guide/element) · [한국어](https://superlucky84.github.io/lithent/#/ko/guide/element)

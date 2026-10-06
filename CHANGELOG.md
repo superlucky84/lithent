@@ -7,7 +7,7 @@
 - Add the `lithent/element` subpath: `defineElement(name, component, options)`
   registers a `mount` or `lmount` component as a standard Custom Element, so it
   can be embedded in any page with a script and a tag. UMD global
-  `lithentElement`; 935 B brotli on top of the core.
+  `lithentElement`; 998 B brotli on top of the core.
 - Declared props (`String`, `Number`, `Boolean`, `Object`) are observed as
   kebab-case attributes with conversion and exposed as properties without it.
   Changes in one task render once; values assigned before the element is
@@ -33,9 +33,18 @@
   `false` as a present (true) attribute. The decision is now cached per
   prototype, so renders after the upgrade assign properties. Built-in elements
   and elements defined before rendering behave as before.
+- Keep the real value of every prop on a custom element that is not upgraded
+  yet, as an own property next to the attribute. The element takes it over
+  when it is defined, so a parent that renders the same values again after the
+  upgrade no longer leaves an object as `"[object Object]"` or `false` as
+  true.
+- Unset a custom element property when the parent stops passing the prop.
+  Removing a prop only removed the attribute, so a value passed as a property
+  stayed on the element. lithent now assigns `undefined` to it, or deletes the
+  own property before the upgrade. Built-in elements behave as before.
 
-These two fixes are the only changes to the base core; `lithent` grows by 1 B
-net (brotli 4,740 B).
+These four fixes are the only changes to the base core; `lithent` grows by
+35 B net (brotli 4,774 B).
 
 `lithent/element` ships inside this package; its private workspace version is
 0.1.0. It works with both cores and is covered by unit tests on both and by
@@ -47,8 +56,10 @@ inside React 18.
 - Fix the same `render()` destroy bug in the concurrent core: unmount callbacks
   now run for the whole removed tree.
 - Fix the same stale property-or-attribute decision for custom elements
-  rendered before their definition.
-- Brotli 6,229 B (−4 B). Still works with `lithent ^1.22.1`; use
+  rendered before their definition, and the same two boundaries: values are
+  kept as own properties until the upgrade, and removed props unset the
+  property.
+- Brotli 6,279 B (+46 B vs 0.1.1). Still works with `lithent ^1.22.1`; use
   `lithent ^1.23.0` for `lithent/element`.
 
 ## 2026-10-02

@@ -40,6 +40,9 @@ defineElement('pay-button', PayButton, {
   and a property. Attributes convert: Number (`NaN` -> undefined), Boolean by
   presence (absent -> false, `"false"` -> true), Object via `JSON.parse`
   (invalid -> undefined). Properties are not converted and not reflected.
+  Assigning `undefined` unsets a property: the prop falls back to the
+  attribute (absent Boolean -> false). lithent does this when a parent stops
+  passing a prop.
   Pass objects, arrays and functions as properties.
 - Types: Boolean props are `boolean`; others are optional (`amount?: number`).
   A component that requires a declared prop is a compile error.

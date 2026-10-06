@@ -46,13 +46,35 @@ export type DefineElementOptions<S extends PropSpec = PropSpec> = {
   styles?: string[];
 };
 
+/** What an element keeps between callbacks. */
+type State = {
+  /** Current props, owned by the element. */
+  p: Props;
+  /** The render root, created on first connect. */
+  root?: ShadowRoot | HTMLElement;
+  /** `destroy` returned by `render`, set while mounted. */
+  d?: () => void;
+  /** The Host component's `renew`, set while mounted. */
+  r?: () => void;
+};
+
 /**
- * Render roots by element. Kept outside the element because a closed shadow
- * root is not on `shadowRoot` and must not leak through a property. (A module
- * WeakMap instead of a `#private` field: the field compiles to helpers that
- * cost more bytes than this whole file — RC-3.)
+ * Element state, outside the element: fields on the instance would collide
+ * with props of the same name (`p`, `d`, ...), and a closed shadow root must
+ * not leak through a property. (A module WeakMap instead of `#private`
+ * fields: those compile to helpers that cost more bytes than this whole
+ * file — RC-3.)
  */
-const roots = new WeakMap<HTMLElement, ShadowRoot | HTMLElement>();
+const states = new WeakMap<HTMLElement, State>();
+const stateOf = (el: HTMLElement) => states.get(el)!;
+
+/** Set a prop and re-render if mounted (renew is batched per microtask). */
+const update = (el: HTMLElement, key: string, value: unknown) => {
+  const state = stateOf(el);
+  state.p[key] = value;
+  // Before the first connect there is no renew: the first render reads p.
+  if (state.r) state.r();
+};
 
 /**
  * Attribute string -> prop value (DESIGN §4.1). `null` means the attribute is
@@ -139,20 +161,14 @@ export const defineElement = <
 
   // FR-3: kebab-case attribute -> camelCase prop key.
   const keyOf: Record<string, string> = {};
+  const attrOf: Record<string, string> = {};
   for (const key in spec) {
-    keyOf[key.replace(/[A-Z]/g, c => '-' + c.toLowerCase())] = key;
+    keyOf[(attrOf[key] = key.replace(/[A-Z]/g, c => '-' + c.toLowerCase()))] =
+      key;
   }
   const observed = Object.keys(keyOf);
 
   class LithentElement extends HTMLElement {
-    // `declare` keeps these out of the emitted class-field helpers (RC-3).
-    /** Current props, owned by the element. */
-    declare p: Props;
-    /** `destroy` returned by `render`, set while mounted. */
-    declare d?: () => void;
-    /** The Host component's `renew`, set while mounted. */
-    declare r?: () => void;
-
     // A getter rather than a static field: static fields compile to helpers.
     static get observedAttributes() {
       return observed;
@@ -160,34 +176,38 @@ export const defineElement = <
 
     constructor() {
       super();
+      const state: State = { p: {} };
+      states.set(this, state);
       // An absent Boolean attribute is `false`, before any attribute callback.
-      this.p = {};
-      for (const key in spec) {
-        if (spec[key] === Boolean) this.p[key] = false;
-        // FR-4: a value assigned before the element was defined is an own
-        // property that hides the prototype accessor. Move it through the
-        // accessor (DESIGN §4.2). Upgrades run this constructor on that object.
-        const self = this as unknown as Props;
-        if (Object.prototype.hasOwnProperty.call(self, key)) {
-          const value = self[key];
-          delete self[key];
-          self[key] = value;
-        }
-      }
+      for (const key in spec) if (spec[key] === Boolean) state.p[key] = false;
     }
 
     connectedCallback() {
+      const state = stateOf(this);
       // Still mounted: this is the reconnect half of a move (DC-4).
-      if (this.d) return;
+      if (state.d) return;
+
+      // FR-4: a value assigned before the element was defined is an own
+      // property that hides the prototype accessor (DESIGN §4.2). Take it over
+      // here rather than in the constructor: an upgrade runs the attribute
+      // callbacks after the constructor and before this, and the property is
+      // the richer value. lithent sets both on an element it renders before
+      // the definition (B-3), so an object or `false` must not be turned back
+      // into the attribute string.
+      for (const key in spec) {
+        if (this.hasOwnProperty(key)) {
+          state.p[key] = (this as unknown as Props)[key];
+          delete (this as unknown as Props)[key];
+        }
+      }
 
       // DC-8: open shadow root by default; `shadow: false` renders into the
       // element itself. A shadow root survives disconnects, so reuse it.
-      let root = roots.get(this);
+      let root = state.root;
       if (!root) {
-        root = shadow
+        root = state.root = shadow
           ? this.attachShadow({ mode: shadow === 'closed' ? 'closed' : 'open' })
           : this;
-        roots.set(this, root);
         // Styles go in once per root: the root, and a fallback <style> in it,
         // outlive disconnects (DESIGN §5, R-2).
         if (css) {
@@ -209,13 +229,13 @@ export const defineElement = <
       if (!shadow) this.textContent = '';
 
       const Host = mount(renew => {
-        this.r = renew;
+        state.r = renew;
         return () =>
-          h(component as unknown as TagFunction, { ...this.p, host: this });
+          h(component as unknown as TagFunction, { ...state.p, host: this });
       });
 
       // DC-9: `render` only appends into its wrapper, so a ShadowRoot works.
-      this.d = render(h(Host, {}), root as unknown as HTMLElement);
+      state.d = render(h(Host, {}), root as unknown as HTMLElement);
     }
 
     disconnectedCallback() {
@@ -224,10 +244,11 @@ export const defineElement = <
       // isConnected is already true; a remove() then insert in the same task
       // is caught by waiting a microtask. connectedCallback sees `d` and
       // does nothing.
+      const state = stateOf(this);
       queueMicrotask(() => {
-        if (!this.isConnected && this.d) {
-          this.d();
-          this.d = this.r = undefined;
+        if (!this.isConnected && state.d) {
+          state.d();
+          state.d = state.r = undefined;
         }
       });
     }
@@ -238,23 +259,29 @@ export const defineElement = <
       value: string | null
     ) {
       const key = keyOf[attr];
-      this.p[key] = convert(spec[key], value);
-      // Before the first connect there is no renew: the first render reads p.
-      // renew is batched per microtask, so N changes in one task render once.
-      if (this.r) this.r();
+      // N changes in one task render once.
+      update(this, key, convert(spec[key], value));
     }
   }
 
   // FR-4: every declared prop is also a property. Values pass through
   // unconverted (objects, arrays, functions) and are not reflected (DC-3).
+  // `undefined` unsets the property: the prop falls back to what the
+  // attribute says, so a Boolean is `false` again when there is none. lithent
+  // assigns it when a parent stops passing the prop (B-4).
   for (const key in spec) {
     Object.defineProperty(LithentElement.prototype, key, {
       get(this: LithentElement) {
-        return this.p[key];
+        return stateOf(this).p[key];
       },
       set(this: LithentElement, value: unknown) {
-        this.p[key] = value;
-        if (this.r) this.r();
+        update(
+          this,
+          key,
+          value === undefined
+            ? convert(spec[key], this.getAttribute(attrOf[key]))
+            : value
+        );
       },
     });
   }

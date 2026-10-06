@@ -31,7 +31,7 @@ const copy = {
     ],
     propsHead: ['Declared as', 'From the attribute', 'When absent'],
     propsText:
-      'Properties take any value without conversion, so pass objects, arrays and functions as properties. Properties are not reflected back to attributes. Changes made in the same task render once.',
+      'Properties take any value without conversion, so pass objects, arrays and functions as properties. Properties are not reflected back to attributes. Assigning undefined unsets a property: the prop goes back to the attribute value, or the “When absent” value. lithent does that when a parent stops passing a prop. Changes made in the same task render once.',
     events: 'Events out of the element',
     eventsText:
       'The component receives the element as props.host. emit dispatches a CustomEvent on it that bubbles, is composed and is cancelable; it returns false when a listener called preventDefault(), so a widget can offer "before" events. A fourth argument overrides those defaults, for example { bubbles: false } for a frequent event that only listeners on the element itself should hear.',
@@ -115,7 +115,7 @@ const copy = {
     ],
     propsHead: ['선언', '속성에서 읽은 값', '없을 때'],
     propsText:
-      '프로퍼티는 변환 없이 어떤 값이든 받으므로 객체·배열·함수는 프로퍼티로 넘기세요. 프로퍼티는 속성으로 반영되지 않습니다. 같은 태스크 안의 여러 변경은 한 번만 렌더됩니다.',
+      '프로퍼티는 변환 없이 어떤 값이든 받으므로 객체·배열·함수는 프로퍼티로 넘기세요. 프로퍼티는 속성으로 반영되지 않습니다. undefined를 대입하면 설정이 해제되어 prop이 속성 값으로, 속성도 없으면 “없을 때” 값으로 돌아갑니다. 부모가 prop을 더 넘기지 않으면 lithent가 이렇게 처리합니다. 같은 태스크 안의 여러 변경은 한 번만 렌더됩니다.',
     events: '엘리먼트 밖으로 이벤트 보내기',
     eventsText:
       '컴포넌트는 엘리먼트 자신을 props.host로 받습니다. emit은 그 위에서 bubbles·composed·cancelable인 CustomEvent를 발생시킵니다. 리스너가 preventDefault()를 호출하면 false를 반환하므로 "실행 전" 이벤트를 만들 수 있습니다. 네 번째 인자로 이 기본값을 바꿀 수 있습니다. 예를 들어 자주 발생하는 이벤트를 엘리먼트에 직접 붙은 리스너만 듣게 하려면 { bubbles: false }를 넘깁니다.',

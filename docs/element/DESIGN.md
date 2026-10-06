@@ -130,9 +130,18 @@ defineElement('pay-button', PayButton, {
 접근자를 가린다. 선언된 키마다 `hasOwnProperty`면 값을 꺼내 `delete` 후 접근자로 다시 할당한다
 (Web Components 표준 관용구).
 
-**위치는 생성자다 (Phase 3에서 변경).** 처음엔 `connectedCallback` 첫 진입으로 적었지만, 업그레이드는 *기존 객체 위에서*
-생성자를 실행하므로 그 시점에 own property가 이미 있다. 생성자에서 흡수하면 연결 전에 `el.items`를 읽어도 접근자를 거친
-일관된 값이 나오고, 연결 여부를 따로 추적할 필요가 없다.
+**위치는 첫 연결(`connectedCallback`)이다 (리뷰 반영으로 다시 변경, B-3).** Phase 3에서는 생성자로 옮겼지만,
+업그레이드는 생성자 → 기존 속성마다 `attributeChangedCallback` → `connectedCallback` 순서로 실행된다. lithent가 정의 전에
+렌더한 요소는 속성(문자열)과 own property(실제 값)를 둘 다 갖게 되므로(B-3), 생성자에서 흡수하면 뒤따르는 속성 콜백이
+객체를 `undefined`로, `false`를 `true`로 덮는다. 연결 시 흡수하면 프로퍼티가 이긴다. 연결 전에 `el.items`를 읽으면 own
+property가 그대로 읽히므로 값은 같다.
+
+**내부 상태는 모듈 `WeakMap`에 둔다 (리뷰 반영).** 인스턴스 필드(`p`, `d`, `r`)는 같은 이름의 prop 접근자와 충돌했다
+(`props: { p: String }`은 생성 시 무한 재귀, `d`를 연결 전에 쓰면 "이미 마운트됨"으로 오인, `r`은 renew를 덮음).
+상태를 요소 밖 `WeakMap<HTMLElement, State>`로 옮겨 예약어는 `host` 하나만 남는다. `#private`은 다운레벨 헬퍼 때문에 쓰지 않는다(RC-3).
+
+**`undefined` 대입은 "설정 해제"다 (B-4).** 접근자에 `undefined`가 오면 prop은 현재 속성 값으로 돌아간다(속성이 없으면
+Boolean은 `false`, 나머지는 `undefined`). lithent 부모가 prop을 더 넘기지 않으면 코어가 `undefined`를 대입한다.
 
 ### 4.2.1 네이티브 프로퍼티와 같은 이름 (제약)
 
@@ -297,3 +306,9 @@ declare function defineElement<S extends PropSpec & { host?: never } = Record<ne
 |---|---|---|
 | B-1 | `render()`가 돌려준 destroy가 **루트 컴포넌트가 한 번이라도 재렌더된 경우에만** unmount 큐를 실행했다 (`src/render.ts:48`, `lithentConcurrent/src/render.ts:122`의 `if (comp !== wDom)`). 갓 렌더한 컴포넌트 루트, 요소 루트 아래 컴포넌트는 `mountCallback` cleanup이 실행되지 않음. 순수 lithent로 base·concurrent 모두 재현. element의 FR-2를 직접 막음 | **수정 (2026-10-06, 사용자 승인 "코어 수정")**. 조건을 지워 항상 실행. `98db595`. 회귀 테스트 `src/tests/core-destroyUnmount.test.tsx`, `lithentConcurrent/src/tests/concurrent-destroyUnmount.test.tsx` (각 5건, 옛 코드에서 3건 실패). 크기 base 4,739→4,738, concurrent 6,233→6,228 B. `test:dual`·`verify:concurrent`·`verify:release`·E2E 24/24 통과. CHANGELOG Unreleased에 기록 |
 | B-2 | 속성/프로퍼티 판단(`hasAccessorMethods`, `src/utils/predicator.ts`)을 **태그 이름+키**로 캐시했다. 커스텀 엘리먼트가 **정의 전에** 렌더되면 "접근자 없음"이 캐시돼, 업그레이드 뒤에도 계속 속성으로 설정 → 객체는 `"[object Object]"`, `false`는 "있음(true)". lithent 앱이 위젯 스크립트를 늦게 불러오는 경우. 사용자 질문(lithent가 React 19처럼 프로퍼티로 대입하는지)을 확인하다 발견, element 테스트로 재현 | **수정 (2026-10-06, 사용자 승인)**. 캐시를 `WeakMap<prototype, Map<key, boolean>>`로 바꿔 업그레이드 후 새 prototype을 다시 조회. 공유 파일이라 두 코어 동시 수정. 회귀 테스트 `core-accessorUpgrade.test.tsx`, `concurrent-accessorUpgrade.test.tsx`(일반 요소·`input.value`·SVG·먼저 정의된 경우는 이전과 같음을 함께 고정), element `element-hardening.test.ts` — 옛 캐시에서 실패 확인. 크기 base 4,738→4,740, concurrent 6,228→6,229 B. 판단 기준(자기 prototype의 getter+setter)은 그대로 — 상속 프로퍼티까지 보는 확장은 기존 앱 동작을 바꿀 수 있어 하지 않음 |
+| B-3 | (리뷰에서 발견) 정의 전에 렌더된 커스텀 엘리먼트는 속성으로만 값을 받는다. B-2로 업그레이드 *후 바뀐* 값은 프로퍼티로 가지만, 부모가 **같은 값**으로 다시 렌더하면 코어의 동등성 검사가 건너뛰어 객체는 `undefined`, `false`는 `true`로 남았다 | **수정 (2026-10-06, 리뷰 요청)**. 코어 `updateProps`가 아직 업그레이드되지 않은 커스텀 엘리먼트(이름에 `-`, 생성자가 `HTMLElement`)에는 속성과 함께 실제 값을 own property로도 남긴다(`isPendingCustomElement`, 공유 `predicator.ts`). 표준 관용구대로 요소가 정의되면 own property를 접근자로 흡수한다 — element는 §4.2대로 연결 시 흡수. 정의 전에 prop이 빠지면 own property도 지운다. 내장 요소·정의된 요소에는 own property를 만들지 않음을 테스트로 고정 |
+| B-4 | (리뷰에서 발견) 부모가 prop을 더 넘기지 않으면 코어는 `removeAttribute`만 했다. 프로퍼티로 넘어간 값(`h('my-widget', { amount: 10 })` → `h('my-widget', {})`)은 요소에 남았다 | **수정 (2026-10-06, 리뷰 요청)**. 커스텀 엘리먼트(이름에 `-`)에서 자기 prototype에 접근자가 있는 키면 `undefined`를 대입한다. 내장 요소는 그대로 — `input.value = undefined`는 `"undefined"`가 되므로. element는 `undefined`를 "속성 값으로 복귀"로 처리(§4.2) |
+
+B-3·B-4 회귀 테스트: `core-accessorUpgrade.test.tsx`, `concurrent-accessorUpgrade.test.tsx` (각 +6건, 옛 코드에서 5건 실패), element `element-boundaries.test.ts` (이름 충돌·제거·같은 값 재렌더 5건; 코어 수정만 빼면 2건, element 수정을 빼면 4건 실패). 크기 base 4,740→4,774 B (예산 4,800), concurrent 6,229→6,279 B, element 936→998 B (예산 1,000).
+
+**알려진 제약 (기존 동작, 이번 범위 밖):** destroy 중 `mountCallback` cleanup이 예외를 던지면 그 뒤 처리(이벤트·DOM 제거)가 멈춘다. B-1로 destroy가 unmount를 항상 실행하게 되면서 이 경로를 타는 경우가 늘었다. 예외 격리는 코어 전반의 정책 결정이라 별도 작업으로 남긴다.
