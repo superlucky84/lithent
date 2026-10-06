@@ -1,5 +1,17 @@
 # Release notes
 
+## Unreleased
+
+### lithent and lithent-concurrent
+
+- Fix `render()`'s destroy function skipping unmount callbacks. It ran them
+  only when the root component had re-rendered at least once, so a fresh
+  component root, or components rendered under an element root, never saw the
+  cleanup returned from `mountCallback`. Both cores now run unmount for the
+  whole removed tree, once per component. `lithent` shrinks by 1 B (brotli
+  4,738 B), `lithent-concurrent` by 5 B (6,228 B). Found while building
+  `lithent/element`.
+
 ## 2026-10-02
 
 ### lithent-concurrent 0.1.1
