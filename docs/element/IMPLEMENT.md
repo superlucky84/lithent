@@ -528,4 +528,4 @@ E2E 전체 **40/40** (기존 24 + element 16). `pnpm test` 실패 0, `verify:rel
 | 2026-10-06 | 문서 연결 보강 (Home·Introduction·QuickStart 영/국, README CDN·표, element/README.md), E2E 44/44 | MANUAL_TEST_CHECKLIST 수동 확인, publish (사용자) | 없음 | `a73d7d5` |
 | 2026-10-06 | 수동 확인용 놀이터 (`element/playground/`, 단일 HTML 빌드 base·concurrent, `pnpm playground:element`, element 빌드에 포함), 0~9단계 자동 판정, E2E로 전 단계 검증 | Safari·Firefox에서 놀이터로 수동 확인, publish (사용자) | 없음 | `f7afcf5` |
 | 2026-10-06 | `emit` 네 번째 인자 `init`(기본값 덮어쓰기, detail은 항상 우선, +1 B, br 936 B), 가이드에 직접 `dispatchEvent` 안내(영/국), 테스트 4건·돌연변이 2종, E2E 46/46 | Safari·Firefox 수동 확인, publish (사용자) | 없음 | `4f5ad02` |
-| 2026-10-06 | 코어 버그 B-2 수정 (커스텀 엘리먼트 속성/프로퍼티 판단 캐시를 prototype 기준으로), 양쪽 코어·element 회귀 테스트, `test:dual`·`verify:*`·E2E 46/46 | Safari·Firefox 수동 확인, publish (사용자) | 없음 | (B-2 커밋) |
+| 2026-10-06 | 코어 버그 B-2 수정 (커스텀 엘리먼트 속성/프로퍼티 판단 캐시를 prototype 기준으로), 양쪽 코어·element 회귀 테스트, `test:dual`·`verify:*`·E2E 46/46 | Safari·Firefox 수동 확인, publish (사용자) | 없음 | `10ab2f1` |
