@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>lithent/element in a plain page</title>
+    <!-- Host page CSS. It must not reach inside the widget, and the widget's
+         CSS must not reach these elements (FR-6, MT-2). -->
+    <style>
+      button {
+        background: rgb(255, 0, 0);
+      }
+      p {
+        color: rgb(1, 2, 3);
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      lithent/element Phase 9. No build step: UMD scripts only (MT-1).
+      - #early exists before the element is defined and gets a property
+        assigned before definition (upgrade, FR-4).
+      - #host-app is rendered by a separate lithent copy, the way a host
+        site would bring its own (R-1 with real custom elements).
+      ?core=base|concurrent picks the widget's lithent core.
+    -->
+    <div id="spot-a">
+      <pay-widget id="early" amount="5"
+        ><span slot="note">projected note</span></pay-widget
+      >
+    </div>
+    <div id="spot-b"></div>
+    <div id="host-app"></div>
+
+    <!-- The host app's own lithent. -->
+    <script src="/dist/lithent.umd.js?copy=host"></script>
+    <script>
+      window.hostCore = window.lithent;
+      delete window.lithent;
+      const core = new URLSearchParams(location.search).get('core');
+      document.write(
+        core === 'concurrent'
+          ? '<script src="/lithentConcurrent/dist/lithentConcurrent.umd.js"><\/script>'
+          : '<script src="/dist/lithent.umd.js?copy=widget"><\/script>'
+      );
+    </script>
+    <script>
+      // lithent/element's UMD binds to the global `lithent`.
+      window.lithent = window.lithentConcurrent || window.lithent;
+      window.widgetCore = window.lithent;
+      // Assigned before the element is defined: an own property for now.
+      document.getElementById('early').options = { pre: 'defined' };
+    </script>
+    <script src="/element/dist/lithentElement.umd.js"></script>
+    <script>
+      const { h, mount, mountCallback } = window.widgetCore;
+      const { defineElement, emit } = window.lithentElement;
+      window.widgetLog = [];
+
+      const Widget = mount((renew, props) => {
+        let count = 0;
+        let result = '';
+        mountCallback(() => {
+          widgetLog.push('mount ' + props.host.id);
+          return () => widgetLog.push('unmount ' + props.host.id);
+        });
+        return () =>
+          h(
+            'div',
+            {},
+            h(
+              'button',
+              {
+                class: 'inc',
+                onClick: () => {
+                  count++;
+                  renew();
+                },
+              },
+              'count ' + count
+            ),
+            h('span', { class: 'amount' }, String(props.amount)),
+            h('span', { class: 'opts' }, JSON.stringify(props.options ?? null)),
+            h(
+              'button',
+              {
+                class: 'pay',
+                onClick: () => {
+                  const ok = emit(props.host, 'pay', { amount: props.amount });
+                  result = ok ? 'paid' : 'blocked';
+                  renew();
+                },
+              },
+              'pay'
+            ),
+            h('span', { class: 'result' }, result),
+            h('p', {}, 'inside'),
+            h('slot', { name: 'note' })
+          );
+      });
+
+      defineElement('pay-widget', Widget, {
+        props: { amount: Number, options: Object },
+        styles: [
+          'button { background: rgb(0, 0, 255); } p { color: rgb(0, 128, 0); }',
+        ],
+      });
+
+      // The host app, with its own lithent copy, renders a widget and passes
+      // it a changing prop on every host re-render.
+      const { h: hh, mount: hmount, render: hrender } = window.hostCore;
+      const HostApp = hmount(renew => {
+        let k = 0;
+        return () =>
+          hh(
+            'section',
+            {},
+            hh(
+              'button',
+              {
+                class: 'host-inc',
+                onClick: () => {
+                  k++;
+                  renew();
+                },
+              },
+              'host ' + k
+            ),
+            hh('p', { class: 'host-p' }, 'host paragraph'),
+            hh('pay-widget', { id: 'in-app', amount: 7 + k })
+          );
+      });
+      hrender(hh(HostApp, {}), document.getElementById('host-app'));
+
+      document.documentElement.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

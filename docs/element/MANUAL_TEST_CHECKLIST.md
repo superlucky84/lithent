@@ -9,6 +9,9 @@
 - 브라우저: Chrome 최신, Safari 최신, Firefox 최신. 각 항목에 브라우저별 결과를 적는다.
 - 결과 표기: `PASS` / `FAIL` / `N/A`, 날짜, 확인한 커밋 SHA, 증거(스크린샷 경로 또는 콘솔 출력).
 - FAIL이면 IMPLEMENT에 이슈를 추가하고 출하하지 않는다.
+- **Chromium 자동화 현황 (Phase 9):** MT-1, MT-2, MT-3, MT-5와 MT-6의 "lithent 2벌 공존"은 `e2e/element.spec.ts`가
+  Chromium에서 자동 검증한다. 수동 확인은 **Safari·Firefox**, MT-4(React 호스트), MT-5의 메모리(detached 노드),
+  MT-6의 "같은 스크립트 2회 로드"에 집중한다.
 
 ## 항목
 

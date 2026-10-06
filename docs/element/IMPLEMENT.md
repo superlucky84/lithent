@@ -1,7 +1,7 @@
 # IMPLEMENT — `lithent/element` (Custom Element 래퍼)
 
 - 작성일: 2026-10-06
-- 상태: **Phase 8 완료 (2026-10-06). 다음: Phase 9.**
+- 상태: **Phase 9 완료 — React 호스트(MT-4) 자동화만 사용자 결정 대기 (2026-10-06). 다음: Phase 10.**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md), [DESIGN.md](./DESIGN.md), [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 ## 공통 규칙
@@ -426,13 +426,43 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 
 ## Phase 9 — 통합 테스트
 
-- [ ] 9-1 Playwright `e2e/element.spec.ts` + fixture 페이지 (base·concurrent 두 프로젝트 모두):
-  - 순수 HTML + UMD (MT-1 자동화)
-  - 호스트 CSS가 shadow 내부에 새지 않음 / 내부 CSS가 밖으로 새지 않음 (computed style 비교)
-  - 실제 브라우저의 `adoptedStyleSheets` 경로
-  - React 호스트 앱 안에서 렌더·속성 갱신·이벤트 수신 (MT-4 자동화, React는 fixture 전용 devDependency)
-  - lithent 2벌 동시 로드 (R-1 최종 확인)
-- [ ] 9-2 `pnpm test`, `pnpm test:dual`, `pnpm size`, `pnpm verify:release` 전부 통과
+- [x] 9-1 Playwright `e2e/element.spec.ts` + fixture `e2e/fixtures/element-umd.html` (base·concurrent 두 프로젝트 모두):
+  - [x] 순수 HTML + UMD (MT-1 자동화) — 빌드 단계 없음, `lithentElement` 전역 API
+  - [x] 호스트 CSS ↔ 위젯 CSS 양방향 격리 (computed style 비교, MT-2 자동화)
+  - [x] 실제 브라우저의 `adoptedStyleSheets` 경로 — 인스턴스 2개가 시트 1개 공유, `<style>` 0개
+  - [ ] **React 호스트 앱 (MT-4 자동화)** — 저장소에 React가 없다. 의존성 추가는 사용자 결정 (아래 "열린 결정")
+  - [x] lithent 2벌 동시 로드 (R-1 최종 확인) — **실제 Custom Element로**: 호스트 앱이 자기 lithent 사본으로
+        `pay-widget`을 렌더하고 재렌더마다 새 prop을 넘김 → 위젯 상태 유지하며 갱신
+  - [x] 정의 전 HTML에 있던 요소의 업그레이드 + 정의 전 프로퍼티 할당 흡수 (실브라우저)
+  - [x] 속성·프로퍼티 갱신, `emit` 페이지 수신, `preventDefault` → `emit`이 `false`
+  - [x] 이름 있는 slot 투영
+  - [x] 이동(한 번 호출 + 두 번 호출) 상태 보존, 제거 시 unmount, 이후 재부착은 새 인스턴스 (MT-5 자동화)
+- [x] 9-2 `pnpm build`, `pnpm test`, `pnpm test:dual`, `pnpm size`, `pnpm verify:release`, E2E 전체 통과
+
+### Phase 9 실측 결과 (2026-10-06)
+
+| 항목 | 결과 |
+|---|---|
+| element E2E | **16/16** (base 8, concurrent 8) — 첫 실행에 통과 |
+| E2E 전체 | **38/38** (기존 24 + R-1 2 + element UMD 14) |
+| `pnpm test` / `test:dual` | 실패 0 / 실패 0 |
+| `verify:release` | ALL PASS |
+| 크기 | base 4,738 B, concurrent 6,228 B, element 935 B (brotli) |
+
+### Phase 9 음성 대조 (element를 고장 낸 빌드로 E2E 실행, base 프로젝트)
+
+| 고장 | 실패한 E2E |
+|---|---|
+| `adoptedStyleSheets` 경로 끄기 (폴백만) | FR-6 공유 시트 테스트 1건 (CSS 격리 테스트는 폴백으로도 통과 — 기대대로) |
+| 즉시 destroy | DC-4/MT-5 이동 테스트 1건 (두 번 호출 이동에서) |
+| 업그레이드 전 할당 흡수 제거 | MT-1/R-1, FR-3/4/5 2건 (가려진 own property 때문에 이후 대입도 무시됨) |
+
+### 열린 결정 — React 호스트 E2E (MT-4)
+
+저장소에 React 의존성이 없다. 선택지:
+1. 루트 devDependency로 `react`·`react-dom` 추가 + Vite fixture (실제 React 동작 자동화, 의존성·lockfile 증가)
+2. 자동화하지 않고 MANUAL_TEST_CHECKLIST MT-4로만 수동 확인
+3. CDN UMD React를 fixture에서 로드 (의존성 없음, 하지만 E2E가 외부 네트워크에 의존 — 현재 하네스는 요청 실패를 테스트 실패로 본다)
 
 ## Phase 10 — 문서와 출하 준비
 
@@ -460,3 +490,4 @@ Phase 2 테스트 2건이 props를 정확히 비교(`toEqual`)하고 있어 `hos
 | 2026-10-06 | Phase 6 완료 (이동 시 인스턴스 보존, CE 반응 타이밍 확인) — 기능 Phase 종료 | Phase 7 (타입·UMD) | 없음 | `d707586` |
 | 2026-10-06 | Phase 7 완료 (props 타입 추론, host·미선언·불일치 컴파일 오류, UMD 전역 확인, NoInfer 불필요 확인) | Phase 8 (테스트 하드닝) | 없음 | `2220272` |
 | 2026-10-06 | Phase 8 완료 (예외·반복·중첩·R-4 하드닝, 돌연변이 8종 양쪽 코어 재확인) | Phase 9 (E2E 통합) | 없음 | `c326393` |
+| 2026-10-06 | Phase 9 완료 (실브라우저 E2E 16건, 음성 대조 3종, 전체 E2E 38/38) | Phase 10 (문서·출하) | React 호스트 E2E 방식 결정 대기 | (Phase 9 커밋) |
