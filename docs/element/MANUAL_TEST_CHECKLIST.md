@@ -13,6 +13,13 @@
   `e2e/element.spec.ts`가 Chromium에서 자동 검증한다. 수동 확인은 **Safari·Firefox**, MT-4의 Vite+React 실제 앱 구성,
   MT-5의 메모리(detached 노드), MT-6의 "같은 스크립트 2회 로드"에 집중한다.
 
+## 수동 확인용 놀이터
+
+`pnpm playground:element` 후 `element/playground/dist/playground.html`(base), `element/playground/dist/playground-concurrent.html`(concurrent)을
+브라우저로 직접 연다 (서버 불필요, 라이브러리 인라인). 0~9단계가 MT-1·2·3·5·6의 핵심을 순서대로 다루고, 자동 판정 ✅/❌를
+보여준다. Safari·Firefox 확인은 이 페이지를 각 브라우저에서 끝까지 눌러 보는 것으로 시작한다. 같은 흐름을 Chromium에서는
+`e2e/element.spec.ts`의 playground 테스트가 매번 검증한다.
+
 ## 항목
 
 ### MT-1. 빌드 없이 CDN으로 사용 (RC-6)

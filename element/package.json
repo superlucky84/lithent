@@ -13,7 +13,8 @@
     "test": "vitest run --reporter verbose",
     "test:dev": "vitest",
     "watch": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build && node scripts/build-playground.mjs",
+    "playground": "node scripts/build-playground.mjs"
   },
   "author": "",
   "repository": {

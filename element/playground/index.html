@@ -1,0 +1,642 @@
+<title>고양이 위젯 놀이터</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;600&display=swap"
+/>
+<style>
+  /* Layout: a host "cat café" page. Left column is the stage (rooms with the
+     widgets, then the event log); right column is a numbered test route. */
+  :root {
+    --bg: #f3f5f9;
+    --surface: #ffffff;
+    --ink: #1d2230;
+    --muted: #5d6578;
+    --line: #dde2ec;
+    --accent: #2b8a5e; /* catnip green: page actions */
+    --event: #c8436b; /* yarn pink: events in the log */
+    --life: #2b6fb8; /* lifecycle entries */
+    --ok: #22834f;
+    --bad: #b23a3a;
+    --room-a: #fff3e4;
+    --room-b: #eaf1ff;
+    --display: 'Jua', 'Gowun Dodum', system-ui, sans-serif;
+    --body: 'Gowun Dodum', system-ui, -apple-system, 'Apple SD Gothic Neo',
+      sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #141823;
+      --surface: #1d2230;
+      --ink: #e8ebf3;
+      --muted: #a2aabd;
+      --line: #313849;
+      --accent: #5cc792;
+      --event: #f07b9d;
+      --life: #7fb2ef;
+      --ok: #5fd08f;
+      --bad: #f08080;
+      --room-a: #2b241c;
+      --room-b: #1c2436;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #141823;
+    --surface: #1d2230;
+    --ink: #e8ebf3;
+    --muted: #a2aabd;
+    --line: #313849;
+    --accent: #5cc792;
+    --event: #f07b9d;
+    --life: #7fb2ef;
+    --ok: #5fd08f;
+    --bad: #f08080;
+    --room-a: #2b241c;
+    --room-b: #1c2436;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-inline: 16px;
+    padding-block: 24px 48px;
+  }
+  header.top {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+  header.top h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1.15;
+    margin: 0;
+    text-wrap: balance;
+  }
+  header.top p {
+    margin: 0;
+    color: var(--muted);
+    max-width: 68ch;
+  }
+  code,
+  kbd {
+    font-family: var(--mono);
+    font-size: 0.88em;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  @media (min-width: 900px) {
+    .grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      align-items: start;
+    }
+    .stage {
+      position: sticky;
+      top: calc(env(safe-area-inset-top, 0px) + 12px);
+    }
+  }
+  .stage {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+  }
+  .rooms {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .room {
+    border-radius: 14px;
+    padding: 12px;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    min-height: 150px;
+    border: 1px dashed var(--line);
+  }
+  .room h2 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 18px;
+  }
+  #living {
+    background: var(--room-a);
+  }
+  #bedroom {
+    background: var(--room-b);
+  }
+  .empty-note {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  /* Before registration the tags are unknown elements showing their own
+     light-DOM text, so the upgrade is visible. */
+  cat-card:not(:defined) {
+    display: block;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px dashed var(--muted);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .sticker-line {
+    display: grid;
+    gap: 6px;
+  }
+  .sticker-line small {
+    color: var(--muted);
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    min-width: 0;
+  }
+  .panel h2 {
+    margin: 0 0 8px;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 18px;
+  }
+  #log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 240px;
+    overflow: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    display: grid;
+    gap: 4px;
+  }
+  #log li {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 8px;
+  }
+  #log time {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  #log .k-event span {
+    color: var(--event);
+  }
+  #log .k-life span {
+    color: var(--life);
+  }
+  #log .k-bad span {
+    color: var(--bad);
+  }
+
+  .route {
+    display: grid;
+    gap: 12px;
+    counter-reset: step;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: grid;
+    gap: 8px;
+  }
+  .step header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .step h3 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 19px;
+  }
+  .step .n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .step p {
+    margin: 0;
+  }
+  .expect {
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .expect b {
+    color: var(--ink);
+    font-weight: 400;
+    font-family: var(--display);
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .controls label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+  }
+  .page-btn {
+    font: inherit;
+    font-size: 14px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--surface);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .page-btn.ghost {
+    background: transparent;
+    color: var(--accent);
+  }
+  .page-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .page-btn:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  input[type='text'] {
+    font: inherit;
+    font-size: 14px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    min-width: 0;
+  }
+  input[type='range'] {
+    accent-color: var(--accent);
+  }
+  .verdict {
+    font-size: 13.5px;
+    font-family: var(--mono);
+    min-height: 1.6em;
+  }
+  .verdict.ok {
+    color: var(--ok);
+  }
+  .verdict.bad {
+    color: var(--bad);
+  }
+  .attr-view {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 8px 10px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+  .check {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--muted);
+    justify-self: end;
+  }
+  .start {
+    border-color: var(--accent);
+    border-width: 2px;
+  }
+  .note {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>
+<style id="css-bomb" disabled>
+  /* "Host page CSS bomb": aggressive page styles. They hit the light-DOM
+     sticker but cannot reach inside the cats' shadow roots. */
+  .stage button,
+  .stage p,
+  .stage h3 {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive !important;
+    background: #ff2d55 !important;
+    color: #fffb00 !important;
+    transform: rotate(-2deg);
+  }
+</style>
+<style id="part-style" disabled>
+  /* Allowed theming: ::part() reaches the parts the widget exposes. */
+  cat-card::part(pet-button) {
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+</style>
+<!-- body -->
+<div class="wrap">
+  <header class="top">
+    <h1>고양이 위젯 놀이터</h1>
+    <p>
+      이 페이지는 고양이 카페의 웹사이트, 즉 <b>남의 페이지</b> 역할을 합니다.
+      고양이 카드 <code>&lt;cat-card&gt;</code>는 <code>lithent/element</code>로
+      만든 위젯이에요. 페이지는 lithent를 모릅니다. 속성과 프로퍼티를 넣고, DOM
+      이벤트를 받을 뿐입니다. 오른쪽 순서대로 눌러 보세요. 자동으로 확인할 수
+      있는 건 ✅/❌로 바로 알려줍니다.
+    </p>
+  </header>
+
+  <div class="grid">
+    <section class="stage" aria-label="무대">
+      <div class="rooms">
+        <div class="room" id="living">
+          <h2>🛋️ 거실</h2>
+          <cat-card id="nabi" name="나비" hunger="40"
+            >⏳ 아직 등록 전인 &lt;cat-card&gt; 태그예요.
+            <span slot="caption">창가 자리를 좋아해요</span></cat-card
+          >
+        </div>
+        <div class="room" id="bedroom">
+          <h2>🛏️ 침실</h2>
+          <cat-card id="momo" name="모모" hunger="75" sleepy
+            >⏳ 아직 등록 전인 &lt;cat-card&gt; 태그예요.</cat-card
+          >
+        </div>
+      </div>
+      <div class="panel sticker-line">
+        <cat-sticker id="sticker" label="오늘의 추천: 참치 라떼"
+          ><p>🖨️ 서버가 그린 임시 스티커 (등록되면 교체돼요)</p></cat-sticker
+        >
+        <small
+          >↑ <code>&lt;cat-sticker&gt;</code>는 비교용으로
+          <code>shadow: false</code>(light DOM)로 만든 위젯이에요.</small
+        >
+      </div>
+      <div class="panel">
+        <h2>이벤트 로그</h2>
+        <ul id="log" aria-live="polite"></ul>
+      </div>
+    </section>
+
+    <ol class="route">
+      <li class="step start" id="s0">
+        <header>
+          <span class="n">0</span>
+          <h3>위젯 등록하기 (업그레이드)</h3>
+        </header>
+        <p>
+          지금 고양이 자리는 아직 등록되지 않은 태그라서 점선 상자만 보여요.
+          나비에게는 등록 <b>전에</b> 프로퍼티로 장난감
+          <code>['털실 공']</code>을 미리 넣어 두었습니다.
+        </p>
+        <div class="controls">
+          <button class="page-btn" id="register" type="button">
+            🚀 defineElement 실행
+          </button>
+        </div>
+        <p class="expect">
+          기대: 두 고양이 카드가 나타나고, 나비 카드에 <b>장난감: 털실 공</b>이
+          보여요. 스티커는 서버 문구가 교체돼요. 로그에 mount 2번.
+        </p>
+        <p class="verdict" id="v0"></p>
+      </li>
+
+      <li class="step" id="s1">
+        <header>
+          <span class="n">1</span>
+          <h3>속성으로 바꾸기</h3>
+        </header>
+        <p>
+          HTML 속성은 문자열이지만, 위젯은 선언된 타입으로 바꿔서 받아요.
+          <code>hunger</code>는 숫자, <code>sleepy</code>는 있으면 true.
+        </p>
+        <div class="controls">
+          <label for="name-input">이름</label>
+          <input id="name-input" type="text" value="나비" />
+          <label for="hunger-input">배고픔</label>
+          <input id="hunger-input" type="range" min="0" max="100" value="40" />
+          <label><input id="sleepy-input" type="checkbox" /> 졸려요</label>
+        </div>
+        <div class="attr-view" id="attr-view"></div>
+        <p class="expect">
+          기대: 카드 이름·게이지·기분이 바로 바뀌어요. 배고픔 70 이상이면
+          <b>😿 배고파요</b>, 졸려요를 켜면 <b>😴</b>.
+        </p>
+      </li>
+
+      <li class="step" id="s2">
+        <header>
+          <span class="n">2</span>
+          <h3>한 번에 세 개 바꾸기 (렌더 합치기)</h3>
+        </header>
+        <p>
+          같은 순간에 속성 세 개를 바꿉니다. 카드 아래 <b>렌더 #</b> 숫자를
+          보세요.
+        </p>
+        <div class="controls">
+          <button class="page-btn" id="batch" type="button" disabled>
+            이름·배고픔·졸림 동시에 바꾸기
+          </button>
+        </div>
+        <p class="expect">기대: 렌더 번호가 <b>딱 1만</b> 올라가요.</p>
+        <p class="verdict" id="v2"></p>
+      </li>
+
+      <li class="step" id="s3">
+        <header>
+          <span class="n">3</span>
+          <h3>프로퍼티로 객체 넘기기</h3>
+        </header>
+        <p>
+          배열 같은 값은 속성(문자열)으로 못 넘기니 프로퍼티
+          <code>nabi.toys = [...]</code>로 넣어요.
+        </p>
+        <div class="controls">
+          <button
+            class="page-btn ghost"
+            data-toy="🐟 생선 인형"
+            type="button"
+            disabled
+          >
+            🐟 던져주기
+          </button>
+          <button
+            class="page-btn ghost"
+            data-toy="🪶 깃털 낚싯대"
+            type="button"
+            disabled
+          >
+            🪶 던져주기
+          </button>
+          <button
+            class="page-btn ghost"
+            data-toy="📦 상자"
+            type="button"
+            disabled
+          >
+            📦 던져주기
+          </button>
+        </div>
+        <p class="expect">
+          기대: 장난감 목록이 늘어나요. 위 <b>속성 보기</b>에는
+          <code>toys</code>가 생기지 않아요 (프로퍼티는 속성으로 반영되지 않음).
+        </p>
+        <p class="verdict" id="v3"></p>
+      </li>
+
+      <li class="step" id="s4">
+        <header>
+          <span class="n">4</span>
+          <h3>위젯이 보내는 이벤트</h3>
+        </header>
+        <p>
+          카드 안의 <b>쓰다듬기</b>를 눌러 보세요. 위젯은
+          <code>emit(host, 'meow')</code>로 이벤트를 보내고, 페이지가 로그에
+          적어요.
+        </p>
+        <div class="controls">
+          <label
+            ><input id="block-meow" type="checkbox" /> 냐옹 금지
+            (<code>preventDefault</code>)</label
+          >
+        </div>
+        <p class="expect">
+          기대: 로그에 <b>냐옹!</b>. 냐옹 금지를 켜고 쓰다듬으면 위젯 얼굴이
+          <b>😾</b>로 바뀌어요 (<code>emit</code>이 false를 돌려받음).
+        </p>
+      </li>
+
+      <li class="step" id="s5">
+        <header>
+          <span class="n">5</span>
+          <h3>CSS 격리와 테마</h3>
+        </header>
+        <p>
+          호스트 페이지가 과격한 CSS를 넣어도 shadow DOM 안은 안전해요. 대신
+          위젯이 허락한 통로(CSS 변수, <code>::part</code>)로는 꾸밀 수 있어요.
+        </p>
+        <div class="controls">
+          <label><input id="bomb" type="checkbox" /> 💣 호스트 CSS 폭탄</label>
+          <label
+            ><input id="part" type="checkbox" /> 버튼 둥글게
+            (<code>::part</code>)</label
+          >
+          <label for="fur">털 색 (<code>--cat-color</code>)</label>
+          <input id="fur" type="color" value="#f4b860" />
+        </div>
+        <p class="expect">
+          기대: 폭탄을 켜면 <b>스티커만</b> 망가지고 고양이 카드는 그대로예요.
+          털 색과 둥근 버튼은 고양이 카드에 적용돼요.
+        </p>
+        <p class="verdict" id="v5"></p>
+      </li>
+
+      <li class="step" id="s6">
+        <header>
+          <span class="n">6</span>
+          <h3>slot으로 내용 끼워 넣기</h3>
+        </header>
+        <p>
+          나비 태그 안의 <code>&lt;span slot="caption"&gt;</code>은 페이지가
+          가진 내용이에요. 위젯은 그 자리를 비워 두고 보여주기만 해요.
+        </p>
+        <div class="controls">
+          <label for="caption-input">캡션</label>
+          <input id="caption-input" type="text" value="창가 자리를 좋아해요" />
+        </div>
+        <p class="expect">기대: 나비 카드의 캡션이 바로 바뀌어요.</p>
+      </li>
+
+      <li class="step" id="s7">
+        <header>
+          <span class="n">7</span>
+          <h3>방 옮기기 (상태 유지)</h3>
+        </header>
+        <p>먼저 나비를 몇 번 쓰다듬은 다음 옮겨 보세요.</p>
+        <div class="controls">
+          <button class="page-btn" id="move-one" type="button" disabled>
+            appendChild로 옮기기
+          </button>
+          <button class="page-btn ghost" id="move-two" type="button" disabled>
+            remove() 후 다시 넣기
+          </button>
+        </div>
+        <p class="expect">
+          기대: 다른 방으로 가도 <b>쓰다듬은 횟수가 그대로</b>예요. 로그에
+          unmount가 찍히지 않아요.
+        </p>
+        <p class="verdict" id="v7"></p>
+      </li>
+
+      <li class="step" id="s8">
+        <header>
+          <span class="n">8</span>
+          <h3>내보냈다가 다시 데려오기</h3>
+        </header>
+        <div class="controls">
+          <button class="page-btn" id="remove" type="button" disabled>
+            나비 내보내기
+          </button>
+          <button class="page-btn ghost" id="bring" type="button" disabled>
+            다시 데려오기
+          </button>
+        </div>
+        <p class="expect">
+          기대: 내보내면 로그에 <b>unmount</b>. 다시 데려오면 <b>mount</b>와
+          함께 새 고양이처럼 쓰다듬은 횟수가 0부터 시작해요.
+        </p>
+        <p class="verdict" id="v8"></p>
+      </li>
+
+      <li class="step" id="s9">
+        <header>
+          <span class="n">9</span>
+          <h3>같은 이름으로 또 등록하기</h3>
+        </header>
+        <p>
+          위젯 스크립트가 한 페이지에 두 번 로드되는 일은 흔해요. 그래도 터지면
+          안 되죠.
+        </p>
+        <div class="controls">
+          <button class="page-btn" id="redefine" type="button" disabled>
+            defineElement('cat-card', …) 다시 실행
+          </button>
+        </div>
+        <p class="expect">
+          기대: 오류 없이 <b>기존 생성자</b>를 돌려받고, 고양이들은 그대로예요.
+        </p>
+        <p class="verdict" id="v9"></p>
+      </li>
+    </ol>
+  </div>
+</div>
+<!--LITHENT_SCRIPTS-->
+<!--PLAYGROUND_SCRIPT-->

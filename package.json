@@ -41,6 +41,7 @@
     "build:tag": "pnpm --filter lithent-tag build",
     "build:ftags": "pnpm --filter lithent-ftags build",
     "build:element": "pnpm --filter lithent-element build",
+    "playground:element": "pnpm build:core && pnpm build:concurrent && pnpm build:element && pnpm --filter lithent-element playground",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
     "build:sequence": "pnpm build:core && pnpm build:concurrent && pnpm build:concurrentHelper && pnpm build:jsxruntime && pnpm build:helper && pnpm build:devHelper && pnpm build:hmrParser && pnpm build:lithentTemplateParser && pnpm build:lithentTemplateVite && pnpm build:lithentMdx && pnpm build:lithentVite && pnpm build:ssr",

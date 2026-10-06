@@ -336,3 +336,68 @@ test('docs: the element guide renders and its demo widget works', async ({
     );
   }
 });
+
+// The hand-test playground (element/playground) must keep working: click
+// through every step and require every automatic verdict to pass.
+test('playground: every step of the cat widget playground passes', async ({
+  page,
+}, info) => {
+  const file =
+    info.project.name === 'concurrent'
+      ? 'playground-concurrent.html'
+      : 'playground.html';
+  // The page asks Google Fonts for its faces; keep the test off the network
+  // (the fallback stacks render the same content).
+  await page.route('https://fonts.googleapis.com/**', route =>
+    route.fulfill({ status: 200, contentType: 'text/css', body: '' })
+  );
+  await page.goto(`/element/playground/dist/${file}`);
+  const ok = (id: string) => expect(page.locator(id)).toHaveClass(/verdict ok/);
+  const nabi = page.locator('#nabi');
+
+  await page.locator('#register').click();
+  await ok('#v0');
+  await expect(nabi.locator('.toys')).toContainText('털실 공');
+
+  await page.locator('#name-input').fill('치즈');
+  await expect(nabi.locator('h3')).toHaveText('치즈');
+  await page.locator('#hunger-input').fill('90');
+  await expect(nabi.locator('.mood')).toHaveText('😿 배고파요');
+  await page.locator('#sleepy-input').check();
+  await expect(nabi.locator('.mood')).toHaveText('😴 꾸벅꾸벅');
+
+  await page.locator('#batch').click();
+  await ok('#v2');
+
+  await page.locator('[data-toy="📦 상자"]').click();
+  await ok('#v3');
+
+  await nabi.locator('button').click();
+  await expect(page.locator('#log')).toContainText('냐옹!');
+  await page.locator('#block-meow').check();
+  await nabi.locator('button').click();
+  await expect(nabi.locator('.avatar')).toHaveText('😾');
+  await page.locator('#block-meow').uncheck();
+
+  await page.locator('#bomb').check();
+  await ok('#v5');
+  await page.locator('#bomb').uncheck();
+
+  await page.locator('#caption-input').fill('상자 안을 좋아해요');
+  await expect(page.locator('#nabi [slot="caption"]')).toHaveText(
+    '상자 안을 좋아해요'
+  );
+
+  await page.locator('#move-one').click();
+  await ok('#v7');
+  await page.locator('#move-two').click();
+  await ok('#v7');
+
+  await page.locator('#remove').click();
+  await ok('#v8');
+  await page.locator('#bring').click();
+  await ok('#v8');
+
+  await page.locator('#redefine').click();
+  await ok('#v9');
+});

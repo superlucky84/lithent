@@ -44,4 +44,19 @@ defineElement('pay-button', PayButton, {
 | Lifecycle | Moves keep state; removal unmounts after a microtask; `undefined` without `customElements` (SSR)                |
 | Cores     | Base and `lithent-concurrent`                                                                                   |
 
+## Hand-test playground
+
+A cat café page that hosts the widget, with ten numbered steps (upgrade,
+attributes, batched renders, object properties, events, CSS isolation, slots,
+moves, remove/re-add, duplicate definition) and automatic ✅/❌ checks:
+
+```bash
+pnpm playground:element   # builds the cores, the element and the playground
+open element/playground/dist/playground.html            # base core, no server needed
+open element/playground/dist/playground-concurrent.html # concurrent core
+```
+
+Sources: `element/playground/`. The playground is also built by
+`pnpm build:element` and walked through by `e2e/element.spec.ts`.
+
 Design notes and test records: [docs/element](../docs/element/).
