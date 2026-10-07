@@ -1,0 +1,2800 @@
+{
+ "2025-12-01 (old app, old core; unreliable)": {
+  "lithent-vlocal-build-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 2645.4,
+     "stddev": 718.06,
+     "n": 15
+    },
+    "script": {
+     "median": 1533.4,
+     "stddev": 353.12,
+     "n": 15
+    },
+    "paint": {
+     "median": 837,
+     "stddev": 418.87,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 2597.9,
+     "stddev": 665.3,
+     "n": 15
+    },
+    "script": {
+     "median": 1807.2,
+     "stddev": 434.74,
+     "n": 15
+    },
+    "paint": {
+     "median": 667.8,
+     "stddev": 266.26,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": null,
+     "stddev": 0,
+     "n": 0
+    },
+    "script": {
+     "median": null,
+     "stddev": 0,
+     "n": 0
+    },
+    "paint": {
+     "median": null,
+     "stddev": 0,
+     "n": 0
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 60.9,
+     "stddev": 1.87,
+     "n": 25
+    },
+    "script": {
+     "median": 55,
+     "stddev": 1.69,
+     "n": 25
+    },
+    "paint": {
+     "median": 3.5,
+     "stddev": 0.65,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 185.2,
+     "stddev": 7.58,
+     "n": 15
+    },
+    "script": {
+     "median": 75.6,
+     "stddev": 2.98,
+     "n": 15
+    },
+    "paint": {
+     "median": 106.4,
+     "stddev": 4.37,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 39.9,
+     "stddev": 2.64,
+     "n": 15
+    },
+    "script": {
+     "median": 24.9,
+     "stddev": 1.52,
+     "n": 15
+    },
+    "paint": {
+     "median": 13.6,
+     "stddev": 1.16,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 403.9,
+     "stddev": 7.12,
+     "n": 15
+    },
+    "script": {
+     "median": 143.5,
+     "stddev": 3.12,
+     "n": 15
+    },
+    "paint": {
+     "median": 250.4,
+     "stddev": 5.7,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 70.4,
+     "stddev": 0.9,
+     "n": 15
+    },
+    "script": {
+     "median": 37.6,
+     "stddev": 0.41,
+     "n": 15
+    },
+    "paint": {
+     "median": 31.4,
+     "stddev": 0.65,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 26.4,
+     "stddev": 1.81,
+     "n": 15
+    },
+    "script": {
+     "median": 23.9,
+     "stddev": 1.67,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.6,
+     "stddev": 0.5,
+     "n": 15
+    }
+   }
+  }
+ },
+ "2026-10-07 run 1 (old app, core 01a7ee2 build)": {
+  "lithent-vlocal-build-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 29.6,
+     "stddev": 0.9,
+     "n": 15
+    },
+    "script": {
+     "median": 10.7,
+     "stddev": 0.4,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.5,
+     "stddev": 0.52,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 45.7,
+     "stddev": 1.09,
+     "n": 15
+    },
+    "script": {
+     "median": 25.7,
+     "stddev": 0.86,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.3,
+     "stddev": 0.39,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 59.5,
+     "stddev": 2.93,
+     "n": 15
+    },
+    "script": {
+     "median": 45.4,
+     "stddev": 2.42,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.6,
+     "stddev": 0.83,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 50.7,
+     "stddev": 2.09,
+     "n": 25
+    },
+    "script": {
+     "median": 45.7,
+     "stddev": 1.93,
+     "n": 25
+    },
+    "paint": {
+     "median": 3.5,
+     "stddev": 0.72,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 62.4,
+     "stddev": 1.78,
+     "n": 15
+    },
+    "script": {
+     "median": 46.9,
+     "stddev": 1.56,
+     "n": 15
+    },
+    "paint": {
+     "median": 14,
+     "stddev": 0.72,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 31.3,
+     "stddev": 0.88,
+     "n": 15
+    },
+    "script": {
+     "median": 19.6,
+     "stddev": 0.67,
+     "n": 15
+    },
+    "paint": {
+     "median": 11,
+     "stddev": 0.19,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 308.9,
+     "stddev": 3.58,
+     "n": 15
+    },
+    "script": {
+     "median": 88.5,
+     "stddev": 2.39,
+     "n": 15
+    },
+    "paint": {
+     "median": 212.9,
+     "stddev": 4.46,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 46.1,
+     "stddev": 0.99,
+     "n": 15
+    },
+    "script": {
+     "median": 22.7,
+     "stddev": 0.89,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.4,
+     "stddev": 0.31,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 85.3,
+     "stddev": 3.9,
+     "n": 15
+    },
+    "script": {
+     "median": 82.5,
+     "stddev": 3.85,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.5,
+     "stddev": 0.57,
+     "n": 15
+    }
+   }
+  },
+  "preact-hooks-v10.27.1-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 26,
+     "stddev": 0.19,
+     "n": 15
+    },
+    "script": {
+     "median": 6.7,
+     "stddev": 0.12,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.7,
+     "stddev": 0.18,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 30.2,
+     "stddev": 1.02,
+     "n": 15
+    },
+    "script": {
+     "median": 10.6,
+     "stddev": 0.26,
+     "n": 15
+    },
+    "paint": {
+     "median": 19,
+     "stddev": 0.83,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 21.4,
+     "stddev": 0.95,
+     "n": 15
+    },
+    "script": {
+     "median": 9.4,
+     "stddev": 0.6,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.1,
+     "stddev": 0.57,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 12.7,
+     "stddev": 1.25,
+     "n": 25
+    },
+    "script": {
+     "median": 8.6,
+     "stddev": 0.57,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.5,
+     "stddev": 0.71,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 24.2,
+     "stddev": 2.08,
+     "n": 15
+    },
+    "script": {
+     "median": 8.9,
+     "stddev": 0.65,
+     "n": 15
+    },
+    "paint": {
+     "median": 13.4,
+     "stddev": 1.19,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 14.9,
+     "stddev": 0.3,
+     "n": 15
+    },
+    "script": {
+     "median": 4.2,
+     "stddev": 0.23,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.1,
+     "stddev": 0.25,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 287.4,
+     "stddev": 3.95,
+     "n": 15
+    },
+    "script": {
+     "median": 62,
+     "stddev": 0.78,
+     "n": 15
+    },
+    "paint": {
+     "median": 217.6,
+     "stddev": 3.26,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 31.8,
+     "stddev": 0.94,
+     "n": 15
+    },
+    "script": {
+     "median": 8.5,
+     "stddev": 0.17,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.4,
+     "stddev": 0.74,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 13.8,
+     "stddev": 1.12,
+     "n": 15
+    },
+    "script": {
+     "median": 11.5,
+     "stddev": 1.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.4,
+     "stddev": 0.58,
+     "n": 15
+    }
+   }
+  },
+  "react-hooks-v19.2.0-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 24.9,
+     "stddev": 1.49,
+     "n": 15
+    },
+    "script": {
+     "median": 6.3,
+     "stddev": 0.22,
+     "n": 15
+    },
+    "paint": {
+     "median": 18,
+     "stddev": 1.29,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 31.4,
+     "stddev": 0.9,
+     "n": 15
+    },
+    "script": {
+     "median": 11.8,
+     "stddev": 0.56,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.7,
+     "stddev": 0.5,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 15.4,
+     "stddev": 0.59,
+     "n": 15
+    },
+    "script": {
+     "median": 4.4,
+     "stddev": 0.29,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.4,
+     "stddev": 0.5,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 5.3,
+     "stddev": 1.58,
+     "n": 25
+    },
+    "script": {
+     "median": 2,
+     "stddev": 0.54,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.5,
+     "stddev": 0.54,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 93.2,
+     "stddev": 9.18,
+     "n": 15
+    },
+    "script": {
+     "median": 18.8,
+     "stddev": 2.03,
+     "n": 15
+    },
+    "paint": {
+     "median": 72.3,
+     "stddev": 7.02,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 13.8,
+     "stddev": 0.76,
+     "n": 15
+    },
+    "script": {
+     "median": 1.2,
+     "stddev": 0.14,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.3,
+     "stddev": 0.5,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 437.6,
+     "stddev": 14.48,
+     "n": 15
+    },
+    "script": {
+     "median": 213.7,
+     "stddev": 14.54,
+     "n": 15
+    },
+    "paint": {
+     "median": 217.4,
+     "stddev": 3.37,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 30.5,
+     "stddev": 0.74,
+     "n": 15
+    },
+    "script": {
+     "median": 7.3,
+     "stddev": 0.17,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.3,
+     "stddev": 0.57,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 17.3,
+     "stddev": 0.76,
+     "n": 15
+    },
+    "script": {
+     "median": 15,
+     "stddev": 0.73,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.1,
+     "stddev": 0.41,
+     "n": 15
+    }
+   }
+  },
+  "solid-v1.9.3-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 22.4,
+     "stddev": 0.31,
+     "n": 15
+    },
+    "script": {
+     "median": 2.8,
+     "stddev": 0.08,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.2,
+     "stddev": 0.26,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 25,
+     "stddev": 0.57,
+     "n": 15
+    },
+    "script": {
+     "median": 5.3,
+     "stddev": 0.14,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.2,
+     "stddev": 0.43,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 11.5,
+     "stddev": 4.13,
+     "n": 15
+    },
+    "script": {
+     "median": 1.1,
+     "stddev": 0.31,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.2,
+     "stddev": 0.72,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 7.7,
+     "stddev": 2.49,
+     "n": 25
+    },
+    "script": {
+     "median": 0.4,
+     "stddev": 0.31,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.3,
+     "stddev": 0.43,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 14.2,
+     "stddev": 5.22,
+     "n": 15
+    },
+    "script": {
+     "median": 1.2,
+     "stddev": 0.28,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.5,
+     "stddev": 1.33,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 12.1,
+     "stddev": 1.18,
+     "n": 15
+    },
+    "script": {
+     "median": 0.5,
+     "stddev": 0.04,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.9,
+     "stddev": 0.49,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 235.9,
+     "stddev": 3.97,
+     "n": 15
+    },
+    "script": {
+     "median": 24.2,
+     "stddev": 0.36,
+     "n": 15
+    },
+    "paint": {
+     "median": 205,
+     "stddev": 3.5,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 25.9,
+     "stddev": 0.5,
+     "n": 15
+    },
+    "script": {
+     "median": 3.1,
+     "stddev": 0.12,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.1,
+     "stddev": 0.41,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 12.2,
+     "stddev": 1.37,
+     "n": 15
+    },
+    "script": {
+     "median": 9.4,
+     "stddev": 1.26,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.2,
+     "stddev": 0.58,
+     "n": 15
+    }
+   }
+  },
+  "svelte-v5.42.1-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 21.4,
+     "stddev": 0.51,
+     "n": 15
+    },
+    "script": {
+     "median": 3.4,
+     "stddev": 0.15,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.7,
+     "stddev": 0.48,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 25.9,
+     "stddev": 0.61,
+     "n": 15
+    },
+    "script": {
+     "median": 6.4,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 19,
+     "stddev": 0.5,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 13.9,
+     "stddev": 5.33,
+     "n": 15
+    },
+    "script": {
+     "median": 1.8,
+     "stddev": 0.29,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.4,
+     "stddev": 1.24,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 6.6,
+     "stddev": 0.87,
+     "n": 25
+    },
+    "script": {
+     "median": 3,
+     "stddev": 0.32,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.6,
+     "stddev": 0.61,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 14.7,
+     "stddev": 4.37,
+     "n": 15
+    },
+    "script": {
+     "median": 1.9,
+     "stddev": 0.34,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.7,
+     "stddev": 1.37,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 12.3,
+     "stddev": 1.44,
+     "n": 15
+    },
+    "script": {
+     "median": 1,
+     "stddev": 0.11,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.4,
+     "stddev": 0.51,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 239.2,
+     "stddev": 2.57,
+     "n": 15
+    },
+    "script": {
+     "median": 26.8,
+     "stddev": 0.51,
+     "n": 15
+    },
+    "paint": {
+     "median": 205.5,
+     "stddev": 2.18,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 26.8,
+     "stddev": 1.25,
+     "n": 15
+    },
+    "script": {
+     "median": 3.6,
+     "stddev": 0.06,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.4,
+     "stddev": 1.03,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 13.1,
+     "stddev": 1.66,
+     "n": 15
+    },
+    "script": {
+     "median": 10.4,
+     "stddev": 1.31,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.4,
+     "stddev": 0.64,
+     "n": 15
+    }
+   }
+  },
+  "vanillajs-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 21.7,
+     "stddev": 0.51,
+     "n": 15
+    },
+    "script": {
+     "median": 1.9,
+     "stddev": 0.13,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.4,
+     "stddev": 0.46,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 22.5,
+     "stddev": 0.34,
+     "n": 15
+    },
+    "script": {
+     "median": 3.5,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.6,
+     "stddev": 0.28,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 11.6,
+     "stddev": 4.76,
+     "n": 15
+    },
+    "script": {
+     "median": 0.2,
+     "stddev": 0.28,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.5,
+     "stddev": 1.41,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 3.2,
+     "stddev": 2.4,
+     "n": 25
+    },
+    "script": {
+     "median": 0.1,
+     "stddev": 0.27,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.4,
+     "stddev": 0.71,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 12.6,
+     "stddev": 3.84,
+     "n": 15
+    },
+    "script": {
+     "median": 0.1,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 11,
+     "stddev": 1.6,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 11.3,
+     "stddev": 1.73,
+     "n": 15
+    },
+    "script": {
+     "median": 0.5,
+     "stddev": 0.06,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.1,
+     "stddev": 0.85,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 218.8,
+     "stddev": 4.35,
+     "n": 15
+    },
+    "script": {
+     "median": 17.6,
+     "stddev": 0.47,
+     "n": 15
+    },
+    "paint": {
+     "median": 194.6,
+     "stddev": 4.09,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 25.8,
+     "stddev": 1.07,
+     "n": 15
+    },
+    "script": {
+     "median": 2,
+     "stddev": 0.11,
+     "n": 15
+    },
+    "paint": {
+     "median": 23,
+     "stddev": 0.94,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 9.7,
+     "stddev": 0.75,
+     "n": 15
+    },
+    "script": {
+     "median": 7.3,
+     "stddev": 0.53,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.2,
+     "stddev": 0.53,
+     "n": 15
+    }
+   }
+  },
+  "vue-v3.6.0-alpha.2-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 25.4,
+     "stddev": 2.01,
+     "n": 15
+    },
+    "script": {
+     "median": 6,
+     "stddev": 0.14,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.8,
+     "stddev": 1.88,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 28.3,
+     "stddev": 0.36,
+     "n": 15
+    },
+    "script": {
+     "median": 8.8,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 19,
+     "stddev": 0.28,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 14.7,
+     "stddev": 2.23,
+     "n": 15
+    },
+    "script": {
+     "median": 3,
+     "stddev": 0.36,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.2,
+     "stddev": 1.57,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 4.3,
+     "stddev": 2.61,
+     "n": 25
+    },
+    "script": {
+     "median": 1.3,
+     "stddev": 0.37,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.2,
+     "stddev": 0.51,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 15.3,
+     "stddev": 5.19,
+     "n": 15
+    },
+    "script": {
+     "median": 1.8,
+     "stddev": 0.2,
+     "n": 15
+    },
+    "paint": {
+     "median": 12.1,
+     "stddev": 1.15,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 13.8,
+     "stddev": 0.93,
+     "n": 15
+    },
+    "script": {
+     "median": 2.6,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.2,
+     "stddev": 0.71,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 270.6,
+     "stddev": 3.56,
+     "n": 15
+    },
+    "script": {
+     "median": 51,
+     "stddev": 0.66,
+     "n": 15
+    },
+    "paint": {
+     "median": 212.9,
+     "stddev": 2.97,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 30.2,
+     "stddev": 1.49,
+     "n": 15
+    },
+    "script": {
+     "median": 6,
+     "stddev": 0.13,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.9,
+     "stddev": 1.24,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 15.2,
+     "stddev": 1.45,
+     "n": 15
+    },
+    "script": {
+     "median": 12.5,
+     "stddev": 1.19,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.5,
+     "stddev": 0.35,
+     "n": 15
+    }
+   }
+  }
+ },
+ "2026-10-07 run 2 (cacheUpdate app, core with removal fix; lithent/vanillajs/preact-hooks only)": {
+  "lithent-vlocal-build-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 29.8,
+     "stddev": 0.66,
+     "n": 15
+    },
+    "script": {
+     "median": 10.7,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.7,
+     "stddev": 0.45,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 36.4,
+     "stddev": 1.67,
+     "n": 15
+    },
+    "script": {
+     "median": 15.7,
+     "stddev": 0.74,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.9,
+     "stddev": 0.99,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 28.9,
+     "stddev": 1.1,
+     "n": 15
+    },
+    "script": {
+     "median": 16,
+     "stddev": 0.5,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.1,
+     "stddev": 0.74,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 15.6,
+     "stddev": 1.41,
+     "n": 25
+    },
+    "script": {
+     "median": 11,
+     "stddev": 0.64,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.7,
+     "stddev": 0.73,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 29.7,
+     "stddev": 1.63,
+     "n": 15
+    },
+    "script": {
+     "median": 13.6,
+     "stddev": 0.97,
+     "n": 15
+    },
+    "paint": {
+     "median": 13.3,
+     "stddev": 0.8,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 18.4,
+     "stddev": 1.42,
+     "n": 15
+    },
+    "script": {
+     "median": 6.2,
+     "stddev": 0.32,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.2,
+     "stddev": 0.97,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 317.6,
+     "stddev": 16.94,
+     "n": 15
+    },
+    "script": {
+     "median": 91.5,
+     "stddev": 7.67,
+     "n": 15
+    },
+    "paint": {
+     "median": 218,
+     "stddev": 9.1,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 38.5,
+     "stddev": 2.11,
+     "n": 15
+    },
+    "script": {
+     "median": 14.4,
+     "stddev": 0.9,
+     "n": 15
+    },
+    "paint": {
+     "median": 23,
+     "stddev": 1.25,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 24.5,
+     "stddev": 1.9,
+     "n": 15
+    },
+    "script": {
+     "median": 21.6,
+     "stddev": 1.59,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.3,
+     "stddev": 0.54,
+     "n": 15
+    }
+   }
+  },
+  "preact-hooks-v10.27.1-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 26.3,
+     "stddev": 0.46,
+     "n": 15
+    },
+    "script": {
+     "median": 7,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.2,
+     "stddev": 0.45,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 29.8,
+     "stddev": 0.56,
+     "n": 15
+    },
+    "script": {
+     "median": 10.4,
+     "stddev": 0.3,
+     "n": 15
+    },
+    "paint": {
+     "median": 19,
+     "stddev": 0.36,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 23,
+     "stddev": 2.59,
+     "n": 15
+    },
+    "script": {
+     "median": 10,
+     "stddev": 0.91,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.5,
+     "stddev": 1.66,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 12,
+     "stddev": 1.53,
+     "n": 25
+    },
+    "script": {
+     "median": 8.1,
+     "stddev": 0.82,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.5,
+     "stddev": 0.63,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 23.1,
+     "stddev": 1.28,
+     "n": 15
+    },
+    "script": {
+     "median": 8.5,
+     "stddev": 0.64,
+     "n": 15
+    },
+    "paint": {
+     "median": 12.4,
+     "stddev": 1.06,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 16,
+     "stddev": 1.64,
+     "n": 15
+    },
+    "script": {
+     "median": 4.6,
+     "stddev": 0.35,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.7,
+     "stddev": 0.92,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 288.6,
+     "stddev": 5.51,
+     "n": 15
+    },
+    "script": {
+     "median": 62.5,
+     "stddev": 0.65,
+     "n": 15
+    },
+    "paint": {
+     "median": 219,
+     "stddev": 4.81,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 32.6,
+     "stddev": 1.24,
+     "n": 15
+    },
+    "script": {
+     "median": 8.6,
+     "stddev": 0.29,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.8,
+     "stddev": 1.01,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 13.3,
+     "stddev": 1.08,
+     "n": 15
+    },
+    "script": {
+     "median": 10.8,
+     "stddev": 0.95,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.4,
+     "stddev": 0.4,
+     "n": 15
+    }
+   }
+  },
+  "vanillajs-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 21.6,
+     "stddev": 0.39,
+     "n": 15
+    },
+    "script": {
+     "median": 2,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.3,
+     "stddev": 0.37,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 22.5,
+     "stddev": 0.37,
+     "n": 15
+    },
+    "script": {
+     "median": 3.5,
+     "stddev": 0.11,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.5,
+     "stddev": 0.34,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 13.8,
+     "stddev": 6.76,
+     "n": 15
+    },
+    "script": {
+     "median": 0.7,
+     "stddev": 0.35,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.8,
+     "stddev": 2.35,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 2.8,
+     "stddev": 1.98,
+     "n": 25
+    },
+    "script": {
+     "median": 0.1,
+     "stddev": 0.24,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.1,
+     "stddev": 0.48,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 14.9,
+     "stddev": 4.92,
+     "n": 15
+    },
+    "script": {
+     "median": 0.2,
+     "stddev": 0.22,
+     "n": 15
+    },
+    "paint": {
+     "median": 12,
+     "stddev": 1.86,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 11.2,
+     "stddev": 1.67,
+     "n": 15
+    },
+    "script": {
+     "median": 0.5,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 10,
+     "stddev": 0.8,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 222.3,
+     "stddev": 4.49,
+     "n": 15
+    },
+    "script": {
+     "median": 17.4,
+     "stddev": 0.42,
+     "n": 15
+    },
+    "paint": {
+     "median": 197.3,
+     "stddev": 4.24,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 25.1,
+     "stddev": 3.54,
+     "n": 15
+    },
+    "script": {
+     "median": 1.9,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.4,
+     "stddev": 3.29,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 8.9,
+     "stddev": 0.52,
+     "n": 15
+    },
+    "script": {
+     "median": 6.7,
+     "stddev": 0.46,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.2,
+     "stddev": 0.42,
+     "n": 15
+    }
+   }
+  }
+ },
+ "2026-10-07 run 3 (cacheUpdate app, core with all update-path changes; all 7 frameworks). lithent 02/09 and preact-hooks 02/09 were re-measured after later experiments; in the full run lithent was 02 total 33.4 / script 13.2 and 09 total 28.0 / script 25.2, preact-hooks 02 29.9 / 10.4 and 09 15.6 / 12.5": {
+  "lithent-vlocal-build-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 29.5,
+     "stddev": 0.42,
+     "n": 15
+    },
+    "script": {
+     "median": 10.3,
+     "stddev": 0.19,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.6,
+     "stddev": 0.36,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 34.8,
+     "stddev": 0.5,
+     "n": 15
+    },
+    "script": {
+     "median": 13.5,
+     "stddev": 0.31,
+     "n": 15
+    },
+    "paint": {
+     "median": 20.6,
+     "stddev": 0.4,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 22.9,
+     "stddev": 0.86,
+     "n": 15
+    },
+    "script": {
+     "median": 10.3,
+     "stddev": 0.51,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.8,
+     "stddev": 0.65,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 10.5,
+     "stddev": 0.7,
+     "n": 25
+    },
+    "script": {
+     "median": 7,
+     "stddev": 0.41,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.4,
+     "stddev": 0.67,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 22.1,
+     "stddev": 1.09,
+     "n": 15
+    },
+    "script": {
+     "median": 8,
+     "stddev": 0.45,
+     "n": 15
+    },
+    "paint": {
+     "median": 12.5,
+     "stddev": 0.91,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 14.1,
+     "stddev": 0.35,
+     "n": 15
+    },
+    "script": {
+     "median": 3.5,
+     "stddev": 0.12,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.9,
+     "stddev": 0.26,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 302.5,
+     "stddev": 12.49,
+     "n": 15
+    },
+    "script": {
+     "median": 84.9,
+     "stddev": 4.71,
+     "n": 15
+    },
+    "paint": {
+     "median": 210.8,
+     "stddev": 10.18,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 37,
+     "stddev": 2.86,
+     "n": 15
+    },
+    "script": {
+     "median": 13.4,
+     "stddev": 0.99,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.6,
+     "stddev": 1.84,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 26.6,
+     "stddev": 1.08,
+     "n": 15
+    },
+    "script": {
+     "median": 23.6,
+     "stddev": 0.99,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.2,
+     "stddev": 0.49,
+     "n": 15
+    }
+   }
+  },
+  "preact-hooks-v10.27.1-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 25.9,
+     "stddev": 0.33,
+     "n": 15
+    },
+    "script": {
+     "median": 6.6,
+     "stddev": 0.14,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.8,
+     "stddev": 0.34,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 30.5,
+     "stddev": 0.48,
+     "n": 15
+    },
+    "script": {
+     "median": 10.6,
+     "stddev": 0.17,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.4,
+     "stddev": 0.4,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 21.6,
+     "stddev": 1.32,
+     "n": 15
+    },
+    "script": {
+     "median": 9.8,
+     "stddev": 0.56,
+     "n": 15
+    },
+    "paint": {
+     "median": 10,
+     "stddev": 1.13,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 12.7,
+     "stddev": 1.01,
+     "n": 25
+    },
+    "script": {
+     "median": 8.3,
+     "stddev": 0.62,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.9,
+     "stddev": 0.71,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 22.5,
+     "stddev": 1.01,
+     "n": 15
+    },
+    "script": {
+     "median": 8.2,
+     "stddev": 0.56,
+     "n": 15
+    },
+    "paint": {
+     "median": 12.4,
+     "stddev": 0.65,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 14.6,
+     "stddev": 0.53,
+     "n": 15
+    },
+    "script": {
+     "median": 4.1,
+     "stddev": 0.19,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.8,
+     "stddev": 0.51,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 287,
+     "stddev": 7.18,
+     "n": 15
+    },
+    "script": {
+     "median": 62.2,
+     "stddev": 0.83,
+     "n": 15
+    },
+    "paint": {
+     "median": 217.1,
+     "stddev": 6.0,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 32.1,
+     "stddev": 1.24,
+     "n": 15
+    },
+    "script": {
+     "median": 8.4,
+     "stddev": 0.15,
+     "n": 15
+    },
+    "paint": {
+     "median": 22.7,
+     "stddev": 0.98,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 15.1,
+     "stddev": 0.85,
+     "n": 15
+    },
+    "script": {
+     "median": 12.2,
+     "stddev": 0.82,
+     "n": 15
+    },
+    "paint": {
+     "median": 1,
+     "stddev": 0.62,
+     "n": 15
+    }
+   }
+  },
+  "react-hooks-v19.2.0-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 25.6,
+     "stddev": 0.81,
+     "n": 15
+    },
+    "script": {
+     "median": 6.4,
+     "stddev": 0.36,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.7,
+     "stddev": 0.48,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 30.9,
+     "stddev": 0.76,
+     "n": 15
+    },
+    "script": {
+     "median": 11.2,
+     "stddev": 0.46,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.8,
+     "stddev": 0.68,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 15.7,
+     "stddev": 1.96,
+     "n": 15
+    },
+    "script": {
+     "median": 4.6,
+     "stddev": 0.44,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.9,
+     "stddev": 1.07,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 5,
+     "stddev": 1.35,
+     "n": 25
+    },
+    "script": {
+     "median": 1.8,
+     "stddev": 0.38,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.2,
+     "stddev": 0.49,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 92.1,
+     "stddev": 2.14,
+     "n": 15
+    },
+    "script": {
+     "median": 19.1,
+     "stddev": 0.82,
+     "n": 15
+    },
+    "paint": {
+     "median": 70.7,
+     "stddev": 2.43,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 13.6,
+     "stddev": 1.07,
+     "n": 15
+    },
+    "script": {
+     "median": 1.3,
+     "stddev": 0.15,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.9,
+     "stddev": 0.35,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 434.6,
+     "stddev": 18.96,
+     "n": 15
+    },
+    "script": {
+     "median": 215.2,
+     "stddev": 16.32,
+     "n": 15
+    },
+    "paint": {
+     "median": 213.4,
+     "stddev": 3.52,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 34.6,
+     "stddev": 2.57,
+     "n": 15
+    },
+    "script": {
+     "median": 7.5,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "paint": {
+     "median": 25.4,
+     "stddev": 2.08,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 20.3,
+     "stddev": 0.97,
+     "n": 15
+    },
+    "script": {
+     "median": 17.5,
+     "stddev": 0.93,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.3,
+     "stddev": 0.59,
+     "n": 15
+    }
+   }
+  },
+  "solid-v1.9.3-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 22.5,
+     "stddev": 0.81,
+     "n": 15
+    },
+    "script": {
+     "median": 2.9,
+     "stddev": 0.11,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.3,
+     "stddev": 0.74,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 24.5,
+     "stddev": 0.39,
+     "n": 15
+    },
+    "script": {
+     "median": 5.1,
+     "stddev": 0.13,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.9,
+     "stddev": 0.31,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 11.3,
+     "stddev": 1.58,
+     "n": 15
+    },
+    "script": {
+     "median": 0.8,
+     "stddev": 0.35,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.1,
+     "stddev": 1.19,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 5.1,
+     "stddev": 2.71,
+     "n": 25
+    },
+    "script": {
+     "median": 0.3,
+     "stddev": 0.33,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.2,
+     "stddev": 0.45,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 13.8,
+     "stddev": 3.97,
+     "n": 15
+    },
+    "script": {
+     "median": 1.1,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.4,
+     "stddev": 1.12,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 12.3,
+     "stddev": 1.63,
+     "n": 15
+    },
+    "script": {
+     "median": 0.4,
+     "stddev": 0.12,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.5,
+     "stddev": 0.27,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 239.1,
+     "stddev": 4.64,
+     "n": 15
+    },
+    "script": {
+     "median": 24.6,
+     "stddev": 0.67,
+     "n": 15
+    },
+    "paint": {
+     "median": 207.1,
+     "stddev": 3.73,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 28.9,
+     "stddev": 0.97,
+     "n": 15
+    },
+    "script": {
+     "median": 3.1,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 24.5,
+     "stddev": 0.82,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 12.8,
+     "stddev": 1.34,
+     "n": 15
+    },
+    "script": {
+     "median": 10,
+     "stddev": 1.21,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.6,
+     "stddev": 0.46,
+     "n": 15
+    }
+   }
+  },
+  "svelte-v5.42.1-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 22,
+     "stddev": 0.78,
+     "n": 15
+    },
+    "script": {
+     "median": 3.3,
+     "stddev": 0.17,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.4,
+     "stddev": 0.62,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 25.9,
+     "stddev": 0.41,
+     "n": 15
+    },
+    "script": {
+     "median": 6.4,
+     "stddev": 0.12,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.9,
+     "stddev": 0.36,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 12.9,
+     "stddev": 3.92,
+     "n": 15
+    },
+    "script": {
+     "median": 1.7,
+     "stddev": 0.31,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.8,
+     "stddev": 1.11,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 6.2,
+     "stddev": 1.36,
+     "n": 25
+    },
+    "script": {
+     "median": 2.9,
+     "stddev": 0.57,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.4,
+     "stddev": 0.62,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 14.4,
+     "stddev": 4.05,
+     "n": 15
+    },
+    "script": {
+     "median": 1.7,
+     "stddev": 0.39,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.5,
+     "stddev": 1.07,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 11.4,
+     "stddev": 2.41,
+     "n": 15
+    },
+    "script": {
+     "median": 0.8,
+     "stddev": 0.17,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.8,
+     "stddev": 0.27,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 239.4,
+     "stddev": 6.37,
+     "n": 15
+    },
+    "script": {
+     "median": 26.7,
+     "stddev": 1.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 205.4,
+     "stddev": 4.53,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 28.4,
+     "stddev": 1.11,
+     "n": 15
+    },
+    "script": {
+     "median": 3.7,
+     "stddev": 0.15,
+     "n": 15
+    },
+    "paint": {
+     "median": 23.8,
+     "stddev": 0.81,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 13,
+     "stddev": 1.0,
+     "n": 15
+    },
+    "script": {
+     "median": 10.3,
+     "stddev": 0.96,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.3,
+     "stddev": 0.57,
+     "n": 15
+    }
+   }
+  },
+  "vanillajs-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 21.4,
+     "stddev": 0.61,
+     "n": 15
+    },
+    "script": {
+     "median": 1.9,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.1,
+     "stddev": 0.52,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 22.5,
+     "stddev": 0.19,
+     "n": 15
+    },
+    "script": {
+     "median": 3.5,
+     "stddev": 0.08,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.6,
+     "stddev": 0.16,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 11,
+     "stddev": 4.96,
+     "n": 15
+    },
+    "script": {
+     "median": 0.6,
+     "stddev": 0.28,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.3,
+     "stddev": 0.8,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 2.9,
+     "stddev": 3.64,
+     "n": 25
+    },
+    "script": {
+     "median": 0.1,
+     "stddev": 0.17,
+     "n": 25
+    },
+    "paint": {
+     "median": 1.9,
+     "stddev": 0.5,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 13.9,
+     "stddev": 5.97,
+     "n": 15
+    },
+    "script": {
+     "median": 0.3,
+     "stddev": 0.33,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.6,
+     "stddev": 1.62,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 14.4,
+     "stddev": 2.77,
+     "n": 15
+    },
+    "script": {
+     "median": 0.4,
+     "stddev": 0.14,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.5,
+     "stddev": 0.82,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 224.2,
+     "stddev": 5.54,
+     "n": 15
+    },
+    "script": {
+     "median": 17.5,
+     "stddev": 0.56,
+     "n": 15
+    },
+    "paint": {
+     "median": 199.4,
+     "stddev": 4.68,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 26.7,
+     "stddev": 0.96,
+     "n": 15
+    },
+    "script": {
+     "median": 2,
+     "stddev": 0.11,
+     "n": 15
+    },
+    "paint": {
+     "median": 23.9,
+     "stddev": 0.75,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 9.5,
+     "stddev": 0.59,
+     "n": 15
+    },
+    "script": {
+     "median": 7.2,
+     "stddev": 0.57,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.3,
+     "stddev": 0.56,
+     "n": 15
+    }
+   }
+  },
+  "vue-v3.6.0-alpha.2-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 25.6,
+     "stddev": 1.62,
+     "n": 15
+    },
+    "script": {
+     "median": 6.1,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "paint": {
+     "median": 19,
+     "stddev": 1.3,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 28.4,
+     "stddev": 0.73,
+     "n": 15
+    },
+    "script": {
+     "median": 8.8,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 19,
+     "stddev": 0.66,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 15,
+     "stddev": 3.9,
+     "n": 15
+    },
+    "script": {
+     "median": 3.1,
+     "stddev": 0.35,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.4,
+     "stddev": 1.14,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 4.5,
+     "stddev": 2.7,
+     "n": 25
+    },
+    "script": {
+     "median": 1.2,
+     "stddev": 0.29,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.3,
+     "stddev": 0.57,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 14.7,
+     "stddev": 5.17,
+     "n": 15
+    },
+    "script": {
+     "median": 1.6,
+     "stddev": 0.34,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.5,
+     "stddev": 1.09,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 12.8,
+     "stddev": 0.59,
+     "n": 15
+    },
+    "script": {
+     "median": 2.5,
+     "stddev": 0.17,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.8,
+     "stddev": 0.5,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 269.1,
+     "stddev": 4.35,
+     "n": 15
+    },
+    "script": {
+     "median": 50.6,
+     "stddev": 0.96,
+     "n": 15
+    },
+    "paint": {
+     "median": 211.7,
+     "stddev": 2.98,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 31.5,
+     "stddev": 1.23,
+     "n": 15
+    },
+    "script": {
+     "median": 6.2,
+     "stddev": 0.17,
+     "n": 15
+    },
+    "paint": {
+     "median": 23.9,
+     "stddev": 0.99,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 15,
+     "stddev": 1.09,
+     "n": 15
+    },
+    "script": {
+     "median": 12.1,
+     "stddev": 0.86,
+     "n": 15
+    },
+    "paint": {
+     "median": 1,
+     "stddev": 0.65,
+     "n": 15
+    }
+   }
+  }
+ }
+}

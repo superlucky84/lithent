@@ -15,7 +15,7 @@
 | 보안 | CSP 페이지에서 도나. 취약점은 어디로 신고하나 | [/SECURITY.md](../../SECURITY.md), [SECURITY_REVIEW.md](./SECURITY_REVIEW.md), `e2e/csp.spec.ts` | 작성·검증 완료 — 신고 창구 활성화 필요 |
 | 탈출구 | 나중에 걷어낼 수 있나 | [EXIT.md](./EXIT.md) | 작성 완료 |
 | 테스트 | 이걸로 만든 컴포넌트를 어떻게 테스트하나 | `lithent/test` (render·쿼리·이벤트 유틸) | 대기 — 설계 필요 |
-| 성능 증거 | "가볍다"는 근거가 제3자 숫자로 있나 | js-framework-benchmark 등재, 저사양 기기 실측 | 대기 — 내부 벤치만 있음 (`docs/performance-improvement/bench`) |
+| 성능 증거 | "가볍다"는 근거가 제3자 숫자로 있나 | js-framework-benchmark 등재, 저사양 기기 실측 | 진행 중 — 로컬 측정·원인 분석 완료, 등재 보류 — [../benchmark/STATUS.md](../benchmark/STATUS.md) |
 | 레퍼런스 | 실제로 쓰는 곳이 있나 | 실서비스 사례 1~2건 | 대기 — 적용처 필요 |
 
 ## 확정 필요
