@@ -2796,5 +2796,1202 @@
     }
    }
   }
+ },
+ "2026-10-07 run 4 (cacheUpdate app, core 71e54c1: listeners left on discarded DOM; all 7 frameworks installed with npm ci, so the versions in the names are the installed ones)": {
+  "lithent-vlocal-build-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 28.1,
+     "stddev": 0.95,
+     "n": 15
+    },
+    "script": {
+     "median": 9.9,
+     "stddev": 0.44,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.8,
+     "stddev": 0.49,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 32,
+     "stddev": 1.02,
+     "n": 15
+    },
+    "script": {
+     "median": 12.2,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "paint": {
+     "median": 19.4,
+     "stddev": 0.79,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 21,
+     "stddev": 0.89,
+     "n": 15
+    },
+    "script": {
+     "median": 9.8,
+     "stddev": 0.38,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.3,
+     "stddev": 0.58,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 9.7,
+     "stddev": 1.06,
+     "n": 25
+    },
+    "script": {
+     "median": 6.6,
+     "stddev": 0.34,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.3,
+     "stddev": 0.54,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 21.2,
+     "stddev": 0.64,
+     "n": 15
+    },
+    "script": {
+     "median": 8,
+     "stddev": 0.49,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.9,
+     "stddev": 0.57,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 14,
+     "stddev": 0.3,
+     "n": 15
+    },
+    "script": {
+     "median": 3.5,
+     "stddev": 0.15,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.8,
+     "stddev": 0.27,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 289.3,
+     "stddev": 2.15,
+     "n": 15
+    },
+    "script": {
+     "median": 83.8,
+     "stddev": 1.22,
+     "n": 15
+    },
+    "paint": {
+     "median": 199,
+     "stddev": 1.76,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 34.1,
+     "stddev": 0.29,
+     "n": 15
+    },
+    "script": {
+     "median": 11.7,
+     "stddev": 0.09,
+     "n": 15
+    },
+    "paint": {
+     "median": 21.4,
+     "stddev": 0.25,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 18.2,
+     "stddev": 0.79,
+     "n": 15
+    },
+    "script": {
+     "median": 16.3,
+     "stddev": 0.66,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.1,
+     "stddev": 0.46,
+     "n": 15
+    }
+   }
+  },
+  "preact-hooks-v10.27.1-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 24.3,
+     "stddev": 0.29,
+     "n": 15
+    },
+    "script": {
+     "median": 6.3,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.6,
+     "stddev": 0.24,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 33.2,
+     "stddev": 0.87,
+     "n": 15
+    },
+    "script": {
+     "median": 14.2,
+     "stddev": 0.99,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.5,
+     "stddev": 0.25,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 20.9,
+     "stddev": 0.62,
+     "n": 15
+    },
+    "script": {
+     "median": 9.4,
+     "stddev": 0.47,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.6,
+     "stddev": 0.67,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 13.1,
+     "stddev": 1.75,
+     "n": 25
+    },
+    "script": {
+     "median": 9.5,
+     "stddev": 1.55,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.1,
+     "stddev": 0.59,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 24.1,
+     "stddev": 0.86,
+     "n": 15
+    },
+    "script": {
+     "median": 9.7,
+     "stddev": 0.41,
+     "n": 15
+    },
+    "paint": {
+     "median": 12.1,
+     "stddev": 0.89,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 15.3,
+     "stddev": 0.48,
+     "n": 15
+    },
+    "script": {
+     "median": 4.9,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.9,
+     "stddev": 0.31,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 278.8,
+     "stddev": 9.76,
+     "n": 15
+    },
+    "script": {
+     "median": 64.1,
+     "stddev": 1.4,
+     "n": 15
+    },
+    "paint": {
+     "median": 207.6,
+     "stddev": 7.6,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 31.5,
+     "stddev": 0.4,
+     "n": 15
+    },
+    "script": {
+     "median": 9,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "paint": {
+     "median": 21.5,
+     "stddev": 0.26,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 12.7,
+     "stddev": 0.33,
+     "n": 15
+    },
+    "script": {
+     "median": 10.5,
+     "stddev": 0.39,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.4,
+     "stddev": 0.45,
+     "n": 15
+    }
+   }
+  },
+  "react-hooks-v19.2.0-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 24.1,
+     "stddev": 0.3,
+     "n": 15
+    },
+    "script": {
+     "median": 6,
+     "stddev": 0.09,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.6,
+     "stddev": 0.21,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 29.5,
+     "stddev": 0.68,
+     "n": 15
+    },
+    "script": {
+     "median": 11,
+     "stddev": 0.56,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.2,
+     "stddev": 0.32,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 14.8,
+     "stddev": 0.42,
+     "n": 15
+    },
+    "script": {
+     "median": 4.2,
+     "stddev": 0.33,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.1,
+     "stddev": 0.43,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 7.8,
+     "stddev": 2.03,
+     "n": 25
+    },
+    "script": {
+     "median": 2,
+     "stddev": 0.24,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.2,
+     "stddev": 0.46,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 89.9,
+     "stddev": 3.59,
+     "n": 15
+    },
+    "script": {
+     "median": 19.3,
+     "stddev": 0.62,
+     "n": 15
+    },
+    "paint": {
+     "median": 68.6,
+     "stddev": 3.18,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 14.2,
+     "stddev": 0.99,
+     "n": 15
+    },
+    "script": {
+     "median": 1.3,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.8,
+     "stddev": 0.27,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 394.1,
+     "stddev": 16.62,
+     "n": 15
+    },
+    "script": {
+     "median": 185.3,
+     "stddev": 16.81,
+     "n": 15
+    },
+    "paint": {
+     "median": 201.9,
+     "stddev": 1.93,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 28.9,
+     "stddev": 0.34,
+     "n": 15
+    },
+    "script": {
+     "median": 6.7,
+     "stddev": 0.14,
+     "n": 15
+    },
+    "paint": {
+     "median": 21.2,
+     "stddev": 0.28,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 17.3,
+     "stddev": 0.32,
+     "n": 15
+    },
+    "script": {
+     "median": 15.2,
+     "stddev": 0.32,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.3,
+     "stddev": 0.43,
+     "n": 15
+    }
+   }
+  },
+  "solid-v1.9.3-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 20.4,
+     "stddev": 0.24,
+     "n": 15
+    },
+    "script": {
+     "median": 2.5,
+     "stddev": 0.05,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.6,
+     "stddev": 0.21,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 23.4,
+     "stddev": 0.52,
+     "n": 15
+    },
+    "script": {
+     "median": 4.8,
+     "stddev": 0.19,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.1,
+     "stddev": 0.33,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 11.3,
+     "stddev": 5.56,
+     "n": 15
+    },
+    "script": {
+     "median": 0.9,
+     "stddev": 0.26,
+     "n": 15
+    },
+    "paint": {
+     "median": 8.9,
+     "stddev": 0.51,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 6.7,
+     "stddev": 3.15,
+     "n": 25
+    },
+    "script": {
+     "median": 0.1,
+     "stddev": 0.28,
+     "n": 25
+    },
+    "paint": {
+     "median": 2,
+     "stddev": 0.41,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 13.6,
+     "stddev": 6.69,
+     "n": 15
+    },
+    "script": {
+     "median": 1,
+     "stddev": 0.32,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.8,
+     "stddev": 0.61,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 14.1,
+     "stddev": 2.62,
+     "n": 15
+    },
+    "script": {
+     "median": 0.5,
+     "stddev": 0.07,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.5,
+     "stddev": 0.38,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 227.1,
+     "stddev": 1.79,
+     "n": 15
+    },
+    "script": {
+     "median": 22.1,
+     "stddev": 0.24,
+     "n": 15
+    },
+    "paint": {
+     "median": 198.4,
+     "stddev": 1.61,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 24.1,
+     "stddev": 0.32,
+     "n": 15
+    },
+    "script": {
+     "median": 2.7,
+     "stddev": 0.06,
+     "n": 15
+    },
+    "paint": {
+     "median": 20.7,
+     "stddev": 0.26,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 10.5,
+     "stddev": 0.94,
+     "n": 15
+    },
+    "script": {
+     "median": 8.3,
+     "stddev": 0.81,
+     "n": 15
+    },
+    "paint": {
+     "median": 1,
+     "stddev": 0.57,
+     "n": 15
+    }
+   }
+  },
+  "svelte-v5.42.1-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 20.8,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "script": {
+     "median": 2.9,
+     "stddev": 0.07,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.5,
+     "stddev": 0.21,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 24.2,
+     "stddev": 0.68,
+     "n": 15
+    },
+    "script": {
+     "median": 5.7,
+     "stddev": 0.29,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.9,
+     "stddev": 0.44,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 11.6,
+     "stddev": 0.81,
+     "n": 15
+    },
+    "script": {
+     "median": 1.5,
+     "stddev": 0.29,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.1,
+     "stddev": 0.56,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 5.2,
+     "stddev": 1.58,
+     "n": 25
+    },
+    "script": {
+     "median": 1.8,
+     "stddev": 0.28,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.3,
+     "stddev": 0.46,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 13.9,
+     "stddev": 1.2,
+     "n": 15
+    },
+    "script": {
+     "median": 1.4,
+     "stddev": 0.26,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.3,
+     "stddev": 1.05,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 13.1,
+     "stddev": 0.88,
+     "n": 15
+    },
+    "script": {
+     "median": 0.6,
+     "stddev": 0.13,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.6,
+     "stddev": 0.19,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 230.7,
+     "stddev": 1.68,
+     "n": 15
+    },
+    "script": {
+     "median": 24.6,
+     "stddev": 0.46,
+     "n": 15
+    },
+    "paint": {
+     "median": 199.7,
+     "stddev": 1.63,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 24.6,
+     "stddev": 0.49,
+     "n": 15
+    },
+    "script": {
+     "median": 2.9,
+     "stddev": 0.09,
+     "n": 15
+    },
+    "paint": {
+     "median": 20.9,
+     "stddev": 0.41,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 10.9,
+     "stddev": 0.77,
+     "n": 15
+    },
+    "script": {
+     "median": 8.5,
+     "stddev": 0.4,
+     "n": 15
+    },
+    "paint": {
+     "median": 1,
+     "stddev": 0.5,
+     "n": 15
+    }
+   }
+  },
+  "vanillajs-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 19.5,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "script": {
+     "median": 1.7,
+     "stddev": 0.03,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.4,
+     "stddev": 0.25,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 21,
+     "stddev": 0.36,
+     "n": 15
+    },
+    "script": {
+     "median": 3.2,
+     "stddev": 0.08,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.3,
+     "stddev": 0.28,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 10.5,
+     "stddev": 6.2,
+     "n": 15
+    },
+    "script": {
+     "median": 0.5,
+     "stddev": 0.31,
+     "n": 15
+    },
+    "paint": {
+     "median": 8.6,
+     "stddev": 0.6,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 2.9,
+     "stddev": 0.44,
+     "n": 25
+    },
+    "script": {
+     "median": 0.3,
+     "stddev": 0.25,
+     "n": 25
+    },
+    "paint": {
+     "median": 1.9,
+     "stddev": 0.43,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 11.7,
+     "stddev": 0.57,
+     "n": 15
+    },
+    "script": {
+     "median": 0.1,
+     "stddev": 0.26,
+     "n": 15
+    },
+    "paint": {
+     "median": 10.4,
+     "stddev": 0.6,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 10.2,
+     "stddev": 0.22,
+     "n": 15
+    },
+    "script": {
+     "median": 0.4,
+     "stddev": 0.09,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.3,
+     "stddev": 0.28,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 210.7,
+     "stddev": 1.71,
+     "n": 15
+    },
+    "script": {
+     "median": 15.8,
+     "stddev": 0.18,
+     "n": 15
+    },
+    "paint": {
+     "median": 188.5,
+     "stddev": 1.18,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 22.6,
+     "stddev": 0.26,
+     "n": 15
+    },
+    "script": {
+     "median": 1.7,
+     "stddev": 0.05,
+     "n": 15
+    },
+    "paint": {
+     "median": 20.1,
+     "stddev": 0.24,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 8.8,
+     "stddev": 1.57,
+     "n": 15
+    },
+    "script": {
+     "median": 6.6,
+     "stddev": 0.39,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.1,
+     "stddev": 0.5,
+     "n": 15
+    }
+   }
+  },
+  "vue-v3.6.0-alpha.2-keyed": {
+   "01_run1k": {
+    "total": {
+     "median": 23.6,
+     "stddev": 0.44,
+     "n": 15
+    },
+    "script": {
+     "median": 5.5,
+     "stddev": 0.16,
+     "n": 15
+    },
+    "paint": {
+     "median": 17.6,
+     "stddev": 0.32,
+     "n": 15
+    }
+   },
+   "02_replace1k": {
+    "total": {
+     "median": 26.4,
+     "stddev": 0.25,
+     "n": 15
+    },
+    "script": {
+     "median": 7.9,
+     "stddev": 0.11,
+     "n": 15
+    },
+    "paint": {
+     "median": 18.1,
+     "stddev": 0.19,
+     "n": 15
+    }
+   },
+   "03_update10th1k_x16": {
+    "total": {
+     "median": 13.7,
+     "stddev": 4.35,
+     "n": 15
+    },
+    "script": {
+     "median": 2.9,
+     "stddev": 0.33,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.7,
+     "stddev": 0.89,
+     "n": 15
+    }
+   },
+   "04_select1k": {
+    "total": {
+     "median": 3.8,
+     "stddev": 0.74,
+     "n": 25
+    },
+    "script": {
+     "median": 1.2,
+     "stddev": 0.24,
+     "n": 25
+    },
+    "paint": {
+     "median": 2.1,
+     "stddev": 0.38,
+     "n": 25
+    }
+   },
+   "05_swap1k": {
+    "total": {
+     "median": 14.3,
+     "stddev": 0.58,
+     "n": 15
+    },
+    "script": {
+     "median": 1.5,
+     "stddev": 0.36,
+     "n": 15
+    },
+    "paint": {
+     "median": 11.8,
+     "stddev": 0.43,
+     "n": 15
+    }
+   },
+   "06_remove-one-1k": {
+    "total": {
+     "median": 12.8,
+     "stddev": 0.27,
+     "n": 15
+    },
+    "script": {
+     "median": 2.5,
+     "stddev": 0.1,
+     "n": 15
+    },
+    "paint": {
+     "median": 9.7,
+     "stddev": 0.21,
+     "n": 15
+    }
+   },
+   "07_create10k": {
+    "total": {
+     "median": 259.1,
+     "stddev": 1.44,
+     "n": 15
+    },
+    "script": {
+     "median": 48.1,
+     "stddev": 0.73,
+     "n": 15
+    },
+    "paint": {
+     "median": 204,
+     "stddev": 1.3,
+     "n": 15
+    }
+   },
+   "08_create1k-after1k_x2": {
+    "total": {
+     "median": 27.3,
+     "stddev": 0.37,
+     "n": 15
+    },
+    "script": {
+     "median": 5.4,
+     "stddev": 0.09,
+     "n": 15
+    },
+    "paint": {
+     "median": 21,
+     "stddev": 0.27,
+     "n": 15
+    }
+   },
+   "09_clear1k_x8": {
+    "total": {
+     "median": 12.1,
+     "stddev": 0.47,
+     "n": 15
+    },
+    "script": {
+     "median": 9.9,
+     "stddev": 0.43,
+     "n": 15
+    },
+    "paint": {
+     "median": 1.1,
+     "stddev": 0.71,
+     "n": 15
+    }
+   }
+  }
+ },
+ "2026-10-07 run 4 memory, MB (lithent/vanillajs/preact-hooks/react-hooks)": {
+  "lithent-vlocal-build-keyed": {
+   "21_ready-memory": {
+    "median": 0.56,
+    "stddev": null,
+    "n": 1
+   },
+   "22_run-memory": {
+    "median": 4.27,
+    "stddev": null,
+    "n": 1
+   },
+   "23_update5-memory": {
+    "median": 5.5,
+    "stddev": null,
+    "n": 1
+   },
+   "25_run-clear-memory": {
+    "median": 0.9,
+    "stddev": null,
+    "n": 1
+   },
+   "26_run-10k-memory": {
+    "median": 35.07,
+    "stddev": null,
+    "n": 1
+   }
+  },
+  "preact-hooks-v10.27.1-keyed": {
+   "21_ready-memory": {
+    "median": 0.61,
+    "stddev": null,
+    "n": 1
+   },
+   "22_run-memory": {
+    "median": 3.21,
+    "stddev": null,
+    "n": 1
+   },
+   "23_update5-memory": {
+    "median": 3.33,
+    "stddev": null,
+    "n": 1
+   },
+   "25_run-clear-memory": {
+    "median": 0.78,
+    "stddev": null,
+    "n": 1
+   },
+   "26_run-10k-memory": {
+    "median": 26.24,
+    "stddev": null,
+    "n": 1
+   }
+  },
+  "react-hooks-v19.2.0-keyed": {
+   "21_ready-memory": {
+    "median": 1.16,
+    "stddev": null,
+    "n": 1
+   },
+   "22_run-memory": {
+    "median": 4.42,
+    "stddev": null,
+    "n": 1
+   },
+   "23_update5-memory": {
+    "median": 4.84,
+    "stddev": null,
+    "n": 1
+   },
+   "25_run-clear-memory": {
+    "median": 1.98,
+    "stddev": null,
+    "n": 1
+   },
+   "26_run-10k-memory": {
+    "median": 30.71,
+    "stddev": null,
+    "n": 1
+   }
+  },
+  "vanillajs-keyed": {
+   "21_ready-memory": {
+    "median": 0.55,
+    "stddev": null,
+    "n": 1
+   },
+   "22_run-memory": {
+    "median": 1.88,
+    "stddev": null,
+    "n": 1
+   },
+   "23_update5-memory": {
+    "median": 1.87,
+    "stddev": null,
+    "n": 1
+   },
+   "25_run-clear-memory": {
+    "median": 0.54,
+    "stddev": null,
+    "n": 1
+   },
+   "26_run-10k-memory": {
+    "median": 12.9,
+    "stddev": null,
+    "n": 1
+   }
+  }
  }
 }
