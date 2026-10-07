@@ -32,7 +32,7 @@ REQUIREMENTS / DESIGN / IMPLEMENT / MANUAL_TEST_CHECKLIST를 만들고 여기서
 | 자리 | 문제 | lithent의 답 | 필요한 기능 |
 |---|---|---|---|
 | **외부에 심는 위젯 / SDK** (결제창, 상담 채팅, 광고, 공통 헤더) | React SDK는 40KB+, 호스트의 React 버전·CSS와 충돌 | 4KB + Shadow DOM 격리 | **`lithent/element`** (§3.1) |
-| **레거시 서버 렌더링 페이지** (JSP, Thymeleaf, PHP) | SPA 전환 예산 없음, jQuery 스파게티 | 빌드 없이 영역 단위 컴포넌트화 | **`autoMount` 아일랜드** (§3.2) |
+| **레거시 서버 렌더링 페이지** (JSP, Thymeleaf, PHP) | SPA 전환 예산 없음, jQuery 스파게티 | 빌드 없이 영역 단위 컴포넌트화 | `lithent/element`의 `shadow: false` (§3.2 — `autoMount`는 보류) |
 | **폼 많은 백오피스** | 편집 중 덮어쓰기 사고 | draft 격리 + 충돌 표시 | **Draft Boundary** (§3.3) |
 
 ### 2.2 기능보다 먼저 채워야 할 도입 승인 체크리스트
@@ -57,15 +57,29 @@ defineElement('pay-button', PayButton, { shadow: true, props: { amount: Number }
 
 "React 사이트든 jQuery 사이트든 5KB로 어디에나 심는다." → [../element/](../element/)
 
-### 3.2 `autoMount` — 서버 HTML 위의 선언형 아일랜드
+### 3.2 `autoMount` — 서버 HTML 위의 선언형 아일랜드 ⛔ 보류 (2026-10-07)
 
 ```html
 <div data-lithent="OrderTable" data-props='{"orderId":42}'>서버가 그린 HTML</div>
 <script>lithent.autoMount({ OrderTable })</script>
 ```
 
-경쟁: Alpine.js, htmx, Stimulus. 차별점: 컴포넌트·상태·hydration까지 있는 구조화된 대안.
-`lithent/element`의 속성→props 변환 규칙을 재사용할 수 있다.
+경쟁: Alpine.js, htmx, Stimulus. 차별점으로 삼으려던 것: 컴포넌트·상태·hydration까지 있는 구조화된 대안.
+
+**보류 사유 — 현실성이 없다.**
+
+- hydration은 서버 HTML을 파싱해 가상 DOM을 만드는 것이 아니라, 컴포넌트(JS)가 만든 가상 DOM을
+  기존 DOM과 태그 구조로 대조하는 것이다. JSP·PHP 서버는 JSX를 실행할 수 없으므로 같은 마크업을
+  서버 템플릿과 JSX에 **손으로 두 번** 써서 구조를 맞춰야 한다. 유지보수가 안 된다.
+- hydration을 빼고 "지우고 새로 그리기"로 가면 `lithent/element`의 `shadow: false`와 같은 물건이
+  된다. light DOM 엘리먼트는 연결될 때 서버가 그린 자식을 비우고 렌더하고, `Object` prop은 속성의
+  JSON을 받으며, 나중에 삽입된 HTML도 브라우저가 업그레이드한다.
+
+```html
+<order-table order-id="42">서버가 그린 HTML</order-table>
+```
+
+레거시 서버 페이지 공략(§2.1)은 새 기능 없이 `lithent/element`로 한다.
 
 ### 3.3 Draft Boundary — "모든 폼이 트랜잭션"
 
@@ -114,8 +128,8 @@ state-ref의 React/Vue/Svelte/Solid 커넥터로 기존 앱 안에 lithent 위�
 | 순위 | 항목 | 근거 | 상태 |
 |---|---|---|---|
 | 1 | `lithent/element` (§3.1) | 구현 작음, 포지션 명확 (코어는 버그 B-1 수정만) | **구현·검증 완료 (2026-10-06)**, 출하 버전 결정 대기 — [../element/](../element/) |
-| 2 | `autoMount` (§3.2) | 레거시 현대화 시장, 1의 변환 규칙 재사용 | 대기 |
-| 3 | 도입 체크리스트 (§2.2) | 기능과 무관하게 승인에 필요 | 대기 |
+| 2 | `autoMount` (§3.2) | 레거시 현대화 시장, 1의 변환 규칙 재사용 | **보류 (2026-10-07)** — 서버·클라이언트 마크업 이중 작성이 필요해 현실성 없음. 1의 `shadow: false`로 대체 |
+| 3 | 도입 체크리스트 (§2.2) | 기능과 무관하게 승인에 필요 | **진행 중 (2026-10-07)** — 보안·지속성·탈출구 문서 초안 작성, `lithent/test`·벤치마크 등재·레퍼런스는 대기 — [../adoption/](../adoption/) |
 | 4 | Draft Boundary (§3.3) | 차별성 최대, state-ref 기능 그대로 활용 | 대기 |
 | 5 | AI 샌드박스 (§3.4) | 4 위에 얹음 | 대기 |
 | 6 | 인과 추적 (§3.5) | 기존 write journal 활용 | 대기 |
