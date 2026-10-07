@@ -1,7 +1,7 @@
 import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent } from '@/utils';
-import { typeDeleteUnused, recursiveRemoveEvent } from '@/render';
+import { typeDeleteUnused } from '@/render';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
@@ -79,7 +79,6 @@ const inheritPropForRender = (
   if (needRerender === 'D' || needRerender === 'R' || needRerender === 'S') {
     if (originalWDom) {
       runUnmountQueueFromWDom(originalWDom);
-      recursiveRemoveEvent(originalWDom);
     }
     remakeWDom.oc = originalWDom && originalWDom.children;
   }

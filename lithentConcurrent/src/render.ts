@@ -121,29 +121,14 @@ export const render = (
     const compData = componentMap.get(wDom.compProps || {});
     const comp = (compData && compData.vd.value) || wDom;
     runUnmountQueueFromWDom(comp);
-    recursiveRemoveEvent(comp);
     rootDelete(comp);
   };
-};
-
-export const recursiveRemoveEvent = (originalWDom: WDom) => {
-  if (originalWDom.props && originalWDom.el) {
-    removeEvent(originalWDom.props, originalWDom.el);
-  }
-
-  (originalWDom.children || []).forEach((childItem: WDom) => {
-    recursiveRemoveEvent(childItem);
-  });
 };
 
 const rootDelete = (newWDom: WDom) =>
   deleteRealDom(newWDom, newWDom.we as HTMLElement);
 
 export const typeDelete = (newWDom: WDom) => {
-  if (newWDom.op && newWDom.el) {
-    removeEvent(newWDom.op, newWDom.el);
-  }
-
   const parentWDom = getParent(newWDom);
   const parentElement = newWDom.isRoot
     ? newWDom.we
@@ -218,12 +203,12 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
 };
 
 /**
- * Unmount, detach events, and remove unused keyed children.
+ * Unmount and remove unused keyed children. Listeners are left on the
+ * discarded DOM and go away with it.
  */
 export const typeDeleteUnused = (items: WDom[]) => {
   items.forEach(item => {
     runUnmountQueueFromWDom(item);
-    recursiveRemoveEvent(item);
     typeDelete(item);
   });
 };
@@ -361,20 +346,6 @@ const typeReplace = (newWDom: WDom) => {
       if (parentElement && newWDom.tag !== 'portal') {
         parentElement.replaceChild(newElement, orignalElement);
       }
-    }
-  }
-};
-
-const removeEvent = (
-  oldProps: Props,
-  element: HTMLElement | DocumentFragment | Text
-) => {
-  for (const dataKey in oldProps) {
-    if (dataKey[0] === 'o' && dataKey[1] === 'n') {
-      element.removeEventListener(
-        dataKey.slice(2).toLowerCase(),
-        oldProps[dataKey] as (e: Event) => void
-      );
     }
   }
 };
@@ -670,6 +641,16 @@ const updateProps = (
       continue;
     }
 
+    if (dataKey[0] === 'o' && dataKey[1] === 'n') {
+      updateEvent(
+        element as HTMLElement,
+        dataKey,
+        undefined,
+        originalProps[dataKey] as (e: Event) => void
+      );
+      continue;
+    }
+
     (element as HTMLElement).removeAttribute(dataKey);
     // A prop that went in as a custom element property is unset there too
     // (B-4). Not upgraded yet: drop the value kept for it (B-3); `delete`
@@ -788,7 +769,7 @@ const wDomChildrenToDom = (
 const updateEvent = (
   element: HTMLElement,
   eventKey: string,
-  newEventHandler: (e: Event) => void,
+  newEventHandler: ((e: Event) => void) | undefined,
   oldEventHandler: (e: Event) => void
 ) => {
   const eventName = eventKey.slice(2).toLowerCase();
