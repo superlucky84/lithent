@@ -18,18 +18,66 @@ export const edits = {
 };`
       );
     }
+    return code;
+  },
+  // Puts back the per-node listener removal the core did before it left
+  // listeners on discarded DOM. Baseline for measuring that change.
+  detach(code, id) {
     if (id.endsWith('/src/render.ts')) {
       code = replace(
         code,
-        `  (originalWDom.children || []).forEach((childItem: WDom) => {
-    recursiveRemoveEvent(childItem);
-  });`,
-        `  const children = originalWDom.children;
-  if (children) {
-    for (let i = 0, length = children.length; i < length; i++) {
-      recursiveRemoveEvent(children[i]);
+        '    runUnmountQueueFromWDom(comp);\n',
+        '    runUnmountQueueFromWDom(comp);\n    recursiveRemoveEvent(comp);\n'
+      );
+      code = replace(
+        code,
+        '    runUnmountQueueFromWDom(item);\n',
+        '    runUnmountQueueFromWDom(item);\n    recursiveRemoveEvent(item);\n'
+      );
+      code = replace(
+        code,
+        'export const typeDelete = (newWDom: WDom) => {\n',
+        `const removeEvent = (
+  oldProps: Props,
+  element: HTMLElement | DocumentFragment | Text
+) => {
+  for (const dataKey in oldProps) {
+    if (dataKey[0] === 'o' && dataKey[1] === 'n') {
+      element.removeEventListener(
+        dataKey.slice(2).toLowerCase(),
+        oldProps[dataKey] as (e: Event) => void
+      );
     }
-  }`
+  }
+};
+
+export const recursiveRemoveEvent = (originalWDom: WDom) => {
+  if (originalWDom.props && originalWDom.el) {
+    removeEvent(originalWDom.props, originalWDom.el);
+  }
+
+  (originalWDom.children || []).forEach((childItem: WDom) => {
+    recursiveRemoveEvent(childItem);
+  });
+};
+
+export const typeDelete = (newWDom: WDom) => {
+  if (newWDom.op && newWDom.el) {
+    removeEvent(newWDom.op, newWDom.el);
+  }
+`
+      );
+    }
+    if (id.endsWith('/src/diff.ts')) {
+      code = replace(
+        code,
+        "import { typeDeleteUnused } from '@/render';",
+        "import { typeDeleteUnused, recursiveRemoveEvent } from '@/render';"
+      );
+      code = replace(
+        code,
+        '      runUnmountQueueFromWDom(originalWDom);\n',
+        '      runUnmountQueueFromWDom(originalWDom);\n      recursiveRemoveEvent(originalWDom);\n'
       );
     }
     return code;
@@ -161,4 +209,5 @@ export const variants = {
   propsLoop: ['propsLoop'],
   compact: ['propsLoop', 'slots', 'empty'],
   queues: ['slots', 'empty'],
+  detach: ['detach'],
 };
