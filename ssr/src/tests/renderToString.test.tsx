@@ -79,3 +79,49 @@ describe('renderToString — text node HTML escaping', () => {
     expect(render(Comp)).toBe('<p>&lt;h-state&gt; anchor</p><p>A &amp; B</p>');
   });
 });
+
+// ── Attribute value escaping ──
+
+describe('renderToString — attribute escaping', () => {
+  it('escapes " in an attribute value so it cannot close the attribute', () => {
+    const value = '"><script>alert(1)</script>';
+    const Comp = mount(_r => () => <input value={value} />);
+    expect(render(Comp)).toBe(
+      '<input value="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;" />'
+    );
+  });
+
+  it('escapes & in an attribute value', () => {
+    const Comp = mount(_r => () => <a href="/search?a=1&b=2">go</a>);
+    expect(render(Comp)).toBe('<a href="/search?a=1&amp;b=2">go</a>');
+  });
+
+  it('escapes " in a style value', () => {
+    const Comp = mount(_r => () => (
+      <div style={{ fontFamily: '"Fira Code", monospace' }} />
+    ));
+    expect(render(Comp)).toBe(
+      '<div style="font-family: &quot;Fira Code&quot;, monospace;"></div>'
+    );
+  });
+
+  it('does not change a plain attribute value', () => {
+    const Comp = mount(_r => () => <div class="a b" data-id={3} />);
+    expect(render(Comp)).toBe('<div class="a b" data-id="3"></div>');
+  });
+
+  it('drops a prop whose name could not be an attribute name', () => {
+    const props = { 'x onmouseover="alert(1)"': 'y', id: 'ok' };
+    const Comp = mount(_r => () => <div {...props} />);
+    expect(render(Comp)).toBe('<div id="ok"></div>');
+  });
+
+  it('round-trips through the HTML parser', () => {
+    const value = `a"b'c<d>e&f`;
+    const Comp = mount(_r => () => <div title={value} />);
+    const wrap = document.createElement('div');
+    wrap.innerHTML = render(Comp);
+    expect(wrap.children.length).toBe(1);
+    expect(wrap.firstElementChild!.getAttribute('title')).toBe(value);
+  });
+});

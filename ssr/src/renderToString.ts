@@ -17,6 +17,21 @@ function escapeHtml(str: string): string {
 }
 
 /**
+ * Escape an attribute value. The value is written inside double quotes, so a
+ * `"` in it would otherwise end the attribute and let the rest be parsed as
+ * markup.
+ */
+function escapeAttr(str: string): string {
+  return escapeHtml(str).replace(/"/g, '&quot;');
+}
+
+/**
+ * Characters that cannot be part of an attribute name. A prop with such a name
+ * (possible when props are spread from data) is not written at all.
+ */
+const invalidAttrName = /[\s"'<>/=]/;
+
+/**
  * Main function of renderToString"
  */
 export function renderToString(wDom: WDom) {
@@ -88,14 +103,16 @@ function makeProp(props?: Props) {
       const isRef = checkRefData(dataKey, dataValue);
       const isEvent = dataKey.match(/^on/);
 
-      if (!(isKey || isPortal || isHtml || isRef || isEvent)) {
+      const isInvalid = invalidAttrName.test(dataKey);
+
+      if (!(isKey || isPortal || isHtml || isRef || isEvent || isInvalid)) {
         if (checkStyleData(dataKey, dataValue)) {
           const cssString = styleObjectToString(dataValue);
-          attrGroup.push(`style="${cssString}"`);
+          attrGroup.push(`style="${escapeAttr(cssString)}"`);
         } else if (dataKey && dataValue === true) {
           attrGroup.push(`${dataKey}="${dataKey}"`);
         } else if (dataKey && typeof dataValue !== 'boolean') {
-          attrGroup.push(`${dataKey}="${String(dataValue)}"`);
+          attrGroup.push(`${dataKey}="${escapeAttr(String(dataValue))}"`);
         }
       }
     }
