@@ -1,6 +1,6 @@
 import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
-import { getParent } from '@/utils';
+import { getParent, makeParentGetter } from '@/utils';
 import { typeDeleteUnused } from '@/render';
 import {
   checkEmptyElement,
@@ -199,7 +199,7 @@ const remakeChildrenForDiff = (
  * Recursive handling for the creation of a new virtual DOM.
  */
 const remakeChildrenForAdd = (newWDom: WDom) => {
-  const getParent = () => newWDom;
+  const getParent = makeParentGetter(newWDom);
 
   return (newWDom.children || []).map((item: WDom) => {
     const child = makeNewWDomTree(item);
@@ -218,7 +218,7 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
   }
 
   const origChildren = originalWDom.children || [];
-  const getParent = () => newWDom;
+  const getParent = makeParentGetter(newWDom);
 
   return (newWDom.children || []).map((item: WDom, index: number) => {
     const child = makeNewWDomTree(item, origChildren[index]);
@@ -257,7 +257,7 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
     }
   });
 
-  const getParent = () => newWDom;
+  const getParent = makeParentGetter(newWDom);
   const remaked = (newWDom.children || []).map(item => {
     const key = getKey(item);
     const origIndex = keyMap.get(key);

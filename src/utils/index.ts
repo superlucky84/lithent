@@ -5,6 +5,9 @@ import { wdomSymbol } from '@/utils/universalRef';
 export const getParent = (vDom: WDom) =>
   (vDom.getParent && vDom.getParent()) as WDom;
 
+// A separate scope keeps parent links from retaining a diff's old children.
+export const makeParentGetter = (parent: WDom) => () => parent;
+
 export const entries = Object.entries;
 export const keys = Object.keys;
 

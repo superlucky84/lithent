@@ -1,6 +1,6 @@
 import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
-import { getParent } from '@/utils';
+import { getParent, makeParentGetter } from '@/utils';
 import { typeDeleteUnused, prepareDom } from '@/render';
 import {
   checkEmptyElement,
@@ -408,7 +408,7 @@ const planChildren = (frame: Frame) => {
   // which happens after the cursor has consumed every entry.
   frame.children = children;
   frame.built = new Array(children.length);
-  frame.getParent = () => wip;
+  frame.getParent = makeParentGetter(wip);
 
   if (!isSameType || !originalWDom) {
     // Nothing to pair against — `originals` and `matchedIndexes` stay the
