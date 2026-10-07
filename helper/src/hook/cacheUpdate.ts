@@ -9,7 +9,9 @@ export const cacheUpdate = (
 
   return (props: Props) => {
     const newDefs = checkFunction();
-    const isSame = originalDefs.every((def, index) => def === newDefs[index]);
+    const isSame =
+      originalDefs.length === newDefs.length &&
+      originalDefs.every((def, index) => def === newDefs[index]);
 
     originalDefs = newDefs;
 

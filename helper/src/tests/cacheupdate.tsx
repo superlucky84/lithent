@@ -75,26 +75,24 @@ if (import.meta.vitest) {
       '<div><button>insCount1</button><button>insCount2</button><span>depth1: 0 - 0</span> </div>'
     );
   });
-  it('If the cache check function is true, the rendered result should be the same as before, even if the state changes.', () => {
+  it('If the cache check function is true, the rendered result should be the same as before, even if the state changes.', async () => {
     if (testChange2Ref.value) {
       testChange2Ref.value();
       testChange2Ref.value();
       testChange2Ref.value();
     }
-    nextTick().then(() => {
-      expect(testWrap.outerHTML).toBe(
-        '<div><button>insCount1</button><button>insCount2</button><span>depth1: 0 - 0</span> </div>'
-      );
-    });
+    await nextTick();
+    expect(testWrap.outerHTML).toBe(
+      '<div><button>insCount1</button><button>insCount2</button><span>depth1: 0 - 0</span> </div>'
+    );
   });
-  it('test33333.', () => {
+  it('renders the latest state when a tracked dependency changes.', async () => {
     if (testChange1Ref.value) {
       testChange1Ref.value();
     }
-    nextTick().then(() => {
-      expect(testWrap.outerHTML).toBe(
-        '<div><button>insCount1</button><button>insCount2</button><span>depth1: 1 - 3</span> </div>'
-      );
-    });
+    await nextTick();
+    expect(testWrap.outerHTML).toBe(
+      '<div><button>insCount1</button><button>insCount2</button><span>depth1: 1 - 3</span> </div>'
+    );
   });
 }
