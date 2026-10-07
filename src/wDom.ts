@@ -16,17 +16,16 @@ import {
   initUpdateHookState,
   initMountHookState,
   needDiffRef,
-  getComponentSubInfo,
+  componentMap,
   wdomSymbol,
   lmountComponentSet,
 } from '@/utils/universalRef';
-import { setRedrawAction, componentUpdate } from '@/utils/redraw';
+import { bindRedraw, componentUpdate } from '@/utils/redraw';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,
   checkCustemComponentFunction,
 } from '@/utils/predicator';
-import { assign } from '@/utils';
 
 // ============================================================================
 // Public API - Highest Level (User-facing API)
@@ -332,6 +331,14 @@ const makeCustomNode = (
   );
 
   addComponentProps(customNode, compKey, tag, props, children, reRender);
+  bindRedraw(compKey, wDom =>
+    replaceWDom(
+      tag,
+      (wDom.compProps as Props) || props,
+      (wDom.compChild as WDom[]) || children,
+      wDom
+    )
+  );
   return customNode;
 };
 
@@ -406,24 +413,16 @@ const addComponentProps = (
   children: WDom[],
   reRender: () => WDom
 ) => {
-  assign(wDom, {
-    compProps: props,
-    compChild: children,
-    ctor: tag,
-    compKey,
-    reRender,
-  });
+  // Runs on every render of every component: plain assignments, and the
+  // redraw action is bound once in makeCustomNode.
+  wDom.compProps = props;
+  wDom.compChild = children;
+  wDom.ctor = tag;
+  wDom.compKey = compKey;
+  wDom.reRender = reRender;
 
-  setRedrawAction(compKey, () =>
-    replaceWDom(
-      tag,
-      (wDom.compProps as Props) || props,
-      (wDom.compChild as WDom[]) || children,
-      wDom
-    )
-  );
-
-  if (getComponentSubInfo(compKey, 'vd')) {
-    (getComponentSubInfo(compKey, 'vd') as { value: WDom }).value = wDom;
+  const comp = componentMap.get(compKey);
+  if (comp) {
+    comp.vd.value = wDom;
   }
 };

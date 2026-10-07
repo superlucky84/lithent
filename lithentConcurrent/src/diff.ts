@@ -10,7 +10,7 @@ import {
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
-import { keys, entries } from '@/utils';
+import { keys, assign } from '@/utils';
 
 /**
  * Side effects the diff pass would have performed inline, recorded to run at
@@ -223,7 +223,7 @@ const completeWork = (frame: Frame, effects: Effects) => {
     // the previous tree still rendered.
     effects.push(() => {
       originalWDom.il = true;
-      delete originalWDom.children;
+      originalWDom.children = undefined;
     });
   }
 
@@ -323,8 +323,11 @@ const addReRenderTypeProperty = (
  */
 const syncResolverProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
-    keys(props).forEach(key => delete props[key]);
-    entries(infoProps || {}).forEach(([key, value]) => (props[key] = value));
+    // Only the keys that are gone: deleting and re-adding every key on every
+    // render changes the object's shape each time.
+    infoProps = infoProps || {};
+    keys(props).forEach(key => key in infoProps || delete props[key]);
+    assign(props, infoProps);
   }
 };
 

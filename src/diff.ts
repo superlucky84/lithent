@@ -10,7 +10,7 @@ import {
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
-import { keys, entries } from '@/utils';
+import { keys, assign } from '@/utils';
 
 /**
  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
@@ -55,7 +55,7 @@ const remakeNewWDom = (
 
   if (!isNoting && originalWDom) {
     originalWDom.il = true;
-    delete originalWDom.children;
+    originalWDom.children = undefined;
   }
   if (originalWDom?.tag === 'portal') {
     remakeWDom.tag = 'portal';
@@ -119,8 +119,11 @@ const addReRenderTypeProperty = (
  */
 const syncResolverProps = (props: Props, infoProps: Props) => {
   if (props && infoProps !== props) {
-    keys(props).forEach(key => delete props[key]);
-    entries(infoProps || {}).forEach(([key, value]) => (props[key] = value));
+    // Only the keys that are gone: deleting and re-adding every key on every
+    // render changes the object's shape each time.
+    infoProps = infoProps || {};
+    keys(props).forEach(key => key in infoProps || delete props[key]);
+    assign(props, infoProps);
   }
 };
 

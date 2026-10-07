@@ -91,7 +91,7 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
       parent.removeChild(newWDom.el);
     }
 
-    delete newWDom.el;
+    newWDom.el = undefined;
   }
 };
 
@@ -100,15 +100,8 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
 
   // Bulk fast path: the parent element contains exactly these children,
   // so they can all be dropped in a single operation.
-  // (counted via sibling pointers -- childNodes would materialize a live list)
-  let count = 0;
-  for (let node = parent.firstChild; node; node = node.nextSibling) {
-    count++;
-  }
-
   if (
     items.length > 1 &&
-    count === items.length &&
     items.every(item => {
       const nt = item.el && item.el.nodeType;
       return (
@@ -118,9 +111,23 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
       );
     })
   ) {
-    parent.textContent = '';
-    items.forEach(item => delete item.el);
-    return;
+    // Stop one past the candidates: a component in a long list calls this
+    // once per component, so counting every sibling there is quadratic.
+    // (counted via sibling pointers -- childNodes would materialize a live list)
+    let count = 0;
+    for (
+      let node = parent.firstChild;
+      node && count <= items.length;
+      node = node.nextSibling
+    ) {
+      count++;
+    }
+
+    if (count === items.length) {
+      parent.textContent = '';
+      items.forEach(item => (item.el = undefined));
+      return;
+    }
   }
 
   items.forEach(item => {
@@ -310,7 +317,6 @@ const typeUpdate = (newWDom: WDom) => {
   if (newWDom.el) {
     const { op: oldProps, props } = newWDom;
     updateProps(props, newWDom.el, oldProps);
-    delete newWDom.op;
 
     if (newWDom.tag === 'input') {
       (newWDom.el as HTMLInputElement).value = String(
@@ -430,11 +436,10 @@ const updateChildren = (newWDom: WDom) => {
   execMountedQueue();
 };
 
+// Assigned, not deleted: `delete` changes the object's shape, which makes
+// every later access to the node slower.
 const clearDiffMeta = (item: WDom) => {
-  delete item.oi;
-  delete item.nr;
-  delete item.oc;
-  delete item.op;
+  item.oi = item.nr = item.oc = item.op = undefined;
 };
 
 /**
@@ -525,7 +530,6 @@ const updateProps = (
     const dataValue: unknown = props[dataKey];
 
     if (dataValue === originalProps[dataKey]) {
-      delete originalProps[dataKey];
       continue;
     }
 
@@ -586,12 +590,16 @@ const updateProps = (
           }
         }
       }
-
-      delete originalProps[dataKey];
     }
   }
 
+  // Props that are gone. The previous props object is left as it was: it may
+  // be the caller's own object.
   for (const dataKey in originalProps) {
+    if (props && dataKey in props) {
+      continue;
+    }
+
     (element as HTMLElement).removeAttribute(dataKey);
     // A prop that went in as a custom element property is unset there too
     // (B-4). Not upgraded yet: drop the value kept for it (B-3); `delete`
