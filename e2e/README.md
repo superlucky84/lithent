@@ -38,6 +38,12 @@ the widget in a React 18 app loaded from the `react`/`react-dom` UMD
 development builds in `node_modules`, since the fixture server does not
 prebundle CommonJS. They need `pnpm build` (or `pnpm build:element`) first.
 
+`csp.spec.ts` (also outside the count) loads the built UMD bundles into a page
+with a strict Content-Security-Policy and Trusted Types enforced. It checks
+that the core and lithent/element render and update with no policy violation,
+and that the `innerHTML` prop is the path Trusted Types rejects. It backs the
+claims in [`SECURITY.md`](../SECURITY.md).
+
 Each project starts fixture, examples and docs Vite servers on fixed loopback
 ports 43130–43135. Existing servers are never reused. HMR edits an isolated copy
 under `.e2e-work`; application sources and built cores are not edited by tests.

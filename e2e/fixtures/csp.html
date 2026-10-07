@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+      A strict policy, the kind a security review asks a third-party widget to
+      run under: no inline script or style, no eval, and Trusted Types
+      enforced for every DOM injection sink. connect-src is only for the
+      fixture server's own socket.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' ws://127.0.0.1:*; require-trusted-types-for 'script'"
+    />
+    <title>lithent under a strict Content-Security-Policy</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="widget-spot"><csp-widget amount="5"></csp-widget></div>
+
+    <!-- No inline script is allowed, so every step is its own file. -->
+    <script src="/e2e/fixtures/csp/watch.js"></script>
+    <script src="/dist/lithent.umd.js"></script>
+    <script src="/lithentConcurrent/dist/lithentConcurrent.umd.js"></script>
+    <!-- ?core=base|concurrent picks the core; lithent/element's UMD binds to
+         the global `lithent`. -->
+    <script src="/e2e/fixtures/csp/pick.js"></script>
+    <script src="/element/dist/lithentElement.umd.js"></script>
+    <script src="/e2e/fixtures/csp/app.js"></script>
+  </body>
+</html>
