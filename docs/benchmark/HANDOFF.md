@@ -1,5 +1,20 @@
 # summary
 
+## base 크기 게이트 해결 — 2026-10-08
+
+- 사용자 요청으로 기존 55B 초과를 해결했다. 코어 로직을 바꾸지 않고 UMD 출력의 지역 변수명과
+  출력 형식만 정리했다. Terser의 `compress`는 끄고, ESM은 기존 빌드를 유지한다.
+- base brotli **4,855 → 4,758B**, 한도 **4,800B**보다 **42B** 작다. gzip은 122B 줄고 raw는
+  61B 늘었다. concurrent **6,385 / 9,000B**, element **998 / 1,000B**는 그대로다. `pnpm size` 통과.
+- 먼저 [UMD_SIZE_REVIEW.md](./UMD_SIZE_REVIEW.md)를 읽는다. ESM core는 바이트·해시까지 동일해
+  기존 benchmark 결과를 유지한다. UMD CPU 성능은 별도로 재측정하지 않았다.
+- `pnpm build:core`, `pnpm test`, 변경 파일 ESLint, `pnpm verify:release` 통과. 실제 UMD의 브라우저
+  검사 18회가 전후 동일하고, CommonJS export 21개와 소스맵 원본 14개 파일도 동일하다.
+- [umd-size-results.json](./umd-size-results.json), [umd-size-evidence.json.gz](./umd-size-evidence.json.gz)에
+  원본을 보존했다. 측정 당시 미커밋 변경을 사용자 요청으로 이 체크포인트 커밋에 포함해
+  `origin/master`로 푸시한다. 버전은 여전히 base `1.23.0`, concurrent `0.1.2`다.
+  아래 크기 게이트의 55B 초과 기록은 이 빌드 변경 전의 기록이다. 버전 변경·배포는 남아 있다.
+
 ## 수정·검증 체크포인트 커밋 — 2026-10-08
 
 - 사용자 요청으로 아래 props·portal 오류 수정, 회귀 테스트, 호환성·성능 검증 도구와 원본을

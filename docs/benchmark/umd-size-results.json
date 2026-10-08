@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-08T06:48:55.780Z",
+  "head": "6a54bdf8831244394c18036e8b2784a1c49e75dc",
+  "configSHA256": "da3b47153212673b304fcab31c0ac4501d69e15ee35c10abc55b0f7aafb79d72",
+  "evidenceSHA256": "26cd115acc5199b17da252f6594d31d655e8882da57d2fdd163197a1e095f1c4",
+  "esmSHA256": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+  "esmUnchanged": true,
+  "mapSourcesUnchanged": true,
+  "mapSourceCount": 14,
+  "commonJSExports": [
+    "Fragment",
+    "componentMap",
+    "componentUpdate",
+    "disposeComponentEntry",
+    "getComponentKey",
+    "getComponentSubInfo",
+    "h",
+    "isPropType",
+    "lmount",
+    "lmountComponentSet",
+    "mount",
+    "mountCallback",
+    "mountReadyCallback",
+    "nextTick",
+    "portal",
+    "ref",
+    "render",
+    "replaceWDom",
+    "setComponentMapManualMode",
+    "updateCallback",
+    "useRenew"
+  ],
+  "browser": "154.0.8037.98",
+  "results": {
+    "before": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": [
+          "label"
+        ]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": [
+          "child",
+          "unmount",
+          "parent"
+        ],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [
+          0,
+          0,
+          0
+        ],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "after": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": [
+          "label"
+        ]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": [
+          "child",
+          "unmount",
+          "parent"
+        ],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [
+          0,
+          0,
+          0
+        ],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    }
+  },
+  "sizes": {
+    "before": {
+      "raw": 12905,
+      "gzip": 5280,
+      "brotli": 4855,
+      "sha256": "b6420828a1d95448c360db579a66661f69a4bba6a3d898db3f0c2103374798cb"
+    },
+    "after": {
+      "raw": 12966,
+      "gzip": 5158,
+      "brotli": 4758,
+      "sha256": "ef1f48dc17504ac6c60c82617c9e1a8fd1b01adbd55b7a6e061738e419cf4414"
+    }
+  }
+}
