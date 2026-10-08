@@ -91,7 +91,9 @@ export const startWork = (
 const sameTypeAs = (
   newWDom: WDom | TagFunctionResolver,
   originalWDom: WDom | undefined
-) => checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom);
+) =>
+  !!originalWDom &&
+  checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom);
 
 /**
  * Runs the recorded effects, in collection order.

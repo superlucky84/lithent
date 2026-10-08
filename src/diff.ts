@@ -21,7 +21,8 @@ export const makeNewWDomTree = (
 ) =>
   remakeNewWDom(
     newWDom,
-    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+    !!originalWDom &&
+      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
     originalWDom
   );
 

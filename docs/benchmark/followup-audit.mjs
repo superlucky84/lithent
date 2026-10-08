@@ -4,6 +4,9 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { brotliCompressSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { cpus, totalmem, loadavg } from 'node:os';
 
 const root = fileURLToPath(new URL('../../', import.meta.url)).replace(
   /\/$/,
@@ -23,6 +26,8 @@ const { chromium } = require('@playwright/test');
 const out = process.env.LITHENT_AUDIT_OUT || '/tmp/lithent-followup-audit';
 mkdirSync(out, { recursive: true });
 import { edits, variants } from './followup-edits.mjs';
+const sourceHashes = {};
+const hash = value => createHash('sha256').update(value).digest('hex');
 
 async function bundle(name, minify = true) {
   const result = await build({
@@ -34,6 +39,12 @@ async function bundle(name, minify = true) {
         name: 'audit',
         enforce: 'pre',
         transform(code, id) {
+          if (
+            id.startsWith(root + '/src/') ||
+            id.startsWith(root + '/helper/src/') ||
+            id === app + '/src/main.tsx'
+          )
+            sourceHashes[path.relative(root, id)] = hash(code);
           for (const edit of variants[name]) code = edits[edit](code, id);
           return { code, map: null };
         },
@@ -124,7 +135,10 @@ const html = readFileSync(`${app}/index.html`, 'utf8')
       '</style>'
   )
   .replace('src="/src/main.tsx"', 'src="/main.js"');
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: process.env.LITHENT_AUDIT_CHROME,
+});
 console.log('Browser', browser.version());
 const scenarios = {
   select: {
@@ -142,7 +156,31 @@ const scenarios = {
   create: { setup: [], pre: '#clear', act: () => '#run' },
   create10k: { setup: [], pre: '#clear', act: () => '#runlots' },
 };
-const results = { browser: browser.version(), throttle: 4, mode, rounds: [] };
+const results = {
+  startedAt: new Date().toISOString(),
+  browser: browser.version(),
+  machine: {
+    cpu: cpus()[0].model,
+    cores: cpus().length,
+    memoryGB: totalmem() / 1024 ** 3,
+  },
+  libraryHead: execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).trim(),
+  benchmarkHead: execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: app,
+    encoding: 'utf8',
+  }).trim(),
+  sourceHashes,
+  bundleHashes: Object.fromEntries(
+    Object.entries(bundles).map(([name, code]) => [name, hash(code)])
+  ),
+  loadStart: loadavg(),
+  throttle: 4,
+  mode,
+  rounds: [],
+};
 const settle = page =>
   page.evaluate(
     () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)))
@@ -282,6 +320,14 @@ try {
           times,
         };
         if (profiles.length) {
+          const profileDir = `${out}/profiles`;
+          mkdirSync(profileDir, { recursive: true });
+          profiles.forEach((profile, index) =>
+            writeFileSync(
+              `${profileDir}/${name}-${scenario}-${round}-${index}.cpuprofile`,
+              JSON.stringify(profile)
+            )
+          );
           const self = {};
           for (const p of profiles) {
             const byId = new Map(p.nodes.map(n => [n.id, n.callFrame]));
@@ -312,3 +358,9 @@ try {
 } finally {
   await browser.close();
 }
+results.finishedAt = new Date().toISOString();
+results.loadEnd = loadavg();
+writeFileSync(
+  `${out}/${mode}-${selected.join('-')}.json`,
+  JSON.stringify(results, null, 2)
+);

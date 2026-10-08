@@ -4,6 +4,22 @@ function replace(code, before, after) {
   return code.replace(before, after);
 }
 export const edits = {
+  beforeAddType(code, id) {
+    if (!id.endsWith('/src/diff.ts')) return code;
+    return replace(
+      code,
+      '    !!originalWDom &&\n      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),',
+      '    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),'
+    );
+  },
+  addLeaf(code, id) {
+    if (!id.endsWith('/src/diff.ts')) return code;
+    return replace(
+      code,
+      'const remakeChildrenForAdd = (newWDom: WDom) => {',
+      'const remakeChildrenForAdd = (newWDom: WDom) => {\n  if (!newWDom.children?.length) return newWDom.children;'
+    );
+  },
   walk(code, id) {
     if (id.endsWith('/src/hook/internal/unmount.ts')) {
       code = replace(
@@ -133,7 +149,8 @@ export const typeDelete = (newWDom: WDom) => {
       `) =>
   remakeNewWDom(
     newWDom,
-    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+    !!originalWDom &&
+      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
     originalWDom
   );`,
       `) => {
@@ -143,7 +160,8 @@ export const typeDelete = (newWDom: WDom) => {
   }
   return remakeNewWDom(
     newWDom,
-    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+    !!originalWDom &&
+      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
     originalWDom
   );
 };`
@@ -196,6 +214,8 @@ export const typeDelete = (newWDom: WDom) => {
 };
 export const variants = {
   base: [],
+  beforeAddType: ['beforeAddType'],
+  addLeaf: ['addLeaf'],
   walk: ['walk'],
   empty: ['empty'],
   slots: ['slots'],
