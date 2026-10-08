@@ -1,0 +1,67 @@
+name: Deploy docs
+
+# Publishes lithentDocs to the gh-pages branch, which GitHub Pages serves at
+# https://superlucky84.github.io/lithent/. Runs when the docs change on main,
+# for every `lithent@x.y.z` tag (the site bundles the released core), and on
+# demand from the Actions tab.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'lithentDocs/**'
+      - '.github/workflows/docs.yml'
+    tags:
+      - 'lithent@*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # The docs import the workspace packages through their built output, so
+      # the whole workspace is built, not only lithentDocs.
+      - run: pnpm build
+
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: site
+
+      # Replace everything the previous build left (hashed assets included)
+      # with the new one. The branch's own .gitignore stays.
+      - name: Replace the site with the new build
+        run: |
+          find site -mindepth 1 -maxdepth 1 ! -name .git ! -name .gitignore -exec rm -rf {} +
+          cp -R lithentDocs/dist/. site/
+
+      - name: Commit and push
+        working-directory: site
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "The site is already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: deploy ${GITHUB_REF_NAME} (${GITHUB_SHA::7})"
+          git push origin gh-pages
