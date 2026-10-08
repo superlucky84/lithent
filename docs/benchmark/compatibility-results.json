@@ -1,0 +1,222 @@
+{
+  "date": "2026-10-08T04:32:37.520Z",
+  "browser": "154.0.8037.98",
+  "baseline": "326a181",
+  "current": "4356120b97185fa832e6c0a0b425f00b610f0daa",
+  "sourceHashes": {
+    "src/diff.ts": "44d36ab298aed4d0494ee01c0375628575ceb977e6b0fb07bba0745fae9b831a",
+    "src/render.ts": "8bac8a32263e40c97960dcf0b0f576e67ebeebc09401975d96c152ceae099a17",
+    "src/wDom.ts": "97e9a0566d3bfc4d1f4265f9133e290190b591b60948ca4b1f893630bcb890af",
+    "src/utils/index.ts": "fe97381a0cffc7acace0d2f71a1aeb149f27f420f0ad1df77bcac5752052d807",
+    "src/utils/redraw.ts": "93b6d82dc33dd1ea2733bd57ea5f60029401f6b87864da8c3a94451339a7fa5e",
+    "lithentConcurrent/src/diff.ts": "035079b67364e520f34b6b9f8f6af45cbb3406168994834deeb26138e38c4e2f",
+    "lithentConcurrent/src/render.ts": "5f5a4f47bd5e42bbf4996f95696e6fcf1f21454bc454726ae99bbb14eb53b5ef",
+    "lithentConcurrent/src/wDom.ts": "f28de90b10c255b36df7fe830c3c709789523ff53133f39c052be0058eafda5f"
+  },
+  "caseHash": "de4f2288f2a3dcafd65fa5e1f20e1712c610a0910a951155ed632e7a32c118b0",
+  "bundleHashes": {
+    "before-base": "102535fd7c547923828fa4fc4b45b6d0f19b24fd41f2469ec0817783ae818ef4",
+    "current-base": "63011453a168484b6c1718a4a2685c2f659b09c62f367dd05c32df544e40cdc7",
+    "before-concurrent": "76bf95ea6b21e6a27bb205dd3f8138d382e5b23ef45b149fafe552ed7a1beb81",
+    "current-concurrent": "2f71ce5e3133408984ddc4beabbafde3966b662e5ccc5da8119aca16390d63ba"
+  },
+  "cases": {
+    "before-base": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": [
+          "label"
+        ]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 0,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 0,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": [
+          "child",
+          "unmount"
+        ],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [
+          0,
+          0,
+          0
+        ],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "current-base": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": [
+          "label",
+          "toString"
+        ]
+      },
+      "inheritedComponentProp": {
+        "text": "owned",
+        "ownKeys": [
+          "value"
+        ]
+      },
+      "nonEnumerableComponentProp": {
+        "text": "owned",
+        "ownKeys": [
+          "value"
+        ]
+      },
+      "inheritedHiddenDomProp": {
+        "title": "owned"
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": [
+          "child",
+          "unmount",
+          "parent"
+        ],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [
+          1,
+          2,
+          3
+        ],
+        "callsAfterDestroy": 4,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "before-concurrent": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": [
+          "label"
+        ]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 0,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 0,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": [
+          "child",
+          "unmount"
+        ],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [
+          0,
+          0,
+          0
+        ],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "current-concurrent": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": [
+          "label",
+          "toString"
+        ]
+      },
+      "inheritedComponentProp": {
+        "text": "owned",
+        "ownKeys": [
+          "value"
+        ]
+      },
+      "nonEnumerableComponentProp": {
+        "text": "owned",
+        "ownKeys": [
+          "value"
+        ]
+      },
+      "inheritedHiddenDomProp": {
+        "title": "owned"
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": [
+          "child",
+          "unmount",
+          "parent"
+        ],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [
+          1,
+          2,
+          3
+        ],
+        "callsAfterDestroy": 4,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    }
+  },
+  "evidenceSHA256": "021bfe5d05987d59e98f4e09391e4339bf2938c1591a686b782e951db2a4d3c9"
+}

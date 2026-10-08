@@ -1,5 +1,84 @@
 # summary
 
+## 수정·검증 체크포인트 커밋 — 2026-10-08
+
+- 사용자 요청으로 아래 props·portal 오류 수정, 회귀 테스트, 호환성·성능 검증 도구와 원본을
+  이 인계 파일과 함께 체크포인트 커밋에 보존한다. 전체 삭제 함수 분리 후보는 포함하지 않는다.
+- 현재 `main`의 추적 브랜치는 `origin/master`다. 앞서 커밋한 `4356120` 성능 개선과 이
+  체크포인트를 함께 해당 원격 브랜치로 푸시한다. 버전 변경·패키지 배포는 이번 요청 범위에 없다.
+- 아래의 미커밋·커밋·푸시하지 않았다는 표현은 각 검증 당시의 기록이다. 측정 당시 HEAD와
+  소스·번들 해시를 현재 커밋으로 바꾸지 않는다. base 크기 게이트의 55B 초과는 그대로 남는다.
+
+## 전체 삭제 후속 후보 검증 — 2026-10-08
+
+- 사용자가 전체 삭제 개선의 가능성과 의미를 물어봐, portal 호스트 정리를 별도 함수로
+  분리하는 작은 후보만 검증했다. **미채택**이며 런타임은 아래 props·portal 수정본 그대로다.
+- 공식 CPU **210개 표본**에서 전체 삭제는 3차수 모두 전체 **0.6~3.5%**, JS **3.8~9.6%**
+  줄었다. 하지만 한 행 삭제는 두 순서 모두 전체 **2.6~4.8%**, JS **1.9~3.4%** 늘었고,
+  base·concurrent 압축 크기도 각각 12B 늘어 후보만 되돌렸다. 새 종합 점수는 계산하지 않았다.
+- [UNMOUNT_PERFORMANCE.md](./UNMOUNT_PERFORMANCE.md)를 먼저 읽는다.
+  [unmount-results.json](./unmount-results.json)과 [unmount-evidence.json.gz](./unmount-evidence.json.gz)에
+  210개 공식·144개 진단 원본, 양쪽 소스·번들과 `reject` 결정을 보존했다.
+- 후보와 복원 후 base 18개·concurrent 22개 계약 검사, 두 코어 빌드와 변경 파일 ESLint 통과.
+  후보의 양쪽 공식 keyed·9개 동작·폰트 검사도 통과했다. 복원한 9개 런타임 소스와 base
+  번들의 해시가 기준과 일치한다. 기존 전체 검증의 런타임을 복원했으므로 전체 검사는 반복하지 않았다.
+- 일반 DOM 리스너 정책·props 오류 수정·외부 portal 정리는 유지했다. 크기는 다시
+  base **4,855 / 4,800B**로 55B 초과다. 추가 구조 최적화·버전 변경·커밋·배포는 하지 않았다.
+
+## props·portal 수정의 CPU 영향 검증 — 2026-10-08
+
+- 사용자 요청으로 수정 전 마지막 성능 종료본과 현재 수정본을 같은 base benchmark 앱·helper로
+  공식 CPU 비교했다. 기준 앱 번들이 이전 측정의 SHA-256과 정확히 일치한다.
+- 9개 항목 290개 표본과 전체 삭제의 반대 순서 30개를 완료했다. 첫 차수의 가중 수정 후/전은
+  전체 **0.9968**(약 -0.3%), JS **0.9999**(거의 동일)다. 공개 공식 점수나 새 타 프레임워크 비교는 아니다.
+- **전체 삭제는 두 순서 모두 느려졌다.** 각 30개를 합치면 전체 **12.632 → 13.688ms (+8.4%)**,
+  JS **10.302 → 11.139ms (+8.1%)**다. 종합 결과가 비슷하다는 이유로 이 악화 신호를 숨기지 않는다.
+- 먼저 [COMPATIBILITY_PERFORMANCE.md](./COMPATIBILITY_PERFORMANCE.md)를 읽는다.
+  [compatibility-performance-results.json](./compatibility-performance-results.json)과
+  [compatibility-performance-evidence.json.gz](./compatibility-performance-evidence.json.gz)에 원본을
+  보존했다. 아래 동작 수정 결과와 이전 성능 수치는 덮어쓰지 않았다.
+- 양쪽 공식 keyed·9개 동작·폰트 검사 통과. benchmark 저장소 tracked 파일은 바꾸지 않았다.
+  항목별 순서 교대는 wrapper의 선택적 환경 변수이며 공식 러너의 계산과 설정은 변경하지 않았다.
+- 이번 턴에서 런타임은 추가 수정하지 않았다. 일반 DOM의 개별 리스너 해제는 여전히 복원하지
+  않았으며, props·외부 portal 호스트 오류 수정은 유지한다. 크기 게이트의 55B 초과도 남아 있다.
+
+## props와 portal 이벤트 수정 완료 — 2026-10-08
+
+- 사용자의 후속 요청으로 실제 props 반영 오류와 살아 있는 외부 portal 호스트의 이벤트 누적을
+  두 코어에서 고쳤다. 일반 DOM 삭제 시 개별 리스너 정리를 생략하는 정책은 유지한다.
+- component props 갱신은 own enumerable string key만 삭제·복사한다. DOM props는 inherited
+  enumerable 키까지 반영하되 hidden/shadowed prop이 이전 attribute·handler를 남기지 않는다.
+- shared unmount 순회에서 portal 호스트의 handler만 정리한다. concurrent의 portal-containing
+  새 subtree는 commit에서 DOM을 만들도록 바꿔 중단·재시도의 외부 호스트 이벤트 누적도 막았다.
+- 새 shared 회귀 14개와 concurrent 전용 4개, `pnpm test:dual`, `pnpm test`, 두 코어 빌드,
+  strict TypeScript, 변경 파일 ESLint와 Playwright 52개가 통과했다.
+  Chrome 비교 도구의 36개 실행에서도 두 코어의 portal 제거/destroy 후 호출은 모두 0회다.
+  `pnpm verify:release`의 세 패키지와 공개 import 11개·strict consumer 타입 검사도 통과했다.
+- [COMPATIBILITY_REVIEW.md](./COMPATIBILITY_REVIEW.md)의 후속 수정부터 읽는다.
+  [compatibility-fixed-results.json](./compatibility-fixed-results.json)과
+  [compatibility-fixed-evidence.json.gz](./compatibility-fixed-evidence.json.gz)에 실행 원본과 해시를
+  보존했다. 초기 재현 자료와 과거 성능 수치는 덮어쓰지 않았다. 당시에는 동작만 검증했고,
+  후속 CPU 측정은 위 항목에 따로 기록했다.
+- 기존 크기 한도는 유지했다. base br **4,855 / 4,800B**로 이전보다 92B 늘었고,
+  `pnpm size`는 **55B 초과로 실패**한다. concurrent **6,385 / 9,000B**, element **998 / 1,000B**.
+  릴리스 시 크기 기준을 판단해야 한다. 버전 변경·커밋·푸시·배포는 하지 않았다.
+
+## 배포 전 호환성 검토 — 2026-10-08
+
+- 사용자가 성능 변경의 기존 동작 위험성을 먼저 확인하도록 요청했다.
+  [COMPATIBILITY_REVIEW.md](./COMPATIBILITY_REVIEW.md)를 먼저 읽는다.
+- 이후 사용자가 기존과 달라도 사용성·성능상 옳은 변경은 유지한다는 기준을 명확히 했다.
+  일반 DOM 삭제의 리스너 정리 생략은 유지하며 복원하지 않는다. Preact 10.29.8의 실제
+  unmount·event prop 소스에서도 같은 삭제 정책을 확인했다.
+- `326a181`과 `4356120`을 두 코어의 같은 브라우저 재현 코드로 비교했다.
+  props 제거 판단의 회귀와 저수준 portal 호스트의 리스너 누적을 재현했다.
+  버려진 DOM의 리스너 유지도 기존 동작과 다른 정책 변경임을 확인했다.
+- 기존 dual과 Playwright 52개는 다시 통과했지만 위 조건을 검출하지 못했다.
+  현재 상태의 바로 배포를 권하지 않는다. 코드·버전은 변경하지 않고 검토 원본만 보존했다.
+- 성능 종료 결과는 유지한다. 다음 수정 대상은 최신 props 반영 오류와 외부 portal 호스트의
+  핸들러 누적이다. 이전 동작과 다르다는 이유만으로 성능 변경을 되돌리지 않는다.
+  이번 검토 자료는 미커밋이며 커밋·푸시·릴리스는 사용자 요청 시 진행한다.
+
 ## 성능 작업 완료 — 2026-10-08
 
 - 사용자가 마지막 동일 VDOM 후보를 검증한 뒤 성능 작업을 마무리하도록 요청했고 완료했다.

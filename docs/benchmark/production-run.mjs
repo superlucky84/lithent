@@ -110,6 +110,7 @@ let output = {
     memoryGB: totalmem() / 1024 ** 3,
   },
   loadStart: loadavg(),
+  alternatingOrder: process.env.LITHENT_PRODUCTION_ALTERNATE_ORDER === '1',
   build: JSON.parse(readFileSync(out + '/build-manifest.json')),
   versions: JSON.parse(readFileSync(out + '/versions.json')),
   samples: [],
@@ -304,7 +305,9 @@ try {
     for (let index = 0; index < selected.length; index++) {
       const id = selected[index];
       const rotation = index % names.length;
-      const order = [...names.slice(rotation), ...names.slice(0, rotation)];
+      const order = output.alternatingOrder
+        ? [...names]
+        : [...names.slice(rotation), ...names.slice(0, rotation)];
       if (index % 2) order.reverse();
       for (const name of order) {
         if (

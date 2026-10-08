@@ -10,7 +10,7 @@ import {
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
-import { keys, assign } from '@/utils';
+import { keys, isEnumerableProp } from '@/utils';
 
 /**
  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
@@ -122,8 +122,10 @@ const syncResolverProps = (props: Props, infoProps: Props) => {
     // Only the keys that are gone: deleting and re-adding every key on every
     // render changes the object's shape each time.
     infoProps = infoProps || {};
-    keys(props).forEach(key => key in infoProps || delete props[key]);
-    assign(props, infoProps);
+    keys(props).forEach(
+      key => isEnumerableProp(infoProps, key) || delete props[key]
+    );
+    keys(infoProps).forEach(key => (props[key] = infoProps[key]));
   }
 };
 

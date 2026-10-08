@@ -27,6 +27,18 @@ export const runUnmountQueueFromWDom = (newWDom: WDom) => {
 };
 
 const recursiveRunUnmount = (wDom: WDom) => {
+  // A portal host belongs to the caller and survives removal. Release its
+  // handlers while leaving listeners on discarded ordinary DOM untouched.
+  if (wDom.tag === 'portal' && wDom.el) {
+    for (const key in wDom.props) {
+      if (key[0] === 'o' && key[1] === 'n') {
+        wDom.el.removeEventListener(
+          key.slice(2).toLowerCase(),
+          wDom.props[key] as EventListener
+        );
+      }
+    }
+  }
   (wDom.children || []).forEach(item => {
     const childComKey = item.compKey;
     if (childComKey) {

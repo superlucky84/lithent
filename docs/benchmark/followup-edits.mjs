@@ -4,6 +4,33 @@ function replace(code, before, after) {
   return code.replace(before, after);
 }
 export const edits = {
+  portalCold(code, id) {
+    if (!id.endsWith('/src/hook/internal/unmount.ts')) return code;
+    const start = code.indexOf('  // A portal host belongs to the caller');
+    const end = code.indexOf('  (wDom.children || []).forEach', start);
+    if (start < 0 || end < 0) throw Error('Missing portal cleanup block');
+    const cleanup = code
+      .slice(start, end)
+      .replace("if (wDom.tag === 'portal' && wDom.el)", 'if (wDom.el)');
+    return (
+      code
+        .slice(0, start)
+        .replace(
+          'const recursiveRunUnmount = (wDom: WDom) => {\n',
+          `const cleanupPortalHost = (wDom: WDom) => {\n${cleanup}};\n\nconst recursiveRunUnmount = (wDom: WDom) => {\n`
+        ) +
+      "  if (wDom.tag === 'portal') cleanupPortalHost(wDom);\n" +
+      code.slice(end)
+    );
+  },
+  // Diagnostic ablation only: intentionally omits required portal cleanup.
+  portalAblation(code, id) {
+    if (!id.endsWith('/src/hook/internal/unmount.ts')) return code;
+    const start = code.indexOf('  // A portal host belongs to the caller');
+    const end = code.indexOf('  (wDom.children || []).forEach', start);
+    if (start < 0 || end < 0) throw Error('Missing portal cleanup block');
+    return code.slice(0, start) + code.slice(end);
+  },
   beforeAddType(code, id) {
     if (!id.endsWith('/src/diff.ts')) return code;
     return replace(
@@ -214,6 +241,8 @@ export const typeDelete = (newWDom: WDom) => {
 };
 export const variants = {
   base: [],
+  portalCold: ['portalCold'],
+  portalAblation: ['portalAblation'],
   beforeAddType: ['beforeAddType'],
   addLeaf: ['addLeaf'],
   walk: ['walk'],

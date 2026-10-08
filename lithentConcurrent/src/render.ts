@@ -13,7 +13,7 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import { getParent, isObject } from '@/utils';
+import { getParent, isObject, hasEnumerableProp } from '@/utils';
 
 const DF = () => new DocumentFragment();
 
@@ -52,10 +52,15 @@ export const prepareDom = (wDom: WDom) => {
   const previousEl = wDom.el;
   const ready: WDom[] = [];
   const mounted: WDom[] = [];
-  const el = wDomToDom(wDom, false, { ready, mounted });
+  const record: Recorder = { ready, mounted };
+  const el = wDomToDom(wDom, false, record);
 
   wDom.el = previousEl;
-  preparedDom.set(wDom, { el, ready, mounted });
+  // Portal hosts are external, so creation of a subtree containing one must
+  // wait for commit. An abandoned build must not append content or listeners.
+  if (!record.hasPortal) {
+    preparedDom.set(wDom, { el, ready, mounted });
+  }
 };
 
 /**
@@ -637,7 +642,7 @@ const updateProps = (
   // Props that are gone. The previous props object is left as it was: it may
   // be the caller's own object.
   for (const dataKey in originalProps) {
-    if (props && dataKey in props) {
+    if (props && hasEnumerableProp(props, dataKey)) {
       continue;
     }
 
@@ -673,7 +678,7 @@ const setAttr = (k: string, el: HTMLElement, v: string) =>
     ? el.setAttributeNS(null, k, v)
     : el.setAttribute(k, v);
 
-type Recorder = { ready: WDom[]; mounted: WDom[] };
+type Recorder = { ready: WDom[]; mounted: WDom[]; hasPortal?: boolean };
 
 const wDomToDom = (
   wDom: WDom,
@@ -683,6 +688,11 @@ const wDomToDom = (
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
+
+  if (record && tag === 'portal') {
+    record.hasPortal = true;
+    return props?.portal as HTMLElement;
+  }
 
   // With a collector the two observable parts — the user's `mountReadyCallback`
   // and the mount queue entry — are recorded instead of run, so that creating

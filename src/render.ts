@@ -13,7 +13,7 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import { getParent, isObject } from '@/utils';
+import { getParent, isObject, hasEnumerableProp } from '@/utils';
 
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
@@ -567,7 +567,7 @@ const updateProps = (
   // Props that are gone. The previous props object is left as it was: it may
   // be the caller's own object.
   for (const dataKey in originalProps) {
-    if (props && dataKey in props) {
+    if (props && hasEnumerableProp(props, dataKey)) {
       continue;
     }
 

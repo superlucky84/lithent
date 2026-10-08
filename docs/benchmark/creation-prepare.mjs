@@ -66,6 +66,22 @@ await build({
 });
 const hash = file =>
   createHash('sha256').update(readFileSync(file)).digest('hex');
+const runtimeFiles = [
+  'src/diff.ts',
+  'src/render.ts',
+  'src/wDom.ts',
+  'src/utils/index.ts',
+  'src/utils/redraw.ts',
+  'src/hook/internal/unmount.ts',
+  'lithentConcurrent/src/diff.ts',
+  'lithentConcurrent/src/render.ts',
+  'lithentConcurrent/src/wDom.ts',
+];
+for (const file of runtimeFiles) {
+  const target = stage + '/runtime/' + file;
+  mkdirSync(resolve(target, '..'), { recursive: true });
+  cpSync(root + '/' + file, target);
+}
 const manifestFile = out + '/build-manifest.json';
 const manifest = existsSync(manifestFile)
   ? JSON.parse(readFileSync(manifestFile))
@@ -81,10 +97,7 @@ manifest[name] = {
     encoding: 'utf8',
   }).trim(),
   sourceFiles: Object.fromEntries(
-    ['src/diff.ts', 'lithentConcurrent/src/diff.ts'].map(file => [
-      file,
-      hash(root + '/' + file),
-    ])
+    runtimeFiles.map(file => [file, hash(root + '/' + file)])
   ),
   appFiles: Object.fromEntries(
     ['src/main.tsx', 'index.html'].map(file => [file, hash(stage + '/' + file)])
