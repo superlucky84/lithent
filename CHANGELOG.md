@@ -1,5 +1,60 @@
 # Release notes
 
+## 2026-10-08
+
+### lithent 1.24.0
+
+A minor release because one documented behavior changes: removed DOM no longer
+has its handlers detached one by one. No API is added or removed.
+
+- **Changed:** handlers passed as props are left on DOM that is being removed
+  and go away with it, both for nodes removed by a render and for `render()`'s
+  destroy function. Unmount cleanups and DOM removal are unchanged. If you keep
+  a reference to a removed node, its handlers can still be called, and an event
+  that is already bubbling when the tree is destroyed reaches the handlers of
+  removed ancestors. Handlers set on a portal target are still detached, since
+  that element outlives the render.
+- Cut the fixed cost of updates and removals. Removing a list of components no
+  longer counts the parent's children once per component, internal diff fields
+  are assigned instead of deleted, component props are synced in place, the
+  redraw action is bound once per component, and newly added nodes skip the
+  type comparison. Measurements are in `docs/benchmark/`.
+- Component props are updated in place: only keys that are gone are deleted.
+  A key that stays keeps its position, so `Object.keys(props)` no longer
+  follows the parent's key order when the parent reorders the same keys.
+- Fix the previous render's VDOM being kept alive through parent links. Keeping
+  1,000 rows and updating part of them 100 times left 17.8 MB of JS heap after
+  GC; it is now 4.0 MB.
+- Fix a handler prop that is dropped from a node that stays: its listener was
+  left attached.
+- Fix a props object reused across renders being emptied. lithent no longer
+  edits the previous props object.
+- Fix `cacheUpdate` ignoring a change in the number of dependencies. A shorter
+  or longer dependency array now invalidates the cache.
+- Fix `renderToString` writing attribute values unescaped. `&`, `<`, `>` and
+  `"` are escaped, including in `style`, and a prop whose name is not a valid
+  attribute name is not written. A value that was escaped by hand before being
+  passed is now escaped twice; pass the raw value.
+- The UMD build mangles local names to stay inside the size budget; the ESM
+  build is unchanged. Brotli 4,758 B (-34 B vs 1.23.0).
+
+`lithent/helper` and `lithent/ssr` ship inside this package; the `cacheUpdate`
+and `renderToString` fixes are not separate npm releases.
+
+### lithent-concurrent 0.1.3
+
+- **Changed:** the same handler policy as the base core. Removed DOM keeps its
+  handlers until it is discarded; handlers on a portal target are detached.
+- The same update and removal work as the base core, except the redraw binding,
+  which stays per render to fit the scheduler.
+- Fix the same VDOM retention through parent links, the same handler left on a
+  node that stays, and the same emptied props object.
+- Fix a low-priority build writing to a portal target before its commit. A new
+  subtree that contains a portal now creates its DOM at commit, so an
+  interrupted or retried build no longer adds content or handlers to the
+  target.
+- Brotli 6,385 B (+97 B vs 0.1.2). Still works with `lithent ^1.22.1`.
+
 ## 2026-10-06
 
 ### lithent 1.23.0

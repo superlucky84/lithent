@@ -254,8 +254,8 @@ finish, use `whenIdle()`. The meaning of `nextTick` itself is unchanged (DC-9).
 
 | Build                |  brotli |
 | -------------------- | ------: |
-| `lithent` (base)     | 4,739 B |
-| `lithent-concurrent` | 6,221 B |
+| `lithent` (base)     | 4,758 B |
+| `lithent-concurrent` | 6,385 B |
 
 ## Further reading
 

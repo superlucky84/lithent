@@ -132,8 +132,9 @@ render(<Greeting />);`}
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       Calling the destroy function returned by <code>render()</code> removes the
-      component from the DOM, unregisters event listeners, and runs any
-      registered cleanup callbacks.
+      component from the DOM and runs any registered cleanup callbacks. Handlers
+      passed as props are not detached one by one; they go away together with
+      the removed DOM.
       <br />
       <br />
       If your component needs to clean up resources (timers, event listeners,
@@ -183,9 +184,14 @@ setTimeout(() => {
       <br />
       1. The cleanup function returned from <code>mountCallback</code> runs
       <br />
-      2. All event listeners are detached
-      <br />
-      3. The rendered DOM nodes are removed
+      2. The rendered DOM nodes are removed, along with the handlers attached to
+      them
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      If you keep a reference to a removed node (through a <code>ref</code>, for
+      example), its handlers can still be called. Handlers set on a portal
+      target are detached, because that element outlives the render.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />

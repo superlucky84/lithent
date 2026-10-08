@@ -131,8 +131,8 @@ render(<Greeting />);`}
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       render() 함수가 반환하는 destroy 함수를 호출하면 컴포넌트를 DOM에서
-      제거하고, 등록된 이벤트 리스너를 정리하며, 등록된 cleanup 콜백을
-      실행합니다.
+      제거하고, 등록된 cleanup 콜백을 실행합니다. props로 전달한 핸들러는 하나씩
+      해제하지 않으며, 제거된 DOM과 함께 사라집니다.
       <br />
       <br />
       컴포넌트가 언마운트될 때 정리 작업(타이머 해제, 이벤트 리스너 제거 등)이
@@ -182,9 +182,13 @@ setTimeout(() => {
       <br />
       1. mountCallback이 반환한 cleanup 함수 실행
       <br />
-      2. 모든 이벤트 리스너 제거
-      <br />
-      3. DOM에서 요소 제거
+      2. DOM에서 요소 제거 (요소에 붙은 핸들러도 함께 사라짐)
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      제거된 노드를 <code>ref</code> 등으로 계속 보관하고 있다면 그 노드의
+      핸들러는 여전히 호출될 수 있습니다. portal 대상 요소에 설정한 핸들러는
+      렌더가 끝난 뒤에도 요소가 남으므로 해제합니다.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
