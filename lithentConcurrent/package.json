@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "lithent-concurrent",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Interface-compatible rendering build of Lithent with priority scheduling and interruptible low-priority builds.",
   "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithentConcurrent.cjs",

@@ -23,8 +23,8 @@
 
 | 패키지 | 현재 | 안정성 | 보안·버그 수정 |
 |---|---|---|---|
-| `lithent` | 1.24.0 | 안정 | 1.x의 최신 minor |
-| `lithent-concurrent` | 0.1.3 | 0.x — minor에서 비호환 변경 가능 | 최신 릴리스 |
+| `lithent` | 1.24.1 | 안정 | 1.x의 최신 minor |
+| `lithent-concurrent` | 0.1.4 | 0.x — minor에서 비호환 변경 가능 | 최신 릴리스 |
 | `create-lithent` | 0.3.4 | 생성기. 생성된 프로젝트는 사용자의 것 | 최신 릴리스 |
 | `@lithent/*` (Vite 플러그인, HMR, MDX, 템플릿) | 0.x | 개발 도구. 런타임에 포함되지 않음 | 최신 릴리스 |
 

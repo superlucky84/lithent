@@ -1,15 +1,38 @@
 # Release notes
 
-## Unreleased
+## 2026-10-09
 
-- Fix CommonJS entry points in `lithent`, its subpaths, and
-  `lithent-concurrent` by emitting dedicated `.cjs` bundles and using them for
-  `main` and `exports.require`. Existing ESM and browser UMD paths are kept.
-- Verify all 11 public import and require paths against installed release
-  tarballs, including export parity and CommonJS JSX/helper/SSR integration.
-- Emit separate CommonJS declarations and select types by import/require mode.
-  Verify native Node16/NodeNext ESM and CommonJS TypeScript consumers, including
-  declaration dependencies and CommonJS JSX, without skipping library checks.
+### lithent 1.24.1
+
+A packaging fix. No runtime code changes; the ESM and UMD bundles are the same
+as in 1.24.0.
+
+- Fix `require('lithent')` and `require` of every subpath. The `require` entry
+  was a `.js` UMD file inside a `"type": "module"` package, so Node.js read it
+  as an ES module. On Node.js 24 the call returned an empty object and
+  `mount`, `useRenew` and the rest were `undefined` (#92). Each entry now ships
+  a `.cjs` bundle, and `main` and `exports.require` point to it.
+- Fix the types a CommonJS TypeScript project gets under `node16`/`nodenext`
+  resolution. It resolved the ESM declarations and failed with TS1479 and
+  TS1471. Each entry now also ships `.d.cts` declarations, and `exports` picks
+  the declarations by `import` or `require`.
+- The ESM (`.mjs`) and browser UMD (`.umd.js`) paths are unchanged, including
+  the CDN URLs.
+- The ESM and CommonJS bundles keep separate module state. Load the core and
+  its subpaths (`lithent/helper`, `lithent/ssr`, ...) in the same format; do
+  not mix `import` and `require` of lithent in one program.
+
+This applies to `lithent`, `lithent/jsx-runtime`, `lithent/jsx-dev-runtime`,
+`lithent/helper`, `lithent/devHelper`, `lithent/ssr`, `lithent/tag`,
+`lithent/ftags` and `lithent/element`.
+
+### lithent-concurrent 0.1.4
+
+- Fix `require('lithent-concurrent')` and `require('lithent-concurrent/helper')`
+  the same way: `.cjs` bundles for `main` and `exports.require`, and `.d.cts`
+  declarations for CommonJS TypeScript projects.
+- No runtime code changes. The ESM and UMD bundles are the same as in 0.1.3.
+  Still works with `lithent ^1.22.1`.
 
 ## 2026-10-08
 
