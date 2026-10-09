@@ -4,7 +4,7 @@
   "version": "1.24.0",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@9.12.3",
-  "main": "./dist/lithent.umd.js",
+  "main": "./dist/lithent.cjs",
   "module": "./dist/lithent.mjs",
   "scripts": {
     "dev:core": "vite",
@@ -71,49 +71,94 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/lithent.mjs",
-      "require": "./dist/lithent.umd.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/lithent.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/lithent.cjs"
+      }
     },
     "./jsx-runtime": {
-      "types": "./jsx-runtime/dist/index.d.ts",
-      "import": "./jsx-runtime/dist/jsxRuntime.mjs",
-      "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
+      "import": {
+        "types": "./jsx-runtime/dist/index.d.ts",
+        "default": "./jsx-runtime/dist/jsxRuntime.mjs"
+      },
+      "require": {
+        "types": "./jsx-runtime/dist/index.d.cts",
+        "default": "./jsx-runtime/dist/jsxRuntime.cjs"
+      }
     },
     "./jsx-dev-runtime": {
-      "types": "./jsx-runtime/dist/index.d.ts",
-      "import": "./jsx-runtime/dist/jsxRuntime.mjs",
-      "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
+      "import": {
+        "types": "./jsx-runtime/dist/index.d.ts",
+        "default": "./jsx-runtime/dist/jsxRuntime.mjs"
+      },
+      "require": {
+        "types": "./jsx-runtime/dist/index.d.cts",
+        "default": "./jsx-runtime/dist/jsxRuntime.cjs"
+      }
     },
     "./helper": {
-      "types": "./helper/dist/index.d.ts",
-      "import": "./helper/dist/lithentHelper.mjs",
-      "require": "./helper/dist/lithentHelper.umd.js"
+      "import": {
+        "types": "./helper/dist/index.d.ts",
+        "default": "./helper/dist/lithentHelper.mjs"
+      },
+      "require": {
+        "types": "./helper/dist/index.d.cts",
+        "default": "./helper/dist/lithentHelper.cjs"
+      }
     },
     "./devHelper": {
-      "types": "./devHelper/dist/index.d.ts",
-      "import": "./devHelper/dist/lithentDevHelper.mjs",
-      "require": "./devHelper/dist/lithentDevHelper.umd.js"
+      "import": {
+        "types": "./devHelper/dist/index.d.ts",
+        "default": "./devHelper/dist/lithentDevHelper.mjs"
+      },
+      "require": {
+        "types": "./devHelper/dist/index.d.cts",
+        "default": "./devHelper/dist/lithentDevHelper.cjs"
+      }
     },
     "./ssr": {
-      "types": "./ssr/dist/index.d.ts",
-      "import": "./ssr/dist/lithentSsr.mjs",
-      "require": "./ssr/dist/lithentSsr.umd.js"
+      "import": {
+        "types": "./ssr/dist/index.d.ts",
+        "default": "./ssr/dist/lithentSsr.mjs"
+      },
+      "require": {
+        "types": "./ssr/dist/index.d.cts",
+        "default": "./ssr/dist/lithentSsr.cjs"
+      }
     },
     "./tag": {
-      "types": "./tag/dist/index.d.ts",
-      "import": "./tag/dist/lithentTag.mjs",
-      "require": "./tag/dist/lithentTag.umd.js"
+      "import": {
+        "types": "./tag/dist/index.d.ts",
+        "default": "./tag/dist/lithentTag.mjs"
+      },
+      "require": {
+        "types": "./tag/dist/index.d.cts",
+        "default": "./tag/dist/lithentTag.cjs"
+      }
     },
     "./ftags": {
-      "types": "./ftags/dist/index.d.ts",
-      "import": "./ftags/dist/lithentFTags.mjs",
-      "require": "./ftags/dist/lithentFTags.umd.js"
+      "import": {
+        "types": "./ftags/dist/index.d.ts",
+        "default": "./ftags/dist/lithentFTags.mjs"
+      },
+      "require": {
+        "types": "./ftags/dist/index.d.cts",
+        "default": "./ftags/dist/lithentFTags.cjs"
+      }
     },
     "./element": {
-      "types": "./element/dist/index.d.ts",
-      "import": "./element/dist/lithentElement.mjs",
-      "require": "./element/dist/lithentElement.umd.js"
+      "import": {
+        "types": "./element/dist/index.d.ts",
+        "default": "./element/dist/lithentElement.mjs"
+      },
+      "require": {
+        "types": "./element/dist/index.d.cts",
+        "default": "./element/dist/lithentElement.cjs"
+      }
     }
   },
   "types": "./dist/index.d.ts",

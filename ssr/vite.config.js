@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { emitDeclarationFormats } from '../scripts/emit-declaration-formats.mjs';
 
 /**
  * RC-9 — run this suite against either core.
@@ -37,6 +38,7 @@ export default defineConfig(({ mode }) => ({
     }),
     dts({
       outputDir: ['dist'],
+      afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
     }),
   ],
   resolve: {
@@ -49,9 +51,11 @@ export default defineConfig(({ mode }) => ({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentSsr',
       fileName: format => {
+        if (format === 'cjs') return 'lithentSsr.cjs';
         return format === 'umd' ? 'lithentSsr.umd.js' : 'lithentSsr.mjs';
       },
     },

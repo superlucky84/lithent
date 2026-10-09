@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { emitDeclarationFormats } from '../../scripts/emit-declaration-formats.mjs';
 
 /**
  * `lithent-concurrent` stays external, exactly as `helper/` keeps `lithent`
@@ -23,6 +24,8 @@ export default defineConfig({
     }),
     dts({
       outputDir: ['dist/types'],
+      afterBuild: () =>
+        emitDeclarationFormats(resolve(__dirname, 'dist/types')),
     }),
   ],
   resolve: {
@@ -32,12 +35,15 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentConcurrentHelper',
-      fileName: format =>
-        format === 'umd'
+      fileName: format => {
+        if (format === 'cjs') return 'lithentConcurrentHelper.cjs';
+        return format === 'umd'
           ? 'lithentConcurrentHelper.umd.js'
-          : 'lithentConcurrentHelper.mjs',
+          : 'lithentConcurrentHelper.mjs';
+      },
     },
     rollupOptions: {
       external: ['lithent-concurrent'],

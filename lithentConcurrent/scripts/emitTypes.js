@@ -19,6 +19,7 @@ import { readdirSync, readFileSync, writeFileSync, statSync } from 'fs';
 import { dirname, join, relative, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { forkModules } from '../alias.js';
+import { emitDeclarationFormats } from '../../scripts/emit-declaration-formats.mjs';
 
 const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const typesDir = resolve(pkgDir, 'dist/types');
@@ -74,3 +75,5 @@ if (leftovers.length) {
 }
 
 console.log(`[emitTypes] declarations emitted, ${rewritten} file(s) rewritten`);
+
+emitDeclarationFormats(typesDir);

@@ -20,9 +20,11 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentConcurrent',
       fileName: format => {
+        if (format === 'cjs') return 'lithentConcurrent.cjs';
         return format === 'umd'
           ? 'lithentConcurrent.umd.js'
           : 'lithentConcurrent.mjs';

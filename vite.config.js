@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { emitDeclarationFormats } from './scripts/emit-declaration-formats.mjs';
 import { minify } from 'terser';
 export default defineConfig({
   plugins: [
@@ -14,6 +15,7 @@ export default defineConfig({
     }),
     dts({
       outputDir: ['dist'],
+      afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
     }),
     {
       name: 'compact-umd-identifiers',
@@ -40,9 +42,11 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithent',
       fileName: format => {
+        if (format === 'cjs') return 'lithent.cjs';
         return format === 'umd' ? 'lithent.umd.js' : 'lithent.mjs';
       },
     },

@@ -27,6 +27,10 @@ const entries = [
   join(repo, 'createLithent'),
 ];
 const artifacts = [];
+const exportTargets = value =>
+  typeof value === 'string'
+    ? [value]
+    : Object.values(value).flatMap(exportTargets);
 
 for (const cwd of entries) {
   const metadata = JSON.parse(
@@ -59,9 +63,7 @@ for (const cwd of entries) {
     )
   )
     throw new Error(`Unresolved public workspace dependency: ${metadata.name}`);
-  for (const target of Object.values(packed.exports || {}).flatMap(value =>
-    Object.values(value)
-  ))
+  for (const target of exportTargets(packed.exports || {}))
     await access(resolve(unpacked, target));
   for (const target of Object.values(packed.bin || {}))
     await access(resolve(unpacked, target));
@@ -72,6 +74,19 @@ for (const cwd of entries) {
 }
 
 const consumer = join(work, 'consumer');
+const paths = [
+  'lithent',
+  'lithent/jsx-runtime',
+  'lithent/jsx-dev-runtime',
+  'lithent/helper',
+  'lithent/devHelper',
+  'lithent/ssr',
+  'lithent/tag',
+  'lithent/ftags',
+  'lithent/element',
+  'lithent-concurrent',
+  'lithent-concurrent/helper',
+];
 await mkdir(consumer);
 await writeFile(
   join(consumer, 'package.json'),
@@ -98,7 +113,7 @@ await writeFile(
   join(consumer, 'imports.mjs'),
   `
 import assert from 'node:assert/strict';
-const paths = ['lithent', 'lithent/jsx-runtime', 'lithent/jsx-dev-runtime', 'lithent/helper', 'lithent/devHelper', 'lithent/ssr', 'lithent/tag', 'lithent/ftags', 'lithent/element', 'lithent-concurrent', 'lithent-concurrent/helper'];
+const paths = ${JSON.stringify(paths)};
 for (const path of paths) {
   const module = await import(path);
   assert(Object.keys(module).length > 0, path + ' has no exports');
@@ -117,6 +132,57 @@ console.log('PASS isolated installed consumer: all 11 public import paths and di
 `
 );
 execFileSync(process.execPath, ['imports.mjs'], {
+  cwd: consumer,
+  stdio: 'inherit',
+});
+await writeFile(
+  join(consumer, 'requires.cjs'),
+  `
+const assert = require('node:assert/strict');
+const paths = ${JSON.stringify(paths)};
+(async () => {
+  // A successful require is insufficient: Node 24 can load the old .js UMD
+  // as ESM and return an empty namespace. Assert usable exports and parity.
+  for (const path of paths) {
+    const commonjs = require(path);
+    const esm = await import(path);
+    assert(Object.keys(commonjs).length > 0, path + ' has no CommonJS exports');
+    assert.deepEqual(Object.keys(commonjs).sort(), Object.keys(esm).sort(), path);
+    for (const name of Object.keys(esm))
+      assert.equal(typeof commonjs[name], typeof esm[name], path + ':' + name);
+  }
+  const base = require('lithent');
+  const concurrent = require('lithent-concurrent');
+  for (const core of [base, concurrent])
+    for (const name of ['mount', 'useRenew', 'h', 'render'])
+      assert.equal(typeof core[name], 'function', name);
+  // Directory resolution bypasses exports and exercises the legacy main field.
+  assert.equal(require('./node_modules/lithent'), base);
+  assert.equal(require('./node_modules/lithent-concurrent'), concurrent);
+  assert(!('deferRender' in base));
+  assert.equal(typeof concurrent.deferRender, 'function');
+  assert.equal(typeof concurrent.whenIdle, 'function');
+  const jsx = require('lithent/jsx-runtime');
+  assert.equal(jsx.Fragment, base.Fragment, 'JSX must share the CommonJS core');
+  assert.equal(require('lithent/jsx-dev-runtime'), jsx);
+  const { state } = require('lithent/helper');
+  const { renderToString } = require('lithent/ssr');
+  const App = base.mount(renew => {
+    const label = state('packed & usable', renew);
+    return () => jsx.jsxs(jsx.Fragment, { children: [
+      jsx.jsx('p', { children: label.v }),
+      jsx.jsx('b', { children: 'CommonJS' }),
+    ] });
+  });
+  assert.equal(renderToString(jsx.jsx(App, {})),
+    '<p>packed &amp; usable</p><b>CommonJS</b>');
+  const element = require('lithent/element');
+  assert.equal(element.defineElement('no-dom', () => null), undefined);
+  console.log('PASS isolated CommonJS consumer: all 11 require paths, export parity, main and JSX/helper/SSR integration');
+})().catch(error => { console.error(error); process.exitCode = 1; });
+`
+);
+execFileSync(process.execPath, ['requires.cjs'], {
   cwd: consumer,
   stdio: 'inherit',
 });
@@ -160,6 +226,140 @@ execFileSync(
 console.log(
   'PASS isolated installed consumer: strict JSX/core/helper declarations'
 );
+
+// These fixtures must use native Node resolution, rather than Bundler mode:
+// a shared ESM .d.ts can hide behind working .cjs JavaScript until a .cts
+// consumer reports TS1479/TS1471. Check declaration dependencies too.
+const typeScopes = [
+  {
+    name: 'base',
+    paths: paths.slice(0, 9),
+    names: [
+      'core',
+      'jsx',
+      'jsxDev',
+      'helper',
+      'devHelper',
+      'ssr',
+      'tag',
+      'ftags',
+      'element',
+    ],
+    state: 'state',
+  },
+  {
+    name: 'concurrent',
+    paths: paths.slice(9),
+    names: ['core', 'helper'],
+    state: 'deferred',
+  },
+];
+for (const scope of typeScopes) {
+  const imports = scope.paths
+    .map((path, i) => `import * as ${scope.names[i]} from '${path}';`)
+    .join('\n');
+  const requires = scope.paths
+    .map((path, i) => `import ${scope.names[i]} = require('${path}');`)
+    .join('\n');
+  const usage = `
+const App = core.mount<{ initial: number }>((renew, props) => {
+  const value: helper.State<number> = helper.${scope.state}(props.initial, renew);
+  // @ts-expect-error The state must keep its numeric value type.
+  value.value = 'wrong';
+  return () => core.h('p', {}, String(value.value));
+});
+const renew: core.Renew = core.useRenew();
+// @ts-expect-error A missing export must not silently become any.
+core.missingExport();
+// @ts-expect-error useRenew does not accept arguments.
+core.useRenew(1);
+export { App, renew, ${scope.names.join(', ')} };
+`;
+  for (const [extension, syntax] of [
+    ['mts', imports],
+    ['cts', imports],
+    ['require.cts', requires],
+  ])
+    await writeFile(
+      join(consumer, `${scope.name}.${extension}`),
+      syntax + usage
+    );
+
+  for (const resolution of ['Node16', 'NodeNext']) {
+    for (const format of ['esm', 'commonjs']) {
+      const config = `${scope.name}-${resolution}-${format}.json`;
+      await writeFile(
+        join(consumer, config),
+        JSON.stringify({
+          compilerOptions: {
+            target: 'ES2022',
+            module: resolution,
+            moduleResolution: resolution,
+            strict: true,
+            skipLibCheck: false,
+            noEmit: true,
+            types: [],
+          },
+          files:
+            format === 'esm'
+              ? [`${scope.name}.mts`]
+              : [`${scope.name}.cts`, `${scope.name}.require.cts`],
+        })
+      );
+      execFileSync(
+        process.execPath,
+        [resolve(repo, 'node_modules/typescript/bin/tsc'), '-p', config],
+        { cwd: consumer, stdio: 'inherit' }
+      );
+      console.log(
+        `PASS installed ${scope.name}: ${resolution} ${format} declarations (skipLibCheck: false)`
+      );
+    }
+  }
+}
+
+const commonjsJsx = join(consumer, 'commonjs-jsx');
+await mkdir(commonjsJsx);
+await writeFile(join(commonjsJsx, 'package.json'), '{"type":"commonjs"}');
+await writeFile(
+  join(commonjsJsx, 'consumer.tsx'),
+  `
+import { mount } from 'lithent';
+import { state } from 'lithent/helper';
+import { renderToString } from 'lithent/ssr';
+const App = mount(renew => {
+  const label = state('typed CommonJS', renew);
+  return () => <p>{label.value}</p>;
+});
+export const html: string = renderToString(<App />);
+`
+);
+for (const resolution of ['Node16', 'NodeNext']) {
+  const config = `tsconfig-${resolution}.json`;
+  await writeFile(
+    join(commonjsJsx, config),
+    JSON.stringify({
+      compilerOptions: {
+        target: 'ES2022',
+        module: resolution,
+        moduleResolution: resolution,
+        strict: true,
+        skipLibCheck: false,
+        noEmit: true,
+        types: [],
+        jsx: 'react-jsx',
+        jsxImportSource: 'lithent',
+      },
+      files: ['consumer.tsx'],
+    })
+  );
+  execFileSync(
+    process.execPath,
+    [resolve(repo, 'node_modules/typescript/bin/tsc'), '-p', config],
+    { cwd: commonjsJsx, stdio: 'inherit' }
+  );
+  console.log(`PASS installed CommonJS JSX/helper/SSR: ${resolution}`);
+}
 console.log(`Release tarballs: ${packs}`);
 console.log(
   `ALL PASS (${(await readdir(packs)).length} prepared packages; nothing published)`
