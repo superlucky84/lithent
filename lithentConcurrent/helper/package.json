@@ -5,7 +5,7 @@
   "description": "Lane-aware state helpers for lithent-concurrent. Meaningless on the base core, so they ship here rather than in lithent/helper.",
   "private": true,
   "packageManager": "pnpm@9.12.3",
-  "main": "./dist/lithentConcurrentHelper.umd.js",
+  "main": "./dist/lithentConcurrentHelper.cjs",
   "module": "./dist/lithentConcurrentHelper.mjs",
   "types": "./dist/types/index.d.ts",
   "sideEffects": false,

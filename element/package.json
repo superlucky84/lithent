@@ -5,7 +5,7 @@
   "description": "Register lithent components as standard Custom Elements",
   "private": true,
   "packageManager": "pnpm@9.12.3",
-  "main": "./dist/lithentElement.umd.js",
+  "main": "./dist/lithentElement.cjs",
   "module": "./dist/lithentElement.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {

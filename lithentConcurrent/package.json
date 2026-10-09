@@ -4,19 +4,19 @@
   "version": "0.1.3",
   "description": "Interface-compatible rendering build of Lithent with priority scheduling and interruptible low-priority builds.",
   "packageManager": "pnpm@9.12.3",
-  "main": "./dist/lithentConcurrent.umd.js",
+  "main": "./dist/lithentConcurrent.cjs",
   "module": "./dist/lithentConcurrent.mjs",
   "types": "./dist/types/lithentConcurrent/src/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/lithentConcurrent/src/index.d.ts",
       "import": "./dist/lithentConcurrent.mjs",
-      "require": "./dist/lithentConcurrent.umd.js"
+      "require": "./dist/lithentConcurrent.cjs"
     },
     "./helper": {
       "types": "./helper/dist/types/index.d.ts",
       "import": "./helper/dist/lithentConcurrentHelper.mjs",
-      "require": "./helper/dist/lithentConcurrentHelper.umd.js"
+      "require": "./helper/dist/lithentConcurrentHelper.cjs"
     }
   },
   "files": [

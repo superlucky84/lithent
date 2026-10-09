@@ -25,9 +25,11 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'jsxRuntime',
       fileName: format => {
+        if (format === 'cjs') return 'jsxRuntime.cjs';
         return format === 'umd' ? 'jsxRuntime.umd.js' : 'jsxRuntime.mjs';
       },
     },

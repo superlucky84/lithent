@@ -49,9 +49,11 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentElement',
       fileName: format => {
+        if (format === 'cjs') return 'lithentElement.cjs';
         return format === 'umd'
           ? 'lithentElement.umd.js'
           : 'lithentElement.mjs';

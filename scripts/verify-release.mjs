@@ -72,6 +72,19 @@ for (const cwd of entries) {
 }
 
 const consumer = join(work, 'consumer');
+const paths = [
+  'lithent',
+  'lithent/jsx-runtime',
+  'lithent/jsx-dev-runtime',
+  'lithent/helper',
+  'lithent/devHelper',
+  'lithent/ssr',
+  'lithent/tag',
+  'lithent/ftags',
+  'lithent/element',
+  'lithent-concurrent',
+  'lithent-concurrent/helper',
+];
 await mkdir(consumer);
 await writeFile(
   join(consumer, 'package.json'),
@@ -98,7 +111,7 @@ await writeFile(
   join(consumer, 'imports.mjs'),
   `
 import assert from 'node:assert/strict';
-const paths = ['lithent', 'lithent/jsx-runtime', 'lithent/jsx-dev-runtime', 'lithent/helper', 'lithent/devHelper', 'lithent/ssr', 'lithent/tag', 'lithent/ftags', 'lithent/element', 'lithent-concurrent', 'lithent-concurrent/helper'];
+const paths = ${JSON.stringify(paths)};
 for (const path of paths) {
   const module = await import(path);
   assert(Object.keys(module).length > 0, path + ' has no exports');
@@ -117,6 +130,57 @@ console.log('PASS isolated installed consumer: all 11 public import paths and di
 `
 );
 execFileSync(process.execPath, ['imports.mjs'], {
+  cwd: consumer,
+  stdio: 'inherit',
+});
+await writeFile(
+  join(consumer, 'requires.cjs'),
+  `
+const assert = require('node:assert/strict');
+const paths = ${JSON.stringify(paths)};
+(async () => {
+  // A successful require is insufficient: Node 24 can load the old .js UMD
+  // as ESM and return an empty namespace. Assert usable exports and parity.
+  for (const path of paths) {
+    const commonjs = require(path);
+    const esm = await import(path);
+    assert(Object.keys(commonjs).length > 0, path + ' has no CommonJS exports');
+    assert.deepEqual(Object.keys(commonjs).sort(), Object.keys(esm).sort(), path);
+    for (const name of Object.keys(esm))
+      assert.equal(typeof commonjs[name], typeof esm[name], path + ':' + name);
+  }
+  const base = require('lithent');
+  const concurrent = require('lithent-concurrent');
+  for (const core of [base, concurrent])
+    for (const name of ['mount', 'useRenew', 'h', 'render'])
+      assert.equal(typeof core[name], 'function', name);
+  // Directory resolution bypasses exports and exercises the legacy main field.
+  assert.equal(require('./node_modules/lithent'), base);
+  assert.equal(require('./node_modules/lithent-concurrent'), concurrent);
+  assert(!('deferRender' in base));
+  assert.equal(typeof concurrent.deferRender, 'function');
+  assert.equal(typeof concurrent.whenIdle, 'function');
+  const jsx = require('lithent/jsx-runtime');
+  assert.equal(jsx.Fragment, base.Fragment, 'JSX must share the CommonJS core');
+  assert.equal(require('lithent/jsx-dev-runtime'), jsx);
+  const { state } = require('lithent/helper');
+  const { renderToString } = require('lithent/ssr');
+  const App = base.mount(renew => {
+    const label = state('packed & usable', renew);
+    return () => jsx.jsxs(jsx.Fragment, { children: [
+      jsx.jsx('p', { children: label.v }),
+      jsx.jsx('b', { children: 'CommonJS' }),
+    ] });
+  });
+  assert.equal(renderToString(jsx.jsx(App, {})),
+    '<p>packed &amp; usable</p><b>CommonJS</b>');
+  const element = require('lithent/element');
+  assert.equal(element.defineElement('no-dom', () => null), undefined);
+  console.log('PASS isolated CommonJS consumer: all 11 require paths, export parity, main and JSX/helper/SSR integration');
+})().catch(error => { console.error(error); process.exitCode = 1; });
+`
+);
+execFileSync(process.execPath, ['requires.cjs'], {
   cwd: consumer,
   stdio: 'inherit',
 });

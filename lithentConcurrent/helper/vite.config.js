@@ -32,12 +32,15 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentConcurrentHelper',
-      fileName: format =>
-        format === 'umd'
+      fileName: format => {
+        if (format === 'cjs') return 'lithentConcurrentHelper.cjs';
+        return format === 'umd'
           ? 'lithentConcurrentHelper.umd.js'
-          : 'lithentConcurrentHelper.mjs',
+          : 'lithentConcurrentHelper.mjs';
+      },
     },
     rollupOptions: {
       external: ['lithent-concurrent'],

@@ -25,9 +25,11 @@ export default defineConfig({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentTag',
       fileName: format => {
+        if (format === 'cjs') return 'lithentTag.cjs';
         return format === 'umd' ? 'lithentTag.umd.js' : 'lithentTag.mjs';
       },
     },

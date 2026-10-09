@@ -1,5 +1,13 @@
 # Release notes
 
+## Unreleased
+
+- Fix CommonJS entry points in `lithent`, its subpaths, and
+  `lithent-concurrent` by emitting dedicated `.cjs` bundles and using them for
+  `main` and `exports.require`. Existing ESM and browser UMD paths are kept.
+- Verify all 11 public import and require paths against installed release
+  tarballs, including export parity and CommonJS JSX/helper/SSR integration.
+
 ## 2026-10-08
 
 ### lithent 1.24.0

@@ -4,7 +4,7 @@
   "version": "1.24.0",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@9.12.3",
-  "main": "./dist/lithent.umd.js",
+  "main": "./dist/lithent.cjs",
   "module": "./dist/lithent.mjs",
   "scripts": {
     "dev:core": "vite",
@@ -73,47 +73,47 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/lithent.mjs",
-      "require": "./dist/lithent.umd.js"
+      "require": "./dist/lithent.cjs"
     },
     "./jsx-runtime": {
       "types": "./jsx-runtime/dist/index.d.ts",
       "import": "./jsx-runtime/dist/jsxRuntime.mjs",
-      "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
+      "require": "./jsx-runtime/dist/jsxRuntime.cjs"
     },
     "./jsx-dev-runtime": {
       "types": "./jsx-runtime/dist/index.d.ts",
       "import": "./jsx-runtime/dist/jsxRuntime.mjs",
-      "require": "./jsx-runtime/dist/jsxRuntime.umd.js"
+      "require": "./jsx-runtime/dist/jsxRuntime.cjs"
     },
     "./helper": {
       "types": "./helper/dist/index.d.ts",
       "import": "./helper/dist/lithentHelper.mjs",
-      "require": "./helper/dist/lithentHelper.umd.js"
+      "require": "./helper/dist/lithentHelper.cjs"
     },
     "./devHelper": {
       "types": "./devHelper/dist/index.d.ts",
       "import": "./devHelper/dist/lithentDevHelper.mjs",
-      "require": "./devHelper/dist/lithentDevHelper.umd.js"
+      "require": "./devHelper/dist/lithentDevHelper.cjs"
     },
     "./ssr": {
       "types": "./ssr/dist/index.d.ts",
       "import": "./ssr/dist/lithentSsr.mjs",
-      "require": "./ssr/dist/lithentSsr.umd.js"
+      "require": "./ssr/dist/lithentSsr.cjs"
     },
     "./tag": {
       "types": "./tag/dist/index.d.ts",
       "import": "./tag/dist/lithentTag.mjs",
-      "require": "./tag/dist/lithentTag.umd.js"
+      "require": "./tag/dist/lithentTag.cjs"
     },
     "./ftags": {
       "types": "./ftags/dist/index.d.ts",
       "import": "./ftags/dist/lithentFTags.mjs",
-      "require": "./ftags/dist/lithentFTags.umd.js"
+      "require": "./ftags/dist/lithentFTags.cjs"
     },
     "./element": {
       "types": "./element/dist/index.d.ts",
       "import": "./element/dist/lithentElement.mjs",
-      "require": "./element/dist/lithentElement.umd.js"
+      "require": "./element/dist/lithentElement.cjs"
     }
   },
   "types": "./dist/index.d.ts",

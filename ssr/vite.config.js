@@ -49,9 +49,11 @@ export default defineConfig(({ mode }) => ({
     emptyOutDir: false,
     sourcemap: true,
     lib: {
+      formats: ['es', 'umd', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'lithentSsr',
       fileName: format => {
+        if (format === 'cjs') return 'lithentSsr.cjs';
         return format === 'umd' ? 'lithentSsr.umd.js' : 'lithentSsr.mjs';
       },
     },
