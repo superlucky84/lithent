@@ -71,49 +71,94 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/lithent.mjs",
-      "require": "./dist/lithent.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/lithent.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/lithent.cjs"
+      }
     },
     "./jsx-runtime": {
-      "types": "./jsx-runtime/dist/index.d.ts",
-      "import": "./jsx-runtime/dist/jsxRuntime.mjs",
-      "require": "./jsx-runtime/dist/jsxRuntime.cjs"
+      "import": {
+        "types": "./jsx-runtime/dist/index.d.ts",
+        "default": "./jsx-runtime/dist/jsxRuntime.mjs"
+      },
+      "require": {
+        "types": "./jsx-runtime/dist/index.d.cts",
+        "default": "./jsx-runtime/dist/jsxRuntime.cjs"
+      }
     },
     "./jsx-dev-runtime": {
-      "types": "./jsx-runtime/dist/index.d.ts",
-      "import": "./jsx-runtime/dist/jsxRuntime.mjs",
-      "require": "./jsx-runtime/dist/jsxRuntime.cjs"
+      "import": {
+        "types": "./jsx-runtime/dist/index.d.ts",
+        "default": "./jsx-runtime/dist/jsxRuntime.mjs"
+      },
+      "require": {
+        "types": "./jsx-runtime/dist/index.d.cts",
+        "default": "./jsx-runtime/dist/jsxRuntime.cjs"
+      }
     },
     "./helper": {
-      "types": "./helper/dist/index.d.ts",
-      "import": "./helper/dist/lithentHelper.mjs",
-      "require": "./helper/dist/lithentHelper.cjs"
+      "import": {
+        "types": "./helper/dist/index.d.ts",
+        "default": "./helper/dist/lithentHelper.mjs"
+      },
+      "require": {
+        "types": "./helper/dist/index.d.cts",
+        "default": "./helper/dist/lithentHelper.cjs"
+      }
     },
     "./devHelper": {
-      "types": "./devHelper/dist/index.d.ts",
-      "import": "./devHelper/dist/lithentDevHelper.mjs",
-      "require": "./devHelper/dist/lithentDevHelper.cjs"
+      "import": {
+        "types": "./devHelper/dist/index.d.ts",
+        "default": "./devHelper/dist/lithentDevHelper.mjs"
+      },
+      "require": {
+        "types": "./devHelper/dist/index.d.cts",
+        "default": "./devHelper/dist/lithentDevHelper.cjs"
+      }
     },
     "./ssr": {
-      "types": "./ssr/dist/index.d.ts",
-      "import": "./ssr/dist/lithentSsr.mjs",
-      "require": "./ssr/dist/lithentSsr.cjs"
+      "import": {
+        "types": "./ssr/dist/index.d.ts",
+        "default": "./ssr/dist/lithentSsr.mjs"
+      },
+      "require": {
+        "types": "./ssr/dist/index.d.cts",
+        "default": "./ssr/dist/lithentSsr.cjs"
+      }
     },
     "./tag": {
-      "types": "./tag/dist/index.d.ts",
-      "import": "./tag/dist/lithentTag.mjs",
-      "require": "./tag/dist/lithentTag.cjs"
+      "import": {
+        "types": "./tag/dist/index.d.ts",
+        "default": "./tag/dist/lithentTag.mjs"
+      },
+      "require": {
+        "types": "./tag/dist/index.d.cts",
+        "default": "./tag/dist/lithentTag.cjs"
+      }
     },
     "./ftags": {
-      "types": "./ftags/dist/index.d.ts",
-      "import": "./ftags/dist/lithentFTags.mjs",
-      "require": "./ftags/dist/lithentFTags.cjs"
+      "import": {
+        "types": "./ftags/dist/index.d.ts",
+        "default": "./ftags/dist/lithentFTags.mjs"
+      },
+      "require": {
+        "types": "./ftags/dist/index.d.cts",
+        "default": "./ftags/dist/lithentFTags.cjs"
+      }
     },
     "./element": {
-      "types": "./element/dist/index.d.ts",
-      "import": "./element/dist/lithentElement.mjs",
-      "require": "./element/dist/lithentElement.cjs"
+      "import": {
+        "types": "./element/dist/index.d.ts",
+        "default": "./element/dist/lithentElement.mjs"
+      },
+      "require": {
+        "types": "./element/dist/index.d.cts",
+        "default": "./element/dist/lithentElement.cjs"
+      }
     }
   },
   "types": "./dist/index.d.ts",

@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { emitDeclarationFormats } from '../scripts/emit-declaration-formats.mjs';
 
 /**
  * RC-9 — run this suite against either core.
@@ -37,6 +38,7 @@ export default defineConfig({
     }),
     dts({
       outputDir: ['dist'],
+      afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
     }),
   ],
   resolve: {

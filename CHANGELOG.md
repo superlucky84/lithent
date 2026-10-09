@@ -7,6 +7,9 @@
   `main` and `exports.require`. Existing ESM and browser UMD paths are kept.
 - Verify all 11 public import and require paths against installed release
   tarballs, including export parity and CommonJS JSX/helper/SSR integration.
+- Emit separate CommonJS declarations and select types by import/require mode.
+  Verify native Node16/NodeNext ESM and CommonJS TypeScript consumers, including
+  declaration dependencies and CommonJS JSX, without skipping library checks.
 
 ## 2026-10-08
 

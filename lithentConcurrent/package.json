@@ -9,14 +9,24 @@
   "types": "./dist/types/lithentConcurrent/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/lithentConcurrent/src/index.d.ts",
-      "import": "./dist/lithentConcurrent.mjs",
-      "require": "./dist/lithentConcurrent.cjs"
+      "import": {
+        "types": "./dist/types/lithentConcurrent/src/index.d.ts",
+        "default": "./dist/lithentConcurrent.mjs"
+      },
+      "require": {
+        "types": "./dist/types/lithentConcurrent/src/index.d.cts",
+        "default": "./dist/lithentConcurrent.cjs"
+      }
     },
     "./helper": {
-      "types": "./helper/dist/types/index.d.ts",
-      "import": "./helper/dist/lithentConcurrentHelper.mjs",
-      "require": "./helper/dist/lithentConcurrentHelper.cjs"
+      "import": {
+        "types": "./helper/dist/types/index.d.ts",
+        "default": "./helper/dist/lithentConcurrentHelper.mjs"
+      },
+      "require": {
+        "types": "./helper/dist/types/index.d.cts",
+        "default": "./helper/dist/lithentConcurrentHelper.cjs"
+      }
     }
   },
   "files": [
