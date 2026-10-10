@@ -6,6 +6,7 @@ export const getRenderProtocol = () =>
   (
     componentMap as typeof componentMap & {
       renderGate?: {
+        boundaryOwner?: (node: WDom) => boolean;
         blocks?: (node: WDom) => boolean;
         reparent?: (node: WDom) => void;
         settle?: (key?: Props) => void;

@@ -8,12 +8,15 @@
 갱신 중단을 Concurrent에만 연결한다.
 현재 `experiment/closure-lifecycle-performance`의 6단계는 컴포넌트 소속 캐시와
 관련 작업만 처리하는 중단 정책으로 Concurrent 비용을 줄인다.
+7단계는 중단 경계가 없으면 차단 콜백을 제거하고, 추가 빌드 분기 없이 기존 Concurrent를
+사용하는 [공개 helper API 검토안](../../docs/closure-lifecycle/API_REVIEW.md)을 작성한다.
 공개 패키지 exports에는 연결하지 않는다. [1단계 결과](../../docs/closure-lifecycle/IMPLEMENT.md),
 [1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md),
 [3단계 호스트·브라우저 결과](../../docs/closure-lifecycle/PHASE3.md),
 [4단계 코어·크기·성능 결과](../../docs/closure-lifecycle/PHASE4.md),
 [5단계 Concurrent 전용 결과](../../docs/closure-lifecycle/PHASE5.md),
-[6단계 성능 개선 결과](../../docs/closure-lifecycle/PHASE6.md)를 참고한다.
+[6단계 성능 개선 결과](../../docs/closure-lifecycle/PHASE6.md),
+[7단계 활성 경계·API 정리](../../docs/closure-lifecycle/PHASE7.md)를 참고한다.
 
 ## 사용 예시
 

@@ -18,6 +18,8 @@ afterEach(() => {
   destroys.splice(0).forEach(destroy => destroy());
   document.body.replaceChildren();
   expect(getRenderProtocol()?.blocks).toBeUndefined();
+  expect(getRenderProtocol()?.reparent).toBeUndefined();
+  expect(getRenderProtocol()?.boundaryOwner).toBeUndefined();
 });
 const attach = (node: Parameters<typeof render>[0]) => {
   const host = document.createElement('section');
@@ -94,10 +96,13 @@ describe('opt-in core render boundary', () => {
     'freezes a child renew and update effects (queued before pause=%s)',
     async queued => {
       const app = fixture();
+      expect(getRenderProtocol()?.blocks).toBeUndefined();
+      expect(getRenderProtocol()?.boundaryOwner).toBeTypeOf('function');
       const input = app.host.querySelector('input')!;
       app.setValue(1);
       if (queued) app.renew();
       app.boundary.pause();
+      expect(getRenderProtocol()?.blocks).toBeTypeOf('function');
       expect(getRenderProtocol()?.reparent).toBeTypeOf('function');
       for (let i = 2; i <= 6; i++) {
         app.setValue(i);
@@ -110,6 +115,7 @@ describe('opt-in core render boundary', () => {
       expect(app.commits).not.toHaveBeenCalled();
       app.boundary.resume();
       app.boundary.resume();
+      expect(getRenderProtocol()?.blocks).toBeUndefined();
       expect(getRenderProtocol()?.reparent).toBeUndefined();
       await nextTick();
       expect(app.host.querySelector('input')).toBe(input);
@@ -214,9 +220,11 @@ describe('opt-in core render boundary', () => {
     renew();
     await nextTick();
     inner.resume();
+    expect(getRenderProtocol()?.blocks).toBeTypeOf('function');
     await nextTick();
     expect(host.textContent).toBe('0');
     outer.resume();
+    expect(getRenderProtocol()?.blocks).toBeUndefined();
     await nextTick();
     expect(host.textContent).toBe('1');
     inner.pause();
@@ -343,5 +351,31 @@ describe('opt-in core render boundary', () => {
     await nextTick();
     expect(host.textContent).toBe('2');
     expect(other.active).toBe(false);
+  });
+
+  it('releases the last paused gate while active roots remain registered', async () => {
+    const active = fixture();
+    const paused = fixture();
+    const input = active.host.querySelector('input')!;
+    paused.boundary.pause();
+    expect(getRenderProtocol()?.blocks).toBeTypeOf('function');
+    paused.boundary.dispose();
+    expect(getRenderProtocol()?.blocks).toBeUndefined();
+    expect(getRenderProtocol()?.reparent).toBeUndefined();
+    expect(getRenderProtocol()?.boundaryOwner).toBeTypeOf('function');
+    active.setValue(1);
+    active.renew();
+    await nextTick();
+    expect(input.value).toBe('initial:1');
+    active.boundary.pause();
+    active.setValue(2);
+    active.renew();
+    await nextTick();
+    expect(input.value).toBe('initial:1');
+    active.boundary.resume();
+    await nextTick();
+    expect(input.value).toBe('initial:2');
+    expect(active.effects).toHaveBeenCalledTimes(2);
+    expect(active.commits).toHaveBeenCalledTimes(2);
   });
 });

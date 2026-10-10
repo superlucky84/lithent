@@ -65,6 +65,12 @@ export const useRenderBoundary = (initialActive = true): RenderBoundary => {
   const entry: Entry = { active: initialActive, dirty: false };
   let disposed = false;
   let registered = false;
+  const releasePauseHooks = () => {
+    if (paused) return;
+    memberships = new WeakMap();
+    if (protocol.blocks === blocks) delete protocol.blocks;
+    if (protocol.reparent === reparent) delete protocol.reparent;
+  };
   const dispose = () => {
     if (disposed) return;
     disposed = true;
@@ -74,27 +80,30 @@ export const useRenderBoundary = (initialActive = true): RenderBoundary => {
       memberships = new WeakMap();
       count--;
       if (!entry.active) paused--;
-      if (!paused && protocol.reparent === reparent) delete protocol.reparent;
-      if (!count && protocol.blocks === blocks) {
-        delete protocol.blocks;
-        delete protocol.reparent;
-      }
+      releasePauseHooks();
+      if (!count && protocol.boundaryOwner === blocks)
+        delete protocol.boundaryOwner;
     }
   };
   // Register only after commit: failed construction and SSR own no gate.
   mountCallback(() => {
     if (disposed) return;
-    if (protocol.blocks && protocol.blocks !== blocks)
+    if (
+      (protocol.boundaryOwner && protocol.boundaryOwner !== blocks) ||
+      (protocol.blocks && protocol.blocks !== blocks)
+    )
       throw new Error('A different render boundary adapter is installed');
     entries.set(key, entry);
     memberships = new WeakMap();
     count++;
-    if (!entry.active) {
-      paused++;
+    if (!entry.active) paused++;
+    if (paused) {
+      protocol.blocks = blocks;
       protocol.reparent = reparent;
     }
     registered = true;
-    protocol.blocks = blocks;
+    // Reserve the adapter independently of the callbacks used by rendering.
+    protocol.boundaryOwner = blocks;
     return dispose;
   });
   return {
@@ -110,6 +119,7 @@ export const useRenderBoundary = (initialActive = true): RenderBoundary => {
       entry.active = false;
       if (registered) {
         paused++;
+        protocol.blocks = blocks;
         protocol.reparent = reparent;
       }
     },
@@ -117,10 +127,7 @@ export const useRenderBoundary = (initialActive = true): RenderBoundary => {
       if (disposed || entry.active) return;
       entry.active = true;
       if (registered) paused--;
-      if (!paused) {
-        memberships = new WeakMap();
-        if (protocol.reparent === reparent) delete protocol.reparent;
-      }
+      releasePauseHooks();
       if (entry.dirty) {
         entry.dirty = false;
         componentMap.get(key)?.up();

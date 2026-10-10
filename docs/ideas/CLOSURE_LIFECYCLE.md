@@ -2,12 +2,13 @@
 
 - 작성일: 2026-10-10
 - 기준: Lithent `main`, `0b685260ab204857d7e0adbd472d029528a31005`
-- 상태: **코어 무수정 1~3단계·양쪽 코어 연동 4단계·Concurrent 전용 분리 5단계 검증 완료. 6단계는 기본 코어 동일성을 유지하며 경계 소속 캐시와 관련 작업만 처리하는 중단 정책을 검증했다. 공개 API 출하는 미결정.**
+- 상태: **1~6단계 검증 완료. 7단계는 활성 경계의 불필요한 콜백을 제거하고 공개 helper API 검토안을 작성했다. 기존 Concurrent 빌드에 포함하며 추가 코어 빌드 분기는 만들지 않는다. 공개 API는 미출하.**
 - 검증 문서: [소유권·비동기 작업 1단계](../closure-lifecycle/REQUIREMENTS.md), [활동 수명·명시적 화면 보존 2단계](../closure-lifecycle/PHASE2.md), [호스트·Chromium 검증 3단계](../closure-lifecycle/PHASE3.md)
 - 관련 후보 목록: [IDEAS.md](./IDEAS.md)
 - 코어 연동 실험: [4단계 결과와 제한](../closure-lifecycle/PHASE4.md), `experiment/closure-lifecycle-core`.
 - Concurrent 전용 실험: [5단계 결과와 제한](../closure-lifecycle/PHASE5.md), `experiment/closure-lifecycle-concurrent`. 기본 코어 소스·타입·번들 해시 동일.
 - Concurrent 성능 개선: [6단계 결과와 제한](../closure-lifecycle/PHASE6.md), `experiment/closure-lifecycle-performance`.
+- 활성 경계 정리·다음 API: [7단계 결과](../closure-lifecycle/PHASE7.md), [공개 helper API 검토안](../closure-lifecycle/API_REVIEW.md).
 
 ## 1. 핵심 아이디어
 
