@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createLatestTask } from '../src/latest';
-import { createOwnerScope } from '../src/scope';
+import { createLatestTask } from 'lithent/helper';
+import { createOwnerScope } from 'lithent/helper';
 import { deferred } from './deferred';
 
 describe('latest-only work', () => {

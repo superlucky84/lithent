@@ -1,10 +1,11 @@
 import { mountCallback } from 'lithent';
 import { createOwnerScope } from './scope';
+import type { CleanupErrorReporter, OwnerScope } from './scope';
 
 /** Call once in a mounter; start external work in mountCallback or events. */
 export const useOwnerScope = (
-  reportCleanupError: (error: unknown) => void = error => console.error(error)
-) => {
+  reportCleanupError: CleanupErrorReporter = error => console.error(error)
+): OwnerScope => {
   const scope = createOwnerScope();
   mountCallback(() => () => {
     try {

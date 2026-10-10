@@ -4,8 +4,8 @@ import {
   createRetainedHost,
   createRetainedView,
   supportsRenderBoundary,
-} from '../src';
-import { getRenderProtocol } from '../src/renderProtocol';
+} from 'lithent/helper';
+import { getRenderProtocol } from '../../../helper/src/lifecycle/renderProtocol';
 
 const destroys: Array<() => void> = [];
 afterEach(() => {

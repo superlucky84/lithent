@@ -34,7 +34,7 @@ Concurrent의 wDom·diff·scheduler는 같은 전용 객체를 사용한다. 공
 | 관리된 루트 renew의 숨김 중 억제             | 지원   | 지원                          |
 | 독립 자식 native renew·부모 diff의 경계 동결 | 미지원 | `freezeChildren: true`로 선택 |
 
-[`renderProtocol.ts`](../../experiments/closure-lifecycle/src/renderProtocol.ts)는
+[`renderProtocol.ts`](https://github.com/superlucky84/lithent/blob/25821b015d23f258a1012a0e1721d7a4c5b8839b/experiments/closure-lifecycle/src/renderProtocol.ts)는
 실험 어댑터가 내부 capability를 읽는 작은 연결부다. `supportsRenderBoundary()`로 지원을 확인할 수 있다.
 기본에서 true 옵션을 요청하면 createRetainedView/createRetainedHost 생성 시 오류를 던진다.
 편집기 초기화·DOM 삽입·비동기 mount를 시작하지 않으며 지원이 되는 것처럼 조용히 넘어가지 않는다.

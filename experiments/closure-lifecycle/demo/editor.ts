@@ -1,6 +1,6 @@
 import { h, mount, mountCallback, updateCallback } from 'lithent';
-import { createScopedTask } from '../src';
-import type { ActivityScope } from '../src';
+import { createScopedTask } from 'lithent/helper';
+import type { ActivityScope } from 'lithent/helper';
 import type { Renew } from 'lithent';
 import type { EditorMetrics } from './metrics';
 import { readStatus } from './status';

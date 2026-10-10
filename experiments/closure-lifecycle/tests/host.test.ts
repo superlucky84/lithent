@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { h, mount, nextTick, render } from 'lithent';
 import { defineElement } from '../../../element/src/index';
-import { createRetainedHost } from '../src';
+import { createRetainedHost } from 'lithent/helper';
 
 const destroys: Array<() => void> = [];
 const flush = async () => {

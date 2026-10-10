@@ -7,6 +7,13 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: /^lithent\/helper$/,
+        replacement: resolve(
+          __dirname,
+          '../../../helper/dist/lithentHelper.mjs'
+        ),
+      },
+      {
         find: /^lithent$/,
         replacement: resolve(
           __dirname,

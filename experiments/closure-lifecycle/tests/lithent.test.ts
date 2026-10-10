@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { h, mount, mountCallback, nextTick, render } from 'lithent';
 import { defineElement } from '../../../element/src/index';
-import { createLatestTask, useOwnerScope } from '../src';
-import type { OwnerScope } from '../src';
+import { createLatestTask, useOwnerScope } from 'lithent/helper';
+import type { OwnerScope } from 'lithent/helper';
 import { deferred } from './deferred';
 
 const destroys: Array<() => void> = [];

@@ -10,12 +10,24 @@ export interface RetainedViewOptions {
   freezeChildren?: boolean;
 }
 
+export type RetainedViewInitializer = (
+  renew: Renew,
+  scope: ActivityScope
+) => () => MiddleStateWDom;
+
+export interface RetainedView {
+  readonly scope: ActivityScope;
+  show(): void;
+  hide(): void;
+  dispose(): void;
+}
+
 /** Explicit retained root, initially hidden. Child freezing is opt-in. */
 export const createRetainedView = (
   host: HTMLElement,
-  initialize: (renew: Renew, scope: ActivityScope) => () => MiddleStateWDom,
+  initialize: RetainedViewInitializer,
   options: RetainedViewOptions = {}
-) => {
+): RetainedView => {
   if (options.freezeChildren && !supportsRenderBoundary())
     throw new Error('Child freezing requires the Concurrent lifecycle core');
   const scope = createActivityScope();

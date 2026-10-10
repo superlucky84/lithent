@@ -1,16 +1,29 @@
-export { createOwnerScope } from './scope';
-export { createLatestTask } from './latest';
-export { useOwnerScope } from './lithent';
-export { createActivityScope } from './activity';
-export { createScopedTask } from './scopedTask';
-export { createRetainedView } from './retainedView';
-export { createRetainedHost } from './host';
-export { useRenderBoundary } from './renderBoundary';
-export { supportsRenderBoundary } from './renderProtocol';
-export type { RenderBoundary } from './renderBoundary';
-export type { RetainedViewOptions } from './retainedView';
-export type { RetainedHostProps } from './host';
-export type { Activity, ActivityScope } from './activity';
-export type { TaskLifetime } from './scopedTask';
-export type { Cleanup, OwnerScope } from './scope';
-export type { TaskHandlers, TaskOutcome } from './latest';
+// Compatibility entry for prior experiment imports. Implementation lives in helper.
+export {
+  createOwnerScope,
+  createLatestTask,
+  useOwnerScope,
+  createActivityScope,
+  createScopedTask,
+  createRetainedView,
+  createRetainedHost,
+  useRenderBoundary,
+  supportsRenderBoundary,
+} from 'lithent/helper';
+export type {
+  Cleanup,
+  CleanupErrorReporter,
+  OwnerScope,
+  Activity,
+  ActivityScope,
+  TaskWork,
+  LatestTask,
+  TaskHandlers,
+  TaskOutcome,
+  TaskLifetime,
+  RetainedViewInitializer,
+  RetainedView,
+  RetainedViewOptions,
+  RetainedHostProps,
+  RenderBoundary,
+} from 'lithent/helper';

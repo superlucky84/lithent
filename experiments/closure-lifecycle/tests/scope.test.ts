@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createOwnerScope } from '../src/scope';
+import { createOwnerScope } from 'lithent/helper';
 
 describe('instance ownership', () => {
   it('releases resources once, including manual release and repeated dispose', () => {

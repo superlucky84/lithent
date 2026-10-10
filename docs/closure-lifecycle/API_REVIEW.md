@@ -2,7 +2,7 @@
 
 - 작성일: 2026-10-10
 - 대상: `experiment/closure-lifecycle-performance`의 검증된 구현
-- 상태: 공개 API와 배치 제안. 아래 `lithent/helper` import는 아직 출하하지 않았다.
+- 상태: 7단계 당시의 API·배치 제안 기록. 현재 공개 통합 계약은 [DESIGN](./DESIGN.md), 진행 상태는 [IMPLEMENT](./IMPLEMENT.md)가 정본이다. npm 배포 전이다.
 - 근거: [6단계 결과](./PHASE6.md), [7단계 정리](./PHASE7.md)
 
 ## 빌드와 배치

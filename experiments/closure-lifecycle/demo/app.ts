@@ -1,7 +1,7 @@
 import * as core from 'lithent';
 import { h, mount, render } from 'lithent';
 import { defineElement } from '../../../element/src';
-import { createRetainedHost, supportsRenderBoundary } from '../src';
+import { createRetainedHost, supportsRenderBoundary } from 'lithent/helper';
 import { createEditor } from './editor';
 import { createMetrics } from './metrics';
 import { emitStatus } from './status';

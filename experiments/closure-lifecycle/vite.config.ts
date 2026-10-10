@@ -10,12 +10,19 @@ const core =
 export default defineConfig({
   root: experiment,
   resolve: {
-    alias: [{ find: /^lithent$/, replacement: resolve(experiment, core) }],
+    alias: [
+      { find: /^lithent$/, replacement: resolve(experiment, core) },
+      {
+        find: /^lithent\/helper$/,
+        replacement: resolve(experiment, '../../helper/dist/lithentHelper.mjs'),
+      },
+    ],
   },
   build: {
     outDir: 'dist',
     lib: {
-      entry: resolve(experiment, 'src/index.ts'),
+      // Historical standalone measurements use the canonical implementation.
+      entry: resolve(experiment, '../../helper/src/lifecycle/index.ts'),
       name: 'lithentLifecycleExperiment',
       formats: ['es', 'cjs', 'umd'],
       fileName: format =>

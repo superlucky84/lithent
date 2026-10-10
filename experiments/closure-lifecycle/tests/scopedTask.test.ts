@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createActivityScope } from '../src/activity';
-import { createScopedTask } from '../src/scopedTask';
+import { createActivityScope } from 'lithent/helper';
+import { createScopedTask } from 'lithent/helper';
 import { deferred } from './deferred';
 
 describe('task lifetimes', () => {

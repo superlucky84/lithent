@@ -1,5 +1,6 @@
-/** Experimental instance ownership. Creation itself starts no external work. */
+/** Instance ownership. Creation itself starts no external work. */
 export type Cleanup = () => void;
+export type CleanupErrorReporter = (error: unknown) => void;
 
 export interface OwnerScope {
   readonly disposed: boolean;

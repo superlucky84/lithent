@@ -39,7 +39,7 @@
 
 ## 실험 어댑터
 
-[`renderBoundary.ts`](../../experiments/closure-lifecycle/src/renderBoundary.ts)의
+[`renderBoundary.ts`](https://github.com/superlucky84/lithent/blob/5a6efb2a58f356c4895592b376ce8c4b3d0a6bc4/experiments/closure-lifecycle/src/renderBoundary.ts)의
 `useRenderBoundary(initialActive = true)`는 mounter에서 컴포넌트당 한 번 호출한다.
 mount commit 뒤에만 경계를 등록하고 unmount 시 제거한다. SSR과 실패한 초기 구성은 등록하지 않는다.
 최초 구성은 inactive 경계에서도 한 번 허용한다.

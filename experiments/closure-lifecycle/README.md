@@ -1,30 +1,33 @@
-# Closure lifecycle experiment
+# Closure lifecycle consumer verification
 
-소유권, 최신 작업, 활동 수명과 명시적인 화면 보존을 검증하는 실험이다.
-`experiment/closure-lifecycle`의 1~3단계는 코어를 변경하지 않는다.
-`experiment/closure-lifecycle-core`의 4단계는 자식 native renew와 부모 diff를 막는
-최소 코어 연동을 별도로 검증한다.
-`experiment/closure-lifecycle-concurrent`의 5단계는 기본 코어를 원본으로 복원하고
-갱신 중단을 Concurrent에만 연결한다.
-현재 `experiment/closure-lifecycle-performance`의 6단계는 컴포넌트 소속 캐시와
-관련 작업만 처리하는 중단 정책으로 Concurrent 비용을 줄인다.
-7단계는 중단 경계가 없으면 차단 콜백을 제거하고, 추가 빌드 분기 없이 기존 Concurrent를
-사용하는 [공개 helper API 검토안](../../docs/closure-lifecycle/API_REVIEW.md)을 작성한다.
-공개 패키지 exports에는 연결하지 않는다. [1단계 결과](../../docs/closure-lifecycle/IMPLEMENT.md),
-[1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md),
-[3단계 호스트·브라우저 결과](../../docs/closure-lifecycle/PHASE3.md),
-[4단계 코어·크기·성능 결과](../../docs/closure-lifecycle/PHASE4.md),
-[5단계 Concurrent 전용 결과](../../docs/closure-lifecycle/PHASE5.md),
-[6단계 성능 개선 결과](../../docs/closure-lifecycle/PHASE6.md),
-[7단계 활성 경계·API 정리](../../docs/closure-lifecycle/PHASE7.md)를 참고한다.
-7단계 콜백 정리까지 포함한 기능 추가 전 Concurrent 대비 시간 증가는
-[최종 성능 비교](../../docs/closure-lifecycle/PERFORMANCE_FINAL.md)에 원본 표본과 함께 기록한다.
+현재 `feature/closure-lifecycle-helper`는 검증된 구현을 기존 `lithent/helper`에 연결한다.
+구현 정본은 `helper/src/lifecycle/`이고 이 폴더는 공개 import 회귀·시연·과거 측정 도구를 유지한다.
+`src/index.ts`는 호환 재수출만 제공한다. 기본·Concurrent 코어는 7단계 이후 변경하지 않는다.
+
+현재 [요구사항](../../docs/closure-lifecycle/REQUIREMENTS.md), [계약](../../docs/closure-lifecycle/DESIGN.md),
+[계획·결과](../../docs/closure-lifecycle/IMPLEMENT.md), [출시 체크리스트](../../docs/closure-lifecycle/MANUAL_TEST_CHECKLIST.md)를 참고한다.
+[2단계](../../docs/closure-lifecycle/PHASE2.md)부터 [7단계](../../docs/closure-lifecycle/PHASE7.md)까지와
+[최종 성능](../../docs/closure-lifecycle/PERFORMANCE_FINAL.md)은 당시 결과다. 아래 단계별 측정 명령은 해당 역사 커밋에서 실행한다.
+
+공개 consumer 검증은 코어·helper 빌드 후 저장소 루트에서 실행한다.
+
+```sh
+(cd helper && ../node_modules/.bin/vite build)
+./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
+LITHENT_CORE=concurrent ./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
+./node_modules/.bin/tsc -p experiments/closure-lifecycle/tsconfig.json
+node scripts/verify-lifecycle-helper.mjs --baseline-helper /path/to/previous-helper-dist --output /path/to/results.json
+```
+
+크기 비교 baseline은 `123c243476b00336faf40e3c249ffde8b118dc8d`의 helper 빌드 세 파일이다.
+별도 checkout에서 `(cd helper && ../node_modules/.bin/vite build)` 후 `helper/dist`를 보관한다.
+기존 `measure*.mjs`는 helper 무수정 실험용이므로 이번 공개 helper 증가분 확인에는 위 소비자 검증기를 사용한다.
 
 ## 사용 예시
 
 ```ts
 import { h, mount, mountCallback } from 'lithent';
-import { createLatestTask, useOwnerScope } from './src';
+import { createLatestTask, useOwnerScope } from 'lithent/helper';
 
 const Search = mount(renew => {
   const owner = useOwnerScope();
@@ -89,7 +92,7 @@ observer가 예외를 던질 수 있는 코드에서는 `run()`의 reject도 처
 
 ```ts
 import { h } from 'lithent';
-import { createRetainedView, createScopedTask } from './src';
+import { createRetainedView, createScopedTask } from 'lithent/helper';
 
 const host = document.querySelector<HTMLElement>('#widget')!;
 const view = createRetainedView(host, (renew, scope) => {

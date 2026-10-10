@@ -5,7 +5,7 @@ it('starts no timer or request while importing or constructing a scope on the se
   vi.resetModules();
   const interval = vi.spyOn(globalThis, 'setInterval');
   const fetch = vi.spyOn(globalThis, 'fetch');
-  const { createLatestTask, createOwnerScope } = await import('../src');
+  const { createLatestTask, createOwnerScope } = await import('lithent/helper');
   const scope = createOwnerScope();
   createLatestTask(scope);
   expect(interval).not.toHaveBeenCalled();
@@ -17,7 +17,7 @@ it('starts no timer or request while importing or constructing a scope on the se
 it('keeps mount work dormant while rendering a component to HTML', async () => {
   const { h, mount, mountCallback } = await import('lithent');
   const { renderToString } = await import('lithent/ssr');
-  const { createLatestTask, useOwnerScope } = await import('../src');
+  const { createLatestTask, useOwnerScope } = await import('lithent/helper');
   const start = vi.fn();
   const Component = mount(() => {
     const scope = useOwnerScope();
@@ -34,7 +34,9 @@ it('keeps mount work dormant while rendering a component to HTML', async () => {
 it('renders a retained host shell without initializing browser work during SSR', async () => {
   const { h } = await import('lithent');
   const { renderToString } = await import('lithent/ssr');
-  const { createRetainedHost, supportsRenderBoundary } = await import('../src');
+  const { createRetainedHost, supportsRenderBoundary } = await import(
+    'lithent/helper'
+  );
   const initialize = vi.fn(() => () => h('span', {}, 'editor'));
   const Host = createRetainedHost(initialize, console.error, {
     freezeChildren: supportsRenderBoundary(),

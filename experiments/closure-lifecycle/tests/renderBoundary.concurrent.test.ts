@@ -9,9 +9,9 @@ import {
   updateCallback,
 } from 'lithent';
 import type { Renew } from 'lithent';
-import { createRetainedView, useRenderBoundary } from '../src';
-import type { RenderBoundary } from '../src';
-import { getRenderProtocol } from '../src/renderProtocol';
+import { createRetainedView, useRenderBoundary } from 'lithent/helper';
+import type { RenderBoundary } from 'lithent/helper';
+import { getRenderProtocol } from '../../../helper/src/lifecycle/renderProtocol';
 
 const destroys: Array<() => void> = [];
 afterEach(() => {

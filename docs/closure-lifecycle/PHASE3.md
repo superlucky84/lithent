@@ -17,7 +17,7 @@
 
 ## 구현 위치
 
-- [`host.ts`](../../experiments/closure-lifecycle/src/host.ts): `createRetainedHost(initialize, reportCleanupError?)`.
+- [`host.ts`](https://github.com/superlucky84/lithent/blob/925b4aa98c40ca20b309ea2613cc625d260fa5b1/experiments/closure-lifecycle/src/host.ts): `createRetainedHost(initialize, reportCleanupError?)`.
 - [`demo/`](../../experiments/closure-lifecycle/demo): 공통 편집기, 일반 호스트, 기존 element 어댑터와 수명 계수.
 - [`browser/hosts.spec.ts`](../../experiments/closure-lifecycle/browser/hosts.spec.ts): 같은 시나리오를 두 코어·두 호스트에서 실행.
 - [시연·테스트 실행 명령](../../experiments/closure-lifecycle/README.md#3단계--호스트-연결과-시연).

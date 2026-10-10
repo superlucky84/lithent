@@ -1,17 +1,23 @@
 import { h, mount, mountCallback, updateCallback } from 'lithent';
 import { createRetainedView } from './retainedView';
+import type {
+  RetainedView,
+  RetainedViewInitializer,
+  RetainedViewOptions,
+} from './retainedView';
+import type { CleanupErrorReporter } from './scope';
 import { useOwnerScope } from './lithent';
 import { supportsRenderBoundary } from './renderProtocol';
 
-export interface RetainedHostProps {
+export type RetainedHostProps = {
   active?: boolean;
-}
+};
 
 /** A committed host owns a separate retained root; removal still disposes it. */
 export const createRetainedHost = (
-  initialize: Parameters<typeof createRetainedView>[1],
-  reportCleanupError: (error: unknown) => void = console.error,
-  options: Parameters<typeof createRetainedView>[2] = {}
+  initialize: RetainedViewInitializer,
+  reportCleanupError: CleanupErrorReporter = console.error,
+  options: RetainedViewOptions = {}
 ) => {
   if (options.freezeChildren && !supportsRenderBoundary())
     throw new Error('Child freezing requires the Concurrent lifecycle core');
@@ -19,7 +25,7 @@ export const createRetainedHost = (
     const owner = useOwnerScope(reportCleanupError);
     const slot: { value?: HTMLElement } = {};
     let active = initial.active === true;
-    let view: ReturnType<typeof createRetainedView> | undefined;
+    let view: RetainedView | undefined;
     const sync = () => {
       if (owner.disposed) return;
       if (active) view?.show();

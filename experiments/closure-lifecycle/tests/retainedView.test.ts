@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { h, mount, mountCallback, nextTick } from 'lithent';
 import type { Renew } from 'lithent';
-import { createRetainedView, createScopedTask } from '../src';
+import { createRetainedView, createScopedTask } from 'lithent/helper';
 import { deferred } from './deferred';
 
 const views: Array<ReturnType<typeof createRetainedView>> = [];

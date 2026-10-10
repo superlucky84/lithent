@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createActivityScope } from '../src/activity';
-import type { Activity } from '../src/activity';
+import { createActivityScope } from 'lithent/helper';
+import type { Activity } from 'lithent/helper';
 
 describe('activity ownership', () => {
   it('starts inactive and keeps instance resources while recreating activity resources', () => {

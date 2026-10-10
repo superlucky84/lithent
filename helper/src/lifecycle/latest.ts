@@ -11,10 +11,20 @@ export type TaskOutcome<T> =
   | { status: 'error'; error: unknown }
   | { status: 'stale' };
 
+export type TaskWork<T> = (signal: AbortSignal) => T | PromiseLike<T>;
+
+export interface LatestTask {
+  cancel(): void;
+  run<T>(
+    work: TaskWork<T>,
+    handlers?: TaskHandlers<T>
+  ): Promise<TaskOutcome<T>>;
+}
+
 /** One latest-only group. Create separate groups for independent operations. */
 export const createLatestTask = (
   scope: Pick<OwnerScope, 'disposed' | 'own'>
-) => {
+): LatestTask => {
   let current: AbortController | undefined;
 
   const cancel = () => {
@@ -27,7 +37,7 @@ export const createLatestTask = (
   return {
     cancel,
     async run<T>(
-      work: (signal: AbortSignal) => T | PromiseLike<T>,
+      work: TaskWork<T>,
       handlers: TaskHandlers<T> = {}
     ): Promise<TaskOutcome<T>> {
       if (scope.disposed) return { status: 'stale' };
