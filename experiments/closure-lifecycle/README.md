@@ -2,7 +2,8 @@
 
 코어를 변경하지 않고 소유권, 최신 작업, 활동 수명과 명시적인 화면 보존을 검증하는 실험이다.
 공개 패키지 exports에는 연결하지 않는다. [1단계 결과](../../docs/closure-lifecycle/IMPLEMENT.md),
-[1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md)을 참고한다.
+[1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md),
+[3단계 호스트·브라우저 결과](../../docs/closure-lifecycle/PHASE3.md)를 참고한다.
 
 ## 사용 예시
 
@@ -167,6 +168,51 @@ view.show();
 임의 자식의 독립 `renew`, 기존 effect, portal을 자동으로 중단하지 않는다.
 CSS 숨김만으로 영상·iframe을 정지시키지 않으며 브라우저 DOM 상태의 자동 복원도 제공하지 않는다.
 
+## 3단계 — 호스트 연결과 시연
+
+`createRetainedHost(initialize, reportCleanupError?)`는 초기화 함수를 일반 `mount` 컴포넌트로 감싼다.
+부모가 `active` Boolean prop으로 활동을 제어하고, 실제 제거 시 안쪽 보존 루트를 정리한다.
+같은 컴포넌트를 기존 `defineElement`의 `{ props: { active: Boolean } }`에 연결할 수 있다.
+보존은 DOM에 연결된 상태로 숨길 때 적용된다. element의 실제 제거·재연결은 폐기·새 생성이다.
+
+시연 페이지에 두 호스트를 나란히 배치했다. 초안·undo, 느린 검색과 빠른 검색,
+숨김 중 저장, 외부 알림 재연결, DOM 이동과 영구 제거를 비교할 수 있다.
+요청은 로컬 타이머로 모의한다. 페이지의 수명 계수로 타이머·구독·draw·요청 반영 횟수를 확인한다.
+
+저장소 루트에서 실행한다. base·concurrent 코어 빌드가 필요하다.
+
+```sh
+./node_modules/.bin/vite --config experiments/closure-lifecycle/demo/vite.config.ts --host 127.0.0.1 --port 43140 --strictPort
+```
+
+concurrent 시연은 별도 터미널에서 실행한다.
+
+```sh
+LITHENT_CORE=concurrent ./node_modules/.bin/vite --config experiments/closure-lifecycle/demo/vite.config.ts --host 127.0.0.1 --port 43141 --strictPort
+```
+
+`http://127.0.0.1:43140` 또는 `http://127.0.0.1:43141`을 연다.
+자동 브라우저 검증은 위 수동 서버를 종료한 뒤 실행한다. 테스트가 두 서버를 직접 시작하고 종료한다.
+
+```sh
+./node_modules/.bin/playwright test --config experiments/closure-lifecycle/playwright.config.ts
+```
+
+Playwright 브라우저 대신 시스템 Chromium을 사용할 때는 `LITHENT_CHROMIUM_PATH=/usr/bin/chromium`을 지정한다.
+이 검증 환경에서는 로컬 소켓 제한으로 서버·Chromium 실행에 샌드박스 외부 실행이 필요했다.
+다른 브라우저와 실제 저장 API는 별도 확인 대상이다.
+
+시연 빌드와 미리보기:
+
+```sh
+./node_modules/.bin/vite build --config experiments/closure-lifecycle/demo/vite.config.ts
+LITHENT_CORE=concurrent ./node_modules/.bin/vite build --config experiments/closure-lifecycle/demo/vite.config.ts
+./node_modules/.bin/vite preview --config experiments/closure-lifecycle/demo/vite.config.ts --host 127.0.0.1 --port 43142
+```
+
+빌드 파일은 `demo/dist/base`와 `demo/dist/concurrent`에 생성하며 Git에 넣지 않는다.
+코어와 실험의 크기·해시 기록은 [3단계 결과](../../docs/closure-lifecycle/PHASE3.md#크기)를 참고한다.
+
 ## 재현
 
 저장소 루트에서 설치된 로컬 실행기를 사용한다. 표준 `pnpm build:core`,
@@ -183,7 +229,7 @@ node experiments/closure-lifecycle/measure.mjs --output work/closure-lifecycle/b
 ./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
 LITHENT_CORE=concurrent ./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
 ./node_modules/.bin/tsc -p experiments/closure-lifecycle/tsconfig.json
-./node_modules/.bin/eslint experiments/closure-lifecycle/src experiments/closure-lifecycle/tests experiments/closure-lifecycle/vite.config.ts experiments/closure-lifecycle/measure.mjs
+./node_modules/.bin/eslint experiments/closure-lifecycle/src experiments/closure-lifecycle/tests experiments/closure-lifecycle/demo/*.ts experiments/closure-lifecycle/browser experiments/closure-lifecycle/playwright.config.ts experiments/closure-lifecycle/vite.config.ts experiments/closure-lifecycle/measure.mjs
 node experiments/closure-lifecycle/measure.mjs --compare work/closure-lifecycle/baseline.json
 ```
 

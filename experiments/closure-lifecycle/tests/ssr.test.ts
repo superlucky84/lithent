@@ -30,3 +30,14 @@ it('keeps mount work dormant while rendering a component to HTML', async () => {
   expect(renderToString(h(Component, {}))).toBe('<span>server</span>');
   expect(start).not.toHaveBeenCalled();
 });
+
+it('renders a retained host shell without initializing browser work during SSR', async () => {
+  const { h } = await import('lithent');
+  const { renderToString } = await import('lithent/ssr');
+  const { createRetainedHost } = await import('../src');
+  const initialize = vi.fn(() => () => h('span', {}, 'editor'));
+  const Host = createRetainedHost(initialize);
+  expect(renderToString(h(Host, { active: true }))).toBe('<div></div>');
+  await Promise.resolve();
+  expect(initialize).not.toHaveBeenCalled();
+});

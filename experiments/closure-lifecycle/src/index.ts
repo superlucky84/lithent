@@ -4,6 +4,8 @@ export { useOwnerScope } from './lithent';
 export { createActivityScope } from './activity';
 export { createScopedTask } from './scopedTask';
 export { createRetainedView } from './retainedView';
+export { createRetainedHost } from './host';
+export type { RetainedHostProps } from './host';
 export type { Activity, ActivityScope } from './activity';
 export type { TaskLifetime } from './scopedTask';
 export type { Cleanup, OwnerScope } from './scope';

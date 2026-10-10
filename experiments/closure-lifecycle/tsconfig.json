@@ -10,7 +10,14 @@
     "noUnusedParameters": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "types": ["node"]
+    "types": ["node", "vite/client"]
   },
-  "include": ["src", "tests", "vite.config.ts"]
+  "include": [
+    "src",
+    "tests",
+    "demo",
+    "browser",
+    "vite.config.ts",
+    "playwright.config.ts"
+  ]
 }
