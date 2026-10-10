@@ -11,6 +11,7 @@ import {
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { keys, isEnumerableProp } from '@/utils';
+import { renderGate } from './renderGate';
 
 /**
  * Side effects the diff pass would have performed inline, recorded to run at
@@ -262,6 +263,7 @@ const attachToParent = (frame: Frame) => {
     frame.wip.oi = matched;
   }
 
+  if (frame.wip === frame.originalWDom) renderGate.reparent?.(frame.wip);
   frame.wip.getParent = parent.getParent as () => WDom;
   parent.built[slot] = frame.wip;
   parent.cursor = slot + 1;
@@ -369,6 +371,8 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
     syncResolverChildren(children, infoChidren);
   }
 
+  // Keep the latest props/slots, but retain the committed subtree while paused.
+  if (renderGate.blocks?.(vDom)) return vDom;
   const newVDom = vDom.reRender && vDom.reRender();
 
   return newVDom as WDom;

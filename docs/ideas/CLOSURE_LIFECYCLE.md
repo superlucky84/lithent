@@ -2,8 +2,14 @@
 
 - 작성일: 2026-10-10
 - 기준: Lithent `main`, `0b685260ab204857d7e0adbd472d029528a31005`
-- 상태: **아이디어 제안. 구현 착수 및 공개 API는 미결정.**
+- 상태: **1~7단계 검증 후 기존 lithent/helper에 공개 API·타입을 연결하고 소비자 검증을 완료했다. 기본 코어는 유지하고 자식 갱신 차단은 기존 Concurrent에 한정한다. 추가 코어 빌드 분기는 없다. [draft PR #96](https://github.com/superlucky84/lithent/pull/96) 리뷰 단계, npm 배포 전.**
+- 공개 helper 통합: `feature/closure-lifecycle-helper`, [현재 요구사항](../closure-lifecycle/REQUIREMENTS.md), [계약](../closure-lifecycle/DESIGN.md), [진행·검증](../closure-lifecycle/IMPLEMENT.md). 기본 코어는 유지하고 자식 갱신 차단은 기존 Concurrent에 한정한다. npm 배포 전이다.
+- 검증 문서: [1단계 당시 기록](https://github.com/superlucky84/lithent/blob/925b4aa98c40ca20b309ea2613cc625d260fa5b1/docs/closure-lifecycle/IMPLEMENT.md), [활동 수명·명시적 화면 보존 2단계](../closure-lifecycle/PHASE2.md), [호스트·Chromium 검증 3단계](../closure-lifecycle/PHASE3.md)
 - 관련 후보 목록: [IDEAS.md](./IDEAS.md)
+- 코어 연동 실험: [4단계 결과와 제한](../closure-lifecycle/PHASE4.md), `experiment/closure-lifecycle-core`.
+- Concurrent 전용 실험: [5단계 결과와 제한](../closure-lifecycle/PHASE5.md), `experiment/closure-lifecycle-concurrent`. 기본 코어 소스·타입·번들 해시 동일.
+- Concurrent 성능 개선: [6단계 결과와 제한](../closure-lifecycle/PHASE6.md), `experiment/closure-lifecycle-performance`.
+- 활성 경계 정리·다음 API: [7단계 결과](../closure-lifecycle/PHASE7.md), [공개 helper API 검토안](../closure-lifecycle/API_REVIEW.md).
 
 ## 1. 핵심 아이디어
 
@@ -180,6 +186,10 @@ Solid의 `createRoot`, Vue의 `effectScope`처럼 소유 범위를 다루는 기
 
 착수가 결정되면 기능별 문서 폴더에 REQUIREMENTS / DESIGN / IMPLEMENT /
 MANUAL_TEST_CHECKLIST를 작성한다. 이 문서만으로 공개 API나 기존 수명 계약을 변경하지 않는다.
+
+2026-10-10: 사용자 요청으로 `experiment/closure-lifecycle`에서 첫 단계의 코어 무수정
+검증을 시작했다. [범위·계약](../closure-lifecycle/REQUIREMENTS.md),
+[결과](../closure-lifecycle/IMPLEMENT.md)를 기록한다. 활성화·비활성화와 화면 보존은 아직 구현하지 않는다.
 
 ## 10. 관련 구현과 참고 자료
 

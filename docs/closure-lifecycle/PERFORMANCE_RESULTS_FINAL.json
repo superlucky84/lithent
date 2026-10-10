@@ -1,0 +1,1107 @@
+{
+  "date": "2026-10-10",
+  "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+  "measuredCommit": "16c6e9d8635a239f5f3cd5373fff5ea5a882e8cf",
+  "sourceHashes": {
+    "/baseline.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+    "/baseline-concurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+    "/base.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+    "/concurrent.mjs": "4011120aedff4bf35e7ed68cb13d7d5de9740ef8f321e2d25f9d8b5343c315f0",
+    "lifecycle.mjs": "f9d6b49cd01ff46d3c198a519440a04a8fd38b73faf8c79ba5d3f25b9570edb4"
+  },
+  "browser": "151.0.7922.173",
+  "node": "v24.19.0",
+  "metric": "Elapsed synchronous JavaScript update time, increase relative to the feature-free original build of the same core. Not frames, throughput loss percent, or paint/input latency.",
+  "sampling": "Three fresh sequential Chromium processes; 9 alternating-order samples per variant per process, 3 complete warmup runs per variant and 200 exact-tree warmup updates per sample. No parallel tests, builds, or benchmarks.",
+  "followupReason": "Initial 10000-renew leaf measurements varied substantially, including the byte-identical base control. Repeat only the leaf workload at 100000 renews per sample in three fresh browsers; use all those longer runs for the final leaf summary. Keep all initial samples.",
+  "limitations": [
+    "Identical base bundles show notable variation, so small observed changes cannot establish a precise causal feature cost or a universal bound.",
+    "Paused retained-host includes a frozen 8192-row editor and a native hidden-child renew requested for every input, while the original variant has only the visible input/results. Its increase includes this additional work and retained DOM, not solely private core guard cost.",
+    "Setup, hide, and resume are excluded; observable parked-work synchronous pause latency is not measured again here.",
+    "Local Chromium synthetic workloads do not establish real app, low-end device, Firefox, or Safari performance."
+  ],
+  "summary": [
+    {
+      "core": "base",
+      "workload": "leaf",
+      "iterationsPerSample": 100000,
+      "independentBrowsers": 3,
+      "samplesPerVariant": 27,
+      "aggregation": "Within each browser: ratio of medians from 9 samples versus the original core. Report the median of these 3 per-browser ratios; do not pool timings across browser runs.",
+      "perBrowserChangePercentVsOriginal": {
+        "current": [0.8290986898910058, 12.889688250603527, -10.963371801179122]
+      },
+      "medianChangePercentVsOriginal": {
+        "current": 0.8290986898910058
+      },
+      "minMaxChangePercentVsOriginal": {
+        "current": [-10.963371801179122, 12.889688250603527]
+      },
+      "perBrowserMediansMs": [
+        {
+          "baseline": 373.8999999985099,
+          "current": 377
+        },
+        {
+          "baseline": 333.5999999977648,
+          "current": 376.6000000014901
+        },
+        {
+          "baseline": 398.5999999977648,
+          "current": 354.8999999985099
+        }
+      ],
+      "pairedRoundMedianChangePercentVsOriginal": {
+        "current": 1.1001100109965911
+      }
+    },
+    {
+      "core": "base",
+      "workload": "parent",
+      "iterationsPerSample": 2000,
+      "independentBrowsers": 3,
+      "samplesPerVariant": 27,
+      "aggregation": "Within each browser: ratio of medians from 9 samples versus the original core. Report the median of these 3 per-browser ratios; do not pool timings across browser runs.",
+      "perBrowserChangePercentVsOriginal": {
+        "current": [1.5125324114185545, 0.4295532646034328, 0.2282062984961586]
+      },
+      "medianChangePercentVsOriginal": {
+        "current": 0.4295532646034328
+      },
+      "minMaxChangePercentVsOriginal": {
+        "current": [0.2282062984961586, 1.5125324114185545]
+      },
+      "perBrowserMediansMs": [
+        {
+          "baseline": 231.39999999850988,
+          "current": 234.89999999850988
+        },
+        {
+          "baseline": 232.80000000074506,
+          "current": 233.80000000074506
+        },
+        {
+          "baseline": 219.09999999776483,
+          "current": 219.59999999776483
+        }
+      ],
+      "pairedRoundMedianChangePercentVsOriginal": {
+        "current": 0.7884972167176318
+      }
+    },
+    {
+      "core": "base",
+      "workload": "retained-host",
+      "iterationsPerSample": 1000,
+      "independentBrowsers": 3,
+      "samplesPerVariant": 27,
+      "aggregation": "Within each browser: ratio of medians from 9 samples versus the original core. Report the median of these 3 per-browser ratios; do not pool timings across browser runs.",
+      "perBrowserChangePercentVsOriginal": {
+        "current": [2.3160762933098766, -2.7180067933064933, 0.6915629322197026]
+      },
+      "medianChangePercentVsOriginal": {
+        "current": 0.6915629322197026
+      },
+      "minMaxChangePercentVsOriginal": {
+        "current": [-2.7180067933064933, 2.3160762933098766]
+      },
+      "perBrowserMediansMs": [
+        {
+          "baseline": 73.39999999850988,
+          "current": 75.09999999776483
+        },
+        {
+          "baseline": 88.30000000074506,
+          "current": 85.90000000223517
+        },
+        {
+          "baseline": 72.30000000074506,
+          "current": 72.80000000074506
+        }
+      ],
+      "pairedRoundMedianChangePercentVsOriginal": {
+        "current": -1.6783216824898362
+      }
+    },
+    {
+      "core": "concurrent",
+      "workload": "leaf",
+      "iterationsPerSample": 100000,
+      "independentBrowsers": 3,
+      "samplesPerVariant": 27,
+      "aggregation": "Within each browser: ratio of medians from 9 samples versus the original core. Report the median of these 3 per-browser ratios; do not pool timings across browser runs.",
+      "perBrowserChangePercentVsOriginal": {
+        "current": [9.69012605098818, 2.9166666663014373, 2.0737882801309393],
+        "boundaryActive": [
+          4.989495798309562, 1.6666666668492702, 2.507836989319956
+        ],
+        "boundaryElsewherePaused": [
+          7.431722688278475, -0.1470588229815717, -0.7716421516655969
+        ]
+      },
+      "medianChangePercentVsOriginal": {
+        "current": 2.9166666663014373,
+        "boundaryActive": 2.507836989319956,
+        "boundaryElsewherePaused": -0.1470588229815717
+      },
+      "minMaxChangePercentVsOriginal": {
+        "current": [2.0737882801309393, 9.69012605098818],
+        "boundaryActive": [1.6666666668492702, 4.989495798309562],
+        "boundaryElsewherePaused": [-0.7716421516655969, 7.431722688278475]
+      },
+      "perBrowserMediansMs": [
+        {
+          "baseline": 380.80000000074506,
+          "current": 417.70000000298023,
+          "boundaryActive": 399.80000000074506,
+          "boundaryElsewherePaused": 409.0999999977648
+        },
+        {
+          "baseline": 408,
+          "current": 419.8999999985099,
+          "boundaryActive": 414.80000000074506,
+          "boundaryElsewherePaused": 407.4000000022352
+        },
+        {
+          "baseline": 414.70000000298023,
+          "current": 423.30000000074506,
+          "boundaryActive": 425.0999999977648,
+          "boundaryElsewherePaused": 411.5
+        }
+      ],
+      "pairedRoundMedianChangePercentVsOriginal": {
+        "current": 2.9166666663014373,
+        "boundaryActive": 1.2156448206945614,
+        "boundaryElsewherePaused": 3.0440251566703935
+      }
+    },
+    {
+      "core": "concurrent",
+      "workload": "parent",
+      "iterationsPerSample": 2000,
+      "independentBrowsers": 3,
+      "samplesPerVariant": 27,
+      "aggregation": "Within each browser: ratio of medians from 9 samples versus the original core. Report the median of these 3 per-browser ratios; do not pool timings across browser runs.",
+      "perBrowserChangePercentVsOriginal": {
+        "current": [
+          1.7790956266611646, -0.28849621375510726, 1.8932222642831453
+        ],
+        "boundaryActive": [
+          3.595255744710224, 2.3800937618003504, 0.5301022334350591
+        ],
+        "boundaryElsewherePaused": [
+          4.966641956439166, 3.822574827889058, 6.550549033291242
+        ]
+      },
+      "medianChangePercentVsOriginal": {
+        "current": 1.7790956266611646,
+        "boundaryActive": 2.3800937618003504,
+        "boundaryElsewherePaused": 4.966641956439166
+      },
+      "minMaxChangePercentVsOriginal": {
+        "current": [-0.28849621375510726, 1.8932222642831453],
+        "boundaryActive": [0.5301022334350591, 3.595255744710224],
+        "boundaryElsewherePaused": [3.822574827889058, 6.550549033291242]
+      },
+      "perBrowserMediansMs": [
+        {
+          "baseline": 269.80000000074506,
+          "current": 274.6000000014901,
+          "boundaryActive": 279.5,
+          "boundaryElsewherePaused": 283.19999999925494
+        },
+        {
+          "baseline": 277.30000000074506,
+          "current": 276.5,
+          "boundaryActive": 283.9000000022352,
+          "boundaryElsewherePaused": 287.8999999985099
+        },
+        {
+          "baseline": 264.1000000014901,
+          "current": 269.1000000014901,
+          "boundaryActive": 265.5,
+          "boundaryElsewherePaused": 281.3999999985099
+        }
+      ],
+      "pairedRoundMedianChangePercentVsOriginal": {
+        "current": 2.72211720198674,
+        "boundaryActive": 0.5301022334350591,
+        "boundaryElsewherePaused": 5.4307116104868935
+      }
+    },
+    {
+      "core": "concurrent",
+      "workload": "retained-host",
+      "iterationsPerSample": 1000,
+      "independentBrowsers": 3,
+      "samplesPerVariant": 27,
+      "aggregation": "Within each browser: ratio of medians from 9 samples versus the original core. Report the median of these 3 per-browser ratios; do not pool timings across browser runs.",
+      "perBrowserChangePercentVsOriginal": {
+        "current": [2.2657054614118266, 0.4188481698797597, 1.5645371616582748],
+        "boundaryActive": [
+          3.3985581882811866, -0.10471203954431907, 4.6936114752608615
+        ],
+        "boundaryElsewherePaused": [
+          14.109165808002366, 8.795811520665108, 20.990873535393106
+        ]
+      },
+      "medianChangePercentVsOriginal": {
+        "current": 1.5645371616582748,
+        "boundaryActive": 3.3985581882811866,
+        "boundaryElsewherePaused": 14.109165808002366
+      },
+      "minMaxChangePercentVsOriginal": {
+        "current": [0.4188481698797597, 2.2657054614118266],
+        "boundaryActive": [-0.10471203954431907, 4.6936114752608615],
+        "boundaryElsewherePaused": [8.795811520665108, 20.990873535393106]
+      },
+      "perBrowserMediansMs": [
+        {
+          "baseline": 97.09999999776483,
+          "current": 99.30000000074506,
+          "boundaryActive": 100.39999999850988,
+          "boundaryElsewherePaused": 110.79999999701977
+        },
+        {
+          "baseline": 95.5,
+          "current": 95.90000000223517,
+          "boundaryActive": 95.40000000223517,
+          "boundaryElsewherePaused": 103.90000000223517
+        },
+        {
+          "baseline": 76.69999999925494,
+          "current": 77.90000000223517,
+          "boundaryActive": 80.30000000074506,
+          "boundaryElsewherePaused": 92.80000000074506
+        }
+      ],
+      "pairedRoundMedianChangePercentVsOriginal": {
+        "current": 2.3653088051377225,
+        "boundaryActive": 3.2171581748819733,
+        "boundaryElsewherePaused": 11.64021164021165
+      }
+    }
+  ],
+  "initialRuns": [
+    {
+      "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+      "currentCommit": "16c6e9d8635a239f5f3cd5373fff5ea5a882e8cf",
+      "sourceHashes": {
+        "/baseline.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/baseline-concurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+        "/base.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/concurrent.mjs": "4011120aedff4bf35e7ed68cb13d7d5de9740ef8f321e2d25f9d8b5343c315f0",
+        "lifecycle.mjs": "f9d6b49cd01ff46d3c198a519440a04a8fd38b73faf8c79ba5d3f25b9570edb4"
+      },
+      "browser": "151.0.7922.173",
+      "node": "v24.19.0",
+      "rounds": 9,
+      "methodology": "2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels; 1000 input events with 32 result components, with a frozen retained editor containing 8192 rows only in the paused variant. Hidden native renews are suppressed, resume replays once and preserves draft DOM. Setup/hide/resume excluded from timing. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic JS update timings, no paint/input latency or performance guarantee.",
+      "measurements": [
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "leaf",
+          "iterations": 10000,
+          "samplesMs": {
+            "baseline": [
+              41.399999998509884, 34.899999998509884, 38.5, 42.100000001490116,
+              37.80000000074506, 38.399999998509884, 39.600000001490116,
+              37.29999999701977, 36.900000002235174
+            ],
+            "current": [
+              45.30000000074506, 48.30000000074506, 38.899999998509884, 39, 47,
+              40.70000000298023, 38.5, 43.19999999925494, 37.600000001490116
+            ]
+          },
+          "medianMs": {
+            "baseline": 38.399999998509884,
+            "current": 40.70000000298023
+          },
+          "ordinaryDeltaPercent": 5.989583345207294
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "leaf",
+          "iterations": 10000,
+          "samplesMs": {
+            "baseline": [
+              50.30000000074506, 51.80000000074506, 50.69999999925494,
+              55.19999999925494, 44.600000001490116, 66.80000000074506,
+              61.69999999925494, 56.900000002235174, 50.100000001490116
+            ],
+            "current": [
+              64.40000000223517, 47.80000000074506, 44.600000001490116, 50,
+              54.30000000074506, 66, 54.70000000298023, 45.600000001490116,
+              46.400000002235174
+            ],
+            "boundaryActive": [
+              65.39999999850988, 52.100000001490116, 51.19999999925494,
+              59.80000000074506, 45.69999999925494, 58, 47.899999998509884,
+              50.19999999925494, 45.79999999701977
+            ],
+            "boundaryElsewherePaused": [
+              57.20000000298023, 49.100000001490116, 42, 43.69999999925494,
+              47.899999998509884, 45.899999998509884, 49.69999999925494,
+              47.69999999925494, 45.30000000074506
+            ]
+          },
+          "medianMs": {
+            "baseline": 51.80000000074506,
+            "current": 50,
+            "boundaryActive": 51.19999999925494,
+            "boundaryElsewherePaused": 47.69999999925494
+          },
+          "ordinaryDeltaPercent": -3.474903476291835,
+          "activeBoundaryDeltaPercent": 2.399999998509883,
+          "elsewherePausedDeltaPercent": -4.600000001490113
+        },
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "parent",
+          "iterations": 2000,
+          "samplesMs": {
+            "baseline": [
+              237.20000000298023, 249.69999999925494, 239.5, 231.39999999850988,
+              242.09999999776483, 216.10000000149012, 213.40000000223517,
+              209.30000000074506, 222.10000000149012
+            ],
+            "current": [
+              247.69999999925494, 231.5, 244.20000000298023, 234.89999999850988,
+              263.69999999925494, 226.30000000074506, 224.20000000298023, 232.5,
+              243
+            ]
+          },
+          "medianMs": {
+            "baseline": 231.39999999850988,
+            "current": 234.89999999850988
+          },
+          "ordinaryDeltaPercent": 1.5125324114185545
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "parent",
+          "iterations": 2000,
+          "samplesMs": {
+            "baseline": [
+              266.69999999925494, 269.80000000074506, 253.70000000298023,
+              274.80000000074506, 276.80000000074506, 279.1000000014901, 269,
+              264.5, 291.30000000074506
+            ],
+            "current": [
+              267, 280.30000000074506, 265.8999999985099, 274.6000000014901,
+              295.4000000022352, 275.69999999925494, 296.3999999985099,
+              271.69999999925494, 264.30000000074506
+            ],
+            "boundaryActive": [
+              270.30000000074506, 287.5, 285.19999999925494, 273.69999999925494,
+              310.5999999977648, 266.5, 283.79999999701977, 265.30000000074506,
+              279.5
+            ],
+            "boundaryElsewherePaused": [
+              289.69999999925494, 283.19999999925494, 277.30000000074506,
+              273.3999999985099, 303.80000000074506, 274.19999999925494, 305,
+              278.3999999985099, 326.6000000014901
+            ]
+          },
+          "medianMs": {
+            "baseline": 269.80000000074506,
+            "current": 274.6000000014901,
+            "boundaryActive": 279.5,
+            "boundaryElsewherePaused": 283.19999999925494
+          },
+          "ordinaryDeltaPercent": 1.7790956266611646,
+          "activeBoundaryDeltaPercent": 1.7844136920915021,
+          "elsewherePausedDeltaPercent": 3.131828112788848
+        },
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "retained-host",
+          "iterations": 1000,
+          "samplesMs": {
+            "baseline": [
+              66, 67.19999999925494, 71.5, 73.39999999850988, 95.09999999776483,
+              77, 66.19999999925494, 83, 77.79999999701977
+            ],
+            "current": [
+              73.19999999925494, 71.30000000074506, 70.29999999701977, 69.5,
+              87.20000000298023, 75.69999999925494, 86.30000000074506,
+              75.09999999776483, 86.39999999850988
+            ]
+          },
+          "medianMs": {
+            "baseline": 73.39999999850988,
+            "current": 75.09999999776483
+          },
+          "ordinaryDeltaPercent": 2.3160762933098766
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "retained-host",
+          "iterations": 1000,
+          "samplesMs": {
+            "baseline": [
+              96.89999999850988, 97.09999999776483, 101.80000000074506,
+              89.39999999850988, 84, 94, 98.5, 101.10000000149012,
+              97.90000000223517
+            ],
+            "current": [
+              102.79999999701977, 95.30000000074506, 107, 104.69999999925494,
+              94.5, 98, 103.30000000074506, 99.30000000074506, 90.5
+            ],
+            "boundaryActive": [
+              100.39999999850988, 129.5, 99.09999999776483, 131.20000000298023,
+              98, 101.39999999850988, 113.70000000298023, 100.30000000074506,
+              98.70000000298023
+            ],
+            "boundaryElsewherePaused": [
+              97.10000000149012, 115.69999999925494, 110.70000000298023, 146,
+              113.5, 99.69999999925494, 110.79999999701977, 130.30000000074506,
+              96.09999999776483
+            ]
+          },
+          "medianMs": {
+            "baseline": 97.09999999776483,
+            "current": 99.30000000074506,
+            "boundaryActive": 100.39999999850988,
+            "boundaryElsewherePaused": 110.79999999701977
+          },
+          "ordinaryDeltaPercent": 2.2657054614118266,
+          "activeBoundaryDeltaPercent": 1.1077542777004679,
+          "elsewherePausedDeltaPercent": 11.581067468467698
+        }
+      ]
+    },
+    {
+      "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+      "currentCommit": "16c6e9d8635a239f5f3cd5373fff5ea5a882e8cf",
+      "sourceHashes": {
+        "/baseline.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/baseline-concurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+        "/base.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/concurrent.mjs": "4011120aedff4bf35e7ed68cb13d7d5de9740ef8f321e2d25f9d8b5343c315f0",
+        "lifecycle.mjs": "f9d6b49cd01ff46d3c198a519440a04a8fd38b73faf8c79ba5d3f25b9570edb4"
+      },
+      "browser": "151.0.7922.173",
+      "node": "v24.19.0",
+      "rounds": 9,
+      "methodology": "2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels; 1000 input events with 32 result components, with a frozen retained editor containing 8192 rows only in the paused variant. Hidden native renews are suppressed, resume replays once and preserves draft DOM. Setup/hide/resume excluded from timing. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic JS update timings, no paint/input latency or performance guarantee.",
+      "measurements": [
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "leaf",
+          "iterations": 10000,
+          "samplesMs": {
+            "baseline": [
+              54.400000002235174, 45, 43.599999997764826, 42.30000000074506,
+              60.80000000074506, 46.600000001490116, 38.80000000074506,
+              37.20000000298023, 35
+            ],
+            "current": [
+              43.399999998509884, 33.5, 42.19999999925494, 39.30000000074506,
+              38.30000000074506, 37, 40.80000000074506, 41.099999997764826,
+              38.79999999701977
+            ]
+          },
+          "medianMs": {
+            "baseline": 43.599999997764826,
+            "current": 39.30000000074506
+          },
+          "ordinaryDeltaPercent": -9.862385314771128
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "leaf",
+          "iterations": 10000,
+          "samplesMs": {
+            "baseline": [
+              53.600000001490116, 56.79999999701977, 49.69999999925494,
+              45.19999999925494, 42.30000000074506, 55.900000002235174, 45, 47,
+              42.400000002235174
+            ],
+            "current": [
+              57.30000000074506, 55.5, 42.80000000074506, 43.80000000074506,
+              45.19999999925494, 52.30000000074506, 58.79999999701977,
+              55.599999997764826, 42.5
+            ],
+            "boundaryActive": [
+              59.80000000074506, 47.80000000074506, 41.80000000074506,
+              41.399999998509884, 47.5, 44.600000001490116, 48,
+              75.80000000074506, 45.19999999925494
+            ],
+            "boundaryElsewherePaused": [
+              62.5, 50.79999999701977, 45, 40, 44.900000002235174,
+              44.30000000074506, 48.80000000074506, 50.69999999925494, 49
+            ]
+          },
+          "medianMs": {
+            "baseline": 47,
+            "current": 52.30000000074506,
+            "boundaryActive": 47.5,
+            "boundaryElsewherePaused": 48.80000000074506
+          },
+          "ordinaryDeltaPercent": 11.276595746266072,
+          "activeBoundaryDeltaPercent": -9.177820268980263,
+          "elsewherePausedDeltaPercent": -6.692160611759346
+        },
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "parent",
+          "iterations": 2000,
+          "samplesMs": {
+            "baseline": [
+              232.80000000074506, 216.30000000074506, 239, 240.10000000149012,
+              262.5, 237.19999999925494, 228.80000000074506, 226.10000000149012,
+              217.90000000223517
+            ],
+            "current": [
+              219.19999999925494, 212.69999999925494, 233.80000000074506,
+              234.30000000074506, 257.19999999925494, 231.60000000149012,
+              234.10000000149012, 243.70000000298023, 225
+            ]
+          },
+          "medianMs": {
+            "baseline": 232.80000000074506,
+            "current": 233.80000000074506
+          },
+          "ordinaryDeltaPercent": 0.4295532646034328
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "parent",
+          "iterations": 2000,
+          "samplesMs": {
+            "baseline": [
+              282.69999999925494, 298, 292.80000000074506, 270.5999999977648,
+              277.30000000074506, 292.6000000014901, 257.4000000022352,
+              260.70000000298023, 254.80000000074506
+            ],
+            "current": [
+              283.5999999977648, 294.5999999977648, 282.3999999985099, 276.5,
+              263.3999999985099, 260.80000000074506, 255.10000000149012,
+              279.69999999925494, 262.6000000014901
+            ],
+            "boundaryActive": [
+              292.0999999977648, 285.6000000014901, 286.9000000022352,
+              283.9000000022352, 268.6000000014901, 295.80000000074506,
+              256.80000000074506, 257.3999999985099, 263.0999999977648
+            ],
+            "boundaryElsewherePaused": [
+              283.69999999925494, 299.6000000014901, 292.3999999985099,
+              299.30000000074506, 260, 278.4000000022352, 287.8999999985099,
+              277, 327.5
+            ]
+          },
+          "medianMs": {
+            "baseline": 277.30000000074506,
+            "current": 276.5,
+            "boundaryActive": 283.9000000022352,
+            "boundaryElsewherePaused": 287.8999999985099
+          },
+          "ordinaryDeltaPercent": -0.28849621375510726,
+          "activeBoundaryDeltaPercent": 2.676311031549794,
+          "elsewherePausedDeltaPercent": 4.122965641414056
+        },
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "retained-host",
+          "iterations": 1000,
+          "samplesMs": {
+            "baseline": [
+              87.30000000074506, 86.80000000074506, 85.10000000149012,
+              106.29999999701977, 90.30000000074506, 95.5, 74.19999999925494,
+              88.30000000074506, 88.69999999925494
+            ],
+            "current": [
+              85.79999999701977, 80.89999999850988, 85.90000000223517,
+              89.89999999850988, 89.79999999701977, 82, 101.69999999925494,
+              89.89999999850988, 85
+            ]
+          },
+          "medianMs": {
+            "baseline": 88.30000000074506,
+            "current": 85.90000000223517
+          },
+          "ordinaryDeltaPercent": -2.7180067933064933
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "retained-host",
+          "iterations": 1000,
+          "samplesMs": {
+            "baseline": [
+              120.69999999925494, 96.40000000223517, 85.70000000298023,
+              96.59999999776483, 82, 96.89999999850988, 94.5, 95.5,
+              86.59999999776483
+            ],
+            "current": [
+              104.30000000074506, 102.5, 96.30000000074506, 102.19999999925494,
+              84.89999999850988, 95.69999999925494, 95.90000000223517,
+              94.70000000298023, 95.09999999776483
+            ],
+            "boundaryActive": [
+              103.80000000074506, 88.70000000298023, 98.60000000149012,
+              94.40000000223517, 92.09999999776483, 90.5, 96.5,
+              98.20000000298023, 95.40000000223517
+            ],
+            "boundaryElsewherePaused": [
+              103, 106.40000000223517, 107.89999999850988, 109.30000000074506,
+              102, 102.59999999776483, 105.5, 103.90000000223517,
+              102.89999999850988
+            ]
+          },
+          "medianMs": {
+            "baseline": 95.5,
+            "current": 95.90000000223517,
+            "boundaryActive": 95.40000000223517,
+            "boundaryElsewherePaused": 103.90000000223517
+          },
+          "ordinaryDeltaPercent": 0.4188481698797597,
+          "activeBoundaryDeltaPercent": -0.5213764337730464,
+          "elsewherePausedDeltaPercent": 8.342022940368654
+        }
+      ]
+    },
+    {
+      "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+      "currentCommit": "16c6e9d8635a239f5f3cd5373fff5ea5a882e8cf",
+      "sourceHashes": {
+        "/baseline.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/baseline-concurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+        "/base.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/concurrent.mjs": "4011120aedff4bf35e7ed68cb13d7d5de9740ef8f321e2d25f9d8b5343c315f0",
+        "lifecycle.mjs": "f9d6b49cd01ff46d3c198a519440a04a8fd38b73faf8c79ba5d3f25b9570edb4"
+      },
+      "browser": "151.0.7922.173",
+      "node": "v24.19.0",
+      "rounds": 9,
+      "methodology": "2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels; 1000 input events with 32 result components, with a frozen retained editor containing 8192 rows only in the paused variant. Hidden native renews are suppressed, resume replays once and preserves draft DOM. Setup/hide/resume excluded from timing. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic JS update timings, no paint/input latency or performance guarantee.",
+      "measurements": [
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "leaf",
+          "iterations": 10000,
+          "samplesMs": {
+            "baseline": [
+              40.100000001490116, 38.399999998509884, 31.399999998509884, 33.5,
+              38.19999999925494, 34, 37, 35.900000002235174, 33.100000001490116
+            ],
+            "current": [
+              38.599999997764826, 31.799999997019768, 35.19999999925494,
+              31.800000000745058, 43.100000001490116, 30.400000002235174,
+              34.400000002235174, 30.300000000745058, 30.600000001490116
+            ]
+          },
+          "medianMs": {
+            "baseline": 35.900000002235174,
+            "current": 31.800000000745058
+          },
+          "ordinaryDeltaPercent": -11.420612816810149
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "leaf",
+          "iterations": 10000,
+          "samplesMs": {
+            "baseline": [
+              48.5, 52.599999997764826, 50.30000000074506, 41,
+              41.29999999701977, 44.099999997764826, 44.20000000298023,
+              43.400000002235174, 40.69999999925494
+            ],
+            "current": [
+              51.30000000074506, 55.399999998509884, 45.70000000298023,
+              41.400000002235174, 42.79999999701977, 44.099999997764826, 49.5,
+              39.80000000074506, 42
+            ],
+            "boundaryActive": [
+              71.5, 49.69999999925494, 44.600000001490116, 45.19999999925494,
+              47.80000000074506, 45, 50.80000000074506, 47.19999999925494,
+              40.69999999925494
+            ],
+            "boundaryElsewherePaused": [
+              56.30000000074506, 50.899999998509884, 41.29999999701977,
+              49.599999997764826, 43.80000000074506, 46.100000001490116,
+              51.20000000298023, 45.899999998509884, 42.5
+            ]
+          },
+          "medianMs": {
+            "baseline": 44.099999997764826,
+            "current": 44.099999997764826,
+            "boundaryActive": 47.19999999925494,
+            "boundaryElsewherePaused": 46.100000001490116
+          },
+          "ordinaryDeltaPercent": 0,
+          "activeBoundaryDeltaPercent": 7.029478461785121,
+          "elsewherePausedDeltaPercent": 4.535147400967476
+        },
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "parent",
+          "iterations": 2000,
+          "samplesMs": {
+            "baseline": [
+              231.5, 215.60000000149012, 211.69999999925494, 236.30000000074506,
+              267.69999999925494, 240.80000000074506, 219.09999999776483, 215,
+              219.09999999776483
+            ],
+            "current": [
+              219.59999999776483, 217.30000000074506, 218.09999999776483,
+              232.60000000149012, 249.69999999925494, 231.09999999776483,
+              224.90000000223517, 214.40000000223517, 215.59999999776483
+            ]
+          },
+          "medianMs": {
+            "baseline": 219.09999999776483,
+            "current": 219.59999999776483
+          },
+          "ordinaryDeltaPercent": 0.2282062984961586
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "parent",
+          "iterations": 2000,
+          "samplesMs": {
+            "baseline": [
+              251, 264.1000000014901, 260.19999999925494, 254, 267,
+              266.1000000014901, 270.8999999985099, 272.3999999985099,
+              244.70000000298023
+            ],
+            "current": [
+              269.1000000014901, 258.5, 268.1000000014901, 264,
+              310.30000000074506, 298.19999999925494, 275.79999999701977,
+              289.29999999701977, 263.5
+            ],
+            "boundaryActive": [
+              270.5999999977648, 265.5, 267.20000000298023, 266.1000000014901,
+              292.80000000074506, 252.30000000074506, 258.5, 256.3999999985099,
+              242.60000000149012
+            ],
+            "boundaryElsewherePaused": [
+              275.70000000298023, 272.4000000022352, 310.5999999977648,
+              281.3999999985099, 281.5, 284, 284.80000000074506,
+              278.19999999925494, 252
+            ]
+          },
+          "medianMs": {
+            "baseline": 264.1000000014901,
+            "current": 269.1000000014901,
+            "boundaryActive": 265.5,
+            "boundaryElsewherePaused": 281.3999999985099
+          },
+          "ordinaryDeltaPercent": 1.8932222642831453,
+          "activeBoundaryDeltaPercent": -1.337792642686797,
+          "elsewherePausedDeltaPercent": 4.570791526180473
+        },
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "retained-host",
+          "iterations": 1000,
+          "samplesMs": {
+            "baseline": [
+              70.60000000149012, 72.30000000074506, 76.5, 102.40000000223517,
+              88.39999999850988, 73.40000000223517, 72.30000000074506,
+              70.39999999850988, 69.5
+            ],
+            "current": [
+              67.79999999701977, 67.10000000149012, 82.60000000149012,
+              90.80000000074506, 74.39999999850988, 78, 72.30000000074506,
+              72.80000000074506, 70.5
+            ]
+          },
+          "medianMs": {
+            "baseline": 72.30000000074506,
+            "current": 72.80000000074506
+          },
+          "ordinaryDeltaPercent": 0.6915629322197026
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "retained-host",
+          "iterations": 1000,
+          "samplesMs": {
+            "baseline": [
+              100.39999999850988, 76.69999999925494, 76.80000000074506,
+              76.10000000149012, 74.60000000149012, 76.20000000298023,
+              76.10000000149012, 87.79999999701977, 99.5
+            ],
+            "current": [
+              99.80000000074506, 76.5, 77.90000000223517, 85.19999999925494,
+              76.90000000223517, 75.5, 77.90000000223517, 80.20000000298023,
+              94.79999999701977
+            ],
+            "boundaryActive": [
+              80.5, 79.60000000149012, 79.09999999776483, 83.39999999850988, 77,
+              78.10000000149012, 97.59999999776483, 97, 80.30000000074506
+            ],
+            "boundaryElsewherePaused": [
+              92.80000000074506, 89.30000000074506, 83.30000000074506,
+              128.10000000149012, 82.39999999850988, 87, 105.69999999925494,
+              96.39999999850988, 106.39999999850988
+            ]
+          },
+          "medianMs": {
+            "baseline": 76.69999999925494,
+            "current": 77.90000000223517,
+            "boundaryActive": 80.30000000074506,
+            "boundaryElsewherePaused": 92.80000000074506
+          },
+          "ordinaryDeltaPercent": 1.5645371616582748,
+          "activeBoundaryDeltaPercent": 3.0808729119910394,
+          "elsewherePausedDeltaPercent": 19.127086005240514
+        }
+      ]
+    }
+  ],
+  "extendedLeafRuns": [
+    {
+      "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+      "currentCommit": "16c6e9d8635a239f5f3cd5373fff5ea5a882e8cf",
+      "sourceHashes": {
+        "/baseline.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/baseline-concurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+        "/base.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/concurrent.mjs": "4011120aedff4bf35e7ed68cb13d7d5de9740ef8f321e2d25f9d8b5343c315f0",
+        "lifecycle.mjs": "f9d6b49cd01ff46d3c198a519440a04a8fd38b73faf8c79ba5d3f25b9570edb4"
+      },
+      "browser": "151.0.7922.173",
+      "node": "v24.19.0",
+      "rounds": 9,
+      "iterationsMultiplier": 10,
+      "methodology": "Default iterations: 2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels; 1000 input events with 32 result components, with a frozen retained editor containing 8192 rows only in the paused variant. All measured iteration counts are multiplied by iterationsMultiplier. Hidden native renews are suppressed, resume replays once and preserves draft DOM. Setup/hide/resume excluded from timing. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic JS update timings, no paint/input latency or performance guarantee.",
+      "measurements": [
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "leaf",
+          "iterations": 100000,
+          "samplesMs": {
+            "baseline": [
+              405.3999999985099, 373.8999999985099, 351.8999999985099,
+              397.1000000014901, 419, 352, 400.79999999701977,
+              363.6000000014901, 354.8999999985099
+            ],
+            "current": [
+              399.5, 424.5, 389.30000000074506, 377, 374.69999999925494,
+              374.8999999985099, 405.1000000014901, 367.6000000014901,
+              351.1000000014901
+            ]
+          },
+          "medianMs": {
+            "baseline": 373.8999999985099,
+            "current": 377
+          },
+          "ordinaryDeltaPercent": 0.8290986898910058
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "leaf",
+          "iterations": 100000,
+          "samplesMs": {
+            "baseline": [
+              431.8999999985099, 380.80000000074506, 378.3999999985099,
+              417.30000000074506, 378.6000000014901, 377.29999999701977, 379.5,
+              425, 427
+            ],
+            "current": [
+              434.30000000074506, 450.5, 402.1000000014901, 406.80000000074506,
+              395.80000000074506, 397.5999999977648, 422.5, 418.4000000022352,
+              417.70000000298023
+            ],
+            "boundaryActive": [
+              435.3999999985099, 526.5999999977648, 383, 399.80000000074506,
+              383.8999999985099, 390.19999999925494, 419.8999999985099, 413, 392
+            ],
+            "boundaryElsewherePaused": [
+              449.80000000074506, 471.5999999977648, 409.0999999977648,
+              404.6000000014901, 397.30000000074506, 394.4000000022352,
+              445.69999999925494, 445.1000000014901, 394.30000000074506
+            ]
+          },
+          "medianMs": {
+            "baseline": 380.80000000074506,
+            "current": 417.70000000298023,
+            "boundaryActive": 399.80000000074506,
+            "boundaryElsewherePaused": 409.0999999977648
+          },
+          "ordinaryDeltaPercent": 9.69012605098818,
+          "activeBoundaryDeltaPercent": -4.285372277258192,
+          "elsewherePausedDeltaPercent": -2.0588939442552134
+        }
+      ]
+    },
+    {
+      "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+      "currentCommit": "16c6e9d8635a239f5f3cd5373fff5ea5a882e8cf",
+      "sourceHashes": {
+        "/baseline.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/baseline-concurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+        "/base.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/concurrent.mjs": "4011120aedff4bf35e7ed68cb13d7d5de9740ef8f321e2d25f9d8b5343c315f0",
+        "lifecycle.mjs": "f9d6b49cd01ff46d3c198a519440a04a8fd38b73faf8c79ba5d3f25b9570edb4"
+      },
+      "browser": "151.0.7922.173",
+      "node": "v24.19.0",
+      "rounds": 9,
+      "iterationsMultiplier": 10,
+      "methodology": "Default iterations: 2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels; 1000 input events with 32 result components, with a frozen retained editor containing 8192 rows only in the paused variant. All measured iteration counts are multiplied by iterationsMultiplier. Hidden native renews are suppressed, resume replays once and preserves draft DOM. Setup/hide/resume excluded from timing. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic JS update timings, no paint/input latency or performance guarantee.",
+      "measurements": [
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "leaf",
+          "iterations": 100000,
+          "samplesMs": {
+            "baseline": [
+              363.8999999985099, 333.5999999977648, 325.80000000074506,
+              342.30000000074506, 332.8999999985099, 367.29999999701977,
+              351.20000000298023, 323.6000000014901, 331.69999999925494
+            ],
+            "current": [
+              390.9000000022352, 380, 398.20000000298023, 370.5999999977648,
+              376.6000000014901, 402.1000000014901, 340.69999999925494,
+              337.1000000014901, 341.3999999985099
+            ]
+          },
+          "medianMs": {
+            "baseline": 333.5999999977648,
+            "current": 376.6000000014901
+          },
+          "ordinaryDeltaPercent": 12.889688250603527
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "leaf",
+          "iterations": 100000,
+          "samplesMs": {
+            "baseline": [
+              413.5999999977648, 408, 382.30000000074506, 414.30000000074506,
+              404.5, 410.30000000074506, 406.19999999925494, 412.19999999925494,
+              401.19999999925494
+            ],
+            "current": [
+              433.5, 419.8999999985099, 395.5, 419.8999999985099,
+              408.30000000074506, 411.3999999985099, 428.30000000074506,
+              426.8999999985099, 420.0999999977648
+            ],
+            "boundaryActive": [
+              420.1000000014901, 399.9000000022352, 414.80000000074506, 427,
+              414.8999999985099, 409.4000000022352, 408.80000000074506,
+              440.80000000074506, 412.5
+            ],
+            "boundaryElsewherePaused": [
+              406.5, 391.29999999701977, 420.3999999985099, 460.19999999925494,
+              404.80000000074506, 407.4000000022352, 431.9000000022352,
+              498.29999999701977, 399.9000000022352
+            ]
+          },
+          "medianMs": {
+            "baseline": 408,
+            "current": 419.8999999985099,
+            "boundaryActive": 414.80000000074506,
+            "boundaryElsewherePaused": 407.4000000022352
+          },
+          "ordinaryDeltaPercent": 2.9166666663014373,
+          "activeBoundaryDeltaPercent": -1.2145748982574256,
+          "elsewherePausedDeltaPercent": -2.9768992608523615
+        }
+      ]
+    },
+    {
+      "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+      "currentCommit": "16c6e9d8635a239f5f3cd5373fff5ea5a882e8cf",
+      "sourceHashes": {
+        "/baseline.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/baseline-concurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+        "/base.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+        "/concurrent.mjs": "4011120aedff4bf35e7ed68cb13d7d5de9740ef8f321e2d25f9d8b5343c315f0",
+        "lifecycle.mjs": "f9d6b49cd01ff46d3c198a519440a04a8fd38b73faf8c79ba5d3f25b9570edb4"
+      },
+      "browser": "151.0.7922.173",
+      "node": "v24.19.0",
+      "rounds": 9,
+      "iterationsMultiplier": 10,
+      "methodology": "Default iterations: 2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels; 1000 input events with 32 result components, with a frozen retained editor containing 8192 rows only in the paused variant. All measured iteration counts are multiplied by iterationsMultiplier. Hidden native renews are suppressed, resume replays once and preserves draft DOM. Setup/hide/resume excluded from timing. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic JS update timings, no paint/input latency or performance guarantee.",
+      "measurements": [
+        {
+          "core": "base",
+          "renderBoundarySupported": false,
+          "workload": "leaf",
+          "iterations": 100000,
+          "samplesMs": {
+            "baseline": [
+              453.0999999977648, 368.8999999985099, 356.8999999985099,
+              449.80000000074506, 398.5999999977648, 440.4000000022352,
+              367.19999999925494, 333, 427.3999999985099
+            ],
+            "current": [
+              390.0999999977648, 359.30000000074506, 364.6000000014901, 335.5,
+              350, 372.80000000074506, 342.70000000298023, 354.8999999985099,
+              351.6000000014901
+            ]
+          },
+          "medianMs": {
+            "baseline": 398.5999999977648,
+            "current": 354.8999999985099
+          },
+          "ordinaryDeltaPercent": -10.963371801179122
+        },
+        {
+          "core": "concurrent",
+          "renderBoundarySupported": true,
+          "workload": "leaf",
+          "iterations": 100000,
+          "samplesMs": {
+            "baseline": [
+              454.4000000022352, 398.9000000022352, 397.5, 412.30000000074506,
+              434.1000000014901, 414.70000000298023, 409.5, 434.8999999985099,
+              429.70000000298023
+            ],
+            "current": [
+              433, 454.20000000298023, 445.3999999985099, 412.19999999925494,
+              410.19999999925494, 394.19999999925494, 390.80000000074506,
+              423.30000000074506, 448.69999999925494
+            ],
+            "boundaryActive": [
+              432.0999999977648, 430.19999999925494, 438.69999999925494,
+              410.69999999925494, 431.5, 425.0999999977648, 406.0999999977648,
+              396.8999999985099, 413
+            ],
+            "boundaryElsewherePaused": [
+              411.5, 403.1000000014901, 409.5999999977648, 406.3999999985099,
+              459.20000000298023, 439.30000000074506, 401.5, 426,
+              417.30000000074506
+            ]
+          },
+          "medianMs": {
+            "baseline": 414.70000000298023,
+            "current": 423.30000000074506,
+            "boundaryActive": 425.0999999977648,
+            "boundaryElsewherePaused": 411.5
+          },
+          "ordinaryDeltaPercent": 2.0737882801309393,
+          "activeBoundaryDeltaPercent": 0.42523033239230124,
+          "elsewherePausedDeltaPercent": -2.7876210726965
+        }
+      ]
+    }
+  ]
+}

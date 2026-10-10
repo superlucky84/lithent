@@ -1,0 +1,203 @@
+{
+  "mode": "concurrent-only",
+  "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+  "node": "v24.19.0",
+  "compression": "gzip level 9; Node default Brotli; source maps excluded",
+  "production": [
+    {
+      "path": "dist/lithent.mjs",
+      "raw": 18487,
+      "gzip": 5951,
+      "brotli": 5420,
+      "sha256": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+      "baseline": {
+        "path": "dist/lithent.mjs",
+        "raw": 18487,
+        "gzip": 5951,
+        "brotli": 5420,
+        "sha256": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    },
+    {
+      "path": "dist/lithent.cjs",
+      "raw": 12819,
+      "gzip": 5171,
+      "brotli": 4785,
+      "sha256": "c1715fad8c0ea4b15bf603ed8fff8278109e16b6d5c85dd9a19a4e7cc5c63394",
+      "baseline": {
+        "path": "dist/lithent.cjs",
+        "raw": 12819,
+        "gzip": 5171,
+        "brotli": 4785,
+        "sha256": "c1715fad8c0ea4b15bf603ed8fff8278109e16b6d5c85dd9a19a4e7cc5c63394"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    },
+    {
+      "path": "dist/lithent.umd.js",
+      "raw": 12966,
+      "gzip": 5142,
+      "brotli": 4758,
+      "sha256": "ef1f48dc17504ac6c60c82617c9e1a8fd1b01adbd55b7a6e061738e419cf4414",
+      "baseline": {
+        "path": "dist/lithent.umd.js",
+        "raw": 12966,
+        "gzip": 5142,
+        "brotli": 4758,
+        "sha256": "ef1f48dc17504ac6c60c82617c9e1a8fd1b01adbd55b7a6e061738e419cf4414"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.mjs",
+      "raw": 25204,
+      "gzip": 8052,
+      "brotli": 7338,
+      "sha256": "2e5b52da85081d913aaa7f898efd02035be3704371562a0379a7242d1faf17fc",
+      "baseline": {
+        "path": "lithentConcurrent/dist/lithentConcurrent.mjs",
+        "raw": 24795,
+        "gzip": 7902,
+        "brotli": 7219,
+        "sha256": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92"
+      },
+      "delta": {
+        "raw": 409,
+        "gzip": 150,
+        "brotli": 119
+      }
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.cjs",
+      "raw": 17278,
+      "gzip": 6950,
+      "brotli": 6418,
+      "sha256": "8f5b0c1f560965165ca3e48c9a3ea0b7a9f39a02c954d202f80cccf49464db70",
+      "baseline": {
+        "path": "lithentConcurrent/dist/lithentConcurrent.cjs",
+        "raw": 16984,
+        "gzip": 6819,
+        "brotli": 6298,
+        "sha256": "bc47852ebd1d4d0997f41bd2eaf5e06bb700fbba2e2b450c2b9265085ce79bd1"
+      },
+      "delta": {
+        "raw": 294,
+        "gzip": 131,
+        "brotli": 120
+      }
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+      "raw": 17339,
+      "gzip": 7027,
+      "brotli": 6493,
+      "sha256": "0b24c1e6ad5d940fa16705a781d947e25ffd78cc49f44216fa25f5fe3a391b55",
+      "baseline": {
+        "path": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+        "raw": 17045,
+        "gzip": 6906,
+        "brotli": 6385,
+        "sha256": "25568c92870172eae7d2ce0bd51d6fcbb176ca2947e4e7a2e25f7d7fed4add62"
+      },
+      "delta": {
+        "raw": 294,
+        "gzip": 121,
+        "brotli": 108
+      }
+    },
+    {
+      "path": "helper/dist/lithentHelper.mjs",
+      "raw": 9130,
+      "gzip": 2457,
+      "brotli": 2115,
+      "sha256": "919ba0763da8edd34ac5c5691d3918a201ad218f53dba20c6b4e7b1d88902c2e",
+      "baseline": {
+        "path": "helper/dist/lithentHelper.mjs",
+        "raw": 9130,
+        "gzip": 2457,
+        "brotli": 2115,
+        "sha256": "919ba0763da8edd34ac5c5691d3918a201ad218f53dba20c6b4e7b1d88902c2e"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    },
+    {
+      "path": "helper/dist/lithentHelper.cjs",
+      "raw": 5982,
+      "gzip": 2040,
+      "brotli": 1807,
+      "sha256": "8ea45730216c45fcfd46518a3835dd79ee3470335a4fb19a22bb577c83a47f32",
+      "baseline": {
+        "path": "helper/dist/lithentHelper.cjs",
+        "raw": 5982,
+        "gzip": 2040,
+        "brotli": 1807,
+        "sha256": "8ea45730216c45fcfd46518a3835dd79ee3470335a4fb19a22bb577c83a47f32"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    },
+    {
+      "path": "helper/dist/lithentHelper.umd.js",
+      "raw": 6145,
+      "gzip": 2134,
+      "brotli": 1879,
+      "sha256": "c3298d1cf1ab4e7d3b769d7a18f5a81ac12b30f139ae5fac598f28b0d994b0ea",
+      "baseline": {
+        "path": "helper/dist/lithentHelper.umd.js",
+        "raw": 6145,
+        "gzip": 2134,
+        "brotli": 1879,
+        "sha256": "c3298d1cf1ab4e7d3b769d7a18f5a81ac12b30f139ae5fac598f28b0d994b0ea"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    }
+  ],
+  "experiment": [
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.mjs",
+      "raw": 8773,
+      "gzip": 2656,
+      "brotli": 2380,
+      "sha256": "8a638918d973a59e47d09875aeab419f25cc13803cb2a794b3ec96bc2ac83565"
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.cjs",
+      "raw": 5636,
+      "gzip": 2238,
+      "brotli": 2018,
+      "sha256": "aa5bdd1c8695b106664f5d0394e7a4dea9702958f72a6edc305954830fe69b91"
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.umd.js",
+      "raw": 5827,
+      "gzip": 2352,
+      "brotli": 2114,
+      "sha256": "db595218904e8de40558e6d44a9791fd630c3f6590fe1d646c87cd00d8ee5a17"
+    }
+  ],
+  "productionSourceDiffStat": "lithentConcurrent/src/diff.ts       |  3 +++\n lithentConcurrent/src/renderGate.ts | 17 +++++++++++++++++\n lithentConcurrent/src/scheduler.ts  | 15 +++++++++++++++\n lithentConcurrent/src/wDom.ts       |  3 ++-\n 4 files changed, 37 insertions(+), 1 deletion(-)"
+}

@@ -1,0 +1,124 @@
+{
+  "probeSha256": "582e66420ef044437e1a951fccc3abfc219f4440002c022d5f6cbb13a4e01cfe",
+  "previousProbeSha256": "186ab35120a5a15b533871021716c2d7c2fe6bb045dafa45e2da2c22d49152e1",
+  "browser": "151.0.7922.173",
+  "node": "v24.19.0",
+  "methodology": "Instrumented concurrent bundle and actual adapter, optional paired previous probe. Zero low budget forces a parked build. Related effects drain exactly once; current related pure work is discarded and dirtied through a blocked renewal; current unrelated effects stay parked and finish in the low lane. Hidden related updates remain blocked and resume commits the latest model once. Alternating versions, 1 warmup + 5 samples per scenario/size/version. Local synthetic timings depend on remaining work.",
+  "measurements": [
+    {
+      "core": "current",
+      "scenario": "related-effects",
+      "rows": 1024,
+      "samplesMs": [
+        5.099999997764826, 8.799999997019768, 3, 2.5, 3.199999999254942
+      ],
+      "medianMs": 3.199999999254942,
+      "maxMs": 8.799999997019768
+    },
+    {
+      "core": "previous",
+      "scenario": "related-effects",
+      "rows": 1024,
+      "samplesMs": [
+        1.699999999254942, 2.599999997764826, 2.600000001490116,
+        3.800000000745058, 1.800000000745058
+      ],
+      "medianMs": 2.599999997764826,
+      "maxMs": 3.800000000745058
+    },
+    {
+      "core": "current",
+      "scenario": "related-effects",
+      "rows": 8192,
+      "samplesMs": [
+        23.600000001490116, 14.099999997764826, 23, 14.700000002980232,
+        17.900000002235174
+      ],
+      "medianMs": 17.900000002235174,
+      "maxMs": 23.600000001490116
+    },
+    {
+      "core": "previous",
+      "scenario": "related-effects",
+      "rows": 8192,
+      "samplesMs": [
+        33.099999997764826, 39, 26.800000000745058, 15.5, 13.700000002980232
+      ],
+      "medianMs": 26.800000000745058,
+      "maxMs": 39
+    },
+    {
+      "core": "current",
+      "scenario": "related-pure",
+      "rows": 1024,
+      "samplesMs": [0, 0, 0, 0, 0],
+      "medianMs": 0,
+      "maxMs": 0
+    },
+    {
+      "core": "previous",
+      "scenario": "related-pure",
+      "rows": 1024,
+      "samplesMs": [
+        2.7000000029802322, 1.9000000022351742, 1.800000000745058,
+        1.0999999977648258, 1.199999999254942
+      ],
+      "medianMs": 1.800000000745058,
+      "maxMs": 2.7000000029802322
+    },
+    {
+      "core": "current",
+      "scenario": "related-pure",
+      "rows": 8192,
+      "samplesMs": [0, 0, 0, 0, 0],
+      "medianMs": 0,
+      "maxMs": 0
+    },
+    {
+      "core": "previous",
+      "scenario": "related-pure",
+      "rows": 8192,
+      "samplesMs": [
+        19.100000001490116, 16, 13.200000002980232, 15.300000000745058,
+        15.399999998509884
+      ],
+      "medianMs": 15.399999998509884,
+      "maxMs": 19.100000001490116
+    },
+    {
+      "core": "current",
+      "scenario": "unrelated-effects",
+      "rows": 1024,
+      "samplesMs": [0, 0.10000000149011612, 0, 0, 0],
+      "medianMs": 0,
+      "maxMs": 0.10000000149011612
+    },
+    {
+      "core": "previous",
+      "scenario": "unrelated-effects",
+      "rows": 1024,
+      "samplesMs": [
+        1.300000000745058, 2.300000000745058, 1.3999999985098839,
+        1.8999999985098839, 2.400000002235174
+      ],
+      "medianMs": 1.8999999985098839,
+      "maxMs": 2.400000002235174
+    },
+    {
+      "core": "current",
+      "scenario": "unrelated-effects",
+      "rows": 8192,
+      "samplesMs": [0, 0, 0, 0.10000000149011612, 0],
+      "medianMs": 0,
+      "maxMs": 0.10000000149011612
+    },
+    {
+      "core": "previous",
+      "scenario": "unrelated-effects",
+      "rows": 8192,
+      "samplesMs": [14.5, 19, 16.399999998509884, 22.5, 18],
+      "medianMs": 18,
+      "maxMs": 22.5
+    }
+  ]
+}

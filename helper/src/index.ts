@@ -24,3 +24,32 @@ export type {
   ContextState as LContextState,
   ProviderProps as LProviderProps,
 } from '@/hook/lcontext';
+
+export {
+  createOwnerScope,
+  createLatestTask,
+  useOwnerScope,
+  createActivityScope,
+  createScopedTask,
+  createRetainedView,
+  createRetainedHost,
+  useRenderBoundary,
+  supportsRenderBoundary,
+} from '@/lifecycle';
+export type {
+  Cleanup,
+  CleanupErrorReporter,
+  OwnerScope,
+  Activity,
+  ActivityScope,
+  TaskWork,
+  LatestTask,
+  TaskHandlers,
+  TaskOutcome,
+  TaskLifetime,
+  RetainedViewInitializer,
+  RetainedView,
+  RetainedViewOptions,
+  RetainedHostProps,
+  RenderBoundary,
+} from '@/lifecycle';
