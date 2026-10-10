@@ -1,0 +1,9 @@
+export function View(name, items, ok) {
+  const pattern = /<img \/>/;
+  return <main data-id="regression" aria-label="Status" title={String(pattern.test('<img />'))}>
+    <p>Hello {name}!</p>
+    <p>https://example.com</p>
+    <ul><li l-for={(item, index) in items} l-if={item.visible}>{index}: {item.label}</li></ul>
+    <span l-if={ok}>yes</span><!-- between branches --><span l-else>no</span>
+  </main>;
+}

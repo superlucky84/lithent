@@ -15,7 +15,7 @@ export function compile(
     const tokens = tokenize(template);
 
     // 2. Parse
-    const ast = parse(tokens);
+    const ast = parse(tokens, true);
 
     // 3. Transform
     const transformedAst = transform(ast, options?.transform);

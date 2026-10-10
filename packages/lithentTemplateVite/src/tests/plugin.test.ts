@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { resolveConfig } from 'vite';
 import type { ConfigEnv, Plugin, PluginOption, ResolvedConfig } from 'vite';
 import { lithentTemplateVite } from '../plugin';
+import { h } from 'lithent';
+import { renderToString } from 'lithent/ssr';
 
 interface TransformResult {
   code: string;
@@ -214,8 +216,37 @@ describe('lithentTemplateVite plugin', () => {
     const result = await runTransforms(plugins, code, filePath);
 
     expect(result.code).toContain('todos.map((todo, index) =>');
-    expect(result.code).toMatch(
-      /h\("strong", { class: "todo-status pending" }, "Pending\\n\s*"\)/
+    const View = new Function(
+      'h',
+      `${result.code.replace('export ', '')}; return View;`
+    )(h);
+    expect(
+      renderToString(h('ul', {}, View([{ text: 'todo', done: false }])))
+    ).toBe(
+      '<ul><li class="todo-item"><span class="todo-index">1.</span><span class="todo-text">todo</span><strong class="todo-status pending">Pending</strong></li></ul>'
+    );
+  });
+
+  it('loads and executes a document with bare return, regex, directives and meaningful spaces', async () => {
+    const filePath = path.resolve(__dirname, './fixtures/regressions.ltsx');
+    const code = await readFile(filePath, 'utf-8');
+    const result = await runTransforms(plugins, code, filePath);
+    const View = new Function(
+      'h',
+      `${result.code.replace('export ', '')}; return View;`
+    )(h);
+    const html = renderToString(
+      View(
+        'Ada',
+        [
+          { visible: true, label: 'first' },
+          { visible: false, label: 'hidden' },
+        ],
+        true
+      )
+    );
+    expect(html).toBe(
+      '<main data-id="regression" aria-label="Status" title="true"><p>Hello Ada!</p><p>https://example.com</p><ul><li>0: first</li></ul><span>yes</span></main>'
     );
   });
 
