@@ -17,6 +17,8 @@
 [5단계 Concurrent 전용 결과](../../docs/closure-lifecycle/PHASE5.md),
 [6단계 성능 개선 결과](../../docs/closure-lifecycle/PHASE6.md),
 [7단계 활성 경계·API 정리](../../docs/closure-lifecycle/PHASE7.md)를 참고한다.
+7단계 콜백 정리까지 포함한 기능 추가 전 Concurrent 대비 시간 증가는
+[최종 성능 비교](../../docs/closure-lifecycle/PERFORMANCE_FINAL.md)에 원본 표본과 함께 기록한다.
 
 ## 사용 예시
 

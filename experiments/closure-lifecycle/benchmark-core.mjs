@@ -8,6 +8,11 @@ import { chromium } from '@playwright/test';
 const repo = fileURLToPath(new URL('../..', import.meta.url));
 const args = process.argv.slice(2);
 const arg = name => args[args.indexOf(name) + 1];
+const iterationsMultiplier = args.includes('--iterations-multiplier')
+  ? Number(arg('--iterations-multiplier'))
+  : 1;
+if (!Number.isSafeInteger(iterationsMultiplier) || iterationsMultiplier < 1)
+  throw new Error('Pass a positive integer --iterations-multiplier');
 if (!args.includes('--baseline') || !args.includes('--baseline-concurrent'))
   throw new Error(
     'Pass baseline ESM paths with --baseline/--baseline-concurrent'
@@ -70,7 +75,7 @@ try {
   const page = await browser.newPage();
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   const measurements = await page.evaluate(
-    async ({ previous, onlyWorkload }) => {
+    async ({ previous, onlyWorkload, iterationsMultiplier }) => {
       const modules = {};
       for (const name of [
         'baseline',
@@ -201,11 +206,11 @@ try {
           }
         };
         const iterations =
-          workload === 'retained-host'
+          (workload === 'retained-host'
             ? 1000
             : workload === 'parent'
               ? 2000
-              : 10000;
+              : 10000) * iterationsMultiplier;
         // Warm the exact mounted tree outside the timed loop.
         for (let i = 0; i < 200; i++) {
           update();
@@ -248,17 +253,17 @@ try {
         destroy();
         destroyOther?.();
         host.remove();
-        if (componentMap.renderGate?.blocks)
+        if (
+          componentMap.renderGate?.blocks ||
+          componentMap.renderGate?.reparent ||
+          componentMap.renderGate?.boundaryOwner
+        )
           throw new Error('Benchmark leaked its boundary adapter');
         return { elapsed, iterations };
       };
       const results = [];
       // Warm every module/workload before collecting any sample.
-      const workloads = [
-        'leaf',
-        'parent',
-        ...(previous ? ['retained-host'] : []),
-      ];
+      const workloads = ['leaf', 'parent', 'retained-host'];
       if (onlyWorkload && !workloads.includes(onlyWorkload))
         throw new Error('Unknown workload: ' + onlyWorkload);
       for (const workload of onlyWorkload ? [onlyWorkload] : workloads)
@@ -331,6 +336,7 @@ try {
     {
       previous,
       onlyWorkload: args.includes('--workload') ? arg('--workload') : undefined,
+      iterationsMultiplier,
     }
   );
   const result = {
@@ -339,6 +345,9 @@ try {
       : undefined,
     previousCommit: args.includes('--previous-commit')
       ? arg('--previous-commit')
+      : undefined,
+    currentCommit: args.includes('--current-commit')
+      ? arg('--current-commit')
       : undefined,
     sourceHashes: Object.fromEntries(
       [
@@ -361,8 +370,9 @@ try {
     browser: browser.version(),
     node: process.version,
     rounds: 9,
+    iterationsMultiplier,
     methodology:
-      '2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels. Optional previous core/adapter comparison adds 1000 input events with 32 result components beside a frozen retained editor containing 8192 rows; hidden native renews are suppressed, resume replays once and preserves draft DOM. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic results, no performance guarantee.',
+      'Default iterations: 2000 parent renews with 64 child components; 10000 leaf renews under 16 DOM levels; 1000 input events with 32 result components, with a frozen retained editor containing 8192 rows only in the paused variant. All measured iteration counts are multiplied by iterationsMultiplier. Hidden native renews are suppressed, resume replays once and preserves draft DOM. Setup/hide/resume excluded from timing. 3 full warmup runs per variant and 200 exact-tree warmup renews per sample. Alternating variant order, median of 9 samples. Independent module instances isolate JIT history. Local synthetic JS update timings, no paint/input latency or performance guarantee.',
     measurements,
   };
   if (args.includes('--output'))
