@@ -2,7 +2,9 @@
 
 - 갱신일: 2026-10-10
 - 브랜치: `feature/closure-lifecycle-helper`
-- 기준 / 최근 확정 커밋: `123c243476b00336faf40e3c249ffde8b118dc8d`
+- 기준 커밋: `123c243476b00336faf40e3c249ffde8b118dc8d`
+- 검증된 구현 커밋: `462fc84fd2688d7fa7cb08ffddf14f626c88e58f`
+- 리뷰: [draft PR #96](https://github.com/superlucky84/lithent/pull/96)
 - [요구사항](./REQUIREMENTS.md) · [계약](./DESIGN.md) · [출시 체크리스트](./MANUAL_TEST_CHECKLIST.md)
 
 ## Phase A — Baseline / 문서 정렬
@@ -47,7 +49,7 @@ Exit: 패키지/선언/호스트 통과·core 증가 0·helper 비용 공개·�
 ## Phase E — 리뷰 / 인계
 
 - [x] 결과·재현 명령·한계를 네 문서에 맞춰 갱신한다.
-- [ ] 새 브랜치의 review 가능한 커밋과 draft PR을 준비한다.
+- [x] 새 브랜치의 review 가능한 커밋과 draft PR #96을 준비한다.
 - [x] 완료·다음 단계·blocker·최근 commit SHA를 갱신한다.
 
 Baseline: Phase B~D 결과. Exit: 문서 정렬·열린 결정 없음 또는 TBD 추적·review 가능한 결과.
@@ -138,6 +140,6 @@ LITHENT_CHROMIUM_PATH=/usr/bin/chromium ./node_modules/.bin/playwright test --co
 ## 인계 상태
 
 - 완료: 네 문서 정렬, 공개 helper 9개·명시적 타입, 구현 정본 이동, 공개 import 시연, 회귀·브라우저 259개, 패키지·타입 10조합·tree shaking·크기·core 불변 검증.
-- 다음: 검증 결과 commit·draft PR로 인계한 뒤 공개 API 리뷰. 버전·배포와 제품 검증은 이후 작업.
+- 다음: draft PR #96의 공개 API·계약 리뷰. 이후 버전·배포 범위를 결정하고 제품 출시 체크리스트를 실행한다.
 - blocker: 없음. 제품 적용의 다른 브라우저·실제 서버·포커스/접근성은 별도 항목이다.
-- 최근 확정 commit SHA: `123c243476b00336faf40e3c249ffde8b118dc8d`.
+- 최근 검증 구현 commit SHA: `462fc84fd2688d7fa7cb08ffddf14f626c88e58f`. 이후 인계 문서 commit은 이 구현·검증을 유지한다. 현재 문서 HEAD는 `git rev-parse HEAD`로 확인한다.

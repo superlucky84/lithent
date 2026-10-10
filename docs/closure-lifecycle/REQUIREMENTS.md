@@ -3,7 +3,7 @@
 - 갱신일: 2026-10-10
 - 브랜치: `feature/closure-lifecycle-helper`
 - 기준 커밋: `123c243476b00336faf40e3c249ffde8b118dc8d` (7단계 성능 검증 완료)
-- 상태: 공개 helper 연결과 소비자 검증 완료, 리뷰 준비. npm 배포·main 병합은 범위 밖이다.
+- 상태: 공개 helper 연결과 소비자 검증 완료, [draft PR #96](https://github.com/superlucky84/lithent/pull/96) 리뷰 단계. npm 배포·main 병합은 범위 밖이다.
 - 적용 절차: 사용자가 제공한 `doc-driven-designer-v1` 플레이북.
 - 배경: [아이디어](../ideas/CLOSURE_LIFECYCLE.md), [최종 성능 기록](./PERFORMANCE_FINAL.md)
 - 현재 계약: [DESIGN](./DESIGN.md), 계획·인계: [IMPLEMENT](./IMPLEMENT.md), [출시 체크리스트](./MANUAL_TEST_CHECKLIST.md)

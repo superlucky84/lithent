@@ -2,7 +2,7 @@
 
 - 작성일: 2026-10-10
 - 기준: Lithent `main`, `0b685260ab204857d7e0adbd472d029528a31005`
-- 상태: **1~7단계 검증 후 기존 lithent/helper에 공개 API·타입을 연결하고 소비자 검증을 완료했다. 기본 코어는 유지하고 자식 갱신 차단은 기존 Concurrent에 한정한다. 추가 코어 빌드 분기는 없다. 리뷰 준비, npm 배포 전.**
+- 상태: **1~7단계 검증 후 기존 lithent/helper에 공개 API·타입을 연결하고 소비자 검증을 완료했다. 기본 코어는 유지하고 자식 갱신 차단은 기존 Concurrent에 한정한다. 추가 코어 빌드 분기는 없다. [draft PR #96](https://github.com/superlucky84/lithent/pull/96) 리뷰 단계, npm 배포 전.**
 - 공개 helper 통합: `feature/closure-lifecycle-helper`, [현재 요구사항](../closure-lifecycle/REQUIREMENTS.md), [계약](../closure-lifecycle/DESIGN.md), [진행·검증](../closure-lifecycle/IMPLEMENT.md). 기본 코어는 유지하고 자식 갱신 차단은 기존 Concurrent에 한정한다. npm 배포 전이다.
 - 검증 문서: [1단계 당시 기록](https://github.com/superlucky84/lithent/blob/925b4aa98c40ca20b309ea2613cc625d260fa5b1/docs/closure-lifecycle/IMPLEMENT.md), [활동 수명·명시적 화면 보존 2단계](../closure-lifecycle/PHASE2.md), [호스트·Chromium 검증 3단계](../closure-lifecycle/PHASE3.md)
 - 관련 후보 목록: [IDEAS.md](./IDEAS.md)
