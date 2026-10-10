@@ -49,7 +49,13 @@ export const collectExportNames = (ast: File): string[] => {
 };
 
 export const detectLithentUsage = (ast: File): boolean => {
-  const watchedNames = new Set(['render', 'mount', 'createApp', 'createRoot']);
+  const watchedNames = new Set([
+    'render',
+    'mount',
+    'lmount',
+    'createApp',
+    'createRoot',
+  ]);
 
   for (const node of ast.program.body) {
     if (node.type !== 'ImportDeclaration') continue;
@@ -86,12 +92,15 @@ export const collectHeaderInsert = (
   ast: File,
   sourceCode: string,
   boundaryImportSpecifier: string,
-  _tagFunctionImportSpecifier: string
+  tagFunctionImportSpecifier: string
 ) => {
-  const importsToPrepend: string[] = [];
+  const importsToPrepend: string[] = [
+    `import { getComponentKey as __lithentGetComponentKey, mountCallback as __lithentMountCallback, componentMap as __lithentComponentMap } from '${tagFunctionImportSpecifier}';`,
+  ];
   let hasBoundaryImport = false;
   let lastImportEnd = 0;
-  let directiveEnd = 0;
+  let directiveEnd =
+    ast.program.directives.at(-1)?.end ?? ast.program.interpreter?.end ?? 0;
   let firstImportStart: number | null = null;
 
   for (const node of ast.program.body) {
@@ -101,8 +110,19 @@ export const collectHeaderInsert = (
         firstImportStart = node.start ?? null;
       }
 
-      if (node.source.value === boundaryImportSpecifier) {
-        hasBoundaryImport = true;
+      if (
+        node.source.value === boundaryImportSpecifier &&
+        node.importKind !== 'type'
+      ) {
+        hasBoundaryImport =
+          node.specifiers.some(
+            specifier =>
+              specifier.type === 'ImportSpecifier' &&
+              specifier.importKind !== 'type' &&
+              specifier.imported.type === 'Identifier' &&
+              specifier.imported.name === 'createBoundary' &&
+              specifier.local.name === '__lithentCreateBoundary'
+          ) || hasBoundaryImport;
       }
 
       continue;
@@ -126,7 +146,7 @@ export const collectHeaderInsert = (
 
   if (!hasBoundaryImport) {
     importsToPrepend.push(
-      `import { createBoundary } from '${boundaryImportSpecifier}';`
+      `import { createBoundary as __lithentCreateBoundary } from '${boundaryImportSpecifier}';`
     );
   }
 

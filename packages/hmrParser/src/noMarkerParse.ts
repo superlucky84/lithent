@@ -5,6 +5,7 @@ import { analyzeNoMarker } from './shared';
 import { stitchComponentRegistration } from './transform/componentRegister';
 import { wrapRenderCalls } from './transform/renderGuard';
 import { collectComponentMounts } from './utils/ast/componentCollector';
+import { createExportSnapshot } from './transform/exportSnapshot';
 
 export const transformWithoutMarker = (
   options: BaseTransformOptions
@@ -23,7 +24,11 @@ export const transformWithoutMarker = (
     return { transformed: false, code: options.code, map: null };
   }
 
-  const mounts = collectComponentMounts(ast, options.code);
+  const mounts = collectComponentMounts(
+    ast,
+    options.code,
+    options.tagFunctionImportSpecifier
+  );
   const componentNames = Array.from(
     new Set(
       mounts
@@ -33,7 +38,14 @@ export const transformWithoutMarker = (
   );
 
   const ms = new MagicString(options.code);
-  wrapRenderCalls(ms, ast, options.code);
+  if (mounts.length)
+    wrapRenderCalls(ms, ast, options.code, options.tagFunctionImportSpecifier);
+  const hoisted = stitchComponentRegistration(
+    ms,
+    mounts,
+    options.code,
+    importInsertionPos
+  );
   const transformBlock = createHmrBootstrapBlock(
     targetExports,
     componentNames
@@ -43,7 +55,7 @@ export const transformWithoutMarker = (
     blockInsertionPos > 0 ? options.code[blockInsertionPos - 1] : undefined;
   const needsLeadingNewlineForBlock =
     blockInsertionPos > 0 && blockPrecedingChar !== '\n';
-  const blockSnippet = `${needsLeadingNewlineForBlock ? '\n' : ''}${transformBlock}\n\n`;
+  const blockSnippet = `${needsLeadingNewlineForBlock ? '\n' : ''}${transformBlock}\n${hoisted}\n\n`;
 
   if (!headerSnippet && !blockSnippet.trim().length) {
     return { transformed: false, code: options.code, map: null };
@@ -60,7 +72,7 @@ export const transformWithoutMarker = (
     ms.appendLeft(blockInsertionPos, blockSnippet);
   }
 
-  stitchComponentRegistration(ms, mounts, options.code, importInsertionPos);
+  ms.append(createExportSnapshot(ast, mounts));
 
   return {
     transformed: true,

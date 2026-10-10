@@ -104,6 +104,8 @@ export type ComponentSubKey =
 export type ComponentMap = WeakMap<CompKey, ComponentInfo>;
 
 export type ComponentInfo = {
+  /** Component invoked by the renderer, before its VDOM is available. */
+  ctor?: TagFunction;
   vd: { value: null | WDom };
   up: () => void;
   upR: (() => void)[];

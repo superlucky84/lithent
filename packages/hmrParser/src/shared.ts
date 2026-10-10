@@ -1,4 +1,5 @@
 import { parse } from '@babel/parser';
+import { collectComponentMounts } from './utils/ast/componentCollector';
 import type { File } from '@babel/types';
 import type {
   MarkerTransformOptions,
@@ -73,7 +74,10 @@ export const analyzeMarker = (
 
   return {
     targetExports: finalTargets,
-    shouldTransform: !!match || detectLithentUsage(ast),
+    shouldTransform:
+      !!match ||
+      detectLithentUsage(ast) ||
+      collectComponentMounts(ast, code, tagFunctionImportSpecifier).length > 0,
     importInsertionPos,
     blockInsertionPos,
     headerSnippet,
@@ -97,7 +101,9 @@ export const analyzeNoMarker = (
 
   return {
     targetExports,
-    shouldTransform: detectLithentUsage(ast),
+    shouldTransform:
+      detectLithentUsage(ast) ||
+      collectComponentMounts(ast, code, tagFunctionImportSpecifier).length > 0,
     importInsertionPos,
     blockInsertionPos,
     headerSnippet,
