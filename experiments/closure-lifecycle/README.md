@@ -1,8 +1,8 @@
 # Closure lifecycle experiment
 
-코어를 변경하지 않고 인스턴스 자원 정리와 최신 작업 반영을 검증하는 실험이다.
-공개 패키지 exports에는 연결하지 않는다. [검증 결과](../../docs/closure-lifecycle/IMPLEMENT.md)와
-[계약](../../docs/closure-lifecycle/DESIGN.md)을 참고한다.
+코어를 변경하지 않고 소유권, 최신 작업, 활동 수명과 명시적인 화면 보존을 검증하는 실험이다.
+공개 패키지 exports에는 연결하지 않는다. [1단계 결과](../../docs/closure-lifecycle/IMPLEMENT.md),
+[1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md)을 참고한다.
 
 ## 사용 예시
 
@@ -65,6 +65,107 @@ const Search = mount(renew => {
 느린 검색 A 뒤에 B를 시작하면 A를 abort하며, A가 취소를 무시해도 그 결과를 반영하지 않는다.
 컴포넌트를 제거하면 등록한 listener와 진행 중인 요청을 정리한다.
 observer가 예외를 던질 수 있는 코드에서는 `run()`의 reject도 처리해야 한다.
+
+## 2단계 — 활동과 화면 보존
+
+`createRetainedView`는 숨긴 독립 루트를 한 번 만든다. 제공된 갱신 함수를 사용하면 숨김 중
+모델 변경을 재활성화에 한 번 반영한다. 폴링은 활동에, 저장은 인스턴스에 연결한다.
+
+```ts
+import { h } from 'lithent';
+import { createRetainedView, createScopedTask } from './src';
+
+const host = document.querySelector<HTMLElement>('#widget')!;
+const view = createRetainedView(host, (renew, scope) => {
+  let draft = '';
+  let status = 'editing';
+  const history: string[] = [];
+  const poll = createScopedTask(scope); // 기본값: activity
+  const save = createScopedTask(scope, 'instance');
+
+  scope.onActive(() => {
+    const timer = setInterval(() => {
+      void poll.run(
+        signal =>
+          fetch('/status', { signal }).then(response => response.text()),
+        {
+          success: text => {
+            status = text;
+            renew();
+          },
+        }
+      );
+    }, 10_000);
+    return () => clearInterval(timer);
+  });
+
+  return () =>
+    h(
+      'div',
+      {},
+      h('input', {
+        value: draft,
+        onInput: (event: Event) => {
+          history.push(draft);
+          draft = (event.target as HTMLInputElement).value;
+          renew();
+        },
+      }),
+      h(
+        'button',
+        {
+          onClick: () => {
+            draft = history.pop() ?? '';
+            renew();
+          },
+        },
+        'Undo'
+      ),
+      h(
+        'button',
+        {
+          onClick: () => {
+            const payload = draft;
+            void save.run(
+              async signal => {
+                const response = await fetch('/save', {
+                  method: 'POST',
+                  body: payload,
+                  signal,
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return 'saved';
+              },
+              {
+                success: text => {
+                  status = text;
+                  renew();
+                },
+                error: error => {
+                  status = String(error);
+                  renew();
+                },
+              }
+            );
+          },
+        },
+        'Save'
+      ),
+      h('span', {}, status)
+    );
+});
+
+view.show();
+// 탭을 닫을 때: view.hide();   다시 열 때: view.show();
+// 위젯을 영구 제거할 때: view.dispose();
+```
+
+숨김은 기존 클로저·DOM을 유지하며 폴링 요청과 타이머를 정리한다. 이미 시작한 저장은 계속 진행하고,
+숨김 중 결과는 모델에만 반영한다. 재활성화는 저장을 다시 실행하지 않는다.
+저장과 폴링이 같은 status를 반영하는 앱에서는 제품 규칙에 따라 표시 상태를 따로 관리할 수 있다.
+활동 작업의 취소는 pending=false를 발행하지 않으므로 pending UI를 쓰면 활성화에 초기화한다.
+임의 자식의 독립 `renew`, 기존 effect, portal을 자동으로 중단하지 않는다.
+CSS 숨김만으로 영상·iframe을 정지시키지 않으며 브라우저 DOM 상태의 자동 복원도 제공하지 않는다.
 
 ## 재현
 

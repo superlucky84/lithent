@@ -12,7 +12,9 @@ export type TaskOutcome<T> =
   | { status: 'stale' };
 
 /** One latest-only group. Create separate groups for independent operations. */
-export const createLatestTask = (scope: OwnerScope) => {
+export const createLatestTask = (
+  scope: Pick<OwnerScope, 'disposed' | 'own'>
+) => {
   let current: AbortController | undefined;
 
   const cancel = () => {

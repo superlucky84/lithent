@@ -1,5 +1,10 @@
 export { createOwnerScope } from './scope';
 export { createLatestTask } from './latest';
 export { useOwnerScope } from './lithent';
+export { createActivityScope } from './activity';
+export { createScopedTask } from './scopedTask';
+export { createRetainedView } from './retainedView';
+export type { Activity, ActivityScope } from './activity';
+export type { TaskLifetime } from './scopedTask';
 export type { Cleanup, OwnerScope } from './scope';
 export type { TaskHandlers, TaskOutcome } from './latest';
