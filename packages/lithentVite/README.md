@@ -4,12 +4,12 @@ Official Vite plugin for Lithent with HMR support.
 
 ## Overview
 
-`@lithent/lithent-vite` is a Vite plugin that enables Hot Module Replacement (HMR) for Lithent components during development. It automatically injects HMR boundaries around your components, allowing you to see changes instantly without losing component state.
+`@lithent/lithent-vite` is a Vite plugin that enables Hot Module Replacement (HMR) for Lithent components during development. It automatically injects HMR boundaries around your components, allowing you to see changes instantly while keeping unaffected parent components mounted. Changed `mount`/`lmount` components remount and reset their closure state.
 
 ## Features
 
 - **Hot Module Replacement**: Instant updates during development
-- **Automatic HMR boundaries**: Auto-wraps mount components
+- **Automatic HMR boundaries**: Supports `mount`, `lmount`, and stateless JSX components
 - **Marker support**: Explicit HMR boundary control with comments
 - **Type-safe**: Full TypeScript support
 - **Zero config**: Works out of the box with sensible defaults
@@ -104,34 +104,44 @@ app.use(vite.middlewares);
 
 ### Automatic HMR Boundaries
 
-The plugin automatically wraps components using `mount`:
+The plugin gives each top-level component its own development boundary. It
+supports `mount`, `lmount`, and stateless functions that return JSX (including
+arrow functions, function declarations, and default exports):
 
-**Before:**
 ```tsx
-import { mount } from 'lithent';
+export const Badge = ({ label }: { label: string }) => <span>{label}</span>;
 
-const App = mount((renew, props) => {
-  return () => <div>Hello World</div>;
-});
-
-export default App;
+export function Card({ title }: { title: string }, children: JSX.Element[]) {
+  return <article><Badge label="Info" />{title}{children}</article>;
+}
 ```
 
-**After (transformed):**
-```tsx
-import { mount } from 'lithent';
-import { createHmrBoundary } from 'lithent/devHelper';
+Lithent still passes children as the second argument. No `mount` wrapper or
+marker is required for stateless JSX components. Development proxies keep
+existing imports pointed at the latest implementation, including after parent
+redraws or an unmount/remount. Several components can share a file without
+being replaced with each other's implementations.
 
-const App = createHmrBoundary(
-  mount((renew, props) => {
-    return () => <div>Hello World</div>;
-  }),
-  import.meta.hot,
-  'App'
-);
+Stateless components can also return a JSX list, a locally computed JSX value,
+their children, or an empty value (`null`, `undefined`, `false`, `[]`). Namespace
+imports and named default functions are supported. Function declarations keep
+their hoisting behavior. Async functions and generators are not component
+boundaries.
 
-export default App;
-```
+Calling a stateless function directly (for example, `{Badge(props)}`) updates
+its caller's existing render closure instead of replacing that caller with the
+stateless function. The caller keeps its state.
+
+HMR remounts the changed module's components; unaffected parents keep their
+state. Files without component boundaries propagate updates to their importers.
+Removing a component can also invalidate its importers. Production builds do
+not inject HMR code by default; application function signatures stay unchanged.
+
+When a file also exports ordinary values, unchanged exports allow component
+updates to stay within that file. Changed values or export names propagate to
+importers so they see the new values; affected importer components can remount.
+Re-exported values also propagate updates. HMR runs cleanup for the previous
+mount before registering its replacement.
 
 ### Explicit HMR Boundaries
 

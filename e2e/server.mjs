@@ -183,11 +183,18 @@ try {
   };
   const config = common(43130 + offset);
   config.root = repo;
+  // Fast test writes can arrive inside Chokidar's change-event throttle.
+  // Emit after each completed write so the next edit is observed reliably.
+  config.server.watch = {
+    awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 10 },
+  };
   config.cacheDir = resolve(work, 'fixture-cache');
   config.plugins = [identity(), ssrPage];
   if (mutation !== 'hmr-reload')
     config.plugins.push(
-      lithentVite({ include: /\.e2e-work\/.*Counter\.tsx$/ })
+      lithentVite({
+        include: /\.e2e-work\/.*(?:Counter|Stateless|Mixed|mixed-app)\.tsx$/,
+      })
     );
   config.esbuild = { jsx: 'automatic', jsxImportSource: 'lithent' };
   config.ssr = { noExternal: ['lithent', 'lithent/ssr'] };

@@ -107,158 +107,51 @@ const runTransform = async (
 
 if (import.meta.vitest) {
   const { describe, it, expect } = import.meta.vitest;
-
   describe('lithentVitePlugin transform', () => {
-    it('주석 마커를 Lithent HMR 부트스트랩 코드로 치환하고 import 를 추가한다', async () => {
-      const source = `
-'use client';
-import { render, mount } from 'lithent';
-
-/* lithent:hmr-boundary default */
-
-const App = mount((renew, props) => {
-  return () => <div>{props.title}</div>;
-});
-
-const root = document.getElementById('root');
-if (root) {
-  render(<App title="hello" />, root);
-}
-
-export default App;
-`;
-
-      const { result } = await runTransform(source);
-
-      expect(result).not.toBeNull();
-      if (!result) return;
-
-      const transformed = result.code;
-      const normalized = transformed.trimStart();
-
-      // HMR code should be injected
-      expect(normalized).toContain('createBoundary');
-      expect(normalized).toContain('import.meta.hot');
-      expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
-      expect(normalized).toContain('const __lithentHotComponent_App = App');
-      expect(normalized).toContain(
-        '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
-      );
-      expect(normalized).toContain('const __lithentRenderOnce =');
-      expect(normalized).toContain('__lithentSetupHmrHooks();');
-      expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(normalized)).toBe(
-        true
-      );
-      expect(normalized).not.toContain('/* lithent:hmr-boundary');
+    it('wraps mounted and stateless components without a marker', async () => {
+      const { result } = await runTransform(`
+import {mount} from 'lithent';
+export const App = mount(() => {return () => <Badge/>;});
+export const Badge = ({label}) => <span>{label}</span>;
+`);
+      expect(result?.code).toContain('__lithentWrapComponent("App", mount(');
+      expect(result?.code).toContain('__lithentWrapComponent("Badge",');
     });
-
-    it('이미 필요한 import 가 존재할 때 중복 삽입하지 않는다', async () => {
-      const source = `
-"use client";
-import type { TagFunction } from 'lithent';
-import { createBoundary } from 'lithent/devHelper';
-import { render, mount } from 'lithent';
-
-/* lithent:hmr-boundary Counter */
-
-export const Counter = mount((renew, props) => {
-  return ({ value }: { value: number }) => <span>{value}</span>;
-});
-`;
-
-      const { result } = await runTransform(source, '/src/Counter.tsx');
-
-      expect(result).not.toBeNull();
-      if (!result) return;
-
-      const transformed = result.code;
-      const normalized = transformed.trimStart();
-      // HMR boundary and registration code should be present
-      expect(normalized).toContain('createBoundary');
-      expect(normalized).toContain('counterBoundary.register(compKey)');
-      expect(normalized).toContain('mountCallback(() => () => unregister())');
-      expect(normalized).toContain('const __lithentHmrTargets = ["Counter"];');
-      expect(normalized).toContain('import.meta.hot');
-      expect(normalized).toContain(
-        'const __lithentHotComponent_Counter = Counter'
+    it('supports stateless-only files with an explicit marker', async () => {
+      const { result, warnings } = await runTransform(`
+/* lithent:hmr-boundary Card */
+export function Card({title}, children) {return <article>{title}{children}</article>;}
+`);
+      expect(result?.code).toContain(
+        'Card = __lithentWrapComponent("Card", Card)'
       );
-      expect(normalized).toContain(
-        '__lithentModuleHotStore["Counter"] = __lithentHotComponent_Counter;'
-      );
+      expect(result?.code).not.toContain('/* lithent:hmr-boundary');
+      expect(warnings).not.toHaveBeenCalled();
     });
-
-    it('마커 없이도 Lithent 엔트리를 감지해 HMR 부트스트랩을 삽입한다', async () => {
-      const source = `
-'use client';
-import { render, mount } from 'lithent';
-
-const App = mount((renew, props) => {
-  return () => <div>{props.title}</div>;
-});
-
-const root = document.getElementById('root');
-if (root) {
-  render(<App title="auto" />, root);
-}
-
-export default App;
-`;
-
-      const { result } = await runTransform(source, '/src/App.tsx');
-
-      expect(result).not.toBeNull();
-      if (!result) return;
-
-      const transformed = result.code;
-      const normalized = transformed.trimStart();
-      // HMR code should be injected
-      expect(normalized).toContain('createBoundary');
-      expect(normalized).toContain('import.meta.hot');
-      expect(normalized).toContain('const __lithentHmrTargets = ["App"];');
-      expect(normalized).toContain('const __lithentHotComponent_App = App');
-      expect(normalized).toContain(
-        '__lithentModuleHotStore["App"] = __lithentHotComponent_App;'
-      );
-      expect(normalized).toContain('const __lithentRenderOnce =');
-      expect(normalized).toContain('__lithentSetupHmrHooks();');
-      expect(/__lithentRenderOnce\(\(\) =>\s*render\(/.test(normalized)).toBe(
-        true
-      );
+    it('does not reinject bootstrap code on a second transform', async () => {
+      const first = await runTransform('export const Badge = () => <span/>;');
+      const second = await runTransform(first.result!.code);
+      expect(second.result).toBeNull();
     });
-
-    it('템플릿 옵션을 활성화하면 템플릿 플러그인을 함께 리턴한다', async () => {
-      const option = lithentVitePlugin({ template: true });
-      const plugins = await flattenPluginOption(option);
-
+    it('skips unrelated files', async () => {
+      expect((await runTransform('export const value = 1;')).result).toBeNull();
       expect(
-        plugins.some(plugin => plugin.name === 'lithent:template-vite')
-      ).toBe(true);
-
-      const hmrPlugin = plugins.find(
-        plugin => plugin.name === 'lithent:hmr-boundary'
+        (
+          await runTransform(
+            'export const Badge = () => <span/>;',
+            '/src/style.css'
+          )
+        ).result
+      ).toBeNull();
+    });
+    it('keeps template compilation ahead of HMR', async () => {
+      const plugins = await flattenPluginOption(
+        lithentVitePlugin({ template: true })
       );
-      expect(hmrPlugin).toBeDefined();
-
-      const configHook = hmrPlugin?.config;
-      const configResult =
-        typeof configHook === 'function'
-          ? configHook.call(
-              {} as any,
-              {},
-              { command: 'serve', mode: 'development', isSsrBuild: false }
-            )
-          : (configHook as any)?.handler?.call(
-              {} as any,
-              {},
-              { command: 'serve', mode: 'development', isSsrBuild: false }
-            );
-
-      expect(configResult).toBeDefined();
-      expect(
-        configResult &&
-          typeof configResult === 'object' &&
-          'esbuild' in (configResult as Record<string, unknown>)
-      ).toBe(false);
+      expect(plugins.map(plugin => plugin.name)).toEqual([
+        'lithent:template-vite',
+        'lithent:hmr-boundary',
+      ]);
     });
   });
 }
