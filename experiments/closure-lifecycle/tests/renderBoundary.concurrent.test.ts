@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
-  componentMap,
   h,
   mount,
   mountCallback,
@@ -12,12 +11,13 @@ import {
 import type { Renew } from 'lithent';
 import { createRetainedView, useRenderBoundary } from '../src';
 import type { RenderBoundary } from '../src';
+import { getRenderProtocol } from '../src/renderProtocol';
 
 const destroys: Array<() => void> = [];
 afterEach(() => {
   destroys.splice(0).forEach(destroy => destroy());
   document.body.replaceChildren();
-  expect(componentMap.renderGate.blocks).toBeUndefined();
+  expect(getRenderProtocol()?.blocks).toBeUndefined();
 });
 const attach = (node: Parameters<typeof render>[0]) => {
   const host = document.createElement('section');

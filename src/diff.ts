@@ -11,7 +11,6 @@ import {
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { keys, isEnumerableProp } from '@/utils';
-import { componentMap } from '@/utils/universalRef';
 
 /**
  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
@@ -167,8 +166,6 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
     syncResolverChildren(children, infoChidren);
   }
 
-  // Keep the latest props/slots, but retain the committed subtree while paused.
-  if (componentMap.renderGate.blocks?.(vDom)) return vDom;
   const newVDom = vDom.reRender && vDom.reRender();
 
   return newVDom as WDom;

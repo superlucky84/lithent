@@ -1,7 +1,7 @@
 import * as core from 'lithent';
 import { h, mount, render } from 'lithent';
 import { defineElement } from '../../../element/src';
-import { createRetainedHost } from '../src';
+import { createRetainedHost, supportsRenderBoundary } from '../src';
 import { createEditor } from './editor';
 import { createMetrics } from './metrics';
 import { emitStatus } from './status';
@@ -14,6 +14,10 @@ if ('deferRender' in core !== (__LITHENT_CORE__ === 'concurrent'))
   throw new Error(`Wrong core: expected ${__LITHENT_CORE__}`);
 document.documentElement.dataset.core = __LITHENT_CORE__;
 document.querySelector('#core')!.textContent = __LITHENT_CORE__;
+const freezeChildren = __LITHENT_CORE__ === 'concurrent';
+if (supportsRenderBoundary() !== freezeChildren)
+  throw new Error(`Wrong render boundary capability: ${__LITHENT_CORE__}`);
+document.documentElement.dataset.freezeChildren = String(freezeChildren);
 
 const plainMetrics = createMetrics();
 const elementMetrics = createMetrics();
@@ -28,14 +32,14 @@ const PlainHost = createRetainedHost(
     displayMetrics('#plain-metrics', plainMetrics)
   ),
   console.error,
-  { freezeChildren: true }
+  { freezeChildren }
 );
 const ElementHost = createRetainedHost(
   createEditor(elementMetrics, () =>
     displayMetrics('#element-metrics', elementMetrics)
   ),
   console.error,
-  { freezeChildren: true }
+  { freezeChildren }
 );
 defineElement('closure-editor', ElementHost, {
   props: { active: Boolean },

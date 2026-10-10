@@ -11,7 +11,7 @@ import {
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { keys, isEnumerableProp } from '@/utils';
-import { componentMap } from '@/utils/universalRef';
+import { renderGate } from './renderGate';
 
 /**
  * Side effects the diff pass would have performed inline, recorded to run at
@@ -371,7 +371,7 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
   }
 
   // Keep the latest props/slots, but retain the committed subtree while paused.
-  if (componentMap.renderGate.blocks?.(vDom)) return vDom;
+  if (renderGate.blocks?.(vDom)) return vDom;
   const newVDom = vDom.reRender && vDom.reRender();
 
   return newVDom as WDom;

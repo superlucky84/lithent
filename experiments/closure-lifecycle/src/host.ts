@@ -1,6 +1,7 @@
 import { h, mount, mountCallback, updateCallback } from 'lithent';
 import { createRetainedView } from './retainedView';
 import { useOwnerScope } from './lithent';
+import { supportsRenderBoundary } from './renderProtocol';
 
 export interface RetainedHostProps {
   active?: boolean;
@@ -11,8 +12,10 @@ export const createRetainedHost = (
   initialize: Parameters<typeof createRetainedView>[1],
   reportCleanupError: (error: unknown) => void = console.error,
   options: Parameters<typeof createRetainedView>[2] = {}
-) =>
-  mount<RetainedHostProps>((_renew, initial) => {
+) => {
+  if (options.freezeChildren && !supportsRenderBoundary())
+    throw new Error('Child freezing requires the Concurrent lifecycle core');
+  return mount<RetainedHostProps>((_renew, initial) => {
     const owner = useOwnerScope(reportCleanupError);
     const slot: { value?: HTMLElement } = {};
     let active = initial.active === true;
@@ -41,3 +44,4 @@ export const createRetainedHost = (
       return h('div', { ref: slot });
     };
   });
+};

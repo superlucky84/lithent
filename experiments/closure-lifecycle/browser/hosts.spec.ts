@@ -27,9 +27,14 @@ test.afterEach(() => {
 for (const host of ['plain', 'element'] as const) {
   const selector = host === 'plain' ? '#plain-root' : '#element-widget';
   test.describe(`${host} host`, () => {
-    test('freezes native child renew and its update effect until reopening', async ({
+    test('applies native child freezing only in concurrent mode', async ({
       page,
-    }) => {
+    }, info) => {
+      const freezeChildren = info.project.name === 'concurrent';
+      await expect(page.locator('html')).toHaveAttribute(
+        'data-freeze-children',
+        String(freezeChildren)
+      );
       const output = page.locator(selector).locator('.native-child');
       await page.locator(`#${host}-toggle`).click();
       await expect.poll(async () => (await metrics(page, host)).timers).toBe(0);
@@ -38,11 +43,14 @@ for (const host of ['plain', 'element'] as const) {
         for (let i = 0; i < 100; i++) window.lifecycleDemo.renewChild(name);
         await new Promise<void>(resolve => queueMicrotask(resolve));
       }, host);
-      expect((await metrics(page, host)).childDraws).toBe(before.childDraws);
-      expect((await metrics(page, host)).childEffects).toBe(
-        before.childEffects
+      const after = await metrics(page, host);
+      expect(after.childDraws).toBe(
+        before.childDraws + (freezeChildren ? 0 : 1)
       );
-      await expect(output).toHaveText('0');
+      expect(after.childEffects).toBe(
+        before.childEffects + (freezeChildren ? 0 : 1)
+      );
+      await expect(output).toHaveText(freezeChildren ? '0' : '100');
       await page.locator(`#${host}-toggle`).click();
       await expect(output).toHaveText('100');
     });

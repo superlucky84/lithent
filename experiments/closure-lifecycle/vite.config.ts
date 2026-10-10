@@ -31,5 +31,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['tests/**/*.test.ts'],
+    exclude:
+      process.env.LITHENT_CORE === 'concurrent'
+        ? []
+        : ['tests/**/*.concurrent.test.ts'],
   },
 });

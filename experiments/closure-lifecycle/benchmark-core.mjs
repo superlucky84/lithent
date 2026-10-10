@@ -144,30 +144,24 @@ try {
     for (const workload of ['leaf', 'parent'])
       for (const core of ['base', 'concurrent']) {
         const before = core === 'base' ? 'baseline' : 'baseline-concurrent';
-        for (const [name, enabled] of [
-          [before, false],
-          [core, false],
-          [`${core}-active`, 'active'],
-          [`${core}-paused`, 'paused'],
-        ])
+        const supported = adapters[`${core}-active`].supportsRenderBoundary();
+        const variants = [
+          ['baseline', before, false],
+          ['current', core, false],
+        ];
+        if (supported)
+          variants.push(
+            ['boundaryActive', `${core}-active`, 'active'],
+            ['boundaryElsewherePaused', `${core}-paused`, 'paused']
+          );
+        for (const [, name, enabled] of variants)
           for (let warmup = 0; warmup < 3; warmup++)
             await run(name, workload, enabled);
-        const samples = {
-          baseline: [],
-          current: [],
-          boundaryActive: [],
-          boundaryElsewherePaused: [],
-        };
+        const samples = Object.fromEntries(variants.map(([key]) => [key, []]));
         let iterations;
         for (let round = 0; round < 9; round++) {
-          const variants = [
-            ['baseline', before, false],
-            ['current', core, false],
-            ['boundaryActive', `${core}-active`, 'active'],
-            ['boundaryElsewherePaused', `${core}-paused`, 'paused'],
-          ];
-          if (round % 2) variants.reverse();
-          for (const [variant, name, enabled] of variants) {
+          const order = round % 2 ? [...variants].reverse() : variants;
+          for (const [variant, name, enabled] of order) {
             const sample = await run(name, workload, enabled);
             samples[variant].push(sample.elapsed);
             iterations = sample.iterations;
@@ -182,15 +176,18 @@ try {
         );
         results.push({
           core,
+          renderBoundarySupported: supported,
           workload,
           iterations,
           samplesMs: samples,
           medianMs: medians,
           ordinaryDeltaPercent: (medians.current / medians.baseline - 1) * 100,
-          activeBoundaryDeltaPercent:
-            (medians.boundaryActive / medians.current - 1) * 100,
-          elsewherePausedDeltaPercent:
-            (medians.boundaryElsewherePaused / medians.current - 1) * 100,
+          activeBoundaryDeltaPercent: supported
+            ? (medians.boundaryActive / medians.current - 1) * 100
+            : undefined,
+          elsewherePausedDeltaPercent: supported
+            ? (medians.boundaryElsewherePaused / medians.current - 1) * 100
+            : undefined,
         });
       }
     return results;

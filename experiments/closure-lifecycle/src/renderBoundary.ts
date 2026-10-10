@@ -1,5 +1,6 @@
 import { componentMap, getComponentKey, mountCallback } from 'lithent';
 import type { Props, WDom } from 'lithent';
+import { getRenderProtocol } from './renderProtocol';
 
 export interface RenderBoundary {
   readonly active: boolean;
@@ -35,9 +36,10 @@ const blocks = (node: WDom) => {
 /** Call in a mounter. Initial construction is allowed, even if inactive. */
 export const useRenderBoundary = (initialActive = true): RenderBoundary => {
   const key = getComponentKey();
-  const protocol = componentMap.renderGate;
-  if (!key || !protocol?.beforePause)
-    throw new Error('Render boundary requires a mounter and the Phase 4 core');
+  const protocol = getRenderProtocol();
+  if (!protocol?.beforePause)
+    throw new Error('Child freezing requires the Concurrent lifecycle core');
+  if (!key) throw new Error('Use render boundary in a component mounter');
   if (requested.has(key))
     throw new Error('Use one render boundary per component');
   requested.add(key);

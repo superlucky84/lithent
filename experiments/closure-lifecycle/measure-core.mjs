@@ -11,6 +11,7 @@ const args = process.argv.slice(2);
 const arg = name => args[args.indexOf(name) + 1];
 if (!args.includes('--baseline')) throw new Error('Pass --baseline <json>');
 const baseline = JSON.parse(readFileSync(arg('--baseline'), 'utf8'));
+const concurrentOnly = args.includes('--concurrent-only');
 const measure = path => {
   const bytes = readFileSync(resolve(repo, path));
   return {
@@ -39,6 +40,14 @@ if (
 )
   throw new Error('This prototype must not change the existing helper bundle');
 const execute = promisify(execFile);
+if (
+  concurrentOnly &&
+  production.some(
+    file =>
+      file.path.startsWith('dist/') && file.sha256 !== file.baseline.sha256
+  )
+)
+  throw new Error('Concurrent-only mode changed a base core artifact');
 const untouched = await execute(
   'git',
   [
@@ -46,6 +55,7 @@ const untouched = await execute(
     '--name-only',
     baseline.baselineCommit,
     '--',
+    ...(concurrentOnly ? ['src'] : []),
     'helper/src',
     'element/src',
     'package.json',
@@ -56,7 +66,7 @@ const untouched = await execute(
 );
 if (untouched.stdout.trim())
   throw new Error(
-    'This prototype must not change helper, element or packaging'
+    'This prototype must not change protected core, helper, element or packaging sources'
   );
 const sourceDiff = await execute(
   'git',
@@ -74,6 +84,7 @@ const sourceDiff = await execute(
   { cwd: repo }
 );
 const result = {
+  mode: concurrentOnly ? 'concurrent-only' : 'dual-core',
   baselineCommit: baseline.baselineCommit,
   node: process.version,
   compression: 'gzip level 9; Node default Brotli; source maps excluded',

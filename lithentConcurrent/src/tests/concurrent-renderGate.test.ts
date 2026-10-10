@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
-  componentMap,
   deferRender,
   h,
   mount,
@@ -10,12 +9,13 @@ import {
   whenIdle,
 } from '@/index';
 import { hasPendingWork, setLowLaneBudget } from '@/scheduler';
+import { renderGate } from '../renderGate';
 
 let destroy: (() => void) | undefined;
 afterEach(() => {
   destroy?.();
   destroy = undefined;
-  delete componentMap.renderGate.blocks;
+  delete renderGate.blocks;
   setLowLaneBudget();
   vi.useRealTimers();
   vi.unstubAllGlobals();
@@ -38,10 +38,10 @@ describe('render gate and concurrent lanes', () => {
     });
     const host = document.createElement('div');
     destroy = render(h(App, {}), host);
-    componentMap.renderGate.blocks = () => !active;
+    renderGate.blocks = () => !active;
     value = 1;
     deferRender(() => renew());
-    componentMap.renderGate.beforePause();
+    renderGate.beforePause();
     active = false;
     await whenIdle();
     expect(host.textContent).toBe('0');
@@ -78,7 +78,7 @@ describe('render gate and concurrent lanes', () => {
     });
     const host = document.createElement('div');
     destroy = render(h(App, {}), host);
-    componentMap.renderGate.blocks = () => !active;
+    renderGate.blocks = () => !active;
     setLowLaneBudget(0);
     value = 1;
     deferRender(() => renew());
@@ -90,7 +90,7 @@ describe('render gate and concurrent lanes', () => {
     expect(commits).not.toHaveBeenCalled();
     expect(host.textContent).toBe('0000');
 
-    componentMap.renderGate.beforePause();
+    renderGate.beforePause();
     active = false;
     expect(hasPendingWork()).toBe(false);
     expect(host.textContent).toBe('1111');

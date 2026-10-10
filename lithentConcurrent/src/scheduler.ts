@@ -1,5 +1,6 @@
 import { Props } from '@/types';
 import { componentMap } from '@/utils/universalRef';
+import { renderGate } from './renderGate';
 
 // ============================================================================
 // Lanes (D1, D2 — DC-1 ambient, DC-2 two lanes, DC-3 MessageChannel)
@@ -202,8 +203,8 @@ let flushingLow = false;
 
 // Pausing is a commit boundary: finish already-started work while still active.
 // Its updater effects cannot be rolled back. Queued work is gated when it runs.
-const beforePause = componentMap.renderGate.beforePause;
-componentMap.renderGate.beforePause = () => {
+const beforePause = renderGate.beforePause;
+renderGate.beforePause = () => {
   beforePause();
   const outerLow = flushingLow;
   flushingLow = false;

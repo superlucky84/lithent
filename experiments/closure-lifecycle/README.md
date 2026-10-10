@@ -4,10 +4,13 @@
 `experiment/closure-lifecycle`의 1~3단계는 코어를 변경하지 않는다.
 `experiment/closure-lifecycle-core`의 4단계는 자식 native renew와 부모 diff를 막는
 최소 코어 연동을 별도로 검증한다.
+현재 `experiment/closure-lifecycle-concurrent`의 5단계는 기본 코어를 원본으로 복원하고
+갱신 중단을 Concurrent에만 연결한다.
 공개 패키지 exports에는 연결하지 않는다. [1단계 결과](../../docs/closure-lifecycle/IMPLEMENT.md),
 [1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md),
 [3단계 호스트·브라우저 결과](../../docs/closure-lifecycle/PHASE3.md),
-[4단계 코어·크기·성능 결과](../../docs/closure-lifecycle/PHASE4.md)를 참고한다.
+[4단계 코어·크기·성능 결과](../../docs/closure-lifecycle/PHASE4.md),
+[5단계 Concurrent 전용 결과](../../docs/closure-lifecycle/PHASE5.md)를 참고한다.
 
 ## 사용 예시
 
@@ -217,9 +220,40 @@ LITHENT_CORE=concurrent ./node_modules/.bin/vite build --config experiments/clos
 빌드 파일은 `demo/dist/base`와 `demo/dist/concurrent`에 생성하며 Git에 넣지 않는다.
 코어와 실험의 크기·해시 기록은 [3단계 결과](../../docs/closure-lifecycle/PHASE3.md#크기)를 참고한다.
 
-## 4단계 — opt-in 자식 갱신 중단
+## 5단계 — Concurrent 전용 경계
 
-이 브랜치의 시연은 `createRetainedHost(initialize, console.error, { freezeChildren: true })`로
+현재 시연은 기본에서 `freezeChildren: false`, Concurrent에서 true를 명시적으로 선택한다.
+기본은 명시적 루트의 관리된 renew를 제어하고, Concurrent는 native 자식 renew와 부모 diff도 중단한다.
+기본에서 `freezeChildren: true`를 요청하면 호스트 생성/편집기 초기화 전에 오류를 던진다.
+`supportsRenderBoundary()`는 실험 어댑터가 현재 런타임의 지원 여부를 확인하는 함수다.
+기본 core 코드·타입·ESM/CJS/UMD는 3단계 원본과 동일하다.
+
+3단계의 기준 산출물을 별도 경로에 보관한 뒤 현재 코어·실험을 빌드한다.
+측정 기준 커밋은 `925b4aa98c40ca20b309ea2613cc625d260fa5b1`이다.
+
+```sh
+./node_modules/.bin/vite build
+(cd lithentConcurrent && ../node_modules/.bin/vite build)
+./node_modules/.bin/vite build --config experiments/closure-lifecycle/vite.config.ts
+node experiments/closure-lifecycle/measure-core.mjs --concurrent-only --baseline /path/to/baseline.json --output /path/to/sizes.json
+./node_modules/.bin/vitest run --maxWorkers 2 --minWorkers 1
+(cd lithentConcurrent && ../node_modules/.bin/vitest run --maxWorkers 2 --minWorkers 1)
+./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
+LITHENT_CORE=concurrent ./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
+./node_modules/.bin/playwright test --config experiments/closure-lifecycle/playwright.config.ts
+```
+
+CPU 작업을 끝낸 뒤 각 성능 측정기를 따로 실행한다.
+
+```sh
+LITHENT_CHROMIUM_PATH=/usr/bin/chromium node experiments/closure-lifecycle/benchmark-core.mjs --baseline /path/to/baseline.mjs --baseline-concurrent /path/to/baseline-concurrent.mjs --baseline-commit 925b4aa98c40ca20b309ea2613cc625d260fa5b1 --output /path/to/performance.json
+./node_modules/.bin/vite build --config experiments/closure-lifecycle/benchmark/vite.config.ts
+LITHENT_CHROMIUM_PATH=/usr/bin/chromium node experiments/closure-lifecycle/benchmark-pause.mjs --output /path/to/pause.json
+```
+
+## 4단계 — opt-in 자식 갱신 중단 (양쪽 코어 브랜치)
+
+`experiment/closure-lifecycle-core`의 시연은 `createRetainedHost(initialize, console.error, { freezeChildren: true })`로
 자식의 native renew까지 중단한다. 기본값 false는 3단계의 명시적 루트 동작을 유지한다.
 같은 코어 인스턴스의 4단계 내부 프로토콜이 필요하다. 공개 패키지 API로 출하하지 않았다.
 

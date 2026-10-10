@@ -133,7 +133,7 @@ export const replaceWDom = (
   children: WDom[],
   originalWDom: WDom
 ) => {
-  if (originalWDom.il || componentMap.renderGate.blocks?.(originalWDom)) {
+  if (originalWDom.il) {
     return;
   }
   needDiffRef.value = true;

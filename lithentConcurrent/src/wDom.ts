@@ -39,6 +39,7 @@ import {
   checkCustemComponentFunction,
 } from '@/utils/predicator';
 import { assign, getParent } from '@/utils';
+import { renderGate } from './renderGate';
 
 // ============================================================================
 // Public API - Highest Level (User-facing API)
@@ -290,7 +291,7 @@ export const replaceWDom = (
 ) => {
   let originalWDom = original;
 
-  if (originalWDom.il || componentMap.renderGate.blocks?.(originalWDom)) {
+  if (originalWDom.il || renderGate.blocks?.(originalWDom)) {
     return;
   }
 

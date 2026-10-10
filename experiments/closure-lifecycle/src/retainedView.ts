@@ -4,6 +4,7 @@ import { createActivityScope } from './activity';
 import type { ActivityScope } from './activity';
 import { useRenderBoundary } from './renderBoundary';
 import type { RenderBoundary } from './renderBoundary';
+import { supportsRenderBoundary } from './renderProtocol';
 
 export interface RetainedViewOptions {
   freezeChildren?: boolean;
@@ -15,6 +16,8 @@ export const createRetainedView = (
   initialize: (renew: Renew, scope: ActivityScope) => () => MiddleStateWDom,
   options: RetainedViewOptions = {}
 ) => {
+  if (options.freezeChildren && !supportsRenderBoundary())
+    throw new Error('Child freezing requires the Concurrent lifecycle core');
   const scope = createActivityScope();
   const container = document.createElement('div');
   container.hidden = true;

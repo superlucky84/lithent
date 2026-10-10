@@ -34,10 +34,10 @@ it('keeps mount work dormant while rendering a component to HTML', async () => {
 it('renders a retained host shell without initializing browser work during SSR', async () => {
   const { h } = await import('lithent');
   const { renderToString } = await import('lithent/ssr');
-  const { createRetainedHost } = await import('../src');
+  const { createRetainedHost, supportsRenderBoundary } = await import('../src');
   const initialize = vi.fn(() => () => h('span', {}, 'editor'));
   const Host = createRetainedHost(initialize, console.error, {
-    freezeChildren: true,
+    freezeChildren: supportsRenderBoundary(),
   });
   expect(renderToString(h(Host, { active: true }))).toBe('<div></div>');
   await Promise.resolve();

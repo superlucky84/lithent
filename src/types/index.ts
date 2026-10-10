@@ -101,13 +101,7 @@ export type ComponentSubKey =
   | 'umts'
   | 'wdCB';
 
-// Experimental internal protocol; no new package export.
-export type ComponentMap = WeakMap<CompKey, ComponentInfo> & {
-  renderGate: {
-    blocks?: (node: WDom) => boolean;
-    beforePause: () => void;
-  };
-};
+export type ComponentMap = WeakMap<CompKey, ComponentInfo>;
 
 export type ComponentInfo = {
   vd: { value: null | WDom };

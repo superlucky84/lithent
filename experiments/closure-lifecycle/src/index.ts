@@ -6,6 +6,7 @@ export { createScopedTask } from './scopedTask';
 export { createRetainedView } from './retainedView';
 export { createRetainedHost } from './host';
 export { useRenderBoundary } from './renderBoundary';
+export { supportsRenderBoundary } from './renderProtocol';
 export type { RenderBoundary } from './renderBoundary';
 export type { RetainedViewOptions } from './retainedView';
 export type { RetainedHostProps } from './host';
