@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   deferRender,
+  getComponentKey,
   h,
   mount,
   nextTick,
@@ -10,6 +11,7 @@ import {
 } from '@/index';
 import { hasPendingWork, setLowLaneBudget } from '@/scheduler';
 import { renderGate } from '../renderGate';
+import type { Props } from '@/types';
 
 let destroy: (() => void) | undefined;
 afterEach(() => {
@@ -110,5 +112,119 @@ describe('render gate and concurrent lanes', () => {
     expect(host.textContent).toBe('2222');
     expect(effects).toHaveBeenCalledTimes(2);
     expect(commits).toHaveBeenCalledTimes(2);
+  });
+
+  it('leaves an unrelated observable build parked when another boundary pauses', async () => {
+    vi.stubGlobal('MessageChannel', undefined);
+    vi.useFakeTimers();
+    let renew = () => false;
+    let otherKey!: Props;
+    const commits = vi.fn();
+    const App = mount(update => {
+      renew = update;
+      updateCallback(() => commits);
+      return () =>
+        h(
+          'ul',
+          {},
+          [1, 2, 3].map(i => h('li', {}, i))
+        );
+    });
+    const Other = mount(() => {
+      otherKey = getComponentKey()!;
+      return () => h('aside', {}, 'other');
+    });
+    const host = document.createElement('div');
+    destroy = render(h('div', {}, h(App, {}), h(Other, {})), host);
+    setLowLaneBudget(0);
+    deferRender(() => renew());
+    vi.runOnlyPendingTimers();
+    expect(hasPendingWork()).toBe(true);
+    renderGate.beforePause(otherKey);
+    expect(hasPendingWork()).toBe(true);
+    expect(commits).not.toHaveBeenCalled();
+    await vi.runAllTimersAsync();
+    expect(commits).toHaveBeenCalledTimes(1);
+    await whenIdle();
+  });
+
+  it('discards a related pure build and blocks its replacement until resume', async () => {
+    vi.stubGlobal('MessageChannel', undefined);
+    vi.useFakeTimers();
+    let renew = () => false;
+    let key!: Props;
+    let value = 0;
+    let dependency = 0;
+    let active = true;
+    const effects = vi.fn();
+    const App = mount(update => {
+      renew = update;
+      key = getComponentKey()!;
+      updateCallback(effects, () => [dependency]);
+      return () =>
+        h(
+          'ul',
+          {},
+          [1, 2, 3].map(() => h('li', {}, value))
+        );
+    });
+    const host = document.createElement('div');
+    destroy = render(h(App, {}), host);
+    renderGate.blocks = () => !active;
+    setLowLaneBudget(0);
+    value = 1;
+    deferRender(() => renew());
+    vi.runOnlyPendingTimers();
+    expect(hasPendingWork()).toBe(true);
+    expect(effects).not.toHaveBeenCalled();
+    renderGate.beforePause(key);
+    active = false;
+    expect(hasPendingWork()).toBe(false);
+    expect(host.textContent).toBe('000');
+    dependency = 1;
+    value = 2;
+    await vi.runAllTimersAsync();
+    await whenIdle();
+    expect(host.textContent).toBe('000');
+    expect(effects).not.toHaveBeenCalled();
+    active = true;
+    renew();
+    await nextTick();
+    expect(host.textContent).toBe('222');
+    expect(effects).toHaveBeenCalledTimes(1);
+  });
+
+  it('completes related mounting work rather than initializing it twice', async () => {
+    vi.stubGlobal('MessageChannel', undefined);
+    vi.useFakeTimers();
+    let renew = () => false;
+    let key!: Props;
+    let add = false;
+    const initializes = vi.fn();
+    const Child = mount(() => {
+      initializes();
+      return () => h('span', {}, 'new');
+    });
+    const App = mount(update => {
+      renew = update;
+      key = getComponentKey()!;
+      return () => h('div', {}, add ? h(Child, {}) : null, h('i', {}, 'tail'));
+    });
+    const host = document.createElement('div');
+    destroy = render(h(App, {}), host);
+    setLowLaneBudget(0);
+    add = true;
+    deferRender(() => renew());
+    // Two units reach the child's resolver and run its mounter.
+    vi.runOnlyPendingTimers();
+    vi.runOnlyPendingTimers();
+    expect(hasPendingWork()).toBe(true);
+    expect(initializes).toHaveBeenCalledTimes(1);
+    renderGate.beforePause(key);
+    expect(hasPendingWork()).toBe(false);
+    expect(host.textContent).toBe('newtail');
+    renew();
+    await nextTick();
+    expect(initializes).toHaveBeenCalledTimes(1);
   });
 });

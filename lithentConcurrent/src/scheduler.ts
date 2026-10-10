@@ -201,15 +201,15 @@ const flushSync = () => {
  */
 let flushingLow = false;
 
-// Pausing is a commit boundary: finish already-started work while still active.
-// Its updater effects cannot be rolled back. Queued work is gated when it runs.
+// The renderer decides whether the parked pass is related and discardable.
+// Observable related work still completes while the boundary is active.
 const beforePause = renderGate.beforePause;
-renderGate.beforePause = () => {
+renderGate.beforePause = key => {
   beforePause();
   const outerLow = flushingLow;
   flushingLow = false;
   try {
-    drainPendingWork();
+    renderGate.settle?.(key);
   } finally {
     flushingLow = outerLow;
   }

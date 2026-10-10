@@ -98,6 +98,7 @@ describe('opt-in core render boundary', () => {
       app.setValue(1);
       if (queued) app.renew();
       app.boundary.pause();
+      expect(getRenderProtocol()?.reparent).toBeTypeOf('function');
       for (let i = 2; i <= 6; i++) {
         app.setValue(i);
         expect(app.renew()).toBe(true);
@@ -109,6 +110,7 @@ describe('opt-in core render boundary', () => {
       expect(app.commits).not.toHaveBeenCalled();
       app.boundary.resume();
       app.boundary.resume();
+      expect(getRenderProtocol()?.reparent).toBeUndefined();
       await nextTick();
       expect(app.host.querySelector('input')).toBe(input);
       expect(input.value).toBe('initial:6');
@@ -307,5 +309,39 @@ describe('opt-in core render boundary', () => {
     await nextTick();
     expect(error).toHaveBeenCalledTimes(1);
     expect(gate.active).toBe(true);
+  });
+
+  it('removes cached ownership when disposed beside another paused root', async () => {
+    let gate!: RenderBoundary;
+    let other!: RenderBoundary;
+    let renew!: Renew;
+    let value = 0;
+    const Child = mount(update => {
+      renew = update;
+      return () => h('span', {}, String(value));
+    });
+    const Root = mount(() => {
+      gate = useRenderBoundary();
+      return () => h('div', {}, h(Child, {}));
+    });
+    const Other = mount(() => {
+      other = useRenderBoundary(false);
+      return () => h('aside', {}, 'paused elsewhere');
+    });
+    const host = attach(h(Root, {}));
+    attach(h(Other, {}));
+    renew();
+    await nextTick();
+    gate.pause();
+    value = 1;
+    renew();
+    await nextTick();
+    expect(host.textContent).toBe('0');
+    gate.dispose();
+    value = 2;
+    renew();
+    await nextTick();
+    expect(host.textContent).toBe('2');
+    expect(other.active).toBe(false);
   });
 });

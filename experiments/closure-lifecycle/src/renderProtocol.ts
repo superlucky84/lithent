@@ -1,5 +1,5 @@
 import { componentMap } from 'lithent';
-import type { WDom } from 'lithent';
+import type { Props, WDom } from 'lithent';
 
 // Structural read of an experimental capability, outside the base public types.
 export const getRenderProtocol = () =>
@@ -7,10 +7,17 @@ export const getRenderProtocol = () =>
     componentMap as typeof componentMap & {
       renderGate?: {
         blocks?: (node: WDom) => boolean;
-        beforePause: () => void;
+        reparent?: (node: WDom) => void;
+        settle?: (key?: Props) => void;
+        beforePause: (key?: Props) => void;
       };
     }
   ).renderGate;
 
-export const supportsRenderBoundary = () =>
-  typeof getRenderProtocol()?.beforePause === 'function';
+export const supportsRenderBoundary = () => {
+  const protocol = getRenderProtocol();
+  return (
+    typeof protocol?.beforePause === 'function' &&
+    typeof protocol.settle === 'function'
+  );
+};

@@ -1,10 +1,12 @@
-import type { WDom } from '@/types';
+import type { Props, WDom } from '@/types';
 import { componentMap, needDiffRef } from '@/utils/universalRef';
 
 // Internal capability installed only by the concurrent runtime.
 type RenderGate = {
   blocks?: (node: WDom) => boolean;
-  beforePause: () => void;
+  reparent?: (node: WDom) => void;
+  settle?: (key?: Props) => void;
+  beforePause: (key?: Props) => void;
 };
 
 export const renderGate = Object.assign(componentMap, {

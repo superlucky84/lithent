@@ -4,13 +4,16 @@
 `experiment/closure-lifecycle`의 1~3단계는 코어를 변경하지 않는다.
 `experiment/closure-lifecycle-core`의 4단계는 자식 native renew와 부모 diff를 막는
 최소 코어 연동을 별도로 검증한다.
-현재 `experiment/closure-lifecycle-concurrent`의 5단계는 기본 코어를 원본으로 복원하고
+`experiment/closure-lifecycle-concurrent`의 5단계는 기본 코어를 원본으로 복원하고
 갱신 중단을 Concurrent에만 연결한다.
+현재 `experiment/closure-lifecycle-performance`의 6단계는 컴포넌트 소속 캐시와
+관련 작업만 처리하는 중단 정책으로 Concurrent 비용을 줄인다.
 공개 패키지 exports에는 연결하지 않는다. [1단계 결과](../../docs/closure-lifecycle/IMPLEMENT.md),
 [1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md),
 [3단계 호스트·브라우저 결과](../../docs/closure-lifecycle/PHASE3.md),
 [4단계 코어·크기·성능 결과](../../docs/closure-lifecycle/PHASE4.md),
-[5단계 Concurrent 전용 결과](../../docs/closure-lifecycle/PHASE5.md)를 참고한다.
+[5단계 Concurrent 전용 결과](../../docs/closure-lifecycle/PHASE5.md),
+[6단계 성능 개선 결과](../../docs/closure-lifecycle/PHASE6.md)를 참고한다.
 
 ## 사용 예시
 
@@ -219,6 +222,27 @@ LITHENT_CORE=concurrent ./node_modules/.bin/vite build --config experiments/clos
 
 빌드 파일은 `demo/dist/base`와 `demo/dist/concurrent`에 생성하며 Git에 넣지 않는다.
 코어와 실험의 크기·해시 기록은 [3단계 결과](../../docs/closure-lifecycle/PHASE3.md#크기)를 참고한다.
+
+## 6단계 — Concurrent 성능 개선
+
+`experiment/closure-lifecycle-performance`를 사용한다. 기본·helper·element·패키지 설정은 변경하지 않는다.
+새 adapter는 이번 Concurrent core와 함께 사용한다. 이전 실험 core는 지원 확인에서 거부한다.
+
+빌드·실험/element 테스트·Chromium 실행은 아래 5단계 명령과 같다.
+성능은 3단계 원본과 함께 5단계의 core·adapter를 직접 비교할 수 있다.
+5단계 브랜치에서 core·실험 라이브러리·benchmark probe를 빌드해 별도 경로에 보관한 뒤,
+6단계에서 같은 산출물을 빌드한다. 이전 probe에도 5단계의 실제 adapter가 포함되어야 한다.
+
+```sh
+node experiments/closure-lifecycle/measure-core.mjs --concurrent-only --baseline /path/to/baseline.json --output /path/to/sizes.json
+LITHENT_CHROMIUM_PATH=/usr/bin/chromium node experiments/closure-lifecycle/benchmark-core.mjs --baseline /path/to/baseline.mjs --baseline-concurrent /path/to/baseline-concurrent.mjs --baseline-commit 925b4aa98c40ca20b309ea2613cc625d260fa5b1 --previous-concurrent /path/to/phase5-core.mjs --previous-adapter /path/to/phase5-adapter.mjs --previous-commit 25821b015d23f258a1012a0e1721d7a4c5b8839b --output /path/to/performance.json
+LITHENT_CHROMIUM_PATH=/usr/bin/chromium node experiments/closure-lifecycle/benchmark-pause.mjs --previous-probe /path/to/phase5-probe.mjs --output /path/to/pause.json
+```
+
+`--previous-concurrent`와 `--previous-adapter`는 함께 전달한다.
+이 비교에는 8,192행 보존 편집 화면 옆의 input 이벤트 시나리오가 추가된다.
+`--workload retained-host`로 해당 시나리오만 실행할 수 있다.
+서로 다른 벤치마크·회귀·빌드를 동시에 실행하지 않는다.
 
 ## 5단계 — Concurrent 전용 경계
 

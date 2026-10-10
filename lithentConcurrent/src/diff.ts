@@ -263,6 +263,7 @@ const attachToParent = (frame: Frame) => {
     frame.wip.oi = matched;
   }
 
+  if (frame.wip === frame.originalWDom) renderGate.reparent?.(frame.wip);
   frame.wip.getParent = parent.getParent as () => WDom;
   parent.built[slot] = frame.wip;
   parent.cursor = slot + 1;
