@@ -2,7 +2,8 @@
 
 - 작성일: 2026-10-10
 - 기준: Lithent `main`, `0b685260ab204857d7e0adbd472d029528a31005`
-- 상태: **아이디어 제안. 구현 착수 및 공개 API는 미결정.**
+- 상태: **아이디어 제안. 코어 무수정 1단계 프로토타입 자동 검증 완료. 공개 API 및 전체 수명 모델은 미결정.**
+- 검증 문서: [소유권·비동기 작업 1단계](../closure-lifecycle/REQUIREMENTS.md)
 - 관련 후보 목록: [IDEAS.md](./IDEAS.md)
 
 ## 1. 핵심 아이디어
@@ -180,6 +181,10 @@ Solid의 `createRoot`, Vue의 `effectScope`처럼 소유 범위를 다루는 기
 
 착수가 결정되면 기능별 문서 폴더에 REQUIREMENTS / DESIGN / IMPLEMENT /
 MANUAL_TEST_CHECKLIST를 작성한다. 이 문서만으로 공개 API나 기존 수명 계약을 변경하지 않는다.
+
+2026-10-10: 사용자 요청으로 `experiment/closure-lifecycle`에서 첫 단계의 코어 무수정
+검증을 시작했다. [범위·계약](../closure-lifecycle/REQUIREMENTS.md),
+[결과](../closure-lifecycle/IMPLEMENT.md)를 기록한다. 활성화·비활성화와 화면 보존은 아직 구현하지 않는다.
 
 ## 10. 관련 구현과 참고 자료
 
