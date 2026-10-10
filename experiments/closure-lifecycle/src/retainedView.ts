@@ -2,11 +2,18 @@ import { h, mount, render } from 'lithent';
 import type { MiddleStateWDom, Renew, WDom } from 'lithent';
 import { createActivityScope } from './activity';
 import type { ActivityScope } from './activity';
+import { useRenderBoundary } from './renderBoundary';
+import type { RenderBoundary } from './renderBoundary';
 
-/** Explicit retained root, initially hidden. It does not intercept child renew. */
+export interface RetainedViewOptions {
+  freezeChildren?: boolean;
+}
+
+/** Explicit retained root, initially hidden. Child freezing is opt-in. */
 export const createRetainedView = (
   host: HTMLElement,
-  initialize: (renew: Renew, scope: ActivityScope) => () => MiddleStateWDom
+  initialize: (renew: Renew, scope: ActivityScope) => () => MiddleStateWDom,
+  options: RetainedViewOptions = {}
 ) => {
   const scope = createActivityScope();
   const container = document.createElement('div');
@@ -15,6 +22,7 @@ export const createRetainedView = (
   let queued = false;
   let disposed = false;
   let update!: Renew;
+  let boundary: RenderBoundary | undefined;
 
   const renew: Renew = () => {
     if (scope.disposed) return false;
@@ -31,6 +39,7 @@ export const createRetainedView = (
 
   const Root = mount(nativeRenew => {
     update = nativeRenew;
+    if (options.freezeChildren) boundary = useRenderBoundary(false);
     const draw = initialize(renew, scope);
     let previous: WDom | undefined;
     return () => {
@@ -75,8 +84,10 @@ export const createRetainedView = (
         container.hidden = !scope.active;
       }
       if (dirty) renew();
+      if (scope.active) boundary?.resume();
     },
     hide() {
+      boundary?.pause();
       try {
         scope.deactivate();
       } finally {

@@ -9,7 +9,8 @@ export interface RetainedHostProps {
 /** A committed host owns a separate retained root; removal still disposes it. */
 export const createRetainedHost = (
   initialize: Parameters<typeof createRetainedView>[1],
-  reportCleanupError: (error: unknown) => void = console.error
+  reportCleanupError: (error: unknown) => void = console.error,
+  options: Parameters<typeof createRetainedView>[2] = {}
 ) =>
   mount<RetainedHostProps>((_renew, initial) => {
     const owner = useOwnerScope(reportCleanupError);
@@ -27,7 +28,7 @@ export const createRetainedHost = (
       // This also guards a host removed before its deferred creation.
       queueMicrotask(() => {
         if (owner.disposed) return;
-        const created = createRetainedView(slot.value!, initialize);
+        const created = createRetainedView(slot.value!, initialize, options);
         owner.own(created.dispose);
         view = created;
         sync();

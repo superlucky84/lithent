@@ -2,9 +2,10 @@
 
 - 작성일: 2026-10-10
 - 기준: Lithent `main`, `0b685260ab204857d7e0adbd472d029528a31005`
-- 상태: **아이디어 제안. 코어 무수정 1·2·3단계 프로토타입 검증 완료. 공개 API 및 일반 서브트리 중단은 미결정.**
+- 상태: **코어 무수정 1~3단계 검증 완료. 별도 브랜치의 4단계는 opt-in 서브트리 중단의 최소 코어 연동·크기·성능을 검증한다. 공개 API 출하는 미결정.**
 - 검증 문서: [소유권·비동기 작업 1단계](../closure-lifecycle/REQUIREMENTS.md), [활동 수명·명시적 화면 보존 2단계](../closure-lifecycle/PHASE2.md), [호스트·Chromium 검증 3단계](../closure-lifecycle/PHASE3.md)
 - 관련 후보 목록: [IDEAS.md](./IDEAS.md)
+- 코어 연동 실험: [4단계 결과와 제한](../closure-lifecycle/PHASE4.md), `experiment/closure-lifecycle-core`.
 
 ## 1. 핵심 아이디어
 

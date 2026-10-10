@@ -2,6 +2,8 @@ export const createMetrics = () => ({
   created: 0,
   live: 0,
   draws: 0,
+  childDraws: 0,
+  childEffects: 0,
   activations: 0,
   timers: 0,
   subscriptions: 0,
@@ -25,6 +27,7 @@ export interface DemoHandle {
     element: EditorMetrics;
   };
   emit(message: string): void;
+  renewChild(host: 'plain' | 'element'): void;
 }
 
 declare global {

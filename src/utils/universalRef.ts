@@ -4,7 +4,14 @@ export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
 export const compKeyRef: { value: CompKey | null } = { value: null };
 export const needDiffRef: { value: boolean } = { value: false };
-export const componentMap: ComponentMap = new WeakMap();
+export const componentMap: ComponentMap = Object.assign(new WeakMap(), {
+  renderGate: {
+    beforePause() {
+      if (needDiffRef.value)
+        throw new Error('Pause outside component rendering');
+    },
+  },
+});
 export const lmountComponentSet: WeakSet<Function> = new WeakSet();
 let componentMapManualMode = false;
 

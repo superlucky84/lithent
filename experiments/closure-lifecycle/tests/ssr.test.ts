@@ -36,7 +36,9 @@ it('renders a retained host shell without initializing browser work during SSR',
   const { renderToString } = await import('lithent/ssr');
   const { createRetainedHost } = await import('../src');
   const initialize = vi.fn(() => () => h('span', {}, 'editor'));
-  const Host = createRetainedHost(initialize);
+  const Host = createRetainedHost(initialize, console.error, {
+    freezeChildren: true,
+  });
   expect(renderToString(h(Host, { active: true }))).toBe('<div></div>');
   await Promise.resolve();
   expect(initialize).not.toHaveBeenCalled();

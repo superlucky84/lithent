@@ -1,9 +1,13 @@
 # Closure lifecycle experiment
 
-코어를 변경하지 않고 소유권, 최신 작업, 활동 수명과 명시적인 화면 보존을 검증하는 실험이다.
+소유권, 최신 작업, 활동 수명과 명시적인 화면 보존을 검증하는 실험이다.
+`experiment/closure-lifecycle`의 1~3단계는 코어를 변경하지 않는다.
+`experiment/closure-lifecycle-core`의 4단계는 자식 native renew와 부모 diff를 막는
+최소 코어 연동을 별도로 검증한다.
 공개 패키지 exports에는 연결하지 않는다. [1단계 결과](../../docs/closure-lifecycle/IMPLEMENT.md),
 [1단계 계약](../../docs/closure-lifecycle/DESIGN.md), [2단계 결과·계약](../../docs/closure-lifecycle/PHASE2.md),
-[3단계 호스트·브라우저 결과](../../docs/closure-lifecycle/PHASE3.md)를 참고한다.
+[3단계 호스트·브라우저 결과](../../docs/closure-lifecycle/PHASE3.md),
+[4단계 코어·크기·성능 결과](../../docs/closure-lifecycle/PHASE4.md)를 참고한다.
 
 ## 사용 예시
 
@@ -213,7 +217,43 @@ LITHENT_CORE=concurrent ./node_modules/.bin/vite build --config experiments/clos
 빌드 파일은 `demo/dist/base`와 `demo/dist/concurrent`에 생성하며 Git에 넣지 않는다.
 코어와 실험의 크기·해시 기록은 [3단계 결과](../../docs/closure-lifecycle/PHASE3.md#크기)를 참고한다.
 
-## 재현
+## 4단계 — opt-in 자식 갱신 중단
+
+이 브랜치의 시연은 `createRetainedHost(initialize, console.error, { freezeChildren: true })`로
+자식의 native renew까지 중단한다. 기본값 false는 3단계의 명시적 루트 동작을 유지한다.
+같은 코어 인스턴스의 4단계 내부 프로토콜이 필요하다. 공개 패키지 API로 출하하지 않았다.
+
+일반 컴포넌트의 mounter에서는 `useRenderBoundary()`로 경계를 만들 수 있다.
+pause는 렌더 실행 밖에서 호출하며, resume는 숨김 중 차단된 갱신이 있으면 경계 루트 갱신을 요청한다.
+pause 자체는 DOM을 숨기거나 자원을 취소하지 않는다. 보존 루트가 DOM 숨김과 ActivityScope를 연결한다.
+
+아래 성능 비교는 기준 커밋의 **재빌드한** ESM 두 파일과 9개 산출물 측정 JSON을 별도 경로에 준비한다.
+기준은 `925b4aa98c40ca20b309ea2613cc625d260fa5b1`이다. 기준 산출물을 보관한 뒤 이 브랜치에서
+코어 두 개와 실험 라이브러리를 빌드한다. 이전 `measure.mjs --compare`는 코어 무수정만 허용하므로
+4단계에는 아래 별도 측정기를 사용한다.
+
+```sh
+./node_modules/.bin/vite build
+(cd lithentConcurrent && ../node_modules/.bin/vite build)
+./node_modules/.bin/vite build --config experiments/closure-lifecycle/vite.config.ts
+node experiments/closure-lifecycle/measure-core.mjs --baseline /path/to/baseline.json --output /path/to/sizes.json
+LITHENT_CHROMIUM_PATH=/usr/bin/chromium node experiments/closure-lifecycle/benchmark-core.mjs --baseline /path/to/baseline.mjs --baseline-concurrent /path/to/baseline-concurrent.mjs --baseline-commit 925b4aa98c40ca20b309ea2613cc625d260fa5b1 --output /path/to/performance.json
+./node_modules/.bin/vite build --config experiments/closure-lifecycle/benchmark/vite.config.ts
+LITHENT_CHROMIUM_PATH=/usr/bin/chromium node experiments/closure-lifecycle/benchmark-pause.mjs --output /path/to/pause.json
+```
+
+성능 측정은 테스트·빌드 등 CPU를 사용하는 작업을 모두 끝낸 뒤 하나씩 실행한다.
+pause 측정용 bundle만 내부 scheduler 계측을 노출한다. 제품 산출물에는 포함하지 않는다.
+단위·회귀 검증은 다음과 같다. 브라우저는 3단계의 Playwright 명령을 사용한다.
+
+```sh
+./node_modules/.bin/vitest run --maxWorkers 2 --minWorkers 1
+(cd lithentConcurrent && ../node_modules/.bin/vitest run --maxWorkers 2 --minWorkers 1)
+./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
+LITHENT_CORE=concurrent ./node_modules/.bin/vitest run --config experiments/closure-lifecycle/vite.config.ts --maxWorkers 2 --minWorkers 1
+```
+
+## 1~3단계 재현 (코어 무수정 브랜치)
 
 저장소 루트에서 설치된 로컬 실행기를 사용한다. 표준 `pnpm build:core`,
 `pnpm build:concurrent`, `pnpm build:helper`도 동일한 Vite 빌드를 실행한다.

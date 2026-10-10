@@ -1,4 +1,4 @@
-import { h } from 'lithent';
+import { h, mount, mountCallback, updateCallback } from 'lithent';
 import { createScopedTask } from '../src';
 import type { ActivityScope } from '../src';
 import type { Renew } from 'lithent';
@@ -47,6 +47,27 @@ export const createEditor =
     let external = '외부 알림 대기';
     const search = createScopedTask(scope);
     const save = createScopedTask(scope, 'instance');
+
+    // Deliberately uses the native child renew, outside the managed root renew.
+    const NativeChild = mount(nativeRenew => {
+      let value = 0;
+      mountCallback(() => {
+        const listener = (event: Event) => {
+          if ((event as CustomEvent).detail !== metrics) return;
+          value++;
+          nativeRenew();
+        };
+        window.addEventListener('closure-demo-child', listener);
+        return () => window.removeEventListener('closure-demo-child', listener);
+      });
+      updateCallback(() => {
+        metrics.childEffects++;
+      });
+      return () => {
+        metrics.childDraws++;
+        return h('output', { class: 'native-child' }, String(value));
+      };
+    });
 
     scope.onActive(() => {
       metrics.activations++;
@@ -152,6 +173,7 @@ export const createEditor =
       return h(
         'article',
         { class: 'editor' },
+        h(NativeChild, {}),
         h(
           'label',
           {},

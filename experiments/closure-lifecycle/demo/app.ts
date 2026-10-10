@@ -26,12 +26,16 @@ const displayMetrics = (
 const PlainHost = createRetainedHost(
   createEditor(plainMetrics, () =>
     displayMetrics('#plain-metrics', plainMetrics)
-  )
+  ),
+  console.error,
+  { freezeChildren: true }
 );
 const ElementHost = createRetainedHost(
   createEditor(elementMetrics, () =>
     displayMetrics('#element-metrics', elementMetrics)
-  )
+  ),
+  console.error,
+  { freezeChildren: true }
 );
 defineElement('closure-editor', ElementHost, {
   props: { active: Boolean },
@@ -117,6 +121,13 @@ window.lifecycleDemo = {
     element: { ...elementMetrics },
   }),
   emit: emitStatus,
+  renewChild: host => {
+    window.dispatchEvent(
+      new CustomEvent('closure-demo-child', {
+        detail: host === 'plain' ? plainMetrics : elementMetrics,
+      })
+    );
+  },
 };
 refresh();
 // The host creates its nested view after the committed mount queue.

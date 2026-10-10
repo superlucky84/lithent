@@ -290,7 +290,7 @@ export const replaceWDom = (
 ) => {
   let originalWDom = original;
 
-  if (originalWDom.il) {
+  if (originalWDom.il || componentMap.renderGate.blocks?.(originalWDom)) {
     return;
   }
 
