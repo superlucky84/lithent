@@ -106,6 +106,7 @@ const categories: CategoryWithTheme[] = [
       { text: 'lcontext', link: '/guide/lcontext' },
       { text: 'cacheUpdate', link: '/guide/cache-update' },
       { text: 'stateRef', link: '/guide/state-ref' },
+      { text: 'Lifecycle Helpers', link: '/guide/lifecycle' },
     ],
   },
   {
@@ -253,6 +254,12 @@ const examples: ExampleItem[] = [
     link: '/examples/21',
     description:
       'Build a complete notes app using HTM Tags, Import Maps, and Lithent’s light API with CDN only',
+  },
+  {
+    text: 'Retained Editor & Tasks',
+    link: '/examples/22',
+    description:
+      'Keep a draft and undo history while managing search, polling, and save lifetimes',
   },
 ];
 

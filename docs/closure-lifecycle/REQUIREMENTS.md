@@ -1,9 +1,9 @@
 # REQUIREMENTS — 공개 lifecycle helper 통합
 
-- 갱신일: 2026-10-10
+- 갱신일: 2026-10-12
 - 브랜치: `feature/closure-lifecycle-helper`
 - 기준 커밋: `123c243476b00336faf40e3c249ffde8b118dc8d` (7단계 성능 검증 완료)
-- 상태: 공개 helper 연결과 소비자 검증 완료, [draft PR #96](https://github.com/superlucky84/lithent/pull/96) 리뷰 단계. npm 배포·main 병합은 범위 밖이다.
+- 상태: 공개 helper 연결과 소비자 검증 완료, [PR #96](https://github.com/superlucky84/lithent/pull/96) 리뷰 단계. npm 배포·main 병합은 범위 밖이다.
 - 적용 절차: 사용자가 제공한 `doc-driven-designer-v1` 플레이북.
 - 배경: [아이디어](../ideas/CLOSURE_LIFECYCLE.md), [최종 성능 기록](./PERFORMANCE_FINAL.md)
 - 현재 계약: [DESIGN](./DESIGN.md), 계획·인계: [IMPLEMENT](./IMPLEMENT.md), [출시 체크리스트](./MANUAL_TEST_CHECKLIST.md)
@@ -13,6 +13,7 @@
 현재 요구사항·계약·계획의 정본은 이 네 문서다. 구현 정본은 `helper/src/lifecycle/`, 공개 진입점은 기존 `helper/src/index.ts`다.
 `experiments/closure-lifecycle/`은 공개 import 회귀·시연과 과거 측정 재현에 사용한다.
 PHASE2~7·성능·기존 크기 기록은 당시 결과이며 현재 계약을 대체하지 않는다.
+사이트 안내의 소유 범위는 `lithentDocs/src/pages/`와 `lithentDocs/src/components/`이며 정본 계약을 사용자 가이드·API·실행 예제로 설명한다.
 
 ## 요구사항과 통과 기준
 
@@ -45,3 +46,14 @@ observer 밖의 상태 변경·서버 저장은 취소로 되돌리지 않는다
 
 기존 helper 사용자는 import·인자·동작 변경이 없다. 실험 사용자는 `./src`를 `lithent/helper`로 바꾼다.
 실험 entry는 호환 재수출만 남긴다. 버전 변경·배포·데이터 마이그레이션은 없다.
+
+## 사이트 문서 후속 범위 (2026-10-12)
+
+- WEB-1: `/guide/lifecycle`와 `/ko/guide/lifecycle`에 공개 함수 9개·반환 타입·수명·취소·SSR·보존·Concurrent freeze 계약을 동일하게 설명한다.
+- WEB-2: `/examples/22`와 한국어 경로에서 draft/undo·활동 polling·stale 검색·숨김 중 instance 저장·최종 제거/새 생성의 실행 예제를 제공한다.
+- WEB-3: Sidebar·두 언어 Home의 helper/예제 목록과 Concurrent·element·mount cleanup 문서에서 새 가이드로 이동할 수 있다.
+- WEB-4: npm 미배포 상태를 안내하고, 기본 코어는 관리된 renew 보존만 제공하며 freezeChildren 기본 false·지원 Concurrent만 true라는 경계를 명시한다.
+- WEB-5: 사이트 전체 TypeScript·ESLint·production 빌드와 Chromium의 영문/한국어·desktop/390 px·light/dark·예제 동작·이탈 cleanup을 확인한다.
+
+범위는 사이트 소스와 정본 문서·PR 설명 갱신이다. 라이브러리 코어·helper 런타임·제품 빌드 분기를 변경하지 않는다.
+기존 main 배포 workflow는 유지한다. PR #96에 반영하며 main 병합·실제 서비스 게시·npm 배포는 수행하지 않는다.

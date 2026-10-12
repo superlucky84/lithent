@@ -1,3 +1,4 @@
+import { LifecycleLink } from './Lifecycle';
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 import { ConcurrentNote } from '@/components/ConcurrentNote';
@@ -466,5 +467,12 @@ mountCallback(() => {
         </p>
       </a>
     </div>
+    <p class="mt-8 text-gray-700 dark:text-gray-300">
+      <LifecycleLink
+        language="ko"
+        path="/guide/lifecycle"
+        label="수명 관리 헬퍼로 여러 자원 소유하기 →"
+      />
+    </p>
   </div>
 );

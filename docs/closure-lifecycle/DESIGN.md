@@ -16,6 +16,11 @@ PHASE2~7과 [API 검토안](./API_REVIEW.md)은 역사 기록이다.
 
 - [x] IC-4: RetainedHostProps는 record-shaped h 인자와 호환되는 객체 타입 별칭으로 제공한다. active 타입 검증은 Host 호출에서 수행하며 기존 h의 타입 계약은 바꾸지 않는다. 검증: 엄격한 TS 소비자의 h(Host, props)·잘못된 active 거부.
 
+- [x] WEB-DC-1: 기존 bilingual route·Sidebar·Home 관례로 가이드/예제 두 언어를 연결한다. 검증: 직접 hash route·언어 전환·목록 링크.
+- [x] WEB-DC-2: 설명/코드와 실행 예제는 기존 `lithent/helper`를 사용하고 실제 예제 원문을 표시한다. 기존 canonical 구현은 복제하지 않는다. 검증: 사이트 타입·빌드·예제 조작.
+- [x] WEB-DC-3: 사이트 앱의 기본 코어와 같은 helper로 보존 예제를 렌더한다. freezeChildren은 예제의 기본 false로 유지하고 Concurrent 설정/지원 검사를 별도 설명한다. 검증: 화면의 지원 범위·기본 native renew 설명·라이브러리 diff 0.
+- [x] WEB-DC-4: 타이머는 owner/onActive에 등록하고 mount commit 이후 시작한다. 라우트·언어 변경 또는 최종 제거에서 정리한다. 검증: Chromium timer 추적·제거/새 생성·이탈 후 DOM 부활 없음.
+
 ## 공개 API
 
 | 함수                                                          | 반환 / 기본값                                             | 지원                         |

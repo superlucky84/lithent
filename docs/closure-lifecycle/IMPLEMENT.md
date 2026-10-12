@@ -4,7 +4,7 @@
 - 브랜치: `feature/closure-lifecycle-helper`
 - 기준 커밋: `123c243476b00336faf40e3c249ffde8b118dc8d`
 - 검증된 구현 커밋: `462fc84fd2688d7fa7cb08ffddf14f626c88e58f`
-- 리뷰: [draft PR #96](https://github.com/superlucky84/lithent/pull/96)
+- 리뷰: [PR #96](https://github.com/superlucky84/lithent/pull/96)
 - [요구사항](./REQUIREMENTS.md) · [계약](./DESIGN.md) · [출시 체크리스트](./MANUAL_TEST_CHECKLIST.md)
 
 ## Phase A — Baseline / 문서 정렬
@@ -143,3 +143,58 @@ LITHENT_CHROMIUM_PATH=/usr/bin/chromium ./node_modules/.bin/playwright test --co
 - 다음: draft PR #96의 공개 API·계약 리뷰. 이후 버전·배포 범위를 결정하고 제품 출시 체크리스트를 실행한다.
 - blocker: 없음. 제품 적용의 다른 브라우저·실제 서버·포커스/접근성은 별도 항목이다.
 - 최근 검증 구현 commit SHA: `462fc84fd2688d7fa7cb08ffddf14f626c88e58f`. 이후 인계 문서 commit은 이 구현·검증을 유지한다. 현재 문서 HEAD는 `git rev-parse HEAD`로 확인한다.
+
+## Phase F — 사이트 가이드·API·예제
+
+Baseline: helper 공개 계약·회귀 259개 완료, 사이트 영어/한국어 라우팅·Concurrent 및 element 가이드 존재, 사이트 lifecycle 안내 미반영.
+
+- [x] 공개 API 9개와 수명·지원 조건을 영어/한국어 가이드에 설명한다.
+- [x] 공개 helper만 사용하는 보존 편집기 예제와 원문 코드를 두 언어로 제공한다.
+- [x] Sidebar·Home·관련 가이드의 탐색 링크를 추가한다.
+
+Exit: 두 언어 내용 동일·기본/Concurrent 지원 조건·npm 미배포 안내·새 helper 구현 없음.
+
+## Phase G — Site Test Hardening / Integration Test
+
+Baseline: Phase F 소스, 기존 사이트 빌드·language/theme/sidebar 관례, helper/코어 artifact 기록.
+
+- [x] 사이트 TypeScript·ESLint·production 빌드를 통과한다.
+- [x] Chromium에서 두 언어 route·목록 링크·언어 전환·light/dark·desktop/390 px를 확인한다.
+- [x] draft/undo·stale 검색·숨김 중 저장·polling 중단/재개·제거/재생성을 확인한다.
+- [x] 타이머의 라우트/언어 이탈 정리와 늦은 작업의 DOM 부활 없음을 확인한다.
+- [x] 코어/helper diff·기록한 9개 artifact 해시 동일을 확인한다.
+- [ ] 영문 PR 설명·검증된 사이트 commit SHA를 반영해 인계를 마무리한다.
+
+Exit: 사이트 게이트 PASS·공개 계약과 실행 예제 일치·PR #96에 review 가능한 commit 반영.
+
+### 사이트 작업 인계
+
+- 완료: 영어/한국어 guide·API 9개·실행 예제 22, Home/Sidebar/관련 문서 링크, 사이트/회귀 타입·lint·build, 두 코어 브라우저 8개, 빌드 화면 8조합, 엄격한 snippet 4개, 라이브러리 source/산출물 불변.
+- 다음: 사이트 변경을 PR #96에 반영하고 공개 API·문서 리뷰. 이후 릴리스 상태 안내 갱신과 main의 기존 사이트 배포 workflow.
+- blocker: 없음. 실제 공개 사이트 배포는 main 병합 후 기존 workflow 범위다.
+- 최근 확정 commit SHA: `a1edfcc27ab17bf11c94f6c632549e37c8c23251`.
+
+### 사이트 검증 결과
+
+[사이트 결과 JSON](./SITE_DOCS_RESULTS.json)에 경로·검사·현재 빌드 entry artifact를 기록했다.
+기존 [helper 결과](./HELPER_INTEGRATION_RESULTS.json)의 ESM/CJS/UMD 9개 SHA-256은 모두 그대로다.
+사이트 source만 추가하며 core·helper·package exports·lockfile·배포 workflow를 변경하지 않았다.
+
+- site TypeScript와 e2e TypeScript, site 전체 ESLint와 신규 테스트 ESLint, production build: PASS.
+- `e2e/lifecycle-docs.spec.ts`: base/Concurrent 각각 3개 PASS. 기존 `e2e/release-docs.spec.ts` 각각 1개 PASS, 합계 8개.
+- production preview: en/ko × 1365/390 px × light/dark = 8조합 PASS. 본문 넘침·클릭 영역·Home helper/예제·Sidebar 예제 탐색·콘솔/HTTP 오류를 확인하고 스크린샷을 육안 확인했다.
+- 가이드 Search/view/host/frozen host 코드 4개는 공개 선언에 strict·noUnusedLocals·noUnusedParameters·skipLibCheck=false로 type check: PASS.
+- 실제 실행 예제의 원문을 raw import로 표시한다. HTML 코드 예제 문자열과 별개 구현을 유지하지 않는다.
+- 신규 예제의 local mock은 abort를 무시해 stale guard를 시연하되 transport 타이머는 instance owner에 등록해 최종 제거에 정리한다. polling은 onActive cleanup으로 정리한다.
+
+```sh
+(cd lithentDocs && ../node_modules/.bin/vite build)
+./node_modules/.bin/tsc -p lithentDocs/tsconfig.json
+./node_modules/.bin/tsc -p e2e/tsconfig.json
+./node_modules/.bin/eslint lithentDocs/src e2e/lifecycle-docs.spec.ts
+./node_modules/.bin/playwright test e2e/lifecycle-docs.spec.ts e2e/release-docs.spec.ts
+```
+
+Playwright는 기존 base/Concurrent 프로젝트와 built core를 사용한다. 이 환경에서는 시스템 Chromium을 지정한 임시 config와 sandbox 외부 서버 실행을 사용했다.
+기존 Browserslist 데이터·large chunk·optional notifyStoreWrite namespace 빌드 경고는 유지되며 검사 오류는 없다.
+공개 사이트 배포는 하지 않았다. npm 미배포 안내를 사이트에 명시했으며, 기능 포함 버전의 배포 때 안내를 갱신한다.

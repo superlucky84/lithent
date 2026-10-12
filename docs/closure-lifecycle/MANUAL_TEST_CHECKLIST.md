@@ -27,3 +27,13 @@ MT-1~5는 공개 import 자동 Chromium 32개에서 확인했다. MT-6은 빌드
 3단계 Chromium에서 두 코어·두 host의 상태/DOM, stale, 저장, 자원 수, element 이동·제거를 확인했고 base 빌드를 데스크톱·390 px에서 수동 확인했다.
 7단계까지 native child freeze·adapter 회귀를 추가했다. 이번 공개 import로 재확인한다.
 다른 브라우저·실제 서버·편집기 포커스·접근성·CSP는 아직 통과 표시하지 않는다.
+
+## 사이트 문서 확인
+
+- [x] WEB-MT-1: 영어/한국어 Home·Sidebar·관련 가이드에서 lifecycle 문서와 예제 링크를 연다. 통과: 새 경로·올바른 언어·명확한 지원 조건.
+- [x] WEB-MT-2: 두 언어·light/dark·desktop/390 px에서 본문·API 표·코드·버튼을 확인한다. 통과: 본문 가로 넘침/가려진 버튼/콘솔 오류 없음.
+- [x] WEB-MT-3: 실행 예제에서 draft/undo·느린 A 후 빠른 B·hide 중 저장·polling 중단/재개·제거/재생성을 확인한다. 통과: 정본 수명 계약과 일치.
+- [x] WEB-MT-4: 라우트·언어를 바꾸며 예제를 제거한다. 통과: 예제 타이머 정리·늦은 응답 DOM 부활 없음·재진입은 새 인스턴스.
+
+사이트 WEB-MT-1~4는 Chromium 자동 회귀·production preview의 8화면 조합과 스크린샷 육안 확인으로 완료했다.
+공개 사이트는 아직 배포하지 않았다. 실제 배포 후 URL 확인·npm 릴리스 시 preview 안내 갱신은 다음 단계다.
