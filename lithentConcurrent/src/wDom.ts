@@ -40,6 +40,7 @@ import {
   checkCustemComponentFunction,
 } from '@/utils/predicator';
 import { assign, getParent } from '@/utils';
+import { renderGate } from './renderGate';
 
 // ============================================================================
 // Public API - Highest Level (User-facing API)
@@ -291,7 +292,7 @@ export const replaceWDom = (
 ) => {
   let originalWDom = original;
 
-  if (originalWDom.il) {
+  if (originalWDom.il || renderGate.blocks?.(originalWDom)) {
     return;
   }
 
@@ -526,6 +527,21 @@ const discardPaused = () => {
   restoreHookState(pass.trace.snapshots);
 };
 
+// A pause must not turn unrelated low work into synchronous work. Related
+// pure builds can be discarded; a queued renew records the boundary's dirty
+// state after pause takes effect, without replaying any user effect.
+renderGate.settle = key => {
+  if (!pausedPass) return;
+  const pass = pausedPass;
+  if (key && pass.props !== key && !relatedComponents(pass.props, key)) return;
+  if (pass.trace.mounted || buildRanUpdateEffects(pass.trace.snapshots)) {
+    drainPendingWork();
+  } else {
+    discardPaused();
+    componentMap.get(pass.props)?.up();
+  }
+};
+
 /**
  * Where a build records what has to happen at commit.
  *
@@ -561,6 +577,8 @@ const finishTree = (pass: Pass, newWDomTree: WDom) => {
   // NOTE: we/ae are short for wrapElement/afterElement
   const { isRoot, getParent, we, ae } = originalWDom;
 
+  if (newWDomTree.getParent && newWDomTree.getParent !== getParent)
+    renderGate.reparent?.(newWDomTree);
   newWDomTree.getParent = getParent;
 
   if (!isRoot && getParent) {
@@ -645,6 +663,7 @@ const remakeChildren = (
 
   return children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
+    if (childItem.getParent) renderGate.reparent?.(childItem);
     childItem.getParent = getParent;
     return childItem;
   });
@@ -839,6 +858,7 @@ const wrapComponentMakerIfNeeded = (
   const wrappedComponentMaker = (newProps: Props): WDom => {
     const next = componentMaker(newProps);
     const wrapper = Fragment({}, next);
+    if (next.getParent) renderGate.reparent?.(next);
     next.getParent = () => wrapper;
     return wrapper;
   };

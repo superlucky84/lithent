@@ -1,5 +1,6 @@
 import { Props } from '@/types';
 import { componentMap } from '@/utils/universalRef';
+import { renderGate } from './renderGate';
 
 // ============================================================================
 // Lanes (D1, D2 — DC-1 ambient, DC-2 two lanes, DC-3 MessageChannel)
@@ -199,6 +200,20 @@ const flushSync = () => {
  * RC-1 (sync commits before low) with it. Interruption is a low-lane feature.
  */
 let flushingLow = false;
+
+// The renderer decides whether the parked pass is related and discardable.
+// Observable related work still completes while the boundary is active.
+const beforePause = renderGate.beforePause;
+renderGate.beforePause = key => {
+  beforePause();
+  const outerLow = flushingLow;
+  flushingLow = false;
+  try {
+    renderGate.settle?.(key);
+  } finally {
+    flushingLow = outerLow;
+  }
+};
 
 export const isFlushingLow = () => flushingLow;
 

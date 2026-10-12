@@ -1,0 +1,109 @@
+{
+  "verifiedDate": "2026-10-12",
+  "timezone": "Asia/Seoul",
+  "baselineCommit": "a1edfcc27ab17bf11c94f6c632549e37c8c23251",
+  "routes": [
+    "/guide/lifecycle",
+    "/ko/guide/lifecycle",
+    "/examples/22",
+    "/ko/examples/22"
+  ],
+  "siteTypeScript": "PASS",
+  "e2eTypeScript": "PASS",
+  "siteESLint": "PASS",
+  "productionBuild": "PASS",
+  "guideSnippets": {
+    "count": 4,
+    "strict": true,
+    "skipLibCheck": false,
+    "result": "PASS"
+  },
+  "browser": {
+    "newLifecycleTests": 6,
+    "existingConcurrentDocumentationTests": 2,
+    "cores": ["base", "concurrent"],
+    "result": "PASS",
+    "coverage": [
+      "bilingual API and source",
+      "localized related navigation",
+      "retained DOM and undo",
+      "stale search and activity generation",
+      "instance save while hidden",
+      "polling stop and resume",
+      "permanent disposal and fresh instance",
+      "route and language cleanup of timers"
+    ]
+  },
+  "builtSiteChecks": [
+    {
+      "language": "en",
+      "width": 1365,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "language": "en",
+      "width": 1365,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "language": "en",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "language": "en",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "language": "ko",
+      "width": 1365,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "language": "ko",
+      "width": 1365,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "language": "ko",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "language": "ko",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    }
+  ],
+  "libraryUnchanged": {
+    "source": true,
+    "coreAndHelperArtifacts": 9,
+    "sha256Matches": true,
+    "reference": "HELPER_INTEGRATION_RESULTS.json"
+  },
+  "currentEntryAssets": [
+    {
+      "path": "lithentDocs/dist/assets/index-1rkrO4Gf.js",
+      "rawBytes": 1884068,
+      "sha256": "935e4e1686ef6ab71bb2730936dfb86932a646ee4a30670d05ad21eb08795cb4"
+    },
+    {
+      "path": "lithentDocs/dist/assets/index-DqhNRqpI.css",
+      "rawBytes": 71131,
+      "sha256": "d5b1c4e8a430d8e459e00c8323375f4e1e802fff9a1642b2db9e4a54b9ea501a"
+    }
+  ],
+  "deployment": {
+    "performed": false,
+    "path": "Existing main docs workflow after PR merge"
+  }
+}

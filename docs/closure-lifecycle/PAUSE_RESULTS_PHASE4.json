@@ -1,0 +1,25 @@
+{
+  "browser": "151.0.7922.173",
+  "node": "v24.19.0",
+  "methodology": "Instrumented current concurrent bundle, actual boundary adapter. Zero low-lane budget forces a genuinely parked build after an updater effect. Time synchronous pause(), verify one commit before inactive, blocked low updates and one latest-model replay. 1 warmup + 5 samples. Local synthetic timings depend on remaining work.",
+  "measurements": [
+    {
+      "rows": 1024,
+      "samplesMs": [
+        7.699999999254942, 2.299999998882413, 4, 4.799999998882413, 5
+      ],
+      "medianMs": 4.799999998882413,
+      "maxMs": 7.699999999254942
+    },
+    {
+      "rows": 8192,
+      "samplesMs": [
+        42.40000000037253, 17.90000000037253, 26.100000001490116,
+        14.199999999254942, 13.300000000745058
+      ],
+      "medianMs": 17.90000000037253,
+      "maxMs": 42.40000000037253
+    }
+  ],
+  "probeSha256": "e91225743405347479dca097b8541de20ff6ca772083778c0ce9693a6d5d2ac7"
+}

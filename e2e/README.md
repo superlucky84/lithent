@@ -22,6 +22,7 @@ context/lcontext, portal placement, real server rendering and hydration, keyed
 row state and DOM identity, and real Vite boundary replacement. They also
 exercise all five examples pages and all 42 English/Korean docs example routes,
 including computed, shared store, keyed list, context and portal interactions.
+The lifecycle documentation adds both language routes of example 22.
 The release documentation checks both languages of the concurrent guides,
 their live concurrent demo, language switching, navigation and cleanup.
 
@@ -66,6 +67,16 @@ Performance judgments (A-3/B-1) and equivalence to a previous release (A-7)
 remain separate from these functional tests. The canonical requirements,
 design, implementation status and checklist are in
 [`docs/concurrent-rendering`](../docs/concurrent-rendering/MANUAL_TEST_CHECKLIST.md).
+
+`lifecycle-docs.spec.ts` adds three checks per core for bilingual lifecycle API
+navigation and source, retained drafts and undo, stale search generations,
+hidden instance saves, polling, permanent disposal and route/language cleanup.
+The mock timer clock is controlled only in the retention test; the cleanup
+check tracks the demo's real intervals and request timers.
+
+```sh
+pnpm exec playwright test e2e/lifecycle-docs.spec.ts e2e/release-docs.spec.ts
+```
 
 `hmr-stateless.spec.ts` checks stateless expression/block functions, default
 exports, and nested `mount`/`lmount` components in one module. It exercises

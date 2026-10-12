@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { ConcurrentDemo } from '@/components/ConcurrentDemo';
 import { navigateTo } from '@/store';
+import { LifecycleLink } from './Lifecycle';
 
 const copy = {
   en: {
@@ -182,6 +183,27 @@ const readPending = () => key ? hasPending(key, 'low') : false;`}
         >
           {t.nextLink}
         </a>
+      </p>
+      <h2>
+        {language === 'ko'
+          ? '보존 화면의 자식 갱신 중단'
+          : 'Pause child updates in retained views'}
+      </h2>
+      <p>
+        {language === 'ko'
+          ? 'lithent/helper의 보존 view·host는 freezeChildren: true로 숨김 중 자식 native renew와 부모 diff를 중단할 수 있습니다. lifecycle을 지원하는 기존 Concurrent 빌드가 필요하며 기본값은 false입니다. supportsRenderBoundary()로 확인하세요. 활동 작업 취소·DOM 숨김은 보존 host가 연결하며 렌더 경계 자체는 갱신만 제어합니다.'
+          : 'Retained views and hosts from lithent/helper can pause native child renews and parent diffs while hidden with freezeChildren: true. This requires the existing Concurrent build with lifecycle support; the default is false. Check supportsRenderBoundary(). Retained hosts connect activity cancellation and DOM visibility; a render boundary itself only controls updates.'}
+      </p>
+      <p>
+        <LifecycleLink
+          language={language}
+          path="/guide/lifecycle"
+          label={
+            language === 'ko'
+              ? '수명 관리·보존·지원 조건 →'
+              : 'Lifecycle, retention, and support →'
+          }
+        />
       </p>
     </div>
   );

@@ -73,6 +73,8 @@ export default defineConfig({
       '**/element/**',
       // Browser contracts use Playwright's runner, not Vitest.
       '**/e2e/**',
+      // Optional prototypes have dedicated Vitest and Playwright runners.
+      '**/experiments/**',
     ],
   },
   server: {

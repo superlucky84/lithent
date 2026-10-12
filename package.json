@@ -171,6 +171,7 @@
     "helper/dist",
     "helper/src",
     "helper/package.json",
+    "helper/README.md",
     "devHelper/dist",
     "devHelper/src",
     "devHelper/package.json",
