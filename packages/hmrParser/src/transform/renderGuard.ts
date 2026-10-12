@@ -1,59 +1,69 @@
 import MagicString from 'magic-string';
 import type { File, Node, CallExpression } from '@babel/types';
-import { VISITOR_KEYS } from '@babel/types';
-
-const collectRenderCalls = (ast: Node, calls: CallExpression[]): void => {
-  const visit = (node: Node | null | undefined) => {
-    if (!node) return;
-
-    if (
-      node.type === 'CallExpression' &&
-      node.callee.type === 'Identifier' &&
-      node.callee.name === 'render'
-    ) {
-      calls.push(node as CallExpression);
-    }
-
-    const keys = VISITOR_KEYS[node.type] ?? [];
-    for (const key of keys) {
-      const value = (node as any)[key];
-      if (Array.isArray(value)) {
-        for (const child of value) {
-          if (child && typeof child.type === 'string') {
-            visit(child as Node);
-          }
-        }
-      } else if (value && typeof value.type === 'string') {
-        visit(value as Node);
-      }
-    }
-  };
-
-  visit(ast);
-};
+import { VISITOR_KEYS, isFunction } from '@babel/types';
 
 export const wrapRenderCalls = (
   ms: MagicString,
   ast: File,
-  code: string
+  _code: string,
+  importSpecifier = 'lithent'
 ): boolean => {
-  const calls: CallExpression[] = [];
-  collectRenderCalls(ast, calls);
-
-  if (!calls.length) return false;
-
-  const sorted = calls
-    .map(node => ({
-      start: node.start ?? 0,
-      end: node.end ?? 0,
-    }))
-    .filter(({ start, end }) => start >= 0 && end > start)
-    .sort((a, b) => b.start - a.start);
-
-  for (const { start, end } of sorted) {
-    const original = code.slice(start, end);
-    ms.overwrite(start, end, `__lithentRenderOnce(() => ${original})`);
+  const renderers = new Set<string>();
+  const namespaces = new Set<string>();
+  for (const node of ast.program.body) {
+    if (
+      node.type !== 'ImportDeclaration' ||
+      node.importKind === 'type' ||
+      node.source.value !== importSpecifier
+    )
+      continue;
+    for (const specifier of node.specifiers) {
+      if (specifier.type === 'ImportNamespaceSpecifier')
+        namespaces.add(specifier.local.name);
+      if (
+        specifier.type === 'ImportSpecifier' &&
+        specifier.importKind !== 'type' &&
+        specifier.imported.type === 'Identifier' &&
+        specifier.imported.name === 'render'
+      )
+        renderers.add(specifier.local.name);
+    }
   }
-
-  return true;
+  const calls: CallExpression[] = [];
+  const visit = (node: Node): void => {
+    // A render inside a function can mount several independent applications.
+    // Guard only module-level mounts that run again when Vite evaluates it.
+    if (isFunction(node)) return;
+    if (node.type === 'CallExpression') {
+      const callee = node.callee;
+      if (
+        (callee.type === 'Identifier' && renderers.has(callee.name)) ||
+        (callee.type === 'MemberExpression' &&
+          !callee.computed &&
+          callee.object.type === 'Identifier' &&
+          namespaces.has(callee.object.name) &&
+          callee.property.type === 'Identifier' &&
+          callee.property.name === 'render')
+      ) {
+        calls.push(node);
+        return;
+      }
+    }
+    for (const key of VISITOR_KEYS[node.type] ?? []) {
+      const value = (node as any)[key];
+      if (Array.isArray(value))
+        value.forEach(child => {
+          if (child?.type) visit(child);
+        });
+      else if (value?.type) visit(value);
+    }
+  };
+  visit(ast);
+  calls
+    .sort((a, b) => a.start! - b.start!)
+    .forEach((node, id) => {
+      ms.appendLeft(node.start!, `__lithentRenderOnce(${id}, () => `);
+      ms.appendRight(node.end!, ')');
+    });
+  return Boolean(calls.length);
 };

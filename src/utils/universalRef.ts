@@ -1,4 +1,10 @@
-import { ComponentMap, ComponentSubKey, CompKey, ComponentInfo } from '@/types';
+import {
+  ComponentMap,
+  ComponentSubKey,
+  CompKey,
+  ComponentInfo,
+  TagFunction,
+} from '@/types';
 
 export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
@@ -8,8 +14,9 @@ export const componentMap: ComponentMap = new WeakMap();
 export const lmountComponentSet: WeakSet<Function> = new WeakSet();
 let componentMapManualMode = false;
 
-const setComponetRef = (compKey: CompKey): void => {
+const setComponetRef = (compKey: CompKey, ctor?: TagFunction): void => {
   componentMap.set(compKey, {
+    ctor,
     vd: { value: null },
     up: () => {},
     upR: [],
@@ -39,9 +46,12 @@ export const initUpdateHookState = (compKey: CompKey): void => {
   compKeyRef.value = compKey;
 };
 
-export const initMountHookState = (compKey: CompKey): void => {
+export const initMountHookState = (
+  compKey: CompKey,
+  ctor?: TagFunction
+): void => {
   compKeyRef.value = compKey;
-  setComponetRef(compKey);
+  setComponetRef(compKey, ctor);
 };
 
 export const setComponentMapManualMode = (enabled: boolean): void => {
