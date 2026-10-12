@@ -46,6 +46,18 @@ function transformNodeList(nodes: TemplateNode[]): TemplateNode[] {
         children: transformNodeList(node.children),
       };
 
+      const orphan = node.directives.find(
+        d =>
+          d.type === NodeType.DIRECTIVE_ELSE_IF ||
+          d.type === NodeType.DIRECTIVE_ELSE
+      );
+      if (orphan) {
+        throw Object.assign(
+          new Error('l-else-if/l-else must follow l-if or l-else-if'),
+          { line: orphan.start.line, column: orphan.start.column }
+        );
+      }
+
       // Check if this starts a conditional chain
       const ifDirective = node.directives.find(
         d => d.type === NodeType.DIRECTIVE_IF
@@ -54,14 +66,23 @@ function transformNodeList(nodes: TemplateNode[]): TemplateNode[] {
       if (ifDirective) {
         // This starts a conditional chain, look ahead for else-if/else
         const conditionalGroup: ConditionalGroup = {
-          if: transformedElement,
+          if: { ...transformedElement },
           elseIfs: [],
         };
 
         // Look ahead for else-if and else
         let j = i + 1;
+        let consumed = i;
         while (j < nodes.length) {
           const nextNode = nodes[j];
+
+          if (
+            nextNode.type === NodeType.COMMENT ||
+            (nextNode.type === NodeType.TEXT && !nextNode.content.trim())
+          ) {
+            j++;
+            continue;
+          }
 
           if (nextNode.type === NodeType.ELEMENT) {
             const elseIfDirective = nextNode.directives.find(
@@ -77,6 +98,7 @@ function transformNodeList(nodes: TemplateNode[]): TemplateNode[] {
                 ...nextNode,
                 children: transformNodeList(nextNode.children),
               });
+              consumed = j;
               j++;
               continue;
             }
@@ -86,6 +108,7 @@ function transformNodeList(nodes: TemplateNode[]): TemplateNode[] {
                 ...nextNode,
                 children: transformNodeList(nextNode.children),
               };
+              consumed = j;
               j++;
               break;
             }
@@ -100,7 +123,7 @@ function transformNodeList(nodes: TemplateNode[]): TemplateNode[] {
         (transformedElement as any).__conditionalGroup = conditionalGroup;
 
         // Skip the else-if/else nodes we've processed
-        i = j - 1;
+        i = consumed;
       }
 
       result.push(transformedElement);

@@ -622,7 +622,7 @@ describe('Parser', () => {
       </ul>
     </article>
   </main>
-  <footer l-else-if={items.length === 0}>
+  <footer l-if={items.length === 0}>
     <p>No items</p>
   </footer>
 </section>
@@ -654,7 +654,7 @@ describe('Parser', () => {
       </>
     </section>
   </div>
-  <footer l-else>
+  <footer l-if={!sidebar}>
     <p>Sidebar disabled</p>
   </footer>
 </>

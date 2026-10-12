@@ -25,9 +25,11 @@ export class Parser {
   private tokens: Token[];
   private position: number = 0;
 
-  constructor(tokens: Token[]) {
+  constructor(tokens: Token[], preserveWhitespace = false) {
     // Filter out whitespace tokens for easier parsing
-    this.tokens = tokens.filter(t => t.type !== TokenType.WHITESPACE);
+    this.tokens = preserveWhitespace
+      ? tokens
+      : tokens.filter(t => t.type !== TokenType.WHITESPACE);
   }
 
   /**
@@ -67,18 +69,16 @@ export class Parser {
       case TokenType.FRAGMENT_OPEN:
         return this.parseFragment();
       case TokenType.TEXT:
+      case TokenType.WHITESPACE:
         return this.parseText();
       case TokenType.EXPRESSION_START:
         return this.parseInterpolation();
       case TokenType.COMMENT:
         return this.parseComment();
       case TokenType.TAG_CLOSE_START:
-        // Unexpected closing tag - skip it
-        this.advance();
-        return null;
+        throw this.error('Unexpected closing tag', token);
       case TokenType.FRAGMENT_CLOSE:
-        this.advance();
-        return null;
+        throw this.error('Unexpected fragment closing tag', token);
       case TokenType.EOF:
         return null;
       default:
@@ -108,9 +108,10 @@ export class Parser {
       return createFragmentNode(children, start, closeToken.end);
     }
 
-    throw new Error(
-      `Unclosed fragment starting at line ${start.line}, column ${start.column}`
-    );
+    throw Object.assign(new Error('Unclosed fragment'), {
+      line: start.line,
+      column: start.column,
+    });
   }
 
   /**
@@ -204,17 +205,7 @@ export class Parser {
       );
     }
 
-    // No closing tag found
-    const end = children.length > 0 ? children[children.length - 1].end : start;
-    return createElementNode(
-      tag,
-      attributes,
-      directives,
-      children,
-      false,
-      start,
-      end
-    );
+    throw this.error(`Unclosed tag <${tag}>`, tagToken);
   }
 
   /**
@@ -298,17 +289,14 @@ export class Parser {
         isDynamic = true;
         this.advance();
       } else {
-        value = { expression: '' };
-        isDynamic = true;
+        throw this.error(
+          'Expected a non-empty attribute expression',
+          exprToken
+        );
       }
-
-      if (this.check(TokenType.EXPRESSION_END)) {
-        end = this.peek().end;
-        this.advance(); // consume }
-      }
+      end = this.expect(TokenType.EXPRESSION_END).end;
     } else {
-      // Unexpected token
-      return createAttributeNode(name, null, false, start, nameToken.end);
+      throw this.error('Expected a quoted attribute or expression', valueToken);
     }
 
     return createAttributeNode(name, value, isDynamic, start, end);
@@ -335,6 +323,8 @@ export class Parser {
           this.advance();
         }
 
+        if (!condition)
+          throw this.error('Expected a non-empty condition', exprToken);
         const end = this.peek().end;
         this.expect(TokenType.EXPRESSION_END);
 
@@ -364,7 +354,10 @@ export class Parser {
         this.expect(TokenType.EXPRESSION_END);
 
         // Parse for expression: "item in list" or "(item, index) in list"
-        const { item, index, list } = this.parseForExpression(expression);
+        const { item, index, list } = this.parseForExpression(
+          expression,
+          exprToken
+        );
 
         return createDirectiveForNode(item, list, index, start, end);
       }
@@ -377,7 +370,10 @@ export class Parser {
   /**
    * Parse l-for expression
    */
-  private parseForExpression(expression: string): {
+  private parseForExpression(
+    expression: string,
+    token: Token
+  ): {
     item: string;
     index?: string;
     list: string;
@@ -408,11 +404,10 @@ export class Parser {
       };
     }
 
-    // Fallback
-    return {
-      item: 'item',
-      list: expression,
-    };
+    throw this.error(
+      'Invalid l-for: expected item in list or (item, index) in list',
+      token
+    );
   }
 
   /**
@@ -439,6 +434,8 @@ export class Parser {
       this.advance();
     }
 
+    if (!expression)
+      throw this.error('Expected a non-empty interpolation', exprToken);
     const end = this.peek().end;
     this.expect(TokenType.EXPRESSION_END);
 
@@ -453,6 +450,15 @@ export class Parser {
     // Extract content between <!-- and -->
     const content = token.value.replace(/^<!--\s*|\s*-->$/g, '');
     return createCommentNode(content, token.start, token.end);
+  }
+
+  private error(message: string, token: Token): Error {
+    return Object.assign(
+      new Error(
+        `${message} at line ${token.start.line}, column ${token.start.column}`
+      ),
+      { line: token.start.line, column: token.start.column }
+    );
   }
 
   /**
@@ -508,7 +514,7 @@ export class Parser {
 /**
  * Parse template string into AST
  */
-export function parse(tokens: Token[]): RootNode {
-  const parser = new Parser(tokens);
+export function parse(tokens: Token[], preserveWhitespace = false): RootNode {
+  const parser = new Parser(tokens, preserveWhitespace);
   return parser.parse();
 }

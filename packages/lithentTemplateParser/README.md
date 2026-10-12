@@ -79,8 +79,8 @@ const source = `
 const View = () => (
   <section class="profile">
     <Avatar l-if={user.avatar} src={user.avatar} />
-    <strong>{user.name}</strong>
     <p l-else>No avatar</p>
+    <strong>{user.name}</strong>
   </section>
 );
 `;
