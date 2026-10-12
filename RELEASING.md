@@ -64,7 +64,9 @@ pnpm은 [pack/publish 시 workspace 범위를 변환한다](https://pnpm.io/work
 
 ## 2. 버전 변경 커밋·push
 
-검증이 통과한 변경을 커밋하고 `origin/main`과 동기화한다.
+이번 릴리스의 버전 변경과 CI 수정은 이미 main에 커밋·push했다.
+추가 변경이 없고 `git status --short --branch`가 깨끗하면 3번으로 진행한다.
+아래 커밋 명령은 추가 릴리스 변경이 있을 때만 실행한다.
 
 ```sh
 git add .github/workflows/docs.yml package.json lithentConcurrent/package.json helper/package.json devHelper/package.json packages/hmrParser/package.json packages/hmrParser/vite.config.js packages/lithentTemplateParser/package.json packages/lithentTemplateParser/vite.config.js packages/lithentTemplateVite/package.json packages/lithentTemplateVite/vite.config.ts packages/lithentVite/package.json packages/lithentVite/vite.config.ts pnpm-lock.yaml helper/README.md lithentDocs/src/pages/Lifecycle.tsx lithentDocs/src/pages/ConcurrentRendering.tsx CHANGELOG.md RELEASING.md
@@ -156,5 +158,8 @@ Concurrent 설치 명령을 확인한다. 이번 준비에서는 해당 안내�
 - 다음 실행 `38212865860`에서는 template Vite 테스트의 `lithent/ssr` import가
   SSR 생성보다 먼저 검사돼 TS2307이 발생했다. 모든 공유 런타임을 toolchain보다
   앞에 배치한 뒤 21개 `dist` 디렉터리가 없는 상태에서 전체 빌드 통과를 확인했다.
-- 이번 준비에서는 `test:dual`과 브라우저 E2E를 실행하지 않았다. 발행 전 위
-  절차의 해당 명령을 실행한다. npm 발행·release commit·tag push는 미실행이다.
+- 영문·한국어 lifecycle E2E의 preview 문구 기대값을 최소 지원 버전 안내로 갱신했다.
+  전체 브라우저 E2E 64개와 `pnpm test:dual` 통과를 확인했다.
+- 릴리스 준비와 CI 수정은 main에 커밋·push했다. 문서 배포 Actions
+  [38213507381](https://github.com/superlucky84/lithent/actions/runs/38213507381)도
+  전체 빌드와 gh-pages 반영까지 성공했다. npm 발행과 릴리스 태그 push는 남아 있다.

@@ -32,7 +32,8 @@ test('lifecycle docs: bilingual API, related navigation and runnable source', as
     'Lifecycle Helpers'
   );
   await expect(main.locator('tbody tr')).toHaveCount(9);
-  await expect(main).toContainText('have not been published to npm yet');
+  await expect(main).toContainText('Requires lithent 1.25.0 or later');
+  await expect(main).toContainText('lithent-concurrent 0.2.0 or later');
   await expect(main).toContainText('freezeChildren defaults to false');
   await expect(main).toContainText(
     'Unsupported cores fail before initialization'
@@ -65,7 +66,10 @@ test('lifecycle docs: bilingual API, related navigation and runnable source', as
     '수명 관리 헬퍼'
   );
   await expect(main.locator('tbody tr')).toHaveCount(9);
-  await expect(main).toContainText('아직 npm에 배포하지 않았습니다');
+  await expect(main).toContainText('lithent 1.25.0 이상이 필요합니다');
+  await expect(main).toContainText(
+    'lithent-concurrent 0.2.0 이상도 필요합니다'
+  );
   await expect(main).toContainText('freezeChildren의 기본값은 false');
   await main
     .getByRole('link', { name: 'Concurrent 설정과 스케줄링 →', exact: true })
