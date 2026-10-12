@@ -5,6 +5,7 @@ import { analyzeMarker } from './shared';
 import { stitchComponentRegistration } from './transform/componentRegister';
 import { wrapRenderCalls } from './transform/renderGuard';
 import { collectComponentMounts } from './utils/ast/componentCollector';
+import { createExportSnapshot } from './transform/exportSnapshot';
 
 export const transformWithMarker = (
   options: MarkerTransformOptions
@@ -15,6 +16,7 @@ export const transformWithMarker = (
     targetExports,
     shouldTransform,
     importInsertionPos,
+    blockInsertionPos,
     headerSnippet,
   } = analysis;
 
@@ -22,7 +24,11 @@ export const transformWithMarker = (
     return { transformed: false, code: options.code, map: null };
   }
 
-  const mounts = collectComponentMounts(analysis.ast, options.code);
+  const mounts = collectComponentMounts(
+    analysis.ast,
+    options.code,
+    options.tagFunctionImportSpecifier
+  );
   const componentNames = Array.from(
     new Set(
       mounts
@@ -32,26 +38,36 @@ export const transformWithMarker = (
   );
 
   const ms = new MagicString(options.code);
-  wrapRenderCalls(ms, analysis.ast, options.code);
+  if (mounts.length)
+    wrapRenderCalls(
+      ms,
+      analysis.ast,
+      options.code,
+      options.tagFunctionImportSpecifier
+    );
+  const hoisted = stitchComponentRegistration(
+    ms,
+    mounts,
+    options.code,
+    importInsertionPos
+  );
   const transformBlock = createHmrBootstrapBlock(
     targetExports,
     componentNames
   ).trimStart();
 
-  if (headerSnippet) {
-    ms.appendLeft(importInsertionPos, headerSnippet);
-  }
-
   const precedingChar =
-    match.index > 0 ? options.code[match.index - 1] : undefined;
-  const needsLeadingNewline = match.index > 0 && precedingChar !== '\n';
-  const followingChar = options.code[match.index + match[0].length] ?? null;
-  const trailingNewline = followingChar === '\n' ? '\n' : '\n\n';
-  const blockSnippet = `${needsLeadingNewline ? '\n' : ''}${transformBlock}${trailingNewline}`;
-
-  ms.overwrite(match.index, match.index + match[0].length, blockSnippet);
-
-  stitchComponentRegistration(ms, mounts, options.code, importInsertionPos);
+    blockInsertionPos > 0 ? options.code[blockInsertionPos - 1] : undefined;
+  const needsLeadingNewline = blockInsertionPos > 0 && precedingChar !== '\n';
+  const blockSnippet = `${needsLeadingNewline ? '\n' : ''}${transformBlock}\n${hoisted}\n\n`;
+  if (blockInsertionPos === importInsertionPos) {
+    ms.appendLeft(importInsertionPos, `${headerSnippet}${blockSnippet}`);
+  } else {
+    ms.appendLeft(importInsertionPos, headerSnippet);
+    ms.appendLeft(blockInsertionPos, blockSnippet);
+  }
+  ms.overwrite(match.index, match.index + match[0].length, '');
+  ms.append(createExportSnapshot(analysis.ast, mounts));
 
   return {
     transformed: true,

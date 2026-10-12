@@ -66,3 +66,16 @@ Performance judgments (A-3/B-1) and equivalence to a previous release (A-7)
 remain separate from these functional tests. The canonical requirements,
 design, implementation status and checklist are in
 [`docs/concurrent-rendering`](../docs/concurrent-rendering/MANUAL_TEST_CHECKLIST.md).
+
+`hmr-stateless.spec.ts` checks stateless expression/block functions, default
+exports, and nested `mount`/`lmount` components in one module. It exercises
+repeated edits, parent state and props/children preservation, mounted child
+state after a parent redraw, and edits while the components are unmounted.
+All file edits stay in the isolated `.e2e-work` copy.
+
+It also checks JSX lists, mount cleanup, and empty output becoming visible and
+empty again, plus direct function calls from another module that keep the
+caller's state. `hmr-mixed-exports.spec.ts` verifies that component-only changes
+preserve parent state, while ordinary export changes update the importer and
+clean up the previous root. The fixture watcher waits for each file write to
+finish so rapid automated edits are not lost to change-event throttling.

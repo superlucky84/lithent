@@ -16,6 +16,7 @@ import { wDomUpdate } from '@/render';
 import { execMountedQueue } from '@/hook/mountCallback';
 import {
   initUpdateHookState,
+  compKeyRef,
   initMountHookState,
   needDiffRef,
   componentMap,
@@ -693,39 +694,50 @@ const createComponentResolver = (
     // Regression tests: src/tests/core-composedRenew.test.tsx,
     // src/tests/core-component-remount.test.tsx
     const prevNeedDiff = needDiffRef.value;
+    const previousKey = compKeyRef.value;
     needDiffRef.value = false;
+    try {
+      markBuildMounted();
+      initMountHookState(compKey, tag);
 
-    markBuildMounted();
-    initMountHookState(compKey);
+      const initialComponent = tag(props, wrappedChildren);
 
-    const initialComponent = tag(props, wrappedChildren);
+      let componentMaker: (nextProps: Props) => MiddleStateWDom;
 
-    let componentMaker: (nextProps: Props) => MiddleStateWDom;
+      if (typeof initialComponent === 'function') {
+        const component = initialComponent;
+        // Check if component is created with lmount (no renew parameter)
+        // TypeScript cannot infer that component is LComponent when has() returns true,
+        // because WeakSet.has() is a runtime check that doesn't narrow types.
+        // We use 'as any' since the runtime check guarantees type safety.
+        componentMaker = lmountComponentSet.has(component)
+          ? (component as any)(props, wrappedChildren)
+          : component(componentUpdate(compKey), props, wrappedChildren);
+      } else {
+        // For components that directly return a VDom, recreate it each render.
+        // The first call already rendered this stateless component. Repeating it
+        // creates orphan child instances and can register hooks under a child's key.
+        let firstRender = true;
+        componentMaker = (nextProps: Props) => {
+          if (firstRender) {
+            firstRender = false;
+            return initialComponent as MiddleStateWDom;
+          }
+          return tag(nextProps, wrappedChildren) as MiddleStateWDom;
+        };
+      }
 
-    if (typeof initialComponent === 'function') {
-      const component = initialComponent;
-      // Check if component is created with lmount (no renew parameter)
-      // TypeScript cannot infer that component is LComponent when has() returns true,
-      // because WeakSet.has() is a runtime check that doesn't narrow types.
-      // We use 'as any' since the runtime check guarantees type safety.
-      componentMaker = lmountComponentSet.has(component)
-        ? (component as any)(props, wrappedChildren)
-        : component(componentUpdate(compKey), props, wrappedChildren);
-    } else {
-      // For components that directly return a VDom, recreate it each render.
-      componentMaker = (nextProps: Props) =>
-        tag(nextProps, wrappedChildren) as MiddleStateWDom;
+      return makeCustomNode(
+        componentMaker,
+        compKey,
+        tag,
+        props,
+        wrappedChildren
+      );
+    } finally {
+      compKeyRef.value = previousKey;
+      needDiffRef.value = prevNeedDiff;
     }
-
-    const node = makeCustomNode(
-      componentMaker,
-      compKey,
-      tag,
-      props,
-      wrappedChildren
-    );
-    needDiffRef.value = prevNeedDiff;
-    return node;
   };
 };
 
@@ -796,14 +808,19 @@ const wDomMaker = (
   children: WDom[],
   reRender: () => WDom
 ) => {
-  traceHookState(compKey);
-  initUpdateHookState(compKey);
-  runUpdateCallback();
+  const previousKey = compKeyRef.value;
+  try {
+    traceHookState(compKey);
+    initUpdateHookState(compKey);
+    runUpdateCallback();
 
-  const customNode = componentMaker(props);
-  addComponentProps(customNode, compKey, tag, props, children, reRender);
+    const customNode = componentMaker(props);
+    addComponentProps(customNode, compKey, tag, props, children, reRender);
 
-  return customNode;
+    return customNode;
+  } finally {
+    compKeyRef.value = previousKey;
+  }
 };
 
 // ============================================================================
