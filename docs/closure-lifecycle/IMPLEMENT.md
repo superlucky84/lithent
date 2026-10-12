@@ -163,16 +163,16 @@ Baseline: Phase F 소스, 기존 사이트 빌드·language/theme/sidebar 관례
 - [x] draft/undo·stale 검색·숨김 중 저장·polling 중단/재개·제거/재생성을 확인한다.
 - [x] 타이머의 라우트/언어 이탈 정리와 늦은 작업의 DOM 부활 없음을 확인한다.
 - [x] 코어/helper diff·기록한 9개 artifact 해시 동일을 확인한다.
-- [ ] 영문 PR 설명·검증된 사이트 commit SHA를 반영해 인계를 마무리한다.
+- [x] 영문 PR 설명·검증된 사이트 commit SHA를 반영해 인계를 마무리한다.
 
 Exit: 사이트 게이트 PASS·공개 계약과 실행 예제 일치·PR #96에 review 가능한 commit 반영.
 
 ### 사이트 작업 인계
 
 - 완료: 영어/한국어 guide·API 9개·실행 예제 22, Home/Sidebar/관련 문서 링크, 사이트/회귀 타입·lint·build, 두 코어 브라우저 8개, 빌드 화면 8조합, 엄격한 snippet 4개, 라이브러리 source/산출물 불변.
-- 다음: 사이트 변경을 PR #96에 반영하고 공개 API·문서 리뷰. 이후 릴리스 상태 안내 갱신과 main의 기존 사이트 배포 workflow.
+- 다음: 사이트 변경이 포함된 PR #96의 공개 API·문서 리뷰. 이후 릴리스 상태 안내 갱신과 main의 기존 사이트 배포 workflow.
 - blocker: 없음. 실제 공개 사이트 배포는 main 병합 후 기존 workflow 범위다.
-- 최근 확정 commit SHA: `a1edfcc27ab17bf11c94f6c632549e37c8c23251`.
+- 최근 검증 사이트 commit SHA: `ef8e5996ab9648c25402a5f99da0f8ba04bcd3c5`. 후속 문서 인계 commit은 이 소스·검증을 유지하며 현재 HEAD는 `git rev-parse HEAD`로 확인한다.
 
 ### 사이트 검증 결과
 
@@ -198,3 +198,5 @@ Exit: 사이트 게이트 PASS·공개 계약과 실행 예제 일치·PR #96에
 Playwright는 기존 base/Concurrent 프로젝트와 built core를 사용한다. 이 환경에서는 시스템 Chromium을 지정한 임시 config와 sandbox 외부 서버 실행을 사용했다.
 기존 Browserslist 데이터·large chunk·optional notifyStoreWrite namespace 빌드 경고는 유지되며 검사 오류는 없다.
 공개 사이트 배포는 하지 않았다. npm 미배포 안내를 사이트에 명시했으며, 기능 포함 버전의 배포 때 안내를 갱신한다.
+
+사이트 소스와 검증 결과는 PR #96에 반영했다. 영문 PR 설명도 사이트 가이드·예제·검증 범위로 갱신했으며 PR의 리뷰 가능 상태를 유지했다.
