@@ -317,7 +317,7 @@ importers:
   lithentConcurrent:
     dependencies:
       lithent:
-        specifier: ^1.22.1
+        specifier: ^1.25.0
         version: link:..
 
   lithentConcurrent/consumer:

@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { emitDeclarationFormats } from '../../scripts/emit-declaration-formats.mjs';
 
 export default defineConfig({
   plugins: [
@@ -14,7 +15,10 @@ export default defineConfig({
     }),
     dts({
       outputDir: ['dist'],
+      entryRoot: resolve(__dirname, 'src'),
+      aliasesExclude: ['@lithent/lithent-template-vite'],
       skipDiagnostics: true,
+      afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
     }),
   ],
   resolve: {
@@ -28,7 +32,7 @@ export default defineConfig({
     },
   },
   build: {
-    emptyOutDir: false,
+    emptyOutDir: true,
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),

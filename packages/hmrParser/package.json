@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/hmr-parser",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Lithent HMR parser utilities for build tools",
   "packageManager": "pnpm@9.12.3",
   "main": "./dist/lithentHmrParser.umd.js",
@@ -27,7 +27,11 @@
   },
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": ["lithent", "hmr", "parser"],
+  "keywords": [
+    "lithent",
+    "hmr",
+    "parser"
+  ],
   "dependencies": {
     "@babel/parser": "^7.26.2",
     "@babel/types": "^7.26.0",

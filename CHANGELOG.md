@@ -1,5 +1,59 @@
 # Release notes
 
+## 2026-10-12
+
+### lithent 1.25.0
+
+- Add nine lifecycle APIs and their types to `lithent/helper`: owner scopes,
+  latest tasks, activity scopes, scoped tasks, retained views/hosts, and render
+  boundary helpers. Activity work stops on hide; instance work can continue;
+  stale task results cannot reach observers (#96).
+- Preserve a hidden view's state and DOM. Freezing native child updates with
+  `freezeChildren: true` requires `lithent-concurrent ^0.2.0`.
+- Fix stateless components rendering twice on first mount and restore the
+  parent component's hook context after nested component construction (#95).
+- Fix HMR replacement loops, instance cleanup, and parent state preservation
+  in `lithent/devHelper`. Use `@lithent/lithent-vite ^0.3.4` for the matching
+  transform and bootstrap fixes.
+- Add English/Korean lifecycle guides and the retained-editor example.
+- Build Custom Element declarations before the documentation site, avoiding
+  a parallel-build race that failed fresh CI runs with TS7016.
+
+`lithent/helper` and `lithent/devHelper` ship inside this package. Their private
+workspace versions are 0.22.0 and 0.21.1; publish only `lithent` for these entries.
+
+### lithent-concurrent 0.2.0
+
+- Add render boundaries that pause native child renews and parent diffs for
+  retained views, while keeping the default core's behavior (#96).
+- Include the stateless component and hook-context fixes from the base core
+  (#95).
+- Require `lithent ^1.25.0` for the matching shared helper and development
+  helper. Continue to alias only the bare `lithent` import.
+
+### @lithent/hmr-parser 0.2.3 / @lithent/lithent-vite 0.3.4
+
+- Fix stable component proxies, stateless/default/nested component detection,
+  direct calls, mixed exports, render disposal, and repeated HMR updates (#95).
+- Require `lithent ^1.25.0` in the Vite plugin so generated HMR code uses the
+  matching `lithent/devHelper` contract.
+- Publish the Vite plugin with the updated HMR and template plugin dependencies.
+- Fix the Vite plugin's declaration output path and keep its template option
+  type import on the public package entry, so packed TypeScript consumers can
+  resolve both declarations.
+- Emit explicit relative declaration paths for the HMR/template toolchain,
+  so ESM TypeScript consumers can use Node16/NodeNext resolution without
+  `skipLibCheck`.
+
+### @lithent/lithent-template-parser 0.1.1 / @lithent/lithent-template-vite 0.1.1
+
+- Preserve JavaScript expressions, directive behavior, generated element
+  semantics, and source text while compiling templates (#97).
+- Publish the template Vite plugin with the fixed parser dependency.
+
+See [RELEASING.md](./RELEASING.md) for the build, validation, publication order,
+and documentation deployment commands.
+
 ## 2026-10-09
 
 ### lithent 1.24.1

@@ -81,7 +81,7 @@ export const ConcurrentGuide = ({ language }: { language: 'en' | 'ko' }) => {
       <h2>{t.install}</h2>
       <CodeBlock
         language="bash"
-        code="npm install lithent@^1.22.1 lithent-concurrent@^0.1.0"
+        code="npm install lithent@^1.25.0 lithent-concurrent@^0.2.0"
       />
       <p>{t.setup}</p>
       <CodeBlock

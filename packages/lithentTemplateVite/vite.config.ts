@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { emitDeclarationFormats } from '../../scripts/emit-declaration-formats.mjs';
 
 export default defineConfig({
   plugins: [
@@ -15,6 +16,7 @@ export default defineConfig({
     dts({
       outputDir: ['dist'],
       skipDiagnostics: true,
+      afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
     }),
   ],
   resolve: {

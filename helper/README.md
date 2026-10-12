@@ -1,8 +1,9 @@
 # Lifecycle helpers
 
-Import lifecycle utilities from the existing `lithent/helper` entry. Ownership,
+Requires `lithent ^1.25.0`. Import lifecycle utilities from the existing
+`lithent/helper` entry. Ownership,
 latest tasks, activities, and retained views work with both rendering cores.
-Freezing native child updates requires the Concurrent core with lifecycle support.
+Freezing native child updates also requires `lithent-concurrent ^0.2.0`.
 
 ```ts
 import { h, mount } from 'lithent';

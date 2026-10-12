@@ -7,7 +7,7 @@ const copy = {
     intro:
       'Own requests, timers, and subscriptions explicitly. Keep a closure and its DOM while a view is hidden, stop activity work, and let instance work finish. Import every helper below from lithent/helper.',
     availability:
-      'Preview: these helpers are included in this change and have not been published to npm yet. Use a build that includes them. The live example uses that build.',
+      'Requires lithent 1.25.0 or later. Freezing native child updates also requires lithent-concurrent 0.2.0 or later. The live example uses a build with these APIs.',
     ownership: 'Ownership and latest results',
     ownershipText:
       'createOwnerScope() starts no external work. own(cleanup) returns a release function; each registration is cleaned once. useOwnerScope() connects disposal to a committed component’s unmount. Call it once in the mounter and start external work in mountCallback or events.',
@@ -56,7 +56,7 @@ const copy = {
     intro:
       '요청·타이머·구독의 소유권을 명시적으로 관리합니다. 화면을 숨겨도 클로저와 DOM을 보존하고, 활동 작업은 멈추며 인스턴스 작업은 계속할 수 있습니다. 아래 헬퍼는 모두 lithent/helper에서 가져옵니다.',
     availability:
-      '미리 보기: 이 헬퍼는 이번 변경에 포함되며 아직 npm에 배포하지 않았습니다. 기능이 포함된 빌드를 사용하세요. 실행 예제는 그 빌드로 동작합니다.',
+      'lithent 1.25.0 이상이 필요합니다. 자식의 native 갱신까지 중단하려면 lithent-concurrent 0.2.0 이상도 필요합니다. 실행 예제는 이 API가 포함된 빌드로 동작합니다.',
     ownership: '소유권과 최신 결과',
     ownershipText:
       'createOwnerScope()는 외부 작업을 시작하지 않습니다. own(cleanup)은 수동 해제 함수를 반환하며 등록마다 한 번 정리합니다. useOwnerScope()는 확정된 컴포넌트의 언마운트에 폐기를 연결합니다. mounter에서 한 번 호출하고 외부 작업은 mountCallback이나 이벤트에서 시작하세요.',
