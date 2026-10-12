@@ -18,6 +18,9 @@
 - Add English/Korean lifecycle guides and the retained-editor example.
 - Build Custom Element declarations before the documentation site, avoiding
   a parallel-build race that failed fresh CI runs with TS7016.
+- Build SSR and the remaining shared runtime declarations before toolchain
+  checks, including the template plugin's SSR regression test. Check root
+  build manifest changes through the docs deployment workflow as well.
 
 `lithent/helper` and `lithent/devHelper` ship inside this package. Their private
 workspace versions are 0.22.0 and 0.21.1; publish only `lithent` for these entries.

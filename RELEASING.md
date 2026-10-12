@@ -37,10 +37,10 @@ pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-`pnpm build`는 core → Concurrent → shared helper/JSX/devHelper → HMR/parser →
-template plugin → Vite plugin → SSR → element 순서로 필요한 의존성부터 준비한다.
-element 선언 파일 생성까지 끝난 뒤 tag/ftags/examples와 문서 사이트를 빌드하므로,
-새 CI 환경에서 문서 TypeScript 검사가 element 선언 생성보다 먼저 시작하지 않는다.
+`pnpm build`는 core → Concurrent → JSX/helper/devHelper → Concurrent helper →
+SSR/tag/ftags/element → HMR/parser → template plugin → MDX/Vite plugin 순서로
+필요한 의존성부터 준비한다. 모든 공개 런타임의 선언 파일을 먼저 생성한 뒤
+toolchain 테스트 코드와 문서를 타입 검사하고 examples와 문서 사이트를 빌드한다.
 `verify:release`는 core/Concurrent의 실제 pack과 격리된 ESM/CJS/타입 소비자를
 검증한다. 이 검증에 `create-lithent` pack도 포함되지만 이번 발행 대상은 아니다.
 
@@ -67,7 +67,7 @@ pnpm은 [pack/publish 시 workspace 범위를 변환한다](https://pnpm.io/work
 검증이 통과한 변경을 커밋하고 `origin/main`과 동기화한다.
 
 ```sh
-git add package.json lithentConcurrent/package.json helper/package.json devHelper/package.json packages/hmrParser/package.json packages/hmrParser/vite.config.js packages/lithentTemplateParser/package.json packages/lithentTemplateParser/vite.config.js packages/lithentTemplateVite/package.json packages/lithentTemplateVite/vite.config.ts packages/lithentVite/package.json packages/lithentVite/vite.config.ts pnpm-lock.yaml helper/README.md lithentDocs/src/pages/Lifecycle.tsx lithentDocs/src/pages/ConcurrentRendering.tsx CHANGELOG.md RELEASING.md
+git add .github/workflows/docs.yml package.json lithentConcurrent/package.json helper/package.json devHelper/package.json packages/hmrParser/package.json packages/hmrParser/vite.config.js packages/lithentTemplateParser/package.json packages/lithentTemplateParser/vite.config.js packages/lithentTemplateVite/package.json packages/lithentTemplateVite/vite.config.ts packages/lithentVite/package.json packages/lithentVite/vite.config.ts pnpm-lock.yaml helper/README.md lithentDocs/src/pages/Lifecycle.tsx lithentDocs/src/pages/ConcurrentRendering.tsx CHANGELOG.md RELEASING.md
 git commit -m "chore(release): prepare lifecycle, HMR and template fixes"
 git push origin main
 git status --short --branch
@@ -126,8 +126,9 @@ gh run list --workflow docs.yml --limit 5
 ```
 
 `.github/workflows/docs.yml`이 `lithent@*` 태그를 받아 전체 workspace를
-빌드하고 `gh-pages`로 배포한다. 문서 파일을 변경한 main push도 배포를
-시작한다. 최종 사이트는 https://superlucky84.github.io/lithent/ 이다.
+빌드하고 `gh-pages`로 배포한다. 문서 파일이나 root `package.json`/
+`pnpm-lock.yaml`을 변경한 main push도 배포를 시작한다.
+최종 사이트는 https://superlucky84.github.io/lithent/ 이다.
 필요하면 발행 완료 후 수동으로 다시 배포할 수 있다.
 
 ```sh
@@ -152,5 +153,8 @@ Concurrent 설치 명령을 확인한다. 이번 준비에서는 해당 안내�
 - Actions 실행 `38210218612`의 문서 TS7016 오류는 element 선언 생성과 문서 빌드의
   병렬 실행에서 발생했다. element를 순차 빌드로 옮긴 뒤 `element/dist`가 없는
   상태에서 전체 `pnpm build` 통과를 확인했다.
+- 다음 실행 `38212865860`에서는 template Vite 테스트의 `lithent/ssr` import가
+  SSR 생성보다 먼저 검사돼 TS2307이 발생했다. 모든 공유 런타임을 toolchain보다
+  앞에 배치한 뒤 21개 `dist` 디렉터리가 없는 상태에서 전체 빌드 통과를 확인했다.
 - 이번 준비에서는 `test:dual`과 브라우저 E2E를 실행하지 않았다. 발행 전 위
   절차의 해당 명령을 실행한다. npm 발행·release commit·tag push는 미실행이다.

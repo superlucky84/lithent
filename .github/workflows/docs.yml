@@ -1,7 +1,7 @@
 name: Deploy docs
 
 # Publishes lithentDocs to the gh-pages branch, which GitHub Pages serves at
-# https://superlucky84.github.io/lithent/. Runs when the docs change on main,
+# https://superlucky84.github.io/lithent/. Runs when docs or root build manifests change on main,
 # for every `lithent@x.y.z` tag (the site bundles the released core), and on
 # demand from the Actions tab.
 on:
@@ -10,6 +10,8 @@ on:
       - main
     paths:
       - 'lithentDocs/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
     tags:
       - 'lithent@*'
@@ -38,7 +40,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # The docs import the workspace packages through their built output, so
-      # the whole workspace is built, not only lithentDocs.
+      # the whole workspace is built, not only lithentDocs. Runtime declarations
+      # must finish before toolchain tests and documentation are type-checked.
       - run: pnpm build
 
       - uses: actions/checkout@v4
