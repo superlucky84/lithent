@@ -90,12 +90,20 @@ npm whoami
 
 ```sh
 pnpm publish --access public --publish-branch main
-pnpm --dir lithentConcurrent publish --access public --publish-branch main
-pnpm --dir packages/hmrParser publish --access public --publish-branch main
-pnpm --dir packages/lithentTemplateParser publish --access public --publish-branch main
-pnpm --dir packages/lithentTemplateVite publish --access public --publish-branch main
-pnpm --dir packages/lithentVite publish --access public --publish-branch main
+(cd lithentConcurrent && pnpm publish --access public --publish-branch main)
+(cd packages/hmrParser && pnpm publish --access public --publish-branch main)
+(cd packages/lithentTemplateParser && pnpm publish --access public --publish-branch main)
+(cd packages/lithentTemplateVite && pnpm publish --access public --publish-branch main)
+(cd packages/lithentVite && pnpm publish --access public --publish-branch main)
 ```
+
+pnpm 9.12.3에서 `--dir <folder> publish`가 npm에 폴더 이름과 `publish`를
+추가 인자로 넘겨 `EUSAGE`가 발생하는 것을 확인했다. 위 명령은 각 폴더에서
+실행하고 괄호로 원래 작업 디렉터리를 유지한다. 남은 5개 명령은 모두
+`--dry-run`으로 실제 발행 없이 검증했다.
+
+이미 발행한 동일 버전의 패키지는 건너뛴다. 현재 `lithent@1.25.0`은 발행이
+확인됐으므로 `lithentConcurrent` 명령부터 진행한다.
 
 의존하는 공개 버전이 먼저 존재해야 한다. 따라서 core → Concurrent,
 parser → template plugin → Vite plugin 순서를 지킨다. 중간에 실패하면 이미
@@ -162,4 +170,5 @@ Concurrent 설치 명령을 확인한다. 이번 준비에서는 해당 안내�
   전체 브라우저 E2E 64개와 `pnpm test:dual` 통과를 확인했다.
 - 릴리스 준비와 CI 수정은 main에 커밋·push했다. 문서 배포 Actions
   [38213507381](https://github.com/superlucky84/lithent/actions/runs/38213507381)도
-  전체 빌드와 gh-pages 반영까지 성공했다. npm 발행과 릴리스 태그 push는 남아 있다.
+  전체 빌드와 gh-pages 반영까지 성공했다. `lithent@1.25.0` npm 발행도 확인했다.
+  나머지 5개 패키지 발행과 릴리스 태그 push는 남아 있다.
