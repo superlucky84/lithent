@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import * as core from '@/index';
 import { nextTick } from '@/index';
 import {
   createHarness,
@@ -17,15 +16,11 @@ import {
   type Harness,
 } from './helpers/renderSpec';
 
-// Base core only: lithentConcurrent's runner aliases `@/index` to its fork,
-// which has not taken the fixes these suites guard.
-const describeCore = describe.skipIf('deferRender' in core);
-
 /**
- * Exhaustive render matrices for the base core. Every case renders one spec,
- * moves to another, and checks the DOM against the HTML that spec has to
- * produce (written without lithent), plus that exactly the expected
- * component instances are mounted.
+ * Exhaustive render matrices, run against the base and the concurrent core.
+ * Every case renders one spec, moves to another, and checks the DOM against
+ * the HTML that spec has to produce (written without lithent), plus that
+ * exactly the expected component instances are mounted.
  */
 
 const check = (hn: Harness, label: string) => {
@@ -104,7 +99,7 @@ const surroundings: Record<string, (slot: Spec) => Spec> = {
   inUnkeyedList: slot => list(false, el('h1'), slot, el('h2')),
 };
 
-describeCore('conditional output matrix (parent redraw)', () => {
+describe('conditional output matrix (parent redraw)', () => {
   Object.entries(surroundings).forEach(([where, wrap]) => {
     it(`switches every output to every other output: ${where}`, async () => {
       for (const withSiblings of [false, true]) {
@@ -128,7 +123,7 @@ describeCore('conditional output matrix (parent redraw)', () => {
   });
 });
 
-describeCore('conditional output matrix (self redraw)', () => {
+describe('conditional output matrix (self redraw)', () => {
   // The switching component redraws on its own; its parent does not.
   Object.entries(surroundings).forEach(([where, wrap]) => {
     it(`a component switches its own output: ${where}`, async () => {
@@ -185,7 +180,7 @@ describeCore('conditional output matrix (self redraw)', () => {
   });
 });
 
-describeCore('sibling order of components, fragments and elements', () => {
+describe('sibling order of components, fragments and elements', () => {
   const kinds: Record<string, Spec> = {
     element: el('p', txt('E')),
     fragment: frag(txt('F1'), el('b', txt('F2'))),
@@ -288,7 +283,7 @@ describeCore('sibling order of components, fragments and elements', () => {
   });
 });
 
-describeCore('a component whose root is another component', () => {
+describe('a component whose root is another component', () => {
   const leafs: Record<string, Spec> = {
     element: el('p', txt('leaf')),
     fragment: frag(el('b', txt('l1')), txt('l2')),
@@ -400,7 +395,7 @@ describeCore('a component whose root is another component', () => {
   });
 });
 
-describeCore('unmount and destroy', () => {
+describe('unmount and destroy', () => {
   it('destroy() removes every node and unmounts every component', () => {
     const specs = Object.values(outputs);
     for (const withSiblings of [false, true]) {

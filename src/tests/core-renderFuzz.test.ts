@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import * as core from '@/index';
 import { nextTick } from '@/index';
 import {
   createHarness,
@@ -9,10 +8,6 @@ import {
   type Spec,
   type Store,
 } from './helpers/renderSpec';
-
-// Base core only: lithentConcurrent's runner aliases `@/index` to its fork,
-// which has not taken the fixes these suites guard.
-const describeCore = describe.skipIf('deferRender' in core);
 
 /**
  * Seeded random render trees. Each run renders a tree and then applies a
@@ -281,7 +276,7 @@ const runSeed = async (seed: number) => {
   expect(hn.liveCounts(), `seed ${seed}: destroy (mounted)`).toEqual({});
 };
 
-describeCore('random render trees', () => {
+describe('random render trees', () => {
   const seeds =
     ONLY_SEED !== undefined
       ? [ONLY_SEED]

@@ -430,6 +430,7 @@ const planChildren = (frame: Frame) => {
   if (wip.type === 'l' && checkExistyKey(children[0])) {
     frame.matchedIndexes = new Array(children.length);
     const keyMap = new Map<unknown, number>();
+    const used: boolean[] = [];
 
     origChildren.forEach((item, index) => {
       const key = getKey(item);
@@ -444,12 +445,15 @@ const planChildren = (frame: Frame) => {
 
       if (origIndex !== undefined) {
         keyMap.delete(key);
+        used[origIndex] = true;
         frame.originals[index] = origChildren[origIndex];
         frame.matchedIndexes[index] = origIndex;
       }
     });
 
-    frame.unused = [...keyMap.values()].map(index => origChildren[index]);
+    // Originals left unmatched, including ones whose key was already taken
+    // (no key, or a duplicate) and so never made it into keyMap.
+    frame.unused = origChildren.filter((_item, index) => !used[index]);
     return;
   }
 

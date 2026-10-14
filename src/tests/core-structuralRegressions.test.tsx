@@ -1,14 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import * as core from '@/index';
 import { h, Fragment, render, mount, mountCallback, nextTick } from '@/index';
-
-// Base core only: the concurrent fork has not taken these fixes yet.
-const describeCore = describe.skipIf('deferRender' in core);
 
 /**
  * Structural cases found by core-renderMatrix / core-renderFuzz.
  */
-describeCore('structural update regressions', () => {
+describe('structural update regressions', () => {
   it('unmounts a component replaced by a fragment with as many children', async () => {
     // A component's node is a one-child fragment, so <><b/></> used to be
     // taken for the same fragment and updated in place: the DOM was right,
@@ -81,6 +77,48 @@ describeCore('structural update regressions', () => {
     expect(el.innerHTML).toBe(
       '<ul><li>first</li><span>element</span><li>last</li></ul>'
     );
+  });
+
+  it('inserts before the next sibling still in the document, past newly added ones', async () => {
+    // Concurrent core: an added sibling's element is built ahead of the
+    // commit, outside the document. The anchor search used to stop there and
+    // append 'T' at the end instead of skipping on to the old 'T'.
+    let swapped = false;
+    let bump = () => {};
+
+    const Comp = mount(() => () => (
+      <Fragment>
+        <i>c1</i>c2
+      </Fragment>
+    ));
+    const Parent = mount(renew => {
+      bump = renew;
+      return () =>
+        swapped ? (
+          <Fragment>
+            <p />
+            {'T'}
+            <Comp />
+            {null}
+          </Fragment>
+        ) : (
+          <Fragment>
+            <p />
+            <Comp />
+            {null}
+            {'T'}
+          </Fragment>
+        );
+    });
+
+    const el = document.createElement('div');
+    render(<Parent />, el);
+    expect(el.innerHTML).toBe('<p></p><i>c1</i>c2T');
+
+    swapped = true;
+    bump();
+    await nextTick();
+    expect(el.innerHTML).toBe('<p></p>T<i>c1</i>c2');
   });
 
   it('removes every old item when an unkeyed array becomes a keyed one', async () => {
