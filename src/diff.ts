@@ -260,6 +260,7 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
     }
   });
 
+  const used: boolean[] = [];
   const getParent = makeParentGetter(newWDom);
   const remaked = (newWDom.children || []).map(item => {
     const key = getKey(item);
@@ -268,6 +269,7 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
 
     if (matched) {
       keyMap.delete(key);
+      used[origIndex] = true;
     }
 
     const child = makeNewWDomTree(
@@ -282,5 +284,7 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
     return child;
   });
 
-  return [remaked, [...keyMap.values()].map(index => origChildren[index])];
+  // Originals left unmatched, including ones whose key was already taken
+  // (no key, or a duplicate) and so never made it into keyMap.
+  return [remaked, origChildren.filter((_item, index) => !used[index])];
 };
