@@ -74,9 +74,8 @@ export const prepareDom = (wDom: WDom) => {
  *
  * Since elements are built during the build phase (D7), a sibling that has not
  * been committed yet already HAS an element — one that is not in the document.
- * The anchor search happily returns it, and `insertBefore` then throws
- * NotFoundError. Falling back to `null` appends, which is what the base core
- * does in that situation: the sibling did not exist there yet either.
+ * The anchor search skips such elements (see startFindNextBrotherElement);
+ * this stays as a guard so `insertBefore` never throws NotFoundError.
  */
 const anchorIn = (parentEl: Node, node?: unknown) =>
   node && (node as Node).parentNode === parentEl ? (node as Node) : null;
@@ -259,10 +258,10 @@ const typeAdd = (
   }
 
   const parentEl = findRealParentElement(parentWDom);
-  const nextEl =
-    parentWDom.type === 'l' && parentWDom.nr
-      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
-      : startFindNextBrotherElement(newWDom, parentWDom);
+  // Children added or moved inside a loop are placed by updateChildren, so
+  // anything that reaches here (e.g. a replaced fragment or component in an
+  // unkeyed loop) goes right before its own next sibling.
+  const nextEl = startFindNextBrotherElement(newWDom, parentWDom, parentEl);
 
   if (newElement && parentEl) {
     if (newWDom.tag !== 'portal') {
@@ -286,16 +285,26 @@ const getElementFromFragment = (newWDom: WDom) => {
   return newWDom.el;
 };
 
+/**
+ * `parentEl` limits the search to elements already in that parent. A sibling
+ * added in this same update has its element built ahead (D7) but not yet
+ * committed; it is skipped, so the search goes on to the next sibling that is
+ * in the document, as in the base core where that element does not exist yet.
+ */
 const startFindNextBrotherElement = (
   wDom: WDom,
-  parentWDom: WDom
+  parentWDom: WDom,
+  parentEl?: Node
 ): HTMLElement | DocumentFragment | Text | undefined => {
   const brothers = parentWDom.children || [];
   const index = brothers.indexOf(wDom);
   const nextIndex = index + 1;
   const candidiateBrothers = brothers.slice(nextIndex);
 
-  const finedNextEl = findChildFragmentNextElement(candidiateBrothers);
+  const finedNextEl = findChildFragmentNextElement(
+    candidiateBrothers,
+    parentEl
+  );
   const parentType = parentWDom.type || '';
 
   if (finedNextEl) {
@@ -303,7 +312,11 @@ const startFindNextBrotherElement = (
   }
 
   if (!parentWDom.isRoot && checkVirtualType(parentType)) {
-    return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
+    return startFindNextBrotherElement(
+      parentWDom,
+      getParent(parentWDom),
+      parentEl
+    );
   } else if (
     parentWDom.isRoot &&
     checkVirtualType(parentType) &&
@@ -316,17 +329,27 @@ const startFindNextBrotherElement = (
 };
 
 const findChildFragmentNextElement = (
-  candidiateBrothers: WDom[]
+  candidiateBrothers: WDom[],
+  parentEl?: Node
 ): HTMLElement | DocumentFragment | Text | undefined =>
   candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
     (targetEl, bItem) => {
       if (targetEl) return targetEl;
       const { type, el } = bItem;
       if (type && checkVirtualType(type)) {
-        const found = findChildFragmentNextElement(bItem.children || []);
+        const found = findChildFragmentNextElement(
+          bItem.children || [],
+          parentEl
+        );
         if (found) return found;
       }
-      if (el && el.nodeType !== 11) return el;
+      if (
+        el &&
+        el.nodeType !== 11 &&
+        (!parentEl || el.parentNode === parentEl)
+      ) {
+        return el;
+      }
       return targetEl;
     },
     undefined
@@ -433,7 +456,7 @@ const updateChildren = (newWDom: WDom) => {
   const parentEl = findRealParentElement(newWDom);
   const baseAnchor = newWDom.isRoot
     ? newWDom.ae
-    : startFindNextBrotherElement(newWDom, getParent(newWDom));
+    : startFindNextBrotherElement(newWDom, getParent(newWDom), parentEl);
 
   // Fast-append the trailing run of added children in order
   // (a null anchor makes insertBefore behave as appendChild).
@@ -457,7 +480,8 @@ const updateChildren = (newWDom: WDom) => {
     // Placement pass (right-to-left): insert added children and non-LIS
     // moves before a running anchor.
     let anchor =
-      findChildFragmentNextElement(children.slice(tail)) || baseAnchor;
+      findChildFragmentNextElement(children.slice(tail), parentEl) ||
+      baseAnchor;
 
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
@@ -472,7 +496,7 @@ const updateChildren = (newWDom: WDom) => {
         }
       }
 
-      const first = findChildFragmentNextElement([item]);
+      const first = findChildFragmentNextElement([item], parentEl);
       if (first) {
         anchor = first;
       }

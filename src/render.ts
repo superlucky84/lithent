@@ -181,10 +181,10 @@ const typeAdd = (
   }
 
   const parentEl = findRealParentElement(parentWDom);
-  const nextEl =
-    parentWDom.type === 'l' && parentWDom.nr
-      ? startFindNextBrotherElement(parentWDom, getParent(parentWDom))
-      : startFindNextBrotherElement(newWDom, parentWDom);
+  // Children added or moved inside a loop are placed by updateChildren, so
+  // anything that reaches here (e.g. a replaced fragment or component in an
+  // unkeyed loop) goes right before its own next sibling.
+  const nextEl = startFindNextBrotherElement(newWDom, parentWDom);
 
   if (newElement && parentEl) {
     if (newWDom.tag !== 'portal') {
