@@ -708,14 +708,15 @@ const wDomChildrenToDom = (
   // The parent is not attached to the document yet, so children can be
   // appended directly (no intermediate fragment allocation).
   children.forEach((childItem: WDom, index: number) => {
-    // A child already drawn elsewhere (the same node twice, a hoisted
-    // constant in several components) is drawn here as its own copy.
-    if (!isHydration && (childItem.el || childItem.il)) {
+    // A child already drawn elsewhere (nr 'N': the same node twice, a
+    // hoisted constant in several components) is drawn here as its own copy.
+    // The children of an added subtree come from a diff, which copied those
+    // already (nr 'A'). Drawn, the child gets nr 'N' (see makeNewWDomTree).
+    if (childItem.nr === 'N' && !isHydration) {
       const copy = cloneWDom(childItem);
       childItem = children[index] = 'resolve' in copy ? copy.resolve() : copy;
       childItem.getParent = makeParentGetter(wDom);
     }
-    // Drawn: nr marks the node as taken (see makeNewWDomTree).
     childItem.nr = 'N';
     if (childItem.type) {
       const childElement = wDomToDom(childItem, isHydration);
