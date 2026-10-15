@@ -337,23 +337,33 @@ const updateChildren = (newWDom: WDom) => {
   // position.
   const ois: (number | undefined)[] = [];
 
+  // Added children, then the matched ones that move.
+  const moving: WDom[] = [];
+  let ordered = true;
+
   children.forEach((item, index) => {
     const oi = (ois[index] = item.oi);
-    if (oi !== undefined && item.nr !== 'A' && item.nr !== 'S') {
+    if (item.nr === 'A' || item.nr === 'S') {
+      moving.push(item);
+    } else if (oi !== undefined) {
+      if (oi < oiSeq[oiSeq.length - 1]) {
+        ordered = false;
+      }
       matchedIndexes.push(index);
       oiSeq.push(oi);
     }
   });
 
-  const stay = new Set(getLisPositions(oiSeq).map(pos => matchedIndexes[pos]));
-  // Flag only the children that move or are added: usually none, and a
-  // redraw of a long list then writes nothing on its children.
-  const moving = children.filter(
-    (item, index) =>
-      item.nr === 'A' ||
-      item.nr === 'S' ||
-      (ois[index] !== undefined && !stay.has(index))
-  );
+  // keep[i]: matched child i stays. Matched children still in their original
+  // order all stay, as in a redraw that moves nothing: no LIS then. Only the
+  // children that move or are added are flagged, so a long list's children
+  // are usually untouched.
+  let keep: boolean[] | undefined;
+  if (!ordered) {
+    const lis: boolean[] = (keep = []);
+    getLisPositions(oiSeq).forEach(pos => (lis[matchedIndexes[pos]] = true));
+    matchedIndexes.forEach(i => lis[i] || moving.push(children[i]));
+  }
   moving.forEach(item => (item.mv = true));
 
   // Content pass (left-to-right, keeps lifecycle order).
@@ -399,10 +409,7 @@ const updateChildren = (newWDom: WDom) => {
     }
   }
 
-  if (
-    stay.size !== matchedIndexes.length ||
-    createdCount > children.length - tail
-  ) {
+  if (keep || createdCount > children.length - tail) {
     // Placement pass (right-to-left): insert added children and non-LIS
     // moves before a running anchor.
     let anchor =
@@ -411,7 +418,7 @@ const updateChildren = (newWDom: WDom) => {
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
       const isNew = created[i] !== undefined;
-      const needMove = ois[i] !== undefined && !isNew && !stay.has(i);
+      const needMove = !!keep && ois[i] !== undefined && !isNew && !keep[i];
 
       if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
         const el = isNew ? created[i] : getElementFromFragment(item);

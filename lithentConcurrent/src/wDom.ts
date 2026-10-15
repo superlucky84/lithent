@@ -671,12 +671,8 @@ const remakeChildren = (
 
   return children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
-    // A node already drawn elsewhere keeps its parent there; where it is drawn
-    // again it is copied (cloneWDom) and the copy gets this parent.
-    if (!childItem.el) {
-      if (childItem.getParent) renderGate.reparent?.(childItem);
-      childItem.getParent = getParent;
-    }
+    if (childItem.getParent) renderGate.reparent?.(childItem);
+    childItem.getParent = getParent;
     return childItem;
   });
 };
@@ -903,10 +899,8 @@ const wrapComponentMakerIfNeeded = (
   const wrappedComponentMaker = (newProps: Props): WDom => {
     const next = componentMaker(newProps);
     const wrapper = Fragment({}, next);
-    if (!next.el) {
-      if (next.getParent) renderGate.reparent?.(next);
-      next.getParent = () => wrapper;
-    }
+    if (next.getParent) renderGate.reparent?.(next);
+    next.getParent = () => wrapper;
     return wrapper;
   };
 

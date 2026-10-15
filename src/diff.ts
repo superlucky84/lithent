@@ -22,13 +22,12 @@ export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
   originalWDom?: WDom
 ) => {
-  // Already drawn or taken by a diff (u) or retired (il): the node belongs
-  // to another place, so this place draws a copy. So does a component drawn
-  // without a diff (compKey: a hoisted <Comp />), which is then compared as
-  // a component. The same node in the same place is still left alone as
-  // unchanged.
+  // Already drawn or taken by a diff (u): the node belongs to another place,
+  // so this place draws a copy. So does a component drawn without a diff (rs:
+  // a hoisted <Comp />), which is then compared as a component. The same node
+  // in the same place is still left alone as unchanged.
   const node = newWDom as WDom;
-  if (newWDom !== originalWDom && (node.u || node.il || node.compKey)) {
+  if (newWDom !== originalWDom && (node.u || node.rs)) {
     newWDom = cloneWDom(node);
   }
 
