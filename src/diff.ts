@@ -68,10 +68,16 @@ const remakeNewWDom = (
   remakeWDom.u = true;
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
-  // The retired node keeps its children: it may be a hoisted constant the
-  // caller draws again later, which is then copied from them.
+  // A retired node keeps its children: it may be a hoisted constant the
+  // caller draws again later, which is then copied from them. A component's
+  // node is copied from its description instead (cloneWDom), so it lets go
+  // of its previous output: otherwise every row a list redraws keeps its old
+  // subtree reachable, for the GC to copy, until the whole redraw is done.
   if (!isNoting && originalWDom) {
     originalWDom.il = true;
+    if (originalWDom.ctor) {
+      originalWDom.children = undefined;
+    }
   }
   if (originalWDom?.tag === 'portal') {
     remakeWDom.tag = 'portal';

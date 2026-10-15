@@ -329,13 +329,19 @@ const startFindNextBrotherElement = (
   return undefined;
 };
 
+// Children of a list being updated that move or are added: until its
+// placement pass they are not where they will be, so they are no anchor for
+// content inserted meanwhile. Kept here rather than as a flag on the node,
+// which would give the nodes that get it another shape.
+const moving = new Set<WDom>();
+
 const findChildFragmentNextElement = (
   candidiateBrothers: WDom[],
   parentEl?: Node
 ): HTMLElement | DocumentFragment | Text | undefined =>
   candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
     (targetEl, bItem) => {
-      if (targetEl || bItem.mv) return targetEl;
+      if (targetEl || (moving.size && moving.has(bItem))) return targetEl;
       const { type, el } = bItem;
       if (type && checkVirtualType(type)) {
         const found = findChildFragmentNextElement(
@@ -436,13 +442,13 @@ const updateChildren = (newWDom: WDom) => {
   const oiSeq: number[] = [];
 
   // Added children, then the matched ones that move.
-  const moving: WDom[] = [];
+  const movers: WDom[] = [];
   let ordered = true;
 
   children.forEach((item, index) => {
     const oi = item.oi;
     if (item.nr === 'A' || item.nr === 'S') {
-      moving.push(item);
+      movers.push(item);
     } else if (oi !== undefined) {
       if (oi < oiSeq[oiSeq.length - 1]) {
         ordered = false;
@@ -461,32 +467,34 @@ const updateChildren = (newWDom: WDom) => {
     const lis: boolean[] = (keep = []);
     matchedIndexes.forEach(i => (lis[i] = false));
     getLisPositions(oiSeq).forEach(pos => (lis[matchedIndexes[pos]] = true));
-    matchedIndexes.forEach(i => lis[i] || moving.push(children[i]));
+    matchedIndexes.forEach(i => lis[i] || movers.push(children[i]));
   }
-  moving.forEach(item => (item.mv = true));
 
   // Content pass (left-to-right, keeps lifecycle order).
   // Added children are created here but inserted in the placement pass.
   const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
   let createdCount = 0;
 
-  children.forEach((item, index) => {
-    const nr = item.nr;
+  movers.forEach(item => moving.add(item));
+  try {
+    children.forEach((item, index) => {
+      const nr = item.nr;
 
-    if (nr === 'A' || nr === 'S') {
-      if (nr === 'S') {
-        typeDelete(item);
+      if (nr === 'A' || nr === 'S') {
+        if (nr === 'S') {
+          typeDelete(item);
+        }
+        created[index] = takeDom(item) || wDomToDom(item);
+        createdCount++;
+      } else if (nr === 'T') {
+        typeUpdate(item);
+      } else {
+        wDomUpdate(item);
       }
-      created[index] = takeDom(item) || wDomToDom(item);
-      createdCount++;
-    } else if (nr === 'T') {
-      typeUpdate(item);
-    } else {
-      wDomUpdate(item);
-    }
-  });
-
-  moving.forEach(item => (item.mv = false));
+    });
+  } finally {
+    movers.forEach(item => moving.delete(item));
+  }
 
   const parentEl = findRealParentElement(newWDom);
   const baseAnchor = newWDom.isRoot

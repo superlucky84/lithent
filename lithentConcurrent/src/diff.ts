@@ -235,11 +235,16 @@ const completeWork = (frame: Frame, effects: Effects) => {
 
   if (!isNoting && originalWDom) {
     // Deferring this is what makes the WIP tree abandonable: the pass can be
-    // thrown away and the previous tree still rendered. The retired node keeps
+    // thrown away and the previous tree still rendered. A retired node keeps
     // its children: it may be a hoisted constant the caller draws again
-    // later, which is then copied from them.
+    // later, which is then copied from them. A component's node is copied
+    // from its description instead (cloneWDom), so it lets go of its
+    // previous output.
     effects.push(() => {
       originalWDom.il = true;
+      if (originalWDom.ctor) {
+        originalWDom.children = undefined;
+      }
     });
   }
 
