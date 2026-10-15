@@ -334,23 +334,26 @@ const updateChildren = (newWDom: WDom) => {
 
   // The matched children that keep their place: an LIS over their original
   // indexes (oi). Worked out before the content pass, because until the
-  // placement pass a child that moves is still where it was and an added
-  // one is not in the document: neither may be the anchor for content
-  // inserted meanwhile (mv), such as a kept row whose fragment changed.
+  // placement pass a child that moves is still where it was, and so is the
+  // old element of one replaced (S): neither may be the anchor for content
+  // inserted meanwhile (moving), such as a kept row whose fragment changed.
+  // An added child needs no such care: it has no element before the content
+  // pass reaches it, and anchors are looked for after the child at hand.
   // Read up front: wDomUpdate clears oi on an unkeyed child matched by
   // position.
   const matchedIndexes: number[] = [];
   const oiSeq: number[] = [];
 
-  // Added children, then the matched ones that move.
+  // Replaced children, then the matched ones that move.
   const movers: WDom[] = [];
   let ordered = true;
 
   children.forEach((item, index) => {
     const oi = item.oi;
-    if (item.nr === 'A' || item.nr === 'S') {
+    const nr = item.nr;
+    if (nr === 'S') {
       movers.push(item);
-    } else if (oi !== undefined) {
+    } else if (nr !== 'A' && oi !== undefined) {
       if (oi < oiSeq[oiSeq.length - 1]) {
         ordered = false;
       }
