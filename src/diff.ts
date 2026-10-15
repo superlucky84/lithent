@@ -2,11 +2,14 @@ import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent, makeParentGetter } from '@/utils';
 import { typeDeleteUnused } from '@/render';
+import { cloneWDom, copyResolver } from '@/wDom';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
   checkExistyKey,
+  checkExisty,
+  checkKeyedChildren,
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
@@ -18,13 +21,24 @@ import { keys, isEnumerableProp } from '@/utils';
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
   originalWDom?: WDom
-) =>
-  remakeNewWDom(
+) => {
+  // Already drawn or taken by a diff (u) or retired (il): the node belongs
+  // to another place, so this place draws a copy. So does a component drawn
+  // without a diff (compKey: a hoisted <Comp />), which is then compared as
+  // a component. The same node in the same place is still left alone as
+  // unchanged.
+  const node = newWDom as WDom;
+  if (newWDom !== originalWDom && (node.u || node.il || node.compKey)) {
+    newWDom = cloneWDom(node);
+  }
+
+  return remakeNewWDom(
     newWDom,
     !!originalWDom &&
       checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
     originalWDom
   );
+};
 
 /**
  * Create a new virtual DOM after comparing with the previous virtual DOM
@@ -52,11 +66,13 @@ const remakeNewWDom = (
 
   // NOTE: short-key metadata (nr = needRerender) keeps bundle size down
   remakeWDom.nr = needRerender;
+  remakeWDom.u = true;
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
+  // The retired node keeps its children: it may be a hoisted constant the
+  // caller draws again later, which is then copied from them.
   if (!isNoting && originalWDom) {
     originalWDom.il = true;
-    originalWDom.children = undefined;
   }
   if (originalWDom?.tag === 'portal') {
     remakeWDom.tag = 'portal';
@@ -182,7 +198,13 @@ const generalize = (
   return checkCustemComponentFunction(newWDom)
     ? isSameType && originalWDom
       ? runUpdate(originalWDom, newWDom)
-      : newWDom.resolve()
+      : // Resolved before (children a component draws again somewhere else):
+        // the first instance owns its props, which are also its key, so the
+        // new instance is made from a copy.
+        (newWDom.rd
+          ? copyResolver(newWDom)
+          : ((newWDom.rd = true), newWDom)
+        ).resolve()
     : newWDom;
 };
 
@@ -216,7 +238,7 @@ const remakeChildrenForAdd = (newWDom: WDom) => {
  * Uses key-based diffing for loops, index-based for others
  */
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
-  if (newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0])) {
+  if (newWDom.type === 'l' && checkKeyedChildren(newWDom)) {
     return remakeChildrenForLoopUpdate(newWDom, originalWDom);
   }
 
@@ -239,7 +261,7 @@ const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
     originalWDom
   );
 
-  typeDeleteUnused(unUsedChildren);
+  typeDeleteUnused(unUsedChildren, originalWDom);
 
   return remakedChildren;
 };
@@ -255,16 +277,22 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
   const keyMap = new Map<unknown, number>();
   origChildren.forEach((item, index) => {
     const key = getKey(item);
-    if (!keyMap.has(key)) {
+    if (checkExisty(key) && !keyMap.has(key)) {
       keyMap.set(key, index);
     }
   });
 
   const used: boolean[] = [];
   const getParent = makeParentGetter(newWDom);
-  const remaked = (newWDom.children || []).map(item => {
+  const remaked = (newWDom.children || []).map((item, index) => {
     const key = getKey(item);
-    const origIndex = keyMap.get(key);
+    // Unkeyed items among keyed ones (a hidden row's null, a nested array)
+    // pair with the unkeyed original at the same index, as in React.
+    const origIndex = checkExisty(key)
+      ? keyMap.get(key)
+      : index < origChildren.length && !checkExistyKey(origChildren[index])
+        ? index
+        : undefined;
     const matched = origIndex !== undefined;
 
     if (matched) {

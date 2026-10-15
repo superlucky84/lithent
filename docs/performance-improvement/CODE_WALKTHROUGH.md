@@ -134,6 +134,16 @@ key 2개가 각각 짝을 찾을 수 있었지만, Map은 첫 등장만 유지�
 > (모두 key `undefined`, 키 없는 배열 → 키 있는 배열 전환)이 삭제 대상에서
 > 빠져 DOM에 남았다. 짝이 된 원본을 `used`로 표시하고 나머지를 모두 삭제하도록
 > 고쳤다(`src/tests/core-structuralRegressions.test.tsx`).
+>
+> 그 뒤로 두 가지가 더 바뀌었다(`src/tests/core-edgeRegressions.test.tsx`).
+> - key가 있는 리스트인지는 **첫 자식이 아니라 자식 중 하나라도** key가 있는지로
+>   판단한다(`checkKeyedChildren`). 첫 행이 `null`(숨긴 행)이면 key 매칭이 꺼져
+>   위치로 짝지어지던 문제다.
+> - key 없는 자식(`null`, 중첩 배열, key 없는 요소)은 Map에 넣지 않고, **같은
+>   인덱스의 key 없는 원본**과 짝짓는다(React와 같은 방식). 전에는 모두 key
+>   `undefined`라 첫 하나만 짝을 찾고 나머지는 매 렌더 다시 만들어졌다. 위치로
+>   짝지은 자식도 `oi`를 받아 LIS·이동에 참여한다. 이런 자식은 `wDomUpdate`가
+>   diff 메타를 지우므로 `updateChildren`은 `oi`를 내용 패스 전에 읽어 둔다.
 
 ### 3.2 `chkDiffLoopOrder` 삭제 + `'L'` RenderType 폐기
 

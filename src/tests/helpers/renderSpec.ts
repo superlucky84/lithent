@@ -15,11 +15,16 @@ import type { WDom, TagFunction } from '@/index';
  * (`specToHtml`), so every update can be checked against what a fresh render
  * of the target spec has to look like.
  *
- *   e: element             t: text          n: null       x: false
+ *   e: element             t: text          n: null    x: false    y: true
  *   f: Fragment            l: array (loop, keyed or not)
  *   c: component rendering `child` (from props, or as a slot child)
  *   s: stateful component whose output lives in the store under `id`, so the
  *      test can renew it on its own (bottom-up update)
+ *   h: a hoisted node: built once, the very same object in every render and
+ *      in every place it appears
+ *   w: stateful wrapper: renders the layout in the store under `id`, where
+ *      each `slot` draws the children it was given. Redrawn on its own it
+ *      draws the same child objects again, possibly somewhere else or twice.
  */
 export type CompKind = 'A' | 'B' | 'Arrow' | 'L' | 'Slot';
 
@@ -28,10 +33,14 @@ export type Spec =
   | { k: 't'; text: string }
   | { k: 'n' }
   | { k: 'x' }
+  | { k: 'y' }
   | { k: 'f'; children: Spec[] }
   | { k: 'l'; keyed: boolean; items: Spec[] }
   | { k: 'c'; comp: CompKind; key?: string; child: Spec }
-  | { k: 's'; id: string; key?: string };
+  | { k: 's'; id: string; key?: string }
+  | { k: 'h'; id: number }
+  | { k: 'w'; id: string; key?: string; children: Spec[] }
+  | { k: 'slot' };
 
 export type Store = Record<string, Spec>;
 
@@ -44,6 +53,8 @@ export const el = (tag: string, ...children: Spec[]): Spec => ({
 export const txt = (text: string): Spec => ({ k: 't', text });
 export const nul: Spec = { k: 'n' };
 export const no: Spec = { k: 'x' };
+export const yes: Spec = { k: 'y' };
+export const slot: Spec = { k: 'slot' };
 export const frag = (...children: Spec[]): Spec => ({ k: 'f', children });
 export const list = (keyed: boolean, ...items: Spec[]): Spec => ({
   k: 'l',
@@ -57,89 +68,126 @@ export const comp = (kind: CompKind, child: Spec, key?: string): Spec => ({
   key,
 });
 export const local = (id: string, key?: string): Spec => ({ k: 's', id, key });
+export const hoisted = (id: number): Spec => ({ k: 'h', id });
+export const wrap = (id: string, ...children: Spec[]): Spec => ({
+  k: 'w',
+  id,
+  children,
+});
 export const keyed = (key: string, spec: Spec): Spec =>
-  spec.k === 'e' || spec.k === 'c' || spec.k === 's' ? { ...spec, key } : spec;
+  spec.k === 'e' || spec.k === 'c' || spec.k === 's' || spec.k === 'w'
+    ? { ...spec, key }
+    : spec;
+
+export type World = { store: Store; pool: Spec[] };
+
+/**
+ * Visit every spec node that ends up drawn, with `slot` leaves replaced by
+ * the children of the wrapper whose layout they are in.
+ */
+const walk = (
+  spec: Spec,
+  world: World,
+  visit: (spec: Spec) => void,
+  slotChildren: Spec[] = []
+): void => {
+  visit(spec);
+  const into = (items: Spec[]) =>
+    items.forEach(c => walk(c, world, visit, slotChildren));
+  switch (spec.k) {
+    case 'e':
+    case 'f':
+      return into(spec.children);
+    case 'l':
+      return into(spec.items);
+    case 'c':
+      return into([spec.child]);
+    case 's':
+      return into([world.store[spec.id]]);
+    case 'h':
+      return into([world.pool[spec.id]]);
+    case 'w':
+      return walk(world.store[spec.id], world, visit, spec.children);
+    case 'slot':
+      return into(slotChildren);
+  }
+};
 
 /**
  * The HTML a spec has to produce, written without lithent.
  */
-export const specToHtml = (spec: Spec, store: Store): string => {
+export const specToHtml = (
+  spec: Spec,
+  world: World,
+  slotChildren: Spec[] = []
+): string => {
+  const inner = (items: Spec[]) =>
+    items.map(c => specToHtml(c, world, slotChildren)).join('');
   switch (spec.k) {
     case 'e': {
       const cls = spec.cls !== undefined ? ` class="${spec.cls}"` : '';
-      const inner = spec.children.map(c => specToHtml(c, store)).join('');
-      return `<${spec.tag}${cls}>${inner}</${spec.tag}>`;
+      return `<${spec.tag}${cls}>${inner(spec.children)}</${spec.tag}>`;
     }
     case 't':
       return spec.text;
     case 'n':
     case 'x':
+    case 'y':
       return '';
     case 'f':
-      return spec.children.map(c => specToHtml(c, store)).join('');
+      return inner(spec.children);
     case 'l':
-      return spec.items.map(c => specToHtml(c, store)).join('');
+      return inner(spec.items);
     case 'c':
-      return specToHtml(spec.child, store);
+      return inner([spec.child]);
     case 's':
-      return specToHtml(store[spec.id], store);
+      return inner([world.store[spec.id]]);
+    case 'h':
+      return inner([world.pool[spec.id]]);
+    case 'w':
+      return specToHtml(world.store[spec.id], world, spec.children);
+    case 'slot':
+      return inner(slotChildren);
   }
 };
 
 /**
  * Component instances a spec mounts, per kind (`Arrow` keeps no lifecycle).
+ * A node drawn in two places is two instances.
  */
-export const countComponents = (
-  spec: Spec,
-  store: Store,
-  acc: Record<string, number> = {}
-): Record<string, number> => {
+export const countComponents = (spec: Spec, world: World) => {
+  const acc: Record<string, number> = {};
   const add = (kind: string) => (acc[kind] = (acc[kind] || 0) + 1);
-  switch (spec.k) {
-    case 'e':
-    case 'f':
-      spec.children.forEach(c => countComponents(c, store, acc));
-      break;
-    case 'l':
-      spec.items.forEach(c => countComponents(c, store, acc));
-      break;
-    case 'c':
-      if (spec.comp !== 'Arrow') add(spec.comp);
-      countComponents(spec.child, store, acc);
-      break;
-    case 's':
-      add('Local');
-      countComponents(store[spec.id], store, acc);
-      break;
-  }
+  walk(spec, world, node => {
+    if (node.k === 'c' && node.comp !== 'Arrow') add(node.comp);
+    if (node.k === 's') add('Local');
+    if (node.k === 'w') add('Wrap');
+  });
   return acc;
 };
 
 /**
- * Stateful component ids reachable from a spec.
+ * Ids of the drawn components that can redraw on their own (`s` and `w`).
  */
-export const collectLocalIds = (
-  spec: Spec,
-  store: Store,
-  acc: string[] = []
-): string[] => {
-  switch (spec.k) {
-    case 'e':
-    case 'f':
-      spec.children.forEach(c => collectLocalIds(c, store, acc));
-      break;
-    case 'l':
-      spec.items.forEach(c => collectLocalIds(c, store, acc));
-      break;
-    case 'c':
-      collectLocalIds(spec.child, store, acc);
-      break;
-    case 's':
-      acc.push(spec.id);
-      collectLocalIds(store[spec.id], store, acc);
-      break;
-  }
+export const collectLocalIds = (spec: Spec, world: World): string[] => {
+  const acc: string[] = [];
+  walk(spec, world, node => {
+    if (node.k === 's' || node.k === 'w') acc.push(node.id);
+  });
   return acc;
+};
+
+/** How many times a layout draws its children. */
+export const countSlots = (spec: Spec, world: World) => {
+  let count = 0;
+  const visit = (node: Spec) => {
+    if (node.k === 'slot') count++;
+    if (node.k === 'e' || node.k === 'f') node.children.forEach(visit);
+    if (node.k === 'l') node.items.forEach(visit);
+    if (node.k === 'h') visit(world.pool[node.id]);
+  };
+  visit(spec);
+  return count;
 };
 
 type ChildProps = { child: Spec; key?: string };
@@ -152,13 +200,15 @@ type LocalProps = { id: string; key?: string };
 export const createHarness = (
   initial: Spec,
   initialStore: Store = {},
-  options: { withSiblings?: boolean } = {}
+  options: { withSiblings?: boolean; pool?: Spec[] } = {}
 ) => {
   let root = initial;
   let store: Store = { ...initialStore };
+  const pool = options.pool || [];
   const live: Record<string, Set<object>> = {};
   const renews = new Map<string, () => boolean>();
   let hostRenew: () => boolean = () => false;
+  const poolNodes: unknown[] = [];
 
   const track = (kind: string) => {
     const token = {};
@@ -168,13 +218,15 @@ export const createHarness = (
     });
   };
 
-  const build = (spec: Spec): unknown => {
+  const build = (spec: Spec, slotChildren?: WDom[]): unknown => {
+    const all = (items: Spec[]) =>
+      items.map(c => build(c, slotChildren)) as WDom[];
     switch (spec.k) {
       case 'e': {
         const props: Record<string, unknown> = {};
         if (spec.key !== undefined) props.key = spec.key;
         if (spec.cls !== undefined) props.class = spec.cls;
-        return h(spec.tag, props, ...(spec.children.map(build) as WDom[]));
+        return h(spec.tag, props, ...all(spec.children));
       }
       case 't':
         return spec.text;
@@ -182,14 +234,12 @@ export const createHarness = (
         return null;
       case 'x':
         return false;
+      case 'y':
+        return true;
       case 'f':
-        return h(
-          Fragment as unknown as TagFunction,
-          {},
-          ...(spec.children.map(build) as WDom[])
-        );
+        return h(Fragment as unknown as TagFunction, {}, ...all(spec.children));
       case 'l':
-        return spec.items.map(build);
+        return all(spec.items);
       case 'c': {
         const props: Record<string, unknown> = { child: spec.child };
         if (spec.key !== undefined) props.key = spec.key;
@@ -207,6 +257,20 @@ export const createHarness = (
         if (spec.key !== undefined) props.key = spec.key;
         return h(Local as unknown as TagFunction, props);
       }
+      case 'h':
+        return poolNodes[spec.id];
+      case 'w': {
+        const props: Record<string, unknown> = { id: spec.id };
+        if (spec.key !== undefined) props.key = spec.key;
+        return h(
+          Wrap as unknown as TagFunction,
+          props,
+          ...(spec.children.map(c => build(c)) as WDom[])
+        );
+      }
+      case 'slot':
+        // The very child objects the wrapper was given.
+        return slotChildren || [];
     }
   };
 
@@ -238,7 +302,18 @@ export const createHarness = (
       return build(store[props.id]) as WDom;
     };
   });
+  const Wrap = mount<LocalProps>((renew, props, children) => {
+    track('Wrap');
+    return () => {
+      renews.set(props.id, renew);
+      return build(store[props.id], children) as WDom;
+    };
+  });
   const comps = { A, B, L, Arrow };
+
+  // Built once, outside any render, like a module-level constant. A later
+  // entry may hold an earlier one.
+  pool.forEach(spec => poolNodes.push(build(spec)));
 
   const Host = mount(renew => {
     hostRenew = renew;
@@ -257,7 +332,8 @@ export const createHarness = (
     options.withSiblings ? (container.lastChild as HTMLElement) : undefined
   );
 
-  const expected = () => head + specToHtml(root, store) + tail;
+  const world = (): World => ({ store, pool });
+  const expected = () => head + specToHtml(root, world()) + tail;
 
   const liveCounts = () => {
     const result: Record<string, number> = {};
@@ -267,12 +343,32 @@ export const createHarness = (
     return result;
   };
 
+  // DOM writes, to check that a redraw with nothing changed touches nothing.
+  const observer = new MutationObserver(() => {});
+  observer.observe(container, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    characterData: true,
+  });
+  const nodes = () => {
+    const result: Node[] = [];
+    const walker = document.createTreeWalker(container);
+    while (walker.nextNode()) result.push(walker.currentNode);
+    return result;
+  };
+
   return {
     container,
     html: () => container.innerHTML,
     expected,
     liveCounts,
-    expectedCounts: () => countComponents(root, store),
+    expectedCounts: () => countComponents(root, world()),
+    localIds: () => collectLocalIds(root, world()),
+    /** Every DOM node in order, for identity checks. */
+    nodes,
+    /** DOM writes since the last call. */
+    takeMutations: () => observer.takeRecords(),
     get root() {
       return root;
     },
@@ -293,6 +389,7 @@ export const createHarness = (
       renew();
     },
     destroy() {
+      observer.disconnect();
       destroy();
       container.remove();
     },

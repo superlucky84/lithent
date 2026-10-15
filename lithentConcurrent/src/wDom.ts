@@ -1,5 +1,6 @@
 import {
   WDom,
+  TagFunctionResolver,
   TagFunction,
   FragmentFunction,
   Props,
@@ -637,9 +638,16 @@ const makeNode = (
   } else if (checkCustemComponentFunction(tag)) {
     const componetMakeResolver = makeWDomResolver(tag, props, children);
 
-    return needDiffRef.value
-      ? componetMakeResolver
-      : componetMakeResolver.resolve();
+    if (needDiffRef.value) {
+      return componetMakeResolver;
+    }
+
+    // Drawn right away, without a diff. Later updates sync the instance's
+    // props and children in place, so it gets copies; the node keeps the
+    // untouched description to be drawn again elsewhere (cloneWDom).
+    const node = copyResolver(componetMakeResolver).resolve();
+    node.rs = componetMakeResolver;
+    return node;
   }
 
   return {
@@ -663,8 +671,12 @@ const remakeChildren = (
 
   return children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
-    if (childItem.getParent) renderGate.reparent?.(childItem);
-    childItem.getParent = getParent;
+    // A node already drawn elsewhere keeps its parent there; where it is drawn
+    // again it is copied (cloneWDom) and the copy gets this parent.
+    if (!childItem.el) {
+      if (childItem.getParent) renderGate.reparent?.(childItem);
+      childItem.getParent = getParent;
+    }
     return childItem;
   });
 };
@@ -673,7 +685,7 @@ const remakeChildren = (
  * Recursively process the child virtual DOM elements.
  */
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
-  if (item === null || item === undefined || item === false) {
+  if (item === null || item === undefined || typeof item === 'boolean') {
     return { type: null, [wdomSymbol]: true } as WDom;
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
@@ -759,6 +771,39 @@ const createComponentResolver = (
     }
   };
 };
+
+/**
+ * A fresh copy of a node that is already drawn somewhere: a hoisted constant,
+ * children a component renders again in another place, the same node twice.
+ * A node holds the state of the place it is drawn in (el, children, parent,
+ * component instance), so a second place gets its own copy. A component
+ * becomes a resolver for a new instance with its own props and children.
+ */
+export const cloneWDom = (wDom: WDom): WDom | TagFunctionResolver =>
+  wDom.ctor
+    ? copyResolver(
+        wDom.rs || {
+          ctor: wDom.ctor,
+          props: wDom.compProps as Props,
+          children: wDom.compChild as WDom[],
+        }
+      )
+    : ({
+        type: wDom.type,
+        tag: wDom.tag,
+        props: wDom.props,
+        text: wDom.text,
+        children: wDom.children && [...wDom.children],
+        getParent: wDom.getParent,
+        [wdomSymbol]: true,
+      } as WDom);
+
+export const copyResolver = ({
+  ctor,
+  props,
+  children,
+}: Omit<TagFunctionResolver, 'resolve'>) =>
+  makeWDomResolver(ctor as TagFunction, { ...props }, [...(children || [])]);
 
 /**
  * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
@@ -858,8 +903,10 @@ const wrapComponentMakerIfNeeded = (
   const wrappedComponentMaker = (newProps: Props): WDom => {
     const next = componentMaker(newProps);
     const wrapper = Fragment({}, next);
-    if (next.getParent) renderGate.reparent?.(next);
-    next.getParent = () => wrapper;
+    if (!next.el) {
+      if (next.getParent) renderGate.reparent?.(next);
+      next.getParent = () => wrapper;
+    }
     return wrapper;
   };
 

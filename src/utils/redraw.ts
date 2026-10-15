@@ -45,11 +45,17 @@ export const componentUpdate = (compKey: Props) => () => {
   return false;
 };
 
+// Each entry is taken out before it runs, so a renew raised during the flush
+// (a new child's mountCallback renewing its parent) queues it again and this
+// same pass runs it. A render that throws leaves the rest queued for the next
+// flush instead of blocking every later renew.
 const execRedrawQueue = () => {
-  redrawQueue.forEach((item: () => void) => {
-    item();
-  });
-
-  redrawQueue.clear();
-  redrawQueueTimeout = false;
+  try {
+    redrawQueue.forEach((item: () => void, compKey: Props) => {
+      redrawQueue.delete(compKey);
+      item();
+    });
+  } finally {
+    redrawQueueTimeout = false;
+  }
 };

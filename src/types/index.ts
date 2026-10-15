@@ -35,6 +35,7 @@ export type TagFunctionResolver = {
   props: Props;
   children: WDom[];
   resolve: (compKey?: CompKey) => WDom;
+  rd?: boolean; // resolved once already
 };
 
 export type FragmentFunction = (props: Props, children: WDom[]) => WDom;
@@ -78,6 +79,9 @@ export interface WDom {
   nr?: RenderType; // needRerender
   oi?: number; // originalIndex (matched keyed position in previous children)
   il?: boolean; // isLegacy
+  u?: boolean; // used: drawn or taken by a diff once already
+  mv?: boolean; // moving: not an insertion anchor while its list is updated
+  rs?: TagFunctionResolver; // resolver: untouched description of a component drawn without a diff
   [wdomSymbol]?: boolean | 'provider';
 }
 

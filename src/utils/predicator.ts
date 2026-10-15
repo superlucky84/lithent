@@ -81,8 +81,7 @@ const checkLoopTypeElement = (
     checkPlainWDomType(newWDom) &&
     originalWDom &&
     originalWDom.type === newWDom.type &&
-    ((checkExistyKey((newWDom.children || [])[0]) &&
-      checkExistyKey((originalWDom.children || [])[0])) ||
+    ((checkKeyedChildren(newWDom) && checkKeyedChildren(originalWDom)) ||
       (originalWDom.children &&
         newWDom.children &&
         originalWDom.children.length === newWDom.children.length))
@@ -115,6 +114,11 @@ export const checkEmptyElement = (wDom: WDomParam) =>
   checkPlainWDomType(wDom) && !wDom.type;
 
 export const checkExistyKey = (target: WDom) => checkExisty(getKey(target));
+
+// A list is keyed when any child has a key: a leading null or false (a hidden
+// row) must not turn key matching off for the rest.
+export const checkKeyedChildren = (target?: WDom) =>
+  !!target && !!target.children && target.children.some(checkExistyKey);
 
 export const checkExisty = (value: unknown) =>
   value !== null && value !== undefined;

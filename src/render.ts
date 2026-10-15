@@ -13,7 +13,13 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import { getParent, isObject, hasEnumerableProp } from '@/utils';
+import {
+  getParent,
+  isObject,
+  hasEnumerableProp,
+  makeParentGetter,
+} from '@/utils';
+import { cloneWDom } from '@/wDom';
 
 const DF = () => new DocumentFragment();
 const CE = (t: string) => document.createElement(t);
@@ -130,26 +136,21 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
 
 /**
  * Unmount and remove unused keyed children. Listeners are left on the
- * discarded DOM and go away with it.
+ * discarded DOM and go away with it. The parent element is found from the
+ * list they were in: a child's own parent link may have been moved on by
+ * the same node being drawn in another place since.
  */
-export const typeDeleteUnused = (items: WDom[]) => {
+export const typeDeleteUnused = (items: WDom[], list: WDom) => {
+  const parentElement = findRealParentElement(list) as HTMLElement;
   items.forEach(item => {
     runUnmountQueueFromWDom(item);
-    typeDelete(item);
+    deleteRealDom(item, parentElement);
   });
 };
 
 const typeSortedReplace = (newWDom: WDom) => {
   typeDelete(newWDom);
   typeAdd(newWDom);
-};
-
-const typeSortedUpdate = (newWDom: WDom) => {
-  typeUpdate(newWDom);
-
-  if (getParent(newWDom) || newWDom.isRoot) {
-    typeAdd(newWDom, getElementFromFragment(newWDom));
-  }
 };
 
 const typeAdd = (
@@ -243,7 +244,7 @@ const findChildFragmentNextElement = (
 ): HTMLElement | DocumentFragment | Text | undefined =>
   candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
     (targetEl, bItem) => {
-      if (targetEl) return targetEl;
+      if (targetEl || bItem.mv) return targetEl;
       const { type, el } = bItem;
       if (type && checkVirtualType(type)) {
         const found = findChildFragmentNextElement(bItem.children || []);
@@ -325,11 +326,39 @@ const updateChildren = (newWDom: WDom) => {
     return;
   }
 
+  // The matched children that keep their place: an LIS over their original
+  // indexes (oi). Worked out before the content pass, because until the
+  // placement pass a child that moves is still where it was and an added
+  // one is not in the document: neither may be the anchor for content
+  // inserted meanwhile (mv), such as a kept row whose fragment changed.
+  const matchedIndexes: number[] = [];
+  const oiSeq: number[] = [];
+  // Read up front: wDomUpdate clears them on an unkeyed child matched by
+  // position.
+  const ois: (number | undefined)[] = [];
+
+  children.forEach((item, index) => {
+    const oi = (ois[index] = item.oi);
+    if (oi !== undefined && item.nr !== 'A' && item.nr !== 'S') {
+      matchedIndexes.push(index);
+      oiSeq.push(oi);
+    }
+  });
+
+  const stay = new Set(getLisPositions(oiSeq).map(pos => matchedIndexes[pos]));
+  // Flag only the children that move or are added: usually none, and a
+  // redraw of a long list then writes nothing on its children.
+  const moving = children.filter(
+    (item, index) =>
+      item.nr === 'A' ||
+      item.nr === 'S' ||
+      (ois[index] !== undefined && !stay.has(index))
+  );
+  moving.forEach(item => (item.mv = true));
+
   // Content pass (left-to-right, keeps lifecycle order).
   // Added children are created here but inserted in the placement pass.
   const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
-  const matchedIndexes: number[] = [];
-  const oiSeq: number[] = [];
   let createdCount = 0;
 
   children.forEach((item, index) => {
@@ -346,14 +375,10 @@ const updateChildren = (newWDom: WDom) => {
     } else {
       wDomUpdate(item);
     }
-
-    if (item.oi !== undefined && created[index] === undefined) {
-      matchedIndexes.push(index);
-      oiSeq.push(item.oi);
-    }
   });
 
-  const stay = new Set(getLisPositions(oiSeq).map(pos => matchedIndexes[pos]));
+  moving.forEach(item => (item.mv = false));
+
   const parentEl = findRealParentElement(newWDom);
   const baseAnchor = newWDom.isRoot
     ? newWDom.ae
@@ -386,7 +411,7 @@ const updateChildren = (newWDom: WDom) => {
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
       const isNew = created[i] !== undefined;
-      const needMove = item.oi !== undefined && !isNew && !stay.has(i);
+      const needMove = ois[i] !== undefined && !isNew && !stay.has(i);
 
       if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
         const el = isNew ? created[i] : getElementFromFragment(item);
@@ -480,7 +505,11 @@ const renderHandlers = {
   R: typeReplace,
   U: typeUpdate,
   S: typeSortedReplace,
-  T: typeSortedUpdate,
+  // A keyed item reaches here only as a component redrawing itself: it has
+  // not moved, so it is updated in place. Re-inserting its nodes would blur a
+  // focused input inside it or reload an iframe. Moves within a list are
+  // placed by updateChildren.
+  T: typeUpdate,
 } as const;
 
 const updateText = (newWDom: WDom) => {
@@ -640,7 +669,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
     element = wDom.el;
   }
 
-  wDomChildrenToDom(children, element, isHydration);
+  wDomChildrenToDom(wDom, children, element, isHydration);
 
   updateProps(props, element, null, isHydration);
 
@@ -654,13 +683,22 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
 };
 
 const wDomChildrenToDom = (
+  wDom: WDom,
   children: WDom[],
   parentElement?: HTMLElement | Element | DocumentFragment | Text,
   isHydration?: boolean
 ) => {
   // The parent is not attached to the document yet, so children can be
   // appended directly (no intermediate fragment allocation).
-  children.forEach((childItem: WDom) => {
+  children.forEach((childItem: WDom, index: number) => {
+    // A child already drawn elsewhere (the same node twice, a hoisted
+    // constant in several components) is drawn here as its own copy.
+    if (!isHydration && (childItem.el || childItem.il)) {
+      const copy = cloneWDom(childItem);
+      childItem = children[index] = 'resolve' in copy ? copy.resolve() : copy;
+      childItem.getParent = makeParentGetter(wDom);
+    }
+    childItem.u = true;
     if (childItem.type) {
       const childElement = wDomToDom(childItem, isHydration);
       if (childItem.tag !== 'portal' && !isHydration && parentElement) {
