@@ -1,5 +1,25 @@
 # Release notes
 
+## 2026-10-15
+
+### lithent 1.25.1
+
+- Unmount a component that is replaced by a fragment with the same number of
+  children. The DOM was already correct, but unmount callbacks never ran (#98).
+- Insert a fragment or component replaced inside an unkeyed array at its own
+  position instead of after the array's last item (#98).
+- Remove old items when an unkeyed array becomes keyed, or when a key had
+  appeared twice (#98).
+- Add structural render matrix and seeded fuzz suites that check every update
+  against independently built HTML and the expected mounted instances.
+
+### lithent-concurrent 0.2.1
+
+- Include the three structural render fixes above (#98).
+- Insert next to a newly added sibling at the right position. A sibling built
+  ahead of the commit was used as the anchor, so the insert fell back to
+  appending at the end (#98).
+
 ## 2026-10-12
 
 ### lithent 1.25.0
