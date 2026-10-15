@@ -167,19 +167,20 @@ const beginWork = (
   originalWDom: WDom | undefined,
   parent?: Frame
 ): Frame => {
-  // Already drawn or taken by a build (u): the node belongs to another place,
-  // so this place draws a copy. The same node in the same place is still left
+  // Already drawn or taken by a build (it has nr, 'N' once drawn): the node
+  // belongs to another place, so this place draws a copy. The same node in the same place is still left
   // alone as unchanged. A component made without a diff and not drawn yet
   // (in a new component's output, or a hoisted <Comp />) is drawn as it is:
   // a copy would be a second instance, leaving the one already set up behind.
-  if (newWDom !== originalWDom && (newWDom as WDom).u) {
+  if (newWDom !== originalWDom && (newWDom as WDom).nr) {
     newWDom = cloneWDom(newWDom as WDom);
   }
 
   const isSameType = sameTypeAs(newWDom, originalWDom);
   const wip = generalize(newWDom, isSameType, originalWDom);
   const needRerender = addReRenderTypeProperty(wip, isSameType, originalWDom);
-  wip.u = true;
+  // Set here, not only when complete: it marks the node as taken.
+  wip.nr = needRerender;
 
   const frame: Frame = {
     wip,

@@ -79,7 +79,6 @@ export interface WDom {
   nr?: RenderType; // needRerender
   oi?: number; // originalIndex (matched keyed position in previous children)
   il?: boolean; // isLegacy
-  u?: boolean; // used: drawn or taken by a diff once already
   rs?: TagFunctionResolver; // resolver: untouched description of a component drawn without a diff
   [wdomSymbol]?: boolean | 'provider';
 }

@@ -547,9 +547,11 @@ const updateChildren = (newWDom: WDom) => {
 };
 
 // Assigned, not deleted: `delete` changes the object's shape, which makes
-// every later access to the node slower.
+// every later access to the node slower. nr goes back to 'N' (nothing to
+// do), not undefined: a node that has it is drawn (see makeNewWDomTree).
 const clearDiffMeta = (item: WDom) => {
-  item.oi = item.nr = item.oc = item.op = undefined;
+  item.oi = item.oc = item.op = undefined;
+  item.nr = 'N';
 };
 
 /**
@@ -843,7 +845,8 @@ const wDomChildrenToDom = (
       childItem = children[index] = 'resolve' in copy ? copy.resolve() : copy;
       childItem.getParent = makeParentGetter(wDom);
     }
-    childItem.u = true;
+    // Drawn: nr marks the node as taken (see makeNewWDomTree).
+    childItem.nr = 'N';
     if (childItem.type) {
       const childElement = wDomToDom(childItem, isHydration, record);
       if (childItem.tag !== 'portal' && !isHydration && parentElement) {
