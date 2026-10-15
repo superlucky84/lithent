@@ -39,6 +39,7 @@ import {
 export const Fragment = (_props: Props, ...children: WDom[]) =>
   ({
     type: 'f', // fragment
+    nr: undefined,
     [wdomSymbol]: true,
     children,
   }) as WDom;
@@ -202,6 +203,9 @@ const makeNode = (
 
   return {
     type: 'e', // element
+    // Declared on every new node: a diff sets it, and a drawn node keeps it
+    // ('N'), so the node keeps its shape and reading it is a plain lookup.
+    nr: undefined,
     [wdomSymbol]: true,
     tag,
     props,
@@ -231,12 +235,13 @@ const remakeChildren = (
  */
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || typeof item === 'boolean') {
-    return { type: null, [wdomSymbol]: true } as WDom;
+    return { type: null, nr: undefined, [wdomSymbol]: true } as WDom;
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
     const node = {
       type: 'l', // loop (array mapping)
+      nr: undefined,
       [wdomSymbol]: true,
       children,
     } as WDom;
@@ -244,7 +249,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 't', [wdomSymbol]: true, text: item } as WDom; // text node
+    return { type: 't', nr: undefined, [wdomSymbol]: true, text: item } as WDom; // text node
   }
 
   return item;
