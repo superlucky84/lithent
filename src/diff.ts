@@ -23,12 +23,12 @@ export const makeNewWDomTree = (
   originalWDom?: WDom
 ) => {
   // Already drawn or taken by a diff (u): the node belongs to another place,
-  // so this place draws a copy. So does a component drawn without a diff (rs:
-  // a hoisted <Comp />), which is then compared as a component. The same node
-  // in the same place is still left alone as unchanged.
-  const node = newWDom as WDom;
-  if (newWDom !== originalWDom && (node.u || node.rs)) {
-    newWDom = cloneWDom(node);
+  // so this place draws a copy. The same node in the same place is still left
+  // alone as unchanged. A component made without a diff and not drawn yet
+  // (in a new component's output, or a hoisted <Comp />) is drawn as it is:
+  // a copy would be a second instance, leaving the one already set up behind.
+  if (newWDom !== originalWDom && (newWDom as WDom).u) {
+    newWDom = cloneWDom(newWDom as WDom);
   }
 
   return remakeNewWDom(

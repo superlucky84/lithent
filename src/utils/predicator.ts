@@ -42,8 +42,11 @@ const checkSameFragment = (
     originalWDom &&
     originalWDom.type === 'f' &&
     // A component's node is a one-child fragment too: never update it in
-    // place as a plain fragment, or the component is never unmounted.
+    // place as a plain fragment, or the component is never unmounted, nor
+    // update a plain fragment with one (a hoisted <Comp /> first drawn by a
+    // redraw), or it is never mounted.
     !originalWDom.ctor &&
+    !newWDom.ctor &&
     originalWDom.children &&
     originalWDom.children.length ===
       (newWDom.children && newWDom.children.length)

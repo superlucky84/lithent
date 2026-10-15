@@ -393,6 +393,7 @@ const runSeed = async (seed: number) => {
     expect(hn.liveCounts(), `${label} (mounted components)`).toEqual(
       hn.expectedCounts()
     );
+    expect(hn.leftBehind(), `${label} (instance left behind)`).toBe(0);
   };
   check();
 

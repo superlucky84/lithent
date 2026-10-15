@@ -190,8 +190,8 @@ export const countSlots = (spec: Spec, world: World) => {
   return count;
 };
 
-type ChildProps = { child: Spec; key?: string };
-type LocalProps = { id: string; key?: string };
+type ChildProps = { child: Spec; key?: string; b?: number };
+type LocalProps = { id: string; key?: string; b?: number };
 
 /**
  * One isolated set of components, registries and a host. Each harness owns
@@ -210,9 +210,22 @@ export const createHarness = (
   let hostRenew: () => boolean = () => false;
   const poolNodes: unknown[] = [];
 
-  const track = (kind: string) => {
+  // The instances made from each built component node (props.b). Several
+  // are fine, one per place it is drawn in, but not one left behind never
+  // mounted next to another: a copy was drawn instead of the instance
+  // already set up. (One alone may stay unmounted: slot children a wrapper
+  // does not draw, a pool node not drawn yet.)
+  let builds = 0;
+  const instances = new Map<number | undefined, { mounted: boolean }[]>();
+
+  const track = (kind: string, props: { b?: number }) => {
     const token = {};
+    const instance = { mounted: false };
+    const made = instances.get(props.b) || [];
+    made.push(instance);
+    instances.set(props.b, made);
     mountCallback(() => {
+      instance.mounted = true;
       (live[kind] = live[kind] || new Set()).add(token);
       return () => live[kind].delete(token);
     });
@@ -242,6 +255,7 @@ export const createHarness = (
         return all(spec.items);
       case 'c': {
         const props: Record<string, unknown> = { child: spec.child };
+        props.b = ++builds;
         if (spec.key !== undefined) props.key = spec.key;
         if (spec.comp === 'Slot') {
           return h(
@@ -253,14 +267,14 @@ export const createHarness = (
         return h(comps[spec.comp] as unknown as TagFunction, props);
       }
       case 's': {
-        const props: Record<string, unknown> = { id: spec.id };
+        const props: Record<string, unknown> = { id: spec.id, b: ++builds };
         if (spec.key !== undefined) props.key = spec.key;
         return h(Local as unknown as TagFunction, props);
       }
       case 'h':
         return poolNodes[spec.id];
       case 'w': {
-        const props: Record<string, unknown> = { id: spec.id };
+        const props: Record<string, unknown> = { id: spec.id, b: ++builds };
         if (spec.key !== undefined) props.key = spec.key;
         return h(
           Wrap as unknown as TagFunction,
@@ -275,27 +289,27 @@ export const createHarness = (
   };
 
   const A = mount<ChildProps>((_renew, props) => {
-    track('A');
+    track('A', props);
     return () => build(props.child) as WDom;
   });
   const B = mount<ChildProps>((_renew, props) => {
-    track('B');
+    track('B', props);
     return () => build(props.child) as WDom;
   });
   const L = lmount<ChildProps>(props => {
-    track('L');
+    track('L', props);
     useRenew();
     return () => build(props.child) as WDom;
   });
   // Stateless: re-run on every render.
   const Arrow = (props: ChildProps) => build(props.child) as WDom;
-  const Slot = mount<ChildProps>((_renew, _props, children) => {
-    track('Slot');
+  const Slot = mount<ChildProps>((_renew, props, children) => {
+    track('Slot', props);
     return () =>
       h(Fragment as unknown as TagFunction, {}, ...(children as WDom[]));
   });
   const Local = mount<LocalProps>((renew, props) => {
-    track('Local');
+    track('Local', props);
     return () => {
       // Read at render time: a reused instance may have been handed a new id.
       renews.set(props.id, renew);
@@ -303,7 +317,7 @@ export const createHarness = (
     };
   });
   const Wrap = mount<LocalProps>((renew, props, children) => {
-    track('Wrap');
+    track('Wrap', props);
     return () => {
       renews.set(props.id, renew);
       return build(store[props.id], children) as WDom;
@@ -363,6 +377,11 @@ export const createHarness = (
     html: () => container.innerHTML,
     expected,
     liveCounts,
+    /** Instances left behind never mounted next to a copy drawn instead. */
+    leftBehind: () =>
+      [...instances.values()].filter(
+        made => made.length > 1 && made.some(instance => !instance.mounted)
+      ).length,
     expectedCounts: () => countComponents(root, world()),
     localIds: () => collectLocalIds(root, world()),
     /** Every DOM node in order, for identity checks. */

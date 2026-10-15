@@ -346,6 +346,48 @@ describe('reused nodes', () => {
     }
   });
 
+  it('sets up a component in a new component output once', async () => {
+    // Components in a new component's output are made without a diff. They
+    // used to be copied when drawn, so each had a second instance and the
+    // first one, set up and registered (HMR), was left behind.
+    const log: string[] = [];
+    let setups = 0;
+    const Child = mount(() => {
+      setups++;
+      mountCallback(() => {
+        log.push('mount');
+        return () => log.push('unmount');
+      });
+      return () => <i>child</i>;
+    });
+    const Parent = mount(() => () => (
+      <div>
+        <Child />
+      </div>
+    ));
+    let show = false;
+    let bump = () => {};
+    const App = mount(renew => {
+      bump = renew;
+      return () => (show ? <Parent /> : <p />);
+    });
+
+    const el = document.createElement('div');
+    render(<App />, el);
+    show = true;
+    bump();
+    await flush();
+    expect(el.innerHTML).toBe('<div><i>child</i></div>');
+    expect(setups).toBe(1);
+    expect(log).toEqual(['mount']);
+
+    show = false;
+    bump();
+    await flush();
+    expect(el.innerHTML).toBe('<p></p>');
+    expect(log).toEqual(['mount', 'unmount']);
+  });
+
   it('mounts a hoisted component first drawn by a redraw', async () => {
     const log: string[] = [];
     const Icon = tracked(log, 'icon');
