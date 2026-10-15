@@ -19,12 +19,6 @@ type WDomParam =
  * Predicator
  */
 
-const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
-  isObject(wDom) && !('resolve' in wDom);
-
-const checkPlainType = (wDom: WDomParam, typeName: string) =>
-  checkPlainWDomType(wDom) && wDom.type === typeName;
-
 const checkSameCustomComponent = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
@@ -33,62 +27,36 @@ const checkSameCustomComponent = (
     ? newWDom.ctor === (originalWDom && originalWDom.ctor)
     : newWDom === (originalWDom && originalWDom.ctor);
 
-const checkSameFragment = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === 'f' &&
-    // A component's node is a one-child fragment too: never update it in
-    // place as a plain fragment, or the component is never unmounted, nor
-    // update a plain fragment with one (a hoisted <Comp /> first drawn by a
-    // redraw), or it is never mounted.
-    !originalWDom.ctor &&
-    !newWDom.ctor &&
-    originalWDom.children &&
-    originalWDom.children.length ===
-      (newWDom.children && newWDom.children.length)
-  );
+// The checks below are reached through checkSameWDomWithOriginal only: with
+// a plain node of that type (getWDomType) and an original.
+const checkSameFragment = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === 'f' &&
+  // A component's node is a one-child fragment too: never update it in
+  // place as a plain fragment, or the component is never unmounted, nor
+  // update a plain fragment with one (a hoisted <Comp /> first drawn by a
+  // redraw), or it is never mounted.
+  !originalWDom.ctor &&
+  !newWDom.ctor &&
+  !!originalWDom.children &&
+  originalWDom.children.length ===
+    (newWDom.children && newWDom.children.length);
 
-const checkSameTagElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === 'e' &&
-    originalWDom.tag === newWDom.tag &&
-    originalWDom.children &&
-    originalWDom.children.length ===
-      (newWDom.children && newWDom.children.length)
-  );
+const checkSameTagElement = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === 'e' &&
+  originalWDom.tag === newWDom.tag &&
+  !!originalWDom.children &&
+  originalWDom.children.length ===
+    (newWDom.children && newWDom.children.length);
 
-const checkNormalTypeElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === newWDom.type
-  );
+const checkNormalTypeElement = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === newWDom.type;
 
-const checkLoopTypeElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === newWDom.type &&
-    ((checkKeyedChildren(newWDom) && checkKeyedChildren(originalWDom)) ||
-      (originalWDom.children &&
-        newWDom.children &&
-        originalWDom.children.length === newWDom.children.length))
-  );
+const checkLoopTypeElement = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === newWDom.type &&
+  ((checkKeyedChildren(newWDom) && checkKeyedChildren(originalWDom)) ||
+    (!!originalWDom.children &&
+      originalWDom.children.length ===
+        (newWDom.children && newWDom.children.length)));
 
 export const getKey = (target: WDom) =>
   (target && target.compProps && target.compProps.key) ??
@@ -110,11 +78,12 @@ export const checkCustemComponentFunction = (
 
 export const checkFragmentFunction = (
   target: unknown
-): target is FragmentFunction =>
-  typeof target === 'function' && target === Fragment;
+): target is FragmentFunction => target === Fragment;
 
-export const checkEmptyElement = (wDom: WDomParam) =>
-  checkPlainWDomType(wDom) && !wDom.type;
+// A diffed node (resolved already): empty when it has no type.
+export const checkEmptyElement = (wDom: WDom) => !wDom.type;
+
+export const checkEventKey = (key: string) => key[0] === 'o' && key[1] === 'n';
 
 export const checkExistyKey = (target: WDom) => checkExisty(getKey(target));
 
@@ -175,15 +144,7 @@ export const getWDomType = (
 ): WDomType =>
   checkCustemComponentFunction(wDom)
     ? 'c'
-    : checkPlainType(wDom, 'f')
-      ? 'f'
-      : checkPlainType(wDom, 'e')
-        ? 'e'
-        : checkPlainType(wDom, 'l')
-          ? 'l'
-          : checkPlainType(wDom, 't')
-            ? 't'
-            : 'et';
+    : ((wDom as WDom).type as WDomType) || 'et';
 
 export const checkSameWDomWithOriginal = {
   c: checkSameCustomComponent,

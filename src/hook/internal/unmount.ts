@@ -1,17 +1,15 @@
 import { WDom, CompKey } from '@/types';
+import { checkEventKey } from '@/utils/predicator';
 import {
   componentMap,
-  getComponentKey,
+  getCurrentComponent,
   isComponentMapManualMode,
   runUnmountEffects,
 } from '@/utils/universalRef';
 
 export const unmount = (effectAction: () => void) => {
-  const compKey = getComponentKey();
-  if (compKey) {
-    const comp = componentMap.get(compKey);
-    comp && comp.umts.push(effectAction);
-  }
+  const comp = getCurrentComponent();
+  comp && comp.umts.push(effectAction);
 };
 
 export const runUnmountQueueFromWDom = (newWDom: WDom) => {
@@ -31,7 +29,7 @@ const recursiveRunUnmount = (wDom: WDom) => {
   // handlers while leaving listeners on discarded ordinary DOM untouched.
   if (wDom.tag === 'portal' && wDom.el) {
     for (const key in wDom.props) {
-      if (key[0] === 'o' && key[1] === 'n') {
+      if (checkEventKey(key)) {
         wDom.el.removeEventListener(
           key.slice(2).toLowerCase(),
           wDom.props[key] as EventListener

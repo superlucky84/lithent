@@ -357,15 +357,16 @@ export const copyResolver = ({
 /**
  * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
  */
-const makeWDomResolver = (tag: TagFunction, props: Props, children: WDom[]) => {
-  const ctor = tag;
-
-  const wrappedChildren = children;
-
-  const resolve = createComponentResolver(tag, props, wrappedChildren);
-
-  return { ctor, props, children: wrappedChildren, resolve };
-};
+const makeWDomResolver = (
+  tag: TagFunction,
+  props: Props,
+  children: WDom[]
+) => ({
+  ctor: tag,
+  props,
+  children,
+  resolve: createComponentResolver(tag, props, children),
+});
 
 /**
  * Create the actual virtual DOM node from the component.
@@ -377,12 +378,8 @@ const makeCustomNode = (
   props: Props,
   children: WDom[]
 ) => {
-  const normalizedComponentMaker = (nextProps: Props): WDom =>
-    makeChildrenItem(componentMaker(nextProps));
-  const { wrappedComponentMaker, customNode } = wrapComponentMakerIfNeeded(
-    normalizedComponentMaker,
-    props
-  );
+  const wrappedComponentMaker = wrapComponentMaker(componentMaker);
+  const customNode = wrappedComponentMaker(props);
   const reRender = makeReRender(
     wrappedComponentMaker,
     compKey,
@@ -413,34 +410,21 @@ const makeReRender = (
   props: Props,
   children: WDom[]
 ) => {
-  const reRender = () =>
-    wDomMaker(componentMaker, compKey, tag, props, children, reRender);
+  const reRender = (): WDom => {
+    const previousKey = compKeyRef.value;
+    try {
+      initUpdateHookState(compKey);
+      runUpdateCallback();
+
+      const customNode = componentMaker(props);
+      addComponentProps(customNode, compKey, tag, props, children, reRender);
+
+      return customNode;
+    } finally {
+      compKeyRef.value = previousKey;
+    }
+  };
   return reRender;
-};
-
-/**
- * The starting point for redrawing from the re-render method
- */
-const wDomMaker = (
-  componentMaker: (props: Props) => WDom,
-  compKey: Props,
-  tag: TagFunction,
-  props: Props,
-  children: WDom[],
-  reRender: () => WDom
-) => {
-  const previousKey = compKeyRef.value;
-  try {
-    initUpdateHookState(compKey);
-    runUpdateCallback();
-
-    const customNode = componentMaker(props);
-    addComponentProps(customNode, compKey, tag, props, children, reRender);
-
-    return customNode;
-  } finally {
-    compKeyRef.value = previousKey;
-  }
 };
 
 // ============================================================================
@@ -452,21 +436,14 @@ const wDomMaker = (
  * dedicated node. This prevents parent/child sharing when a component returns
  * another component and keeps updates stable even when output becomes empty.
  */
-const wrapComponentMakerIfNeeded = (
-  componentMaker: (props: Props) => WDom,
-  props: Props
-): { wrappedComponentMaker: (props: Props) => WDom; customNode: WDom } => {
-  const wrappedComponentMaker = (newProps: Props): WDom => {
-    const next = componentMaker(newProps);
+const wrapComponentMaker =
+  (componentMaker: (props: Props) => MiddleStateWDom) =>
+  (newProps: Props): WDom => {
+    const next = makeChildrenItem(componentMaker(newProps));
     const wrapper = Fragment({}, next);
     next.getParent = () => wrapper;
     return wrapper;
   };
-
-  const customNode = wrappedComponentMaker(props);
-
-  return { wrappedComponentMaker, customNode };
-};
 
 /**
  * When creating a custom component node, attach additional information attributes to the virtual DOM object.
