@@ -331,18 +331,17 @@ const updateChildren = (newWDom: WDom) => {
   // placement pass a child that moves is still where it was and an added
   // one is not in the document: neither may be the anchor for content
   // inserted meanwhile (mv), such as a kept row whose fragment changed.
+  // Read up front: wDomUpdate clears oi on an unkeyed child matched by
+  // position.
   const matchedIndexes: number[] = [];
   const oiSeq: number[] = [];
-  // Read up front: wDomUpdate clears them on an unkeyed child matched by
-  // position.
-  const ois: (number | undefined)[] = [];
 
   // Added children, then the matched ones that move.
   const moving: WDom[] = [];
   let ordered = true;
 
   children.forEach((item, index) => {
-    const oi = (ois[index] = item.oi);
+    const oi = item.oi;
     if (item.nr === 'A' || item.nr === 'S') {
       moving.push(item);
     } else if (oi !== undefined) {
@@ -354,13 +353,14 @@ const updateChildren = (newWDom: WDom) => {
     }
   });
 
-  // keep[i]: matched child i stays. Matched children still in their original
-  // order all stay, as in a redraw that moves nothing: no LIS then. Only the
-  // children that move or are added are flagged, so a long list's children
-  // are usually untouched.
+  // keep[i]: whether matched child i stays (unset when not matched).
+  // Matched children still in their original order all stay, as in a redraw
+  // that moves nothing: no LIS then. Only the children that move or are
+  // added are flagged, so a long list's children are usually untouched.
   let keep: boolean[] | undefined;
   if (!ordered) {
     const lis: boolean[] = (keep = []);
+    matchedIndexes.forEach(i => (lis[i] = false));
     getLisPositions(oiSeq).forEach(pos => (lis[matchedIndexes[pos]] = true));
     matchedIndexes.forEach(i => lis[i] || moving.push(children[i]));
   }
@@ -418,7 +418,7 @@ const updateChildren = (newWDom: WDom) => {
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
       const isNew = created[i] !== undefined;
-      const needMove = !!keep && ois[i] !== undefined && !isNew && !keep[i];
+      const needMove = !!keep && keep[i] === false;
 
       if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
         const el = isNew ? created[i] : getElementFromFragment(item);
