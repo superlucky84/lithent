@@ -1,0 +1,2894 @@
+{
+  "comparison": {
+    "before": "592d320ebd0c9610596d33cb02cb3272d4b3064f",
+    "after": "0ccd1265384fd68ebd0db63e8d7b4ca74088726e"
+  },
+  "verification": {
+    "startedAt": "2026-10-16T06:57:55.265Z",
+    "mode": "verify",
+    "chrome": "155.0.8059.82",
+    "machine": {
+      "cpu": "Apple M4 Pro",
+      "cores": 12,
+      "memoryGB": 24
+    },
+    "loadStart": [4.60791015625, 3.8193359375, 3.24755859375],
+    "alternatingOrder": false,
+    "build": {
+      "lithent-before": {
+        "date": "2026-10-16T06:56:31.055Z",
+        "libraryHead": "592d320ebd0c9610596d33cb02cb3272d4b3064f",
+        "benchmarkHead": "88396117046bba4fdd338eb33d6f7e330a9977ab",
+        "benchmarkStatus": "",
+        "appFiles": {
+          "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "index.html": "16c041ee8852c4caf8eecbf4c00c51cdb2ef4e18ff0d23f353f55cb2d1586ef4"
+        },
+        "core": "f8200b696c556024acaf4fed659330ba5c035ef20a08428e5f10ac616dccb366",
+        "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+        "bundle": "a5afc56a82be686622902459db3b4e9e0c504d0c7246e6bf15780fdcf9c2ebcb",
+        "libraryVite": "5.4.8",
+        "vite": "5.4.21",
+        "runnerFiles": {
+          "forkedBenchmarkRunnerPuppeteer.js": "5f9a710d2b800b47dc6f9323faf795971fa74cd76e415b0fac3c9d20ddf3e62a",
+          "benchmarksPuppeteer.js": "195b803c845422597b10c1c2d8aeacdaa747b5494b92d57c4f101ea6b90106bf",
+          "benchmarksCommon.js": "7a2280a94bd65573e3e22cfba2a9c98ef61f41c57dec4ae1a0360835601e91fc",
+          "timeline.js": "15c361b6e51143798fc70603a28870501104d4b24fe7f1d5f669fb0988f475f3",
+          "puppeteerAccess.js": "01c96ef57a951bda031fda9045254947ff234f3be49390bf23298a44b40c6c3a"
+        },
+        "sizes": {
+          "lithent.mjs": 18888,
+          "lithent.umd.js": 13078
+        }
+      },
+      "lithent": {
+        "date": "2026-10-16T06:56:35.740Z",
+        "libraryHead": "0ccd1265384fd68ebd0db63e8d7b4ca74088726e",
+        "benchmarkHead": "88396117046bba4fdd338eb33d6f7e330a9977ab",
+        "benchmarkStatus": "",
+        "appFiles": {
+          "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "index.html": "16c041ee8852c4caf8eecbf4c00c51cdb2ef4e18ff0d23f353f55cb2d1586ef4"
+        },
+        "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+        "bundle": "d1eeafc2451b7cf81102acc41bf6a46c6bb19c5df8b369332377ed897b938dd6",
+        "libraryVite": "5.4.8",
+        "vite": "5.4.21",
+        "runnerFiles": {
+          "forkedBenchmarkRunnerPuppeteer.js": "5f9a710d2b800b47dc6f9323faf795971fa74cd76e415b0fac3c9d20ddf3e62a",
+          "benchmarksPuppeteer.js": "195b803c845422597b10c1c2d8aeacdaa747b5494b92d57c4f101ea6b90106bf",
+          "benchmarksCommon.js": "7a2280a94bd65573e3e22cfba2a9c98ef61f41c57dec4ae1a0360835601e91fc",
+          "timeline.js": "15c361b6e51143798fc70603a28870501104d4b24fe7f1d5f669fb0988f475f3",
+          "puppeteerAccess.js": "01c96ef57a951bda031fda9045254947ff234f3be49390bf23298a44b40c6c3a"
+        },
+        "sizes": {
+          "lithent.mjs": 19110,
+          "lithent.umd.js": 12741
+        }
+      }
+    },
+    "versions": {
+      "node": "v20.3.0",
+      "libraryVite": "5.4.8",
+      "appVite": "5.4.21",
+      "puppeteer": "24.23.0"
+    },
+    "samples": [
+      {
+        "name": "lithent-before",
+        "scenarios": 9,
+        "fontLoaded": true
+      },
+      {
+        "name": "lithent",
+        "scenarios": 9,
+        "fontLoaded": true
+      }
+    ],
+    "complete": true,
+    "finishedAt": "2026-10-16T06:57:59.411Z",
+    "loadEnd": [5.11962890625, 3.9384765625, 3.29296875]
+  },
+  "runs": [
+    {
+      "startedAt": "2026-10-16T06:58:09.072Z",
+      "mode": "cpu",
+      "chrome": "Chrome/155.0.8059.82",
+      "machine": {
+        "cpu": "Apple M4 Pro",
+        "cores": 12,
+        "memoryGB": 24
+      },
+      "loadStart": [4.86962890625, 3.90625, 3.28515625],
+      "alternatingOrder": true,
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-16T06:56:31.055Z",
+          "libraryHead": "592d320ebd0c9610596d33cb02cb3272d4b3064f",
+          "benchmarkHead": "88396117046bba4fdd338eb33d6f7e330a9977ab",
+          "benchmarkStatus": "",
+          "appFiles": {
+            "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+            "index.html": "16c041ee8852c4caf8eecbf4c00c51cdb2ef4e18ff0d23f353f55cb2d1586ef4"
+          },
+          "core": "f8200b696c556024acaf4fed659330ba5c035ef20a08428e5f10ac616dccb366",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "a5afc56a82be686622902459db3b4e9e0c504d0c7246e6bf15780fdcf9c2ebcb",
+          "libraryVite": "5.4.8",
+          "vite": "5.4.21",
+          "runnerFiles": {
+            "forkedBenchmarkRunnerPuppeteer.js": "5f9a710d2b800b47dc6f9323faf795971fa74cd76e415b0fac3c9d20ddf3e62a",
+            "benchmarksPuppeteer.js": "195b803c845422597b10c1c2d8aeacdaa747b5494b92d57c4f101ea6b90106bf",
+            "benchmarksCommon.js": "7a2280a94bd65573e3e22cfba2a9c98ef61f41c57dec4ae1a0360835601e91fc",
+            "timeline.js": "15c361b6e51143798fc70603a28870501104d4b24fe7f1d5f669fb0988f475f3",
+            "puppeteerAccess.js": "01c96ef57a951bda031fda9045254947ff234f3be49390bf23298a44b40c6c3a"
+          },
+          "sizes": {
+            "lithent.mjs": 18888,
+            "lithent.umd.js": 13078
+          }
+        },
+        "lithent": {
+          "date": "2026-10-16T06:56:35.740Z",
+          "libraryHead": "0ccd1265384fd68ebd0db63e8d7b4ca74088726e",
+          "benchmarkHead": "88396117046bba4fdd338eb33d6f7e330a9977ab",
+          "benchmarkStatus": "",
+          "appFiles": {
+            "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+            "index.html": "16c041ee8852c4caf8eecbf4c00c51cdb2ef4e18ff0d23f353f55cb2d1586ef4"
+          },
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "d1eeafc2451b7cf81102acc41bf6a46c6bb19c5df8b369332377ed897b938dd6",
+          "libraryVite": "5.4.8",
+          "vite": "5.4.21",
+          "runnerFiles": {
+            "forkedBenchmarkRunnerPuppeteer.js": "5f9a710d2b800b47dc6f9323faf795971fa74cd76e415b0fac3c9d20ddf3e62a",
+            "benchmarksPuppeteer.js": "195b803c845422597b10c1c2d8aeacdaa747b5494b92d57c4f101ea6b90106bf",
+            "benchmarksCommon.js": "7a2280a94bd65573e3e22cfba2a9c98ef61f41c57dec4ae1a0360835601e91fc",
+            "timeline.js": "15c361b6e51143798fc70603a28870501104d4b24fe7f1d5f669fb0988f475f3",
+            "puppeteerAccess.js": "01c96ef57a951bda031fda9045254947ff234f3be49390bf23298a44b40c6c3a"
+          },
+          "sizes": {
+            "lithent.mjs": 19110,
+            "lithent.umd.js": 12741
+          }
+        }
+      },
+      "versions": {
+        "node": "v20.3.0",
+        "libraryVite": "5.4.8",
+        "appVite": "5.4.21",
+        "puppeteer": "24.23.0"
+      },
+      "samples": [
+        {
+          "name": "lithent-before",
+          "id": "01_run1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 28.499,
+              "script": 8.486,
+              "paint": 19.208
+            },
+            {
+              "total": 28.734,
+              "script": 8.897,
+              "paint": 19.258
+            },
+            {
+              "total": 27.731,
+              "script": 8.61,
+              "paint": 18.614
+            },
+            {
+              "total": 29.125,
+              "script": 9.559,
+              "paint": 19.018
+            },
+            {
+              "total": 28.115,
+              "script": 8.917,
+              "paint": 18.656
+            },
+            {
+              "total": 28.316,
+              "script": 8.711,
+              "paint": 19.066
+            },
+            {
+              "total": 28.8,
+              "script": 8.839,
+              "paint": 19.333
+            },
+            {
+              "total": 27.652,
+              "script": 8.644,
+              "paint": 18.517
+            },
+            {
+              "total": 27.957,
+              "script": 8.923,
+              "paint": 18.509
+            },
+            {
+              "total": 28.844,
+              "script": 8.522,
+              "paint": 19.683
+            },
+            {
+              "total": 29.326,
+              "script": 9.201,
+              "paint": 19.565
+            },
+            {
+              "total": 28.451,
+              "script": 8.602,
+              "paint": 19.259
+            },
+            {
+              "total": 28.643,
+              "script": 8.867,
+              "paint": 19.194
+            },
+            {
+              "total": 28.091,
+              "script": 8.984,
+              "paint": 18.572
+            },
+            {
+              "total": 28.185,
+              "script": 8.774,
+              "paint": 18.877
+            }
+          ],
+          "load": [4.9189453125, 4.03173828125, 3.349609375],
+          "finishedAt": "2026-10-16T06:58:33.537Z"
+        },
+        {
+          "name": "lithent",
+          "id": "01_run1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 27.557,
+              "script": 7.833,
+              "paint": 19.136
+            },
+            {
+              "total": 27.753,
+              "script": 8.193,
+              "paint": 19.016
+            },
+            {
+              "total": 27.635,
+              "script": 8.142,
+              "paint": 18.97
+            },
+            {
+              "total": 27.458,
+              "script": 8.204,
+              "paint": 18.757
+            },
+            {
+              "total": 27.195,
+              "script": 8.065,
+              "paint": 18.607
+            },
+            {
+              "total": 27.793,
+              "script": 8.372,
+              "paint": 18.92
+            },
+            {
+              "total": 34.253,
+              "script": 9.106,
+              "paint": 24.143
+            },
+            {
+              "total": 27.687,
+              "script": 8.223,
+              "paint": 18.957
+            },
+            {
+              "total": 29.01,
+              "script": 7.895,
+              "paint": 20.383
+            },
+            {
+              "total": 27.471,
+              "script": 7.937,
+              "paint": 18.967
+            },
+            {
+              "total": 26.979,
+              "script": 8.093,
+              "paint": 18.352
+            },
+            {
+              "total": 27.4,
+              "script": 7.995,
+              "paint": 18.816
+            },
+            {
+              "total": 26.855,
+              "script": 7.924,
+              "paint": 18.397
+            },
+            {
+              "total": 27.389,
+              "script": 8.091,
+              "paint": 18.772
+            },
+            {
+              "total": 27.531,
+              "script": 8.114,
+              "paint": 18.881
+            }
+          ],
+          "load": [4.193359375, 3.91845703125, 3.32763671875],
+          "finishedAt": "2026-10-16T06:58:57.213Z"
+        },
+        {
+          "name": "lithent",
+          "id": "09_clear1k_x8",
+          "warnings": [],
+          "result": [
+            {
+              "total": 11.554,
+              "script": 8.803,
+              "paint": 1.247
+            },
+            {
+              "total": 13.197,
+              "script": 10.766,
+              "paint": 0.657
+            },
+            {
+              "total": 11.88,
+              "script": 9.134,
+              "paint": 1.129
+            },
+            {
+              "total": 11.08,
+              "script": 8.897,
+              "paint": 1.102
+            },
+            {
+              "total": 11.979,
+              "script": 9.399,
+              "paint": 1.498
+            },
+            {
+              "total": 11.865,
+              "script": 9.388,
+              "paint": 1.402
+            },
+            {
+              "total": 13.259,
+              "script": 10.669,
+              "paint": 1.215
+            },
+            {
+              "total": 13.175,
+              "script": 10.798,
+              "paint": 0.662
+            },
+            {
+              "total": 14.054,
+              "script": 10.837,
+              "paint": 2.152
+            },
+            {
+              "total": 11.863,
+              "script": 9.586,
+              "paint": 1.498
+            },
+            {
+              "total": 12.988,
+              "script": 10.441,
+              "paint": 0.833
+            },
+            {
+              "total": 15.361,
+              "script": 12.409,
+              "paint": 1.507
+            },
+            {
+              "total": 11.852,
+              "script": 9.349,
+              "paint": 1.416
+            },
+            {
+              "total": 13.235,
+              "script": 10.926,
+              "paint": 2.05
+            },
+            {
+              "total": 13.334,
+              "script": 10.579,
+              "paint": 1.289
+            }
+          ],
+          "load": [3.279296875, 3.716796875, 3.27099609375],
+          "finishedAt": "2026-10-16T06:59:21.492Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "09_clear1k_x8",
+          "warnings": [],
+          "result": [
+            {
+              "total": 14.304,
+              "script": 11.504,
+              "paint": 1.062
+            },
+            {
+              "total": 13.822,
+              "script": 10.452,
+              "paint": 2.175
+            },
+            {
+              "total": 11.97,
+              "script": 9.671,
+              "paint": 1.631
+            },
+            {
+              "total": 13.575,
+              "script": 11.045,
+              "paint": 1.97
+            },
+            {
+              "total": 14.481,
+              "script": 11.437,
+              "paint": 2.372
+            },
+            {
+              "total": 13.803,
+              "script": 10.736,
+              "paint": 1.2
+            },
+            {
+              "total": 13.303,
+              "script": 10.978,
+              "paint": 1.451
+            },
+            {
+              "total": 12.386,
+              "script": 10.087,
+              "paint": 2.053
+            },
+            {
+              "total": 13.867,
+              "script": 10.961,
+              "paint": 0.335
+            },
+            {
+              "total": 14.75,
+              "script": 12.323,
+              "paint": 0.96
+            },
+            {
+              "total": 14.226,
+              "script": 11.557,
+              "paint": 1.059
+            },
+            {
+              "total": 14.446,
+              "script": 11.682,
+              "paint": 0.892
+            },
+            {
+              "total": 13.198,
+              "script": 10.225,
+              "paint": 1.689
+            },
+            {
+              "total": 14.596,
+              "script": 11.876,
+              "paint": 1.322
+            },
+            {
+              "total": 15.27,
+              "script": 12.45,
+              "paint": 1.584
+            }
+          ],
+          "load": [2.7724609375, 3.5615234375, 3.2275390625],
+          "finishedAt": "2026-10-16T06:59:46.545Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "03_update10th1k_x16",
+          "warnings": [],
+          "result": [
+            {
+              "total": 19.399,
+              "script": 6.891,
+              "paint": 9.998
+            },
+            {
+              "total": 25.044,
+              "script": 7.562,
+              "paint": 14.241
+            },
+            {
+              "total": 19.22,
+              "script": 6.847,
+              "paint": 10.119
+            },
+            {
+              "total": 21.268,
+              "script": 7.365,
+              "paint": 11.579
+            },
+            {
+              "total": 23.559,
+              "script": 7.249,
+              "paint": 13.016
+            },
+            {
+              "total": 22.06,
+              "script": 7.45,
+              "paint": 11.844
+            },
+            {
+              "total": 19.252,
+              "script": 7.001,
+              "paint": 10.377
+            },
+            {
+              "total": 21.34,
+              "script": 7.411,
+              "paint": 10.739
+            },
+            {
+              "total": 20.586,
+              "script": 6.864,
+              "paint": 11.851
+            },
+            {
+              "total": 20.437,
+              "script": 7.094,
+              "paint": 11.056
+            },
+            {
+              "total": 29.266,
+              "script": 8.745,
+              "paint": 16.326
+            },
+            {
+              "total": 20.596,
+              "script": 6.85,
+              "paint": 12.106
+            },
+            {
+              "total": 27.95,
+              "script": 7.485,
+              "paint": 15.17
+            },
+            {
+              "total": 21.761,
+              "script": 6.677,
+              "paint": 12.674
+            },
+            {
+              "total": 18.613,
+              "script": 7.112,
+              "paint": 9.152
+            }
+          ],
+          "load": [3.0673828125, 3.58642578125, 3.244140625],
+          "finishedAt": "2026-10-16T07:00:08.215Z"
+        },
+        {
+          "name": "lithent",
+          "id": "03_update10th1k_x16",
+          "warnings": [],
+          "result": [
+            {
+              "total": 24.12,
+              "script": 6.439,
+              "paint": 13.549
+            },
+            {
+              "total": 18.013,
+              "script": 5.705,
+              "paint": 10.697
+            },
+            {
+              "total": 22.72,
+              "script": 7.349,
+              "paint": 12.386
+            },
+            {
+              "total": 17.309,
+              "script": 5.964,
+              "paint": 9.384
+            },
+            {
+              "total": 30.118,
+              "script": 8.965,
+              "paint": 16.001
+            },
+            {
+              "total": 19.788,
+              "script": 6.189,
+              "paint": 11.369
+            },
+            {
+              "total": 18.87,
+              "script": 6.556,
+              "paint": 9.947
+            },
+            {
+              "total": 19.207,
+              "script": 6.585,
+              "paint": 10.962
+            },
+            {
+              "total": 17.957,
+              "script": 5.934,
+              "paint": 9.81
+            },
+            {
+              "total": 19.625,
+              "script": 5.888,
+              "paint": 11.557
+            },
+            {
+              "total": 17.873,
+              "script": 5.611,
+              "paint": 10.995
+            },
+            {
+              "total": 17.661,
+              "script": 5.653,
+              "paint": 10.133
+            },
+            {
+              "total": 17.89,
+              "script": 6.091,
+              "paint": 9.568
+            },
+            {
+              "total": 22.116,
+              "script": 6.291,
+              "paint": 13.205
+            },
+            {
+              "total": 20.476,
+              "script": 6.844,
+              "paint": 11.289
+            }
+          ],
+          "load": [5.5947265625, 4.12060546875, 3.44580078125],
+          "finishedAt": "2026-10-16T07:00:29.553Z"
+        },
+        {
+          "name": "lithent",
+          "id": "05_swap1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 17.635,
+              "script": 3.607,
+              "paint": 12.166
+            },
+            {
+              "total": 19.556,
+              "script": 3.791,
+              "paint": 14.037
+            },
+            {
+              "total": 17.876,
+              "script": 3.858,
+              "paint": 12.973
+            },
+            {
+              "total": 15.879,
+              "script": 2.859,
+              "paint": 12.44
+            },
+            {
+              "total": 19.7,
+              "script": 3.98,
+              "paint": 14.232
+            },
+            {
+              "total": 16.839,
+              "script": 3.359,
+              "paint": 12.391
+            },
+            {
+              "total": 21.675,
+              "script": 4.299,
+              "paint": 14.722
+            },
+            {
+              "total": 19.238,
+              "script": 3.762,
+              "paint": 13.64
+            },
+            {
+              "total": 18.555,
+              "script": 3.82,
+              "paint": 13.201
+            },
+            {
+              "total": 16.475,
+              "script": 3.565,
+              "paint": 11.994
+            },
+            {
+              "total": 19.331,
+              "script": 3.862,
+              "paint": 14.037
+            },
+            {
+              "total": 18.106,
+              "script": 3.074,
+              "paint": 13.759
+            },
+            {
+              "total": 17.377,
+              "script": 3.277,
+              "paint": 13.087
+            },
+            {
+              "total": 17.314,
+              "script": 4.018,
+              "paint": 12.035
+            },
+            {
+              "total": 19.235,
+              "script": 4.056,
+              "paint": 13.839
+            }
+          ],
+          "load": [4.67236328125, 3.99951171875, 3.4169921875],
+          "finishedAt": "2026-10-16T07:00:52.357Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "05_swap1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 21.086,
+              "script": 4.193,
+              "paint": 14.718
+            },
+            {
+              "total": 16.654,
+              "script": 3.967,
+              "paint": 11.179
+            },
+            {
+              "total": 18.424,
+              "script": 4.138,
+              "paint": 13.002
+            },
+            {
+              "total": 19.228,
+              "script": 4.366,
+              "paint": 13.331
+            },
+            {
+              "total": 18.569,
+              "script": 3.884,
+              "paint": 12.962
+            },
+            {
+              "total": 18.758,
+              "script": 3.797,
+              "paint": 13.242
+            },
+            {
+              "total": 19.336,
+              "script": 3.927,
+              "paint": 14.316
+            },
+            {
+              "total": 16.81,
+              "script": 3.762,
+              "paint": 12.233
+            },
+            {
+              "total": 18.939,
+              "script": 3.816,
+              "paint": 13.876
+            },
+            {
+              "total": 17.519,
+              "script": 4.195,
+              "paint": 12.326
+            },
+            {
+              "total": 17.961,
+              "script": 3.813,
+              "paint": 13.269
+            },
+            {
+              "total": 17.521,
+              "script": 3.57,
+              "paint": 12.491
+            },
+            {
+              "total": 18.8,
+              "script": 3.724,
+              "paint": 13.445
+            },
+            {
+              "total": 18.248,
+              "script": 4.013,
+              "paint": 12.837
+            },
+            {
+              "total": 18.577,
+              "script": 3.917,
+              "paint": 13.514
+            }
+          ],
+          "load": [3.71484375, 3.82177734375, 3.36572265625],
+          "finishedAt": "2026-10-16T07:01:14.522Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "04_select1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 6.466,
+              "script": 4.005,
+              "paint": 2.313
+            },
+            {
+              "total": 8.584,
+              "script": 4.22,
+              "paint": 2.991
+            },
+            {
+              "total": 7.369,
+              "script": 3.673,
+              "paint": 3.481
+            },
+            {
+              "total": 6.581,
+              "script": 3.649,
+              "paint": 2.207
+            },
+            {
+              "total": 6.506,
+              "script": 3,
+              "paint": 2.594
+            },
+            {
+              "total": 5.987,
+              "script": 2.891,
+              "paint": 2.368
+            },
+            {
+              "total": 7.693,
+              "script": 3.311,
+              "paint": 3.327
+            },
+            {
+              "total": 7.18,
+              "script": 3.462,
+              "paint": 2.981
+            },
+            {
+              "total": 6.376,
+              "script": 3.486,
+              "paint": 2.197
+            },
+            {
+              "total": 8.768,
+              "script": 3.423,
+              "paint": 3.83
+            },
+            {
+              "total": 6.296,
+              "script": 3.269,
+              "paint": 2.56
+            },
+            {
+              "total": 6.689,
+              "script": 2.854,
+              "paint": 3.663
+            },
+            {
+              "total": 5.878,
+              "script": 3.252,
+              "paint": 2.326
+            },
+            {
+              "total": 7.705,
+              "script": 4.09,
+              "paint": 2.521
+            },
+            {
+              "total": 8.58,
+              "script": 3.628,
+              "paint": 4.162
+            },
+            {
+              "total": 7.25,
+              "script": 3.404,
+              "paint": 2.95
+            },
+            {
+              "total": 6.136,
+              "script": 3.217,
+              "paint": 2.774
+            },
+            {
+              "total": 6.035,
+              "script": 2.817,
+              "paint": 2.35
+            },
+            {
+              "total": 6.211,
+              "script": 3.56,
+              "paint": 1.903
+            },
+            {
+              "total": 5.9,
+              "script": 3.591,
+              "paint": 1.845
+            },
+            {
+              "total": 6.588,
+              "script": 3.695,
+              "paint": 2.008
+            },
+            {
+              "total": 6.212,
+              "script": 3.189,
+              "paint": 2.615
+            },
+            {
+              "total": 6.716,
+              "script": 3.125,
+              "paint": 3.007
+            },
+            {
+              "total": 7.288,
+              "script": 3.709,
+              "paint": 3.062
+            },
+            {
+              "total": 6.314,
+              "script": 3.229,
+              "paint": 2.134
+            }
+          ],
+          "load": [3.26171875, 3.69970703125, 3.34033203125],
+          "finishedAt": "2026-10-16T07:01:51.002Z"
+        },
+        {
+          "name": "lithent",
+          "id": "04_select1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 5.798,
+              "script": 2.726,
+              "paint": 2.132
+            },
+            {
+              "total": 6.491,
+              "script": 2.812,
+              "paint": 2.881
+            },
+            {
+              "total": 6.157,
+              "script": 2.945,
+              "paint": 2.236
+            },
+            {
+              "total": 8.713,
+              "script": 3.174,
+              "paint": 2.517
+            },
+            {
+              "total": 6.11,
+              "script": 2.373,
+              "paint": 2.634
+            },
+            {
+              "total": 6.147,
+              "script": 3.159,
+              "paint": 2.849
+            },
+            {
+              "total": 6.472,
+              "script": 3.446,
+              "paint": 2.179
+            },
+            {
+              "total": 7.785,
+              "script": 3.058,
+              "paint": 1.962
+            },
+            {
+              "total": 5.414,
+              "script": 2.354,
+              "paint": 2.914
+            },
+            {
+              "total": 5.595,
+              "script": 2.476,
+              "paint": 2.533
+            },
+            {
+              "total": 5.262,
+              "script": 2.252,
+              "paint": 2.312
+            },
+            {
+              "total": 5.411,
+              "script": 2.757,
+              "paint": 1.993
+            },
+            {
+              "total": 5.941,
+              "script": 2.891,
+              "paint": 2.086
+            },
+            {
+              "total": 5.645,
+              "script": 3.103,
+              "paint": 1.731
+            },
+            {
+              "total": 5.966,
+              "script": 2.383,
+              "paint": 3.425
+            },
+            {
+              "total": 8.934,
+              "script": 3.31,
+              "paint": 4.517
+            },
+            {
+              "total": 6.72,
+              "script": 2.978,
+              "paint": 3.141
+            },
+            {
+              "total": 8.495,
+              "script": 3.464,
+              "paint": 3.518
+            },
+            {
+              "total": 5.331,
+              "script": 2.9,
+              "paint": 1.607
+            },
+            {
+              "total": 7.113,
+              "script": 3.293,
+              "paint": 1.944
+            },
+            {
+              "total": 6.119,
+              "script": 2.554,
+              "paint": 2.885
+            },
+            {
+              "total": 7.797,
+              "script": 3.6,
+              "paint": 2.386
+            },
+            {
+              "total": 6.714,
+              "script": 3.082,
+              "paint": 2.912
+            },
+            {
+              "total": 5.594,
+              "script": 2.798,
+              "paint": 2.06
+            },
+            {
+              "total": 10.517,
+              "script": 3.154,
+              "paint": 2.33
+            }
+          ],
+          "load": [3.5322265625, 3.70361328125, 3.3544921875],
+          "finishedAt": "2026-10-16T07:02:27.469Z"
+        },
+        {
+          "name": "lithent",
+          "id": "06_remove-one-1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 14.784,
+              "script": 1.458,
+              "paint": 11.037
+            },
+            {
+              "total": 12.195,
+              "script": 1.135,
+              "paint": 10.476
+            },
+            {
+              "total": 12.211,
+              "script": 1.212,
+              "paint": 10.003
+            },
+            {
+              "total": 13.1,
+              "script": 1.282,
+              "paint": 10.906
+            },
+            {
+              "total": 13.174,
+              "script": 1.425,
+              "paint": 10.954
+            },
+            {
+              "total": 18.541,
+              "script": 1.642,
+              "paint": 14.717
+            },
+            {
+              "total": 12.628,
+              "script": 1.172,
+              "paint": 10.769
+            },
+            {
+              "total": 16.706,
+              "script": 1.333,
+              "paint": 13.732
+            },
+            {
+              "total": 12.69,
+              "script": 1.159,
+              "paint": 10.678
+            },
+            {
+              "total": 12.332,
+              "script": 1.204,
+              "paint": 10.533
+            },
+            {
+              "total": 12.562,
+              "script": 1.122,
+              "paint": 10.729
+            },
+            {
+              "total": 12.42,
+              "script": 1.367,
+              "paint": 10.231
+            },
+            {
+              "total": 12.896,
+              "script": 1.32,
+              "paint": 10.867
+            },
+            {
+              "total": 12.355,
+              "script": 1.177,
+              "paint": 10.592
+            },
+            {
+              "total": 12.303,
+              "script": 1.228,
+              "paint": 10.362
+            }
+          ],
+          "load": [3.52099609375, 3.6767578125, 3.3515625],
+          "finishedAt": "2026-10-16T07:02:48.974Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "06_remove-one-1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 12.902,
+              "script": 1.606,
+              "paint": 10.442
+            },
+            {
+              "total": 12.621,
+              "script": 1.528,
+              "paint": 10.481
+            },
+            {
+              "total": 13.491,
+              "script": 1.741,
+              "paint": 11.126
+            },
+            {
+              "total": 12.724,
+              "script": 1.802,
+              "paint": 10.063
+            },
+            {
+              "total": 12.766,
+              "script": 1.57,
+              "paint": 10.352
+            },
+            {
+              "total": 16.291,
+              "script": 1.637,
+              "paint": 10.954
+            },
+            {
+              "total": 12.307,
+              "script": 1.629,
+              "paint": 9.894
+            },
+            {
+              "total": 13.776,
+              "script": 1.906,
+              "paint": 11.106
+            },
+            {
+              "total": 12.668,
+              "script": 1.757,
+              "paint": 10.341
+            },
+            {
+              "total": 12.657,
+              "script": 1.591,
+              "paint": 10.225
+            },
+            {
+              "total": 12.182,
+              "script": 1.554,
+              "paint": 9.982
+            },
+            {
+              "total": 12.761,
+              "script": 1.91,
+              "paint": 9.98
+            },
+            {
+              "total": 12.527,
+              "script": 1.651,
+              "paint": 10.305
+            },
+            {
+              "total": 13.323,
+              "script": 1.694,
+              "paint": 10.765
+            },
+            {
+              "total": 12.992,
+              "script": 1.55,
+              "paint": 10.602
+            }
+          ],
+          "load": [3.990234375, 3.77978515625, 3.39794921875],
+          "finishedAt": "2026-10-16T07:03:10.436Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "02_replace1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 31.984,
+              "script": 11.961,
+              "paint": 19.405
+            },
+            {
+              "total": 33.355,
+              "script": 11.693,
+              "paint": 20.928
+            },
+            {
+              "total": 32.137,
+              "script": 11.954,
+              "paint": 19.576
+            },
+            {
+              "total": 33.38,
+              "script": 12.156,
+              "paint": 20.54
+            },
+            {
+              "total": 31.703,
+              "script": 11.829,
+              "paint": 19.297
+            },
+            {
+              "total": 30.501,
+              "script": 11.155,
+              "paint": 18.779
+            },
+            {
+              "total": 31.776,
+              "script": 11.706,
+              "paint": 19.48
+            },
+            {
+              "total": 31.464,
+              "script": 11.474,
+              "paint": 19.381
+            },
+            {
+              "total": 31.271,
+              "script": 11.814,
+              "paint": 18.879
+            },
+            {
+              "total": 31.561,
+              "script": 11.774,
+              "paint": 19.224
+            },
+            {
+              "total": 31.579,
+              "script": 11.496,
+              "paint": 19.519
+            },
+            {
+              "total": 32.672,
+              "script": 12.093,
+              "paint": 19.954
+            },
+            {
+              "total": 31.588,
+              "script": 11.722,
+              "paint": 19.327
+            },
+            {
+              "total": 31.027,
+              "script": 11.755,
+              "paint": 18.7
+            },
+            {
+              "total": 31.276,
+              "script": 11.864,
+              "paint": 18.853
+            }
+          ],
+          "load": [3.4130859375, 3.66259765625, 3.36474609375],
+          "finishedAt": "2026-10-16T07:03:33.272Z"
+        },
+        {
+          "name": "lithent",
+          "id": "02_replace1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 30.774,
+              "script": 11.345,
+              "paint": 18.834
+            },
+            {
+              "total": 31.406,
+              "script": 11.917,
+              "paint": 18.918
+            },
+            {
+              "total": 31.142,
+              "script": 11.355,
+              "paint": 19.178
+            },
+            {
+              "total": 31.166,
+              "script": 11.692,
+              "paint": 18.905
+            },
+            {
+              "total": 31.496,
+              "script": 11.799,
+              "paint": 19.092
+            },
+            {
+              "total": 32.177,
+              "script": 11.69,
+              "paint": 19.83
+            },
+            {
+              "total": 31.569,
+              "script": 11.725,
+              "paint": 19.262
+            },
+            {
+              "total": 31.128,
+              "script": 11.534,
+              "paint": 18.944
+            },
+            {
+              "total": 31.313,
+              "script": 11.22,
+              "paint": 19.483
+            },
+            {
+              "total": 31.598,
+              "script": 11.327,
+              "paint": 19.662
+            },
+            {
+              "total": 30.796,
+              "script": 11.516,
+              "paint": 18.723
+            },
+            {
+              "total": 31.472,
+              "script": 11.459,
+              "paint": 19.414
+            },
+            {
+              "total": 31.221,
+              "script": 11.532,
+              "paint": 19.114
+            },
+            {
+              "total": 31.003,
+              "script": 11.481,
+              "paint": 18.919
+            },
+            {
+              "total": 30.716,
+              "script": 11.456,
+              "paint": 18.723
+            }
+          ],
+          "load": [3.552734375, 3.6728515625, 3.3759765625],
+          "finishedAt": "2026-10-16T07:03:55.971Z"
+        },
+        {
+          "name": "lithent",
+          "id": "08_create1k-after1k_x2",
+          "warnings": [],
+          "result": [
+            {
+              "total": 30.834,
+              "script": 8.351,
+              "paint": 21.55
+            },
+            {
+              "total": 31.097,
+              "script": 8.025,
+              "paint": 22.141
+            },
+            {
+              "total": 31.26,
+              "script": 7.943,
+              "paint": 22.14
+            },
+            {
+              "total": 30.614,
+              "script": 7.998,
+              "paint": 21.72
+            },
+            {
+              "total": 30.438,
+              "script": 7.859,
+              "paint": 21.695
+            },
+            {
+              "total": 34.097,
+              "script": 7.855,
+              "paint": 24.751
+            },
+            {
+              "total": 31.082,
+              "script": 8.384,
+              "paint": 21.797
+            },
+            {
+              "total": 30.515,
+              "script": 7.955,
+              "paint": 21.638
+            },
+            {
+              "total": 30.699,
+              "script": 8.295,
+              "paint": 21.484
+            },
+            {
+              "total": 30.615,
+              "script": 7.875,
+              "paint": 21.716
+            },
+            {
+              "total": 30.244,
+              "script": 7.917,
+              "paint": 21.438
+            },
+            {
+              "total": 30.855,
+              "script": 8.44,
+              "paint": 21.524
+            },
+            {
+              "total": 30.416,
+              "script": 7.94,
+              "paint": 21.535
+            },
+            {
+              "total": 30.778,
+              "script": 8.192,
+              "paint": 21.639
+            },
+            {
+              "total": 31.832,
+              "script": 7.822,
+              "paint": 22.864
+            }
+          ],
+          "load": [3.6005859375, 3.69287109375, 3.39208984375],
+          "finishedAt": "2026-10-16T07:04:20.766Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "08_create1k-after1k_x2",
+          "warnings": [],
+          "result": [
+            {
+              "total": 31.803,
+              "script": 9.507,
+              "paint": 21.355
+            },
+            {
+              "total": 32.774,
+              "script": 9.587,
+              "paint": 22.247
+            },
+            {
+              "total": 31.843,
+              "script": 9.554,
+              "paint": 21.361
+            },
+            {
+              "total": 32,
+              "script": 9.61,
+              "paint": 21.519
+            },
+            {
+              "total": 32.12,
+              "script": 9.541,
+              "paint": 21.685
+            },
+            {
+              "total": 31.914,
+              "script": 9.495,
+              "paint": 21.469
+            },
+            {
+              "total": 31.968,
+              "script": 9.621,
+              "paint": 21.457
+            },
+            {
+              "total": 31.774,
+              "script": 9.376,
+              "paint": 21.51
+            },
+            {
+              "total": 32.055,
+              "script": 9.623,
+              "paint": 21.537
+            },
+            {
+              "total": 32.938,
+              "script": 9.028,
+              "paint": 22.779
+            },
+            {
+              "total": 31.885,
+              "script": 9.311,
+              "paint": 21.671
+            },
+            {
+              "total": 32.105,
+              "script": 9.471,
+              "paint": 21.723
+            },
+            {
+              "total": 31.967,
+              "script": 9.605,
+              "paint": 21.481
+            },
+            {
+              "total": 31.975,
+              "script": 9.427,
+              "paint": 21.679
+            },
+            {
+              "total": 31.635,
+              "script": 9.504,
+              "paint": 21.223
+            }
+          ],
+          "load": [2.89990234375, 3.51025390625, 3.3330078125],
+          "finishedAt": "2026-10-16T07:04:45.537Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 291.457,
+              "script": 64.183,
+              "paint": 220.749
+            },
+            {
+              "total": 294.936,
+              "script": 62.4,
+              "paint": 223.423
+            },
+            {
+              "total": 283.367,
+              "script": 61.566,
+              "paint": 214.42
+            },
+            {
+              "total": 283.729,
+              "script": 62.641,
+              "paint": 213.975
+            },
+            {
+              "total": 286.362,
+              "script": 63.071,
+              "paint": 215.062
+            },
+            {
+              "total": 284.962,
+              "script": 61.812,
+              "paint": 215.898
+            },
+            {
+              "total": 294.55,
+              "script": 62.463,
+              "paint": 224.306
+            },
+            {
+              "total": 298.349,
+              "script": 62.977,
+              "paint": 226.802
+            },
+            {
+              "total": 294.324,
+              "script": 63.668,
+              "paint": 223.14
+            },
+            {
+              "total": 293.395,
+              "script": 64.266,
+              "paint": 221.324
+            },
+            {
+              "total": 287.722,
+              "script": 64.213,
+              "paint": 215.884
+            },
+            {
+              "total": 289.095,
+              "script": 64.63,
+              "paint": 216.694
+            },
+            {
+              "total": 284.777,
+              "script": 62.866,
+              "paint": 214.749
+            },
+            {
+              "total": 285.74,
+              "script": 63.296,
+              "paint": 215.105
+            },
+            {
+              "total": 284.775,
+              "script": 62.518,
+              "paint": 214.619
+            }
+          ],
+          "load": [3.560546875, 3.591796875, 3.3671875],
+          "finishedAt": "2026-10-16T07:05:17.136Z"
+        },
+        {
+          "name": "lithent",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 299.602,
+              "script": 64.471,
+              "paint": 227.625
+            },
+            {
+              "total": 296.663,
+              "script": 63.884,
+              "paint": 225.309
+            },
+            {
+              "total": 295.473,
+              "script": 65.806,
+              "paint": 222.552
+            },
+            {
+              "total": 285.897,
+              "script": 63.105,
+              "paint": 215.462
+            },
+            {
+              "total": 284.087,
+              "script": 63.346,
+              "paint": 213.628
+            },
+            {
+              "total": 284.405,
+              "script": 63.228,
+              "paint": 214.511
+            },
+            {
+              "total": 294.933,
+              "script": 64.646,
+              "paint": 222.528
+            },
+            {
+              "total": 284.842,
+              "script": 63.393,
+              "paint": 214.162
+            },
+            {
+              "total": 295.699,
+              "script": 63.983,
+              "paint": 223.241
+            },
+            {
+              "total": 293.403,
+              "script": 63.537,
+              "paint": 222.949
+            },
+            {
+              "total": 296.703,
+              "script": 63.206,
+              "paint": 222.845
+            },
+            {
+              "total": 290.374,
+              "script": 63.901,
+              "paint": 217.714
+            },
+            {
+              "total": 289.487,
+              "script": 64.28,
+              "paint": 217.977
+            },
+            {
+              "total": 296.047,
+              "script": 62.624,
+              "paint": 223.531
+            },
+            {
+              "total": 297.389,
+              "script": 64.192,
+              "paint": 224.545
+            }
+          ],
+          "load": [6.20263671875, 4.23291015625, 3.60693359375],
+          "finishedAt": "2026-10-16T07:05:48.634Z"
+        }
+      ],
+      "complete": true,
+      "finishedAt": "2026-10-16T07:05:48.635Z",
+      "loadEnd": [6.20263671875, 4.23291015625, 3.60693359375]
+    },
+    {
+      "startedAt": "2026-10-16T07:06:42.086Z",
+      "mode": "cpu",
+      "chrome": "Chrome/155.0.8059.82",
+      "machine": {
+        "cpu": "Apple M4 Pro",
+        "cores": 12,
+        "memoryGB": 24
+      },
+      "loadStart": [5.064453125, 4.275390625, 3.662109375],
+      "alternatingOrder": true,
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-16T06:56:31.055Z",
+          "libraryHead": "592d320ebd0c9610596d33cb02cb3272d4b3064f",
+          "benchmarkHead": "88396117046bba4fdd338eb33d6f7e330a9977ab",
+          "benchmarkStatus": "",
+          "appFiles": {
+            "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+            "index.html": "16c041ee8852c4caf8eecbf4c00c51cdb2ef4e18ff0d23f353f55cb2d1586ef4"
+          },
+          "core": "f8200b696c556024acaf4fed659330ba5c035ef20a08428e5f10ac616dccb366",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "a5afc56a82be686622902459db3b4e9e0c504d0c7246e6bf15780fdcf9c2ebcb",
+          "libraryVite": "5.4.8",
+          "vite": "5.4.21",
+          "runnerFiles": {
+            "forkedBenchmarkRunnerPuppeteer.js": "5f9a710d2b800b47dc6f9323faf795971fa74cd76e415b0fac3c9d20ddf3e62a",
+            "benchmarksPuppeteer.js": "195b803c845422597b10c1c2d8aeacdaa747b5494b92d57c4f101ea6b90106bf",
+            "benchmarksCommon.js": "7a2280a94bd65573e3e22cfba2a9c98ef61f41c57dec4ae1a0360835601e91fc",
+            "timeline.js": "15c361b6e51143798fc70603a28870501104d4b24fe7f1d5f669fb0988f475f3",
+            "puppeteerAccess.js": "01c96ef57a951bda031fda9045254947ff234f3be49390bf23298a44b40c6c3a"
+          },
+          "sizes": {
+            "lithent.mjs": 18888,
+            "lithent.umd.js": 13078
+          }
+        },
+        "lithent": {
+          "date": "2026-10-16T06:56:35.740Z",
+          "libraryHead": "0ccd1265384fd68ebd0db63e8d7b4ca74088726e",
+          "benchmarkHead": "88396117046bba4fdd338eb33d6f7e330a9977ab",
+          "benchmarkStatus": "",
+          "appFiles": {
+            "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+            "index.html": "16c041ee8852c4caf8eecbf4c00c51cdb2ef4e18ff0d23f353f55cb2d1586ef4"
+          },
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "d1eeafc2451b7cf81102acc41bf6a46c6bb19c5df8b369332377ed897b938dd6",
+          "libraryVite": "5.4.8",
+          "vite": "5.4.21",
+          "runnerFiles": {
+            "forkedBenchmarkRunnerPuppeteer.js": "5f9a710d2b800b47dc6f9323faf795971fa74cd76e415b0fac3c9d20ddf3e62a",
+            "benchmarksPuppeteer.js": "195b803c845422597b10c1c2d8aeacdaa747b5494b92d57c4f101ea6b90106bf",
+            "benchmarksCommon.js": "7a2280a94bd65573e3e22cfba2a9c98ef61f41c57dec4ae1a0360835601e91fc",
+            "timeline.js": "15c361b6e51143798fc70603a28870501104d4b24fe7f1d5f669fb0988f475f3",
+            "puppeteerAccess.js": "01c96ef57a951bda031fda9045254947ff234f3be49390bf23298a44b40c6c3a"
+          },
+          "sizes": {
+            "lithent.mjs": 19110,
+            "lithent.umd.js": 12741
+          }
+        }
+      },
+      "versions": {
+        "node": "v20.3.0",
+        "libraryVite": "5.4.8",
+        "appVite": "5.4.21",
+        "puppeteer": "24.23.0"
+      },
+      "samples": [
+        {
+          "name": "lithent",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 295.169,
+              "script": 64.743,
+              "paint": 222.4
+            },
+            {
+              "total": 288.475,
+              "script": 65.167,
+              "paint": 215.354
+            },
+            {
+              "total": 287.776,
+              "script": 63.078,
+              "paint": 216.923
+            },
+            {
+              "total": 293.455,
+              "script": 63.657,
+              "paint": 221.651
+            },
+            {
+              "total": 291.054,
+              "script": 62.997,
+              "paint": 221.086
+            },
+            {
+              "total": 290.063,
+              "script": 65.724,
+              "paint": 216.939
+            },
+            {
+              "total": 283.107,
+              "script": 63.052,
+              "paint": 212.786
+            },
+            {
+              "total": 284.224,
+              "script": 64.879,
+              "paint": 212.258
+            },
+            {
+              "total": 284.074,
+              "script": 64.074,
+              "paint": 213.421
+            },
+            {
+              "total": 287.759,
+              "script": 63.731,
+              "paint": 216.733
+            },
+            {
+              "total": 288.619,
+              "script": 63.554,
+              "paint": 217.578
+            },
+            {
+              "total": 284.583,
+              "script": 63.244,
+              "paint": 214.037
+            },
+            {
+              "total": 286.557,
+              "script": 63.35,
+              "paint": 215.28
+            },
+            {
+              "total": 290.797,
+              "script": 64.252,
+              "paint": 218.771
+            },
+            {
+              "total": 285.162,
+              "script": 63.479,
+              "paint": 213.603
+            }
+          ],
+          "load": [3.80029296875, 4.041015625, 3.59765625],
+          "finishedAt": "2026-10-16T07:07:14.363Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 300.802,
+              "script": 67.176,
+              "paint": 224.724
+            },
+            {
+              "total": 290.878,
+              "script": 62.744,
+              "paint": 219.9
+            },
+            {
+              "total": 287.701,
+              "script": 62.878,
+              "paint": 217.624
+            },
+            {
+              "total": 286.018,
+              "script": 62.695,
+              "paint": 216.295
+            },
+            {
+              "total": 284.339,
+              "script": 63.015,
+              "paint": 214.083
+            },
+            {
+              "total": 286.818,
+              "script": 61.564,
+              "paint": 217.282
+            },
+            {
+              "total": 284.404,
+              "script": 62.056,
+              "paint": 215.653
+            },
+            {
+              "total": 285.479,
+              "script": 62.356,
+              "paint": 216.043
+            },
+            {
+              "total": 288.565,
+              "script": 62.71,
+              "paint": 216.932
+            },
+            {
+              "total": 289.026,
+              "script": 61.859,
+              "paint": 217.12
+            },
+            {
+              "total": 297.646,
+              "script": 62.587,
+              "paint": 224.969
+            },
+            {
+              "total": 288.765,
+              "script": 62.27,
+              "paint": 219.674
+            },
+            {
+              "total": 289.733,
+              "script": 63.129,
+              "paint": 218.94
+            },
+            {
+              "total": 286.119,
+              "script": 63.45,
+              "paint": 214.407
+            },
+            {
+              "total": 292.865,
+              "script": 62.324,
+              "paint": 221.489
+            }
+          ],
+          "load": [2.85107421875, 3.78076171875, 3.52001953125],
+          "finishedAt": "2026-10-16T07:07:45.928Z"
+        }
+      ],
+      "complete": true,
+      "finishedAt": "2026-10-16T07:07:45.929Z",
+      "loadEnd": [2.85107421875, 3.78076171875, 3.52001953125]
+    }
+  ],
+  "summary": [
+    {
+      "id": "01_run1k",
+      "lithent-before": {
+        "count": 15,
+        "total": {
+          "median": 28.451,
+          "q25": 28.103,
+          "q75": 28.767000000000003
+        },
+        "script": {
+          "median": 8.839,
+          "q25": 8.626999999999999,
+          "q75": 8.92
+        },
+        "paint": {
+          "median": 19.066,
+          "q25": 18.634999999999998,
+          "q75": 19.258499999999998
+        }
+      },
+      "lithent": {
+        "count": 15,
+        "total": {
+          "median": 27.531,
+          "q25": 27.3945,
+          "q75": 27.72
+        },
+        "script": {
+          "median": 8.093,
+          "q25": 7.966,
+          "q75": 8.1985
+        },
+        "paint": {
+          "median": 18.92,
+          "q25": 18.764499999999998,
+          "q75": 18.993
+        }
+      },
+      "ratio": {
+        "total": 0.967663702506063,
+        "script": 0.9156013123656522,
+        "paint": 0.9923423895940419
+      }
+    },
+    {
+      "id": "02_replace1k",
+      "lithent-before": {
+        "count": 15,
+        "total": {
+          "median": 31.588,
+          "q25": 31.369999999999997,
+          "q75": 32.060500000000005
+        },
+        "script": {
+          "median": 11.774,
+          "q25": 11.6995,
+          "q75": 11.909
+        },
+        "paint": {
+          "median": 19.381,
+          "q25": 19.0515,
+          "q75": 19.5475
+        }
+      },
+      "lithent": {
+        "count": 15,
+        "total": {
+          "median": 31.221,
+          "q25": 31.0655,
+          "q75": 31.484
+        },
+        "script": {
+          "median": 11.516,
+          "q25": 11.4055,
+          "q75": 11.690999999999999
+        },
+        "paint": {
+          "median": 19.092,
+          "q25": 18.9115,
+          "q75": 19.338
+        }
+      },
+      "ratio": {
+        "total": 0.9883816639230087,
+        "script": 0.9780873110242909,
+        "paint": 0.9850884887260718
+      }
+    },
+    {
+      "id": "03_update10th1k_x16",
+      "lithent-before": {
+        "count": 15,
+        "total": {
+          "median": 21.268,
+          "q25": 19.918,
+          "q75": 22.8095
+        },
+        "script": {
+          "median": 7.112,
+          "q25": 6.8774999999999995,
+          "q75": 7.4305
+        },
+        "paint": {
+          "median": 11.844,
+          "q25": 10.558,
+          "q75": 12.844999999999999
+        }
+      },
+      "lithent": {
+        "count": 15,
+        "total": {
+          "median": 19.207,
+          "q25": 17.9235,
+          "q75": 21.296
+        },
+        "script": {
+          "median": 6.189,
+          "q25": 5.911,
+          "q75": 6.5705
+        },
+        "paint": {
+          "median": 10.995,
+          "q25": 10.04,
+          "q75": 11.971499999999999
+        }
+      },
+      "ratio": {
+        "total": 0.9030938499153658,
+        "script": 0.8702193475815523,
+        "paint": 0.9283181357649443
+      }
+    },
+    {
+      "id": "04_select1k",
+      "lithent-before": {
+        "count": 25,
+        "total": {
+          "median": 6.581,
+          "q25": 6.212,
+          "q75": 7.288
+        },
+        "script": {
+          "median": 3.423,
+          "q25": 3.217,
+          "q75": 3.649
+        },
+        "paint": {
+          "median": 2.594,
+          "q25": 2.313,
+          "q75": 3.007
+        }
+      },
+      "lithent": {
+        "count": 25,
+        "total": {
+          "median": 6.147,
+          "q25": 5.645,
+          "q75": 7.113
+        },
+        "script": {
+          "median": 2.945,
+          "q25": 2.726,
+          "q75": 3.159
+        },
+        "paint": {
+          "median": 2.386,
+          "q25": 2.086,
+          "q75": 2.885
+        }
+      },
+      "ratio": {
+        "total": 0.9340525755964139,
+        "script": 0.8603564125036517,
+        "paint": 0.9198149575944489
+      }
+    },
+    {
+      "id": "05_swap1k",
+      "lithent-before": {
+        "count": 15,
+        "total": {
+          "median": 18.569,
+          "q25": 17.741,
+          "q75": 18.869500000000002
+        },
+        "script": {
+          "median": 3.917,
+          "q25": 3.805,
+          "q75": 4.0755
+        },
+        "paint": {
+          "median": 13.242,
+          "q25": 12.664,
+          "q75": 13.4795
+        }
+      },
+      "lithent": {
+        "count": 15,
+        "total": {
+          "median": 18.106,
+          "q25": 17.3455,
+          "q75": 19.2845
+        },
+        "script": {
+          "median": 3.791,
+          "q25": 3.4619999999999997,
+          "q75": 3.9210000000000003
+        },
+        "paint": {
+          "median": 13.201,
+          "q25": 12.4155,
+          "q75": 13.938
+        }
+      },
+      "ratio": {
+        "total": 0.9750659701653295,
+        "script": 0.9678325248914986,
+        "paint": 0.9969037909681316
+      }
+    },
+    {
+      "id": "06_remove-one-1k",
+      "lithent-before": {
+        "count": 15,
+        "total": {
+          "median": 12.761,
+          "q25": 12.639,
+          "q75": 13.1575
+        },
+        "script": {
+          "median": 1.637,
+          "q25": 1.5805,
+          "q75": 1.749
+        },
+        "paint": {
+          "median": 10.352,
+          "q25": 10.144,
+          "q75": 10.6835
+        }
+      },
+      "lithent": {
+        "count": 15,
+        "total": {
+          "median": 12.628,
+          "q25": 12.3435,
+          "q75": 13.137
+        },
+        "script": {
+          "median": 1.228,
+          "q25": 1.1745,
+          "q75": 1.35
+        },
+        "paint": {
+          "median": 10.729,
+          "q25": 10.5045,
+          "q75": 10.93
+        }
+      },
+      "ratio": {
+        "total": 0.9895776193088317,
+        "script": 0.7501527183872938,
+        "paint": 1.0364180834621328
+      }
+    },
+    {
+      "id": "07_create10k",
+      "lithent-before": {
+        "count": 30,
+        "total": {
+          "median": 288.1435,
+          "q25": 285.54425,
+          "q75": 292.51300000000003
+        },
+        "script": {
+          "median": 62.727000000000004,
+          "q25": 62.367000000000004,
+          "q75": 63.25425
+        },
+        "paint": {
+          "median": 217.026,
+          "q25": 215.242,
+          "q75": 221.18025
+        }
+      },
+      "lithent": {
+        "count": 30,
+        "total": {
+          "median": 289.775,
+          "q25": 285.34574999999995,
+          "q75": 295.11
+        },
+        "script": {
+          "median": 63.694,
+          "q25": 63.2695,
+          "q75": 64.273
+        },
+        "paint": {
+          "median": 217.64600000000002,
+          "q25": 214.70325,
+          "q75": 222.546
+        }
+      },
+      "ratio": {
+        "total": 1.0056621093309408,
+        "script": 1.0154160090551119,
+        "paint": 1.002856800567674
+      }
+    },
+    {
+      "id": "08_create1k-after1k_x2",
+      "lithent-before": {
+        "count": 15,
+        "total": {
+          "median": 31.968,
+          "q25": 31.864,
+          "q75": 32.08
+        },
+        "script": {
+          "median": 9.507,
+          "q25": 9.449,
+          "q75": 9.596
+        },
+        "paint": {
+          "median": 21.519,
+          "q25": 21.463,
+          "q75": 21.682
+        }
+      },
+      "lithent": {
+        "count": 15,
+        "total": {
+          "median": 30.778,
+          "q25": 30.564500000000002,
+          "q75": 31.0895
+        },
+        "script": {
+          "median": 7.955,
+          "q25": 7.896,
+          "q75": 8.243500000000001
+        },
+        "paint": {
+          "median": 21.695,
+          "q25": 21.5425,
+          "q75": 21.9685
+        }
+      },
+      "ratio": {
+        "total": 0.9627752752752753,
+        "script": 0.8367518670453351,
+        "paint": 1.008178818718342
+      }
+    },
+    {
+      "id": "09_clear1k_x8",
+      "lithent-before": {
+        "count": 15,
+        "total": {
+          "median": 13.867,
+          "q25": 13.439,
+          "q75": 14.4635
+        },
+        "script": {
+          "median": 11.045,
+          "q25": 10.594000000000001,
+          "q75": 11.6195
+        },
+        "paint": {
+          "median": 1.451,
+          "q25": 1.0605,
+          "q75": 1.8295
+        }
+      },
+      "lithent": {
+        "count": 15,
+        "total": {
+          "median": 12.988,
+          "q25": 11.864,
+          "q75": 13.247
+        },
+        "script": {
+          "median": 10.441,
+          "q25": 9.368500000000001,
+          "q75": 10.782
+        },
+        "paint": {
+          "median": 1.289,
+          "q25": 1.1155,
+          "q75": 1.498
+        }
+      },
+      "ratio": {
+        "total": 0.9366121006706568,
+        "script": 0.9453146220009054,
+        "paint": 0.8883528600964851
+      }
+    }
+  ],
+  "summariesByRun": [
+    {
+      "startedAt": "2026-10-16T06:58:09.072Z",
+      "rows": [
+        {
+          "id": "01_run1k",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 28.451,
+              "q25": 28.103,
+              "q75": 28.767000000000003
+            },
+            "script": {
+              "median": 8.839,
+              "q25": 8.626999999999999,
+              "q75": 8.92
+            },
+            "paint": {
+              "median": 19.066,
+              "q25": 18.634999999999998,
+              "q75": 19.258499999999998
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 27.531,
+              "q25": 27.3945,
+              "q75": 27.72
+            },
+            "script": {
+              "median": 8.093,
+              "q25": 7.966,
+              "q75": 8.1985
+            },
+            "paint": {
+              "median": 18.92,
+              "q25": 18.764499999999998,
+              "q75": 18.993
+            }
+          },
+          "ratio": {
+            "total": 0.967663702506063,
+            "script": 0.9156013123656522,
+            "paint": 0.9923423895940419
+          }
+        },
+        {
+          "id": "02_replace1k",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 31.588,
+              "q25": 31.369999999999997,
+              "q75": 32.060500000000005
+            },
+            "script": {
+              "median": 11.774,
+              "q25": 11.6995,
+              "q75": 11.909
+            },
+            "paint": {
+              "median": 19.381,
+              "q25": 19.0515,
+              "q75": 19.5475
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 31.221,
+              "q25": 31.0655,
+              "q75": 31.484
+            },
+            "script": {
+              "median": 11.516,
+              "q25": 11.4055,
+              "q75": 11.690999999999999
+            },
+            "paint": {
+              "median": 19.092,
+              "q25": 18.9115,
+              "q75": 19.338
+            }
+          },
+          "ratio": {
+            "total": 0.9883816639230087,
+            "script": 0.9780873110242909,
+            "paint": 0.9850884887260718
+          }
+        },
+        {
+          "id": "03_update10th1k_x16",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 21.268,
+              "q25": 19.918,
+              "q75": 22.8095
+            },
+            "script": {
+              "median": 7.112,
+              "q25": 6.8774999999999995,
+              "q75": 7.4305
+            },
+            "paint": {
+              "median": 11.844,
+              "q25": 10.558,
+              "q75": 12.844999999999999
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 19.207,
+              "q25": 17.9235,
+              "q75": 21.296
+            },
+            "script": {
+              "median": 6.189,
+              "q25": 5.911,
+              "q75": 6.5705
+            },
+            "paint": {
+              "median": 10.995,
+              "q25": 10.04,
+              "q75": 11.971499999999999
+            }
+          },
+          "ratio": {
+            "total": 0.9030938499153658,
+            "script": 0.8702193475815523,
+            "paint": 0.9283181357649443
+          }
+        },
+        {
+          "id": "04_select1k",
+          "lithent-before": {
+            "count": 25,
+            "total": {
+              "median": 6.581,
+              "q25": 6.212,
+              "q75": 7.288
+            },
+            "script": {
+              "median": 3.423,
+              "q25": 3.217,
+              "q75": 3.649
+            },
+            "paint": {
+              "median": 2.594,
+              "q25": 2.313,
+              "q75": 3.007
+            }
+          },
+          "lithent": {
+            "count": 25,
+            "total": {
+              "median": 6.147,
+              "q25": 5.645,
+              "q75": 7.113
+            },
+            "script": {
+              "median": 2.945,
+              "q25": 2.726,
+              "q75": 3.159
+            },
+            "paint": {
+              "median": 2.386,
+              "q25": 2.086,
+              "q75": 2.885
+            }
+          },
+          "ratio": {
+            "total": 0.9340525755964139,
+            "script": 0.8603564125036517,
+            "paint": 0.9198149575944489
+          }
+        },
+        {
+          "id": "05_swap1k",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 18.569,
+              "q25": 17.741,
+              "q75": 18.869500000000002
+            },
+            "script": {
+              "median": 3.917,
+              "q25": 3.805,
+              "q75": 4.0755
+            },
+            "paint": {
+              "median": 13.242,
+              "q25": 12.664,
+              "q75": 13.4795
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 18.106,
+              "q25": 17.3455,
+              "q75": 19.2845
+            },
+            "script": {
+              "median": 3.791,
+              "q25": 3.4619999999999997,
+              "q75": 3.9210000000000003
+            },
+            "paint": {
+              "median": 13.201,
+              "q25": 12.4155,
+              "q75": 13.938
+            }
+          },
+          "ratio": {
+            "total": 0.9750659701653295,
+            "script": 0.9678325248914986,
+            "paint": 0.9969037909681316
+          }
+        },
+        {
+          "id": "06_remove-one-1k",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 12.761,
+              "q25": 12.639,
+              "q75": 13.1575
+            },
+            "script": {
+              "median": 1.637,
+              "q25": 1.5805,
+              "q75": 1.749
+            },
+            "paint": {
+              "median": 10.352,
+              "q25": 10.144,
+              "q75": 10.6835
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 12.628,
+              "q25": 12.3435,
+              "q75": 13.137
+            },
+            "script": {
+              "median": 1.228,
+              "q25": 1.1745,
+              "q75": 1.35
+            },
+            "paint": {
+              "median": 10.729,
+              "q25": 10.5045,
+              "q75": 10.93
+            }
+          },
+          "ratio": {
+            "total": 0.9895776193088317,
+            "script": 0.7501527183872938,
+            "paint": 1.0364180834621328
+          }
+        },
+        {
+          "id": "07_create10k",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 287.722,
+              "q25": 284.8695,
+              "q75": 293.8595
+            },
+            "script": {
+              "median": 62.977,
+              "q25": 62.4905,
+              "q75": 63.9255
+            },
+            "paint": {
+              "median": 215.898,
+              "q25": 214.90550000000002,
+              "q75": 222.232
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 294.933,
+              "q25": 287.692,
+              "q75": 296.355
+            },
+            "script": {
+              "median": 63.884,
+              "q25": 63.287,
+              "q75": 64.23599999999999
+            },
+            "paint": {
+              "median": 222.552,
+              "q25": 216.588,
+              "q75": 223.38600000000002
+            }
+          },
+          "ratio": {
+            "total": 1.0250623866092965,
+            "script": 1.0144020833002525,
+            "paint": 1.0308201094961509
+          }
+        },
+        {
+          "id": "08_create1k-after1k_x2",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 31.968,
+              "q25": 31.864,
+              "q75": 32.08
+            },
+            "script": {
+              "median": 9.507,
+              "q25": 9.449,
+              "q75": 9.596
+            },
+            "paint": {
+              "median": 21.519,
+              "q25": 21.463,
+              "q75": 21.682
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 30.778,
+              "q25": 30.564500000000002,
+              "q75": 31.0895
+            },
+            "script": {
+              "median": 7.955,
+              "q25": 7.896,
+              "q75": 8.243500000000001
+            },
+            "paint": {
+              "median": 21.695,
+              "q25": 21.5425,
+              "q75": 21.9685
+            }
+          },
+          "ratio": {
+            "total": 0.9627752752752753,
+            "script": 0.8367518670453351,
+            "paint": 1.008178818718342
+          }
+        },
+        {
+          "id": "09_clear1k_x8",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 13.867,
+              "q25": 13.439,
+              "q75": 14.4635
+            },
+            "script": {
+              "median": 11.045,
+              "q25": 10.594000000000001,
+              "q75": 11.6195
+            },
+            "paint": {
+              "median": 1.451,
+              "q25": 1.0605,
+              "q75": 1.8295
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 12.988,
+              "q25": 11.864,
+              "q75": 13.247
+            },
+            "script": {
+              "median": 10.441,
+              "q25": 9.368500000000001,
+              "q75": 10.782
+            },
+            "paint": {
+              "median": 1.289,
+              "q25": 1.1155,
+              "q75": 1.498
+            }
+          },
+          "ratio": {
+            "total": 0.9366121006706568,
+            "script": 0.9453146220009054,
+            "paint": 0.8883528600964851
+          }
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-10-16T07:06:42.086Z",
+      "rows": [
+        {
+          "id": "07_create10k",
+          "lithent-before": {
+            "count": 15,
+            "total": {
+              "median": 288.565,
+              "q25": 286.0685,
+              "q75": 290.3055
+            },
+            "script": {
+              "median": 62.695,
+              "q25": 62.297,
+              "q75": 62.9465
+            },
+            "paint": {
+              "median": 217.282,
+              "q25": 216.16899999999998,
+              "q75": 219.787
+            }
+          },
+          "lithent": {
+            "count": 15,
+            "total": {
+              "median": 287.776,
+              "q25": 284.8725,
+              "q75": 290.43
+            },
+            "script": {
+              "median": 63.657,
+              "q25": 63.297,
+              "q75": 64.4975
+            },
+            "paint": {
+              "median": 216.733,
+              "q25": 213.82,
+              "q75": 218.1745
+            }
+          },
+          "ratio": {
+            "total": 0.9972657806733318,
+            "script": 1.0153441263258633,
+            "paint": 0.9974733295901179
+          }
+        }
+      ]
+    }
+  ],
+  "initialWeightedRatio": {
+    "total": 0.9664711209867091,
+    "script": 0.8982019698536746
+  },
+  "weights": {
+    "values": [
+      0.64280248137063, 0.5607178150466176, 0.5643800750716564,
+      0.1925635870170522, 0.13200612879341714, 0.5277091212292658,
+      0.5644449600965534, 0.5508359820582848, 0.4225836631419211
+    ],
+    "source": "webdriver-ts-results/src/Common.ts",
+    "sha256": "95932eecd0b1c22d5d69a88b9ff14cb173476aec3f461ad2f6dc0f6756830593"
+  },
+  "sampleCount": 320,
+  "evidenceSHA256": "bed8be2fc0b37797ff2216d7e6e923360cc7c4ee428379e1f40f808c42d46252"
+}

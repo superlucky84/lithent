@@ -103,7 +103,7 @@ const baseURL = 'http://127.0.0.1:' + server.address().port;
 let output = {
   startedAt: new Date().toISOString(),
   mode,
-  chrome: '154.0.8037.98 (system Google Chrome)',
+  chrome: null,
   machine: {
     cpu: cpus()[0].model,
     cores: cpus().length,
@@ -260,6 +260,15 @@ try {
       await browser.close();
     }
   } else if (mode === 'cpu' || mode === 'mem') {
+    const { startBrowser } = await import(
+      bench + '/webdriver-ts/dist/puppeteerAccess.js'
+    );
+    const metadataBrowser = await startBrowser({ headless: true });
+    try {
+      output.chrome = await metadataBrowser.version();
+    } finally {
+      await metadataBrowser.close();
+    }
     const { executeBenchmark } = await import(
       bench + '/webdriver-ts/dist/forkedBenchmarkRunnerPuppeteer.js'
     );
