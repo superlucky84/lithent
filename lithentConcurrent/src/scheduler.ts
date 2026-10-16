@@ -166,8 +166,8 @@ const scheduleFlush = (lane: Lane) => {
  * render joins this same flush instead of booking another microtask. Each
  * entry is taken out before it runs, so one raised for a component this pass
  * already drew (a new child's mountCallback renewing its parent) queues it
- * again and is drawn too. A render that throws leaves the rest queued for
- * the next flush instead of blocking every later renew.
+ * again and is drawn too. If a render throws, another microtask drains the
+ * rest without requiring a new renew; the original error still propagates.
  */
 const flushSync = () => {
   // Whatever runs here is sync work, even if a low flush is somewhere up the
@@ -185,6 +185,7 @@ const flushSync = () => {
   } finally {
     syncScheduled = false;
     flushingLow = outerLow;
+    if (lanes.sync.size) scheduleFlush('sync');
   }
 };
 
@@ -227,6 +228,11 @@ const flushLow = () => {
     flushLowSlice();
   } finally {
     flushingLow = false;
+    // An exception may skip both the rest of the lane and the idle waiters.
+    // Finish those in another task while letting the original error surface.
+    if (lanes.low.size || pendingWork || idleWaiters.length) {
+      scheduleFlush('low');
+    }
   }
 };
 

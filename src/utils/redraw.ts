@@ -47,8 +47,8 @@ export const componentUpdate = (compKey: Props) => () => {
 
 // Each entry is taken out before it runs, so a renew raised during the flush
 // (a new child's mountCallback renewing its parent) queues it again and this
-// same pass runs it. A render that throws leaves the rest queued for the next
-// flush instead of blocking every later renew.
+// same pass runs it. If a render throws, another microtask drains the rest
+// without requiring a new renew; the original error still propagates.
 const execRedrawQueue = () => {
   try {
     redrawQueue.forEach((item: () => void, compKey: Props) => {
@@ -56,6 +56,7 @@ const execRedrawQueue = () => {
       item();
     });
   } finally {
-    redrawQueueTimeout = false;
+    redrawQueueTimeout = !!redrawQueue.size;
+    if (redrawQueueTimeout) queueMicrotask(execRedrawQueue);
   }
 };

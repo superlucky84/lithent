@@ -5,6 +5,7 @@ import {
   mount,
   nextTick,
   deferRender,
+  whenIdle,
   getComponentKey,
 } from '../index';
 import type { Props, Renew } from '../index';
@@ -96,6 +97,64 @@ beforeEach(() => {
 });
 
 describe('scheduler lanes', () => {
+  it.each([false, true])(
+    'settles idle waiters after a low render throws (queued sibling: %s)',
+    async queuedSibling => {
+      let fail = false;
+      let bumpA = () => {};
+      let bumpB = () => {};
+      let count = 0;
+      const A = mount(renew => {
+        bumpA = renew;
+        return () => {
+          if (fail) throw new Error('low render failed');
+          return <i>a</i>;
+        };
+      });
+      const B = mount(renew => {
+        bumpB = () => {
+          count++;
+          renew();
+        };
+        return () => <b>{count}</b>;
+      });
+      const host = document.createElement('div');
+      const destroy = render(
+        <div>
+          <A />
+          <B />
+        </div>,
+        host
+      );
+      const errors: unknown[] = [];
+      const onError = (error: unknown) => errors.push(error);
+      process.on('uncaughtException', onError);
+      try {
+        fail = true;
+        deferRender(() => {
+          bumpA();
+          if (queuedSibling) bumpB();
+        });
+        let idle = false;
+        void whenIdle().then(() => (idle = true));
+        await vi.waitFor(() => expect(idle).toBe(true));
+        expect(errors).toEqual([new Error('low render failed')]);
+        expect(host.innerHTML).toBe(
+          queuedSibling
+            ? '<div><i>a</i><b>1</b></div>'
+            : '<div><i>a</i><b>0</b></div>'
+        );
+      } finally {
+        // Also drain the lane if this regression fails, so its queued work
+        // and idle waiters do not leak into the next test.
+        deferRender(bumpB);
+        await whenIdle();
+        process.off('uncaughtException', onError);
+        destroy();
+      }
+    }
+  );
+
   it('RC-1: commits a sync update before a pending low one', async () => {
     const low = makeRow('low');
     const sync = makeRow('sync');

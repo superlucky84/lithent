@@ -1,5 +1,13 @@
 # Release notes
 
+## Unreleased
+
+- Keep each reused component attached to its actual parent when its own
+  render changes tags, becomes empty, or inserts multiple nodes (both cores).
+- Resume already queued updates after a render throws without requiring a new
+  `renew()`. Concurrent low-lane errors also finish pending `whenIdle()` waits.
+- Accept `true` as an empty child in public types, matching runtime behavior.
+
 ## 2026-10-15
 
 ### lithent 1.25.1

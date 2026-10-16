@@ -46,7 +46,7 @@ export type MiddleStateWDom =
   | WDom
   | number
   | string
-  | false
+  | boolean
   | null
   | MiddleStateWDomChildren;
 

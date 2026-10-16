@@ -189,7 +189,8 @@ execFileSync(process.execPath, ['requires.cjs'], {
 await writeFile(
   join(consumer, 'types.tsx'),
   `
-import { mount, deferRender, whenIdle } from 'lithent-concurrent';
+import { h as baseH, mount as baseMount } from 'lithent';
+import { h, mount, deferRender, whenIdle } from 'lithent-concurrent';
 import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper';
 import type { State, Computed } from 'lithent-concurrent/helper';
 const List = mount(renew => {
@@ -198,6 +199,10 @@ const List = mount(renew => {
   deferRender(() => { value.v = 'updated'; });
   return () => <p>{value.value}:{String(pending.v)}</p>;
 });
+const BaseEmpty = baseMount(() => () => true);
+const ConcurrentEmpty = mount(() => () => true);
+baseH('div', {}, true, false, baseH(BaseEmpty, {}));
+h('div', {}, true, false, h(ConcurrentEmpty, {}));
 export { List, ldeferred, whenIdle };
 `
 );

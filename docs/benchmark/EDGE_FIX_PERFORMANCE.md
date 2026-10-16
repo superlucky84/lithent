@@ -169,3 +169,50 @@ CHROMIUM=<chromium 경로> node browser.mjs plain select 300 16 main head
 ```
 
 번들은 `EDGE_FIX_OUT`(기본 `/tmp/lithent-edge-fix`)에 만든다.
+
+## 후속 정확성 수정 — 2026-10-16
+
+기준은 `b420187`이다. 위 성능 기록 이후의 릴리스 검토에서 찾은 세 가지 누락을 고쳤다.
+
+- 같은 컴포넌트 노드를 서로 다른 부모 아래 재사용하면 `h()`가 첫 노드의 부모 링크를
+  마지막 부모로 덮어썼다. 그 인스턴스가 자체 갱신으로 태그를 바꾸면 `NotFoundError`가 났다.
+  이제 처음 그리는 자식과 복제한 자식 모두 실제 부모를 가리키며, 형제들은 getter 하나를 공유한다.
+- 렌더 예외 뒤 이미 큐에 있던 다른 컴포넌트의 갱신은 새 `renew()`가 오기 전까지 정체됐다.
+  base·Concurrent sync 큐는 남은 일을 다른 microtask에 이어 실행한다. Concurrent low 큐도
+  남은 작업과 `whenIdle()` 대기를 다음 task에서 마친다. 원래 예외는 그대로 보고한다.
+- 런타임이 빈 자식으로 처리하는 `true`를 공개 `MiddleStateWDom` 타입에도 허용했다.
+  기존 테스트의 강제 캐스팅을 없애고 배포 선언을 사용하는 소비자 검증에 추가했다.
+
+회귀 테스트는 서로 다른 부모에 있는 두 인스턴스 각각의 태그 교체·빈 출력·다중 출력·해제,
+같은 tick에 예약된 형제의 오류 복구, low 큐의 남은 작업 유무에 따른 idle 완료를 확인한다.
+각 오류 재현은 수정 전 실패하고 수정 후 통과했다.
+
+관련 파일: `src/tests/core-edgeRegressions.test.tsx`, `src/tests/core-redrawRecovery.test.tsx`,
+`lithentConcurrent/src/tests/concurrent-schedulerLane.test.tsx`, `scripts/verify-release.mjs`.
+
+검증 결과:
+
+- 전체 workspace 빌드·TypeScript·ESLint, `pnpm test`, `pnpm test:concurrent`,
+  `pnpm test:satellites:concurrent`, base SSR 테스트 통과.
+- `verify:concurrent`, `verify:release` 통과. 두 코어의 실제 tarball을 설치한 소비자가
+  강제 캐스팅 없이 `true` 자식과 `true`를 반환하는 컴포넌트를 타입 검사한다.
+- 기존 Chromium E2E **64개 통과**. 배포 ESM을 직접 불러온 별도 Chromium 재현에서도
+  두 부모의 컴포넌트 자체 갱신이 정상이며 DOM 예외가 없다.
+- base **br 4,798 / 4,800B**, Concurrent **6,903 / 9,000B**, element **998 / 1,000B**.
+- 위 `edge-fix/domwrites.mjs`로 `b420187`과 비교한 세 앱 × 8개 시나리오의 DOM 쓰기는
+  **24/24 동일**하다.
+
+다른 빌드·테스트가 끝난 뒤 같은 Chromium에서 번들 순서를 번갈아 비교했다.
+선택·교환은 연산 300회 × 16라운드, 생성은 60회 × 8라운드의 라운드 평균 중앙값이다.
+
+| 앱 / 시나리오 | `b420187` | 수정 후 |
+| --- | ---: | ---: |
+| flat 선택 | 0.405ms | 0.388ms |
+| flat 교환 | 0.354ms | 0.369ms |
+| plain 전체 삭제 + 1,000행 생성 | 13.565ms | 13.007ms |
+
+세 시나리오는 기존에 기록한 측정 편차 안에서 동등했다(차이 ±4.3% 이내).
+공식 js-framework-benchmark 러너 전체를 다시 측정한 결과는 아니다.
+
+현재 상태: 세 누락과 low 큐의 같은 원인을 수정·검증했다. 다음 단계는 새 patch 버전 준비다.
+수정 전 검토·성능 비교의 기준 커밋은 `b420187`이다.

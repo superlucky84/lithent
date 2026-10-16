@@ -10,6 +10,52 @@ const flush = async () => {
 };
 
 describe('redraw scheduling after an error', () => {
+  it('flushes already queued siblings after an error without another renew', async () => {
+    let fail = false;
+    let bumpA = () => {};
+    let bumpB = () => {};
+    let count = 0;
+    const A = mount(renew => {
+      bumpA = renew;
+      return () => {
+        if (fail) throw new Error('render failed with a sibling queued');
+        return <i>a</i>;
+      };
+    });
+    const B = mount(renew => {
+      bumpB = () => {
+        count++;
+        renew();
+      };
+      return () => <b>{count}</b>;
+    });
+    const el = document.createElement('div');
+    const destroy = render(
+      <div>
+        <A />
+        <B />
+      </div>,
+      el
+    );
+    const errors: unknown[] = [];
+    const onError = (error: unknown) => errors.push(error);
+    process.on('uncaughtException', onError);
+    try {
+      fail = true;
+      bumpA();
+      bumpB();
+      await new Promise(resolve => setTimeout(resolve));
+      expect(errors).toHaveLength(1);
+      expect(errors[0]).toEqual(
+        new Error('render failed with a sibling queued')
+      );
+      expect(el.innerHTML).toBe('<div><i>a</i><b>1</b></div>');
+    } finally {
+      process.off('uncaughtException', onError);
+      destroy();
+    }
+  });
+
   it('keeps redrawing after a render throws', async () => {
     let fail = false;
     let bumpA = () => {};

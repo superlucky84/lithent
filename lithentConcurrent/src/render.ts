@@ -837,6 +837,7 @@ const wDomChildrenToDom = (
 ) => {
   // The parent is not attached to the document yet, so children can be
   // appended directly (no intermediate fragment allocation).
+  const getParent = makeParentGetter(wDom);
   children.forEach((childItem: WDom, index: number) => {
     // A child already drawn elsewhere (nr 'N': the same node twice, a
     // hoisted constant in several components) is drawn here as its own copy.
@@ -845,8 +846,10 @@ const wDomChildrenToDom = (
     if (childItem.nr === 'N' && !isHydration) {
       const copy = cloneWDom(childItem);
       childItem = children[index] = 'resolve' in copy ? copy.resolve() : copy;
-      childItem.getParent = makeParentGetter(wDom);
     }
+    // h() may have assigned a shared node to a later parent already. The
+    // first occurrence needs its actual owner too, not only the copies.
+    childItem.getParent = getParent;
     childItem.nr = 'N';
     if (childItem.type) {
       const childElement = wDomToDom(childItem, isHydration, record);

@@ -174,13 +174,21 @@ describe('children', () => {
     const el = document.createElement('div');
     render(
       <div>
-        {true as unknown as string}
+        {true}
         {0}
         <i />
       </div>,
       el
     );
     expect(el.innerHTML).toBe('<div>0<i></i></div>');
+  });
+
+  it('accepts true from h and from a component', () => {
+    const Empty = mount(() => () => true);
+    const el = document.createElement('div');
+    const destroy = render(h('div', {}, true, <Empty />, 0), el);
+    expect(el.innerHTML).toBe('<div>0</div>');
+    destroy();
   });
 });
 
@@ -320,6 +328,56 @@ describe('reused nodes', () => {
     await flush();
     expect(el.innerHTML).toBe('<div><em>icon</em></div>');
     expect(log).toEqual(['mount icon', 'mount icon', 'unmount icon']);
+  });
+
+  it('keeps each reused component under its own parent while its output changes', async () => {
+    const updates: ((step: number) => void)[] = [];
+    const unmounted: number[] = [];
+    const Child = mount(renew => {
+      let step = 0;
+      const id = updates.length;
+      updates.push(next => {
+        step = next;
+        renew();
+      });
+      mountCallback(() => () => unmounted.push(id));
+      return () => {
+        if (step === 1) return <i>changed</i>;
+        if (step === 2) return null;
+        if (step === 3) return [<span>one</span>, <span>two</span>];
+        return <b>initial</b>;
+      };
+    });
+    const shared = <Child />;
+    const el = document.createElement('div');
+    const destroy = render(
+      <main>
+        <section>{shared}</section>
+        <aside>{shared}</aside>
+      </main>,
+      el
+    );
+    const html = [
+      '<b>initial</b>',
+      '<i>changed</i>',
+      '',
+      '<span>one</span><span>two</span>',
+      '<b>initial</b>',
+    ];
+    expect(updates).toHaveLength(2);
+    for (const instance of [0, 1]) {
+      for (let step = 1; step < html.length; step++) {
+        updates[instance](step);
+        await flush();
+        expect(el.innerHTML).toBe(
+          `<main><section>${instance === 0 ? html[step] : html[0]}</section><aside>${instance === 1 ? html[step] : html[0]}</aside></main>`
+        );
+      }
+    }
+    expect(unmounted).toEqual([]);
+    destroy();
+    expect(el.innerHTML).toBe('');
+    expect(unmounted).toEqual([0, 1]);
   });
 
   it('keeps a hoisted component its own props next to the same component inline', async () => {
