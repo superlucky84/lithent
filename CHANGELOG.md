@@ -1,12 +1,36 @@
 # Release notes
 
-## Unreleased
+## 2026-10-16
+
+### lithent 1.25.2
 
 - Keep each reused component attached to its actual parent when its own
-  render changes tags, becomes empty, or inserts multiple nodes (both cores).
+  render changes tags, becomes empty, or inserts multiple nodes (#99).
+- Render hoisted or shared element/component nodes safely in multiple places,
+  with separate component instances and the correct props for each position.
+- Preserve keyed identity and input focus through lists with empty or mixed
+  keyed/unkeyed children, reorders, and rows that redraw themselves.
+- Run renewals raised during a flush, including a new child's mount callback
+  renewing a parent that has already rendered.
 - Resume already queued updates after a render throws without requiring a new
-  `renew()`. Concurrent low-lane errors also finish pending `whenIdle()` waits.
+  `renew()`, while still reporting the original error.
+- Set up components created inside new component output once, avoiding duplicate
+  instances and HMR registration. Release retired component output so previous
+  render trees can be collected.
 - Accept `true` as an empty child in public types, matching runtime behavior.
+- Reduce render, diff, and hook overhead while keeping the base bundle within
+  its size budget. Preserve the parent-getter scopes used for VDOM reclamation.
+
+### lithent-concurrent 0.2.2
+
+- Include the reused-node, component-instance, keyed-list, focus, and renewal
+  fixes above (#99), along with the shared public type fix for `true` children.
+- Resume queued sync and low-lane work after render errors. Low-lane errors also
+  finish pending `whenIdle()` waits, even when no render entries remain.
+
+See [RELEASING.md](./RELEASING.md) for the two-package publication order and
+[the benchmark report](./docs/benchmark/EDGE_OFFICIAL_RESULTS.md) for the
+same-app rendering comparison against 1.25.1.
 
 ## 2026-10-15
 
