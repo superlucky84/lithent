@@ -2,7 +2,7 @@ import { WDom } from '@/types';
 import {
   compKeyRef,
   componentMap,
-  getComponentKey,
+  getCurrentComponent,
 } from '@/utils/universalRef';
 import { unmount } from '@/hook/internal/unmount';
 
@@ -10,11 +10,8 @@ import { unmount } from '@/hook/internal/unmount';
  * WDom이 생성된 직후(DOM 마운트 전)에 실행될 콜백 등록
  */
 export const mountReadyCallback = (effectAction: () => void | (() => void)) => {
-  const compKey = getComponentKey();
-  if (compKey) {
-    const comp = componentMap.get(compKey);
-    comp && comp.wdCB.push(effectAction);
-  }
+  const comp = getCurrentComponent();
+  comp && comp.wdCB.push(effectAction);
 };
 
 /**
@@ -35,7 +32,7 @@ export const runWDomCallbacksFromWDom = (newWDom: WDom) => {
 
       wdCBQueue.forEach((effect: Function) => {
         const cleanup = effect();
-        if (cleanup && typeof cleanup === 'function') {
+        if (typeof cleanup === 'function') {
           unmount(cleanup);
         }
       });

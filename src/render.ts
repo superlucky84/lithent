@@ -6,6 +6,7 @@ import {
   checkVirtualType,
   hasAccessorMethods,
   isPendingCustomElement,
+  checkEventKey,
 } from '@/utils/predicator';
 
 import { componentMap, xmlnsRef } from '@/utils/universalRef';
@@ -13,9 +14,28 @@ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { execMountedQueue, addMountedQueue } from '@/hook/mountCallback';
 import { runWDomCallbacksFromWDom } from '@/hook/mountReadyCallback';
 import { runUpdatedQueueFromWDom } from '@/hook/internal/useUpdate';
-import { getParent, isObject, hasEnumerableProp } from '@/utils';
+import {
+  getParent,
+  isObject,
+  hasEnumerableProp,
+  makeParentGetter,
+} from '@/utils';
+import { cloneWDom } from '@/wDom';
 
 const DF = () => new DocumentFragment();
+
+// Into the root's wrapper: before its after element, in place of <html>, or
+// at the end.
+const insertRoot = (
+  wrapElement: HTMLElement,
+  element: Node,
+  afterElement?: HTMLElement | null
+) =>
+  afterElement
+    ? wrapElement.insertBefore(element, afterElement)
+    : wrapElement.tagName === 'HTML'
+      ? wrapElement.replaceWith(element)
+      : wrapElement.appendChild(element);
 const CE = (t: string) => document.createElement(t);
 
 export const render = (
@@ -30,21 +50,15 @@ export const render = (
 
   const Dom = wDomToDom(wDom, isHydration);
 
-  if (afterElement) {
-    wDom.ae = afterElement;
-    wrapElement.insertBefore(Dom, afterElement);
-  } else if (!isHydration) {
-    if (wrapElement.tagName === 'HTML') {
-      wrapElement.replaceWith(Dom);
-    } else {
-      wrapElement.appendChild(Dom);
-    }
+  wDom.ae = afterElement as HTMLElement;
+  if (afterElement || !isHydration) {
+    insertRoot(wrapElement, Dom, afterElement);
   }
 
   execMountedQueue();
 
   return () => {
-    const compData = componentMap.get(wDom.compProps || {});
+    const compData = componentMap.get(wDom.compProps as Props);
     const comp = (compData && compData.vd.value) || wDom;
     runUnmountQueueFromWDom(comp);
     rootDelete(comp);
@@ -56,21 +70,18 @@ const rootDelete = (newWDom: WDom) =>
 
 export const typeDelete = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
-  const parentElement = newWDom.isRoot
-    ? newWDom.we
-    : parentWDom
-      ? findRealParentElement(parentWDom)
-      : undefined;
-
-  if (parentElement) {
-    deleteRealDom(newWDom, parentElement as HTMLElement);
-  }
+  deleteRealDom(
+    newWDom,
+    (newWDom.isRoot
+      ? newWDom.we
+      : parentWDom && findRealParentElement(parentWDom)) as HTMLElement
+  );
 };
 
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
     const nt = newWDom.el.nodeType;
-    if (nt === 11 || newWDom?.tag === 'portal') {
+    if (nt === 11 || newWDom.tag === 'portal') {
       findChildWithRemoveElement(newWDom, parent);
     } else if (nt === 1 || nt === 3) {
       parent.removeChild(newWDom.el);
@@ -81,7 +92,7 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
 };
 
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
-  const items = (newWDom && newWDom.oc) || (newWDom && newWDom.children) || [];
+  const items = newWDom.oc || newWDom.children || [];
 
   // Bulk fast path: the parent element contains exactly these children,
   // so they can all be dropped in a single operation.
@@ -130,12 +141,15 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
 
 /**
  * Unmount and remove unused keyed children. Listeners are left on the
- * discarded DOM and go away with it.
+ * discarded DOM and go away with it. The parent element is found from the
+ * list they were in: a child's own parent link may have been moved on by
+ * the same node being drawn in another place since.
  */
-export const typeDeleteUnused = (items: WDom[]) => {
+export const typeDeleteUnused = (items: WDom[], list: WDom) => {
+  const parentElement = findRealParentElement(list) as HTMLElement;
   items.forEach(item => {
     runUnmountQueueFromWDom(item);
-    typeDelete(item);
+    deleteRealDom(item, parentElement);
   });
 };
 
@@ -144,37 +158,16 @@ const typeSortedReplace = (newWDom: WDom) => {
   typeAdd(newWDom);
 };
 
-const typeSortedUpdate = (newWDom: WDom) => {
-  typeUpdate(newWDom);
-
-  if (getParent(newWDom) || newWDom.isRoot) {
-    typeAdd(newWDom, getElementFromFragment(newWDom));
-  }
-};
-
 const typeAdd = (
   newWDom: WDom,
   newElement?: HTMLElement | DocumentFragment | Text
 ) => {
-  if (!newElement) {
-    newElement = wDomToDom(newWDom) as HTMLElement;
-  }
+  newElement = newElement || wDomToDom(newWDom);
 
   const parentWDom = getParent(newWDom);
   if (!parentWDom || !parentWDom.type) {
-    if (
-      newWDom.isRoot &&
-      newWDom.we &&
-      newElement &&
-      newWDom.tag !== 'portal'
-    ) {
-      if (newWDom.ae) {
-        newWDom.we.insertBefore(newElement, newWDom.ae);
-      } else if (newWDom.we.tagName === 'HTML') {
-        newWDom.we.replaceWith(newElement);
-      } else {
-        newWDom.we.appendChild(newElement);
-      }
+    if (newWDom.isRoot && newWDom.we && newWDom.tag !== 'portal') {
+      insertRoot(newWDom.we, newElement, newWDom.ae);
       execMountedQueue();
     }
     return;
@@ -186,7 +179,7 @@ const typeAdd = (
   // unkeyed loop) goes right before its own next sibling.
   const nextEl = startFindNextBrotherElement(newWDom, parentWDom);
 
-  if (newElement && parentEl) {
+  if (parentEl) {
     if (newWDom.tag !== 'portal') {
       parentEl.insertBefore(newElement, nextEl || null);
     }
@@ -196,7 +189,7 @@ const typeAdd = (
 
 const getElementFromFragment = (newWDom: WDom) => {
   if (checkVirtualType(newWDom.type)) {
-    return ((newWDom && newWDom.children) || []).reduce((acc, item) => {
+    return (newWDom.children || []).reduce((acc, item) => {
       const element = getElementFromFragment(item);
 
       if (element) {
@@ -214,36 +207,31 @@ const startFindNextBrotherElement = (
   parentWDom: WDom
 ): HTMLElement | DocumentFragment | Text | undefined => {
   const brothers = parentWDom.children || [];
-  const index = brothers.indexOf(wDom);
-  const nextIndex = index + 1;
-  const candidiateBrothers = brothers.slice(nextIndex);
 
-  const finedNextEl = findChildFragmentNextElement(candidiateBrothers);
-  const parentType = parentWDom.type || '';
-
-  if (finedNextEl) {
-    return finedNextEl;
-  }
-
-  if (!parentWDom.isRoot && checkVirtualType(parentType)) {
-    return startFindNextBrotherElement(parentWDom, getParent(parentWDom));
-  } else if (
-    parentWDom.isRoot &&
-    checkVirtualType(parentType) &&
-    parentWDom.ae
-  ) {
-    return parentWDom.ae;
-  }
-
-  return undefined;
+  // After the brothers, a fragment or loop parent goes on with its own next
+  // brother, up to the root's after element.
+  return (
+    findChildFragmentNextElement(brothers.slice(brothers.indexOf(wDom) + 1)) ||
+    (checkVirtualType(parentWDom.type)
+      ? parentWDom.isRoot
+        ? parentWDom.ae
+        : startFindNextBrotherElement(parentWDom, getParent(parentWDom))
+      : undefined)
+  );
 };
+
+// Children of a list being updated that move or are added: until its
+// placement pass they are not where they will be, so they are no anchor for
+// content inserted meanwhile. Kept here rather than as a flag on the node,
+// which would give the nodes that get it another shape.
+const moving = new Set<WDom>();
 
 const findChildFragmentNextElement = (
   candidiateBrothers: WDom[]
 ): HTMLElement | DocumentFragment | Text | undefined =>
   candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
     (targetEl, bItem) => {
-      if (targetEl) return targetEl;
+      if (targetEl || (moving.size && moving.has(bItem))) return targetEl;
       const { type, el } = bItem;
       if (type && checkVirtualType(type)) {
         const found = findChildFragmentNextElement(bItem.children || []);
@@ -259,13 +247,8 @@ const typeReplace = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
   const orignalElement = newWDom.el;
 
-  if (newWDom.isRoot && !parentWDom && orignalElement) {
-    typeSortedReplace(newWDom);
-    return;
-  }
-
-  if (parentWDom && parentWDom.type && orignalElement) {
-    if (orignalElement.nodeType === 11) {
+  if (orignalElement && (parentWDom ? parentWDom.type : newWDom.isRoot)) {
+    if (!parentWDom || orignalElement.nodeType === 11) {
       typeSortedReplace(newWDom);
     } else {
       const parentElement = findRealParentElement(parentWDom);
@@ -309,51 +292,84 @@ const typeUpdate = (newWDom: WDom) => {
  */
 const updateChildren = (newWDom: WDom) => {
   const children = newWDom.children || [];
-  let needPlace = false;
 
-  if (newWDom.type === 'l') {
-    for (const item of children) {
-      if ('ATS'.includes(item.nr as string) || item.oi !== undefined) {
-        needPlace = true;
-        break;
-      }
-    }
+  if (
+    newWDom.type !== 'l' ||
+    !children.some(
+      item => 'ATS'.includes(item.nr as string) || item.oi !== undefined
+    )
+  ) {
+    children.forEach(wDomUpdate);
+    return;
   }
 
-  if (!needPlace) {
-    children.forEach(childItem => wDomUpdate(childItem));
-    return;
+  // The matched children that keep their place: an LIS over their original
+  // indexes (oi). Worked out before the content pass, because until the
+  // placement pass a child that moves is still where it was, and so is the
+  // old element of one replaced (S): neither may be the anchor for content
+  // inserted meanwhile (moving), such as a kept row whose fragment changed.
+  // An added child needs no such care: it has no element before the content
+  // pass reaches it, and anchors are looked for after the child at hand.
+  // Read up front: wDomUpdate clears oi on an unkeyed child matched by
+  // position.
+  const matchedIndexes: number[] = [];
+  const oiSeq: number[] = [];
+
+  // Replaced children, then the matched ones that move.
+  const movers: WDom[] = [];
+  let ordered = true;
+
+  children.forEach((item, index) => {
+    const oi = item.oi;
+    const nr = item.nr;
+    if (nr === 'S') {
+      movers.push(item);
+    } else if (nr !== 'A' && oi !== undefined) {
+      if (oi < oiSeq[oiSeq.length - 1]) {
+        ordered = false;
+      }
+      matchedIndexes.push(index);
+      oiSeq.push(oi);
+    }
+  });
+
+  // keep[i]: whether matched child i stays (unset when not matched).
+  // Matched children still in their original order all stay, as in a redraw
+  // that moves nothing: no LIS then. Only the children that move or are
+  // added are flagged, so a long list's children are usually untouched.
+  let keep: boolean[] | undefined;
+  if (!ordered) {
+    const lis: boolean[] = (keep = []);
+    getLisPositions(oiSeq).forEach(pos => (lis[matchedIndexes[pos]] = true));
+    matchedIndexes.forEach(
+      i => lis[i] || ((lis[i] = false), movers.push(children[i]))
+    );
   }
 
   // Content pass (left-to-right, keeps lifecycle order).
   // Added children are created here but inserted in the placement pass.
   const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
-  const matchedIndexes: number[] = [];
-  const oiSeq: number[] = [];
   let createdCount = 0;
 
-  children.forEach((item, index) => {
-    const nr = item.nr;
+  movers.forEach(item => moving.add(item));
+  try {
+    children.forEach((item, index) => {
+      const nr = item.nr;
 
-    if (nr === 'A' || nr === 'S') {
-      if (nr === 'S') {
-        typeDelete(item);
+      if (nr === 'A' || nr === 'S') {
+        if (nr === 'S') {
+          typeDelete(item);
+        }
+        created[index] = wDomToDom(item);
+        createdCount++;
+      } else {
+        wDomUpdate(item);
       }
-      created[index] = wDomToDom(item);
-      createdCount++;
-    } else if (nr === 'T') {
-      typeUpdate(item);
-    } else {
-      wDomUpdate(item);
-    }
+    });
+  } finally {
+    movers.forEach(item => moving.delete(item));
+  }
 
-    if (item.oi !== undefined && created[index] === undefined) {
-      matchedIndexes.push(index);
-      oiSeq.push(item.oi);
-    }
-  });
-
-  const stay = new Set(getLisPositions(oiSeq).map(pos => matchedIndexes[pos]));
   const parentEl = findRealParentElement(newWDom);
   const baseAnchor = newWDom.isRoot
     ? newWDom.ae
@@ -374,10 +390,7 @@ const updateChildren = (newWDom: WDom) => {
     }
   }
 
-  if (
-    stay.size !== matchedIndexes.length ||
-    createdCount > children.length - tail
-  ) {
+  if (keep || createdCount > children.length - tail) {
     // Placement pass (right-to-left): insert added children and non-LIS
     // moves before a running anchor.
     let anchor =
@@ -386,7 +399,7 @@ const updateChildren = (newWDom: WDom) => {
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
       const isNew = created[i] !== undefined;
-      const needMove = item.oi !== undefined && !isNew && !stay.has(i);
+      const needMove = !!keep && keep[i] === false;
 
       if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
         const el = isNew ? created[i] : getElementFromFragment(item);
@@ -408,9 +421,11 @@ const updateChildren = (newWDom: WDom) => {
 };
 
 // Assigned, not deleted: `delete` changes the object's shape, which makes
-// every later access to the node slower.
+// every later access to the node slower. nr goes back to 'N' (nothing to
+// do), not undefined: a node that has it is drawn (see makeNewWDomTree).
 const clearDiffMeta = (item: WDom) => {
-  item.oi = item.nr = item.oc = item.op = undefined;
+  item.oi = item.oc = item.op = undefined;
+  item.nr = 'N';
 };
 
 /**
@@ -418,57 +433,46 @@ const clearDiffMeta = (item: WDom) => {
  * Returns the positions in seq that form the LIS.
  */
 const getLisPositions = (seq: number[]) => {
-  const result: number[] = [];
+  // tails[k]: the position ending the smallest-tailed increasing run of
+  // length k + 1. A value larger than the last tail just extends it.
+  const tails: number[] = [];
+  const prev: number[] = [];
 
-  if (!seq.length) {
-    return result;
-  }
-
-  const prev = new Array(seq.length);
-  result.push(0);
-
-  for (let i = 1; i < seq.length; i++) {
-    const value = seq[i];
-
-    if (seq[result[result.length - 1]] < value) {
-      prev[i] = result[result.length - 1];
-      result.push(i);
-      continue;
-    }
-
+  seq.forEach((value, i) => {
     let lo = 0;
-    let hi = result.length - 1;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (seq[result[mid]] < value) {
-        lo = mid + 1;
-      } else {
-        hi = mid;
+    let hi = tails.length;
+
+    if (hi && seq[tails[hi - 1]] < value) {
+      lo = hi;
+    } else {
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (seq[tails[mid]] < value) {
+          lo = mid + 1;
+        } else {
+          hi = mid;
+        }
       }
     }
 
-    if (value < seq[result[lo]]) {
-      if (lo > 0) {
-        prev[i] = result[lo - 1];
-      }
-      result[lo] = i;
-    }
-  }
+    prev[i] = lo ? tails[lo - 1] : -1;
+    tails[lo] = i;
+  });
 
-  let i = result.length;
-  let last = result[i - 1];
+  let i = tails.length;
+  let last = tails[i - 1];
   while (i-- > 0) {
-    result[i] = last;
+    tails[i] = last;
     last = prev[last];
   }
 
-  return result;
+  return tails;
 };
 
 export const wDomUpdate = (newWDomTree: WDom) => {
   const { nr: needRerender } = newWDomTree;
 
-  if (needRerender !== undefined && needRerender !== 'N') {
+  if (needRerender && needRerender !== 'N') {
     renderHandlers[needRerender](newWDomTree);
     clearDiffMeta(newWDomTree);
   }
@@ -480,7 +484,11 @@ const renderHandlers = {
   R: typeReplace,
   U: typeUpdate,
   S: typeSortedReplace,
-  T: typeSortedUpdate,
+  // A keyed item reaches here only as a component redrawing itself: it has
+  // not moved, so it is updated in place. Re-inserting its nodes would blur a
+  // focused input inside it or reload an iframe. Moves within a list are
+  // placed by updateChildren.
+  T: typeUpdate,
 } as const;
 
 const updateText = (newWDom: WDom) => {
@@ -492,8 +500,7 @@ const updateText = (newWDom: WDom) => {
 const updateProps = (
   props?: Props,
   element?: HTMLElement | Element | DocumentFragment | Text,
-  oldProps?: Props | null,
-  isHydration?: boolean
+  oldProps?: Props | null
 ) => {
   const originalProps = oldProps || {};
 
@@ -504,9 +511,8 @@ const updateProps = (
       continue;
     }
 
-    const isEvent = dataKey[0] === 'o' && dataKey[1] === 'n';
-
-    if (isHydration && isEvent) {
+    // An event key starts with "on", so it is none of the keys below.
+    if (checkEventKey(dataKey)) {
       updateEvent(
         element as HTMLElement,
         dataKey,
@@ -530,13 +536,6 @@ const updateProps = (
         );
       } else if (checkRefData(dataKey, dataValue)) {
         dataValue.value = element;
-      } else if (isEvent) {
-        updateEvent(
-          element as HTMLElement,
-          dataKey,
-          dataValue as (e: Event) => void,
-          originalProps[dataKey] as (e: Event) => void
-        );
       } else if (dataKey) {
         if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
           (element as HTMLElement & Record<string, unknown>)[dataKey] =
@@ -571,7 +570,7 @@ const updateProps = (
       continue;
     }
 
-    if (dataKey[0] === 'o' && dataKey[1] === 'n') {
+    if (checkEventKey(dataKey)) {
       updateEvent(
         element as HTMLElement,
         dataKey,
@@ -615,9 +614,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
   }
 
   if (!isHydration) {
-    if (!type) {
-      element = DF();
-    } else if (isVirtualType) {
+    if (!type || isVirtualType) {
       element = DF();
     } else if (type === 'e' && tag) {
       // element
@@ -640,9 +637,9 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
     element = wDom.el;
   }
 
-  wDomChildrenToDom(children, element, isHydration);
+  wDomChildrenToDom(wDom, children, element, isHydration);
 
-  updateProps(props, element, null, isHydration);
+  updateProps(props, element, null);
 
   addMountedQueue(wDom);
 
@@ -654,13 +651,27 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
 };
 
 const wDomChildrenToDom = (
+  wDom: WDom,
   children: WDom[],
   parentElement?: HTMLElement | Element | DocumentFragment | Text,
   isHydration?: boolean
 ) => {
   // The parent is not attached to the document yet, so children can be
   // appended directly (no intermediate fragment allocation).
-  children.forEach((childItem: WDom) => {
+  const getParent = makeParentGetter(wDom);
+  children.forEach((childItem: WDom, index: number) => {
+    // A child already drawn elsewhere (nr 'N': the same node twice, a
+    // hoisted constant in several components) is drawn here as its own copy.
+    // The children of an added subtree come from a diff, which copied those
+    // already (nr 'A'). Drawn, the child gets nr 'N' (see makeNewWDomTree).
+    if (childItem.nr === 'N' && !isHydration) {
+      const copy = cloneWDom(childItem);
+      childItem = children[index] = 'resolve' in copy ? copy.resolve() : copy;
+    }
+    // h() may have assigned a shared node to a later parent already. The
+    // first occurrence needs its actual owner too, not only the copies.
+    childItem.getParent = getParent;
+    childItem.nr = 'N';
     if (childItem.type) {
       const childElement = wDomToDom(childItem, isHydration);
       if (childItem.tag !== 'portal' && !isHydration && parentElement) {
@@ -695,12 +706,9 @@ const updateStyle = (
   element?: HTMLElement | Element | DocumentFragment | Text
 ) => {
   const orig = { ...oldStyle };
-  const htmlElement = element instanceof HTMLElement ? element : null;
-  const cssStyle = htmlElement?.style;
+  if (!(element instanceof HTMLElement)) return;
 
-  if (!cssStyle) return;
-
-  const styleProxy = cssStyle as unknown as Record<string, string>;
+  const styleProxy = element.style as unknown as Record<string, string>;
 
   for (const k in style) {
     styleProxy[k] = style[k];
@@ -714,15 +722,9 @@ const updateStyle = (
 
 const findRealParentElement = (
   vDom: WDom
-): HTMLElement | DocumentFragment | Text | undefined => {
-  const isVirtualType = checkVirtualType(vDom.type);
-  if (vDom.isRoot && isVirtualType) {
-    return vDom.we;
-  }
-
-  if (!isVirtualType) {
-    return vDom.el as HTMLElement;
-  }
-
-  return findRealParentElement(getParent(vDom));
-};
+): HTMLElement | DocumentFragment | Text | undefined =>
+  checkVirtualType(vDom.type)
+    ? vDom.isRoot
+      ? vDom.we
+      : findRealParentElement(getParent(vDom) as WDom)
+    : (vDom.el as HTMLElement);

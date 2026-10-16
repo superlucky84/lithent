@@ -28,6 +28,7 @@ const check = (hn: Harness, label: string) => {
   expect(hn.liveCounts(), `${label} (mounted components)`).toEqual(
     hn.expectedCounts()
   );
+  expect(hn.leftBehind(), `${label} (instance left behind)`).toBe(0);
 };
 
 const permutations = <T>(items: T[]): T[][] =>

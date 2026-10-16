@@ -163,8 +163,11 @@ const scheduleFlush = (lane: Lane) => {
  * Identical in shape to the base core's `execRedrawQueue`, deliberately (BC-3).
  *
  * `syncScheduled` stays true for the whole pass so an update raised during a
- * render joins this same flush instead of booking another microtask, and the
- * clear-after-forEach ordering is what the existing suite already pins down.
+ * render joins this same flush instead of booking another microtask. Each
+ * entry is taken out before it runs, so one raised for a component this pass
+ * already drew (a new child's mountCallback renewing its parent) queues it
+ * again and is drawn too. If a render throws, another microtask drains the
+ * rest without requiring a new renew; the original error still propagates.
  */
 const flushSync = () => {
   // Whatever runs here is sync work, even if a low flush is somewhere up the
@@ -175,14 +178,14 @@ const flushSync = () => {
   flushingLow = false;
 
   try {
-    lanes.sync.forEach((item: () => void) => {
+    lanes.sync.forEach((item: () => void, compKey) => {
+      lanes.sync.delete(compKey);
       item();
     });
-
-    lanes.sync.clear();
-    syncScheduled = false;
   } finally {
+    syncScheduled = false;
     flushingLow = outerLow;
+    if (lanes.sync.size) scheduleFlush('sync');
   }
 };
 
@@ -225,6 +228,11 @@ const flushLow = () => {
     flushLowSlice();
   } finally {
     flushingLow = false;
+    // An exception may skip both the rest of the lane and the idle waiters.
+    // Finish those in another task while letting the original error surface.
+    if (lanes.low.size || pendingWork || idleWaiters.length) {
+      scheduleFlush('low');
+    }
   }
 };
 

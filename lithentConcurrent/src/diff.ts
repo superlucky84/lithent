@@ -7,7 +7,10 @@ import {
   checkSameWDomWithOriginal,
   getWDomType,
   checkExistyKey,
+  checkExisty,
+  checkKeyedChildren,
 } from '@/utils/predicator';
+import { cloneWDom, copyResolver } from '@/wDom';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
 import { keys, isEnumerableProp } from '@/utils';
@@ -164,9 +167,20 @@ const beginWork = (
   originalWDom: WDom | undefined,
   parent?: Frame
 ): Frame => {
+  // Already drawn or taken by a build (it has nr, 'N' once drawn): the node
+  // belongs to another place, so this place draws a copy. The same node in the same place is still left
+  // alone as unchanged. A component made without a diff and not drawn yet
+  // (in a new component's output, or a hoisted <Comp />) is drawn as it is:
+  // a copy would be a second instance, leaving the one already set up behind.
+  if (newWDom !== originalWDom && (newWDom as WDom).nr) {
+    newWDom = cloneWDom(newWDom as WDom);
+  }
+
   const isSameType = sameTypeAs(newWDom, originalWDom);
   const wip = generalize(newWDom, isSameType, originalWDom);
   const needRerender = addReRenderTypeProperty(wip, isSameType, originalWDom);
+  // Set here, not only when complete: it marks the node as taken.
+  wip.nr = needRerender;
 
   const frame: Frame = {
     wip,
@@ -212,7 +226,7 @@ const completeWork = (frame: Frame, effects: Effects) => {
   if (!isNoting) {
     if (frame.unused) {
       const unused = frame.unused;
-      effects.push(() => typeDeleteUnused(unused));
+      effects.push(() => typeDeleteUnused(unused, originalWDom as WDom));
     }
     wip.children = frame.built;
   }
@@ -221,12 +235,17 @@ const completeWork = (frame: Frame, effects: Effects) => {
   inheritPropForRender(wip, originalWDom, effects, needRerender);
 
   if (!isNoting && originalWDom) {
-    // Deferring this is what makes the WIP tree abandonable: the original keeps
-    // its children until the commit lands, so the pass can be thrown away and
-    // the previous tree still rendered.
+    // Deferring this is what makes the WIP tree abandonable: the pass can be
+    // thrown away and the previous tree still rendered. A retired node keeps
+    // its children: it may be a hoisted constant the caller draws again
+    // later, which is then copied from them. A component's node is copied
+    // from its description instead (cloneWDom), so it lets go of its
+    // previous output.
     effects.push(() => {
       originalWDom.il = true;
-      originalWDom.children = undefined;
+      if (originalWDom.ctor) {
+        originalWDom.children = undefined;
+      }
     });
   }
 
@@ -389,7 +408,13 @@ const generalize = (
   return checkCustemComponentFunction(newWDom)
     ? isSameType && originalWDom
       ? runUpdate(originalWDom, newWDom)
-      : newWDom.resolve()
+      : // Resolved before (children a component draws again somewhere else):
+        // the first instance owns its props, which are also its key, so the
+        // new instance is made from a copy.
+        (newWDom.rd
+          ? copyResolver(newWDom)
+          : ((newWDom.rd = true), newWDom)
+        ).resolve()
     : newWDom;
 };
 
@@ -427,21 +452,27 @@ const planChildren = (frame: Frame) => {
   frame.originals = new Array(children.length);
   const origChildren = originalWDom.children || [];
 
-  if (wip.type === 'l' && checkExistyKey(children[0])) {
+  if (wip.type === 'l' && checkKeyedChildren(wip)) {
     frame.matchedIndexes = new Array(children.length);
     const keyMap = new Map<unknown, number>();
     const used: boolean[] = [];
 
     origChildren.forEach((item, index) => {
       const key = getKey(item);
-      if (!keyMap.has(key)) {
+      if (checkExisty(key) && !keyMap.has(key)) {
         keyMap.set(key, index);
       }
     });
 
     children.forEach((item, index) => {
       const key = getKey(item);
-      const origIndex = keyMap.get(key);
+      // Unkeyed items among keyed ones (a hidden row's null, a nested array)
+      // pair with the unkeyed original at the same index, as in React.
+      const origIndex = checkExisty(key)
+        ? keyMap.get(key)
+        : index < origChildren.length && !checkExistyKey(origChildren[index])
+          ? index
+          : undefined;
 
       if (origIndex !== undefined) {
         keyMap.delete(key);

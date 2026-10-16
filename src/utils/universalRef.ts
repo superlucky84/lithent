@@ -31,6 +31,10 @@ const setComponetRef = (compKey: CompKey, ctor?: TagFunction): void => {
 
 export const getComponentKey = (): CompKey | null => compKeyRef.value;
 
+/** The component whose setup or render is running (a WeakMap misses null). */
+export const getCurrentComponent = () =>
+  componentMap.get(compKeyRef.value as CompKey);
+
 export const getComponentSubInfo = <K extends ComponentSubKey>(
   compKey: CompKey,
   subKey: K

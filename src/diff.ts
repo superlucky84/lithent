@@ -2,11 +2,14 @@ import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent, makeParentGetter } from '@/utils';
 import { typeDeleteUnused } from '@/render';
+import { cloneWDom, copyResolver } from '@/wDom';
 import {
   checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
   checkExistyKey,
+  checkExisty,
+  checkKeyedChildren,
 } from '@/utils/predicator';
 
 import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
@@ -18,13 +21,23 @@ import { keys, isEnumerableProp } from '@/utils';
 export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
   originalWDom?: WDom
-) =>
-  remakeNewWDom(
+) => {
+  // Already drawn or taken by a diff (it has nr, 'N' once drawn): the node
+  // belongs to another place, so this place draws a copy. The same node in the same place is still left
+  // alone as unchanged. A component made without a diff and not drawn yet
+  // (in a new component's output, or a hoisted <Comp />) is drawn as it is:
+  // a copy would be a second instance, leaving the one already set up behind.
+  if (newWDom !== originalWDom && (newWDom as WDom).nr) {
+    newWDom = cloneWDom(newWDom as WDom);
+  }
+
+  return remakeNewWDom(
     newWDom,
     !!originalWDom &&
       checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
     originalWDom
   );
+};
 
 /**
  * Create a new virtual DOM after comparing with the previous virtual DOM
@@ -54,11 +67,18 @@ const remakeNewWDom = (
   remakeWDom.nr = needRerender;
   inheritPropForRender(remakeWDom, originalWDom, needRerender);
 
+  // A retired node keeps its children: it may be a hoisted constant the
+  // caller draws again later, which is then copied from them. A component's
+  // node is copied from its description instead (cloneWDom), so it lets go
+  // of its previous output: otherwise every row a list redraws keeps its old
+  // subtree reachable, for the GC to copy, until the whole redraw is done.
   if (!isNoting && originalWDom) {
     originalWDom.il = true;
-    originalWDom.children = undefined;
+    if (originalWDom.ctor) {
+      originalWDom.children = undefined;
+    }
   }
-  if (originalWDom?.tag === 'portal') {
+  if (originalWDom && originalWDom.tag === 'portal') {
     remakeWDom.tag = 'portal';
   }
 
@@ -98,14 +118,15 @@ const addReRenderTypeProperty = (
 ): RenderType | undefined => {
   if (checkEmptyElement(newWDom)) return 'D';
 
-  const isSameText =
-    newWDom.type === 't' &&
-    isSameType &&
-    newWDom.text === (originalWDom && originalWDom.text);
-  if (isSameText || newWDom === originalWDom) return 'N';
-
-  const existOriginalWDom = originalWDom && originalWDom.type;
-  if (!existOriginalWDom) return 'A';
+  if (
+    newWDom === originalWDom ||
+    (isSameType &&
+      newWDom.type === 't' &&
+      newWDom.text === (originalWDom as WDom).text)
+  ) {
+    return 'N';
+  }
+  if (!(originalWDom && originalWDom.type)) return 'A';
 
   const parent = getParent(originalWDom);
   const isKeyChecked =
@@ -126,16 +147,6 @@ const syncResolverProps = (props: Props, infoProps: Props) => {
       key => isEnumerableProp(infoProps, key) || delete props[key]
     );
     keys(infoProps).forEach(key => (props[key] = infoProps[key]));
-  }
-};
-
-const syncResolverChildren = (children: WDom[], infoChidren: WDom[]) => {
-  if (children) {
-    children.splice(0, children.length);
-
-    if (infoChidren) {
-      infoChidren.forEach(childrenItem => children.push(childrenItem));
-    }
   }
 };
 
@@ -163,12 +174,10 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
    * If it's the same Fragment reference, the diff process will handle updating its children
    */
   if (children && infoChidren && children !== infoChidren) {
-    syncResolverChildren(children, infoChidren);
+    children.splice(0, children.length, ...infoChidren);
   }
 
-  const newVDom = vDom.reRender && vDom.reRender();
-
-  return newVDom as WDom;
+  return (vDom.reRender && vDom.reRender()) as WDom;
 };
 
 /**
@@ -182,7 +191,13 @@ const generalize = (
   return checkCustemComponentFunction(newWDom)
     ? isSameType && originalWDom
       ? runUpdate(originalWDom, newWDom)
-      : newWDom.resolve()
+      : // Resolved before (children a component draws again somewhere else):
+        // the first instance owns its props, which are also its key, so the
+        // new instance is made from a copy.
+        (newWDom.rd
+          ? copyResolver(newWDom)
+          : ((newWDom.rd = true), newWDom)
+        ).resolve()
     : newWDom;
 };
 
@@ -199,7 +214,8 @@ const remakeChildrenForDiff = (
     : remakeChildrenForAdd(newWDom);
 
 /**
- * Recursive handling for the creation of a new virtual DOM.
+ * Recursive handling for the creation of a new virtual DOM. Kept apart from
+ * the update below: one function for both made creating 1,000 rows 6% slower.
  */
 const remakeChildrenForAdd = (newWDom: WDom) => {
   const getParent = makeParentGetter(newWDom);
@@ -216,8 +232,8 @@ const remakeChildrenForAdd = (newWDom: WDom) => {
  * Uses key-based diffing for loops, index-based for others
  */
 const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
-  if (newWDom.type === 'l' && checkExistyKey((newWDom.children || [])[0])) {
-    return remakeChildrenForLoopUpdate(newWDom, originalWDom);
+  if (newWDom.type === 'l' && checkKeyedChildren(newWDom)) {
+    return diffLoopChildren(newWDom, originalWDom);
   }
 
   const origChildren = originalWDom.children || [];
@@ -231,52 +247,42 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
 };
 
 /**
- * Handling virtual DOM of loop-type elements.
- */
-const remakeChildrenForLoopUpdate = (newWDom: WDom, originalWDom: WDom) => {
-  const [remakedChildren, unUsedChildren] = diffLoopChildren(
-    newWDom,
-    originalWDom
-  );
-
-  typeDeleteUnused(unUsedChildren);
-
-  return remakedChildren;
-};
-
-/**
  * Recursive handling of loop-type virtual DOM elements.
  * Matches children against the originals by key via a Map in O(n) and
  * records each match's original index (oi) for the render phase to
- * minimize moves via LIS.
+ * minimize moves via LIS. The originals left unmatched are deleted.
  */
 const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
   const origChildren = originalWDom.children || [];
   const keyMap = new Map<unknown, number>();
   origChildren.forEach((item, index) => {
     const key = getKey(item);
-    if (!keyMap.has(key)) {
+    if (checkExisty(key) && !keyMap.has(key)) {
       keyMap.set(key, index);
     }
   });
 
   const used: boolean[] = [];
   const getParent = makeParentGetter(newWDom);
-  const remaked = (newWDom.children || []).map(item => {
+  const remaked = (newWDom.children || []).map((item, index) => {
     const key = getKey(item);
-    const origIndex = keyMap.get(key);
-    const matched = origIndex !== undefined;
+    // Unkeyed items among keyed ones (a hidden row's null, a nested array)
+    // pair with the unkeyed original at the same index, as in React.
+    const origIndex = checkExisty(key)
+      ? keyMap.get(key)
+      : index < origChildren.length && !checkExistyKey(origChildren[index])
+        ? index
+        : undefined;
+    let original: WDom | undefined;
 
-    if (matched) {
+    if (origIndex !== undefined) {
       keyMap.delete(key);
       used[origIndex] = true;
+      original = origChildren[origIndex];
     }
 
-    const child = makeNewWDomTree(
-      item,
-      matched ? origChildren[origIndex] : undefined
-    );
-    if (matched) {
+    const child = makeNewWDomTree(item, original);
+    if (original) {
       child.oi = origIndex;
     }
     child.getParent = getParent;
@@ -286,5 +292,10 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
 
   // Originals left unmatched, including ones whose key was already taken
   // (no key, or a duplicate) and so never made it into keyMap.
-  return [remaked, origChildren.filter((_item, index) => !used[index])];
+  typeDeleteUnused(
+    origChildren.filter((_item, index) => !used[index]),
+    originalWDom
+  );
+
+  return remaked;
 };

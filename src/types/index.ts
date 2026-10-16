@@ -35,6 +35,7 @@ export type TagFunctionResolver = {
   props: Props;
   children: WDom[];
   resolve: (compKey?: CompKey) => WDom;
+  rd?: boolean; // resolved once already
 };
 
 export type FragmentFunction = (props: Props, children: WDom[]) => WDom;
@@ -45,7 +46,7 @@ export type MiddleStateWDom =
   | WDom
   | number
   | string
-  | false
+  | boolean
   | null
   | MiddleStateWDomChildren;
 
@@ -78,6 +79,7 @@ export interface WDom {
   nr?: RenderType; // needRerender
   oi?: number; // originalIndex (matched keyed position in previous children)
   il?: boolean; // isLegacy
+  rs?: TagFunctionResolver; // resolver: untouched description of a component drawn without a diff
   [wdomSymbol]?: boolean | 'provider';
 }
 
