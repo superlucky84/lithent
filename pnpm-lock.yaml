@@ -142,7 +142,7 @@ importers:
         specifier: ^9.16.0
         version: 9.16.0
       '@lithent/lithent-vite':
-        specifier: ^0.3.3
+        specifier: ^0.3.4
         version: link:../../packages/lithentVite
       '@tailwindcss/postcss':
         specifier: ^4.0.0
@@ -206,7 +206,7 @@ importers:
         specifier: ^0.2.6
         version: link:../../packages/lithentMdx
       '@lithent/lithent-vite':
-        specifier: ^0.3.3
+        specifier: ^0.3.4
         version: link:../../packages/lithentVite
       '@tailwindcss/postcss':
         specifier: ^4.0.0
