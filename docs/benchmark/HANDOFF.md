@@ -1,5 +1,17 @@
 # summary
 
+## 행 선택·부분 갱신 진단 — 2026-10-18
+
+- [SELECT_PARTIAL_UPDATE_ANALYSIS.md](./SELECT_PARTIAL_UPDATE_ANALYSIS.md)에 공식 앱과 npm
+  `lithent@1.25.2`의 계측 결과를 정리했다. 런타임과 벤치마크 앱은 수정하지 않았다.
+- 선택 이동은 DOM class 2개, 부분 갱신은 텍스트 100개만 바꾸지만, 두 경우 모두 캐시 검사가
+  1,000회 발생했다. 전체 diff 호출은 각각 1,021회·1,903회이며, DOM 정체성은 유지됐다.
+- 전체 Table 갱신과 keyed 목록 처리, 변경 행의 VDOM 재생성이 비용의 주요 경로다.
+  행 컴포넌트 갱신은 Table 1회이며, LIS와 DOM 이동은 없었다.
+- 원본 표본·소스·번들·프로파일을 `select-partial-results.json`과
+  `select-partial-evidence.json.gz`에 보존했다. 로컬 진단 시간은 공식 점수 재현이 아니며,
+  개선 후보는 아직 적용하거나 검증하지 않았다.
+
 ## base 크기 게이트 해결 — 2026-10-08
 
 - 사용자 요청으로 기존 55B 초과를 해결했다. 코어 로직을 바꾸지 않고 UMD 출력의 지역 변수명과
