@@ -163,7 +163,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.0(eslint@9.16.0(jiti@2.6.1))
       lithent:
-        specifier: ^1.22.1
+        specifier: ^1.25.2
         version: link:../..
       postcss:
         specifier: ^8.4.24
@@ -196,7 +196,7 @@ importers:
         specifier: ^4.21.1
         version: 4.21.1
       lithent:
-        specifier: ^1.22.1
+        specifier: ^1.25.2
         version: link:../..
       state-ref:
         specifier: ^2.0.0
