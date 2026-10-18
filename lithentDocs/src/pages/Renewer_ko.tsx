@@ -56,6 +56,27 @@ const Counter = mount((renew, _props) => {
       철학입니다.
     </p>
 
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      외부 연동에서 갱신을 요청하려면 해당 인스턴스의 <code>renew</code>를
+      보관하세요. <code>lmount</code>에서는 초기화 중 <code>useRenew()</code>로
+      얻을 수 있습니다. export된 <code>componentUpdate</code>는 인스턴스 자신의
+      props 객체로 조회하므로, 처음 <code>h()</code>에 전달한 외부 객체를 키로
+      사용하면 찾지 못할 수 있습니다. <code>renew()</code>도 외부 props 객체를
+      인스턴스에 동기화하는 기능은 아닙니다. 1.25.2의 변경 내용과 외부 데이터
+      연동의 이전 예제는{' '}
+      <a
+        href="#/ko/guide/props"
+        class="text-[#42b883] hover:underline"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/ko/guide/props');
+        }}
+      >
+        Props 가이드
+      </a>
+      를 참고하세요.
+    </p>
+
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">

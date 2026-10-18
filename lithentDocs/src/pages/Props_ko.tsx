@@ -25,7 +25,9 @@ export const PropsKo = () => (
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
         Updater의 첫 번째 인자
       </strong>
-      로도 제공됩니다. 컴포넌트의 생명주기 동안 동일한 참조를 유지합니다.
+      로도 제공됩니다. 인스턴스 내부의 props는 생명주기 동안 동일한 참조를
+      유지합니다. 처음 <code>h()</code>에 전달한 외부 객체와 같은 참조라는
+      보장은 아닙니다.
     </p>
 
     <CodeBlock
@@ -55,6 +57,79 @@ render(
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       TypeScript를 사용할 때는 mount 함수의 제네릭으로 Props 타입을 정의할 수
       있습니다. 이를 통해 타입 안정성을 확보할 수 있습니다.
+    </p>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      Props 객체의 참조와 외부에서 갱신하기
+    </h2>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      1.25.2부터 diff 밖에서 생성한 컴포넌트는 props의 얕은 복사본을 받습니다.
+      <code>render()</code> 전에 호출하는 최상위 <code>h(Comp, props)</code>도
+      해당합니다. 같은 노드를 다른 위치에 그려도 각 인스턴스가 서로 영향을 주지
+      않도록 하기 위한 동작입니다. 중첩된 객체나 배열은 참조를 공유하며, 깊은
+      복사는 아닙니다. 외부 객체를 변경하는 것만으로 렌더가 예약되지는 않습니다.
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      export된 <code>componentUpdate(compKey)</code>는 인스턴스를 조회하여 갱신
+      함수를 반환하는 저수준 API입니다. 키는 인스턴스 자신의 props 객체이며,
+      임의의 외부 데이터 객체가 아닙니다. 반환된 함수를 호출하면 갱신 액션을
+      찾아 호출한 경우 <code>true</code>, 찾지 못하면 경고 없이{' '}
+      <code>false</code>를 반환합니다. <code>true</code>는 DOM 반영이 이미
+      완료되었다는 뜻은 아닙니다.
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      애플리케이션에서는 <code>mount</code>가 제공하는 <code>renew</code>나{' '}
+      <code>lmount</code>의 초기화 중 호출한 <code>useRenew()</code>를
+      사용하세요. 원본 props를 수정하고{' '}
+      <code>componentUpdate(originalProps)()</code>를 호출하던 방식은 위
+      인스턴스를 찾지 못합니다. 호출만 <code>renew()</code>로 바꿔도 인스턴스의
+      복사된 props에 외부 변경이 전달되지는 않습니다.
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      외부 데이터와 연동할 때는 부모가 렌더마다 최신 데이터를 읽고 자식에게 새
+      props를 전달하게 하세요. 부모의 <code>renew</code>를 보관해 외부에서
+      갱신을 요청할 수 있습니다:
+    </p>
+
+    <CodeBlock
+      language="ts"
+      code={`import { h, mount, nextTick, render } from 'lithent';
+
+const Label = mount<{ text: string }>((_renew, props) =>
+  () => h('p', {}, props.text)
+);
+const data = { text: 'a' };
+let refresh = () => false;
+
+const Host = mount(renew => {
+  refresh = renew;
+  return () => h(Label, { ...data });
+});
+
+const root = document.getElementById('root')!;
+const destroy = render(h(Host, {}), root);
+
+data.text = 'b';
+refresh();
+await nextTick();
+// root.innerHTML === '<p>b</p>'
+
+// 연동을 제거할 때:
+destroy();
+refresh = () => false;`}
+    />
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      자식은 인스턴스를 유지하며 일반적인 부모 갱신 경로로 최신 props를
+      받습니다. props 참조와 조회 키에 관한 규칙은 lithent-concurrent에도
+      동일하게 적용됩니다. 미룬 렌더의 완료를 기다려야 한다면 해당 코어의
+      스케줄링 API를 사용하세요.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />

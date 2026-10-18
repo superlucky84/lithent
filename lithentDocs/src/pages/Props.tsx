@@ -25,7 +25,9 @@ export const Props = () => (
       <strong class="font-semibold text-[#42b883] bg-[#42b883] bg-opacity-10 px-2 py-1 rounded">
         the first argument to the Updater
       </strong>
-      . The same props reference is preserved for the lifetime of the component.
+      . The instance keeps the same props reference for its lifetime. This does
+      not guarantee the same reference as the object originally passed to{' '}
+      <code>h()</code>.
     </p>
 
     <CodeBlock
@@ -55,6 +57,80 @@ render(
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
       When using TypeScript, you can define the Props type as the generic
       parameter of <code>mount</code> for better type safety.
+    </p>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      Props identity and external updates
+    </h2>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Since 1.25.2, a component created outside a diff, such as a top-level{' '}
+      <code>h(Comp, props)</code> before <code>render()</code>, receives a
+      shallow copy of props. This keeps its instance separate from other places
+      that render the same node. Nested objects and arrays are still references;
+      this is not a deep copy. Changing an external object does not itself
+      schedule a render.
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      The exported <code>componentUpdate(compKey)</code> is a low-level lookup
+      that returns an update function. Its key is the instance&apos;s own props
+      object, not an arbitrary external data object. Calling that function
+      returns <code>true</code> when an update action is found and invoked, or{' '}
+      <code>false</code> when none is found, without a warning. A{' '}
+      <code>true</code> result does not mean the DOM has already updated.
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      For application code, use <code>renew</code> from <code>mount</code>, or
+      call <code>useRenew()</code> during an <code>lmount</code> setup. The old
+      pattern of changing the original props and calling{' '}
+      <code>componentUpdate(originalProps)()</code> no longer finds these
+      instances. Switching only the update call to <code>renew()</code> still
+      leaves the instance&apos;s copied props unchanged.
+    </p>
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      To integrate external data, let a parent read the latest data on each
+      render and pass fresh props to the child. Keep that parent&apos;s{' '}
+      <code>renew</code> function as the external refresh handle:
+    </p>
+
+    <CodeBlock
+      language="ts"
+      code={`import { h, mount, nextTick, render } from 'lithent';
+
+const Label = mount<{ text: string }>((_renew, props) =>
+  () => h('p', {}, props.text)
+);
+const data = { text: 'a' };
+let refresh = () => false;
+
+const Host = mount(renew => {
+  refresh = renew;
+  return () => h(Label, { ...data });
+});
+
+const root = document.getElementById('root')!;
+const destroy = render(h(Host, {}), root);
+
+data.text = 'b';
+refresh();
+await nextTick();
+// root.innerHTML === '<p>b</p>'
+
+// When the integration is removed:
+destroy();
+refresh = () => false;`}
+    />
+
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      The child keeps its instance and receives updated props through the normal
+      parent update path. The same props identity and lookup rules apply to
+      lithent-concurrent; use its scheduling APIs when you need to wait for
+      deferred rendering.
     </p>
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />

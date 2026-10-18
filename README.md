@@ -88,6 +88,13 @@ const Counter = lmount(() => {
 
 > **[📚 Explore component patterns in detail](https://superlucky84.github.io/lithent/#/guide/mounter)**
 
+Component updates use `renew()` from `mount`, or `useRenew()` inside `lmount`.
+The instance's props object is stable, but it is not guaranteed to be the
+original object passed to `h()`. Since 1.25.2, components created outside a diff
+receive shallow copies of props. If you previously used
+`componentUpdate(originalProps)()`, see the [props guide](https://superlucky84.github.io/lithent/#/guide/props)
+for the lookup contract and an external-data migration example.
+
 <br />
 
 ## Key features

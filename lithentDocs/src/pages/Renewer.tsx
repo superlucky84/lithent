@@ -57,6 +57,27 @@ const Counter = mount((renew, _props) => {
       philosophy.
     </p>
 
+    <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
+      Keep the instance&apos;s <code>renew</code> function when an external
+      integration needs to request updates. With <code>lmount</code>, capture it
+      using <code>useRenew()</code> during setup. The exported{' '}
+      <code>componentUpdate</code> looks up an instance by its own props object;
+      the original object passed to <code>h()</code> is not a reliable key.
+      Calling <code>renew()</code> also does not synchronize an external props
+      object with the instance. See the{' '}
+      <a
+        href="#/guide/props"
+        class="text-[#42b883] hover:underline"
+        onClick={(e: Event) => {
+          e.preventDefault();
+          navigateTo('/guide/props');
+        }}
+      >
+        props guide
+      </a>{' '}
+      for the 1.25.2 change and an external-data migration example.
+    </p>
+
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">

@@ -8,6 +8,14 @@
   render changes tags, becomes empty, or inserts multiple nodes (#99).
 - Render hoisted or shared element/component nodes safely in multiple places,
   with separate component instances and the correct props for each position.
+- Compatibility note: components created outside a diff, including a top-level
+  `h(Comp, props)` before `render`, now receive shallow copies of props and
+  children. `componentUpdate(originalProps)()` no longer finds those instances
+  and returns `false` without a warning. Use the instance's `renew()` or
+  `useRenew()` for updates; external data must also be passed into the instance,
+  for example through a parent that renders fresh props. Calling `renew()` alone
+  does not synchronize the original props object. See the
+  [props guide](https://superlucky84.github.io/lithent/#/guide/props).
 - Preserve keyed identity and input focus through lists with empty or mixed
   keyed/unkeyed children, reorders, and rows that redraw themselves.
 - Run renewals raised during a flush, including a new child's mount callback
