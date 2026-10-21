@@ -1,6 +1,6 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-21. 상태: **Phase 1 완료, 다음은 C1 한정 프로토타입. 저장·유지 방식 확정 전이며 채택 구현 없음**.
+- 기준일: 2026-10-21. 상태: **Phase 2 C1 한정 검증 완료·채택 보류, baseline 복원. C3 계약 검토 대기**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
@@ -39,6 +39,18 @@ Phase 1의 비용 분해로 **C1 한정 프로토타입을 다음 작업**, C2�
 - 조상 `compChild`는 부모 `children`과 별도 배열이다. 하나의 인덱스로 둘을 대체하지 않는다. 각 참조 안정성과 슬롯 전달을 보존한다.
 - concurrent에서는 미완료 work-in-progress가 현재 연결을 바꾸지 않는다. 연결 publication 시점은 commit 또는 기존 안전한 동기화 지점이어야 한다. 폐기 작업은 새 연결을 남기지 않는다.
 - **가설:** 갱신 위치가 안정적인 컴포넌트 목록에서 반복 검색을 줄일 수 있다. 조상 탐색·배열 이동·인덱스 유지 비용이 남으므로 전체 갱신 O(1)은 약속하지 않는다.
+
+#### Phase 2 첫 후보 — base의 부모 children 검색만
+
+DC-6에서 확정해 구현·검증한 한정 후보는 다음과 같다. [실측](../benchmark/PARENT_POSITION_RESULTS.md) 후 기본 코어 채택은 보류했고 후보는 별도 패치·증거에 보존했다.
+
+- 저장: base `wDom.ts`의 module sidecar `WeakMap<CompKey, WeakMap<WDom[], number>>`를 사용한다. 외부 key는 현재 컴포넌트의 `originalWDom.compKey`, 내부 key는 실제 부모 children 배열이다. 컴포넌트가 비root 자체 갱신에서 위치를 조회할 때 lazy 생성하고 성공 위치만 기록한다. 모든 WDom/ComponentInfo의 필드·public API·컴포넌트당 최초 생성 closure를 늘리지 않는다.
+- 조회: index 0과 미저장을 구분하며 현재 배열의 `array[index] === originalWDom`을 확인한다. 실패 시 기존 native `indexOf`로 돌아간 뒤 성공 위치를 저장한다. 음수 검색 결과를 다음 갱신을 생략하는 negative cache로 쓰지 않는다. compKey가 없는 직접 `replaceWDom` 호출은 기존 검색을 사용한다. 기존 `splice`와 `il` 조기 반환·예약 시점·callback·예외 동작을 유지한다.
+- 정합성 경계: hint hit의 충분조건은 정규화된 parent.children에서 live 인스턴스가 분리·단일 소비된다는 전제다. cached/중복 same-WDom의 다중 위치 재사용·hydration·직접 `replaceWDom`의 baseline 대조를 먼저 검증한다. identity가 같은 뒤 위치를 찾았다는 사실만으로 첫 등장 의미가 증명되지 않는 배열은 최적화 대상으로 확대하지 않는다.
+- slot: `compChild`는 raw 설명·공유 배열을 in-place splice하며 같은 WDom alias가 있을 수 있다. cached 뒤 위치도 identity가 같으면서 앞에 같은 참조가 추가되면 native `indexOf`의 첫 등장 결과와 달라질 수 있으므로 **이번 후보는 조상 slot의 기존 검색을 유지한다**. 부모/slot에 같은 helper를 무조건 적용하지 않는다.
+- 수명·유지: 두 WeakMap의 key가 컴포넌트와 배열을 강하게 보유하지 않으며 값은 숫자뿐이다. 배열→index의 강한 Map이나 컴포넌트→단일 강한 array/index 레코드는 이전 부모 배열·형제 subtree를 잡을 수 있어 이번에는 사용하지 않는다. 구조 diff마다 전체 hint를 재작성하지 않고 현재 배열·노드 검증으로 stale을 처리한다. GC 진단은 반복 부모 갱신·이동·삭제·dispose 이후의 이전 배열/VDOM 회수를 확인한다.
+- concurrent: 이번에는 수정하지 않는다. concurrent는 `addComponentProps`에서 redraw/live 노드를 commit effects로 publish하고 매번 closure를 새로 연결하므로 base의 bind-once closure나 검색 시 cache 갱신을 그대로 이식할 수 없다. 별도 후보를 만들 때 live 소유와 commit/abandon 시 cache publication을 결정한다. 공통 타입/helper·계약 검증은 이번에도 양쪽에 수행한다.
+- 비용: 최상위 WeakMap, 첫 실제 자체 갱신의 내부 WeakMap, 매 검색의 get/set·identity 검사와 warm hit·cold/stale fallback을 분리한다. original/Table의 한 요소 검색에는 추가 비용만 생길 수 있으며, nested 입력의 slot 검색과 render 앵커 검색은 남는다. 전체 시간·생성/삭제·메모리·raw/gzip/br를 함께 기록하고 4,800B를 넘으면 미채택 실험으로 보존한다.
 
 검증: M-3·M-4·M-6, `core-parentChildSync`, `core-mixedComponentUpdate`, `core-composedRenew`, `core-removedRedraw`, `core-cachedIdentity` 및 concurrent 폐기/commit 동등성 테스트. 별도의 비벤치마크 예제로 nested slots 안의 여러 입력 필드를 갱신한다.
 
@@ -123,12 +135,15 @@ Phase 1에서는 다음 기준으로 카운터의 의미와 시나리오를 기�
 - [x] **DC-3 확정:** base와 concurrent의 관찰 가능한 계약을 각각 검증한다. 성능 측정은 우선 base이며 concurrent 개선을 추론하지 않는다. → Phase 2~6, M-6.
 - [ ] **DC-4 검증 대기:** C3가 필요한지, 기존 기능 조합으로 충분한지, 새 API·callback 의미·패키지 위치. Phase 3 진입 시 비용 분해와 일반 예제로 결정. → M-4·M-6·M-9.
 - [ ] **DC-5 TBD:** C4의 목록 소유권/변경 정보/무효화·fallback 계약. C3까지로 목표에 접근 가능한지 본 뒤 분기. → Phase 3, M-4·M-9.
-- [ ] **DC-6 구현 전 결정 대기:** C1은 컴포넌트 소유 hint와 parent/각 slot의 독립적인 배열 참조·index 검증을 우선 검토한다. field/sidecar 저장 위치, 최초 생성·이동/삭제/부모 재실행 때 유지 비용, concurrent commit publication을 산정해 Phase 2 구현 전에 닫는다. C2를 재개하면 uniqueness/순서 진입 증명 방식과 추가 비용도 별도로 확정한다. → Phase 2, M-2·M-3·M-8.
+- [x] **DC-6 C1 한정 후보 확정:** base의 정규화된 parent.children만 lazy `WeakMap<CompKey, WeakMap<WDom[], number>>` sidecar로 조회한다. 현재 배열·original identity 검증 뒤 성공 위치만 저장하고 stale/compKey 없음은 native fallback이다. slot은 alias의 첫 등장 증명 부족으로 기존 검색, concurrent는 commit 소유 경계가 달라 미수정이다. 고정 WDom/ComponentInfo/public API 변경·전체 hint 재작성 없이 cold/warm/stale·추가 WeakMap·크기/회수를 검증한다. 근거는 위 한정 후보 계약과 Phase 1 작업량이다. **C1 한정 구현·검증은 완료했고 기본 채택은 보류했다. [실측](../benchmark/PARENT_POSITION_RESULTS.md)을 참조한다.** → Phase 2, M-2·M-3·M-8.
 - [x] **DC-7 확정:** 기존 retainedView/renderBoundary와 새 memo 의미를 구분하며 benchmark 주석 회피를 설계 동기로 삼지 않는다. → Phase 3·6, M-6·M-9.
+- [ ] **DC-8 조건부 TBD:** C1 slot 검색 확장의 첫 등장/alias 불변식과 invalidation. 이번 부모 전용 후보에는 포함하지 않으며 재개 시 구현 전에 확정한다. → M-3·M-4.
+- [ ] **DC-9 조건부 TBD:** C1 concurrent 이식의 live 소유, commit publication·abandon 및 메모리 비용. 이번에는 기존 경로를 유지한다. → M-6·M-8.
+- [ ] **DC-10 조건부 TBD:** 보류한 C2의 uniqueness/순서 진입 증명 방식과 실제 제거 작업·추가 비용. 재개 시 별도 후보로 확정한다. → Phase 2, M-2·M-3.
 
 ## 상태 / 핸드오프
 
-- done: Phase 1의 38개 시나리오와 일반 nested 예제로 작업량을 확인하고 C1 우선·C2 보류·C3 계약 연구 유지로 분기했다. 공식 성능 채택 판정은 없다.
-- next: DC-6의 C1 저장·유지·concurrent publication을 구체화한 뒤 한정 프로토타입을 구현한다. C3/C4를 자동 채택하지 않는다.
-- blockers: Phase 1 완료의 블로커 없음. DC-4~DC-6은 각 후보의 구현 진입 조건이다.
-- commit: 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`; Phase 0 문서 `dbbd320a5b92c63262d43b667692396ae5d53322`. 이번 실행 변경은 미커밋이며 채택 구현 없음.
+- done: DC-6 C1의 구현·cold/warm/stale·dual·공식 290표본과 회수 검증 완료. 10k 반복 자체 갱신 약 17~18% 개선, 원래 앱 가중 전체 −0.55% 단일 차수·크기 한도 +53B로 기본 채택 보류 및 baseline 복원. slot/concurrent 미수정.
+- next: DC-4 C3의 의존성 스냅샷·props/children 무효화·자체 renew·callback·동시 갱신·disposal 계약을 먼저 구체화한다. C1의 parent-array 소유 저장으로 map 할당을 줄이는 대안은 미구현 가설로 남긴다.
+- blockers: 사용자 결정이 필요한 현재 블로커 없음. DC-4/5·DC-8~DC-10은 해당 조건부 후보의 구현 진입 조건이다.
+- commit: Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`; 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. Phase 2 C1 산출물은 `perf: preserve C1 parent-position evaluation` 체크포인트에 보존하며 채택 구현은 없음. 정확한 SHA는 git log·ctxbin 인계 참조.

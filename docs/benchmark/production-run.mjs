@@ -1,6 +1,12 @@
 // Measures real production adapters with the unchanged local official runner.
 import { createServer } from 'node:http';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  cpSync,
+} from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve, extname } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -392,6 +398,24 @@ try {
             at: new Date().toISOString(),
             ...result,
           });
+          // The upstream runner reuses trace filenames on retry. Preserve the
+          // failed attempt before another batch can overwrite its evidence.
+          const failedDir =
+            out +
+            '/failed-attempts/' +
+            name +
+            '-' +
+            id +
+            '-' +
+            Date.now() +
+            '-' +
+            attempt;
+          mkdirSync(failedDir, { recursive: true });
+          cpSync(out + '/traces', failedDir + '/traces', { recursive: true });
+          writeFileSync(
+            failedDir + '/result.json',
+            JSON.stringify(result, null, 2)
+          );
           writeFileSync(
             out + '/production-' + mode + '.json',
             JSON.stringify(output, null, 2)

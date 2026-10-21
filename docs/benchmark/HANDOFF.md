@@ -1,5 +1,49 @@
 # summary
 
+## C1 검증 커밋·ctxbin 인계 체크포인트 — 2026-10-21
+
+- 사용자 요청으로 아래 C1 보고서·후보 패치·raw/압축 증거·재현 도구·회귀와 정본 계획을
+  `perf: preserve C1 parent-position evaluation` 커밋에 보존한다. 정확한 커밋 SHA는
+  `git log`와 이번 ctxbin 인계 기록에 남긴다. 아래 미커밋 표기는 각 측정 당시의 이력이다.
+- 런타임은 복원된 base 1.25.2/concurrent 0.2.2다. 이번 커밋은 C1 기본 채택이 아니다.
+  다음은 Phase 3 DC-4의 C3 계약 검토이며 실제 sibling의 기존 targeted 앱을 보존한다.
+- 이번 요청은 커밋과 ctxbin 인계 저장이며 새 push·배포는 하지 않는다.
+
+## C1 부모 위치 검색 후보 검증 완료 — 2026-10-21
+
+- [C1 보고서](./PARENT_POSITION_RESULTS.md)를 먼저 읽는다. base 부모 children의 위치 캐시를
+  구현해 검증했고 **기본 코어 채택은 보류**, 후보 패치·raw·압축 증거를 보존한 뒤 runtime을 복원했다.
+- 일반 10k 항목 중 1k 반복 자체 갱신은 JS+nextTick **약 17~18% 감소**했다. 부모 검색 예상 방문
+  4,996,000회를 1,000회 위치 확인으로 대체했다. slot 검색과 원래 Table의 전체 순회는 남는다.
+- 동일 원래 앱의 공식 9항목 **290표본**에서는 가중 전체 **−0.55%**, JS **−1.13%**.
+  부분 갱신 −4.4%, 선택 +6.2%로 엇갈렸다. 한 차수이며 역순·전체 React/Preact 비교는 미실행이다.
+- 일반 1k 컴포넌트를 모두 갱신한 GC 후 JS heap은 중앙값 **+82.5KiB (+3.0%)**.
+  1천 key를 유지해도 dispose 후 1천 VDOM/부모 배열은 양쪽 3context씩 모두 회수됐다.
+  초기 검사 코드의 참조 보관 오류를 수정했고 최종 `diagnostic-v3`만 수치에 사용했다.
+- 후보 brotli **4,853B**, baseline 대비 +55B/한도 +53B. dual **1,050 passed·3 skipped**,
+  production 계약·keyed·9동작·폰트 통과. size는 실패로 공개했고 한도는 바꾸지 않았다.
+- done: C1 한정 검증·증거 보존·두 코어 재빌드·기존 size 복원. 개별 회귀/메모리 증가만으로
+  기각한 것은 아니며, 작은 단일 차수 전체 신호·미해결 주 병목·크기 비용으로 채택을 보류했다.
+- next: **C3의 부모 기인 갱신 생략과 자체 renew 보존 계약**을 DC-4에서 구체화한다.
+  C2는 시간상 기각 없이 보류하고, C1의 저장 구조 절약·slot/concurrent 확장도 별도 후보로 남긴다.
+- blockers: 현재 사용자 결정 블로커 없음. Phase 4~6 및 최종 표의 색상/수치 목표는 미완료다.
+- commit: Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0` 이후 이번 변경은 미커밋.
+  새 push·배포는 하지 않았고 실제 sibling의 기존 targeted 앱 수정은 보존했다.
+
+## 범용 코어 구조 개선 Phase 2 착수 — 2026-10-21
+
+- 사용자의 커밋 후 바로 다음 페이즈 진행 요청으로 Phase 1의 문서·도구·증거 9파일을
+  `979f88f222c45cadadd1871d8d9f861a5e71f9a0`에 커밋하고, [정본 Phase 2](../performance-improvement/IMPLEMENT.md)의
+  **C1 한정 프로토타입**을 시작한다. 기존 Phase 1 보고서는 측정 당시 기록으로 보존한다.
+- done: DC-6에서 **base 부모 children 검색만** lazy `WeakMap<CompKey, WeakMap<WDom[], number>>`
+  sidecar로 다루는 후보를 확정했다. 현재 배열·노드 identity를 검증하고 성공 위치만 저장하며 stale은
+  native fallback이다. slot은 raw 설명 alias의 첫 등장 증명 부족, concurrent는 commit 경계 차이로 미수정이다.
+- next: C1만 독립 구현해 회귀·cold/warm/stale 작업량·새 WeakMap/생성/유지 비용·production 사전 비교·
+  크기와 회수를 확인한다. 원래 Table의 전체 순회·조상 slot 검색·render 앵커 검색은 남는다.
+  후보 검증 완료·최종 채택은 아직 아니며 실패 후보도 소스·증거를 보존한다.
+- blockers: 사용자 결정이 필요한 현재 블로커 없음. base **4,800B** 게이트와 최종 채택 전 Phase 4~6 검증은 유지한다.
+- commit: Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`. Phase 2 변경은 미커밋이며 push·배포는 하지 않았다.
+
 ## 범용 코어 구조 개선 Phase 1 완료 — 2026-10-21
 
 - 사용자의 후속 착수 요청으로 로컬 `doc-driven-designer-v1` 에이전트·스킬을 적용해

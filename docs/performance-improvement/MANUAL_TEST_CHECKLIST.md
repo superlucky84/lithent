@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-21. 상태: **Phase 1의 M-1·M-2 기준선 범위 완료. 후보 구현·최종 검증은 미수행**.
+- 기준일: 2026-10-21. 상태: **Phase 2 C1 한정 검증 완료·채택 보류 및 baseline 복원. 최종 채택용 전체 검증은 미완료**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택 확인에서는 후보의 B1~B4 통과와 성능 측정 산출물이 필요하다. 정합성 실패를 시간·메모리 교환으로 허용하지 않는다. 개별 성능 손해 자체는 실패 판정이 아니다.
@@ -18,18 +18,19 @@
 
 - [x] 원래 Table·행별 갱신·일반 nested slot 예제에서 updater, cache, keyed 매칭, diff, 부모/slot 검색 방문 추정, placement, DOM mutation을 [38개 시나리오](../benchmark/structural-baseline-results.json)로 분리했다.
 - [x] 1k/10k와 `k = 1, 10, n/10`, 선택 위치·parent-refresh를 바꿔 전체 목록과 변경 범위 처리를 구분했다. 계측 값과 uniqueness shadow를 공식 production 속도 개선으로 사용하지 않았다.
-- [ ] C1 위치 유지와 C2 uniqueness/순서 검사 등 새 비용을 카운터와 생성·메모리 비교에 포함했다.
-- [ ] 원래 앱을 바꾸지 않은 core-only 결과와 앱 구조/공개 기능을 사용하는 결과가 별도로 표시된다.
+- [x] C1 위치 유지의 lookup/hit/cold/stale/map 생성/쓰기와 생성·메모리 비용을 [C1 결과](../benchmark/PARENT_POSITION_RESULTS.md)에 기록했다. C2 구현/uniqueness 유지비 검증은 보류다.
+- [x] C1의 원래 앱 core-only 공식 290표본과 일반 입력 예제의 비공식 JS+nextTick 진단을 분리했다.
 
 통과: 어떤 작업이 제거되고 어떤 작업이 남는지 증거로 설명할 수 있다. 아직 O(n)인 경로에 O(1) 또는 변경 수만큼이라는 표현을 쓰지 않는다.
 
-Phase 1 범위: 현재 작업량·후보의 예상 제거 작업까지만 확인했다. C1의 실제 위치 유지, C2의 대체 구현, 생성/메모리 비용과 core-only 후보 성능은 미실행이므로 위의 후속 후보 전용 두 체크는 미완료다. 진단의 DOM/입력 정체성·값, B1~B3는 통과했지만 최종 후보 검증을 대신하지 않는다.
+Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 공식 사전 비교까지 완료했다. C2는 미구현이다. C1의 68개 카운터 검사, 24개 시간 context, 6개 회수 context, dual 1,050 passed·3 skipped와 B3 검사는 최종 후보의 Phase 4~6 검증을 대신하지 않는다. 후보 size는 53B 초과해 실패한 상태로 기록했다.
 
 ## M-3. keyed 정체성·이동·부모 위치 — DC-2/DC-6, Phase 2·5
 
 - [ ] 상태가 있는 행을 생성하고 선택/입력 → 앞·중간 삽입 → 원거리 swap → 역순 → 일부 삭제 → 다시 갱신한다. DOM 객체와 행의 내부 상태가 올바른 key에 유지된다.
 - [ ] 같은 순서/바뀐 순서의 중복 키, 0/false/빈 문자열/NaN/Symbol/object 키, null·unkeyed 혼합이 baseline의 소비·삭제와 일치한다. 각 인스턴스는 한 번만 unmount된다.
 - [ ] C1 후보에서 저장 위치가 stale인 삭제/이동/reparent 후 자체 renew가 다른 형제를 덮어쓰지 않는다. 부모 children과 조상 compChild의 공유 참조가 유지된다.
+- [x] C1의 index 0·cold/warm·배열 교체·합성 in-place 재정렬 stale fallback은 카운터/DOM 검사로, 다중 위치·중복 재사용·hydration·직접 `replaceWDom`·slot 첫 등장은 dual 회귀로 확인했다. 최종 통합 e2e는 미실행이다.
 - [ ] C2 후보에서 진입 실패 시 이미 수행한 lifecycle·DOM 변경이 없고 일반 경로로 돌아간다. 중간에 tag/type이 바뀌거나 empty가 된 같은 key도 처리된다.
 - [ ] 리스트 뒤 footer, 빈 Fragment, 여러 실제 DOM을 내는 행, portal이 섞인 삽입/이동에서도 경계를 넘지 않는다.
 
@@ -79,9 +80,10 @@ Phase 1 범위: 현재 작업량·후보의 예상 제거 작업까지만 확인
 
 - [ ] 공식 메모리 21/22/23/25/26의 절대 MB와 baseline/peer 비율을 기록한다. JS heap 진단과 `measureUserAgentSpecificMemory()`를 같은 지표로 섞지 않는다.
 - [ ] fresh context에서 생성/삭제 반복, partial 반복, 최종 dispose 후 DOM·listener·heap 잔류를 관찰한다. 데이터 문자열 증가와 참조 누수를 구분한다.
+- [x] C1 map 생성/조회/쓰기·cold/warm/stale를 분리했다. 1천 key를 유지한 dispose 후 1천 VDOM+부모 배열의 생존 0개를 양쪽 3context씩 확인했다. 반복 부모 갱신 중 모든 과거 배열의 회수 및 100회 churn 검사는 미실행이다.
 - [ ] 행/경계별 메타데이터·wrapper 비용이 1k/10k 생성, append, clear에 주는 영향을 공식 전체 시간과 함께 기록한다.
-- [ ] base/concurrent/element UMD 존재를 확인한 뒤 `pnpm size`를 실행했다. raw/gzip/br 및 선택적 API 사용/미사용 번들 비용을 기록한다.
-- [ ] 기존 한도 초과 시 수치·격리/상쇄 대안·미채택 상태를 표시했다. 한도를 조용히 바꾸거나 2B 여유를 코어 개선 불가능의 근거로 쓰지 않았다.
+- [x] C1의 세 UMD 존재와 size 실행 결과를 기록했다. 후보 base br 4,853/4,800B 실패, concurrent 6,903B·element 998B. 공개 옵트인 API 추가는 없었다.
+- [x] C1은 +55B/한도 +53B와 채택 보류를 공개했다. 저장 구조 변경·옵트인 분리/상쇄는 후속 가설이며 한도를 변경하지 않았다.
 
 통과: 새로운 구조적 누수가 없고 비용이 공개되어 있다. 단순 메모리 증가나 개별 시간 손해의 수용 여부는 IC-2에서 별도로 판단한다.
 
@@ -105,7 +107,7 @@ Phase 1 범위: 현재 작업량·후보의 예상 제거 작업까지만 확인
 
 ## 상태 / 핸드오프
 
-- done: Phase 1의 M-1·M-2 기준선 재구성·38개 진단·B1~B3 근거를 연결했다. 후보 전용·최종 단계 항목은 미완료로 유지한다.
-- next: DC-6을 닫은 C1 프로토타입에서 M-2~M-6·M-8의 해당 항목을 수행하고 실제 후보 해시의 증거를 연결한다.
+- done: C1의 M-2·M-3·M-8 한정 검증과 dual/B3·공식 290표본을 보고서에 연결했다. 채택 보류·baseline 복원이며 최종 전체 검증 항목은 미완료로 유지한다.
+- next: C3 계약 확정 뒤 M-4·M-6의 새 옵트인 전용 회귀를 먼저 준비한다. C1 결과를 C3 또는 concurrent 개선율로 사용하지 않는다.
 - blockers: 현재 없음. 새 기능 전용 항목은 후보 선정 후 적용 범위를 결정한다.
-- commit: 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`; Phase 0 문서 `dbbd320a5b92c63262d43b667692396ae5d53322`. 이번 실행 변경은 미커밋.
+- commit: Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`; 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. Phase 2 C1 산출물은 `perf: preserve C1 parent-position evaluation` 체크포인트에 보존. 정확한 SHA는 git log·ctxbin 인계 참조.

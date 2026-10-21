@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-21. 상태: **Phase 1 완료, 다음은 C1 한정 프로토타입의 구현 전 결정. Phase 2 이후 미착수**.
+- 기준일: 2026-10-21. 상태: **Phase 2 C1 한정 검증 완료·채택 보류 및 baseline 복원. Phase 3 C3 계약 검토가 다음 작업**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
@@ -49,12 +49,14 @@
 
 진입: Phase 1에서 해당 비용이 확인되고 DC-6의 저장/진입 방식이 정해짐. 종료: 후보별 정합성·작업량 감소 여부·비용이 기록되어 다음 분기로 판단 가능.
 
-- [ ] C1/C2를 한 후보씩 구현. 파일 책임은 DESIGN의 모듈 표를 따른다. 서로 다른 후보를 처음부터 합쳐 효과를 섞지 않는다.
-- [ ] 구현 전에 실제 위험을 재현하는 최소 회귀 사례 추가: 위치 stale 후 자체 renew, slot 공유, same-order 중복 키, keyed/unkeyed/null 전환, cache empty 전환 등. 구현을 그대로 흉내 내는 테스트는 만들지 않는다.
-- [ ] fallback과 lifecycle 순서가 기존 결과와 같은지 확인. concurrent 이식 여부는 구조 적합성을 검토한 뒤 정하며, 미이식이면 그 범위를 명시한다.
-- [ ] 진단 카운터로 제거 작업뿐 아니라 인덱스 유지·Set 검사·메모리/생성 비용을 기록. 전체 O(n) 검사가 남으면 그대로 명시.
-- [ ] 공식 전체 CPU 사전 비교로 다음 후보 진행 여부를 판단. 일부 회귀 자체는 탈락 사유가 아니며 작은 신호만으로 채택하지 않음.
-- [ ] 기준 검사: 변경마다 관련 base/concurrent 회귀, 단계 종료 B1·B2·B3, M-3~M-6. 동일 후보 해시의 이미 확보한 결과는 재사용.
+현재 상태: Phase 1 `979f88f` 뒤의 C1 한정 검증을 완료했다. [보고서](../benchmark/PARENT_POSITION_RESULTS.md), [raw 결과](../benchmark/parent-position-results.json), [압축 증거](../benchmark/parent-position-evidence.json.gz), [후보 패치](../benchmark/parent-position-candidate.patch)에 보존했다. slot/concurrent는 미수정이다. 큰 목록 반복 자체 갱신의 이득은 확인했지만 원래 앱 가중 전체 −0.55% 단일 차수·크기 한도 +53B여서 기본 채택은 보류하고 baseline으로 복원했다. C2는 구현하지 않은 보류 후보이며 다음은 Phase 3의 C3 계약 검토다.
+
+- [x] C1만 독립 구현·검증했다. C2는 미구현 보류이며 완료로 간주하지 않는다.
+- [x] C1 구현 전에 [부모 위치 회귀 4개](../../src/tests/core-parentPosition.test.tsx)를 추가하고 기준선 base/concurrent 각각 4개 통과: index 0·말미 반복/재정렬/추가/삭제 뒤 자체 renew, shared slot의 앞쪽 live alias 첫 등장 동기화, 같은 컴포넌트 VDOM 설명의 다중 위치 독립 수명, compKey 없는 공개 `replaceWDom`. 이는 후보 통과가 아니며 C2 전용 same-order 중복 키·mixed 목록은 재개 시 별도 준비한다.
+- [x] C1의 base/concurrent 공유 회귀·기존 lifecycle suite와 브라우저 계약 통과. 새 배열·합성 stale fallback, slot 첫 등장 동기화 확인. concurrent 이식은 하지 않음.
+- [x] C1의 68개 카운터 검사, 24개 시간 context, 6개 heap/회수 context에서 새 비용 기록. 조상 slot과 원래 Table의 전체 순회는 남음. C2 Set 비용은 Phase 1 shadow 이외 새 측정 없음.
+- [x] 공식 9항목 290표본 사전 비교 완료. 전체 −0.55%, JS −1.13%; 일부 회귀만으로 기각하지 않고 작은 단일 차수 신호·미해결 주 병목·크기 비용으로 채택 보류. Phase 4 전체 역순/peer 검증은 미실행.
+- [x] C1 B1 dual 1,050 passed·3 skipped, B2 core build 성공/size 한도 53B 초과 기록, B3 양쪽 contracts·keyed·9동작·폰트 통과. size 실패를 통과로 바꾸지 않고 baseline 복원 후 기존 게이트 재확인. M-3~M-6의 최종 채택 범위는 남김.
 
 분기: 내부 후보로 충분한 이득이 보이면 Phase 4로 진행할 수 있다. 기존 정보의 한계가 주요 원인이면 Phase 3을 구체화한다. 효과가 없으면 소스·측정·기각 이유를 보존하고 baseline으로 복원한다.
 
@@ -121,7 +123,7 @@
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** 앞선 문서/계획은 Phase 0에서 완료했고, 2026-10-21 후속 착수 요청으로 Phase 1을 완료했다. 다음은 C1 한정 프로토타입의 구현 전 결정이다. 후보 구현은 각 단계 진입 조건을 따르며, 실행 결과가 없는 항목은 미완료로 유지한다.
+- [x] **IC-0 확정:** 앞선 문서/계획은 Phase 0에서 완료했고, 2026-10-21 후속 착수 요청으로 Phase 1을 완료했다. C1 한정 프로토타입의 검증까지 완료했고 다음은 C3의 DC-4 계약 결정이다. 후보 구현은 각 단계 진입 조건을 따르며, 실행 결과가 없는 항목은 미완료로 유지한다.
 - [ ] **IC-1 TBD:** 최종 표의 비교군, 정규화·색상/통계 모드, CPU/메모리/startup 표시 범위, 빠른 구간의 수치 임계치. Phase 1에서 제안·기록하고 Phase 6 목표 판정 전에 닫음.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
 - [ ] **IC-3 조건부 TBD:** 크기 한도 초과 후보의 격리·상쇄·예산 재검토. 초과가 없으면 해당 없음으로 닫음. 한도 변경은 별도 명시적 결정.
@@ -129,7 +131,7 @@
 
 ## 상태 / 핸드오프
 
-- done: Phase 0 계획과 Phase 1 기준선 동등성·38개 진단·B1~B3 완료. 보고서·raw·영구 증거·재현 도구를 연결하고 후보 분기를 기록했다. 새 코어 후보 구현·공식 CPU/메모리 실측은 없다.
-- next: DESIGN DC-6에서 C1의 컴포넌트 소유 hint 저장·유지·concurrent publication을 확정한 뒤 Phase 2 한정 프로토타입을 진행한다.
+- done: Phase 2 C1 한정 검증·증거 보존·baseline 복원. 사용자 요청으로 C1 체크포인트를 커밋·ctxbin 인계한다. C2는 보류이며 Phase 4~6 최종 검증은 미실행.
+- next: Phase 3 진입 전 DC-4 C3 계약과 기존 callback/배칭 기준을 구체화한다. 명시적 생략이 자체 renew를 삼키지 않는 경계를 정한 뒤 독립 구현에 진입한다.
 - blockers: 현재 없음. 선택적 후보의 공개 계약과 최종 성능 목표의 미확정은 각 단계에서 관리.
-- commit: 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`; Phase 0 문서 `dbbd320a5b92c63262d43b667692396ae5d53322`. 이번 실행 변경은 미커밋.
+- commit: Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`; 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. Phase 2 C1 산출물은 `perf: preserve C1 parent-position evaluation` 체크포인트에 보존. 정확한 SHA는 git log·ctxbin 인계 참조.
