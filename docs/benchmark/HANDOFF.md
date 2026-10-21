@@ -1,5 +1,25 @@
 # summary
 
+## 범용 코어 구조 개선 Phase 1 완료 — 2026-10-21
+
+- 사용자의 후속 착수 요청으로 로컬 `doc-driven-designer-v1` 에이전트·스킬을 적용해
+  [정본 실행 계획](../performance-improvement/IMPLEMENT.md)의 **Phase 1 기준선·비용 분해**를 완료했다.
+  아래의 계획만 수행했다는 문단은 앞선 Phase 0의 이력이다. 새 채택 구현이나 성능 개선 판정은 없다.
+- 문서·설계와 실행·증거 책임을 나누고 테스트·빌드·브라우저 계측은 실행 담당이 직렬 수행했다.
+  원래 앱·실제 upstream의 targeted 실험 앱·새 staging을 구분하고, 기존 보고서·실측은 보존한다.
+- done: 런타임·앱/runner 조건 재확인, 1k/10k·변경 수/위치별 **38개 진단**, B1 dual·B2 build/size·
+  B3 양쪽 contracts 및 공식 keyed·9개 동작·폰트 검증 완료. [보고서](./STRUCTURAL_BASELINE_RESULTS.md),
+  [raw manifest·카운터](./structural-baseline-results.json), [영구 증거](./structural-baseline-evidence.json.gz),
+  [재현 도구](./structural-baseline.mjs)에 보존한다. 새 코어 후보·공식 CPU/메모리 비교는 없다.
+- next: 일반 nested slot에서도 검색 증가가 확인되어 **C1 한정 프로토타입**을 우선한다.
+  컴포넌트 소유 hint의 parent/각 slot 배열 참조·index 검증을 검토하고, 저장 방식·생성/이동 유지비·
+  concurrent commit publication을 DC-6에서 확정한다. C1은 원래 Table의 n개 순회를 해결하지 않는다.
+  C2는 시간상 기각 없이 보류하며 C3의 parent-refresh updater n+1 근거는 별도 계약 연구로 유지한다.
+- blockers: Phase 1 완료의 블로커 없음. DC-6은 C1 구현 전, IC-1 최종 색상/수치 임계치는 최종 판정 전에 닫는다.
+  base **4,800B** 크기 게이트를 유지하며, 한도 변경은 별도 명시적 결정이 필요하다.
+- commit: Phase 0 문서 체크포인트 `dbbd320a5b92c63262d43b667692396ae5d53322`,
+  런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. 이번 실행 변경은 미커밋이다.
+
 ## 범용 코어 구조 개선 계획 — 2026-10-21
 
 - 사용자는 작은 앱 최적화의 후속 upstream PR보다 **일반 앱에도 적용되는 코어의 구조적 개선**을

@@ -1,8 +1,8 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-21. 상태: **Phase 0 문서 작성 완료, Phase 1 이후 미착수**.
+- 기준일: 2026-10-21. 상태: **Phase 1 완료, 다음은 C1 한정 프로토타입의 구현 전 결정. Phase 2 이후 미착수**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
-- 이 문서의 체크박스는 실제 완료만 표시한다. 다음 명령은 앞으로 수행할 절차이며 이번 문서 작업에서 실행한 테스트·벤치마크가 아니다.
+- 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
 ## 공통 실행 규칙
 
@@ -29,17 +29,21 @@
 
 진입: Phase 0 정리 완료. 종료: 원본·실험 앱/코어가 구별되고, C1/C2의 구현 진입 또는 C3/C4 계약 연구로 진행할 계측 근거가 있음.
 
-- [ ] 기준 커밋 `085137b0447a8bbe7d28d3bf55c0a997779132b2`, base 1.25.2/concurrent 0.2.2, 런타임 소스·세 번들·크기 해시 재확인.
-- [ ] upstream 원래 앱을 기록된 upstream 커밋 또는 기존 evidence에서 새 staging으로 추출하고 해시 저장. 현재 upstream `src/main.tsx`의 targeted 실험본은 그대로 보존.
-- [ ] 공식 러너의 `03_update10th1k_x16`, `09_clear1k_x8` 등 실제 행 수·반복·throttle·GC를 manifest에 기록. README 설명이 다르면 실행 코드를 근거로 차이를 명시.
-- [ ] 기존 진단을 재현하거나 읽기 쉬운 계측으로 교체: 원래 앱과 행별 갱신 예제에서 cache/diff/updater/부모·slot index 검색/placement/DOM 작업 수를 따로 측정. 1k/10k 및 변경 수를 바꿔 비용 증가를 관찰.
-- [ ] 후보 C1에는 부모/slot 검색 비중, C2에는 진입 검증을 포함한 중복 목록 처리 비중을 기록. 기존 ordered/keymatch/type identity/early-return/bulk와 달라지는 실제 작업을 적음.
-- [ ] IC-1의 초기 비교군·표 모드를 기록. 수치 임계치 미확정은 진단을 막지 않음.
-- [ ] 기준 검사: B1·B2·B3를 변경 전 해시에 대해 확보하고 M-1·M-2 수행.
+현재 상태: 2026-10-21 후속 착수 요청으로 완료했다. 문서·설계 담당과 실행·증거 담당을 나누고, 벤치마크·테스트·빌드는 실행 담당이 직렬 수행했다. 증거는 [기준선 보고서](../benchmark/STRUCTURAL_BASELINE_RESULTS.md), [raw manifest·카운터](../benchmark/structural-baseline-results.json), [영구 증거](../benchmark/structural-baseline-evidence.json.gz), [재현 도구](../benchmark/structural-baseline.mjs)에 보존한다.
 
-산출물: 새 실험 manifest·기준선 카운터, 후보별 예상 제거 작업/새 비용, DC-6 선택 근거. 단계가 끝나도 새 성능 개선을 입증한 것은 아니다.
+- [x] 기준 커밋 `085137b0447a8bbe7d28d3bf55c0a997779132b2`, base 1.25.2/concurrent 0.2.2, 런타임 소스·세 번들·크기 해시 재확인. base 소스 16개와 ESM/UMD/CJS는 npm 1.25.2와 일치하며 concurrent도 기준 소스·과거 evidence 해시를 확인했다.
+- [x] upstream 원래 앱을 기존 select-partial evidence의 `official-main.tsx`에서 새 staging으로 추출하고 해시 저장. 현재 upstream `src/main.tsx`의 targeted 실험본은 그대로 보존.
+- [x] 공식 러너의 `03_update10th1k_x16`, `09_clear1k_x8` 등 실제 행 수·반복·throttle·GC를 manifest에 기록. README 설명과 다른 1,000행 준비 조건을 실행 코드 근거로 명시.
+- [x] 원래 앱·행별 갱신·일반 nested slot 예제의 별도 계측 38개 시나리오에서 cache/diff/updater/부모·slot 검색/placement/DOM을 분리했다. 1k/10k와 `k = 1, 10, n/10`, 선택 위치·parent-refresh를 바꿔 비교했고 DOM/입력 정체성·값 검증을 통과했다.
+- [x] C1 검색 방문 추정과 C2 uniqueness shadow의 추가 작업을 기록하고 과거 후보와 다른 제거 작업을 식별했다. 방문량을 시간 비중으로 해석하지 않는다. 실제 후보의 제거량·생성/메모리 비용은 미측정이다.
+- [x] IC-1 초기 제안은 React/Preact hooks·classes 전체 항목, 공식 전체 시간의 항목별 중앙값·분포·baseline/peer 비율과 가중 전체 지표다. 최종 표·색상·startup 포함 범위·수치 임계치는 미확정이며 이번 peer 실측은 없다.
+- [x] B1 `pnpm test:dual`, B2 core/concurrent/element 빌드·size, B3 양쪽 앱 contracts 및 공식 keyed·9개 동작·폰트 verify를 확보했다. M-1·M-2의 기준선 범위를 수행했으며 후속 후보 전용 체크는 미완료다.
+
+산출물: 새 실험 manifest·기준선 카운터, 후보별 예상 제거 작업/새 비용, DC-6 선택 근거. 단계가 끝나도 새 성능 개선을 입증한 것은 아니다. M-1·M-2 중 최종 후보 일치·후보 유지 비용·core-only 성능 비교 등 후속 단계에만 해당하는 체크는 이번 종료 판정과 구분해 미완료로 남긴다.
 
 분기: C1이 원래 앱에 효과가 없고 C2의 진입 증명 비용이 크다는 근거가 있으면 Phase 2 후보들을 모두 구현하지 않고 바로 Phase 3의 C3/C4 계약 연구로 진행할 수 있다. 내부 개선 우선 검토는 미세 최적화 소진 의무가 아니다.
+
+이번 분기: 일반 nested slot에서도 반복 검색 증가가 재현되어 **다음은 C1 한정 프로토타입**이다. original/Table의 전체 순회 해결책으로 설명하지 않는다. C2는 실제 시간상 기각 없이 보류하고, C3의 필요 근거인 parent-refresh updater n+1을 후속 연구로 유지한다. C1의 DC-6 하위 결정을 닫기 전에는 Phase 2 구현 완료로 표시하지 않는다.
 
 ## Phase 2 — 기존 계약 안의 내부 후보 C1/C2
 
@@ -113,11 +117,11 @@
 - core-only `prepare`는 **`LITHENT_BASELINE_SOURCE`와 `LITHENT_CANDIDATE_SOURCE`를 같은 보존 원본으로 명시**하고 `LITHENT_CANDIDATE_CORE`만 후보 ESM으로 지정한다. 기본값은 현재 upstream 실험 앱/targeted 후보를 사용하므로 그대로 실행하지 않는다.
 - `contracts`, `verify`, `cpu`, `mem`, `retention` 모드를 분리해 실행한다. 반대 차수는 새 출력 위치와 앱 순서를 사용한다. `LITHENT_PRODUCTION_ALTERNATE_ORDER=1`과 실제 실행 순서를 manifest에 남긴다.
 - React/Preact는 고정 lockfile의 `react-hooks`, `preact-hooks`, `react-classes`, `preact-classes`를 우선 후보군으로 기록하되 최종 표 포함 범위는 IC-1에서 확정한다. peer를 재빌드하면 해시를 갱신하고 과거 다른 버전 수치와 섞지 않는다.
-- 성능 검사에 브라우저 실행·네트워크·sibling 쓰기가 필요하면 해당 환경의 실행 권한 절차를 따른다. 계획 단계에서는 이 작업을 하지 않는다.
+- 성능 검사에 브라우저 실행·네트워크·sibling 쓰기가 필요하면 해당 환경의 실행 권한 절차를 따른다. 원래 upstream 실험 앱을 보존하고 새 staging을 사용한다.
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** 이번 요청은 문서/계획까지. Phase 1 이후 실행 결과는 아직 없음.
+- [x] **IC-0 확정:** 앞선 문서/계획은 Phase 0에서 완료했고, 2026-10-21 후속 착수 요청으로 Phase 1을 완료했다. 다음은 C1 한정 프로토타입의 구현 전 결정이다. 후보 구현은 각 단계 진입 조건을 따르며, 실행 결과가 없는 항목은 미완료로 유지한다.
 - [ ] **IC-1 TBD:** 최종 표의 비교군, 정규화·색상/통계 모드, CPU/메모리/startup 표시 범위, 빠른 구간의 수치 임계치. Phase 1에서 제안·기록하고 Phase 6 목표 판정 전에 닫음.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
 - [ ] **IC-3 조건부 TBD:** 크기 한도 초과 후보의 격리·상쇄·예산 재검토. 초과가 없으면 해당 없음으로 닫음. 한도 변경은 별도 명시적 결정.
@@ -125,7 +129,7 @@
 
 ## 상태 / 핸드오프
 
-- done: Phase 0 문서 계획과 단계별 진입/종료·기준 검사·측정/원복 절차, 문서 간 일관성·형식·링크 검토 완료. 새 런타임 구현·실험은 하지 않음.
-- next: 구현 작업이 시작되면 Phase 1 기준선/비용 분해부터 수행.
+- done: Phase 0 계획과 Phase 1 기준선 동등성·38개 진단·B1~B3 완료. 보고서·raw·영구 증거·재현 도구를 연결하고 후보 분기를 기록했다. 새 코어 후보 구현·공식 CPU/메모리 실측은 없다.
+- next: DESIGN DC-6에서 C1의 컴포넌트 소유 hint 저장·유지·concurrent publication을 확정한 뒤 Phase 2 한정 프로토타입을 진행한다.
 - blockers: 현재 없음. 선택적 후보의 공개 계약과 최종 성능 목표의 미확정은 각 단계에서 관리.
-- commit: 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`; 문서 체크포인트는 이 파일의 최신 커밋을 참조한다.
+- commit: 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`; Phase 0 문서 `dbbd320a5b92c63262d43b667692396ae5d53322`. 이번 실행 변경은 미커밋.
