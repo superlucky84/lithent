@@ -1,5 +1,28 @@
 # summary
 
+## 범용 코어 구조 개선 계획 — 2026-10-21
+
+- 사용자는 작은 앱 최적화의 후속 upstream PR보다 **일반 앱에도 적용되는 코어의 구조적 개선**을
+  우선하기로 했다. `doc-driven-designer-v1` 서브에이전트의 초안과 부모 검토로 문서·계획 작성을
+  완료했다. 이번 단계에서는 런타임 구현이나 새 성능 측정을 시작하지 않았다.
+- 현재 계획의 정본은 [REQUIREMENTS](../performance-improvement/REQUIREMENTS.md),
+  [DESIGN](../performance-improvement/DESIGN.md), [IMPLEMENT](../performance-improvement/IMPLEMENT.md),
+  [MANUAL_TEST_CHECKLIST](../performance-improvement/MANUAL_TEST_CHECKLIST.md)다.
+  과거 Map/LIS 계획은 이력으로 보존하고, 아래 실험 보고서는 측정 당시의 결과로 유지한다.
+- 일부 개별 시간·메모리 손해를 허용하는 사용자 기준을 유지한다. 전체 가중 시간의 개선과
+  최종 비교표의 모든 항목이 빠른 범위에 드는 것은 다른 판정이며, 어느 쪽도 아직 달성을 보장하지 않는다.
+- 앱 후보는 개선 가능한 작업을 찾는 근거다. `full`의 수동 행 VDOM 캐시와 `retained-row`의
+  코어 관리 VDOM 참조 읽기는 각각 추가 설명이 필요하며, 둘 다 upstream의
+  [수동 DOM·VDOM 캐싱 주석 #1261](https://github.com/krausest/js-framework-benchmark/issues/1261)
+  적용 가능성이 있다. 이는 검토상 추론이며 PR 거절 확정이 아니다. 공개 API 사용·동작 검사 통과만으로
+  무주석 통과를 주장하지 않는다. 벤치마크 전용 코드를 코어/helper에 숨기는 방식은 개선 범위가 아니다.
+- 후보 검토는 전체 방문량, 목록 구조 검사·매칭·배치, 부모의 컴포넌트 재실행과 자체 renew 비용을
+  나눠 다룬다. 기존 계약으로 가능한 생략과 추가적인 변경 정보가 필요한 경로를 구분하고,
+  임의의 mutable 상태 변경을 코어가 자동으로 안다고 가정하지 않는다.
+- 기준 커밋 `085137b0447a8bbe7d28d3bf55c0a997779132b2`는
+  `origin/docs/select-partial-update-analysis`에 푸시되어 있다. 다음 구현은 정본 계획의 기준선·계약
+  확인부터 시작하며, 아래의 1.25.2 런타임과 실제 upstream 실험 앱의 구분을 유지한다.
+
 ## 목표 재확인과 체크포인트 — 2026-10-21
 
 - 사용자의 목표는 **일부 항목의 시간·메모리 손해를 허용하더라도 최종 비교표의 모든 항목을

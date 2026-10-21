@@ -1,5 +1,11 @@
 # 행 선택·부분 갱신 비용 분석 — 2026-10-18
 
+> **2026-10-21 코어 구조 개선 계획:** 사용자가 범용 코어 개선을 우선하고 문서·계획부터 작성하도록
+> 요청했다. 새 작업의 정본은 [요구사항](../performance-improvement/REQUIREMENTS.md)과
+> [설계](../performance-improvement/DESIGN.md), [단계별 계획](../performance-improvement/IMPLEMENT.md),
+> [수동 검증](../performance-improvement/MANUAL_TEST_CHECKLIST.md)이다. 아래 진단·실험은 과거 근거로
+> 유지하며, 계획 작성 자체를 코어 구현 완료나 성능 개선 입증으로 해석하지 않는다.
+
 > **2026-10-21 목표 재확인:** 사용자는 일부 시간·메모리 손해를 허용하고 최종 비교표의 모든 항목이
 > 빠른 색상 구간에 들어오기를 원한다. 개별 악화 자체를 자동 탈락 기준으로 삼지 않는다.
 > [후속 행 VDOM 재사용 후보](./STRUCTURAL_UPDATE_RESULTS.md)는 첫 차수에서 원래 앱 대비 가중

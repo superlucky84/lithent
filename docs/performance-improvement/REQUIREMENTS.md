@@ -1,122 +1,74 @@
-# REQUIREMENTS — Lithent 렌더링 성능 개선
+# REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
-- 브랜치: `feat/alterSpeed`
-- 작성일: 2026-07-27 (최종 수정: 2026-07-27)
-- 상태: **병목 분석 완료 — RC-2/RC-3 결정 대기**
-- 관련 문서: [BOTTLENECK_ANALYSIS.md](./BOTTLENECK_ANALYSIS.md) → DESIGN.md (예정) → IMPLEMENT.md (예정) → MANUAL_TEST_CHECKLIST.md (예정)
+- 기준일: 2026-10-21. 상태: **계획 수립 완료, 새 구현·성능 검증 미착수**.
+- 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
+- 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
+- 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
 
-## 1. 배경 및 목적
+## 1. 사용자 목표와 판단 기준
 
-Lithent는 diff 시 최적화 알고리즘 없이 트리를 정직하게 전부 비교하는 구조라서
-[js-framework-benchmark](https://github.com/krausest/js-framework-benchmark)(keyed)로
-측정하면 성능 지표가 잘 나오지 않는다.
-**이번 작업의 목적은 기존 동작을 그대로 유지하면서 js-framework-benchmark에서
-좋은 성능 지표를 얻는 것**이다.
+**벤치마크 앱만 복잡하게 바꾸는 대신, 일반 Lithent 앱에도 유효한 코어 개선으로 전체 렌더링 성능을 높인다.** 최근 upstream 병합 직후의 작은 앱 캐시 PR보다 근본적인 개선을 우선한다. 이번 요청의 산출물은 문서와 실행 계획이며, 코드 변경·실험 실행·릴리스·새 PR은 아직 수행하지 않는다.
 
-병목은 코드 분석 + jsdom 마이크로벤치 실측으로 확인 완료 —
-상세는 [BOTTLENECK_ANALYSIS.md](./BOTTLENECK_ANALYSIS.md) 참조. 요약:
+- R1. 행 선택·부분 업데이트의 넓은 탐색, 부모 갱신 시 변경 없는 컴포넌트 재실행, 자식 자체 갱신의 부모 연결 비용을 검토한다. 최신 작은 코어 후보의 실패를 코어가 최적이라는 증거로 해석하지 않는다.
+- R2. **개별 작업의 시간·CPU/JS·메모리 손해를 허용할 수 있다.** 한 항목의 회귀만으로 자동 탈락시키지 않는다. 전체 이득, 상대적으로 느린 항목, 손해의 절대량·반복성·실사용 영향으로 판정한다.
+- R3. 최종 희망은 벤치마크표의 모든 항목이 충분히 빠른 색상 구간에 들어가는 것이다. 색상 이름 자체는 합격 기준이 아니다. 비교군·정규화·표 설정과 수치 임계치는 아직 미확정이다. 평균 개선만으로 전 항목 목표 달성이라고 쓰지 않는다.
+- R4. upstream 기본 React·Preact 구현을 같은 환경에서 전체 항목 비교한다. hooks/classes 등 실제 비교 대상을 기록하고 유리한 구현만 사후 선택하지 않는다. 이 비교는 아직 완료되지 않았다.
+- R5. JS 실행 시간이 아닌 **공식 클릭→최종 paint 전체 시간**을 렌더링 성능의 주 지표로 삼는다. JS, 메모리, 번들, 생성·삭제 비용은 별도 지표로 함께 공개한다.
+- R6. 기존 API를 사용하는 앱의 결과·DOM 정체성·수명·배칭·예외 복구 계약을 보존한다. 추가 옵트인 기능이 필요하면 새 계약을 명시하고 기존 기본 동작과 구분한다.
 
-| 순위 | 병목 | 실측 근거 (10k행, jsdom) |
-|---|---|---|
-| B1 | 순서 변경 시 전 행 DOM 재삽입 (`render.ts` T-경로) | swap 2rows = **2,719ms** |
-| B2 | 신규 노드 삽입 위치 탐색 O(n²) (`startFindNextBrotherElement`) | append 1k = **3,031ms** |
-| B3 | keyed 키 매칭 O(n²) (`findSameKeyOriginalItem` + splice) | replace 4k = 879ms (2배당 ×3.4) |
-| B4 | `chkDiffLoopOrder` O(n²) — keyed 갱신마다 실행 | 부분갱신 4k = 380ms (2배당 ×4) |
-| B5 | 전체 리스트 재-diff + 노드당 클로저 2회 할당 | partial 1/10 of 10k = 700ms |
-| B6 | prop 처리 상수비용 (정규식/디스크립터/배열 할당) | create 10k = 414ms, clear = 90ms |
+## 2. 현재 근거와 한계
 
-## 2. 목표
+기준 런타임은 base **1.25.2**, concurrent **0.2.2**다. 이전 복원 검증에서 base 런타임 소스 16개와 ESM/UMD/CJS가 설치된 npm 1.25.2와 일치했다. 실험 착수 시 다시 해시를 확인한다. 실제 `../js-framework-benchmark-upstream/frameworks/keyed/lithent/src/main.tsx`는 초기 행별 `renew` 실험본이므로 원래 앱과 구분한다.
 
-- G1. js-framework-benchmark(keyed) 주요 시나리오에서 O(n²) 경로를 제거한다:
-  swap / append / replace all / partial update가 리스트 크기에 선형(또는 n log n)으로 스케일.
-- G2. 모든 최적화는 **벤치마크 전/후 실측 수치로 입증**한다.
-- G3. 기존 동작(렌더 결과, 라이프사이클 순서, 공개 API)을 100% 유지한다.
-  기존 전체 테스트(`pnpm build && pnpm test`) 통과가 필수 조건.
-- G4. 코어 번들 크기: **최소화(minified) 빌드 brotli 기준 5KB 이하 유지** (RC-3 확정).
-  - 크기 기준선 (2026-07-27 실측, zlib brotli 기본 옵션):
+| 근거                                                                                                                                                            | 관찰                                                                                                            | 이번 설계에 주는 의미                                                                                                                                 |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [원본 진단](../benchmark/SELECT_PARTIAL_UPDATE_ANALYSIS.md)                                                                                                     | 1,000행 진단에서 선택은 1~2 class 변경에 캐시 검사·keyed 매칭 1,000행, 부분 갱신은 100 text 변경에 diff 1,903회 | 작은 변경에도 전체 목록 처리 비용이 남음. Table 컴포넌트 갱신은 1회이며 1,001회가 아님. LIS·DOM 이동은 0회                                            |
+| [초기 행별 renew](../benchmark/TARGETED_UPDATE_RESULTS.md)                                                                                                      | 전체 가중 시간 +4.7%, 선택·부분 갱신 개선                                                                       | 갱신 범위 축소는 효과가 있으나 행 컴포넌트의 생성·유지 비용이 있음                                                                                    |
+| [행 VDOM 재사용](../benchmark/STRUCTURAL_UPDATE_RESULTS.md)                                                                                                     | 첫 차수 전체 −2.1%, JS −9.4%; 1,000행 메모리 3.506→4.145MB                                                      | 선택 7.920→3.507ms, 부분 갱신 18.438→14.403ms.전체 삭제 11.554→16.371ms와 생성·추가 손해도 함께 판단. 메모리 +0.639MB 자체를 치명적으로 단정하지 않음 |
+| [앱 full/static/scalar](../benchmark/OVERALL_UPDATE_RESULTS.md)                                                                                                 | 첫 차수 전체 각각 −3.0/−1.9/−0.3%                                                                               | full 메모리·전체 역순 미완료. 위 행 재사용과 다른 차수이므로 직접 순위 확정·표본 합산 금지                                                            |
+| [ordered](../benchmark/ORDERED_CORE_RESULTS.md), [keymatch](../benchmark/KEYMATCH_CORE_RESULTS.md), [type identity](../benchmark/TYPE_IDENTITY_CORE_RESULTS.md) | 전체 이득을 일관되게 입증하지 못해 복원                                                                         | 순회 내부 비용 실험이며 전체 방문 범위 축소 실험이 아님                                                                                               |
+| [동일 VDOM 조기 반환](../benchmark/PERFORMANCE_CLOSEOUT.md), [bulk removal](../benchmark/BULK_REMOVAL_RESULTS.md)                                               | JS 또는 삭제 이득과 다른 작업 손해가 공존                                                                       | 같은 실패안을 근거 없이 반복하지 않음. 다른 진입 조건·비용 구조를 검증할 때만 별도 후보로 기록                                                        |
 
-    | 파일 | raw | gzip | brotli |
-    |---|---:|---:|---:|
-    | lithent.umd.js (minified) | 11,309B | 4,510B | **4,169B** |
-    | lithent.mjs (비압축최적화) | 15,983B | 5,076B | 4,626B |
-    | preact 10.29.7 min (참고) | 11,360B | 4,839B | 4,410B |
+위 앱 후보 수치는 코어 개선율이 아니다. 진단 표본과 공식 CPU 표본을 분리한다. 공식 시나리오의 행 수·반복·스로틀은 README 문구나 ID만으로 추정하지 않고 실제 고정 러너에서 확인한다. 현재 로컬 러너의 부분 갱신 `03_update10th1k_x16`과 전체 삭제 `09_clear1k_x8`는 `#run`으로 1,000행을 준비한다. 문서 설명과 실행 코드가 다르면 manifest에 불일치를 기록하고 실행 조건을 기준으로 삼는다.
 
-  - 유효 예산: 4,169B → 5,120B, **여유 +951B (br)**.
-  - 스트레치 목표: preact min(4,410B br)보다 작게 유지.
+## 3. 포함 범위와 비범위
 
-### 정량 기준선 (jsdom, 10k행 — 개선 목표는 RC-2에서 확정)
+포함 범위는 `src/{diff,render,wDom}.ts`, 갱신 스케줄·컴포넌트 메타데이터 및 필요 시 대응 concurrent 경로다. 기존 정보로 충분한 내부 개선을 우선 검토하고, 정보가 부족할 때만 명시적 무효화·부모 재실행 생략·리스트 구조 안정성 계약을 검토한다. 공개 API 추가가 필수라고 미리 결정하지 않는다.
 
-| 시나리오 | 기준선 | 목표 |
-|---|------:|---|
-| swap 2 rows | 2,719ms | O(n) 스케일링 달성 (수치 목표 `TBD RC-2`) |
-| append 1,000 rows | 3,031ms | 〃 |
-| partial update (1/10) | 700ms | 〃 |
-| create 10,000 rows | 414ms | 상수비용 절감 (`TBD RC-2`) |
+helper나 타입·export 수정은 범용 계약의 배치가 확정된 경우에 한한다. benchmark 전용 분기, 특정 행 수·id·매 10행 패턴, 직접 DOM 쓰기를 범용 최적화처럼 코어/helper에 옮기지 않는다. 앱 후보는 가설 검증용 증거로 보존한다.
 
-## 3. 범위
+이번 비범위는 upstream 제출, 패키지 버전·배포, 기존 앱 실험본 덮어쓰기, 선언되지 않은 immutable props/children 가정 도입이다. base와 concurrent의 스케줄러를 하나로 재작성하는 일도 목표가 아니다.
 
-### 포함 (확정 — RC-1 결정 완료)
+## 4. 보존해야 하는 계약과 비용 제약
 
-- S1. 성능 계측 수단: js-framework-benchmark 시나리오 재현 벤치 스크립트를 저장소에 추가.
-- S2. keyed 리스트 diff 최적화 (B3, B4) — Map 기반 O(n) 키 매칭.
-- S3. 렌더 경로 최적화 (B1, B2) — 삽입 위치 탐색 O(1)화, LIS 기반 최소 이동.
-- S4. 할당 절감 (B5) — 클로저/assign 감소, 무변경 노드 조기 종료.
-- S5. 상수비용 최적화 (B6) — 정규식/디스크립터 조회/배열 할당 제거, clear 일괄 삭제.
-- S6. 변경 전후 동등성 검증: 기존 전체 테스트 통과 + 필요 시 keyed 시나리오 테스트 보강.
+- R7. keyed 소비 규칙을 유지한다. 중복 키의 첫 등장 소비, falsy/NaN/Symbol/object 키, null·unkeyed 혼합과 노드당 한 번의 소비·unmount를 기존 테스트 기준으로 검증한다.
+- R8. 같은 VDOM이라도 empty 전환은 삭제해야 한다. 다른 위치의 동일 VDOM은 독립 인스턴스를 유지한다. 캐시 hit에서의 `updateCallback`, 이동 후 자식 `renew`, props/children 배열의 공유 참조를 보존한다.
+- R9. Fragment/portal/HTML root/외부 형제/SSR·hydration, 예외 뒤 갱신 재개, 삭제 뒤 예약 갱신, 부모·자식 동시 갱신을 검증한다. concurrent는 중단·재시작·폐기된 작업의 상태 누출·render boundary와의 상호작용을 추가 검증한다.
+- R10. 임의 mutable 상태를 읽는 부모가 새 children 배열을 반환하면, 코어가 변경 행·구조 불변을 자동으로 안다고 가정하지 않는다. 변경 정보의 생산자와 신뢰 조건을 설계에 명시한다.
+- R11. 현재 [크기 게이트](../../scripts/size-report.js)는 UMD brotli base **4,798/4,800B**, concurrent **6,903/9,000B**, element **998/1,000B**다. base 여유는 2B다. 오래된 `base frozen` 설명은 과거 concurrent 작업 범위이고 이번 사용자는 코어 수정을 허용했지만, 크기 한도 상향까지 승인한 것은 아니다. 한도 초과 후보는 비용을 공개하고 미채택 상태로 유지하며 한도를 조용히 바꾸지 않는다. 이 한도가 구조 개선 가능성 자체를 부정하는 근거는 아니다.
+- R12. 메모리 증가의 허용 상한은 미정이다. 공식 메모리의 절대 MB·비율, 생성/삭제 반복 후 DOM·listener·heap 잔류를 함께 보고한다. 구조적 누수·정합성 손상은 허용 가능한 속도 교환으로 취급하지 않는다.
 
-### 비범위 (Non-goals)
+## 5. 비교와 채택 정책
 
-- N1. 공개 API 변경·추가 (`h`, `mount`, `lmount`, `render`, `portal`, `Fragment` 등 시그니처 불변).
-- N2. helper / ssr / tag / ftags 패키지의 직접 수정 (코어 개선의 파급 효과는 허용).
-- N3. 스케줄링/배칭 등 새 렌더링 모델 도입 (기존 microtask 배칭 유지).
-- N4. js-framework-benchmark 공식 저장소 등재 작업 자체 (측정용 구현 작성은 S1 범위).
+1. 같은 원래 앱·helper + 기준 코어/후보 코어를 먼저 비교한다. 새 옵트인 계약이 필요한 후보는 같은 앱 구조의 구기능/신기능 대조도 분리해 기능의 효과를 구한다. 앱과 코어를 동시에 바꾼 종단 개선율만으로 코어 이득을 주장하지 않는다.
+2. 전체 9 CPU 항목을 두 실행 순서로 반복하고, 코드·앱·브라우저·엔진·비교군 해시가 같은 차수만 합산 가능성을 검토한다. 동일 조건이어도 시간 간격·부하와 분산을 기록한다. 작거나 불일치하는 차이는 `불확실`로 남긴다.
+3. 채택 후보에는 공식 메모리 5항목, retention 진단, raw/gzip/brotli, 비교군 전체 결과가 필요하다. startup/전송 크기는 공식 CPU 점수와 분리한다. 사용자가 말한 전체 표에 포함할 startup 항목·표 모드도 IC-1에서 정한다.
+4. 전체 가중 시간과 항목별 baseline/React/Preact 비율을 함께 표로 제시한다. 가중치·정규화·색상 함수를 보존한다. 일부 손해만으로 탈락시키지 않으며, 전체 목표가 미확정이면 목표 달성 판정을 유보한다.
+5. 정확성 실패, 해시/측정 조건 불일치, 증거 유실은 먼저 해결한다. 속도·메모리 교환과 별개의 검증 실패다. 후보별 채택/보류/기각 이유를 남기고 기각 후보 소스·실측도 보존한다.
 
-## 4. 제약
+upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#44-submitting-your-implementation)에서 일반적인 사용 방식과 HTML/keyed 정합성을 요구하며, [수동 DOM/VDOM 캐싱 주석 #1261](https://github.com/krausest/js-framework-benchmark/issues/1261)이 있다. 앱 캐싱을 helper로 옮기면 주석이 면제된다는 근거는 없다. 기존 full·행 VDOM 재사용 후보의 적용 여부나 새 기능의 리뷰 통과는 maintainer 판정 전까지 **추론/미확정**이다. 코어 기능 자체의 일반적 유용성을 먼저 검증한다.
 
-- C1. 패키지 매니저는 pnpm, 전체 테스트는 빌드 후 실행 (`pnpm build` → `pnpm test`).
-- C2. WDom 노드의 `props`/`children` **배열·객체 참조 안정성**을 깨면 안 된다
-  — 조상/클로저가 같은 배열 인스턴스를 공유 (`src/diff.ts:184-190` 주석 참조).
-- C3. `nr`, `oc`, `op` 등 short-key 메타데이터 규약 유지 (번들 크기 사유).
-- C4. Fragment / portal / hydration 경로의 동작 보존 (SSR 패키지가 코어에 의존).
-- C5. `renew()`의 microtask 배칭(`queueMicrotask`, `src/utils/redraw.ts`) 동작 유지.
-- C6. TypeScript strict 모드, 기존 ESLint/Prettier 규칙 준수.
+## 6. 요구사항 결정 대장
 
-## 5. 가정
+- [x] **RC-1 확정:** 코어의 범용 구조 개선 우선. 근거: 2026-10-21 사용자 방향. → Phase 1~3, M-1.
+- [x] **RC-2 확정:** 개별 시간·메모리 손해 허용 가능, 한 항목 회귀 자동 탈락 금지. → Phase 4·6, M-7~M-9.
+- [x] **RC-3 확정:** 기존 기본 계약 보존, 새 옵트인은 별도 계약. → DC-2~DC-5, M-3~M-6.
+- [x] **RC-4 확정:** 정본 위치는 이 폴더, 기존 실측은 benchmark 보고서와 과거 문서로 보존. → Phase 0, M-1.
+- [ ] **RC-5 TBD:** 전체 표의 비교군·표 모드·수치 임계치·허용 교환 범위. → IC-1. 진단과 후보 구현을 막지 않지만 최종 목표 달성 판정 전에 확정한다.
 
-- A1. jsdom 마이크로벤치의 절대값은 실브라우저와 다르지만 스케일링 특성·병목 순위는 동일하다.
-  최종 지표 확인은 실브라우저(js-framework-benchmark 하네스)로 수행한다.
-- A2. 기존 테스트 스위트가 렌더 결과 동등성의 1차 안전망이다.
-  keyed 정렬/이동 경로는 커버리지 보강이 선행될 수 있다 (DESIGN.md에서 판단).
-- A3. dist 빌드는 현재 src와 동기화된 상태로 측정되었다 (클린 워킹트리).
+## 상태 / 핸드오프
 
-## 6. 검증 요구사항
-
-- V1. 모든 최적화 단계는 벤치 전/후 수치를 IMPLEMENT.md에 기록한다.
-- V2. `pnpm build && pnpm test` 전체 통과가 각 단계(phase)의 종료 조건이다.
-- V3. 번들 크기(gzip)는 각 단계 종료 시 측정해 기준선과 비교 기록한다.
-- V4. 최종 검증은 js-framework-benchmark 하네스(실브라우저)로 keyed 시나리오를 측정한다.
-- V5. 릴리스 전 수동 확인 항목은 MANUAL_TEST_CHECKLIST.md에서 관리한다.
-
-## 7. 결정 기록 (Requirements Checklist)
-
-- [x] **RC-1**: 범위 — 렌더 경로(S3)·할당 절감(S4)·diff 구조 개선 **모두 포함**.
-  근거: 실측 결과 최대 병목(swap 2.7s, append 3.0s)이 diff가 아닌 렌더 경로에 있어
-  diff만 고쳐서는 jsfb 지표가 나오지 않음. (2026-07-27 사용자 결정)
-- [x] **RC-4**: 벤치마크 — **js-framework-benchmark 시나리오 기준**.
-  개발 중에는 저장소 내 재현 스크립트(jsdom)로 회귀 측정, 최종은 실브라우저 하네스.
-  근거: 사용자 목적 자체가 jsfb 지표 개선. (2026-07-27 사용자 결정)
-- [x] **RC-3**: 번들 크기 상한 — **minified 빌드 brotli ≤ 5KB** (스트레치: preact min 4,410B br 이하).
-  근거: 실측상 현재 min 빌드는 4,169B br로 preact보다 작음. 풀 최적화(LIS 포함)의
-  순증 예상은 +200~500B br(제거되는 O(n²) 코드로 일부 상쇄)로 예산 내 수용 가능.
-  (2026-07-27 사용자 결정)
-- [x] **RC-2**: 정량 목표 — DESIGN.md §5 제안 수치로 확정 (2026-07-27):
-  jsdom @10k 기준 swap ≤ 100ms, append 1k ≤ 200ms, partial(1/10) ≤ 300ms,
-  create ≤ 350ms, clear ≤ 50ms. 실브라우저 1차 목표는 react 수준, 2차 preact 근접.
-
-## 8. 상태 / 핸드오프
-
-- done: 병목 분석 (B1~B6 실측), RC-1·RC-3·RC-4 결정, 크기 기준선 실측
-  (lithent min 4,169B br vs preact 4,410B br), DESIGN.md 초안 (Map+LIS 채택, D1~D6).
-- next: RC-2 수치 확정 (DESIGN.md §5 제안 검토) → DC-1~DC-4 결정 → IMPLEMENT.md.
-- blockers: DC-1(이동 마킹 방식)은 구현 착수 전 확정 필요.
-- commit: (문서 커밋 전)
+- done: 현재 요구·근거·보존 계약·채택 정책을 재정의하고 과거 문서를 분리했다. **구현 완료를 뜻하지 않는다.**
+- next: IMPLEMENT Phase 1에서 기준선과 비용 분해를 재확인하고 후보 순서의 진입 조건을 판정한다.
+- blockers: 계획 작성의 블로커 없음. API·수치 목표는 해당 의사결정 시점까지 열린 항목으로 관리한다.
+- commit: 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`; 문서 체크포인트는 이 파일의 최신 커밋을 참조한다.
