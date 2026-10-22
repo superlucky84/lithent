@@ -1,6 +1,6 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-22. 상태: **Phase 3 C3 base 한정 구현·검증 완료. 기본 채택 보류·baseline 복원**.
+- 기준일: 2026-10-22. 상태: **DC-13 같은 행 앱 memo on/off의 CPU580·메모리60·100회 churn 검증 완료. 기본 runtime 보존·채택 보류**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
@@ -14,7 +14,7 @@
 
 ## 2. 후보 묶음과 우선순위
 
-Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **현재는 C3의 기능 격리/고정 비용 절감을 검토할 단계**다. C2는 미구현 보류, C4는 조건부 연구다. 네 후보를 모두 구현하는 계획이 아니며, 한 번에 하나씩 기준선과 비교한다.
+Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **DC-12의 별도 렌더러 격리와 비참여 비용 대조까지 완료했다**. DC-13의 같은 행 앱 기능 대조도 완료했고 다음은 실제 캐시 앱 대조와 heap 원인 분석이다. C2는 미구현 보류, C4는 조건부 연구다. 네 후보를 모두 구현하는 계획이 아니며, 한 번에 하나씩 기준선과 비교한다.
 
 | 후보                                               | 줄이려는 작업                                                    | 필요한 정보                                                  | 한계와 진입 조건                                                                                                 |
 | -------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
@@ -141,7 +141,7 @@ miss 때 기존 배칭을 재설계하지 않는다. hit는 자체 요청을 소
 
 구현 경계(2026-10-22 착수): base에만 setup scope와 memo work scope를 둔다. `createComponentResolver`는 setup 등록 범위를 제한하고 초기화 실패를 정리한다. `replaceWDom`과 `render`는 하위 diff/DOM/mount/post를 포함한 작업의 성공/실패를 한 번에 memo 상태에 알린다. pending은 출력 노드를 weak key로 연결하며, DOM renderer에서 실제로 방문한 출력만 최외곽 성공 경계에서 게시한다. 중첩 작업은 상위 scope로 합치고 실행 세대·현재 ComponentInfo/live wrapper를 검증한다. eager `h()`만 끝난 출력은 아직 유효하지 않다. 이는 memo 상태의 성공 경계이며 기존 DOM/props 전체의 transaction rollback은 아니다. 공통 hook/ComponentInfo와 concurrent 런타임은 수정하지 않는다. unmount 정리는 등록 시 첫 cleanup으로 넣어 사용자 cleanup이 throw해도 먼저 해제되게 한다.
 
-구현 결과: [C3 보고서](../benchmark/PARENT_MEMO_RESULTS.md)의 전용 **33회귀**·기존 dual **1,070 passed/3 skipped**·실제 패키지 타입/exports·B3를 통과했다. 동일 입력 UI의 3조건×3context에서 부모 refresh 자식 updater 1,000→0회, 한 props 변경 1,000→1회를 확인했다. key 1,000개 유지 후 dispose/GC에서 등록·관찰한 VDOM/host 잔류 0개였다. 공식 시간은 측정하지 않았다. 후보 br **5,691B**는 한도 +891B여서 기본 채택을 보류하고 runtime을 복원했다. 비사용자의 setup/work/DOM 경계 비용도 미측정이며 다음 결정은 DC-12다.
+첫 구현 결과: [C3 보고서](../benchmark/PARENT_MEMO_RESULTS.md)의 전용 **33회귀**·기존 dual **1,070 passed/3 skipped**·실제 패키지 타입/exports·B3를 통과했다. 동일 입력 UI의 3조건×3context에서 부모 refresh 자식 updater 1,000→0회, 한 props 변경 1,000→1회를 확인했다. key 1,000개 유지 후 dispose/GC에서 등록·관찰한 VDOM/host 잔류 0개였다. 당시 공식 시간은 측정하지 않았다. 후보 br **5,691B**는 한도 +891B여서 기본 채택을 보류하고 runtime을 복원했다. 이후 비참여 앱 비용은 아래 DC-12에서 측정했으며 memo를 쓰는 통제 행 앱은 후속 DC-13에서 측정했고 원래 캐시 앱과의 동차수 대조는 남아 있다.
 
 오류 검증의 한계: memo 스냅샷 무효화와 base의 전체 실패 복구는 별개다. 실패한 부모 diff는 live pointer를, updater throw는 hook cursor/대기 callback을 자동 롤백하지 않는 기존 동작을 확인했다. 기준 동작을 보존하며 parent selector 오류 뒤의 명시적 재시도에는 이전 unretired tree를 사용했다. 이를 자동 재시도/전체 rollback 지원으로 설명하지 않는다.
 
@@ -196,10 +196,10 @@ Phase 1에서는 다음 기준으로 카운터의 의미와 시나리오를 기�
 
 체크는 **결정이 닫혔음**을 뜻하며 구현·검증 완료가 아니다.
 
-- [x] **DC-1 확정:** C1/C2 내부 후보와 C3/C4 추가 정보 후보를 분리한다. C1과 C3 base 한정 후보는 각각 독립 검증 후 기본 채택 보류, C2는 미구현 보류다. 현재는 C3 기능 격리/비용 절감을 검토한다. 근거: 원래 앱과 row-renew의 비용 발생 지점이 다름. → Phase 1~3, M-2.
+- [x] **DC-1 확정:** C1/C2 내부 후보와 C3/C4 추가 정보 후보를 분리한다. C1과 C3 base 한정 후보는 각각 독립 검증 후 기본 채택 보류, C2는 미구현 보류다. C3 별도 렌더러 격리·비참여 비용과 DC-13 통제 앱의 기능 이득/비용을 검증했다. 원래 캐시 앱의 이득은 미확정이다. 근거: 원래 앱과 row-renew의 비용 발생 지점이 다름. → Phase 1~3, M-2.
 - [x] **DC-2 확정:** 기본 동작의 불명확한 identity/props 생략 금지, 증명 불가 시 기존 경로 사용. 근거: cached identity·keyed 소비 테스트. → Phase 2·5, M-3~M-5.
 - [x] **DC-3 확정:** base와 concurrent의 관찰 가능한 계약을 각각 검증한다. 성능 측정은 우선 base이며 concurrent 개선을 추론하지 않는다. → Phase 2~6, M-6.
-- [x] **DC-4 한정 후보 확정:** base root의 새 setup hook `useParentMemo`로 부모 기인 갱신만 생략한다. 복사 deps·무효화/fallback·self 우회·hit/miss callback/배칭·성공 게시·실패/삭제 소유 계약은 위 C3 절이 정본이다. 기존 helper로는 pre callback/updater 진입을 막거나 self를 구분할 수 없어 새 코어 경계를 택했다. **한정 구현·동작/회수·B1/B3 검증은 완료했고 크기 초과로 기본 채택 보류, 공식 시간과 API 배포는 미완료다.** → C3-T1~T7, M-4·M-6·M-8·M-9.
+- [x] **DC-4 한정 후보 확정:** base root의 새 setup hook `useParentMemo`로 부모 기인 갱신만 생략한다. 복사 deps·무효화/fallback·self 우회·hit/miss callback/배칭·성공 게시·실패/삭제 소유 계약은 위 C3 절이 정본이다. 기존 helper로는 pre callback/updater 진입을 막거나 self를 구분할 수 없어 새 코어 경계를 택했다. **한정 구현·동작/회수·B1/B3와 DC-12의 비참여 비용 검증은 완료했다. DC-13 통제 앱의 기능 시간을 측정했고 크기 초과로 기본 채택은 보류했다. 원래 앱 대조와 API 배포는 미완료다.** → C3-T1~T7, M-4·M-6·M-8·M-9.
 - [ ] **DC-5 TBD:** C4의 목록 소유권/변경 정보/무효화·fallback 계약. C3까지로 목표에 접근 가능한지 본 뒤 분기. → Phase 3, M-4·M-9.
 - [x] **DC-6 C1 한정 후보 확정:** base의 정규화된 parent.children만 lazy `WeakMap<CompKey, WeakMap<WDom[], number>>` sidecar로 조회한다. 현재 배열·original identity 검증 뒤 성공 위치만 저장하고 stale/compKey 없음은 native fallback이다. slot은 alias의 첫 등장 증명 부족으로 기존 검색, concurrent는 commit 소유 경계가 달라 미수정이다. 고정 WDom/ComponentInfo/public API 변경·전체 hint 재작성 없이 cold/warm/stale·추가 WeakMap·크기/회수를 검증한다. 근거는 위 한정 후보 계약과 Phase 1 작업량이다. **C1 한정 구현·검증은 완료했고 기본 채택은 보류했다. [실측](../benchmark/PARENT_POSITION_RESULTS.md)을 참조한다.** → Phase 2, M-2·M-3·M-8.
 - [x] **DC-7 확정:** 기존 retainedView/renderBoundary와 새 memo 의미를 구분하며 benchmark 주석 회피를 설계 동기로 삼지 않는다. → Phase 3·6, M-6·M-9.
@@ -207,11 +207,36 @@ Phase 1에서는 다음 기준으로 카운터의 의미와 시나리오를 기�
 - [ ] **DC-9 조건부 TBD:** C1 concurrent 이식의 live 소유, commit publication·abandon 및 메모리 비용. 이번에는 기존 경로를 유지한다. → M-6·M-8.
 - [ ] **DC-10 조건부 TBD:** 보류한 C2의 uniqueness/순서 진입 증명 방식과 실제 제거 작업·추가 비용. 재개 시 별도 후보로 확정한다. → Phase 2, M-2·M-3.
 - [ ] **DC-11 조건부 TBD:** C3 concurrent 지원의 work-in-progress snapshot 소유·commit 게시·abandon 폐기·boundary 상호작용. 첫 base 후보에는 포함하지 않으며 concurrent는 새 hook을 export하지 않는다. 재개 시 기준선의 두 번 실행·callback 불가역 부작용까지 별도 결정한다. → C3-T1·T4·T5, M-6·M-8.
-- [ ] **DC-12 검토 대기:** C3의 선택적 진입점/기능 격리와 비사용자 setup/work/DOM 경계 비용 절감. 한정 후보 br +893B(한도 +891B)를 근거로 삼되, 예산 상향이나 새 subpath 채택을 미리 확정하지 않는다. 보존한 계약·실패 경계·props/slot fallback을 유지할 설계를 정한 뒤 새 후보를 만든다. → C3-T7, IC-3, M-8·M-9.
+- [x] **DC-12 첫 격리 후보 확정:** 검증된 C3 source를 독립 staging에서 재빌드하는 별도 실험 렌더러를 선택한다. default source/bundle과 public exports는 보존하고, 선택한 렌더러 내부의 비참여 비용은 원래 앱 양순서 CPU 대조로 따로 측정한다. 아래 DC-12 절이 정본이다. 첫 격리 후보의 한정 검증은 완료했다. 새 subpath·예산 상향·최종 채택은 미정이다. → R18~R20, C3-T7, IC-3, M-1·M-6~M-9.
+- [x] **DC-13 기능 대조 확정:** 동일 isolated renderer와 행 컴포넌트 앱의 memo on/off를 비교한다. HTML의 시작 설정만 다르고 production JS는 바이트 단위로 같아야 한다. 아래 DC-13 절과 R21/R22가 범위다. [통제 앱 실측](../benchmark/PARENT_MEMO_OPTIN_RESULTS.md)의 CPU580·공식 메모리60·100회 churn까지 완료했다. 기본 채택/원래 앱 이득은 미확정이다. → Phase4, M-4·M-7·M-8.
+
+### DC-12 — 별도 렌더러로 기능을 격리하는 첫 후보
+
+기본 코어에 optional dispatcher/capability 분기를 추가하는 안은 비사용자에게도 비용이 생기고 2B 여유 안에서 보존할 근거가 없다. compile-time flag로 기존 함수를 감싸는 안도 출력/호출 경로가 같아진다는 증명이 필요하다. 첫 대조는 **기본 코어를 수정하지 않는 별도 실험 렌더러 빌드**로 선택한다. 이는 opt-in 렌더러 내부의 비참여 컴포넌트 비용을 없앤다는 주장이 아니다.
+
+- `experiments/parent-memo-isolated/build.mjs`가 이전 C3 압축 증거의 SHA-256을 검사하고 검증된 `candidate/src/` 17파일을 새 임시 source tree로 복원한다. 알고리즘/메타데이터/실패 의미는 첫 C3와 같다. 중복된 수동 fork를 repo에 두지 않고 원본 후보 해시를 manifest에 연결한다.
+- staging source로 ESM/UMD/CommonJS와 declarations를 재빌드한다. default source/세 번들은 그대로 두며 기존 baseline 28파일의 전후 해시를 검사한다. 생성된 private package/명시적 bundler alias만 실험 진입점으로 사용하고 repo의 public exports는 바꾸지 않는다.
+- 새 렌더러는 자체 componentMap·Fragment·queue를 가진다. 앱과 helper/JSX의 bare core import는 같은 렌더러로 alias해야 한다. default h/mount 안에서 isolated hook을 호출하는 혼용은 setup 오류로 드러나야 한다. 기존 `createRetainedView`/concurrent render boundary의 의미는 바꾸지 않는다.
+- B1: 이전 C3 전용 33개를 staging alias로 재실행하고 공유 core suite·기존 dual도 확보한다. B2: 재빌드한 타입·package maps·일반 base의 size/hash와 별도 번들의 실제 전체 크기를 확인한다. B3: 같은 일반 입력 UI 9context 및 같은 원래 앱의 contracts/keyed/9동작/font를 확인한다.
+- 비용 대조는 같은 원래 앱·helper의 default core/isolated core, 고정 Chrome로 전체 CPU 9항목 두 순서를 사용한다. 선택25/기타15씩 두 앱×두 차수 **580표본**을 기본 계획으로 한다. 첫 C3의 다른 코드/차수와 합산하지 않는다. 공식 메모리·peer·새 기능을 쓰는 행 앱의 대조는 별도 후속이다.
+- 기본 base가 4,798B로 보존돼도 별도 렌더러가 4,800B 게이트를 통과한 것은 아니다. 전체 비용과 opt-in 앱의 이득을 얻기 전까지 package/subpath·예산·채택은 미정이다. 결과가 약해도 격리된 기본 경로의 바이트 보존과 opt-in 렌더러의 실행 비용을 각각 기록한다.
+
+[DC-12 실측](../benchmark/PARENT_MEMO_ISOLATION_RESULTS.md): 세 번들 재현·28파일/package 보존·staging 251/dual 1,070·B3·9context 통과. 비참여 580표본의 가중 전체 +0.10%/JS +0.32%는 차수별 방향이 달라 불확실하다. 기본 byte/분기는 추가하지 않았지만 별도 렌더러 br 5,691B는 그대로다. 같은 행 앱 시간/공식 메모리는 후속 DC-13에서 측정했으며 최종 peer 검증은 남아 있다.
+
+→ REQUIREMENTS R18~R20, IMPLEMENT DC-12 단계, M-1·M-6·M-7·M-8·M-9. Phase 5 Test Hardening과 Phase 6 Integration의 전체 종료 조건은 유지한다.
+
+### DC-13 — 같은 행 앱에서 memo 기능을 비교
+
+- 각 RowView는 부모로부터 `{ row, selected, key }`를 새 props로 받는다. on 조건만 setup에서 `useParentMemo(next => [next.row, next.row.id, next.row.label, next.selected])`를 등록한다. mutable label 변경과 selected 변화는 값 deps로 감지한다. 이벤트는 동기화된 props를 읽으며 모든 동작 뒤 부모 Table을 renew한다. row 자체 renew/store 캐시/helper 캐시를 결합하지 않는다.
+- 행 view·키·버튼·스토어·이벤트 코드는 동일하다. HTML의 `window.__PARENT_MEMO__`를 최초 시작에 읽고 이후 변경하지 않는다. 두 production bundle의 core/app/JS 해시를 동일하게 고정한다. off는 **isolated renderer 내부의 기능 비사용**이며 기존 default 원래 앱을 뜻하지 않는다.
+- 별도 diagnostic 빌드의 상수 flag로 updater/mount/unmount·key/VDOM 회수를 관찰한다. production은 해당 코드가 제거된 빌드이며 공식 CPU/메모리는 계측하지 않는다. no-change refresh n→0, 선택 n→1/2, label 변경 n→n/10, swap n→0의 실제 updater 수와 DOM 정체성·선택 유지·batched 갱신·삭제를 검사한다.
+- 기존 C3 source/세 번들·251회귀/dual1070·기본 크기 증거는 해시가 일치할 때 재사용한다. 새 앱 타입·B3 contracts/공식 keyed·9동작/font와 diagnostic은 새로 실행한다. 기본28파일/package·sibling 앱은 계속 guard한다.
+- 공식 CPU580·공식 메모리60표본을 양순서로 순차 실행하고, production retention의 생성/clear100회·partial100회/조건별3context와 별도 full dispose를 구분한다. per-item 전체/JS·분포·실패/부하, 공식 MB, DOM/listener/heap 잔류와 같은 JS의 전체 크기를 보고한다. 비교군 전체·공개 예산·채택·concurrent 지원 결정은 포함하지 않는다.
+- 메모리 capability 사전 검사는 실제 exported 객체의 metadata/registry를 확인한다. 현재 upstream의 비활성23/26은 기존 metadata와 workload 객체를 프로세스 안에서만 등록한다. sibling 파일·workload/GC/측정 API는 바꾸지 않는다. 등록 오류와 유효 표본의 resume, CPU 당시 runner 버전은 따로 보존한다.
 
 ## 상태 / 핸드오프
 
-- done: C3 한정 구현·33회귀·dual·실제 패키지/B3·9개 일반 context 검증과 증거 보존. 한도 +891B로 기본 채택 보류·baseline 복원, 공식 속도 개선 판정 없음.
-- next: DC-12의 기능 격리/고정 비용 절감과 C3-T7 비사용자 비용 검증. C1/C2/C4는 결합하지 않는다.
-- blockers: 현재 사용자 결정 블로커 없음. DC-12는 새 C3 후보 구현 전 결정하며 DC-5·DC-8~DC-11은 별도 조건부 연구다.
-- commit: 최신 `ddd545e5b8c3878cfd5a6340464106e4c417da4f`(C3 계약·기준 회귀). 이번 후보 증거·보고서는 미커밋. C1 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
+- done: [DC-13 기능 대조](../benchmark/PARENT_MEMO_OPTIN_RESULTS.md). 같은 JS/core의 CPU580표본은 가중 전체−8.12%/JS−13.11%, 생성/교체/10k 생성 전체는 약5% 증가했다. 공식 메모리60표본은1k +0.343MB/10k +3.231MB다. B3·타입·diagnostic6context·조건별3context/100회 churn을 완료했고 DOM/listener 증가는0이었다. on heap은5→25회 약0.18MB,25→100회 약0.015MB 증가했으며 원인은 미귀속이다. 기본28파일/package/sibling은 보존했다.
+- next: heap 잔류 원인을 분석하고 실제 cacheUpdate/원래 앱과 같은 차수로 대조한다. 통제 앱의 이득을 원래 앱/전체peer 결과로 확대하지 않는다. C1/C2/C4는 결합하지 않는다.
+- blockers: 현재 실행 블로커 없음. 원래 앱/전체peer·heap 원인·공개 진입점/예산·concurrent 새 지원·최종 B4/Test Hardening/Integration·RC-5/IC-1의 목표 기준은 미완료다.
+- commit: 최신 `d660fdf33578885c9534fec8040ef8b5602bbe23` — `perf: preserve C3 parent memo prototype evaluation`. DC-12/DC-13 후속 문서·도구·증거는 미커밋이며 기본 runtime은 baseline이다.

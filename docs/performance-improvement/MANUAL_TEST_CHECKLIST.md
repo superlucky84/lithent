@@ -1,12 +1,13 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-22. 상태: **Phase 3 C3 base 한정 구현·검증 및 baseline 복원 완료. 최종 채택 검증은 미완료**.
+- 기준일: 2026-10-22. 상태: **DC-13 같은 행 앱 memo on/off의 CPU580·메모리60·100회 churn 검증 완료. 기본 runtime 보존·채택 보류**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택 확인에서는 후보의 B1~B4 통과와 성능 측정 산출물이 필요하다. 정합성 실패를 시간·메모리 교환으로 허용하지 않는다. 개별 성능 손해 자체는 실패 판정이 아니다.
 
 ## M-1. 기준선과 작업 상태 — RC-1/RC-4, Phase 0·1·6
 
+- [x] DC-12의 별도 source tree/package/bundle이 기본 runtime과 분리돼 있고, 기본 source/번들28개와 public exports가 전후 일치한다.
 - [x] Phase 1 기준선의 base 1.25.2/concurrent 0.2.2 소스/번들 해시, 변경 파일, HEAD를 [보고서와 manifest](../benchmark/STRUCTURAL_BASELINE_RESULTS.md)에 기록했다. 새 코어 후보는 없으며 최종 후보 해시는 Phase 6에서 다시 확인한다.
 - [x] 원래 upstream 앱, 초기 targeted 실험 앱, 이번 진단/production staging을 구별했다. 원래 앱을 기존 evidence의 `official-main.tsx`에서 추출하고 실제 upstream targeted 앱을 보존했다.
 - [x] 과거 문서/보고서와 미채택 결정을 보존했다. Phase 1은 현재 기준선의 별도 진단으로 기록했다.
@@ -38,7 +39,8 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-4. 캐시·자체 renew·부모 갱신 — DC-2/DC-4/DC-5, Phase 2·3·5
 
-- [x] C3 기준 회귀에서 기존 parent→child의 base/concurrent 실행 수 차이, child→parent의 두 번 실행, pre/post callback·callback 재예약·삭제를 확인했다. 새 회귀 양쪽 **10개씩**, 전체 dual **1,070 passed·3 skipped**·타입 검사 통과. 이 결과를 미구현 C3 hit/miss의 검증 기대치와 구분한다.
+- [x] DC-13의 off/on diagnostic에서 부모 refresh·선택·mutable label·swap의 실제 updater 수와 props 동기화·DOM 정체성·batched 결과·최종 dispose/GC가 계약과 같다. 6context·key1,000개 유지 후 등록/관찰한 VDOM/host0개를 확인했다.
+- [x] C3 기준 회귀에서 기존 parent→child의 base/concurrent 실행 수 차이, child→parent의 두 번 실행, pre/post callback·callback 재예약·삭제를 확인했다. 새 회귀 양쪽 **10개씩**, 전체 dual **1,070 passed·3 skipped**·타입 검사 통과. 이 baseline 결과를 별도 C3 hit/miss 전용 검증과 구분한다.
 - [x] C3-T1~T4: 전용 33회귀에서 setup 등록 오류, incoming selector·복사/Object.is·길이·key 변화, mutable row·빠뜨린 deps, nonempty slots·특수 props fallback을 확인했다. 후보 소스/실험 타입도 통과했다.
 - [x] C3 부모 hit의 props 동기화·live wrapper·자체 요청 유지와 updater/pre/post 생략, self/public replace 우회·miss 배칭 표를 확인했다. 최종 회귀는 후보 패치·[보고서](../benchmark/PARENT_MEMO_RESULTS.md)에 보존한다.
 - [ ] 기존 API에서 cache hit 후에도 `updateCallback`과 updater가 기존 규칙대로 실행된다. 동일 cached 객체의 `type = null` 전환이 삭제로 반영된다.
@@ -61,6 +63,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-6. concurrent와 기존 retained 기능 — DC-3/DC-7, Phase 3·5·6
 
+- [x] DC-12의 staging alias 회귀·실제 consumer 타입이 통과한다. helper/JSX는 같은 core 인스턴스로 alias하며 default setup에서 isolated hook을 섞으면 명시적 오류가 난다.
 - [x] C3 첫 후보는 base만 지원하며 concurrent의 새 API 부재를 실행 검증했다. DC-11의 commit/abandon 새 기능 지원은 미구현이다.
 - [x] C3-T1: 실제 ESM/CommonJS·consumer 타입을 확인했다. concurrent named import는 ESM missing export/TS2305로 실패하고 기존 helper/공통 dual·원래 앱 B3는 통과했다.
 - [ ] 공통 core spec와 concurrent 고유 scheduler/commit/abandon 테스트를 수행했다. base 성능 결과를 concurrent 개선율로 표시하지 않는다.
@@ -72,6 +75,8 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-7. 공식 전체 성능과 비교표 — RC-2/RC-5/IC-1/IC-2, Phase 4·6
 
+- [x] DC-13의 같은 JS/core·설정만 다른 두 조건으로 CPU580/메모리60표본의 양순서·분포·실패/부하를 감사했다. 기능 대조이며 원래 앱 종단/전체peer 판정과 구분한다.
+- [x] DC-12 core-only 양순서 대조의 앱/helper/렌더러/Chrome/엔진 해시·580표본·배치 실패를 감사했다. C3를 쓰지 않는 별도 렌더러의 비용으로만 해석하고 기능 이득·기본 렌더러 회귀·전체 peer 판정과 분리한다.
 - [ ] 최종 동일 앱·코어/helper·브라우저/엔진·lockfile 해시로 원순서/반대 순서의 전체 9 CPU 항목을 확보했다. 실제 러너의 ID·행 수·throttle·warmup·GC 설정을 기록했다.
 - [ ] raw 표본 수·완료 상태·실패 배치·재시도·trace가 보존된다. 다른 앱/브라우저/코어 버전이나 사전 후보의 표본을 합치지 않았다.
 - [ ] IC-1의 React/Preact 기본 비교군에 선택·부분 갱신만이 아닌 전체 항목을 실행했다. 비교군의 버전·소스와 표의 정규화/가중치/색상 모드가 고정되어 있다.
@@ -83,7 +88,9 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-8. 메모리·생성/삭제·번들 — R11/R12/IC-2/IC-3, Phase 2·4·5·6
 
-- [x] C3-T5/T7 한정 회수: pending 게시 금지·실패/초기화 하위 등록·삭제 정리, key 1,000개 유지 dispose 후 등록·관찰한 VDOM/host 0개를 3조건×3context에서 확인했다. 비사용자 시간 비용과 100회 churn은 미측정이다.
+- [x] DC-13의 production100회 생성/삭제·100회partial/조건별3context에서 GC 뒤 DOM/listener/heap을 기록하고 full dispose 검사·공식 MB와 구분했다. 같은 JS의 raw/gzip/br와 기본 런타임 보존을 확인했다.
+- [x] DC-12 기본 bundle 보존과 별도 렌더러의 전체 크기를 따로 공개했다. 별도 package/subpath·예산을 승인된 것으로 다루지 않는다.
+- [x] C3-T5/T7 한정 회수: pending 게시 금지·실패/초기화 하위 등록·삭제 정리, key 1,000개 유지 dispose 후 등록·관찰한 VDOM/host 0개를 3조건×3context에서 확인했다. 첫 후보 시점의 비사용자 시간 미측정은 위 DC-12 대조로 보완했고 100회 churn은 미실행이다.
 - [x] eager `h()`/실제 mount의 성공을 구분하고 selector/pre/updater/post/DOM/mount 실패와 재예약 세대를 회귀로 확인했다. baseline의 실패한 부모 tree/hook cursor 자동 롤백은 지원하지 않으며 관련 재시도 범위를 보고서에 기록했다.
 - [x] C3 size 실패를 공개했다: base br 5,691/4,800B(+891B 초과), concurrent 6,903B·element 998B. 후보를 보존하고 baseline 복원 후 세 게이트·28개 source/산출물 해시와 base21/concurrent23 회귀를 확인했다.
 - [ ] 공식 메모리 21/22/23/25/26의 절대 MB와 baseline/peer 비율을 기록한다. JS heap 진단과 `measureUserAgentSpecificMemory()`를 같은 지표로 섞지 않는다.
@@ -115,7 +122,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## 상태 / 핸드오프
 
-- done: C3 33전용 회귀·dual·실제 패키지/B3와 일반 입력 9context 동작/회수·size 실패를 연결했다. 기본 채택 보류·baseline 복원이며 최종 전체 체크는 미완료다.
-- next: DC-12의 기능 격리/고정 비용 절감·비사용자 대조를 검토한다. 공식 시간 개선 판정이나 concurrent 새 기능 지원을 추론하지 않는다.
-- blockers: 현재 없음. concurrent 새 기능은 DC-11, 새 비용 격리 후보는 DC-12 결정 뒤 검증한다.
-- commit: 최신 `ddd545e5b8c3878cfd5a6340464106e4c417da4f`(C3 계약·기준 회귀). 이번 구현 증거·보고서는 미커밋. 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
+- done: [DC-13 기능 대조](../benchmark/PARENT_MEMO_OPTIN_RESULTS.md). 같은 JS/core의 CPU580표본은 가중 전체−8.12%/JS−13.11%, 생성/교체/10k 생성 전체는 약5% 증가했다. 공식 메모리60표본은1k +0.343MB/10k +3.231MB다. B3·타입·diagnostic6context·조건별3context/100회 churn을 완료했고 DOM/listener 증가는0이었다. on heap은5→25회 약0.18MB,25→100회 약0.015MB 증가했으며 원인은 미귀속이다. 기본28파일/package/sibling은 보존했다.
+- next: heap 잔류 원인을 분석하고 실제 cacheUpdate/원래 앱과 같은 차수로 대조한다. 통제 앱의 이득을 원래 앱/전체peer 결과로 확대하지 않는다. C1/C2/C4는 결합하지 않는다.
+- blockers: 현재 실행 블로커 없음. 원래 앱/전체peer·heap 원인·공개 진입점/예산·concurrent 새 지원·최종 B4/Test Hardening/Integration·RC-5/IC-1의 목표 기준은 미완료다.
+- commit: 최신 `d660fdf33578885c9534fec8040ef8b5602bbe23` — `perf: preserve C3 parent memo prototype evaluation`. DC-12/DC-13 후속 문서·도구·증거는 미커밋이며 기본 runtime은 baseline이다.

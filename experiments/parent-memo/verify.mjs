@@ -18,7 +18,8 @@ const out =
   process.argv[2] ||
   '/tmp/lithent-c3-parent-memo-20261022';
 const baseline = path.join(out, 'baseline/dist/lithent.mjs');
-const candidate = path.join(root, 'dist/lithent.mjs');
+const candidatePackage = path.resolve(process.argv[3] || root);
+const candidate = path.join(candidatePackage, 'dist/lithent.mjs');
 const concurrent = path.join(
   root,
   'lithentConcurrent/dist/lithentConcurrent.mjs'
@@ -37,7 +38,7 @@ const manifest = {
 // Real consumer declarations and runtime artifacts, including deliberate
 // failure of the unsupported named import under the concurrent alias.
 for (const [name, declaration] of Object.entries({
-  base: path.join(root, 'dist/index.d.ts'),
+  base: path.join(candidatePackage, 'dist/index.d.ts'),
   concurrent: path.join(
     root,
     'lithentConcurrent/dist/types/lithentConcurrent/src/index.d.ts'
@@ -95,7 +96,7 @@ for (const [name, declaration] of Object.entries({
 }
 const require = createRequire(path.join(root, 'package.json'));
 const esm = await import(candidate);
-const cjs = require(path.join(root, 'dist/lithent.cjs'));
+const cjs = require(path.join(candidatePackage, 'dist/lithent.cjs'));
 assert.equal(typeof esm.useParentMemo, 'function');
 assert.equal(typeof cjs.useParentMemo, 'function');
 assert.equal('useParentMemo' in (await import(concurrent)), false);

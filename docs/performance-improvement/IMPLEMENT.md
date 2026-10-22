@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-22. 상태: **Phase 3 C3 base 한정 구현·검증 완료. 기본 채택 보류·baseline 복원**.
+- 기준일: 2026-10-22. 상태: **DC-13 같은 행 앱 memo on/off의 CPU580·메모리60·100회 churn 검증 완료. 기본 runtime 보존·채택 보류**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
@@ -43,7 +43,7 @@
 
 분기: C1이 원래 앱에 효과가 없고 C2의 진입 증명 비용이 크다는 근거가 있으면 Phase 2 후보들을 모두 구현하지 않고 바로 Phase 3의 C3/C4 계약 연구로 진행할 수 있다. 내부 개선 우선 검토는 미세 최적화 소진 의무가 아니다.
 
-당시 분기: 일반 nested slot에서도 반복 검색 증가가 재현되어 C1 한정 프로토타입을 택했다. original/Table의 전체 순회 해결책으로 설명하지 않는다. C1의 실제 결과와 채택 보류는 아래 Phase 2에 기록하며, 현재의 다음 작업은 Phase 3 C3 후보 구현이다. C2는 실제 시간상 기각 없이 보류한다.
+당시 분기: 일반 nested slot에서도 반복 검색 증가가 재현되어 C1 한정 프로토타입을 택했다. original/Table의 전체 순회 해결책으로 설명하지 않는다. C1의 실제 결과와 채택 보류는 아래 Phase 2에 기록하며, 이후 Phase 3 C3 후보와 DC-12 별도 렌더러의 한정 검증으로 이어졌다. C2는 실제 시간상 기각 없이 보류한다.
 
 ## Phase 2 — 기존 계약 안의 내부 후보 C1/C2
 
@@ -75,11 +75,33 @@
 - [x] helper는 미수정이다. 원래 앱 B3 manifest에서 양쪽 helper/appSource 동일성과 후보 core 해시를 확인했다. candidate helper staging 지원 추가는 이번에는 N/A다.
 - [x] **C3-T7 비용/기준 검사:** 후보 B1 dual **1,070 passed·3 skipped**, B2 core build/타입 성공·br **5,691/4,800B 실패**, B3 동일 원래 앱 contracts·keyed·9동작·폰트 통과. 크기 실패를 통과로 바꾸지 않고 증거 보존 뒤 baseline 복원했다. 비사용자 시간·공식 메모리·전체 최종 검증은 남아 있다.
 
-산출물: [C3 보고서](../benchmark/PARENT_MEMO_RESULTS.md), [raw 결과](../benchmark/parent-memo-results.json), [압축 증거](../benchmark/parent-memo-evidence.json.gz), [후보 패치](../benchmark/parent-memo-candidate.patch), [전용 회귀·도구](../../experiments/parent-memo/README.md). 한정 구현·동작/회수 검증은 완료했고 크기 한도 +891B로 기본 채택을 보류했다. 비사용자 시간 비용은 미측정이며 Phase 4 최종 비교를 시작하지 않았다. 패치를 역적용해 자신의 코어 변경만 복원했고 source/산출물 **28개 SHA-256**과 실제 sibling 앱의 해시가 이전 baseline과 일치한다. 복원 후 core build/size·관련 base **21**/concurrent **23** 회귀가 통과했다. 다음 후보는 DESIGN DC-12의 비용 격리 계약부터 정한다.
+산출물: [C3 보고서](../benchmark/PARENT_MEMO_RESULTS.md), [raw 결과](../benchmark/parent-memo-results.json), [압축 증거](../benchmark/parent-memo-evidence.json.gz), [후보 패치](../benchmark/parent-memo-candidate.patch), [전용 회귀·도구](../../experiments/parent-memo/README.md). 한정 구현·동작/회수 검증은 완료했고 크기 한도 +891B로 기본 채택을 보류했다. 당시 비사용자 시간 비용은 미측정이었다. 아래 DC-12에서 별도 렌더러의 비참여 대조만 추가했으며 Phase 4 전체 peer/메모리 검증은 미완료다. 패치를 역적용해 자신의 코어 변경만 복원했고 source/산출물 **28개 SHA-256**과 실제 sibling 앱의 해시가 이전 baseline과 일치한다. 복원 후 core build/size·관련 base **21**/concurrent **23** 회귀가 통과했다. 후속 DC-12 격리 계약·검증은 아래에 기록한다.
 
 분기: API/메모리/번들 비용이 목표에 맞지 않으면 미채택으로 보존한다. 한도 변경은 IC-3에서 구체적인 수치와 대안을 검토하며 기존 게이트를 임의 수정하지 않는다. 일상적인 내부 구현 선택마다 사용자 재승인을 요구하지 않는다.
 
 ## Phase 4 — 전체 성능과 교환 비용 검증
+
+### DC-12 한정 실행 — 기본 경로 보존과 별도 렌더러 비용
+
+- [x] 검증된 C3 source를 독립 staging으로 복원·재빌드하고 source/bundle/types provenance를 기록한다. 기본 28파일과 public exports는 바꾸지 않는다.
+- [x] 전용 33회귀를 staging alias로, 공유 core 회귀와 기존 dual을 각각 확보한다. 실제 타입/패키지·혼용 실패도 확인한다.
+- [x] 동일 입력 UI 9context와 원래 앱 B3를 재실행한다. 재사용하는 이전 도구에는 명시적인 candidate package/source override만 추가하고 기본 사용법을 보존한다.
+- [x] 새 출력 위치의 원래 앱 core-only 대조를 두 실행 순서로 수행한다. 전체 580표본·고정 Chrome/엔진 해시·같은 앱/helper를 감사한다. 공식 CPU 동안 빌드·단위 테스트를 병행하지 않는다.
+- [x] 항목별 전체/JS·양차수/합산 분포·실패/재시도와 기본/별도 번들 비용을 보존한다. 별도 렌더러 비참여 앱의 비용이며 C3 기능 개선율이나 최종 목표 달성으로 쓰지 않는다.
+- [x] 보고서·raw·영구 증거와 done/next/blockers/실제 SHA로 인계한다. public subpath·크기 예산·배포는 별도 결정이고 Phase 5/6 완료로 표시하지 않는다.
+
+[DC-12 결과](../benchmark/PARENT_MEMO_ISOLATION_RESULTS.md): 양순서 580표본/실패0, 가중 전체 +0.10%/JS +0.32%로 불확실하며 기본 런타임은 그대로다. 보고서·raw·영구 압축 증거를 보존했다. 이 검사는 DC-12의 한정 사전 비교다. 아래 Phase 4 전체의 peer/메모리/새 기능 대조를 모두 마쳤다는 뜻이 아니다.
+
+### DC-13 한정 실행 — 같은 행 앱의 memo on/off
+
+- [x] 기존 isolated core·기본28파일/package/sibling 해시와 재사용할251/dual1070 증거를 감사한다. 새 행 앱/source·같은 JS/HTML 설정 차이·diagnostic 분리를 manifest에 기록한다.
+- [x] 새 앱 타입, production B3 contracts/공식 keyed·9동작/font, diagnostic updater 수·identity/batching·dispose/GC를 통과한다.
+- [x] 공식 CPU9항목 양순서580표본과 공식 메모리5항목 양순서60표본을 같은 빌드/브라우저로 직렬 실행한다. 정상 CPU 중 빌드/테스트를 병행하지 않는다.
+- [x] production retention3context×두 조건에서 생성/삭제100회·부분 갱신100회를 실행한다. 진단 heap/DOM/listener와 공식 메모리를 구분한다.
+- [x] 항목별·양차수/합산 전체/JS·메모리·분포·크기와 실패/재시도·부하를 보고서/raw/영구 증거에 보존한다. 기본 원래 앱/전체peer 개선율로 해석하지 않는다.
+- [x] 정본4문서·HANDOFF에 done/next/blockers/실제 commit을 갱신한다. 기본 코어 채택/예산 확정이나 Phase5/6 완료로 표시하지 않는다.
+
+[DC-13 결과](../benchmark/PARENT_MEMO_OPTIN_RESULTS.md): CPU580·메모리60·100회 churn을 완료했다. 통제 앱의 가중 전체−8.12%와 생성/메모리 비용·heap 미귀속을 함께 공개했다. 메모리23/26 등록/메타데이터 오류2회는 기존 정의를 프로세스 안에서 복원해 해결하고 유효12표본의 resume을 감사했다.
 
 진입: 후보별 B1~B3 통과 및 immutable production staging 완료. 종료: 모든 항목의 실제 이득/손해와 불확실성이 같은 환경에서 비교됨.
 
@@ -129,15 +151,15 @@
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 다음은 DC-12의 비용 격리이며 미실행인 공식 성능·최종 채택 검증을 완료로 표시하지 않는다.
+- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13의 통제 앱 CPU/메모리도 완료했으며 다음은 heap 원인/실제 캐시 앱 대조다. 전체peer·최종 채택은 미완료다.
 - [ ] **IC-1 TBD:** 최종 표의 비교군, 정규화·색상/통계 모드, CPU/메모리/startup 표시 범위, 빠른 구간의 수치 임계치. Phase 1에서 제안·기록하고 Phase 6 목표 판정 전에 닫음.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
-- [ ] **IC-3 조건부 TBD:** 크기 한도 초과 후보의 격리·상쇄·예산 재검토. 초과가 없으면 해당 없음으로 닫음. 한도 변경은 별도 명시적 결정.
+- [ ] **IC-3 조건부 TBD:** 기본 경로 격리는 DC-12에서 검증했지만 별도 렌더러는 br 5,691B다. 기능 이득·비용을 본 뒤 공개 경로/별도 예산을 결정한다. 기존 한도 변경이나 초과 해소로 표시하지 않는다.
 - [ ] **IC-4 검증 대기:** C1/C2/C3/C4 중 최종 채택 조합. 각 후보의 독립 결과 뒤 결합 상호작용을 확인.
 
 ## 상태 / 핸드오프
 
-- done: C3 base 한정 구현·33회귀·dual/B3·일반 입력 동작/회수·크기 검증, 후보 보존과 baseline 복원. 크기 실패는 공개했으며 공식 시간·Phase 4~6은 미실행이다.
-- next: DC-12의 기능 격리/고정 비용 절감 설계 후 새 후보와 비사용자 대조. C1/C2/C4를 결합하지 않는다.
-- blockers: 현재 사용자 결정 블로커 없음. 한도는 그대로 유지하며 설계되지 않은 격리/상쇄를 완료로 간주하지 않는다.
-- commit: 최신 `ddd545e5b8c3878cfd5a6340464106e4c417da4f` — `docs: define C3 parent memo contract and baseline regressions`. 이번 구현 증거·보고서는 미커밋. 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
+- done: [DC-13 기능 대조](../benchmark/PARENT_MEMO_OPTIN_RESULTS.md). 같은 JS/core의 CPU580표본은 가중 전체−8.12%/JS−13.11%, 생성/교체/10k 생성 전체는 약5% 증가했다. 공식 메모리60표본은1k +0.343MB/10k +3.231MB다. B3·타입·diagnostic6context·조건별3context/100회 churn을 완료했고 DOM/listener 증가는0이었다. on heap은5→25회 약0.18MB,25→100회 약0.015MB 증가했으며 원인은 미귀속이다. 기본28파일/package/sibling은 보존했다.
+- next: heap 잔류 원인을 분석하고 실제 cacheUpdate/원래 앱과 같은 차수로 대조한다. 통제 앱의 이득을 원래 앱/전체peer 결과로 확대하지 않는다. C1/C2/C4는 결합하지 않는다.
+- blockers: 현재 실행 블로커 없음. 원래 앱/전체peer·heap 원인·공개 진입점/예산·concurrent 새 지원·최종 B4/Test Hardening/Integration·RC-5/IC-1의 목표 기준은 미완료다.
+- commit: 최신 `d660fdf33578885c9534fec8040ef8b5602bbe23` — `perf: preserve C3 parent memo prototype evaluation`. DC-12/DC-13 후속 문서·도구·증거는 미커밋이며 기본 runtime은 baseline이다.

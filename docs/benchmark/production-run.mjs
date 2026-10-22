@@ -289,6 +289,12 @@ try {
       await browser.close();
     }
   } else if (mode === 'cpu' || mode === 'mem') {
+    if (mode === 'mem') {
+      const { registerOfficialMemoryBenchmarks } = await import(
+        './official-memory.mjs'
+      );
+      output.memoryRegistration = await registerOfficialMemoryBenchmarks(bench);
+    }
     const { startBrowser } = await import(
       bench + '/webdriver-ts/dist/puppeteerAccess.js'
     );

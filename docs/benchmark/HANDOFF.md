@@ -1,5 +1,58 @@
 # summary
 
+## DC-13 같은 행 앱의 memo on/off 완료 — 2026-10-22
+
+- [기능 대조 보고서](./PARENT_MEMO_OPTIN_RESULTS.md), [raw](./parent-memo-optin-results.json),
+  [압축 증거](./parent-memo-optin-evidence.json.gz), [도구](../../experiments/parent-memo-optin/README.md)를 읽는다.
+  같은 core/source/production JS에서 HTML 시작 설정만 다르며 모든 동작은 부모 Table renew다.
+  row 자체 renew·cacheUpdate/수동 VDOM 캐시는 없다. 원래 캐시 앱의 대조가 아니다.
+- done: 앱 타입·B3 keyed/9동작/font·diagnostic6context와 full dispose/GC 통과.
+  같은 해시의251회귀/dual1,070·3skip은 재사용했다. 새 재현 빌드/자동 타입 검사도 같은 JS/HTML을 생성했다.
+- CPU580표본/실패0: 가중 전체 **−8.12%/JS−13.11%**. 두 차수 전체−8.56%/−8.39%.
+  생성/교체/10k 생성 전체 약5% 증가는 함께 공개한다.
+- 공식 메모리60표본:1k **+0.343MB(+8.37%)**,10k **+3.231MB(+9.82%)**.
+  upstream 비활성23/26의 registry/metadata를 프로세스 안에서만 복원했다.
+  초기 등록 오류2회와 유효12표본 resume을 보존했고 workload/GC/측정 API·sibling은 바꾸지 않았다.
+  현재 runner의 CPU 부분이 실제 측정 당시와 같음도 감사했다.
+- production100회 create/clear·partial100회/조건별3context 완료. DOM/listener 증가는 모두0.
+  on heap은5→25회 약0.18MB 증가 후25→100회 약0.015MB 증가했다. 원인은 아직 미귀속이다.
+  별도 full dispose에서 key1천개 유지 뒤 등록/관찰한 VDOM/host0개를 확인한 것과 구분한다.
+- 기본28파일/package/실제 sibling 앱은 보존했고 별도 UMD br5,691B·기본4,798B다.
+  후보는 실험 유지·기본 채택 보류다. 정상 trace580개 inventory/선택4개 내용을 영구 보존한다.
+- next: **heap 잔류 원인 분석과 실제 cacheUpdate/원래 앱의 동차수 대조**.
+  통제 앱 이득을 원래 앱/전체peer 판정으로 확대하지 않고 C1/C2/C4는 결합하지 않는다.
+- blockers: 현재 실행 블로커 없음. 전체peer·concurrent 새 API·공개 진입점/예산·최종 B4/
+  hardening/integration·RC-5/IC-1은 미완료다. 출력은 `/tmp/lithent-c3-optin-20261022`다.
+- commit: 최신 `d660fdf33578885c9534fec8040ef8b5602bbe23`. DC-12/DC-13 후속은 미커밋이다.
+
+## DC-12 별도 렌더러 격리·비참여 비용 완료 — 2026-10-22
+
+- 사용자 요청으로 앞선 C3 증거/도구/정본 16파일을 영문 메시지
+  `perf: preserve C3 parent memo prototype evaluation`로 커밋했다.
+  SHA **`d660fdf33578885c9534fec8040ef8b5602bbe23`**.
+- [격리 보고서](./PARENT_MEMO_ISOLATION_RESULTS.md)를 먼저 읽는다. 로컬
+  `doc-driven-designer-v1` 규칙으로 정본 네 문서의 R18~R20/DC-12/검사·인계를 갱신했다.
+  검증된 C3 source 17개를 별도 staging에서 재빌드했고 세 런타임 번들은 이전 후보와 같다.
+  기본 source/산출물28개·package.json/exports와 실제 sibling의 targeted 앱을 보존했다.
+- staging **251 passed**(shared core218+C3 전용33), 기존 dual **1,070 passed·3 skipped**,
+  source/consumer 타입·실제 ESM/CommonJS·private package self-reference/NodeNext·혼용 실패,
+  입력 UI9context·원래 앱 B3 keyed/9동작/font를 통과했다. concurrent 새 API는 미지원이다.
+- 같은 원래 앱·helper의 비참여 렌더러 대조 **580표본/두 순서/실패0·재시도0** 완료.
+  합산 가중 전체 **+0.10%**, JS **+0.32%**. 차수별 전체 **+0.48%/−0.45%**로 작은 차이의
+  방향도 달라 불확실하다. 기본 runtime의 회귀나 memo 기능의 이득으로 해석하지 않는다.
+- 기본 base br **4,798B**, 별도 전체 렌더러 br **5,691B**. 기본 경로의 추가 bytes/분기는0이지만
+  후보 자체를 작게 만들지 않았고 optional 예산/public subpath/배포/채택은 미정이다.
+- [raw](./parent-memo-isolation-results.json)/[압축 증거](./parent-memo-isolation-evidence.json.gz)에
+  전 표본·source/build/types·러너·lock·명령·로그를 보존했다. 정상 trace는580개 inventory와
+  선택 index0의4개 내용만 영구 보존한다. 다른 정상 trace는 임시 출력에만 있다.
+- done: DC-12 한정 격리·정합성·비참여 비용 대조·영구 증거. 실행 위치는
+  `/tmp/lithent-c3-isolated-20261022`; 공식 두 출력은 `original`, `original-reverse`다.
+- next: **같은 행 컴포넌트 앱에서 memo on/off의 공식 CPU·생성/삭제·메모리 대조**.
+  기능 이득·비용을 먼저 얻고 공개 진입점/예산을 판단한다. C1/C2/C4는 결합하지 않는다.
+- blockers: 현재 실행 블로커 없음. 전체peer·공식 메모리5개·100회 churn·Phase5/6·RC-5/IC-1의
+  최종 목표 기준은 미완료다. 다음 한정 실험을 막는 승인 조건으로 다루지 않는다.
+- commit: 최신 `d660fdf`; 이번 격리 후속 결과는 작업 트리에 남겼다. 아래 기록은 각 당시의 이력이다.
+
 ## C3 base 프로토타입 검증·보존 및 baseline 복원 — 2026-10-22
 
 - 사용자 요청으로 앞선 계약·기준 회귀 6파일을 영문 메시지

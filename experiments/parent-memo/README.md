@@ -29,6 +29,12 @@ to override the browser path. The script verifies DOM/state/focus, component
 work counts and disposal with externally retained keys. It does not measure
 official CPU time.
 
+To keep the default checkout intact, use the follow-up
+[isolated renderer experiment](../parent-memo-isolated/README.md).
+`verify.mjs <fresh-output-directory> <candidate-package-root>` selects its
+staged ESM/CommonJS and declarations; the one-argument form still uses this
+repository's runtime.
+
 `preserve.mjs capture` snapshots the candidate and writes the reversible patch.
 `preserve.mjs` audits and archives the finished run after baseline restoration.
 Set `LITHENT_C3_OUT` to its output directory. The original run is
