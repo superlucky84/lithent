@@ -1,6 +1,6 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-22. 상태: **Phase 3 C3 한정 후보 계약·기준 회귀 완료. 다음은 후보 구현이며 런타임은 baseline**.
+- 기준일: 2026-10-22. 상태: **Phase 3 C3 base 한정 구현·검증 완료. 기본 채택 보류·baseline 복원**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
@@ -14,7 +14,7 @@
 
 ## 2. 후보 묶음과 우선순위
 
-Phase 1의 비용 분해로 선택했던 C1 한정 프로토타입은 검증 후 채택을 보류했다. **현재는 C3의 한정 계약과 기준 회귀를 완료하고 후보 구현을 준비하는 단계**다. C2는 미구현 보류, C4는 조건부 연구다. 네 후보를 모두 구현하는 계획이 아니며, 한 번에 하나씩 기준선과 비교한다.
+Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **현재는 C3의 기능 격리/고정 비용 절감을 검토할 단계**다. C2는 미구현 보류, C4는 조건부 연구다. 네 후보를 모두 구현하는 계획이 아니며, 한 번에 하나씩 기준선과 비교한다.
 
 | 후보                                               | 줄이려는 작업                                                    | 필요한 정보                                                  | 한계와 진입 조건                                                                                                 |
 | -------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
@@ -74,7 +74,7 @@ retained-row 앱은 `getComponentSubInfo(key, 'vd')`로 live VDOM을 읽는다. 
 
 #### DC-4의 한정 API와 의존성
 
-실험 후보의 API는 base `src/hook/useParentMemo.ts`에서 base root export로 제공할 `useParentMemo<P extends object = Props>(dependencies: (nextProps: Readonly<P>) => readonly unknown[]): void`다. setup 중 인스턴스당 한 번 호출한다. setup 밖 호출·중복 등록은 명시적 오류로 처리한다. 이 문서의 API는 **구현 전 계약**이며 현재 패키지에는 없다.
+실험 후보의 API는 base `src/hook/useParentMemo.ts`에서 base root export로 제공한 `useParentMemo<P extends object = Props>(dependencies: (nextProps: Readonly<P>) => readonly unknown[]): void`다. setup 중 인스턴스당 한 번 호출하고 setup 밖 호출·중복 등록은 명시적 오류로 처리한다. **구현·검증 후 후보 패치에 보존했고 현재 기본 패키지에는 없다.**
 
 ```tsx
 type FieldProps = {
@@ -120,7 +120,7 @@ const Field = mount<FieldProps>((renew, props) => {
 
 부모의 hit 판정은 `src/diff.ts:runUpdate`의 props 동기화 앞, 자체 갱신 구분은 `src/wDom.ts:replaceWDom`의 루트 경계에 둔다. 재귀 자식은 부모 경로다. 같은 props 참조 여부, 전역 dirty flag, 앱이 읽어 온 VDOM을 신뢰 신호로 쓰지 않는다. hit여도 `makeNewWDomTree`의 keyed 소비·배치 처리를 유지하며 parent pointer는 새 부모에 연결한다.
 
-기준선의 배칭은 코어별로 다르다. [기존 update-path 회귀](../../src/tests/core-updatePaths.test.tsx)는 parent→child 예약에서 base가 retired wrapper의 자식 작업을 생략하고 concurrent는 최신 live 노드에서 한 번 더 실행함을 이미 명시한다. 새 [기준 회귀](../../src/tests/core-parentUpdateContract.test.tsx)에서 callback/DOM 관찰까지 고정한다. 초기 mount를 제외한 예상 실행 수는 다음과 같고, C3 열은 **미실행인 후보의 검증 기대치**다.
+기준선의 배칭은 코어별로 다르다. [기존 update-path 회귀](../../src/tests/core-updatePaths.test.tsx)는 parent→child 예약에서 base가 retired wrapper의 자식 작업을 생략하고 concurrent는 최신 live 노드에서 한 번 더 실행함을 이미 명시한다. 새 [기준 회귀](../../src/tests/core-parentUpdateContract.test.tsx)에서 callback/DOM 관찰까지 고정했다. 초기 mount를 제외한 실행 수는 다음과 같고, C3 열은 후보 전용 회귀에서 확인한 결과다.
 
 | 같은 task의 예약  | baseline base | baseline concurrent | C3 base hit |                            C3 base miss |
 | ----------------- | ------------: | ------------------: | ----------: | --------------------------------------: |
@@ -138,6 +138,12 @@ miss 때 기존 배칭을 재설계하지 않는다. hit는 자체 요청을 소
 - selector는 hit 판정 때 읽고, 실제 updater 실행 때 pre callback 뒤의 입력으로 pending 스냅샷을 만든다. 이후 성공 경계에서만 게시한다. 같은 task에 재진입한 갱신은 실행 세대와 현재 인스턴스가 맞는 pending만 게시해 이전 실행이 새 스냅샷을 덮지 못하게 한다. unmount/초기화 실패에서도 pending·등록을 제거한다.
 - **첫 후보는 base만 지원한다.** concurrent root는 hook을 export하지 않으며 alias한 consumer의 새 API import/type 검사가 명시적으로 실패해야 한다. helper 공통 export로 우회하지 않는다. concurrent 지원은 별도 **DC-11**에서 pending을 work-in-progress에 소유시키고 commit에서 게시, abandon에서 폐기하는 계약을 구현하기 전에는 추가하지 않는다. 기존 concurrent 경로·boundary 동작은 그대로 회귀한다.
 - lookup·selector·배열 복사·key shape 검사·실패 정리의 비용은 별도 기록한다. 비사용자도 parent 경계의 분기 비용이 생길 수 있으므로 원래 앱의 core-only 대조와 같은 행 구조의 opt-in 대조가 모두 필요하다. 전체 keyed O(n), 컴포넌트 생성/메모리, C1의 부모 검색은 남는다. 크기 게이트를 넘으면 후보를 미채택 증거로 보존한다.
+
+구현 경계(2026-10-22 착수): base에만 setup scope와 memo work scope를 둔다. `createComponentResolver`는 setup 등록 범위를 제한하고 초기화 실패를 정리한다. `replaceWDom`과 `render`는 하위 diff/DOM/mount/post를 포함한 작업의 성공/실패를 한 번에 memo 상태에 알린다. pending은 출력 노드를 weak key로 연결하며, DOM renderer에서 실제로 방문한 출력만 최외곽 성공 경계에서 게시한다. 중첩 작업은 상위 scope로 합치고 실행 세대·현재 ComponentInfo/live wrapper를 검증한다. eager `h()`만 끝난 출력은 아직 유효하지 않다. 이는 memo 상태의 성공 경계이며 기존 DOM/props 전체의 transaction rollback은 아니다. 공통 hook/ComponentInfo와 concurrent 런타임은 수정하지 않는다. unmount 정리는 등록 시 첫 cleanup으로 넣어 사용자 cleanup이 throw해도 먼저 해제되게 한다.
+
+구현 결과: [C3 보고서](../benchmark/PARENT_MEMO_RESULTS.md)의 전용 **33회귀**·기존 dual **1,070 passed/3 skipped**·실제 패키지 타입/exports·B3를 통과했다. 동일 입력 UI의 3조건×3context에서 부모 refresh 자식 updater 1,000→0회, 한 props 변경 1,000→1회를 확인했다. key 1,000개 유지 후 dispose/GC에서 등록·관찰한 VDOM/host 잔류 0개였다. 공식 시간은 측정하지 않았다. 후보 br **5,691B**는 한도 +891B여서 기본 채택을 보류하고 runtime을 복원했다. 비사용자의 setup/work/DOM 경계 비용도 미측정이며 다음 결정은 DC-12다.
+
+오류 검증의 한계: memo 스냅샷 무효화와 base의 전체 실패 복구는 별개다. 실패한 부모 diff는 live pointer를, updater throw는 hook cursor/대기 callback을 자동 롤백하지 않는 기존 동작을 확인했다. 기준 동작을 보존하며 parent selector 오류 뒤의 명시적 재시도에는 이전 unretired tree를 사용했다. 이를 자동 재시도/전체 rollback 지원으로 설명하지 않는다.
 
 기존 [createRetainedView](../../helper/src/lifecycle/retainedView.ts)는 독립 host의 show/hide/dispose, [useRenderBoundary](../../helper/src/lifecycle/renderBoundary.ts)는 concurrent 자식 갱신 pause/resume를 제공한다. 둘은 행의 부모 재실행 memo와 목적이 다르다. 이름을 재사용하거나 숨김/freeze 의미를 암묵적으로 바꾸지 않는다. 수명 정리·capability 연결의 검증 사례는 참고하되 그대로 대체 API로 채택하지 않는다.
 
@@ -190,10 +196,10 @@ Phase 1에서는 다음 기준으로 카운터의 의미와 시나리오를 기�
 
 체크는 **결정이 닫혔음**을 뜻하며 구현·검증 완료가 아니다.
 
-- [x] **DC-1 확정:** C1/C2 내부 후보와 C3/C4 추가 정보 후보를 분리한다. Phase 1 근거로 선택한 C1 한정 후보는 검증 후 채택 보류, C2는 미구현 보류다. 현재는 C3의 한정 계약·기준 회귀를 완료하고 독립 구현을 준비한다. 근거: 원래 앱과 row-renew의 비용 발생 지점이 다름. → Phase 1~3, M-2.
+- [x] **DC-1 확정:** C1/C2 내부 후보와 C3/C4 추가 정보 후보를 분리한다. C1과 C3 base 한정 후보는 각각 독립 검증 후 기본 채택 보류, C2는 미구현 보류다. 현재는 C3 기능 격리/비용 절감을 검토한다. 근거: 원래 앱과 row-renew의 비용 발생 지점이 다름. → Phase 1~3, M-2.
 - [x] **DC-2 확정:** 기본 동작의 불명확한 identity/props 생략 금지, 증명 불가 시 기존 경로 사용. 근거: cached identity·keyed 소비 테스트. → Phase 2·5, M-3~M-5.
 - [x] **DC-3 확정:** base와 concurrent의 관찰 가능한 계약을 각각 검증한다. 성능 측정은 우선 base이며 concurrent 개선을 추론하지 않는다. → Phase 2~6, M-6.
-- [x] **DC-4 한정 후보 확정:** base root의 새 setup hook `useParentMemo`로 부모 기인 갱신만 생략한다. 동기화 전 incoming props의 복사 deps·Object.is·key shape 무효화, nonempty slots/특수 props fallback, 명시적 self 우회, hit의 updater/pre/post 생략·live wrapper 보존, miss의 기존 배칭, 성공 후 스냅샷 게시·실패/삭제 정리를 위 C3 절에서 정했다. 기존 helper로는 pre callback/updater 진입을 막거나 self를 구분할 수 없어 새 코어 경계를 택했다. **기준 회귀는 통과했으며 구현·API 배포·C3 성능 검증은 미완료다.** → C3-T1~T7, M-4·M-6·M-8·M-9.
+- [x] **DC-4 한정 후보 확정:** base root의 새 setup hook `useParentMemo`로 부모 기인 갱신만 생략한다. 복사 deps·무효화/fallback·self 우회·hit/miss callback/배칭·성공 게시·실패/삭제 소유 계약은 위 C3 절이 정본이다. 기존 helper로는 pre callback/updater 진입을 막거나 self를 구분할 수 없어 새 코어 경계를 택했다. **한정 구현·동작/회수·B1/B3 검증은 완료했고 크기 초과로 기본 채택 보류, 공식 시간과 API 배포는 미완료다.** → C3-T1~T7, M-4·M-6·M-8·M-9.
 - [ ] **DC-5 TBD:** C4의 목록 소유권/변경 정보/무효화·fallback 계약. C3까지로 목표에 접근 가능한지 본 뒤 분기. → Phase 3, M-4·M-9.
 - [x] **DC-6 C1 한정 후보 확정:** base의 정규화된 parent.children만 lazy `WeakMap<CompKey, WeakMap<WDom[], number>>` sidecar로 조회한다. 현재 배열·original identity 검증 뒤 성공 위치만 저장하고 stale/compKey 없음은 native fallback이다. slot은 alias의 첫 등장 증명 부족으로 기존 검색, concurrent는 commit 소유 경계가 달라 미수정이다. 고정 WDom/ComponentInfo/public API 변경·전체 hint 재작성 없이 cold/warm/stale·추가 WeakMap·크기/회수를 검증한다. 근거는 위 한정 후보 계약과 Phase 1 작업량이다. **C1 한정 구현·검증은 완료했고 기본 채택은 보류했다. [실측](../benchmark/PARENT_POSITION_RESULTS.md)을 참조한다.** → Phase 2, M-2·M-3·M-8.
 - [x] **DC-7 확정:** 기존 retainedView/renderBoundary와 새 memo 의미를 구분하며 benchmark 주석 회피를 설계 동기로 삼지 않는다. → Phase 3·6, M-6·M-9.
@@ -201,10 +207,11 @@ Phase 1에서는 다음 기준으로 카운터의 의미와 시나리오를 기�
 - [ ] **DC-9 조건부 TBD:** C1 concurrent 이식의 live 소유, commit publication·abandon 및 메모리 비용. 이번에는 기존 경로를 유지한다. → M-6·M-8.
 - [ ] **DC-10 조건부 TBD:** 보류한 C2의 uniqueness/순서 진입 증명 방식과 실제 제거 작업·추가 비용. 재개 시 별도 후보로 확정한다. → Phase 2, M-2·M-3.
 - [ ] **DC-11 조건부 TBD:** C3 concurrent 지원의 work-in-progress snapshot 소유·commit 게시·abandon 폐기·boundary 상호작용. 첫 base 후보에는 포함하지 않으며 concurrent는 새 hook을 export하지 않는다. 재개 시 기준선의 두 번 실행·callback 불가역 부작용까지 별도 결정한다. → C3-T1·T4·T5, M-6·M-8.
+- [ ] **DC-12 검토 대기:** C3의 선택적 진입점/기능 격리와 비사용자 setup/work/DOM 경계 비용 절감. 한정 후보 br +893B(한도 +891B)를 근거로 삼되, 예산 상향이나 새 subpath 채택을 미리 확정하지 않는다. 보존한 계약·실패 경계·props/slot fallback을 유지할 설계를 정한 뒤 새 후보를 만든다. → C3-T7, IC-3, M-8·M-9.
 
 ## 상태 / 핸드오프
 
-- done: DC-4 C3의 한정 API·의존성·fallback·callback/배칭·소유/실패·base 지원 범위 확정. 새 기준 회귀 양쪽 10개씩·전체 dual 1,070 passed/3 skipped·타입 검사 통과. C1의 채택 보류와 runtime baseline은 유지한다.
-- next: C3-T1~T5의 후보 전용 회귀와 base 구현, 이어 T6/T7의 동일 행 구조·일반 입력 예제·비사용자 비용 검증. C1/C2/C4는 결합하지 않는다.
-- blockers: 현재 없음. DC-5·DC-8~DC-11은 해당 조건부 후보를 재개할 때의 결정이며 첫 C3 base 후보를 막지 않는다.
-- commit: 최신 체크포인트 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`(C1 증거 보존, 기본 채택 아님). 이번 C3 문서·기준 회귀는 미커밋. Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
+- done: C3 한정 구현·33회귀·dual·실제 패키지/B3·9개 일반 context 검증과 증거 보존. 한도 +891B로 기본 채택 보류·baseline 복원, 공식 속도 개선 판정 없음.
+- next: DC-12의 기능 격리/고정 비용 절감과 C3-T7 비사용자 비용 검증. C1/C2/C4는 결합하지 않는다.
+- blockers: 현재 사용자 결정 블로커 없음. DC-12는 새 C3 후보 구현 전 결정하며 DC-5·DC-8~DC-11은 별도 조건부 연구다.
+- commit: 최신 `ddd545e5b8c3878cfd5a6340464106e4c417da4f`(C3 계약·기준 회귀). 이번 후보 증거·보고서는 미커밋. C1 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.

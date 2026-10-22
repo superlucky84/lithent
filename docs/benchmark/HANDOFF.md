@@ -1,5 +1,40 @@
 # summary
 
+## C3 base 프로토타입 검증·보존 및 baseline 복원 — 2026-10-22
+
+- 사용자 요청으로 앞선 계약·기준 회귀 6파일을 영문 메시지
+  `docs: define C3 parent memo contract and baseline regressions`로 커밋했다.
+  SHA **`ddd545e5b8c3878cfd5a6340464106e4c417da4f`**. 이어서 C3 base 후보를 실제 구현했다.
+- [C3 보고서](./PARENT_MEMO_RESULTS.md)를 먼저 읽는다. `useParentMemo`의 incoming deps,
+  props/slot fallback, parent hit와 self 경계, setup/work 성공 게시·실패/초기화 하위 정리를
+  구현·검증했다. **기본 채택 보류**, 후보는 [패치](./parent-memo-candidate.patch)와
+  [raw](./parent-memo-results.json)/[증거](./parent-memo-evidence.json.gz)에 보존하고 runtime은 복원했다.
+- 전용 **33개**, dual **1,070 passed·3 skipped**, 실제 ESM/CommonJS/consumer 타입·
+  concurrent 미지원 import 실패, 같은 원래 앱의 contracts·공식 keyed·9동작·폰트 통과.
+- 같은 일반 입력 UI를 baseline/후보 비사용/후보 opt-in 3context씩 검증했다.
+  1k 부모 refresh의 자식 updater **1,000→0회**, 한 label/version 변경은 **1,000→1회**다.
+  DOM/state/refresh focus와 이동·삭제를 확인했다. key1천개 유지 dispose/GC 뒤 모든 context에서
+  등록·관찰한 VDOM/host 생존0개. 이는 작업량/회수 검사이며 공식 시간·메모리 개선율이 아니다.
+- 최종 후보 UMD raw15,481/gzip6,169/br**5,691B**, baseline br4,798B보다893B 증가,
+  4,800B 한도보다 **891B 초과**다. gzip은 집계 Node20.3/zlib1.2.13 기준이며
+  `pnpm size`의 Node22.13/zlib1.3은6,157B다. 양쪽 br는 같고 한도는 바꾸지 않았다.
+- base의 실패한 parent diff/live pointer·hook cursor는 자동 롤백되지 않는 기존 한계가 있다.
+  memo 실패 상태를 무효화하는 것과 전체 실패 복구를 구분했다. parent selector 오류 뒤의
+  명시적 재시도는 이전 unretired tree를 사용했으며 자동 재시도 완료로 해석하지 않는다.
+- 18개 후보 파일 해시를 확인하고 자신의 patch만 역적용했다. base rebuild/size 및
+  복원 후 base21/concurrent23 회귀 통과. 이전 소스/산출물28개·실제 sibling 앱 해시가 일치한다.
+  현재 default export에 새 hook이 없고 concurrent runtime/helper는 바꾸지 않았다.
+- 최종 감사: 증거153개 파일 SHA-256·패치 SHA-256·로컬 링크124개·Prettier/ESLint/diff·
+  복원한 base TypeScript 검사가 통과했다. 증거 SHA-256은
+  `94ed789b1277de331a0f473cd610d057f025d1c22950a36253b377cae43783d8`이다.
+- done: C3 base 한정 구현·동작/회수·B1/B3·크기·영구 증거와 baseline 복원.
+- next: **DC-12의 기능 격리/고정 비용 절감 설계와 비사용자 비용 대조**. API/subpath/한도 변경을
+  미리 확정하지 않는다. 기존 후보의 contract와 동작 증거를 유지한 뒤 새 후보를 비교한다.
+- blockers: 현재 사용자 결정 블로커 없음. 공식 CPU/역순/전체peer/공식 메모리/100회 churn/최종 B4는 미실행.
+- commit: 최신 `ddd545e` 이후 이번 후보 증거·보고서·재현 도구·정본 갱신은 미커밋.
+  새 push·배포는 하지 않았다. `/tmp/lithent-c3-parent-memo-20261022/final`이 최종 실행이며
+  앞선 `screen-v1`은 다른 후보 해시이므로 표본/결과를 섞지 않는다.
+
 ## C3 한정 계약·기준 회귀 완료 — 2026-10-22
 
 - 로컬 `doc-driven-designer-v1` 에이전트 규칙과 스킬을 적용해 정본 네 문서를

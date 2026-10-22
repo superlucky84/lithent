@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-22. 상태: **Phase 3 C3 한정 계약·기준 회귀 완료. C3 런타임 구현·성능 검증은 미실행**.
+- 기준일: 2026-10-22. 상태: **Phase 3 C3 base 한정 구현·검증 완료. 기본 채택 보류·baseline 복원**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
@@ -64,18 +64,18 @@
 
 진입: 내부 최적화만으로 남는 작업과 정보 부족이 설명됨. 먼저 DC-4 또는 DC-5의 계약을 구체화하고, 해당 결정이 닫힌 후보만 구현에 진입한다. 종료: 채택 여부를 비교할 수 있는 동작·API·비용 증거가 있음.
 
-- [x] C3는 base `useParentMemo` setup hook의 새 명시적 옵트인으로 한정 설계했다. incoming props의 deps 복사·Object.is·key shape 무효화, nonempty slots fallback, self 경로 우회, hit의 두 단계 callback 생략, 기존 miss 배칭, 성공 후 스냅샷 게시·실패/삭제 정리를 DESIGN DC-4에 기록했다. 현재 API 구현/export는 없다.
+- [x] C3는 base `useParentMemo` setup hook의 새 명시적 옵트인으로 한정 설계·구현했다. incoming props의 deps 복사·Object.is·key shape 무효화, nonempty slots fallback, self 경로 우회, hit의 두 단계 callback 생략, 기존 miss 배칭, 성공 후 스냅샷 게시·실패/삭제 정리를 검증했다. 후보는 패치에 보존했으며 baseline 복원 뒤 기본 API/export에는 없다.
 - [x] **C3 기준 회귀:** `core-parentUpdateContract`에서 양방향 부모/자식 예약·두 단계 callback·재진입·삭제·자체 출력 보존 **10개씩**을 base/concurrent로 확인했다. 기존 updatePaths·cached identity·parentChildSync·composedRenew·removedRedraw를 포함한 B1 `pnpm test:dual` **1,070 passed·3 skipped**(13개 suite 집계, base runner 409/concurrent runner 312), `pnpm exec tsc --noEmit` 통과. 이는 후보 T1~T7 통과가 아니다.
-- [ ] **C3-T1:** base hook의 setup 등록·중복/외부 호출 오류·타입/export를 구현하고 concurrent import가 의도대로 실패하는 fixture를 검증. public 패키지 배포는 하지 않는다.
-- [ ] **C3-T2/T3:** 동기화 전 selector·복사 스냅샷·deps 길이/NaN/−0·공유 mutable row·key 추가/삭제·nonempty slots/특수 props fallback을 먼저 회귀로 준비하고 독립 구현. props 참조로 self 갱신을 추측하지 않는다.
-- [ ] **C3-T4/T5:** DESIGN 배칭 표의 hit/miss와 두 단계 callback·재진입, 이동·다중 위치·삭제/초기화/업데이트 실패, pending의 세대·정리·회수를 확인. C1을 결합하거나 기존 scheduler를 다시 쓰지 않는다.
+- [x] **C3-T1:** base setup 등록·중복/외부/잘못된 시점 오류·lmount·실제 ESM/CommonJS API·consumer 타입을 확인했다. concurrent import는 TS2305와 ESM missing export로 실패한다. 패키지 배포는 하지 않았다.
+- [x] **C3-T2/T3:** 동기화 전 selector·복사 스냅샷·deps 길이/NaN/−0·공유 mutable 값·key 추가/삭제·선언 누락·nonempty slots/특수 props fallback을 전용 회귀로 검증했다.
+- [x] **C3-T4/T5 한정 검증:** hit/miss 양방향 배칭·pre/post·재예약, keyed 이동·생성자 교체·같은 설명의 독립 수명·삭제, selector/pre/updater/post/DOM/mount 실패·실패한 초기화의 하위 등록 정리를 전용 **33개**에서 확인했다. 일반 UI의 key 유지 dispose/GC 9context에서도 등록·관찰한 VDOM/host 잔류 0개다. 전체 base 트리/hook cursor의 예외 롤백을 구현한 것은 아니며 추가 hardening/100회 churn은 미실행이다.
+- 구현 단위: base 전용 memo sidecar/setup/work scope → self/parent diff 경계 → DOM 방문/성공 게시 → 전용 계약 회귀·공통 dual → 타입/실제 exports/크기. 후보 소스와 baseline은 별도 스냅샷으로 보존하며 크기 초과를 자동 채택하지 않는다.
 - [ ] C4가 필요하면 목록 소유권·구조 version·dirty item·외부 mutation·fallback을 정의. C4를 구현하지 않는다면 이유와 연구 상태를 남기고 완료로 체크하지 않음.
-- [ ] 공개 API 이름/위치/타입이 추가되면 사용 예제와 비사용자의 기본 동작을 함께 검증. 기존 retainedView/renderBoundary 의미를 재정의하지 않음.
-- [ ] 기준 행 컴포넌트 앱과 새 기능 앱의 구조를 가능한 한 같게 유지한 대조를 준비. 일반 편집 목록 또는 nested 입력 UI를 추가해 benchmark 특수 동작이 아님을 확인.
-- [ ] 코어/helper/API를 함께 바꾸는 경우 현재 staging 도구가 후보 helper를 정말 사용하는지 검증하고 필요한 지원을 명시적으로 추가. 현재 `targeted-update.mjs prepare`는 helper를 설치된 npm 패키지에서 복사한다.
-- [ ] 기준 검사: B1·B2·B3 + 새 계약의 양쪽 코어 테스트·타입/exports·수명/경계 검증, M-4~M-6. 새 API가 concurrent 미지원이면 지원 범위와 안전한 실패를 명시.
+- [x] **C3-T6 동작 대조:** 동일한 일반 1k 입력 앱에 baseline/후보 비사용/후보 opt-in을 3context씩 실행했다. refresh 자식 updater 1,000→0회·한 props 변화 1,000→1회, 자체 갱신·DOM/state/focus·이동·삭제를 확인했다. 공식 시간 비교는 미실행이다. 기존 retainedView/renderBoundary 의미는 유지한다.
+- [x] helper는 미수정이다. 원래 앱 B3 manifest에서 양쪽 helper/appSource 동일성과 후보 core 해시를 확인했다. candidate helper staging 지원 추가는 이번에는 N/A다.
+- [x] **C3-T7 비용/기준 검사:** 후보 B1 dual **1,070 passed·3 skipped**, B2 core build/타입 성공·br **5,691/4,800B 실패**, B3 동일 원래 앱 contracts·keyed·9동작·폰트 통과. 크기 실패를 통과로 바꾸지 않고 증거 보존 뒤 baseline 복원했다. 비사용자 시간·공식 메모리·전체 최종 검증은 남아 있다.
 
-현재 한정 범위: C3 **계약 결정과 baseline 회귀**를 마쳤다. T1~T7은 후보 구현/검증의 다음 단위이며 완료 증거가 생길 때 각각 체크한다. 첫 후보의 concurrent 새 API 테스트는 미지원 import 검사로 한정하고 기존 공통·boundary 회귀를 유지한다. concurrent 구현은 DESIGN DC-11의 별도 진입 조건을 따른다. C4는 C3의 작업량·일반 예제·공식 결과를 얻기 전까지 조건부 연구이며, 아직 전체 keyed 방문을 제거했다고 주장하지 않는다. 이번 변경은 문서와 baseline 테스트뿐이므로 B2/B3의 새로운 후보 빌드·브라우저 측정은 실행하지 않았다. C1 복원 evidence의 `execution/restoration.json`과 현재 소스/산출물 **28개 SHA-256이 모두 일치**하고 실제 sibling 앱 해시도 보존됨을 확인했다. ESLint·Prettier·diff 검사, 정본/HANDOFF의 로컬 파일 링크 102개도 통과했다.
+산출물: [C3 보고서](../benchmark/PARENT_MEMO_RESULTS.md), [raw 결과](../benchmark/parent-memo-results.json), [압축 증거](../benchmark/parent-memo-evidence.json.gz), [후보 패치](../benchmark/parent-memo-candidate.patch), [전용 회귀·도구](../../experiments/parent-memo/README.md). 한정 구현·동작/회수 검증은 완료했고 크기 한도 +891B로 기본 채택을 보류했다. 비사용자 시간 비용은 미측정이며 Phase 4 최종 비교를 시작하지 않았다. 패치를 역적용해 자신의 코어 변경만 복원했고 source/산출물 **28개 SHA-256**과 실제 sibling 앱의 해시가 이전 baseline과 일치한다. 복원 후 core build/size·관련 base **21**/concurrent **23** 회귀가 통과했다. 다음 후보는 DESIGN DC-12의 비용 격리 계약부터 정한다.
 
 분기: API/메모리/번들 비용이 목표에 맞지 않으면 미채택으로 보존한다. 한도 변경은 IC-3에서 구체적인 수치와 대안을 검토하며 기존 게이트를 임의 수정하지 않는다. 일상적인 내부 구현 선택마다 사용자 재승인을 요구하지 않는다.
 
@@ -129,7 +129,7 @@
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** Phase 1과 C1 한정 검증·baseline 복원 뒤, 2026-10-22에는 C3 DC-4 한정 계약과 baseline 회귀를 완료했다. 다음은 C3-T1~T5의 base 후보 회귀·구현이다. 실행 결과가 없는 API·성능 검증과 Phase 3 전체는 미완료로 유지한다.
+- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 다음은 DC-12의 비용 격리이며 미실행인 공식 성능·최종 채택 검증을 완료로 표시하지 않는다.
 - [ ] **IC-1 TBD:** 최종 표의 비교군, 정규화·색상/통계 모드, CPU/메모리/startup 표시 범위, 빠른 구간의 수치 임계치. Phase 1에서 제안·기록하고 Phase 6 목표 판정 전에 닫음.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
 - [ ] **IC-3 조건부 TBD:** 크기 한도 초과 후보의 격리·상쇄·예산 재검토. 초과가 없으면 해당 없음으로 닫음. 한도 변경은 별도 명시적 결정.
@@ -137,7 +137,7 @@
 
 ## 상태 / 핸드오프
 
-- done: C3 한정 계약과 baseline callback/배칭 회귀 완료. 전체 dual 1,070 passed/3 skipped·타입 검사 통과. C1은 채택 보류·복원 상태다. C3 구현과 Phase 3 전체 및 Phase 4~6은 미완료다.
-- next: C3-T1~T5의 후보 전용 회귀·base 구현, 이후 T6/T7의 일반 예제·동일 행 구조/비사용자 대조. 필요한 candidate helper staging 지원은 실제 변경 여부에 따라 추가한다.
-- blockers: 현재 없음. DC-11의 concurrent 확장은 첫 base 후보와 분리하고 최종 목표는 IC-1에서 관리한다.
-- commit: 최신 체크포인트 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`(C1 증거 보존). 이번 C3 문서·기준 회귀는 미커밋. Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
+- done: C3 base 한정 구현·33회귀·dual/B3·일반 입력 동작/회수·크기 검증, 후보 보존과 baseline 복원. 크기 실패는 공개했으며 공식 시간·Phase 4~6은 미실행이다.
+- next: DC-12의 기능 격리/고정 비용 절감 설계 후 새 후보와 비사용자 대조. C1/C2/C4를 결합하지 않는다.
+- blockers: 현재 사용자 결정 블로커 없음. 한도는 그대로 유지하며 설계되지 않은 격리/상쇄를 완료로 간주하지 않는다.
+- commit: 최신 `ddd545e5b8c3878cfd5a6340464106e4c417da4f` — `docs: define C3 parent memo contract and baseline regressions`. 이번 구현 증거·보고서는 미커밋. 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.

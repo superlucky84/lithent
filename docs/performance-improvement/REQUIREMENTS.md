@@ -1,13 +1,13 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
-- 기준일: 2026-10-22. 상태: **Phase 3 C3 한정 계약·기준 회귀 완료. 후보 구현은 다음 작업이며 런타임은 baseline**.
+- 기준일: 2026-10-22. 상태: **Phase 3 C3 base 한정 구현·검증 완료, 기본 채택 보류 및 baseline 복원**.
 - 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
 
 ## 1. 사용자 목표와 판단 기준
 
-**벤치마크 앱만 복잡하게 바꾸는 대신, 일반 Lithent 앱에도 유효한 코어 개선으로 전체 렌더링 성능을 높인다.** 최근 upstream 병합 직후의 작은 앱 캐시 PR보다 근본적인 개선을 우선한다. Phase 1은 `979f88f`에 보존했고, 후속 진행 요청으로 Phase 2의 C1 한정 프로토타입을 검증했다. [C1 결과](../benchmark/PARENT_POSITION_RESULTS.md)는 10k 일반 자체 갱신의 이득과 원래 앱의 작은 공식 전체 신호를 구분한다. 채택은 보류하고 baseline으로 복원했다. 현재 Phase 3의 C3 한정 계약·기준 회귀를 완료했고 후보 구현을 준비한다. Phase 4~6의 최종 채택 검증은 미완료다.
+**벤치마크 앱만 복잡하게 바꾸는 대신, 일반 Lithent 앱에도 유효한 코어 개선으로 전체 렌더링 성능을 높인다.** 최근 upstream 병합 직후의 작은 앱 캐시 PR보다 근본적인 개선을 우선한다. Phase 1은 `979f88f`에 보존했고, 후속 진행 요청으로 Phase 2의 C1 한정 프로토타입을 검증했다. [C1 결과](../benchmark/PARENT_POSITION_RESULTS.md)는 10k 일반 자체 갱신의 이득과 원래 앱의 작은 공식 전체 신호를 구분한다. C1 채택은 보류했다. 현재 Phase 3의 [C3 한정 구현·검증](../benchmark/PARENT_MEMO_RESULTS.md)까지 완료했고, 크기 한도 초과로 후보를 보존한 뒤 baseline을 복원했다. 공식 CPU 시간은 미측정이며 Phase 4~6의 최종 채택 검증은 미완료다.
 
 - R1. 행 선택·부분 업데이트의 넓은 탐색, 부모 갱신 시 변경 없는 컴포넌트 재실행, 자식 자체 갱신의 부모 연결 비용을 검토한다. 최신 작은 코어 후보의 실패를 코어가 최적이라는 증거로 해석하지 않는다.
 - R2. **개별 작업의 시간·CPU/JS·메모리 손해를 허용할 수 있다.** 한 항목의 회귀만으로 자동 탈락시키지 않는다. 전체 이득, 상대적으로 느린 항목, 손해의 절대량·반복성·실사용 영향으로 판정한다.
@@ -80,7 +80,7 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 
 ## 상태 / 핸드오프
 
-- done: C3의 R13~R17과 DESIGN DC-4 한정 계약 확정. 기준 회귀 양쪽 10개씩·전체 dual 1,070 passed/3 skipped·타입 검사 통과. C1 채택 보류·baseline 복원 상태를 유지하며 새로운 성능 개선 판정은 없다.
-- next: C3의 base 후보 전용 회귀·구현과 일반 예제/동일 행 구조의 대조. C1 확장·C2·C4는 별도 조건부 후보로 남긴다.
+- done: C3 base 후보·전용 33회귀·dual 1,070 passed/3 skipped·B3 검증 완료. 같은 일반 입력 앱의 9context에서 부모 refresh 자식 updater 1,000→0회와 회수를 확인했다. 후보 br 5,691B/한도 +891B로 기본 채택 보류·baseline 복원. 공식 속도 개선 판정은 없다.
+- next: C3 기능 격리/고정 비용 절감과 비사용자 비용 대조를 DC-12에서 구체화한다. C1 확장·C2·C4는 별도 조건부 후보다.
 - blockers: 현재 없음. concurrent의 새 C3 지원은 DC-11에서 별도 결정하고 RC-5/IC-1의 최종 수치 목표는 최종 목표 판정 전에 닫는다.
-- commit: 최신 체크포인트 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`(C1 증거 보존). 이번 C3 문서·기준 회귀는 미커밋. Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
+- commit: 최신 `ddd545e5b8c3878cfd5a6340464106e4c417da4f` — `docs: define C3 parent memo contract and baseline regressions`. 이번 C3 구현 증거/보고서는 미커밋. C1 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
