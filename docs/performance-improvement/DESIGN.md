@@ -1,6 +1,6 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-22. 상태: **DC-13 같은 행 앱 memo on/off의 CPU580·메모리60·100회 churn 검증 완료. 기본 runtime 보존·채택 보류**.
+- 기준일: 2026-10-22. 상태: **DC-14 production300회 churn·14 snapshot의 heap 귀속 완료. DC-15 캐시 대조 계획 확정, 공식 측정 미실행. 기본 runtime 보존·채택 보류**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
@@ -14,7 +14,7 @@
 
 ## 2. 후보 묶음과 우선순위
 
-Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **DC-12의 별도 렌더러 격리와 비참여 비용 대조까지 완료했다**. DC-13의 같은 행 앱 기능 대조도 완료했고 다음은 실제 캐시 앱 대조와 heap 원인 분석이다. C2는 미구현 보류, C4는 조건부 연구다. 네 후보를 모두 구현하는 계획이 아니며, 한 번에 하나씩 기준선과 비교한다.
+Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **DC-12의 별도 렌더러 격리와 비참여 비용 대조까지 완료했다**. DC-13의 같은 행 앱 기능 대조와 DC-14의 heap 주원인 귀속도 완료했고 다음은 DC-15 실제 캐시 앱 대조다. C2는 미구현 보류, C4는 조건부 연구다. 네 후보를 모두 구현하는 계획이 아니며, 한 번에 하나씩 기준선과 비교한다.
 
 | 후보                                               | 줄이려는 작업                                                    | 필요한 정보                                                  | 한계와 진입 조건                                                                                                 |
 | -------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
@@ -234,9 +234,28 @@ Phase 1에서는 다음 기준으로 카운터의 의미와 시나리오를 기�
 - 공식 CPU580·공식 메모리60표본을 양순서로 순차 실행하고, production retention의 생성/clear100회·partial100회/조건별3context와 별도 full dispose를 구분한다. per-item 전체/JS·분포·실패/부하, 공식 MB, DOM/listener/heap 잔류와 같은 JS의 전체 크기를 보고한다. 비교군 전체·공개 예산·채택·concurrent 지원 결정은 포함하지 않는다.
 - 메모리 capability 사전 검사는 실제 exported 객체의 metadata/registry를 확인한다. 현재 upstream의 비활성23/26은 기존 metadata와 workload 객체를 프로세스 안에서만 등록한다. sibling 파일·workload/GC/측정 API는 바꾸지 않는다. 등록 오류와 유효 표본의 resume, CPU 당시 runner 버전은 따로 보존한다.
 
+### DC-14 — production heap 보유 원인과 캐시 대조 준비
+
+- [x] 동일 DC-13 production JS/HTML/core를 재사용한다. 기본28파일/package와 sibling source를 전후 확인한다. 공식 시간·메모리는 다시 측정하지 않는다.
+- [x] snapshot 없는 off/on 각3 fresh context에서 GC2회 뒤0/5/25/100/300 create-clear의 heap/DOM/listener를 수집한다. 실행 순서는 교대한다.
+- [x] 별도 off/on 각1 context에서 같은 checkpoint와 마지막1k live/clear의 CDP heap snapshot을 보존한다. snapshot 자체의 GC/최적화 영향을 별도 조건으로 공개한다.
+- [x] V8 snapshot schema로 node type/name별 self size, 생존 ID, 객체 shape, WeakMap backing table와 강한 root 경로를 분석한다. 합계는 snapshot 전체 self size와 맞추며 retained size로 오인하지 않는다. 익명·엔진 객체의 미귀속은 남겨 둔다.
+- [x] 원래 cacheUpdate 앱과 row helper/memo 대조의 제어 변수를 문서화한다. 과거 차수의 CPU를 새 결과와 합산하지 않는다.
+
+→ R23/R24, Phase4 DC-14, M-8. 장기 누수 부재·최종 채택·공개 예산·전체peer 완료를 이 실험으로 선언하지 않는다.
+
+[DC-14 결과](../benchmark/PARENT_MEMO_HEAP_RESULTS.md): 출력 WeakMap table의5→25회+196,608B를 귀속했다. 25→300회 테이블 ID/크기는 같았고 실제 row/memo/snapshot/output은 clear 뒤0개였다. AllocationSite 템플릿과 인스턴스를 분리하고14개 snapshot을 독립 감사했다. 전체 heap의 모든 변동을 설명하거나 장기 누수 부재를 확정한 결과는 아니다.
+
+### DC-15 — 실제 캐시 앱 대조
+
+- [x] [사전 조건](../benchmark/PARENT_MEMO_CACHE_PLAN.md)을 고정한다. 기존 monolithic cacheUpdate 앱의 default/isolated 두 조건과 같은 RowView 앱의 off/helper/memo 세 조건을 분리한다. 행 세 조건은 같은 production JS를 쓰며 E/A 종단 차이와 E/D 같은 구조의 memo/helper 차이를 구분한다.
+- [ ] 새 staging의 타입/B3·작업량/정체성·dispose gate 뒤 전체9항목 양순서 CPU1,450·공식 메모리150표본을 수집한다. 이전 차수와 합산하지 않는다. 기본28파일/package/sibling·후보 core hash를 보존한다.
+
+→ R24, Phase4 DC-15, M-4·M-7·M-8. 원래 앱 대비 개선 여부는 미확정이다.
+
 ## 상태 / 핸드오프
 
-- done: [DC-13 기능 대조](../benchmark/PARENT_MEMO_OPTIN_RESULTS.md). 같은 JS/core의 CPU580표본은 가중 전체−8.12%/JS−13.11%, 생성/교체/10k 생성 전체는 약5% 증가했다. 공식 메모리60표본은1k +0.343MB/10k +3.231MB다. B3·타입·diagnostic6context·조건별3context/100회 churn을 완료했고 DOM/listener 증가는0이었다. on heap은5→25회 약0.18MB,25→100회 약0.015MB 증가했으며 원인은 미귀속이다. 기본28파일/package/sibling은 보존했다.
-- next: heap 잔류 원인을 분석하고 실제 cacheUpdate/원래 앱과 같은 차수로 대조한다. 통제 앱의 이득을 원래 앱/전체peer 결과로 확대하지 않는다. C1/C2/C4는 결합하지 않는다.
-- blockers: 현재 실행 블로커 없음. 원래 앱/전체peer·heap 원인·공개 진입점/예산·concurrent 새 지원·최종 B4/Test Hardening/Integration·RC-5/IC-1의 목표 기준은 미완료다.
-- commit: 최신 `d660fdf33578885c9534fec8040ef8b5602bbe23` — `perf: preserve C3 parent memo prototype evaluation`. DC-12/DC-13 후속 문서·도구·증거는 미커밋이며 기본 runtime은 baseline이다.
+- done: [DC-14 heap 귀속](../benchmark/PARENT_MEMO_HEAP_RESULTS.md). 동일 production의300회 churn6context와 별도14 snapshot을 확인했다. outputs WeakMap table은5→25회+196,608B,25→300회 같은 ID/262,164B였고 clear 뒤 Hole/Map만 남았다. 실제 row/memo/snapshot/output0개와 App/Table2개를 확인하고 AllocationSite 템플릿을 분리했다. Python으로 전체 snapshot 합계·shape·강한 경로를 감사했다. 기존 DC-13 공식 결과와 기본28파일/package/sibling은 보존했다.
+- next: [DC-15 캐시 대조](../benchmark/PARENT_MEMO_CACHE_PLAN.md)의 기존 앱 default/isolated와 행 앱 off/helper/memo를 빌드·타입/B3/diagnostic gate 후 동차수 공식 비교한다. 계획은 CPU1,450/메모리150표본이다. 아직 측정하지 않았다. outputs 게시 후 정리는 별도 후보 가설이며 이번 코어에 적용하지 않았다.
+- blockers: 실행 블로커 없음. on 한 context의 추가 heap 변동은 미귀속이다. 장기 누수 부재·원래 앱/전체peer·공개 예산·concurrent 새 지원·최종 B4/Test Hardening/Integration·RC-5/IC-1은 미완료다.
+- commit: 최신 `aa20ccc84f4252c46e5a89ce1abb9ead0c6ee387` — `perf: validate isolated parent memo overhead and opt-in tradeoffs`. DC-12/DC-13은 커밋했고 DC-14 후속 도구·문서·증거는 작업 트리다. 기본 runtime은 baseline이다.

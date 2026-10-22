@@ -1,5 +1,27 @@
 # summary
 
+## 영문 커밋과 DC-14 heap 귀속 완료 — 2026-10-22
+
+- 사용자 요청으로 DC-12/DC-13 도구·문서·증거29파일을 커밋했다.
+  **`aa20ccc84f4252c46e5a89ce1abb9ead0c6ee387`** —
+  `perf: validate isolated parent memo overhead and opt-in tradeoffs`.
+- [heap 보고서](./PARENT_MEMO_HEAP_RESULTS.md), [raw](./parent-memo-heap-results.json),
+  [증거](./parent-memo-heap-evidence.json.gz), [도구](../../experiments/parent-memo-heap/README.md)를 읽는다.
+- done: 기존 DC-13 production JS/HTML/core 그대로300회 churn6context와 별도14 snapshot/2context를 확인했다.
+  기본28파일/package/실제 sibling은 보존했고 새 공식 CPU/메모리 표본은0개다.
+- outputs WeakMap table은5→25회65,556→262,164B(+196,608B)이며25/100/300회와 마지막 clear의
+  ID/크기가 같았다. clear 뒤 table edge는 Hole/엔진 Map뿐이다. 실제 row/memo/snapshot/output은0개,
+  App/Table은2개였다. shape상 남는1개는 각 AllocationSite 생성 템플릿으로 경로를 확인했다.
+- Python이 전체14개 hash/self size/shape/템플릿과 강한 WeakMap 경로를 별도로 감사했다.
+  300회까지 DOM/listener 증가는0이었다. 전체 heap은 이후에도 코드/브라우저 기록 증가가 있고
+  on 한 context의 추가 약0.25MB는 미귀속이다. 장기 누수 부재를 확정하지 않는다.
+- next: [DC-15 실제 캐시 앱 계획](./PARENT_MEMO_CACHE_PLAN.md)의 기존 앱 default/isolated와
+  같은 행 앱 off/helper/memo 다섯 조건을 빌드·타입/B3/diagnostic 검증 후 동차수 공식 비교한다.
+  계획CPU1,450·메모리150표본은 미실행이다. outputs 명시적 정리는 별도 개선 가설로 남겼다.
+- blockers: 실행 블로커 없음. 다른 heap 변동·전체peer·공개 예산/concurrent·최종 hardening/integration은 미완료다.
+- commit: 최신 `aa20ccc`; 이번 DC-14 후속 도구·문서·증거는 작업 트리다.
+  출력은 `/tmp/lithent-c3-heap-20261022`이며 아래 기록은 각 당시의 이력이다.
+
 ## DC-13 같은 행 앱의 memo on/off 완료 — 2026-10-22
 
 - [기능 대조 보고서](./PARENT_MEMO_OPTIN_RESULTS.md), [raw](./parent-memo-optin-results.json),
