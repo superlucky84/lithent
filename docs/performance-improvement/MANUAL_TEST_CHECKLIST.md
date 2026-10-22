@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-21. 상태: **Phase 2 C1 한정 검증 완료·채택 보류 및 baseline 복원. 최종 채택용 전체 검증은 미완료**.
+- 기준일: 2026-10-22. 상태: **Phase 3 C3 한정 계약·기준 회귀 완료. 런타임은 baseline이며 새 후보 검증은 미완료**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택 확인에서는 후보의 B1~B4 통과와 성능 측정 산출물이 필요하다. 정합성 실패를 시간·메모리 교환으로 허용하지 않는다. 개별 성능 손해 자체는 실패 판정이 아니다.
@@ -38,6 +38,9 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-4. 캐시·자체 renew·부모 갱신 — DC-2/DC-4/DC-5, Phase 2·3·5
 
+- [x] C3 기준 회귀에서 기존 parent→child의 base/concurrent 실행 수 차이, child→parent의 두 번 실행, pre/post callback·callback 재예약·삭제를 확인했다. 새 회귀 양쪽 **10개씩**, 전체 dual **1,070 passed·3 skipped**·타입 검사 통과. 이 결과를 미구현 C3 hit/miss의 검증 기대치와 구분한다.
+- [ ] C3-T1~T4: setup 등록 오류, incoming props selector·복사 스냅샷·Object.is·deps 길이, props key 추가/삭제, mutable row·빠뜨린 deps의 사용 제약, nonempty slots·특수 props fallback이 DESIGN과 같다. 아직 없는 후보 기능을 baseline 통과로 대신하지 않는다.
+- [ ] C3 부모 hit에서는 props 참조를 동기화하되 live wrapper·자체 갱신 요청을 유지하고 updater/pre/post callback만 생략한다. self/public replace는 검사를 우회하며 miss는 기존 배칭 표와 같다.
 - [ ] 기존 API에서 cache hit 후에도 `updateCallback`과 updater가 기존 규칙대로 실행된다. 동일 cached 객체의 `type = null` 전환이 삭제로 반영된다.
 - [ ] 같은 VDOM을 다른 위치에 재사용해도 독립적인 DOM·컴포넌트 상태가 만들어진다. 이동한 cached subtree의 자식 자체 renew가 계속 작동한다.
 - [ ] mutable props의 변경·삭제, frozen props, children/slots 교체와 외부 상태 변경을 처리한다. 참조 동일성만으로 필요한 갱신을 누락하지 않는다.
@@ -58,6 +61,8 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-6. concurrent와 기존 retained 기능 — DC-3/DC-7, Phase 3·5·6
 
+- [x] C3 첫 후보는 base만 지원하기로 설계했다. concurrent 새 hook은 export하지 않는 계약이며, 지원 구현/안전한 import 실패의 실행 검증은 아직 없다. DC-11을 닫기 전에는 commit/abandon 지원 완료로 표시하지 않는다.
+- [ ] C3-T1: 실제 package alias에서 concurrent 새 API의 import/type 검사가 실패하고, 새 API를 쓰지 않는 helper/기존 앱은 통과한다. 실패를 조용한 no-op으로 바꾸지 않는다.
 - [ ] 공통 core spec와 concurrent 고유 scheduler/commit/abandon 테스트를 수행했다. base 성능 결과를 concurrent 개선율로 표시하지 않는다.
 - [ ] 중단 가능한 low 작업 중 high 작업을 실행해 폐기된 후보의 부모 연결·캐시·dirty 정보가 live 상태에 남지 않는다.
 - [ ] `createRetainedView` show/hide/dispose와 `useRenderBoundary` pause/resume 중 자식 갱신, 이동·삭제가 기존 규칙대로 동작한다.
@@ -78,6 +83,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-8. 메모리·생성/삭제·번들 — R11/R12/IC-2/IC-3, Phase 2·4·5·6
 
+- [ ] C3-T5/T7: 성공 경계 전 pending의 게시 금지·실패/초기화 오류/삭제 정리, 외부에 component key를 유지한 dispose 후 회수를 검사했다. 비사용자의 분기·WeakMap 조회 비용과 사용자 selector/스냅샷 비용을 구분한다.
 - [ ] 공식 메모리 21/22/23/25/26의 절대 MB와 baseline/peer 비율을 기록한다. JS heap 진단과 `measureUserAgentSpecificMemory()`를 같은 지표로 섞지 않는다.
 - [ ] fresh context에서 생성/삭제 반복, partial 반복, 최종 dispose 후 DOM·listener·heap 잔류를 관찰한다. 데이터 문자열 증가와 참조 누수를 구분한다.
 - [x] C1 map 생성/조회/쓰기·cold/warm/stale를 분리했다. 1천 key를 유지한 dispose 후 1천 VDOM+부모 배열의 생존 0개를 양쪽 3context씩 확인했다. 반복 부모 갱신 중 모든 과거 배열의 회수 및 100회 churn 검사는 미실행이다.
@@ -107,7 +113,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## 상태 / 핸드오프
 
-- done: C1의 M-2·M-3·M-8 한정 검증과 dual/B3·공식 290표본을 보고서에 연결했다. 채택 보류·baseline 복원이며 최종 전체 검증 항목은 미완료로 유지한다.
-- next: C3 계약 확정 뒤 M-4·M-6의 새 옵트인 전용 회귀를 먼저 준비한다. C1 결과를 C3 또는 concurrent 개선율로 사용하지 않는다.
-- blockers: 현재 없음. 새 기능 전용 항목은 후보 선정 후 적용 범위를 결정한다.
-- commit: Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`; 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. Phase 2 C1 산출물은 `perf: preserve C1 parent-position evaluation` 체크포인트에 보존. 정확한 SHA는 git log·ctxbin 인계 참조.
+- done: C3 DC-4의 한정 계약·base 지원 범위와 baseline callback/배칭 회귀를 M-4·M-6에 연결했다. 새 회귀 양쪽 10개씩·전체 dual 1,070 passed/3 skipped·타입 검사 통과. C1 채택 보류·baseline 복원과 최종 전체 체크의 미완료 표시는 유지한다.
+- next: C3-T1~T5의 새 옵트인 전용 회귀·구현, T6/T7의 일반 UI/동일 행 구조·비사용자 대조·비용 증거를 확보한다. C1 결과를 C3 또는 concurrent 개선율로 사용하지 않는다.
+- blockers: 현재 없음. concurrent 새 기능은 DC-11 결정 뒤 별도 검증한다.
+- commit: 최신 체크포인트 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`(C1 증거 보존). 이번 C3 문서·기준 회귀는 미커밋. Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.

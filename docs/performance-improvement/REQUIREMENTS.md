@@ -1,13 +1,13 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
-- 기준일: 2026-10-21. 상태: **Phase 2 C1 한정 검증 완료·채택 보류, 런타임 baseline 복원. 다음은 C3 계약 검토**.
+- 기준일: 2026-10-22. 상태: **Phase 3 C3 한정 계약·기준 회귀 완료. 후보 구현은 다음 작업이며 런타임은 baseline**.
 - 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
 
 ## 1. 사용자 목표와 판단 기준
 
-**벤치마크 앱만 복잡하게 바꾸는 대신, 일반 Lithent 앱에도 유효한 코어 개선으로 전체 렌더링 성능을 높인다.** 최근 upstream 병합 직후의 작은 앱 캐시 PR보다 근본적인 개선을 우선한다. Phase 1은 `979f88f`에 보존했고, 후속 진행 요청으로 Phase 2의 C1 한정 프로토타입을 검증했다. [C1 결과](../benchmark/PARENT_POSITION_RESULTS.md)는 10k 일반 자체 갱신의 이득과 원래 앱의 작은 공식 전체 신호를 구분한다. 채택은 보류하고 baseline으로 복원했다. 다음은 C3 계약 검토이며 Phase 4~6의 최종 채택 검증은 미완료다.
+**벤치마크 앱만 복잡하게 바꾸는 대신, 일반 Lithent 앱에도 유효한 코어 개선으로 전체 렌더링 성능을 높인다.** 최근 upstream 병합 직후의 작은 앱 캐시 PR보다 근본적인 개선을 우선한다. Phase 1은 `979f88f`에 보존했고, 후속 진행 요청으로 Phase 2의 C1 한정 프로토타입을 검증했다. [C1 결과](../benchmark/PARENT_POSITION_RESULTS.md)는 10k 일반 자체 갱신의 이득과 원래 앱의 작은 공식 전체 신호를 구분한다. 채택은 보류하고 baseline으로 복원했다. 현재 Phase 3의 C3 한정 계약·기준 회귀를 완료했고 후보 구현을 준비한다. Phase 4~6의 최종 채택 검증은 미완료다.
 
 - R1. 행 선택·부분 업데이트의 넓은 탐색, 부모 갱신 시 변경 없는 컴포넌트 재실행, 자식 자체 갱신의 부모 연결 비용을 검토한다. 최신 작은 코어 후보의 실패를 코어가 최적이라는 증거로 해석하지 않는다.
 - R2. **개별 작업의 시간·CPU/JS·메모리 손해를 허용할 수 있다.** 한 항목의 회귀만으로 자동 탈락시키지 않는다. 전체 이득, 상대적으로 느린 항목, 손해의 절대량·반복성·실사용 영향으로 판정한다.
@@ -31,7 +31,7 @@
 
 위 앱 후보 수치는 코어 개선율이 아니다. 진단 표본과 공식 CPU 표본을 분리한다. 공식 시나리오의 행 수·반복·스로틀은 README 문구나 ID만으로 추정하지 않고 실제 고정 러너에서 확인한다. 현재 로컬 러너의 부분 갱신 `03_update10th1k_x16`과 전체 삭제 `09_clear1k_x8`는 `#run`으로 1,000행을 준비한다. 문서 설명과 실행 코드가 다르면 manifest에 불일치를 기록하고 실행 조건을 기준으로 삼는다.
 
-[Phase 1 기준선 보고서](../benchmark/STRUCTURAL_BASELINE_RESULTS.md)는 production 런타임을 변경하지 않은 별도 계측의 **38개 시나리오**다. 원래 앱의 1k 선택 이동은 cache 1,000회·diff 1,021회에 class 변경 2회였다. 행별 갱신과 일반 중첩 slot 예제에서는 변경 위치에 따라 부모/slot 검색 방문 추정이 n·k와 함께 증가했다. 기준선 계약·빌드·크기는 통과했으나 공식 CPU/메모리 개선을 측정한 결과는 아니다. 이 근거로 C1을 한정 프로토타입으로 정했다. Phase 2의 첫 후보는 **base의 부모 children 검색만** 다루며 slot 검색과 concurrent는 확장하지 않는다. C2는 보류하고 C3의 부모 기인 재실행 감소는 후속 계약 연구로 유지한다.
+[Phase 1 기준선 보고서](../benchmark/STRUCTURAL_BASELINE_RESULTS.md)는 production 런타임을 변경하지 않은 별도 계측의 **38개 시나리오**다. 원래 앱의 1k 선택 이동은 cache 1,000회·diff 1,021회에 class 변경 2회였다. 행별 갱신과 일반 중첩 slot 예제에서는 변경 위치에 따라 부모/slot 검색 방문 추정이 n·k와 함께 증가했다. 기준선 계약·빌드·크기는 통과했으나 공식 CPU/메모리 개선을 측정한 결과는 아니다. 이 근거로 Phase 2에서 **base의 부모 children 검색만** 다루는 C1 한정 후보를 검증했고 채택을 보류했다. C2는 미구현 보류이며 C3의 부모 기인 재실행 감소는 아래 한정 계약으로 구체화했다.
 
 ## 3. 포함 범위와 비범위
 
@@ -49,6 +49,16 @@ helper나 타입·export 수정은 범용 계약의 배치가 확정된 경우�
 - R10. 임의 mutable 상태를 읽는 부모가 새 children 배열을 반환하면, 코어가 변경 행·구조 불변을 자동으로 안다고 가정하지 않는다. 변경 정보의 생산자와 신뢰 조건을 설계에 명시한다.
 - R11. 현재 [크기 게이트](../../scripts/size-report.js)는 UMD brotli base **4,798/4,800B**, concurrent **6,903/9,000B**, element **998/1,000B**다. base 여유는 2B다. 오래된 `base frozen` 설명은 과거 concurrent 작업 범위이고 이번 사용자는 코어 수정을 허용했지만, 크기 한도 상향까지 승인한 것은 아니다. 한도 초과 후보는 비용을 공개하고 미채택 상태로 유지하며 한도를 조용히 바꾸지 않는다. 이 한도가 구조 개선 가능성 자체를 부정하는 근거는 아니다.
 - R12. 메모리 증가의 허용 상한은 미정이다. 공식 메모리의 절대 MB·비율, 생성/삭제 반복 후 DOM·listener·heap 잔류를 함께 보고한다. 구조적 누수·정합성 손상은 허용 가능한 속도 교환으로 취급하지 않는다.
+
+### Phase 3 C3의 한정 범위
+
+- R13. 부모 갱신 생략은 새 명시적 옵트인으로 제공한다. 첫 후보는 **base 코어의 `useParentMemo` setup hook**으로 설계하며, 기존 `cacheUpdate`·`createRetainedView`·`useRenderBoundary`의 의미는 유지한다. 이름과 타입은 실험 후보의 결정이고 배포 확정이 아니다.
+- R14. 의존성 selector는 동기화 전의 **incoming props를 인자로 받아** 값 배열을 만든다. 코어는 배열을 복사해 마지막 성공한 출력의 스냅샷과 비교한다. mutable 객체 참조 하나로 내부 변경을 감지한다고 약속하지 않는다. 출력·이벤트에 영향을 주는 props/외부 상태를 빠뜨리면 생략될 수 있으며, 사용자가 값을 선언하거나 자체 `renew`해야 한다.
+- R15. props key의 추가·삭제와 nonempty children/slots는 첫 후보에서 강제로 기존 갱신 경로를 사용한다. children을 같은 참조로 재사용해도 생략하지 않는다. 생성자/key가 달라진 인스턴스는 기존 reconciliation 규칙을 따른다. 모든 VDOM/slot의 deep snapshot을 추가하는 방식은 이번 범위가 아니다.
+- R16. 부모 생략 hit는 해당 자식의 updater와 두 단계 `updateCallback`을 모두 생략하지만 props는 기존 참조에 동기화한다. 자체 `renew`는 생략 검사를 우회한다. hit 때문에 예약된 자체 갱신을 소비하거나 live wrapper를 교체하지 않는다. miss에서는 각 코어의 기존 배칭을 유지한다. 따라서 base와 concurrent의 기존 실행 횟수가 같다고 가정하지 않는다.
+- R17. 실패한 출력의 의존성을 성공한 스냅샷으로 게시하지 않는다. unmount/초기화 실패 후 새 memo 상태와 pending 상태를 정리한다. 첫 구현은 base만 지원하고 concurrent는 해당 API를 export하지 않아 잘못된 조합이 import/type 검사에서 드러나도록 한다. concurrent 지원은 commit/abandon 계약과 별도 검증 뒤 확장한다.
+
+세부 계약·상태 전이·검증 항목의 정본은 [DESIGN의 C3 절](./DESIGN.md#c3--부모-갱신과-자식-자체-갱신의-분리)이다. C1은 결합하지 않는다. C3도 부모의 전체 keyed 순회·행 컴포넌트 생성·부모 연결 검색을 없애지 못한다. 이 한정 계약을 준비한 것과 후보 구현·성능 검증을 완료한 것은 구분한다.
 
 ## 5. 비교와 채택 정책
 
@@ -70,7 +80,7 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 
 ## 상태 / 핸드오프
 
-- done: Phase 2 C1의 68개 카운터 검사·일반 시간/회수·공식 CPU 290표본·dual 및 계약 검증 완료. 원래 앱 가중 전체 −0.55% 한 차수, 크기 +55B(한도 +53B)로 채택 보류·baseline 복원. 전 항목 목표 달성 판정은 없음.
-- next: C3의 부모 기인 갱신 생략·자체 renew 보존 계약을 DC-4에서 구체화한다. C2와 C1 확장은 별도 보류이며 C3도 자동 채택하지 않는다.
-- blockers: 사용자 결정이 필요한 현재 블로커 없음. slot/concurrent 확장과 C2 재개는 별도 조건부 결정이며 최종 판정 전 API·수치 목표는 열린 항목으로 관리한다.
-- commit: Phase 1 체크포인트 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`; 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. Phase 2 C1 산출물은 `perf: preserve C1 parent-position evaluation` 체크포인트에 보존. 정확한 SHA는 git log·ctxbin 인계 참조.
+- done: C3의 R13~R17과 DESIGN DC-4 한정 계약 확정. 기준 회귀 양쪽 10개씩·전체 dual 1,070 passed/3 skipped·타입 검사 통과. C1 채택 보류·baseline 복원 상태를 유지하며 새로운 성능 개선 판정은 없다.
+- next: C3의 base 후보 전용 회귀·구현과 일반 예제/동일 행 구조의 대조. C1 확장·C2·C4는 별도 조건부 후보로 남긴다.
+- blockers: 현재 없음. concurrent의 새 C3 지원은 DC-11에서 별도 결정하고 RC-5/IC-1의 최종 수치 목표는 최종 목표 판정 전에 닫는다.
+- commit: 최신 체크포인트 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`(C1 증거 보존). 이번 C3 문서·기준 회귀는 미커밋. Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.

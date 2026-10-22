@@ -1,5 +1,30 @@
 # summary
 
+## C3 한정 계약·기준 회귀 완료 — 2026-10-22
+
+- 로컬 `doc-driven-designer-v1` 에이전트 규칙과 스킬을 적용해 정본 네 문서를
+  REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL_TEST_CHECKLIST 순서로 갱신했다.
+  **Phase 3의 계약·baseline 회귀만 완료**했으며 C3 API 구현·성능 검증은 다음 작업이다.
+- [DESIGN C3](../performance-improvement/DESIGN.md)의 DC-4를 한정 후보 결정으로 닫았다.
+  base의 새 setup hook `useParentMemo`에서 incoming props의 deps를 복사해 비교하고,
+  key 추가/삭제·nonempty slots·특수 props는 기존 경로로 보낸다. 부모 hit는 live wrapper를
+  유지하며 updater와 두 단계 callback을 생략하고, 자체 renew/public replace는 검사를 우회한다.
+  스냅샷은 성공한 DOM/post 처리 뒤 게시하고 실패·삭제 시 pending을 정리하는 계약이다.
+- 중요한 기준 차이: 같은 task의 parent→child 예약은 **base 자식 1회/concurrent 2회**,
+  child→parent는 양쪽 2회다. miss는 이 기존 배칭을 보존하고 hit는 예약된 자체 작업을 소비하지 않는다.
+  concurrent 새 API는 첫 후보에서 export하지 않으며 commit/abandon 지원은 새 DC-11로 분리했다.
+- 새 [기준 회귀](../../src/tests/core-parentUpdateContract.test.tsx) **10개씩**에서 정확한
+  pre/updater/post 순서·변경/동일 props·post callback 재예약·삭제·DOM identity를 확인했다.
+  전체 `pnpm test:dual` **1,070 passed·3 skipped**(13개 suite 집계, base runner 409/concurrent runner 312),
+  `pnpm exec tsc --noEmit` 통과. baseline 결과를 미구현 후보의 통과로 해석하지 않는다.
+- done: C3 DC-4 한정 계약과 기준 회귀. 런타임은 C1 복원 baseline이며 C1 채택 보류·C2 보류를 유지한다.
+  복원 manifest의 소스/산출물 28개·실제 sibling 앱 SHA-256 일치, ESLint·Prettier·diff/로컬 파일 링크 검사도 통과했다.
+- next: IMPLEMENT Phase 3 **C3-T1~T5**의 후보 전용 테스트·base 구현, 이후 T6/T7의 일반 입력 UI·
+  같은 행 구조의 opt-in 대조·비사용자 core-only 비용 검증. C1/C2/C4를 처음부터 결합하지 않는다.
+- blockers: 현재 없음. 최종 표의 RC-5/IC-1과 조건부 DC-5/DC-8~DC-11은 각 진입 시점에 닫는다.
+- commit: 최신 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`(C1 증거 체크포인트).
+  이번 C3 문서·기준 회귀는 미커밋이며 실제 sibling의 기존 targeted 앱을 보존했다.
+
 ## C1 검증 커밋·ctxbin 인계 체크포인트 — 2026-10-21
 
 - 사용자 요청으로 아래 C1 보고서·후보 패치·raw/압축 증거·재현 도구·회귀와 정본 계획을

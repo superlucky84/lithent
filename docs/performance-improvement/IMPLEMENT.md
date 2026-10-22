@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-21. 상태: **Phase 2 C1 한정 검증 완료·채택 보류 및 baseline 복원. Phase 3 C3 계약 검토가 다음 작업**.
+- 기준일: 2026-10-22. 상태: **Phase 3 C3 한정 계약·기준 회귀 완료. C3 런타임 구현·성능 검증은 미실행**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
@@ -43,13 +43,13 @@
 
 분기: C1이 원래 앱에 효과가 없고 C2의 진입 증명 비용이 크다는 근거가 있으면 Phase 2 후보들을 모두 구현하지 않고 바로 Phase 3의 C3/C4 계약 연구로 진행할 수 있다. 내부 개선 우선 검토는 미세 최적화 소진 의무가 아니다.
 
-이번 분기: 일반 nested slot에서도 반복 검색 증가가 재현되어 **다음은 C1 한정 프로토타입**이다. original/Table의 전체 순회 해결책으로 설명하지 않는다. C2는 실제 시간상 기각 없이 보류하고, C3의 필요 근거인 parent-refresh updater n+1을 후속 연구로 유지한다. C1의 DC-6 하위 결정을 닫기 전에는 Phase 2 구현 완료로 표시하지 않는다.
+당시 분기: 일반 nested slot에서도 반복 검색 증가가 재현되어 C1 한정 프로토타입을 택했다. original/Table의 전체 순회 해결책으로 설명하지 않는다. C1의 실제 결과와 채택 보류는 아래 Phase 2에 기록하며, 현재의 다음 작업은 Phase 3 C3 후보 구현이다. C2는 실제 시간상 기각 없이 보류한다.
 
 ## Phase 2 — 기존 계약 안의 내부 후보 C1/C2
 
 진입: Phase 1에서 해당 비용이 확인되고 DC-6의 저장/진입 방식이 정해짐. 종료: 후보별 정합성·작업량 감소 여부·비용이 기록되어 다음 분기로 판단 가능.
 
-현재 상태: Phase 1 `979f88f` 뒤의 C1 한정 검증을 완료했다. [보고서](../benchmark/PARENT_POSITION_RESULTS.md), [raw 결과](../benchmark/parent-position-results.json), [압축 증거](../benchmark/parent-position-evidence.json.gz), [후보 패치](../benchmark/parent-position-candidate.patch)에 보존했다. slot/concurrent는 미수정이다. 큰 목록 반복 자체 갱신의 이득은 확인했지만 원래 앱 가중 전체 −0.55% 단일 차수·크기 한도 +53B여서 기본 채택은 보류하고 baseline으로 복원했다. C2는 구현하지 않은 보류 후보이며 다음은 Phase 3의 C3 계약 검토다.
+현재 상태: Phase 1 `979f88f` 뒤의 C1 한정 검증을 완료했다. [보고서](../benchmark/PARENT_POSITION_RESULTS.md), [raw 결과](../benchmark/parent-position-results.json), [압축 증거](../benchmark/parent-position-evidence.json.gz), [후보 패치](../benchmark/parent-position-candidate.patch)에 보존했다. slot/concurrent는 미수정이다. 큰 목록 반복 자체 갱신의 이득은 확인했지만 원래 앱 가중 전체 −0.55% 단일 차수·크기 한도 +53B여서 기본 채택은 보류하고 baseline으로 복원했다. C2는 구현하지 않은 보류 후보이며 Phase 3의 C3 계약·기준 회귀로 진행했다.
 
 - [x] C1만 독립 구현·검증했다. C2는 미구현 보류이며 완료로 간주하지 않는다.
 - [x] C1 구현 전에 [부모 위치 회귀 4개](../../src/tests/core-parentPosition.test.tsx)를 추가하고 기준선 base/concurrent 각각 4개 통과: index 0·말미 반복/재정렬/추가/삭제 뒤 자체 renew, shared slot의 앞쪽 live alias 첫 등장 동기화, 같은 컴포넌트 VDOM 설명의 다중 위치 독립 수명, compKey 없는 공개 `replaceWDom`. 이는 후보 통과가 아니며 C2 전용 same-order 중복 키·mixed 목록은 재개 시 별도 준비한다.
@@ -64,12 +64,18 @@
 
 진입: 내부 최적화만으로 남는 작업과 정보 부족이 설명됨. 먼저 DC-4 또는 DC-5의 계약을 구체화하고, 해당 결정이 닫힌 후보만 구현에 진입한다. 종료: 채택 여부를 비교할 수 있는 동작·API·비용 증거가 있음.
 
-- [ ] C3의 기존 API 조합/옵트인 새 계약 중 선택. deps·props/children 무효화, 자체 renew, callback, 부모/자식 동시 갱신, disposal을 구현 전에 DESIGN에 확정 기록.
+- [x] C3는 base `useParentMemo` setup hook의 새 명시적 옵트인으로 한정 설계했다. incoming props의 deps 복사·Object.is·key shape 무효화, nonempty slots fallback, self 경로 우회, hit의 두 단계 callback 생략, 기존 miss 배칭, 성공 후 스냅샷 게시·실패/삭제 정리를 DESIGN DC-4에 기록했다. 현재 API 구현/export는 없다.
+- [x] **C3 기준 회귀:** `core-parentUpdateContract`에서 양방향 부모/자식 예약·두 단계 callback·재진입·삭제·자체 출력 보존 **10개씩**을 base/concurrent로 확인했다. 기존 updatePaths·cached identity·parentChildSync·composedRenew·removedRedraw를 포함한 B1 `pnpm test:dual` **1,070 passed·3 skipped**(13개 suite 집계, base runner 409/concurrent runner 312), `pnpm exec tsc --noEmit` 통과. 이는 후보 T1~T7 통과가 아니다.
+- [ ] **C3-T1:** base hook의 setup 등록·중복/외부 호출 오류·타입/export를 구현하고 concurrent import가 의도대로 실패하는 fixture를 검증. public 패키지 배포는 하지 않는다.
+- [ ] **C3-T2/T3:** 동기화 전 selector·복사 스냅샷·deps 길이/NaN/−0·공유 mutable row·key 추가/삭제·nonempty slots/특수 props fallback을 먼저 회귀로 준비하고 독립 구현. props 참조로 self 갱신을 추측하지 않는다.
+- [ ] **C3-T4/T5:** DESIGN 배칭 표의 hit/miss와 두 단계 callback·재진입, 이동·다중 위치·삭제/초기화/업데이트 실패, pending의 세대·정리·회수를 확인. C1을 결합하거나 기존 scheduler를 다시 쓰지 않는다.
 - [ ] C4가 필요하면 목록 소유권·구조 version·dirty item·외부 mutation·fallback을 정의. C4를 구현하지 않는다면 이유와 연구 상태를 남기고 완료로 체크하지 않음.
 - [ ] 공개 API 이름/위치/타입이 추가되면 사용 예제와 비사용자의 기본 동작을 함께 검증. 기존 retainedView/renderBoundary 의미를 재정의하지 않음.
 - [ ] 기준 행 컴포넌트 앱과 새 기능 앱의 구조를 가능한 한 같게 유지한 대조를 준비. 일반 편집 목록 또는 nested 입력 UI를 추가해 benchmark 특수 동작이 아님을 확인.
 - [ ] 코어/helper/API를 함께 바꾸는 경우 현재 staging 도구가 후보 helper를 정말 사용하는지 검증하고 필요한 지원을 명시적으로 추가. 현재 `targeted-update.mjs prepare`는 helper를 설치된 npm 패키지에서 복사한다.
 - [ ] 기준 검사: B1·B2·B3 + 새 계약의 양쪽 코어 테스트·타입/exports·수명/경계 검증, M-4~M-6. 새 API가 concurrent 미지원이면 지원 범위와 안전한 실패를 명시.
+
+현재 한정 범위: C3 **계약 결정과 baseline 회귀**를 마쳤다. T1~T7은 후보 구현/검증의 다음 단위이며 완료 증거가 생길 때 각각 체크한다. 첫 후보의 concurrent 새 API 테스트는 미지원 import 검사로 한정하고 기존 공통·boundary 회귀를 유지한다. concurrent 구현은 DESIGN DC-11의 별도 진입 조건을 따른다. C4는 C3의 작업량·일반 예제·공식 결과를 얻기 전까지 조건부 연구이며, 아직 전체 keyed 방문을 제거했다고 주장하지 않는다. 이번 변경은 문서와 baseline 테스트뿐이므로 B2/B3의 새로운 후보 빌드·브라우저 측정은 실행하지 않았다. C1 복원 evidence의 `execution/restoration.json`과 현재 소스/산출물 **28개 SHA-256이 모두 일치**하고 실제 sibling 앱 해시도 보존됨을 확인했다. ESLint·Prettier·diff 검사, 정본/HANDOFF의 로컬 파일 링크 102개도 통과했다.
 
 분기: API/메모리/번들 비용이 목표에 맞지 않으면 미채택으로 보존한다. 한도 변경은 IC-3에서 구체적인 수치와 대안을 검토하며 기존 게이트를 임의 수정하지 않는다. 일상적인 내부 구현 선택마다 사용자 재승인을 요구하지 않는다.
 
@@ -123,7 +129,7 @@
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** 앞선 문서/계획은 Phase 0에서 완료했고, 2026-10-21 후속 착수 요청으로 Phase 1을 완료했다. C1 한정 프로토타입의 검증까지 완료했고 다음은 C3의 DC-4 계약 결정이다. 후보 구현은 각 단계 진입 조건을 따르며, 실행 결과가 없는 항목은 미완료로 유지한다.
+- [x] **IC-0 확정:** Phase 1과 C1 한정 검증·baseline 복원 뒤, 2026-10-22에는 C3 DC-4 한정 계약과 baseline 회귀를 완료했다. 다음은 C3-T1~T5의 base 후보 회귀·구현이다. 실행 결과가 없는 API·성능 검증과 Phase 3 전체는 미완료로 유지한다.
 - [ ] **IC-1 TBD:** 최종 표의 비교군, 정규화·색상/통계 모드, CPU/메모리/startup 표시 범위, 빠른 구간의 수치 임계치. Phase 1에서 제안·기록하고 Phase 6 목표 판정 전에 닫음.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
 - [ ] **IC-3 조건부 TBD:** 크기 한도 초과 후보의 격리·상쇄·예산 재검토. 초과가 없으면 해당 없음으로 닫음. 한도 변경은 별도 명시적 결정.
@@ -131,7 +137,7 @@
 
 ## 상태 / 핸드오프
 
-- done: Phase 2 C1 한정 검증·증거 보존·baseline 복원. 사용자 요청으로 C1 체크포인트를 커밋·ctxbin 인계한다. C2는 보류이며 Phase 4~6 최종 검증은 미실행.
-- next: Phase 3 진입 전 DC-4 C3 계약과 기존 callback/배칭 기준을 구체화한다. 명시적 생략이 자체 renew를 삼키지 않는 경계를 정한 뒤 독립 구현에 진입한다.
-- blockers: 현재 없음. 선택적 후보의 공개 계약과 최종 성능 목표의 미확정은 각 단계에서 관리.
-- commit: Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`; 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. Phase 2 C1 산출물은 `perf: preserve C1 parent-position evaluation` 체크포인트에 보존. 정확한 SHA는 git log·ctxbin 인계 참조.
+- done: C3 한정 계약과 baseline callback/배칭 회귀 완료. 전체 dual 1,070 passed/3 skipped·타입 검사 통과. C1은 채택 보류·복원 상태다. C3 구현과 Phase 3 전체 및 Phase 4~6은 미완료다.
+- next: C3-T1~T5의 후보 전용 회귀·base 구현, 이후 T6/T7의 일반 예제·동일 행 구조/비사용자 대조. 필요한 candidate helper staging 지원은 실제 변경 여부에 따라 추가한다.
+- blockers: 현재 없음. DC-11의 concurrent 확장은 첫 base 후보와 분리하고 최종 목표는 IC-1에서 관리한다.
+- commit: 최신 체크포인트 `b4eef39afa5fcc49937cb2ac168099f664b51fbe`(C1 증거 보존). 이번 C3 문서·기준 회귀는 미커밋. Phase 1 `979f88f222c45cadadd1871d8d9f861a5e71f9a0`, 런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
