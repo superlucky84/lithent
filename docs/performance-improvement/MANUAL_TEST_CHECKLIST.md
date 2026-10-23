@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보 source/증거 보존 뒤 compact13 복원을 진행한다.
+> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
 DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
 
@@ -203,4 +203,4 @@ DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict
 - [x] 외부 listener order/remove/dedup과 dispatch 중 교체 차이를 baseline과 병렬 기록하고 기본 채택 여부에 반영.
 - [x] production build와 별도 등록/해제 카운터 분리, 양순서 fresh-page update/mount/dispatch raw 완전성 확인.
 - [x] 별도 GC/DOM/listener·churn/dispose와 3 bundle 형식 size, 독립 통계/해시 감사 확인.
-- [ ] 결과·실제 commit·done/next/blockers 및 runtime 복원 확인; 공식 peer/모든 앱 개선으로 확대하지 않음.
+- [x] 결과·실제 commit·done/next/blockers 및 runtime 복원 확인; 공식 peer/모든 앱 개선으로 확대하지 않음.

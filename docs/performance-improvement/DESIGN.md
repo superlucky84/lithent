@@ -1,6 +1,6 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보 source/증거 보존 뒤 compact13 복원을 진행한다.
+> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
 DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
 

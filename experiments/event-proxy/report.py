@@ -45,7 +45,7 @@ for name in ['lithent.mjs','lithent.umd.js','lithent.cjs']:
     b=a['size']['baseline/production'][name];c=a['size']['candidate/production'][name]
     lines.append(f"| {name} | {b['raw']}/{b['gzip']}/{b['br']} | {c['raw']}/{c['gzip']}/{c['br']} | {c['br']-b['br']:+} |")
 lines+=['','기존4,824B guard는 변경하지 않았다. 크기 초과와 관계없이 성능/메모리 수집을 완료했다.','',
-'재현: [도구/조건](../../experiments/event-proxy/README.md). [독립 통계와 manifest](./event-proxy-results.json), [후보 패치](./event-proxy-candidate.patch), [압축 원자료/소스/도구](./event-proxy-evidence.json.gz). 최종 source commit·archive SHA·복원 검증은 [HANDOFF](./HANDOFF.md)의 DC-20에 기록한다. 기본 runtime은 compact13으로 복원하며 원래 checkout/C2는 수정하지 않는다.','',
+'재현: [도구/조건](../../experiments/event-proxy/README.md). [독립 통계와 manifest](./event-proxy-results.json), [후보 패치](./event-proxy-candidate.patch), [압축 원자료/소스/도구](./event-proxy-evidence.json.gz). source commit `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`. runtime17 baseline hashes와 복원31회귀/strict/lint·재현6번들 hash/size 일치를 확인했다. archive SHA·복원 검증은 [HANDOFF](./HANDOFF.md)의 DC-20에 기록한다. 기본 runtime은 compact13으로 복원하며 원래 checkout/C2는 수정하지 않는다.','',
 '남은 범위: 공식 four-peer/nine-action 성능 목표, 이 관찰 차이를 다루는 별도 API/설계, 다른 앱·브라우저·장기 메모리. 이번 후보를 기본 채택하지 않는 결정과 성능 실험 완료를 구분한다.','']
 (bench/'EVENT_PROXY_RESULTS.md').write_text('\n'.join(lines))
 (bench/'event-proxy-results.json').write_text(json.dumps(a,indent=2)+'\n')

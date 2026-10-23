@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보 source/증거 보존 뒤 compact13 복원을 진행한다.
+> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
 DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
 
@@ -279,6 +279,6 @@ DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict
 - [x] P2 후보: slot 기반 updateEvent/portal 정리 구현, 같은 공통 동작 검증·strict type/lint. phase baseline은 frozen source로 같은 공통 테스트 통과.
 - [x] P3 Test Hardening: alias/dedup·this/object·drop/readd·retained DOM·portal·native stopImmediatePropagation·외부 order/removal·동일 dispatch 중 교체를 검사한다. 알려진 차이를 예상 관찰값으로 별도 기록한다.
 - [x] P4 Integration Test: production ESM browser gates/UMD/CJS smoke 뒤 serial 양순서 update/mount/dispatch·별도 memory/size, 입력 hash와 독립 통계 검증. 정상 회귀와 관찰 차이를 혼합하지 않는다.
-- [ ] P5 보존/복원: source/patch/raw/보고서·재현 도구/commit, unchanged concurrent·원래 checkout 확인, base runtime 복원 뒤 관련 회귀와 strict 검사. 광범위 dual/e2e와 fixed peer 전체 목표는 범위 밖.
+- [x] P5 보존/복원: source/patch/raw/보고서·재현 도구/commit, unchanged concurrent·원래 checkout 확인, base runtime 복원 뒤 관련 회귀와 strict 검사. 광범위 dual/e2e와 fixed peer 전체 목표는 범위 밖.
 
-DC-20 P4 종료: base/concurrent 각238/55파일, concurrent portal commit4, strict/ESLint, CJS/UMD 및 actual ESM 공통 계약·native6관찰/variant·등록 진단8조건, 시간48page/1,440update batches/480dispatch batches·메모리24context·별도settled-retention24context와 Python hash/통계 감사를 완료했다. 최초 shared teardown의 concurrent portal5실패는 fallback 수정/전체 재검증과 함께 보존한다. 미채택 판단은 native 관찰 차이·교환 비용/대조 회귀에 근거하며 크기만으로 종료하지 않았다. P5 보존/복원이 남았다.
+DC-20 P4 종료: base/concurrent 각238/55파일, concurrent portal commit4, strict/ESLint, CJS/UMD 및 actual ESM 공통 계약·native6관찰/variant·등록 진단8조건, 시간48page/1,440update batches/480dispatch batches·메모리24context·별도settled-retention24context와 Python hash/통계 감사를 완료했다. 최초 shared teardown의 concurrent portal5실패는 fallback 수정/전체 재검증과 함께 보존한다. 미채택 판단은 native 관찰 차이·교환 비용/대조 회귀에 근거하며 크기만으로 종료하지 않았다. P5까지 완료: source commit `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`, 복원17 source hash 일치·관련31회귀/strict/lint·재현6번들 해시/크기 일치·후보 patch 적용 감사를 확인했다.
