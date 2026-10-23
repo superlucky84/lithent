@@ -1,5 +1,18 @@
 # summary
 
+## DC-19/19B cloud anchor experiments concluded — 2026-10-24
+
+- Branch/worktree: `experiment/fragment-anchor-cloud` at `/workspace/work/lithent-fragment-anchor`. Base is `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`. The original `/workspace/lithent` stays clean on `docs/select-partial-update-analysis` at that base. These experiments are independent of the local C2 work.
+- First range prototype/source commit: `f99730289e7ffd934ed785f4585edd500a37f00c`. [Report](./FRAGMENT_ANCHOR_RESULTS.md), [raw](./fragment-anchor-results.json), [patch](./fragment-anchor-candidate.patch), [evidence](./fragment-anchor-evidence.json.gz). It removed suffix/singleton constructions but changed accessor/snapshot observations. Reveal update0.2→0.1ms is on a0.1ms timer grid; reorder pooled3.3→3.2ms differed by order; two-rAF medians stayed33.3ms. UMD br4,847B/+23B. Not adopted.
+- Snapshot-preserving prototype/source commit: `3afd8de44148222d19f4ab76be7e6e18114e000c`. [Report](./FRAGMENT_ANCHOR_SNAPSHOT_RESULTS.md), [raw](./fragment-anchor-snapshot-results.json), [patch](./fragment-anchor-snapshot-candidate.patch), [evidence](./fragment-anchor-snapshot-evidence.json.gz). It preserves suffix snapshots and indexed reads after an anchor while removing reducer callbacks and singleton arrays. Covered source-helper getter/mutation/hole/length/throw observations match. Pooled update medians0.1/3.2/0.2ms match the fresh baseline; reverse reorder3.2→3.4ms. Two-rAF medians stay33.3ms. UMD br4,845B/+21B. Not adopted.
+- Each trial uses fresh synthetic Linux headless Chromium151.0.7922.173, Node24.19.0,2CPU quota/8GiB, three workloads, opposite orders,1,080 retained update/two-rAF samples and18 separate GC/DOM/listener contexts. Each has6browser gates/6diagnostic conditions and no browser-batch failures. The trials are separated by hours, are not a randomized direct comparison and are never pooled with Mac/official peer samples.
+- Candidate shared base232/54files and unchanged concurrent232 pass, plus strict TypeScript/ESLint/Prettier, source/build input guards, CJS/UMD smoke, Python distributions/input audit and decoded archive checks. This is bounded validation; full monorepo dual/64e2e/official9CPU/four-peer goals were not rerun.
+- Final runtime was guarded-restored: all17source hashes equal compact13/base8056. Preserved snapshot candidate inputs reproduce all6production bundle hashes/sizes. Post-restore focused regression/fuzz/keyed/anchor tests:27pass, CLI exit0. [Restoration audit](./fragment-anchor-restoration.json). Size guard is unchanged. Sources for both candidates remain in commits/patches/archives, not active in the final runtime.
+- Evidence range128entries/890,850B SHA256 `46d05f396300c5b95aab80b732d517850adc5cc0fe72567bee4ca643890604d1`; snapshot121entries/874,531B SHA256 `bc1da9e7d1c9150a647e3e0af68f7ab15e883dc06dca20d8d778ef525ee3bc85`.
+- done: independent branch, two isolated core hypotheses, covered observational issue resolved in the second, correctness/counters/new A/B/memory/size, durable evidence and restoration.
+- next: select another independently documented cost hypothesis if requested. Source-level array method removal alone has not demonstrated a useful speedup in these workloads. No C2 combination, general budget increase, upstream submission, push or release was performed.
+- blockers: neither candidate demonstrated rendering latency benefit here; the first also changes observation order. The fixed four-peer all-nine1.10× goal remains a local follow-up. Exact final branch tip is obtained with `git log -1`; the implementation commits above identify the tested sources.
+
 ## DC-18 common-field factory adopted — 2026-10-24
 
 - User priority: keep watching size, but consider modest excess for rendering

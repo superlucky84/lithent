@@ -228,32 +228,20 @@ const moving = new Set<WDom>();
 
 const findChildFragmentNextElement = (
   candidiateBrothers: WDom[]
-): HTMLElement | DocumentFragment | Text | undefined => {
-  let targetEl: HTMLElement | DocumentFragment | Text | undefined;
-  const length = candidiateBrothers.length;
-  for (let index = 0; index < length; index++) {
-    if (!(index in candidiateBrothers)) continue;
-    const bItem = candidiateBrothers[index];
-    // reduce reads later indexed values even after an anchor was found.
-    if (!targetEl) {
-      targetEl = findFragmentNextElement(bItem);
-    }
-  }
-  return targetEl;
-};
-
-const findFragmentNextElement = (
-  bItem: WDom
-): HTMLElement | DocumentFragment | Text | undefined => {
-  if (moving.size && moving.has(bItem)) return undefined;
-  const { type, el } = bItem;
-  if (type && checkVirtualType(type)) {
-    const found = findChildFragmentNextElement(bItem.children || []);
-    if (found) return found;
-  }
-  if (el && el.nodeType !== 11) return el;
-  return undefined;
-};
+): HTMLElement | DocumentFragment | Text | undefined =>
+  candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
+    (targetEl, bItem) => {
+      if (targetEl || (moving.size && moving.has(bItem))) return targetEl;
+      const { type, el } = bItem;
+      if (type && checkVirtualType(type)) {
+        const found = findChildFragmentNextElement(bItem.children || []);
+        if (found) return found;
+      }
+      if (el && el.nodeType !== 11) return el;
+      return targetEl;
+    },
+    undefined
+  );
 
 const typeReplace = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
@@ -421,7 +409,7 @@ const updateChildren = (newWDom: WDom) => {
         }
       }
 
-      const first = findFragmentNextElement(item);
+      const first = findChildFragmentNextElement([item]);
       if (first) {
         anchor = first;
       }
