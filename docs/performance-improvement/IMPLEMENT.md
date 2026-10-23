@@ -1,5 +1,7 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
+> DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
+
 - 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
@@ -229,7 +231,24 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 - [ ] **IC-3 조건부 TBD:** 기본 경로 격리는 DC-12에서 검증했지만 별도 렌더러는 br 5,691B다. 기능 이득·비용을 본 뒤 공개 경로/별도 예산을 결정한다. 기존 한도 변경이나 초과 해소로 표시하지 않는다.
 - [ ] **IC-4 검증 대기:** C1/C2/C3/C4 중 최종 채택 조합. 각 후보의 독립 결과 뒤 결합 상호작용을 확인.
 
-## 상태 / 핸드오프
+## DC-19 — 클라우드 Fragment 앵커 한정 실행
+
+진입: `8056e02` clean baseline, 독립 브랜치/worktree와 R40~R43 범위 확정. 종료: 한정 후보의 동작·작업량·Linux 전용 A/B·교환 비용 및 미검증 경계를 재현할 수 있음.
+
+- [x] 독립 브랜치/worktree 생성과 범위·검사·표본 계획 기록.
+- [x] baseline source/환경/hash를 보존하고 앵커 전용 회귀를 baseline base/concurrent에서 먼저 통과한다.
+- [x] base helper의 suffix/singleton 할당·불필요한 callback만 변경한다. baseline 대비 patch와 비범위 source hash를 확인한다.
+- [x] Test Hardening: 새 앵커 회귀·공유 structural/keyed/fuzz/lifecycle/recovery·기본 core 전체 및 concurrent 공통 회귀·엄격 타입을 실행한다. accessor snapshot 경계도 별도로 확인한다.
+- [x] 동일 production 설정으로 baseline/candidate를 빌드하고 세 형식 size/hash, 실브라우저 DOM/identity/focus/mount/portal gate와 별도 작업량을 확인한다.
+- [x] 새 Linux 전용 stress/대조 workload를 두 순서로 직렬 수집한다. warmup·raw·실패·브라우저 hash·부하를 보존하고 통계를 독립 계산한다. 공식 peer 측정으로 표시하지 않는다.
+- [x] Integration: 별도 fresh context의 GC/DOM/listener·dispose와 실제 번들 import를 확인한다. artifact·source·패치/hash와 원래 worktree 전후 동일성을 감사한다.
+- [x] 결과·보류/채택 범위·done/next/blockers/실제 commit을 정본4종/HANDOFF에 기록한다. 별도 요청 전 원래 브랜치 적용·push/release는 하지 않는다.
+
+재현 도구/실험 계획: `experiments/fragment-anchor/README.md`. 기존 DC-16 runner의 Mac 고정 guard를 변경하거나 과거 표본을 재사용하지 않는다.
+
+DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict 타입/lint·ESM6gate/CJS·UMD smoke·진단6조건·CPU1,080/메모리18context·Python 입력/통계 감사를 통과했다. 초기 환경/테스트 수집 오류와 getter 관찰 차이는 증거에 보존했다. two-rAF 이득은 입증하지 못했고 후보는 미채택이다. 현재 guard 대비br+23B이며 기존 guard를 바꾸지 않았다. [보고서](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)에서 범위·분포·원자료·완료/다음을 확인한다.
+
+## 상태 / 핸드오프 (DC-18 당시 기록)
 
 - done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.

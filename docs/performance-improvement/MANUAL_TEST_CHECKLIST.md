@@ -1,5 +1,7 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
+> DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
+
 - 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
@@ -161,7 +163,19 @@ DC-17 전용 추가 gate(기준 회귀와 후보 검증 분리):
 
 통과: compact13 기본 반영·한정 통합/보존 감사는 완료했다. 모든 앱/환경의 성능·전면 own-key 동등성·전체 heap 누수 부재·전체 peer 목표는 보장하지 않는다.
 
-## 상태 / 핸드오프
+## M-12. DC-19 클라우드 Fragment 앵커 — R40~R43
+
+- [x] baseline/candidate/current source·branch·runtime·브라우저/엔진 hash를 기록하고 Linux 결과를 Mac과 분리한다.
+- [x] 빈→다중 출력·긴 형제 목록·중첩 Fragment·keyed 이동/추가/삭제·portal·root afterElement·외부 형제·focus/수명 순서와 no-op을 확인한다. baseline base/concurrent를 후보와 구분한다.
+- [x] `slice`의 snapshot과 lazy 범위 읽기의 accessor/변이 차이를 별도 검증하고 일반적인 관찰 동등성을 과장하지 않는다.
+- [x] 진단에서 제거된 suffix/singleton 배열·복사량·callback/loop 방문과 남은 indexOf/Map/LIS를 구분한다. 실제 시간 build에는 계측을 넣지 않는다.
+- [x] 동일 앱/build/browser의 fresh page·warmup·양순서 raw/분포와 같은 순서 대조군을 확인한다. build/test를 측정과 병행하지 않는다.
+- [x] 별도 GC/heap/DOM/listener·dispose와 세 형식 raw/gzip/br를 확인한다. 공식 메모리·전체 peer 목표/기본 채택으로 확대하지 않는다.
+- [x] 한정 hardening/번들 통합·압축 증거/패치/source hash·원래 worktree 보존과 done/next/blockers/실제 commit을 남긴다.
+
+DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict 타입/lint·ESM6gate/CJS·UMD smoke·진단6조건·CPU1,080/메모리18context·Python 입력/통계 감사를 통과했다. 초기 환경/테스트 수집 오류와 getter 관찰 차이는 증거에 보존했다. two-rAF 이득은 입증하지 못했고 후보는 미채택이다. 현재 guard 대비br+23B이며 기존 guard를 바꾸지 않았다. [보고서](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)에서 범위·분포·원자료·완료/다음을 확인한다.
+
+## 상태 / 핸드오프 (DC-18 당시 기록)
 
 - done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.

@@ -1,5 +1,7 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
+> DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
+
 - 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
 - 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
@@ -119,7 +121,17 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 - [x] **RC-5 CPU 확정:** 고정 네 peer·전체 시간 중앙값·항목별 가장 빠른 peer 대비1.10배 이하/9항목 전부. 사용자 선택을 반영했다. → IC-1, DC-16, M-7. 메모리 허용 상한·size/startup의 최종 표시 범위는 별도 미정이다.
 - [x] **RC-6 사용자 후속 지시 확정:** 렌더 성능을 우선하고 소폭 크기 초과는 실제 성능/메모리 뒤 고려한다. 당시 full4,854B 평가를 새 영구 예산 숫자 때문에 멈추지 않았고 현재는 compact4,824B/검증24B allowance로 선정했다. 광범위 새 예산·추가 여유를 만들지 않으며 DC-17 당시 종료는 역사로 보존한다. → R11/R34/R39, DC-18, M-11.
 
-## 상태 / 핸드오프
+## DC-19 — 클라우드의 독립 Fragment 앵커 실험
+
+- 기준: `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`의 compact13, 브랜치 `experiment/fragment-anchor-cloud`. 로컬 C2와 분리한 worktree에서 수행한다. 이전 Mac 결과는 역사이며 Linux 표본에 합산하지 않는다.
+- R40. `startFindNextBrotherElement`와 `findChildFragmentNextElement`의 suffix `slice`·단일 항목 배열·끝까지 호출되는 `reduce` callback만 대상으로 한다. keyed Map/LIS·C2 proof·WDom factory·events·component wrapper·앱 구조는 고정한다. `indexOf`와 조상 탐색은 남는다.
+- R41. 빈/중첩 Fragment·텍스트·keyed 이동·portal·root afterElement·외부 형제·focus·mount 순서를 검증한다. 결과가 같은 DOM이라는 이유만으로 모든 getter/배열 변이 관찰이 동일하다고 주장하지 않는다. 관찰 차이는 공개하고 기본 채택과 분리한다.
+- R42. 같은 source/app/build/browser의 baseline/candidate를 두 순서로 직렬 비교한다. 전용 stress workload와 same-order 대조군, JS+갱신/두 rAF 시간, GC 후 heap/DOM/listener와 raw/gzip/br를 공개한다. 공식 upstream CPU·공식 메모리·네 peer 목표의 증거로 쓰지 않는다.
+- R43. 이번 종료는 한정 프로토타입·회귀·진단과 증거 보존이다. 기본 브랜치 적용·C2 결합·push/release는 포함하지 않는다. 소폭 크기 초과만으로 평가를 중단하지 않는다.
+
+현재 DC-19: 독립 프로토타입·공통 core 각232/strict 타입·실브라우저6gate·시간1,080표본/별도 메모리18context·Python 감사를 완료했다. suffix/singleton 할당을 제거했으나 two-rAF 중앙값은 같고 update는0.1ms grid/순서 변동 한계가 있다. UMD br4,824→4,847B(+23B), guard는 유지한다. slice snapshot/getter 관찰 차이로 **미채택**이며 [보고서](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)에 raw/patch/evidence를 보존했다. 정본은 DESIGN DC-19, IMPLEMENT DC-19, 수동 M-12다.
+
+## 상태 / 핸드오프 (DC-18 당시 기록)
 
 - done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.

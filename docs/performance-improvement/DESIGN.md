@@ -1,5 +1,7 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
+> DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
+
 - 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
@@ -328,7 +330,20 @@ frame은 내부 `{ proofs: WeakMap<WDom, WDom[]>, ready: boolean, invalid: boole
 
 → R1/R6~R12/R30~R39, Phase4 DC-18, M-11. compact 기본 반영·한정 통합/보존 감사는 완료했다. 전체 fixed-peer9항목1.10 목표·다른 후보 연구·광범위 Phase5/6은 별도 미완료이며 배포/커밋/푸시는 하지 않았다.
 
-## 상태 / 핸드오프
+## DC-19 — 인덱스 범위로 Fragment 앵커 탐색
+
+실험 baseline은 `8056e02`의 compact13이다. C2 proof 전달과 별개이며 base의 `src/render.ts`만 변경한다. concurrent는 기존 알고리즘을 보존한 회귀 대조군이다.
+
+- 배열/시작/끝 인덱스를 받는 helper로 suffix 복사와 `[item]` 임시 배열을 없앤다. native `reduce`의 순서·빈 슬롯 건너뛰기를 유지하며 첫 실제 DOM을 찾으면 반환한다. 각 호출의 종료 길이는 진입 때 고정한다.
+- `moving` 제외, 가상 자식 우선 재귀, 그 뒤 현재 노드의 non-DocumentFragment DOM, 마지막 root afterElement/조상 fallback 순서를 유지한다. Map/LIS·좌→우 content·우→좌 placement·cleanup/mount queue를 수정하지 않는다.
+- `slice`는 원본 배열의 값들을 먼저 snapshot한다. 범위 탐색은 lazy read이므로 accessor/Proxy나 재진입이 뒤 배열을 바꾸는 경우 차이가 날 수 있다. 이 경계를 baseline과 비교해 기록한다. 새 immutable 계약을 선언하거나 차이를 숨겨 기본 채택하지 않는다.
+- 별도 진단 build에서 suffix 복사/복사 길이·helper callback/loop 방문·singleton 배열과 실제 DOM 동작을 센다. 진단 코드를 timing build에 넣지 않는다.
+- production 비교는 같은 Vite 설정의 새 baseline/candidate 번들이다. 일반 갱신·중첩 Fragment 노출·keyed multi-node 재정렬을 동일 앱에서 실행한다. fresh page, warmup, 반대 순서와 raw 표본을 남긴다. 측정 중 다른 build/test를 실행하지 않는다.
+- GC/DOM/listener 진단은 별도 context에서 수행한다. CDP JS heap을 공식 메모리로 표시하지 않는다. 번들 세 형식의 크기와 source/browser/toolchain hash를 보존한다.
+
+판정 완료: 범위 탐색 프로토타입을 [결과/증거](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)에 보존하며 **기본 미채택**이다. 실제 helper의 getter 변이 검사에서 baseline은 slice snapshot의 old, 후보는 lazy read의 new를 반환했다. 일반 DOM 회귀/브라우저 gate는 통과했으나 전면 관찰 동등성이 아니다. reveal12회에서 복사6,006/방문6,006→0/6, reorder singleton1,400→0을 확인했다. update0.2→0.1ms는0.1ms grid 한계, reorder3.3→3.2ms는 순서 불일치이며 two-rAF는 같았다. br4,847B/guard+23B를 공개했고 C2/전체 peer 목표·기본 채택과 구분한다.
+
+## 상태 / 핸드오프 (DC-18 당시 기록)
 
 - done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
