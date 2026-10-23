@@ -1,0 +1,663 @@
+{
+  "schema": 1,
+  "at": "2026-10-23T11:59:23.853Z",
+  "head": "452dc2eeae29d1e555f7f7b467f01de2baa55c0d",
+  "decision": "defer-this-prototype-size-gate",
+  "scope": "DC-17 base-only internal current-diff proof; no default runtime adoption",
+  "baseline": {
+    "at": "2026-10-23T11:42:39.886Z",
+    "sources": {
+      "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+      "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+      "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+      "src/wDom.ts": "76a9f33aedf0b4f34e5f836a003aa6481581e3cdbde65a5e36cc606d83b8abbb",
+      "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+      "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+      "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+      "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+      "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+      "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+      "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+      "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+      "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+      "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+      "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+      "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed"
+    },
+    "bundles": {
+      "lithent.mjs": {
+        "sha256": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "raw": 19110,
+        "gzip": 6454,
+        "brotli": 5896,
+        "historicalSHA256": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "matchesHistorical": true
+      },
+      "lithent.umd.js": {
+        "sha256": "1b64873b03874d40999175c2244c84fea27aff6994764ff918f197b30c050773",
+        "raw": 12741,
+        "gzip": 5178,
+        "brotli": 4798,
+        "historicalSHA256": "1b64873b03874d40999175c2244c84fea27aff6994764ff918f197b30c050773",
+        "matchesHistorical": true
+      },
+      "lithent.cjs": {
+        "sha256": "60275b5d55315fff6b3038b8dcaa1809dec0a9e1dffea0f58c65c376a545be52",
+        "raw": 12592,
+        "gzip": 5210,
+        "brotli": 4828,
+        "historicalSHA256": "60275b5d55315fff6b3038b8dcaa1809dec0a9e1dffea0f58c65c376a545be52",
+        "matchesHistorical": true
+      }
+    },
+    "size": {
+      "budget": 4800,
+      "actual": 4798,
+      "pass": true
+    }
+  },
+  "candidate": {
+    "at": "2026-10-23T11:56:42.136Z",
+    "sources": {
+      "src/diff.ts": "fc1f07f095bcbf5d69b791d4603b69ffefb3f39d1028b1ff3f05e82cd7ec6190",
+      "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+      "src/render.ts": "7cef7cd0a00f09d7e750465764630ddcf49e5e8286e4b619d7a0314bc1d1f8ef",
+      "src/wDom.ts": "7528900248640441b5172214dedcd3df032ba7af5d7b83b9800ba510ad11fa5e",
+      "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+      "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+      "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+      "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+      "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+      "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+      "src/utils/childOrder.ts": "6221323edfad7b00d166db57e0c562f5d77d84e8f850588c33612148f9dc444d",
+      "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+      "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+      "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+      "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+      "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+      "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed"
+    },
+    "bundles": {
+      "lithent.mjs": {
+        "sha256": "8b24feff0120eecd149c7481d73e961ef7f4ce0c50e951ab69ba43c9f5181c01",
+        "raw": 19809,
+        "gzip": 6643,
+        "brotli": 6067
+      },
+      "lithent.umd.js": {
+        "sha256": "2f588fc11e1f399637c31a7c046ea4eaa5e95c046547185e239654ab63e20609",
+        "raw": 13210,
+        "gzip": 5348,
+        "brotli": 4952
+      },
+      "lithent.cjs": {
+        "sha256": "bc4bd7b0cfe4dd16159c7f5b59cac00e180281006397c9f3eb0b83cfdd8eebf6",
+        "raw": 13059,
+        "gzip": 5376,
+        "brotli": 4993
+      }
+    },
+    "size": {
+      "budget": 4800,
+      "actual": 4952,
+      "pass": false
+    }
+  },
+  "counters": {
+    "at": "2026-10-23T11:58:20.477Z",
+    "environment": "JSDOM structural counters; no timing or official B3",
+    "inputs": {
+      "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+      "cacheUpdate.ts": "8ff83de7781eaca123b8290c16409f6ebc0affadd29b8ea23e7eba968b9c9150"
+    },
+    "variants": {
+      "baseline": {
+        "samples": [
+          {
+            "name": "create1k",
+            "rows": 1000,
+            "counts": {
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3
+            }
+          },
+          {
+            "name": "select",
+            "rows": 1000,
+            "counts": {
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1012,
+              "updateChildren": 11,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 1000,
+              "createdArrays": 1,
+              "clearDiffMeta": 1011
+            }
+          },
+          {
+            "name": "select-next",
+            "rows": 1000,
+            "counts": {
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1021,
+              "updateChildren": 19,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 1000,
+              "createdArrays": 1,
+              "clearDiffMeta": 1019
+            }
+          },
+          {
+            "name": "partial",
+            "rows": 1000,
+            "counts": {
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1903,
+              "updateChildren": 803,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 1000,
+              "createdArrays": 1,
+              "clearDiffMeta": 1903
+            }
+          },
+          {
+            "name": "swap",
+            "rows": 1000,
+            "counts": {
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1003,
+              "updateChildren": 3,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 1000,
+              "createdArrays": 1,
+              "clearDiffMeta": 1003
+            }
+          },
+          {
+            "name": "remove",
+            "rows": 999,
+            "counts": {
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 1999,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 999,
+              "mapDelete": 999,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1002,
+              "updateChildren": 3,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 999,
+              "createdArrays": 1,
+              "clearDiffMeta": 1002
+            }
+          },
+          {
+            "name": "replace1k",
+            "rows": 1000,
+            "counts": {
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 999,
+              "diffKeyReads": 1999,
+              "mapHas": 999,
+              "mapSet": 999,
+              "mapGet": 1000,
+              "unusedVisits": 999,
+              "wDomUpdate": 3,
+              "updateChildren": 3,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 1000,
+              "createdArrays": 1,
+              "clearDiffMeta": 1003
+            }
+          },
+          {
+            "name": "append1k",
+            "rows": 2000,
+            "counts": {
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 3000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 2000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1003,
+              "updateChildren": 3,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 2000,
+              "createdArrays": 1,
+              "clearDiffMeta": 2003
+            }
+          },
+          {
+            "name": "clear",
+            "rows": 0,
+            "counts": {
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3
+            }
+          },
+          {
+            "name": "create10k",
+            "rows": 10000,
+            "counts": {
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3
+            }
+          },
+          {
+            "name": "clear10k",
+            "rows": 0,
+            "counts": {
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3
+            }
+          }
+        ],
+        "bundleSHA256": "5ca84632b72db345b04e00c0cb8b71545854fda0e354251a68d4bbff4184a8ca"
+      },
+      "candidate": {
+        "samples": [
+          {
+            "name": "create1k",
+            "rows": 1000,
+            "counts": {
+              "frameStart": 1,
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "select",
+            "rows": 1000,
+            "counts": {
+              "frameStart": 1,
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "proofWrites": 1,
+              "proofWriteChildren": 1000,
+              "wDomUpdate": 1012,
+              "updateChildren": 11,
+              "proofReads": 1,
+              "proofDeletes": 1,
+              "fastLoops": 1,
+              "fastChildren": 1000,
+              "clearDiffMeta": 1011,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "select-next",
+            "rows": 1000,
+            "counts": {
+              "frameStart": 1,
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "proofWrites": 1,
+              "proofWriteChildren": 1000,
+              "wDomUpdate": 1021,
+              "updateChildren": 19,
+              "proofReads": 1,
+              "proofDeletes": 1,
+              "fastLoops": 1,
+              "fastChildren": 1000,
+              "clearDiffMeta": 1019,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "partial",
+            "rows": 1000,
+            "counts": {
+              "frameStart": 1,
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "proofWrites": 1,
+              "proofWriteChildren": 1000,
+              "wDomUpdate": 1903,
+              "updateChildren": 803,
+              "proofReads": 1,
+              "proofDeletes": 1,
+              "fastLoops": 1,
+              "fastChildren": 1000,
+              "clearDiffMeta": 1903,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "swap",
+            "rows": 1000,
+            "counts": {
+              "frameStart": 1,
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 2000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 1000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1003,
+              "updateChildren": 3,
+              "proofReads": 1,
+              "proofDeletes": 1,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 1000,
+              "createdArrays": 1,
+              "clearDiffMeta": 1003,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "remove",
+            "rows": 999,
+            "counts": {
+              "frameStart": 1,
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 1999,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 999,
+              "mapDelete": 999,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1002,
+              "updateChildren": 3,
+              "proofReads": 1,
+              "proofDeletes": 1,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 999,
+              "createdArrays": 1,
+              "clearDiffMeta": 1002,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "replace1k",
+            "rows": 1000,
+            "counts": {
+              "frameStart": 1,
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 999,
+              "diffKeyReads": 1999,
+              "mapHas": 999,
+              "mapSet": 999,
+              "mapGet": 1000,
+              "unusedVisits": 999,
+              "wDomUpdate": 3,
+              "updateChildren": 3,
+              "proofReads": 1,
+              "proofDeletes": 1,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 1000,
+              "createdArrays": 1,
+              "clearDiffMeta": 1003,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "append1k",
+            "rows": 2000,
+            "counts": {
+              "frameStart": 1,
+              "diffLoopChildren": 1,
+              "mapBuildVisits": 1000,
+              "diffKeyReads": 3000,
+              "mapHas": 1000,
+              "mapSet": 1000,
+              "mapGet": 2000,
+              "mapDelete": 1000,
+              "unusedVisits": 1000,
+              "wDomUpdate": 1003,
+              "updateChildren": 3,
+              "proofReads": 1,
+              "proofDeletes": 1,
+              "placementProbeVisits": 1,
+              "matchedArrays": 1,
+              "oiArrays": 1,
+              "moverArrays": 1,
+              "matchAnalysisVisits": 2000,
+              "createdArrays": 1,
+              "clearDiffMeta": 2003,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "clear",
+            "rows": 0,
+            "counts": {
+              "frameStart": 1,
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "create10k",
+            "rows": 10000,
+            "counts": {
+              "frameStart": 1,
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3,
+              "frameEnd": 1
+            }
+          },
+          {
+            "name": "clear10k",
+            "rows": 0,
+            "counts": {
+              "frameStart": 1,
+              "wDomUpdate": 3,
+              "updateChildren": 2,
+              "clearDiffMeta": 3,
+              "frameEnd": 1
+            }
+          }
+        ],
+        "bundleSHA256": "38680230827531bf341a4476f99a8a56855d5976d0dd1482d833a78a906b8f30"
+      }
+    }
+  },
+  "validations": {
+    "baselineNew": {
+      "base": 11,
+      "concurrent": 11
+    },
+    "candidateShared": 229,
+    "candidateLifetime": 4,
+    "candidateAll": 233,
+    "defaultDual": {
+      "passed": 1090,
+      "skipped": 3
+    },
+    "strictTypes": true,
+    "patchReplay": true,
+    "eslint": true
+  },
+  "notRun": [
+    "official B3 browser/keyed/font",
+    "CPU580 opposite orders",
+    "official memory60",
+    "real-browser retention",
+    "final candidate+peer target",
+    "final Test Hardening/Integration"
+  ],
+  "sizeGate": {
+    "budget": 4800,
+    "baseline": 4798,
+    "candidate": 4952,
+    "added": 154,
+    "exceeded": 152,
+    "pass": false
+  },
+  "environment": {
+    "at": "2026-10-23T11:59:23.694Z",
+    "platform": "darwin",
+    "arch": "arm64",
+    "release": "25.5.0",
+    "node": "v20.3.0",
+    "zlib": "1.2.13.1-motley",
+    "initialMissingInputs": [
+      "/Users/superlucky84/project/js-framework-benchmark-upstream/package.json",
+      "/Users/superlucky84/project/js-framework-benchmark-upstream/frameworks/keyed/lithent/src/main.tsx",
+      "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/MacOS/Google Chrome"
+    ],
+    "initialGeneratedBuildDifferences": {
+      "dist/lithent.mjs": {
+        "expected": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "actual": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f"
+      },
+      "dist/lithent.umd.js": {
+        "expected": "1b64873b03874d40999175c2244c84fea27aff6994764ff918f197b30c050773",
+        "actual": "ef1f48dc17504ac6c60c82617c9e1a8fd1b01adbd55b7a6e061738e419cf4414"
+      },
+      "dist/lithent.cjs": {
+        "expected": "60275b5d55315fff6b3038b8dcaa1809dec0a9e1dffea0f58c65c376a545be52",
+        "actual": "c1715fad8c0ea4b15bf603ed8fff8278109e16b6d5c85dd9a19a4e7cc5c63394"
+      },
+      "lithentConcurrent/dist/lithentConcurrent.mjs": {
+        "expected": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c",
+        "actual": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92"
+      },
+      "lithentConcurrent/dist/lithentConcurrent.umd.js": {
+        "expected": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0",
+        "actual": "25568c92870172eae7d2ce0bd51d6fcbb176ca2947e4e7a2e25f7d7fed4add62"
+      }
+    },
+    "siblingAfter": {
+      "head": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+      "status": "## add-lithent...origin/add-lithent\n",
+      "sourceSHA256": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+      "note": "Absent at initialization; checkout appeared externally during this run. This experiment only read it and does not claim to have preserved the historical modified app."
+    },
+    "fixedChromePresent": false
+  },
+  "preservation": {
+    "files": {
+      "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+      "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+      "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+      "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+      "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+      "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+      "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+      "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+      "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+      "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+      "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+      "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+      "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+      "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+      "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+      "src/wDom.ts": "76a9f33aedf0b4f34e5f836a003aa6481581e3cdbde65a5e36cc606d83b8abbb",
+      "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+      "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+      "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+      "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+      "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+      "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+      "dist/lithent.mjs": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f",
+      "dist/lithent.umd.js": "ef1f48dc17504ac6c60c82617c9e1a8fd1b01adbd55b7a6e061738e419cf4414",
+      "dist/lithent.cjs": "c1715fad8c0ea4b15bf603ed8fff8278109e16b6d5c85dd9a19a4e7cc5c63394",
+      "lithentConcurrent/dist/lithentConcurrent.mjs": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92",
+      "lithentConcurrent/dist/lithentConcurrent.umd.js": "25568c92870172eae7d2ce0bd51d6fcbb176ca2947e4e7a2e25f7d7fed4add62",
+      "element/dist/lithentElement.umd.js": "5a4c46084d86263a417e8d3aeccbd370334f42eda82b0de53519c8fc9c2ba826",
+      "package.json": "1288231593e510a2c84a1f0416681709496ce37558878e27adc7e7795ca8f336"
+    },
+    "verifiedUnchanged": 29,
+    "defaultRuntimeEdited": false
+  },
+  "evidence": {
+    "file": "docs/benchmark/keyed-placement-evidence.json.gz",
+    "sha256": "8ee32f171df7a45df6b2bc4494a2589cc025c0c8581ed6ed336883af811b555e",
+    "bytes": 1089255,
+    "entries": 212
+  }
+}

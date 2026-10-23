@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-23. 상태: **DC-16 CPU1,450/메모리150·독립 감사·별도 진단 완료. CPU 목표 합산5/9 통과로 미달. 다음은 DC-17 C2 한정 후보이며 기본 runtime 보존**.
+- 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
@@ -11,7 +11,7 @@
 - **계측 build와 공식 production build를 분리한다.** 성능 측정 중 빌드·단위 테스트·다른 벤치마크를 동시에 돌리지 않는다. 공식 warmup·CPU throttle·GC·paint 계산은 유지한다.
 - 아래 기준 검사 묶음은 매 단계의 gate다. 같은 소스·번들·환경 해시에서 이미 통과한 결과는 재사용할 수 있다. 문서만 바뀐 경우 무거운 테스트를 다시 돌리지 않는다. 런타임 변경·실패·해결되지 않은 우려가 생기면 관련 검사를 다시 수행한다.
 - **B1 기본 계약:** 변경 관련 공통 core 테스트를 base와 concurrent에 각각 실행하고, 해당 단계 종료 전에 `pnpm test:dual` 결과를 확보한다. 두 코어 중 하나를 수정하지 않더라도 공유 타입/helper 영향과 기본 동작을 확인한다.
-- **B2 빌드·크기:** 필요한 패키지를 빌드하고 `pnpm size`로 기존 한도를 확인한다. 최종 단계에서는 `pnpm build`와 `pnpm verify:concurrent`도 통과해야 한다. 크기 스크립트는 파일이 없으면 skip하므로 대상 세 UMD가 존재하는지 먼저 확인한다.
+- **B2 빌드·크기:** 필요한 타입/패키지 빌드를 통과하고 `pnpm size`의 기존 기준/실제 초과량을 공개한다. 현재 사용자 지시(R11/R34)는 렌더 성능 우선이므로 소폭 크기 초과만으로 CPU/메모리 평가를 멈추지 않는다. 기존 script의 실패를 통과로 표시하거나 영구 숫자 예산을 임의 변경하지 않는다. 최종 `pnpm build`와 `pnpm verify:concurrent`의 타입/코드생성·정합성 결함은 해결하며 크기 초과 결과는 위 정책으로 분리한다. 크기 스크립트는 파일이 없으면 skip하므로 대상 세 UMD가 존재하는지 먼저 확인한다.
 - **B3 앱 계약:** 기존 `targeted-update.mjs contracts`와 `verify`에서 keyed, 9개 동작, glyph font, DOM 정체성·mutation·일괄 갱신 순서·재생성을 기준/후보 양쪽에 확인한다. 러너의 기존 계약 검사로 새 API 경로를 검증할 수 없는 경우 명시적으로 확장한다.
 - **B4 전체 회귀:** `pnpm build`, `pnpm test`, `pnpm test:dual`, `pnpm test:e2e`를 최종 후보 해시에 대해 확보한다. 수정 파일의 ESLint/Prettier 및 `git diff --check`도 포함한다.
 
@@ -49,9 +49,9 @@
 
 진입: Phase 1에서 해당 비용이 확인되고 DC-6의 저장/진입 방식이 정해짐. 종료: 후보별 정합성·작업량 감소 여부·비용이 기록되어 다음 분기로 판단 가능.
 
-현재 상태: Phase 1 `979f88f` 뒤의 C1 한정 검증을 완료했다. [보고서](../benchmark/PARENT_POSITION_RESULTS.md), [raw 결과](../benchmark/parent-position-results.json), [압축 증거](../benchmark/parent-position-evidence.json.gz), [후보 패치](../benchmark/parent-position-candidate.patch)에 보존했다. slot/concurrent는 미수정이다. 큰 목록 반복 자체 갱신의 이득은 확인했지만 원래 앱 가중 전체 −0.55% 단일 차수·크기 한도 +53B여서 기본 채택은 보류하고 baseline으로 복원했다. C2는 구현하지 않은 보류 후보이며 Phase 3의 C3 계약·기준 회귀로 진행했다.
+C1 실행 당시 상태: Phase 1 `979f88f` 뒤의 C1 한정 검증을 완료했다. [보고서](../benchmark/PARENT_POSITION_RESULTS.md), [raw 결과](../benchmark/parent-position-results.json), [압축 증거](../benchmark/parent-position-evidence.json.gz), [후보 패치](../benchmark/parent-position-candidate.patch)에 보존했다. slot/concurrent는 미수정이다. 큰 목록 반복 자체 갱신의 이득은 확인했지만 원래 앱 가중 전체 −0.55% 단일 차수·크기 한도 +53B여서 기본 채택은 보류하고 baseline으로 복원했다. 당시 C2는 구현하지 않은 보류 후보여서 Phase 3의 C3 계약·기준 회귀로 진행했다. 후속 C2 실행은 아래 DC-17과 구분한다.
 
-- [x] C1만 독립 구현·검증했다. C2는 미구현 보류이며 완료로 간주하지 않는다.
+- [x] 이 Phase에서는 C1만 독립 구현·검증했다. 당시 C2는 미구현 보류이며 완료로 간주하지 않는다.
 - [x] C1 구현 전에 [부모 위치 회귀 4개](../../src/tests/core-parentPosition.test.tsx)를 추가하고 기준선 base/concurrent 각각 4개 통과: index 0·말미 반복/재정렬/추가/삭제 뒤 자체 renew, shared slot의 앞쪽 live alias 첫 등장 동기화, 같은 컴포넌트 VDOM 설명의 다중 위치 독립 수명, compKey 없는 공개 `replaceWDom`. 이는 후보 통과가 아니며 C2 전용 same-order 중복 키·mixed 목록은 재개 시 별도 준비한다.
 - [x] C1의 base/concurrent 공유 회귀·기존 lifecycle suite와 브라우저 계약 통과. 새 배열·합성 stale fallback, slot 첫 등장 동기화 확인. concurrent 이식은 하지 않음.
 - [x] C1의 68개 카운터 검사, 24개 시간 context, 6개 heap/회수 context에서 새 비용 기록. 조상 slot과 원래 Table의 전체 순회는 남음. C2 Set 비용은 Phase 1 shadow 이외 새 측정 없음.
@@ -134,21 +134,48 @@
 
 기준 검사: 측정 전후 default28파일/package/sibling·peer source/lock/의존성·Chrome/엔진·runner hash, 앱별 gate, 표본 완전성·반대 순서·독립 통계·로컬 링크. CPU 중 build/test 금지. 최종 Phase5/6의 새 후보 검증은 별도다.
 
-### DC-17 다음 실행 — C2의 현재 diff 결과 전달
+### DC-17 — C2의 현재 diff 결과 전달·size 탈락 후보 정리
 
-진입: DC-16 전체 비교·진단을 완료하고 DESIGN DC-17의 범위를 고정함. 종료: 같은 원래 앱의 core-only 이득/손해와 정합성·메모리·크기·복원 증거가 있어 다음 분기를 판단할 수 있음.
+진입: DC-16 전체 비교·진단과 DESIGN DC-17의 범위·metadata 수명 계약 확정. 종료: gate 통과 시 같은 원래 앱의 core-only 이득/손해와 정합성·메모리·크기·복원 증거로 판단하거나, gate 실패 시 후보·실패 증거·runtime 복원과 미실행 범위를 남겨 이번 후보를 미채택으로 종료함.
 
 - [x] 범위: 기존 general keyed Map 이후의 현재 결과를 render에 전달해 중복 인덱스/배열 처리를 줄인다. 새 key preflight/Set/immutable 가정/공개 API 없이 시작한다.
-- [ ] metadata의 저장·현재 diff 성공 후 게시·일회 소비·실패/삭제/재진입 폐기를 결정하고 기본 경로/fallback 비용을 기록한다.
-- [ ] DESIGN의 baseline 회귀를 두 코어에 먼저 추가한다. 원본 hash·앱/helper·브라우저·별도 스냅샷을 고정한다.
-- [ ] base 한정 프로토타입과 별도 카운터로 배열/방문 제거·실패 경로를 확인한다. 실제 app/default runtime과 실험 snapshot을 혼동하지 않는다.
-- [ ] 후보 B1 dual·B2 타입/빌드/size·B3 원래 앱 정체성/keyed/9동작/font를 확인한다. 4,800B 초과를 통과로 바꾸지 않는다.
-- [ ] 같은 앱의 baseline/후보 CPU9항목 양순서580·공식 메모리60·별도3context/조건 retention을 직렬 수집하고 독립 통계·전후 hash를 감사한다. DC-16과 표본을 합치지 않는다.
-- [ ] 후보 소스/패치/증거와 채택 또는 보류 이유를 보존하고 자신의 runtime 변경만 복원한다. 최종 후보/peer 비교·Phase5/6은 남긴다.
+- [x] metadata 계약은 root-scoped `frame={proofs: WeakMap<WDom,WDom[]>, ready, invalid}`로 확정했다. 현재 general diff가 성공한 node/children 배열을 stage하고 root diff·wrapper 게시 뒤 ready, `typeUpdate`의 loop 진입에서 props/DOM setter/콜백 전 get/delete 후 identity/ready/invalid 검사, root finally에서 frame 전체 폐기/이전 frame 복원이다. 중첩 재진입은 바깥 frame을 무효화한다. WDom shape/clone 필드·uniqueness 사전검사는 추가하지 않는다. 구현·비용 검증 완료를 뜻하지 않는다.
+- [x] 재개 시 과거 upstream sibling·staging·고정 Chrome155가 없었고, 실행 중 clean 원래앱 upstream checkout이 외부에서 출현했다. 그 checkout은 과거 targeted 앱과 다르며 이번 작업은 생성/수정하지 않았다. staging/고정 Chrome155 부재가 계속되어 B3/공식 측정은 같은 환경 복원 전 불가하다. 초기 부재·외부 출현과 기본28파일/package 사전 상태를 구분한다. size 실패 시 측정용 환경을 새로 설치하지 않는다.
+- [x] [공통 회귀](../../src/tests/core-placementProof.test.tsx)는 초기10개를 기본 base/concurrent에서 먼저 통과했고 최종 children getter 순서1개를 추가해 base/concurrent/candidate 각각11개 통과했다. 특수/중복/혼합 키·empty/tag 교체·pre callback 후속 key mutation·Fragment arity·portal/외부 형제·focus/자체 renew·callback/재예약·diff throw 뒤 live sibling 재개·동기 wrapper 교체를 확인했다. base/concurrent의 기존 매칭/children 읽기 순서 차이도 보존한다.
+- [x] 실제 사전29파일·소스/격리 baseline·후보·앱/helper·도구 hash와 환경 변동을 [raw](../benchmark/keyed-placement-results.json)에 고정했다. archive에서 원래 앱/cacheUpdate를 hash 검증해 추출했다. 브라우저 부재 기록은 B3 복원 완료를 뜻하지 않는다.
+- [x] base 프로토타입은 영구 WDom 필드 없이17모듈로 격리 구현했다. 원래 Map 구성 뒤 children을 읽는 관측 순서를 유지한다. 최종 엄격 타입/빌드·17모듈 declaration pair, 후보 shared229+수명4=233회귀, root/candidate source·test strict 타입과 변경 TypeScript ESLint/Prettier가 통과했다.
+- [x] 기본 `pnpm test:dual`은 초기10회귀 시점1,090 passed·3 skipped였다. 첫 실행의 기존 lithentVite3실패는 stale hmr-parser dist였으며 소스 변경 없이 `pnpm build:hmrParser` 후 통과했다. 마지막 read-order1개는 unchanged base/concurrent targeted와 후보 전체233에서 추가 확인했다. 초기 full dual과 최종 targeted·후보 전체를 구분한다.
+- [x] 별도 JSDOM11동작씩에서 선택/선택이동/partial의4배열·1,000인덱스 방문이0으로 줄고 Map/키 접근·content/cleanup은 전동작 동등했다. fallback 배열/방문은 그대로이며 proof lookup/delete가 추가된다. 매동작 frame1개 생성/정리를 확인했다. [수명4회귀](../../experiments/keyed-placement/lifetime.test.tsx)는 stage/consume, 뒤 diff throw의 미방문 proof 폐기, DOM throw, 중첩 invalidation/복원을 확인했다. 실제 보유 메모리나 모든 in-place VDOM mutation을 검증한 것은 아니다.
+- [ ] 최종 채택 후보의 B1~B3/size 전체 통과: 이번 후보는 아래 size 실패로 미완료이며 B3 원래 앱/keyed/9동작/font 실브라우저 검사는 미실행이다.
+- [x] 후보 UMD raw/gzip/br13,210/5,348/4,952B를 baseline12,741/5,178/4,798B와 대조했다. br+154B이며 한도152B 초과다. 이번 프로토타입은 미채택으로 보존하고 공식 CPU580/메모리60·retention/B3는 실행하지 않는 분기를 확정했다. 전체 후보 gate 통과로 체크하지 않는다.
+- [ ] **이번 후보는 size 실패로 미실행:** gate 통과 후 같은 앱의 CPU9항목 양순서580·공식 메모리60·3context/조건 retention·독립 통계/전후 hash 감사. DC-16과 표본을 합치지 않는다.
+- [x] size 실패 분기의 [결과](../benchmark/KEYED_PLACEMENT_RESULTS.md)·[패치](../benchmark/keyed-placement-candidate.patch)·[영구 증거](../benchmark/keyed-placement-evidence.json.gz)·[재현 도구](../../experiments/keyed-placement/README.md)를 보존했다. 기본29파일은 사전 상태와 바이트 일치하고 root runtime 복원은 불필요했다. sibling은 외부 출현 상태를 읽기만 했다. Python의212개 archive entry·154counter 비교·size/29guard·패치17source replay 감사를 통과했다. 공식 CPU/메모리/retention/B3는 미실행이며 이번 프로토타입만 미채택으로 종료한다.
 
-기준 검사: baseline 회귀 → 후보 B1~B3 → 실제 제거 작업/전체CPU·메모리·크기 → 복원28파일/package/sibling·local links. 진단 위치가 실제 비용 절감이나 전 항목 목표 달성을 보장하지 않는다.
+기준 검사: baseline 회귀 → 후보 B1~B3/size → 통과 시 실제 제거 작업/전체CPU·메모리, 실패 시 실패 증거/미실행 기록 → 복원28파일/package/sibling·local links. 진단 위치나 수명 계약 확정이 실제 비용 절감·전 항목 목표 달성을 보장하지 않는다.
 
-진입: 후보별 B1~B3 통과 및 immutable production staging 완료. 종료: 모든 항목의 실제 이득/손해와 불확실성이 같은 환경에서 비교됨.
+DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실행이었다. 기본28파일·package 사전 hash와 sibling의 초기 부재→clean 원래앱 외부 출현을 구분하며 새 checkout을 수정하지 않았다. 과거 targeted sibling의 hash 보존이나 브라우저 검증 완료를 주장하지 않는다. 별도 JSDOM 구조계측은 영구 DC-16 archive에서 원래앱/cacheUpdate를 hash 검증해 추출했고 공식 B3/실브라우저/CPU/retention과 구분했다. 당시의 core/size gate 종료를 현재 후속의 조기 종료 조건으로 적용하지 않으며 새 측정은 R11/R34와 DC-18에 따른다.
+
+이번 실행은 size 실패 분기를 완료했다. 기본 runtime은 격리 실험 전 사전29파일 상태로 유지되며 공식 시간·공식 메모리·retention·브라우저 B3·최종 B4/Phase5/6은 미실행/미완료다. 최종 증거는212entries/1,089,255B·SHA-256 `8ee32f171df7a45df6b2bc4494a2589cc025c0c8581ed6ed336883af811b555e`다. 이전 br4,951B의 archive/results/patch/report는 내부 `superseded/source-order-v1/`에 보존하며 현 최종 수치·hash와 합치지 않는다. C2의 다른 전달비용 대안은 후속 미결정으로 남긴다.
+
+### DC-18 — compact13 기본 반영·한정 통합/보존 감사 완료
+
+진입: DC-17/Preact 검토 보존과 엔진별 layout 진단 범위 확정. 종료: 선택 compact13의 실제 성능/메모리·동일 default artifact·한정 통합/영구 보존 감사 완료. 전체 peer 목표·광범위 Phase5/6 완료와 구분한다.
+
+- [x] **A 입력/smoke:** 고정 Chrome156.0.8078.47/V8 15.6.75.19·Node25.6.1, archive 원래앱/helper/runner/CSS/fonts185파일·동일 package.json/별도 lock을 고정했다. source probe/IC flags와 실제 CPU/메모리 production lane을 분리했다. sandbox smoke 실패·CPU 전 자체 wrapper 스키마 오류는 보존하고 공식 runner/workload는 변경하지 않았다.
+- [x] **B baseline/후보 진단:** baseline/full/compact의 fast-property·Map·IC/deopt/함수/source 귀속을 구분했다. 모든 live dictionary0과 ever-N39→9를 확인했지만 이 계수 자체를 속도 점수로 쓰지 않았다. exact V8 tag·raw H 해석·누락/프로브 한계를 보존했다.
+- [x] **C full22 대조:**229shared/17pairs, CPU580/메모리60/retention6context·실패/경고0과192분포/9가중값을 확보했다. total−4.8664%/JS−12.1886%·10k 메모리+14.95%·UMD4,854B를 미채택 대안으로 보존했다. compact 준비/실행으로 자료를 취소하거나 덮어쓰지 않았다.
+- [x] **D compact 범위/회귀:** hot13 초기 선언·희소9 필요 시 추가로 제한하고 allocation site/인자·Map/LIS/helper·wrapper/event/앱을 유지했다. full 수집 뒤 별도 `compact-experiment`에서229shared/17pairs와 UMD4,824B를 확인했다. IC3context ever-N9/final-N9/P73·wrong-map27·probe Map3/fast/dictionary0을 보존했다.
+- [x] **E compact 실제 수집/감사:** 새 동차수 baseline으로 CPU580/메모리60/retention6을 직렬 수집했다. total−5.8917%/JS−14.4232%, main−6.6228%/reverse−5.1433%·9pooled total 중앙값 하락·10k 메모리+2.4747%(+0.6801MB)를 확인했다. CPU reverse partial/메모리 main ready 각1실패는 자동 재시도·원자료 보존했고 CPU 경고0이다. 두 실험 합계384분포/18가중값 독립 Python1e-12 감사 완료이며 raw를 합산하지 않았다.
+- [x] **F 기본 source 적용:** 적용 전29guard/`before-adoption.json` 뒤 측정한 `src/wDom.ts`·새 `src/utils/createWDom.ts`를 복사했다. default3JS가 측정 후보와 byte/hash 일치한다. 최종79파일 manifest와 초기29 중6변경을 기록했다. concurrent 소스 미수정이며2concurrent JS 변화는 초기 stale 산출물 재빌드다.
+- [x] **G 한정 통합:** 측정 종료 뒤 build:sequence/build:parallel·verify:concurrent ALL PASS, dual1,092 passed/3 existing skipped, strict core/concurrent/e2e 타입·ESLint·Playwright64/retry0을 통과했다. SSR/hydration·HMR·helper/context·예제/docs를 포함하며 optional metadata own-key 차이는 공개했다. root Vitest420 등 dual에 포함된 검사를 별도 pnpm test로 반복하지 않았다. 광범위 B4/Phase5/6 전체 완료는 주장하지 않는다.
+- [x] **H size guard:** reference4,800B+이번 검증24B allowance=4,824B/실제4,824B·추가 여유0, concurrent6,903/9,000B·element998/1,000B strict 통과다. full+54B 허용이나 광범위 영구 예산을 compact에 자동 이전한 것이 아니다. 형식/압축 환경 차이를 기록하고 실제 선택 artifact와 연결했다.
+- [x] **I 보존/독립 감사:** [보고서](../benchmark/NODE_SHAPE_RESULTS.md)·[raw/적용 manifest](../benchmark/node-shape-results.json)·[선택 패치](../benchmark/node-shape-candidate.patch)·[full 패치](../benchmark/node-shape-full-candidate.patch)·[증거](../benchmark/node-shape-evidence.json.gz)·[도구](../../experiments/node-shape/README.md)를 보존했다. 최종1,367entries/18packed rawlogs·33,532,452B·SHA-256 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.384분포/18가중·4,380IC access-site/724raw deopt·CPU1,160/메모리120/retention12/최종79파일 독립 감사 완료다.
+
+판정: compact13을 기본 base에 반영했다. full22는 미채택 대안으로 유지한다. 전체 peer1.10 목표·다른 후보 연구·광범위 Phase5/6은 별도 미완료다. DOM/listener0을 전체 heap 누수 부재로, core/통합 검사를 전면 own-key 동등성으로 확대하지 않는다. 커밋/푸시/릴리스는 하지 않았다.
+
+### 후속 채택 후보의 전체 성능 검증
+
+진입: 후보별 정합성/B1·B2 타입/빌드·앱/B3와 immutable production staging 완료, 실제 크기 비용 공개 및 R11/R34 평가 정책 적용. 소폭 크기 초과 단독 중단은 적용하지 않음. 종료: 모든 항목의 실제 이득/손해와 불확실성이 같은 환경에서 비교됨.
 
 - [ ] 같은 앱·helper의 core-only 대조 및 필요 시 동일 구조의 opt-in 대조를 분리. 원래 앱 대비 최종 앱 결과는 별도 표로 제공.
 - [ ] 전체 9 CPU 항목을 원순서·반대 순서로 측정. 기본 표본 계획은 선택 25개/다른 항목 15개씩, 두 앱×두 차수 580개이며 정확한 러너 버전·설정을 기록. 부족한 신뢰도나 실패가 있으면 이유와 추가 계획을 먼저 기록.
@@ -196,7 +223,7 @@
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13 통제 앱 CPU/메모리·DC-14 heap 귀속·DC-15 실제 캐시 앱 대조도 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16의 전체 peer 기준·별도 진단을 완료했고 DC-17 C2가 다음 후보다. 새 후보·최종 채택은 미완료다.
+- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13 통제 앱 CPU/메모리·DC-14 heap 귀속·DC-15 실제 캐시 앱 대조도 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16 전체 peer 기준·진단 뒤 DC-17 C2 sidecar 프로토타입의 한정 검증/계측·size 탈락·증거 보존으로 실험을 종료했다. 다른 후보·최종 채택은 미완료다.
 - [x] **IC-1 CPU 확정:** 사용자2026-10-23 선택으로 고정 React/Preact hooks/classes 네 peer 최저 전체 시간 중앙값 대비1.10배 이하를9항목 전부 만족하는 목표를 택했다. DC-16의 같은 차수 합산/차수별 수치와 upstream 가중치/색상 함수를 보존한다. memory·size는 별도 비용, startup은 이번 범위 제외이며 최종 메모리 교환 상한은 IC-2에 남긴다.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
 - [ ] **IC-3 조건부 TBD:** 기본 경로 격리는 DC-12에서 검증했지만 별도 렌더러는 br 5,691B다. 기능 이득·비용을 본 뒤 공개 경로/별도 예산을 결정한다. 기존 한도 변경이나 초과 해소로 표시하지 않는다.
@@ -204,8 +231,7 @@
 
 ## 상태 / 핸드오프
 
-- done: DC-16의 고정 다섯 production gate·CPU1,450/메모리150표본을 양순서 실패0으로 완료했다. 분포480/가중69개와 목표·색상/정규화를 독립 감사했다. 별도 profile119/120유효·독립 trace4context/40구간과 첫 제외 시도도 보존했고 Python으로 제외/함수 합계/구간을 감사했다. [결과](../benchmark/PEER_BASELINE_RESULTS.md)·[비교표](../benchmark/PEER_BASELINE_TABLE.html)·raw/증거·재현 도구를 남겼다.
-- goal: CPU 기준은 각9항목의 고정 네 peer 최저 total 중앙값 대비1.10배 이하다. 합산5/9·첫5/9·반대6/9 통과로 미달이다. 선택1.630×/부분 갱신1.269×가 큰 격차다. 한 행 삭제1.103×는 차수별 경계를 오가므로 작은 초과를 확정하지 않는다. memory/size는 별도 비용이다.
-- next: DC-17 C2의 현재 diff 증명→render 전달 범위에서 metadata 수명/fallback을 먼저 확정하고 baseline 회귀→base 프로토타입→B1~B3/size→같은 앱 CPU580/메모리60·retention→복원/증거 순으로 진행한다. 기존 Map 소비/키 읽기·helper와 실제 sibling 앱을 유지한다.
-- blockers: 실행 블로커 없음. CDP 음수 간격 원인은 미확정이며 제외 원본을 보존했다. C2 구현/이득·메모리 교환 상한·최종 B4/Test Hardening/Integration은 미완료다. C3는 기존 앱 개선안으로 미채택이다.
-- commit: DC-16 측정 기준은 `6bd3b3317ae73562afc49479bd3ed0ba952ce8ab`다. DC-16 도구/문서/증거와 DC-17 계획을 `perf: record fixed peer baseline and C2 follow-up plan`으로 함께 기록한다. 후속 확정 SHA와 푸시 상태는 `git log -1` 및 이 브랜치의 ctxbin 컨텍스트에서 확인한다. default28파일/package/sibling·고정 입력1,228개를 보존했다.
+- done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.
+- next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
+- blockers: DC-18의 남은 구현/검사/보존 블로커는 없다. 전체 peer 목표는 미검증이다. optional metadata own-key 차이를 공개하며 전면 동등성·모든 heap 누수 부재·보편적 성능 우위를 주장하지 않는다. compact2실패 배치/재시도와 full/compact 시점·표본은 분리 보존한다.
+- commit: 현재 HEAD는 `452dc2eeae29d1e555f7f7b467f01de2baa55c0d`이며 이번 변경은 미커밋이다. 푸시/릴리스/upstream 제출은 하지 않았다. 적용 직전29guard 뒤2소스/size guard를 반영했고 최종79파일 manifest에 의도된6기존파일 변화를 기록했다. concurrent 소스는 미수정이다. 최종 증거 SHA-256은 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.

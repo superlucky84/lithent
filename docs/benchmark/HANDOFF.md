@@ -1,5 +1,99 @@
 # summary
 
+## DC-18 common-field factory adopted — 2026-10-24
+
+- User priority: keep watching size, but consider modest excess for rendering
+  gains. The selected candidate keeps the 4,800B reference and an explicit
+  measured24B allowance: **4,824/4,824B br**, zero extra headroom. This is not a
+  broad future budget. UMD baseline4,798B, selected4,824B (+26B).
+- [Report](./NODE_SHAPE_RESULTS.md), [raw/adoption manifest](./node-shape-results.json),
+  [evidence](./node-shape-evidence.json.gz), [selected patch](./node-shape-candidate.patch),
+  [full22 alternative](./node-shape-full-candidate.patch), [tools](../../experiments/node-shape/README.md).
+  Work directory: `/private/tmp/lithent-shape-20261023`; fixed Chrome copy:
+  `/tmp/lithent-shape-chrome-156.0.8078.47.app` (Chrome156/V8 15.6.75.19).
+- Adopted compact13 initializes common WDom fields in one factory; component/root
+  metadata stays sparse. Only `src/wDom.ts`, new `src/utils/createWDom.ts`, and
+  the size policy change in the runtime/tooling scope. Matching/LIS, anchors,
+  wrappers, events, helper and original benchmark app remain unchanged.
+- Compact same-app CPU580/memory60, two opposite orders: weighted total
+  **−5.8917%**, JS **−14.4232%**; main/reverse total−6.6228%/−5.1433%.
+  All9pooled total medians decrease (partial−10.15%, select−25.34%). Memory
+  1k+1.77%, update5+1.12%,10k **27.483558→28.163685MB (+0.680128/+2.47%)**.
+  Two failed browser batches (CPUreverse partial detachedFrame, memmain ready
+  Targetclosed) automatically retried successfully; failed raw files remain.
+  CPU warnings0. Nonisolated machine/load and order variation limit claims.
+- Full22 is unadopted: its separate baseline CPU580/memory60 has total−4.8664%,
+  JS−12.1886%,10k memory+14.95%/+4.1087MB, UMD4,854B. Never combine full/compact
+  raw timings. Both have6fresh retention contexts/100create-clear+100updates,
+  no DOM/listener growth; that does not establish all-heap leak absence.
+- Diagnostics are separate flagged runs/source probes, never scores. Original
+  live1k tree10,034nodes has9→12→13maps and fast properties/dictionary0; full
+  probe1map, compact3maps. Fresh baseline/full/compact IC contexts have
+  ever-N39/9/9 and aggregate wrong-map records66/12/27. Raw IC transitions and
+  deopt records do not measure access frequency/time share. Original cached
+  select/partial handlers have0listener adds/removes. See the corrected
+  [five-cause review](./PREACT_CAUSE_REVIEW.md).
+- Validation: both candidates229shared regressions/17declaration pairs. Default
+  full-build phases `pnpm run build:sequence`/`build:parallel`,
+  `pnpm verify:concurrent`, strict core/concurrent/e2e types and changed-file
+  ESLint pass. `pnpm test:dual`: **1,092passed/3existing skipped**. Browser
+  integration: **64passed**, retries0, SSR/hydration/HMR/helper/identity/apps/docs.
+  All3actual base JS hashes exactly match the measured compact candidate. Size
+  strict passes (concurrent6,903/9,000B, element998/1,000B).
+- Preservation: default29 hashes matched through both experiments and directly
+  before adoption (`before-adoption.json`). Deliberate final adoption has79file
+  hashes; concurrent source unchanged but rebuilding updates2initially stale
+  concurrent JS outputs. Original sibling hashes still match. Both17source
+  patches replay exactly. Initial generated differences from historical artifacts
+  are separate provenance. Fixed Node20 gzip comparison is +18B; `pnpm size`
+  uses Node24/zlib1.3.1 and reports5,187B gzip, same4,824B Brotli.
+- Independent audit: **384distributions/18weighted values**, 1e-12,
+  over CPU1,160/memory120 total across both experiments; decoded entry hashes,
+  4,380raw IC access-site summaries,724raw deopt records,retention12contexts and
+  final79file hashes pass. Evidence1,367entries/33,532,074B, SHA256
+  `86b390a2c9ed09503361cd474cd122dfe16677d5afc7405689b1d956024baaef`.
+  All18target renderer logs are nested gzip;1,160normal traces inventoried,
+  8selection traces and all failed attempts retained in full.
+- Next: the selected candidate is applied and this experiment is complete. The fixed four-peer
+  all9≤1.10×CPU target is not remeasured or proved by DC-18. C2 CPU/memory,
+  event-proxy workloads and other scoped candidates remain separate work.
+  The user requested a commit, push and ctxbin handoff. Record the resulting
+  commit SHA and push state in this handoff and the branch context before stopping.
+
+## DC-17 C2 prototype deferred by size gate — 2026-10-23
+
+- [Report](./KEYED_PLACEMENT_RESULTS.md), [raw](./keyed-placement-results.json),
+  [patch](./keyed-placement-candidate.patch), [evidence](./keyed-placement-evidence.json.gz),
+  [reproduction](../../experiments/keyed-placement/README.md).
+- done: resolved root-scoped WeakMap proof publication/consumption/cleanup and
+  evaluated one isolated base prototype. New shared baseline11×base/concurrent,
+  candidate229shared+4lifetime=233, default dual1,090passed·3skipped, strict types,
+  declaration/build and patch replay passed. A stale generated HMR parser caused
+  the initial dual failures; rebuilding only that prerequisite fixed the run.
+  Full dual contains the initial10new regressions; the final children-read-order
+  regression was separately checked on both cores and the full final candidate.
+- gate: UMD br **4,952 / 4,800B**, baseline4,798B: +154B, **152B over budget**.
+  This prototype is not adopted. Official B3, CPU580, memory60 and browser retention
+  were not run. Final candidate/peer goal and Test Hardening/Integration remain open.
+- diagnostic: the archived exact original app/helper ran under JSDOM for11actions×2.
+  Select/next-select/partial each remove4temporary arrays and1,000index-analysis
+  visits; Map/key reads/content/cleanup counts remain equal. Structural fallback
+  retains its work and pays proof lookup/delete. No timing/retention gain is claimed.
+- preservation: all29initial default source/build/package files are unchanged;
+  no runtime restoration was needed. Initial generated outputs differ from the
+  historical report, but isolated baseline rebuilds reproduce all3historical base
+  JS hashes. Evidence212entries/1,089,255B, SHA256
+  `8ee32f171df7a45df6b2bc4494a2589cc025c0c8581ed6ed336883af811b555e`;
+  independent Python checks212decoded hashes/154counter comparisons/default guards.
+- environment: upstream checkout was initially absent and appeared externally
+  during this run as a clean original-app checkout at `ecbff5f`; we only read it.
+  It differs from the handoff's modified targeted app. Fixed Chrome155 and the old
+  staging remain absent. Size already stops this prototype before browser gates.
+- next: another C2 transfer design would need a substantially smaller lifetime
+  mechanism and fresh gates; no alternative is selected here. Preserve this size
+  result separately from the still-unmet DC-16 CPU target. Latest committed HEAD
+  remains `452dc2e`; this follow-up is uncommitted. No push/release/submission.
+
 ## DC-16 전체 peer 비교·진단 완료, 다음은 DC-17 C2 — 2026-10-23
 
 - [보고서](./PEER_BASELINE_RESULTS.md), [지표/차수 전환 표](./PEER_BASELINE_TABLE.html), [raw](./peer-baseline-results.json), [증거](./peer-baseline-evidence.json.gz), [도구](../../experiments/peer-baseline/README.md).
