@@ -1,0 +1,60 @@
+diff --git a/src/render.ts b/src/render.ts
+index 5d9163c..43f0ec7 100644
+--- a/src/render.ts
++++ b/src/render.ts
+@@ -228,20 +228,32 @@ const moving = new Set<WDom>();
+
+ const findChildFragmentNextElement = (
+   candidiateBrothers: WDom[]
+-): HTMLElement | DocumentFragment | Text | undefined =>
+-  candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
+-    (targetEl, bItem) => {
+-      if (targetEl || (moving.size && moving.has(bItem))) return targetEl;
+-      const { type, el } = bItem;
+-      if (type && checkVirtualType(type)) {
+-        const found = findChildFragmentNextElement(bItem.children || []);
+-        if (found) return found;
+-      }
+-      if (el && el.nodeType !== 11) return el;
+-      return targetEl;
+-    },
+-    undefined
+-  );
++): HTMLElement | DocumentFragment | Text | undefined => {
++  let targetEl: HTMLElement | DocumentFragment | Text | undefined;
++  const length = candidiateBrothers.length;
++  for (let index = 0; index < length; index++) {
++    if (!(index in candidiateBrothers)) continue;
++    const bItem = candidiateBrothers[index];
++    // reduce reads later indexed values even after an anchor was found.
++    if (!targetEl) {
++      targetEl = findFragmentNextElement(bItem);
++    }
++  }
++  return targetEl;
++};
++
++const findFragmentNextElement = (
++  bItem: WDom
++): HTMLElement | DocumentFragment | Text | undefined => {
++  if (moving.size && moving.has(bItem)) return undefined;
++  const { type, el } = bItem;
++  if (type && checkVirtualType(type)) {
++    const found = findChildFragmentNextElement(bItem.children || []);
++    if (found) return found;
++  }
++  if (el && el.nodeType !== 11) return el;
++  return undefined;
++};
+
+ const typeReplace = (newWDom: WDom) => {
+   const parentWDom = getParent(newWDom);
+@@ -409,7 +421,7 @@ const updateChildren = (newWDom: WDom) => {
+         }
+       }
+
+-      const first = findChildFragmentNextElement([item]);
++      const first = findFragmentNextElement(item);
+       if (first) {
+         anchor = first;
+       }

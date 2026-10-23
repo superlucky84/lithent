@@ -211,7 +211,7 @@ const startFindNextBrotherElement = (
   // After the brothers, a fragment or loop parent goes on with its own next
   // brother, up to the root's after element.
   return (
-    findChildFragmentNextElement(brothers, brothers.indexOf(wDom) + 1) ||
+    findChildFragmentNextElement(brothers.slice(brothers.indexOf(wDom) + 1)) ||
     (checkVirtualType(parentWDom.type)
       ? parentWDom.isRoot
         ? parentWDom.ae
@@ -227,21 +227,31 @@ const startFindNextBrotherElement = (
 const moving = new Set<WDom>();
 
 const findChildFragmentNextElement = (
-  candidiateBrothers: WDom[],
-  start = 0,
-  end = candidiateBrothers.length
+  candidiateBrothers: WDom[]
 ): HTMLElement | DocumentFragment | Text | undefined => {
-  for (let index = start; index < end; index++) {
+  let targetEl: HTMLElement | DocumentFragment | Text | undefined;
+  const length = candidiateBrothers.length;
+  for (let index = 0; index < length; index++) {
     if (!(index in candidiateBrothers)) continue;
     const bItem = candidiateBrothers[index];
-    if (moving.size && moving.has(bItem)) continue;
-    const { type, el } = bItem;
-    if (type && checkVirtualType(type)) {
-      const found = findChildFragmentNextElement(bItem.children || []);
-      if (found) return found;
+    // reduce reads later indexed values even after an anchor was found.
+    if (!targetEl) {
+      targetEl = findFragmentNextElement(bItem);
     }
-    if (el && el.nodeType !== 11) return el;
   }
+  return targetEl;
+};
+
+const findFragmentNextElement = (
+  bItem: WDom
+): HTMLElement | DocumentFragment | Text | undefined => {
+  if (moving.size && moving.has(bItem)) return undefined;
+  const { type, el } = bItem;
+  if (type && checkVirtualType(type)) {
+    const found = findChildFragmentNextElement(bItem.children || []);
+    if (found) return found;
+  }
+  if (el && el.nodeType !== 11) return el;
   return undefined;
 };
 
@@ -395,7 +405,8 @@ const updateChildren = (newWDom: WDom) => {
   if (keep || createdCount > children.length - tail) {
     // Placement pass (right-to-left): insert added children and non-LIS
     // moves before a running anchor.
-    let anchor = findChildFragmentNextElement(children, tail) || baseAnchor;
+    let anchor =
+      findChildFragmentNextElement(children.slice(tail)) || baseAnchor;
 
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
@@ -410,7 +421,7 @@ const updateChildren = (newWDom: WDom) => {
         }
       }
 
-      const first = findChildFragmentNextElement(children, i, i + 1);
+      const first = findFragmentNextElement(item);
       if (first) {
         anchor = first;
       }

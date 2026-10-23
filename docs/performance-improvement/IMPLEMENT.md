@@ -248,6 +248,18 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict 타입/lint·ESM6gate/CJS·UMD smoke·진단6조건·CPU1,080/메모리18context·Python 입력/통계 감사를 통과했다. 초기 환경/테스트 수집 오류와 getter 관찰 차이는 증거에 보존했다. two-rAF 이득은 입증하지 못했고 후보는 미채택이다. 현재 guard 대비br+23B이며 기존 guard를 바꾸지 않았다. [보고서](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)에서 범위·분포·원자료·완료/다음을 확인한다.
 
+## DC-19B — snapshot 보존 후속 실행
+
+진입: 첫 후보 `f997302` 보존, R44/R45 계약 확정. 종료: 새 source의 getter/회귀·동일 조건 A/B와 비용/미실행 범위를 인계함.
+
+- [x] 기존 source/결과를 커밋하고 범위·새 출력·계약을 문서화.
+- [x] snapshot suffix + getter 순서 보존 for + 단일 노드 helper만 구현.
+- [x] Test Hardening: helper snapshot/index read/변이/sparse/길이/throw·공통 core232·strict 타입/lint. unchanged concurrent232 증거는 source가 같은 범위에서 재사용.
+- [x] Integration: 동일 설정의 세 형식·ESM 브라우저6gate/CJS·UMD·진단6조건, 별도 새 시간1,080/메모리18context를 직렬 확보.
+- [x] 독립 통계·archive/source/hash/patch 감사, 첫 결과 보존과 새 결과/정본/HANDOFF 업데이트. 기본 채택·C2 결합·peer 목표와 구분.
+
+후속 종료: [새 결과](../benchmark/FRAGMENT_ANCHOR_SNAPSHOT_RESULTS.md)의232core/strict·6browser gate/6진단·1,080시간/18memory·Python hash/통계 감사 완료. getter 관찰 차이는 검사 범위에서 해결했으나 시간 이득이 없고UMD+21B여서 미채택이다. 두 후보를 각각 보존하고 현재 runtime은 compact13으로 복원한다. 최종 source/복원 SHA와 인계는 HANDOFF/git log에 남긴다.
+
 ## 상태 / 핸드오프 (DC-18 당시 기록)
 
 - done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.

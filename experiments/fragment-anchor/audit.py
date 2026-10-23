@@ -9,6 +9,7 @@ out = Path(sys.argv[1]).resolve()
 raw = json.loads((out / 'raw.json').read_text())
 build = json.loads((out / 'build.json').read_text())
 boundary = json.loads((out / 'snapshot-boundary.json').read_text())
+candidate_kind = build.get('candidateKind', 'range')
 assert raw['complete'] and not raw['failures']
 assert len(raw['gates']) == len(raw['diagnostics']) == 6
 assert len(raw['timings']) == 36 and len(raw['memory']) == 18
@@ -27,10 +28,16 @@ for variant in ['baseline', 'candidate']:
         assert b'__anchorMetrics' not in data
 for kind in ['reveal', 'reorder', 'control']:
     pair = {row['variant']: row for row in raw['diagnostics'] if row['kind'] == kind}
-    assert pair['candidate']['slices'] == pair['candidate']['singleton'] == 0
+    assert pair['candidate']['singleton'] == 0
+    if candidate_kind == 'range':
+        assert pair['candidate']['slices'] == 0
+    else:
+        assert pair['candidate']['slices'] == pair['baseline']['slices']
+        assert pair['candidate']['copied'] == pair['baseline']['copied']
+        assert pair['candidate']['callbacks'] == 0
     assert pair['candidate']['nodeReads'] == pair['baseline']['nodeReads']
     assert pair['candidate']['visits'] <= pair['baseline']['visits']
-assert boundary['observationallyEquivalent'] is False
+assert boundary['observationallyEquivalent'] is (candidate_kind == 'snapshot-loop')
 
 def distribution(values):
     values = sorted(values)
@@ -42,7 +49,8 @@ def distribution(values):
 
 summary = {'scope': 'Synthetic Linux A/B; no official CPU/memory/peer score',
            'cpu': {}, 'memory': {}, 'diagnostics': raw['diagnostics'],
-           'boundary': boundary, 'sizes': {}, 'adoption': 'deferred: accessor/snapshot observation differs',
+           'boundary': boundary, 'sizes': {}, 'candidateKind': candidate_kind,
+           'adoption': 'deferred: full-app/official performance not validated' if candidate_kind == 'snapshot-loop' else 'deferred: accessor/snapshot observation differs',
            'checks': {'timingSamples': 1080, 'memoryContexts': 18, 'productionGates': 6,
                       'diagnosticConditions': 6, 'runtimeSourcesPerVariant': len(build['files']['baseline'])}}
 samples = [sample['updateMs'] for row in raw['timings'] for sample in row['samples']]

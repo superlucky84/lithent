@@ -1,5 +1,10 @@
 # DC-19: Fragment anchor range experiment
 
+The first range candidate is preserved at `f997302` and in the original report.
+The snapshot-preserving follow-up is a separate trial; see the DC-19B section
+below. Neither was adopted. The branch's final runtime is restored to compact13;
+use a preserved candidate snapshot or its source commit when reproducing.
+
 Base commit: `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7` (adopted compact13).
 Branch: `experiment/fragment-anchor-cloud`. Canonical scope is R40–R43,
 DESIGN/IMPLEMENT DC-19 and manual M-12 in `docs/performance-improvement/`.
@@ -70,3 +75,34 @@ must be reproduced or a new browser treated as a new experiment. The binary is
 not bundled. Runtime-input checks in `audit.py` refer to the original paths;
 portable raw-statistics/archive verification is separate from claiming the
 original executable is currently installed.
+
+## DC-19B: snapshot-preserving follow-up
+
+Keep suffix snapshots and the original index getter/throw/length observations.
+Replace the anchor reducer with a for loop that continues indexed reads after
+finding an anchor; split out a single-node helper to remove `[item]` arrays.
+Callbacks and singleton construction decrease, while suffix copies remain.
+Do not call this an elimination of all list visits or V8 physical allocations.
+
+This fresh baseline/candidate trial retains the same 1,080/18 protocol. The six
+browser gates, 232 base tests, strict types and covered helper observations pass.
+Pooled update/two-rAF medians show no benefit; reverse reorder is 3.2→3.4ms.
+UMD br is 4,845B versus 4,824B (+21B). The prototype is not adopted.
+
+After extracting and verifying the second archive, use its candidate source:
+
+```sh
+LITHENT_ANCHOR_CANDIDATE_SOURCE=/extracted/run/candidate/source \
+  node experiments/fragment-anchor/build.mjs /path/to/new-snapshot-output
+node experiments/fragment-anchor/snapshot.mjs /path/to/new-snapshot-output
+LITHENT_CHROME_BINARY=/usr/bin/chromium \
+  node experiments/fragment-anchor/run.mjs /path/to/new-snapshot-output
+python3 experiments/fragment-anchor/audit.py /path/to/new-snapshot-output
+node experiments/fragment-anchor/integration.mjs /path/to/new-snapshot-output
+python3 experiments/fragment-anchor/report-snapshot.py /path/to/new-snapshot-output
+```
+
+Use `report-snapshot.py` for this variant. It writes separate
+`fragment-anchor-snapshot-*` artifacts and preserves the original range results.
+The helper probe covers the actual source functions using stub DOM nodeType;
+its matching covered observations do not prove universal JS equivalence.

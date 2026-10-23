@@ -131,6 +131,13 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 
 현재 DC-19: 독립 프로토타입·공통 core 각232/strict 타입·실브라우저6gate·시간1,080표본/별도 메모리18context·Python 감사를 완료했다. suffix/singleton 할당을 제거했으나 two-rAF 중앙값은 같고 update는0.1ms grid/순서 변동 한계가 있다. UMD br4,824→4,847B(+23B), guard는 유지한다. slice snapshot/getter 관찰 차이로 **미채택**이며 [보고서](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)에 raw/patch/evidence를 보존했다. 정본은 DESIGN DC-19, IMPLEMENT DC-19, 수동 M-12다.
 
+## DC-19B — snapshot을 보존하는 독립 후속
+
+- R44. 첫 range 후보는 `f99730289e7ffd934ed785f4585edd500a37f00c`와 별도 결과에 보존한다. 새 후보는 suffix `slice`를 유지하고, 앵커 뒤에도 기존 배열 index getter를 같은 순서로 읽는 명시적 for 순회로 reduce callback만 제거한다. 한 항목은 캡처한 `item`을 직접 검사해 `[item]` 할당을 없앤다. 새 immutable 가정·shape·Map/LIS/C2·event 변경은 없다.
+- R45. getter가 뒤 원소를 바꾸는 snapshot, 앵커 뒤 index getter, sparse slot/길이 snapshot/moving/throw를 정확한 helper로 대조한다. 일반 DOM232회귀와 strict 타입을 새 source에서 실행하고 같은 전용 세 화면의 fresh A/B·18context 메모리/size를 독립 수집한다. 이전 range/Mac 표본과 합산하지 않는다. 전면 JS prototype monkeypatch 동등성이나 공식 peer 목표를 주장하지 않는다.
+
+상태: 새 core232/strict/lint·helper 관찰 일치·브라우저6gate·시간1,080/메모리18context·독립 감사를 완료했다. pooled update/두rAF 중앙값은 같고 reverse reorder3.2→3.4ms,UMD4,845B(+21B)다. 시간 이득을 입증하지 못해 미채택이며 [별도 결과](../benchmark/FRAGMENT_ANCHOR_SNAPSHOT_RESULTS.md)에 보존하고 runtime을 compact13으로 복원한다. 첫 결과는 유지한다.
+
 ## 상태 / 핸드오프 (DC-18 당시 기록)
 
 - done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.

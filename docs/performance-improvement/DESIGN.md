@@ -343,6 +343,16 @@ frame은 내부 `{ proofs: WeakMap<WDom, WDom[]>, ready: boolean, invalid: boole
 
 판정 완료: 범위 탐색 프로토타입을 [결과/증거](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)에 보존하며 **기본 미채택**이다. 실제 helper의 getter 변이 검사에서 baseline은 slice snapshot의 old, 후보는 lazy read의 new를 반환했다. 일반 DOM 회귀/브라우저 gate는 통과했으나 전면 관찰 동등성이 아니다. reveal12회에서 복사6,006/방문6,006→0/6, reorder singleton1,400→0을 확인했다. update0.2→0.1ms는0.1ms grid 한계, reorder3.3→3.2ms는 순서 불일치이며 two-rAF는 같았다. br4,847B/guard+23B를 공개했고 C2/전체 peer 목표·기본 채택과 구분한다.
 
+## DC-19B — snapshot 보존과 단일 노드 검사 분리
+
+- suffix 호출의 `brothers.slice(...)`와 `children.slice(tail)`은 원래 위치에 유지한다. range 제거로 관찰이 달라진 첫 후보를 채택하지 않는다.
+- 배열 helper는 진입 길이를 고정하고 각 index의 존재/값을 순서대로 읽는다. 첫 앵커를 찾은 뒤에도 뒤 index getter는 읽되 WDom field/하위 탐색은 생략한다. 이는 기존 reduce의 누산·읽기 순서다. 조기 return으로 뒤 Get을 없애지 않는다.
+- 단일 WDom helper가 moving 검사→type/el 읽기→가상 children 재귀→현재 실제 DOM을 담당한다. placement의 `[item]`은 이미 캡처한 item을 직접 넘긴다. 원본 children[i]를 재독해 관찰을 바꾸지 않는다.
+- 별도 계측은 loop 방문·노드 읽기·reduce callback 호출·suffix 복사·singleton을 구분한다. 기존 callbacks 제거와 전체 방문 제거를 혼동하지 않는다.
+- baseline은 다시 `8056e02`, candidate는 후속 source이며 새 출력/동일 빌드·브라우저·양순서를 사용한다. 첫 range와의 직접 무작위 대조가 아니므로 후보 간 순위를 단정하지 않는다.
+
+판정 완료: getter/index/throw/길이 등 검사한 helper 관찰과 base232·브라우저6gate를 통과했다. callback/singleton 제거를 확인했으나 fresh A/B1,080표본의 pooled update/두rAF 이득은 없고 reverse reorder는3.2→3.4ms였다. 별도18memory context와UMD4,845B(+21B)를 공개한다. [미채택 결과](../benchmark/FRAGMENT_ANCHOR_SNAPSHOT_RESULTS.md)를 보존하고 runtime은 compact13으로 복원한다. 범용 동등성·공식 peer 목표로 확대하지 않는다.
+
 ## 상태 / 핸드오프 (DC-18 당시 기록)
 
 - done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.

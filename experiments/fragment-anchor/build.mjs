@@ -10,6 +10,18 @@ import { build } from 'vite';
 import { minify } from 'terser';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
+const candidateRoot = path.resolve(
+  process.env.LITHENT_ANCHOR_CANDIDATE_SOURCE || root
+);
+const candidateCode = fs.readFileSync(
+  path.join(candidateRoot, 'src/render.ts'),
+  'utf8'
+);
+assert(
+  candidateCode.includes('const findFragmentNextElement =') ||
+    candidateCode.includes('for (let index = start; index < end; index++)'),
+  'Select a preserved candidate with LITHENT_ANCHOR_CANDIDATE_SOURCE; the default runtime may have been restored.'
+);
 const out = path.resolve(process.argv[2]);
 const base = '8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7';
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -28,6 +40,11 @@ const sources = (await git(['ls-tree', '-r', '--name-only', base, '--', 'src']))
   .filter(file => !file.startsWith('src/tests/'));
 const manifest = {
   base,
+  candidateKind: fs
+    .readFileSync(path.join(candidateRoot, 'src/render.ts'), 'utf8')
+    .includes('const findFragmentNextElement =')
+    ? 'snapshot-loop'
+    : 'range',
   at: new Date().toISOString(),
   node: process.version,
   files: {},
@@ -40,7 +57,7 @@ for (const variant of ['baseline', 'candidate']) {
     const bytes =
       variant === 'baseline'
         ? await git(['show', `${base}:${file}`])
-        : fs.readFileSync(path.join(root, file));
+        : fs.readFileSync(path.join(candidateRoot, file));
     const dest = path.join(stage, file);
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.writeFileSync(dest, bytes);
@@ -65,9 +82,12 @@ for (const variant of ['baseline', 'candidate']) {
       };
       one(
         'const DF =',
-        'const anchorMetrics = ((globalThis as any).__anchorMetrics = { slices: 0, copied: 0, singleton: 0, visits: 0, nodeReads: 0 });\nconst DF ='
+        'const anchorMetrics = ((globalThis as any).__anchorMetrics = { slices: 0, copied: 0, singleton: 0, visits: 0, callbacks: 0, nodeReads: 0 });\nconst DF ='
       );
-      if (variant === 'baseline') {
+      if (
+        variant === 'baseline' ||
+        manifest.candidateKind === 'snapshot-loop'
+      ) {
         one(
           'brothers.slice(brothers.indexOf(wDom) + 1)',
           '(anchorMetrics.slices++, anchorMetrics.copied += brothers.length - (brothers.indexOf(wDom) + 1), brothers.slice(brothers.indexOf(wDom) + 1))'
@@ -76,13 +96,20 @@ for (const variant of ['baseline', 'candidate']) {
           'children.slice(tail)',
           '(anchorMetrics.slices++, anchorMetrics.copied += children.length - tail, children.slice(tail))'
         );
+      }
+      if (variant === 'baseline') {
         one(
           'findChildFragmentNextElement([item])',
           '(anchorMetrics.singleton++, findChildFragmentNextElement([item]))'
         );
         one(
           '(targetEl, bItem) => {',
-          '(targetEl, bItem) => {\n      anchorMetrics.visits++;'
+          '(targetEl, bItem) => {\n      anchorMetrics.visits++; anchorMetrics.callbacks++;'
+        );
+      } else if (manifest.candidateKind === 'snapshot-loop') {
+        one(
+          'for (let index = 0; index < length; index++) {',
+          'for (let index = 0; index < length; index++) {\n    anchorMetrics.visits++;'
         );
       } else {
         one(

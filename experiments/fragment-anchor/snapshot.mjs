@@ -5,6 +5,9 @@ import vm from 'node:vm';
 import ts from 'typescript';
 
 const out = path.resolve(process.argv[2]);
+const candidateKind =
+  JSON.parse(fs.readFileSync(path.join(out, 'build.json'), 'utf8'))
+    .candidateKind || 'range';
 const helpers = {};
 for (const variant of ['baseline', 'candidate']) {
   const source = fs.readFileSync(
@@ -30,7 +33,7 @@ const cases = {};
 for (const variant of ['baseline', 'candidate']) {
   const { search, movingNodes } = helpers[variant];
   const find = (items, start = 0, end = items.length) =>
-    variant === 'baseline'
+    variant === 'baseline' || candidateKind === 'snapshot-loop'
       ? search(items.slice(start, end))
       : search(items, start, end);
   const sparse = new Array(5);
@@ -61,23 +64,70 @@ for (const variant of ['baseline', 'candidate']) {
     enumerable: true,
   });
   assert.equal(find(indexed).id, 'first');
+  let directReads = 0;
+  const direct = [element('first')];
+  Object.defineProperty(direct, '1', {
+    get() {
+      directReads++;
+      return element('last');
+    },
+    enumerable: true,
+  });
+  assert.equal(search(direct).id, 'first');
+  const throwing = [element('first')];
+  Object.defineProperty(throwing, '1', {
+    get() {
+      throw Error('later-index');
+    },
+    enumerable: true,
+  });
+  let laterError;
+  try {
+    search(throwing);
+  } catch (error) {
+    laterError = error.message;
+  }
+  const growing = [
+    {
+      type: 'f',
+      get children() {
+        growing.push(element('new'));
+        return [];
+      },
+    },
+  ];
+  const lengthResult = search(growing);
+  assert.equal(lengthResult, undefined);
   cases[variant] = {
     sparseAndMoving: 'pass',
     mutationResult,
     unusedIndexedGetterReads: getterReads,
+    directIndexedGetterReads: directReads,
+    laterError: laterError || null,
+    lengthSnapshot: 'pass',
   };
 }
 assert.equal(cases.baseline.mutationResult, 'old');
-assert.equal(cases.candidate.mutationResult, 'new');
 assert.equal(cases.baseline.unusedIndexedGetterReads, 1);
-assert.equal(cases.candidate.unusedIndexedGetterReads, 0);
+assert.equal(cases.baseline.directIndexedGetterReads, 1);
+assert.equal(cases.baseline.laterError, 'later-index');
+const equivalent =
+  JSON.stringify(cases.baseline) === JSON.stringify(cases.candidate);
+if (candidateKind === 'snapshot-loop') assert.equal(equivalent, true);
+else {
+  assert.equal(cases.candidate.mutationResult, 'new');
+  assert.equal(cases.candidate.unusedIndexedGetterReads, 0);
+  assert.equal(equivalent, false);
+}
 const result = {
   scope:
     'Exact extracted source helper; stub DOM nodeType, not a full-browser contract',
   cases,
-  observationallyEquivalent: false,
-  implication:
-    'Keep as experimental; slice snapshot/read-order differs for accessor/mutating inputs. No automatic adoption or new immutable contract.',
+  candidateKind,
+  observationallyEquivalent: equivalent,
+  implication: equivalent
+    ? 'The tested snapshot/index getter/hole/length/throw observations match; not a universal equivalence proof.'
+    : 'Keep as experimental; slice snapshot/read-order differs for accessor/mutating inputs. No automatic adoption or new immutable contract.',
 };
 fs.writeFileSync(
   path.join(out, 'snapshot-boundary.json'),
