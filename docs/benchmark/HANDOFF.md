@@ -1,5 +1,29 @@
 # summary
 
+## 영문 커밋과 DC-15 실제 캐시 비교 완료 — 2026-10-23
+
+- 사용자 요청으로 DC-14 heap 분석·증거와 캐시 비교 사전 계획을 영문 커밋했다.
+  **`defa088e9863b6e82ea7f903e86fbcc97354beca`** —
+  `perf: attribute parent memo heap growth and define cache comparison`.
+- [실제 캐시 비교 보고서](./PARENT_MEMO_CACHE_RESULTS.md), [raw](./parent-memo-cache-results.json),
+  [증거](./parent-memo-cache-evidence.json.gz), [도구](../../experiments/parent-memo-cache/README.md)를 읽는다.
+  A/B는 원래 앱 default/isolated, C/D/E는 같은 행 앱 off/helper/memo다. 행 세 조건은 같은 JS다.
+- done: 다섯 조건 타입·B3 keyed/9동작/font, 행 diagnostic9context·원래 앱 dispose6context 통과.
+  기존 same-hash251회귀/dual1,070·3skip/package 증거는 재사용했고 기본28파일/package/sibling을 보존했다.
+- CPU1,450/메모리150표본, 양순서·실패 배치0개. Python으로 분포480/가중36개와 메모리 비교를
+  독립 감사했고 upstream source/compiled runner/CSS/lock183개도 이전 증거 hash와 일치했다.
+- memo의 합산 가중 전체는 **기존 앱 대비+21.08%/JS+70.27%**, 같은 행 helper 대비 **+3.75%**다.
+  캐시 없는 행 앱 대비−9.30%와 구분한다. 기존 앱 대비 합산9항목이 모두 느렸고 양차수 전체도
+  +22.50%/+20.03%였다. 현재 C3를 기존 앱 개선안으로 채택하지 않는다.
+- 10k 공식 MB는 기존 앱27.474→memo36.438(+8.964MB)다. 생성/삭제300회·partial100회/15context에서
+  DOM/listener 증가는0이지만 memo 한 context의 추가 heap은 미귀속이다. 장기 누수 부재로 확대하지 않는다.
+  공식 측정은2026-10-22UTC, 추가 churn은2026-10-23UTC로 분리했다.
+- next: 원래 앱/React·Preact의 전체 항목 비교 조건을 고정해 다음 코어 후보를 선택한다.
+  C3 outputs 정리·공개 예산 상향/API 배포·concurrent 확장을 이번 결과에 섞지 않는다.
+- blockers: 실행 블로커 없음. 전체peer/색상 임계치·최종 B4/hardening/integration은 미완료다.
+- commit: 최신 `defa088`; 이번 DC-15 후속 도구·문서·증거는 작업 트리다.
+  출력은 `/tmp/lithent-c3-cache-20261022`이며 아래 기록은 각 당시의 이력이다.
+
 ## 영문 커밋과 DC-14 heap 귀속 완료 — 2026-10-22
 
 - 사용자 요청으로 DC-12/DC-13 도구·문서·증거29파일을 커밋했다.

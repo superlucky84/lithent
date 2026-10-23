@@ -1,6 +1,6 @@
 # C3 실제 캐시 앱 대조 사전 조건 — DC-15
 
-2026-10-22. **계획 확정, 빌드/공식 측정 미실행.** [DC-14](./PARENT_MEMO_HEAP_RESULTS.md)
+2026-10-22 사전 계획, 2026-10-23 완료 기록. **CPU1,450·메모리150·retention15context·dispose 완료.** [DC-14](./PARENT_MEMO_HEAP_RESULTS.md)
 뒤의 다음 한정 단계다. 전체 React/Preact 비교·공개 예산·최종 채택을 대신하지 않는다.
 
 ## 조건과 비교 의미
@@ -53,6 +53,8 @@ resume을 구분하고 정상 CPU 중 build/test를 병행하지 않는다.
 다섯 조건의 실행 간격/시간 흐름 한계와 손해 항목도 공개한다. trace는 전 hash/size와
 선택 index0/조건/차수10개의 내용을, 실패 시도는 전체 내용을 영구 보존한다.
 
-- [ ] immutable staging/manifest와 타입/B3/diagnostic gate
-- [ ] CPU1,450·메모리150·retention15context·dispose
-- [ ] raw/증거 감사·전체 항목 교환 비용 보고·정본4문서/HANDOFF 갱신
+- [x] immutable staging/manifest와 타입/B3/diagnostic gate
+- [x] CPU1,450·메모리150·retention15context·dispose
+- [x] raw/증거 감사·전체 항목 교환 비용 보고·정본4문서/HANDOFF 갱신
+
+[실측 결과](./PARENT_MEMO_CACHE_RESULTS.md): memo는 기존 앱 대비 전체+21.08%/같은 행 helper 대비+3.75%였다. 현재 C3를 기존 앱 개선안으로 채택하지 않으며 기본 runtime을 유지한다. 비교군 전체/최종 채택·hardening은 별도 미완료다.

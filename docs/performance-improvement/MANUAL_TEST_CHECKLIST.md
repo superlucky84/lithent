@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-22. 상태: **DC-14 production300회 churn·14 snapshot의 heap 귀속 완료. DC-15 캐시 대조 계획 확정, 공식 측정 미실행. 기본 runtime 보존·채택 보류**.
+- 기준일: 2026-10-23. 상태: **DC-15 다섯 조건의 CPU1,450·메모리150·300회 churn/15context 완료. 현재 C3를 기존 앱 개선안으로 미채택. 기본 runtime 보존**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택 확인에서는 후보의 B1~B4 통과와 성능 측정 산출물이 필요하다. 정합성 실패를 시간·메모리 교환으로 허용하지 않는다. 개별 성능 손해 자체는 실패 판정이 아니다.
@@ -39,6 +39,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-4. 캐시·자체 renew·부모 갱신 — DC-2/DC-4/DC-5, Phase 2·3·5
 
+- [x] DC-15 새 행 앱의 off/helper/memo9context에서 updater 진입과 JSX view 수를 분리하고 mutable label·선택·swap·양방향 배칭·key identity·삭제·dispose를 확인했다. helper refresh는1,000/0, memo는0/0이며 key1,000개 유지 후 등록/관찰 출력/host0개였다.
 - [x] DC-13의 off/on diagnostic에서 부모 refresh·선택·mutable label·swap의 실제 updater 수와 props 동기화·DOM 정체성·batched 결과·최종 dispose/GC가 계약과 같다. 6context·key1,000개 유지 후 등록/관찰한 VDOM/host0개를 확인했다.
 - [x] C3 기준 회귀에서 기존 parent→child의 base/concurrent 실행 수 차이, child→parent의 두 번 실행, pre/post callback·callback 재예약·삭제를 확인했다. 새 회귀 양쪽 **10개씩**, 전체 dual **1,070 passed·3 skipped**·타입 검사 통과. 이 baseline 결과를 별도 C3 hit/miss 전용 검증과 구분한다.
 - [x] C3-T1~T4: 전용 33회귀에서 setup 등록 오류, incoming selector·복사/Object.is·길이·key 변화, mutable row·빠뜨린 deps, nonempty slots·특수 props fallback을 확인했다. 후보 소스/실험 타입도 통과했다.
@@ -75,7 +76,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-7. 공식 전체 성능과 비교표 — RC-2/RC-5/IC-1/IC-2, Phase 4·6
 
-- [ ] DC-15의 실제 캐시 앱 다섯 조건을 같은 차수로 비교하고 row helper/memo와 원래 앱 종단 차이를 분리한다. 사전 계획CPU1,450/메모리150표본은 아직 미실행이다.
+- [x] DC-15의 실제 캐시 앱 다섯 조건을 같은 차수/반대 순서로 비교했다. CPU1,450/메모리150표본, 분포480/가중36개 Python 감사를 완료했고 row helper/memo와 원래 앱 종단 손해를 분리했다.
 - [x] DC-13의 같은 JS/core·설정만 다른 두 조건으로 CPU580/메모리60표본의 양순서·분포·실패/부하를 감사했다. 기능 대조이며 원래 앱 종단/전체peer 판정과 구분한다.
 - [x] DC-12 core-only 양순서 대조의 앱/helper/렌더러/Chrome/엔진 해시·580표본·배치 실패를 감사했다. C3를 쓰지 않는 별도 렌더러의 비용으로만 해석하고 기능 이득·기본 렌더러 회귀·전체 peer 판정과 분리한다.
 - [ ] 최종 동일 앱·코어/helper·브라우저/엔진·lockfile 해시로 원순서/반대 순서의 전체 9 CPU 항목을 확보했다. 실제 러너의 ID·행 수·throttle·warmup·GC 설정을 기록했다.
@@ -89,6 +90,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## M-8. 메모리·생성/삭제·번들 — R11/R12/IC-2/IC-3, Phase 2·4·5·6
 
+- [x] DC-15 다섯 조건의300회 create/clear·100회 partial/15context와 공식 메모리150표본을 분리해 기록했다. DOM/listener 증가는0, 원래 앱 dispose6context의 행1,000개+host 회수는0잔류였다. memo 한 churn context의 추가 heap은 미귀속으로 남겼다. JS/HTML의 raw/gzip/br와 같은 행 JS 동일성을 확인했다.
 - [x] DC-14의300회 churn·snapshot 별도 조건·V8 self size 합계·강한 보유 경로와 미귀속을 확인한다. 공식 MB나 최종 누수 부재 판정과 혼동하지 않는다.
 - [x] DC-13의 production100회 생성/삭제·100회partial/조건별3context에서 GC 뒤 DOM/listener/heap을 기록하고 full dispose 검사·공식 MB와 구분했다. 같은 JS의 raw/gzip/br와 기본 런타임 보존을 확인했다.
 - [x] DC-12 기본 bundle 보존과 별도 렌더러의 전체 크기를 따로 공개했다. 별도 package/subpath·예산을 승인된 것으로 다루지 않는다.
@@ -124,7 +126,7 @@ Phase 1은 예상 작업량까지, Phase 2 C1은 실제 제거량·유지비와 
 
 ## 상태 / 핸드오프
 
-- done: [DC-14 heap 귀속](../benchmark/PARENT_MEMO_HEAP_RESULTS.md). 동일 production의300회 churn6context와 별도14 snapshot을 확인했다. outputs WeakMap table은5→25회+196,608B,25→300회 같은 ID/262,164B였고 clear 뒤 Hole/Map만 남았다. 실제 row/memo/snapshot/output0개와 App/Table2개를 확인하고 AllocationSite 템플릿을 분리했다. Python으로 전체 snapshot 합계·shape·강한 경로를 감사했다. 기존 DC-13 공식 결과와 기본28파일/package/sibling은 보존했다.
-- next: [DC-15 캐시 대조](../benchmark/PARENT_MEMO_CACHE_PLAN.md)의 기존 앱 default/isolated와 행 앱 off/helper/memo를 빌드·타입/B3/diagnostic gate 후 동차수 공식 비교한다. 계획은 CPU1,450/메모리150표본이다. 아직 측정하지 않았다. outputs 게시 후 정리는 별도 후보 가설이며 이번 코어에 적용하지 않았다.
-- blockers: 실행 블로커 없음. on 한 context의 추가 heap 변동은 미귀속이다. 장기 누수 부재·원래 앱/전체peer·공개 예산·concurrent 새 지원·최종 B4/Test Hardening/Integration·RC-5/IC-1은 미완료다.
-- commit: 최신 `aa20ccc84f4252c46e5a89ce1abb9ead0c6ee387` — `perf: validate isolated parent memo overhead and opt-in tradeoffs`. DC-12/DC-13은 커밋했고 DC-14 후속 도구·문서·증거는 작업 트리다. 기본 runtime은 baseline이다.
+- done: [DC-15 실제 캐시 비교](../benchmark/PARENT_MEMO_CACHE_RESULTS.md). 다섯 조건의 타입/B3·diagnostic9context·원래 앱 dispose6context, CPU1,450/메모리150표본 양순서와300회 churn/15context를 완료했다. 실패 배치0개, Python 분포480/가중36개 및 upstream183파일 hash 감사를 통과했다. memo는 기존 앱 대비 전체+21.08%/JS+70.27%, 같은 행 helper 대비 전체+3.75%였다. 기존 앱 대비 합산9항목이 모두 느렸다. 10k 메모리는27.474→36.438MB다. DOM/listener 증가는0이지만 memo 한 churn context의 추가 heap은 미귀속이다.
+- next: 현재 C3를 기존 앱 성능 개선안으로 채택하지 않고 원래 앱과 React/Preact의 전체 항목 비교 조건을 고정한다. 그 근거로 다음 코어 후보를 선택한다. 공개 예산 상향·C3 API 배포·concurrent 확장·outputs 정리 후보를 이번 결과에 섞지 않는다.
+- blockers: 실행 블로커 없음. 장기 누수 부재·전체peer/색상 수치 기준·최종 B4/Test Hardening/Integration은 미완료다. C3의 캐시 없는 행 앱 이득−9.30%는 기존 앱 개선율과 구분해 보존한다.
+- commit: 최신 `defa088e9863b6e82ea7f903e86fbcc97354beca` — `perf: attribute parent memo heap growth and define cache comparison`. DC-14까지 커밋했고 DC-15 후속 도구·문서·증거는 작업 트리다. 기본28파일/package/sibling 앱은 baseline 상태로 보존했다.

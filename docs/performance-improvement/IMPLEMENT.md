@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-22. 상태: **DC-14 production300회 churn·14 snapshot의 heap 귀속 완료. DC-15 캐시 대조 계획 확정, 공식 측정 미실행. 기본 runtime 보존·채택 보류**.
+- 기준일: 2026-10-23. 상태: **DC-15 다섯 조건의 CPU1,450·메모리150·300회 churn/15context 완료. 현재 C3를 기존 앱 개선안으로 미채택. 기본 runtime 보존**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
@@ -73,7 +73,7 @@
 - [ ] C4가 필요하면 목록 소유권·구조 version·dirty item·외부 mutation·fallback을 정의. C4를 구현하지 않는다면 이유와 연구 상태를 남기고 완료로 체크하지 않음.
 - [x] **C3-T6 동작 대조:** 동일한 일반 1k 입력 앱에 baseline/후보 비사용/후보 opt-in을 3context씩 실행했다. refresh 자식 updater 1,000→0회·한 props 변화 1,000→1회, 자체 갱신·DOM/state/focus·이동·삭제를 확인했다. 공식 시간 비교는 미실행이다. 기존 retainedView/renderBoundary 의미는 유지한다.
 - [x] helper는 미수정이다. 원래 앱 B3 manifest에서 양쪽 helper/appSource 동일성과 후보 core 해시를 확인했다. candidate helper staging 지원 추가는 이번에는 N/A다.
-- [x] **C3-T7 비용/기준 검사:** 후보 B1 dual **1,070 passed·3 skipped**, B2 core build/타입 성공·br **5,691/4,800B 실패**, B3 동일 원래 앱 contracts·keyed·9동작·폰트 통과. 크기 실패를 통과로 바꾸지 않고 증거 보존 뒤 baseline 복원했다. 비사용자 시간·공식 메모리·전체 최종 검증은 남아 있다.
+- [x] **C3-T7 비용/기준 검사:** 후보 B1 dual **1,070 passed·3 skipped**, B2 core build/타입 성공·br **5,691/4,800B 실패**, B3 동일 원래 앱 contracts·keyed·9동작·폰트 통과. 크기 실패를 통과로 바꾸지 않고 증거 보존 뒤 baseline 복원했다. 당시 비사용자 시간·공식 메모리는 미측정이었으며 DC-12/DC-15에서 보완했다. 전체 최종 검증은 남아 있다.
 
 산출물: [C3 보고서](../benchmark/PARENT_MEMO_RESULTS.md), [raw 결과](../benchmark/parent-memo-results.json), [압축 증거](../benchmark/parent-memo-evidence.json.gz), [후보 패치](../benchmark/parent-memo-candidate.patch), [전용 회귀·도구](../../experiments/parent-memo/README.md). 한정 구현·동작/회수 검증은 완료했고 크기 한도 +891B로 기본 채택을 보류했다. 당시 비사용자 시간 비용은 미측정이었다. 아래 DC-12에서 별도 렌더러의 비참여 대조만 추가했으며 Phase 4 전체 peer/메모리 검증은 미완료다. 패치를 역적용해 자신의 코어 변경만 복원했고 source/산출물 **28개 SHA-256**과 실제 sibling 앱의 해시가 이전 baseline과 일치한다. 복원 후 core build/size·관련 base **21**/concurrent **23** 회귀가 통과했다. 후속 DC-12 격리 계약·검증은 아래에 기록한다.
 
@@ -114,13 +114,15 @@
 
 [DC-14 결과](../benchmark/PARENT_MEMO_HEAP_RESULTS.md):300회 churn6context·별도14 snapshot/2context·WeakMap table/AllocationSite 귀속·Python 독립 감사를 완료했다. 코어 수정과 새 공식 CPU/메모리 표본은 없다.
 
-### DC-15 다음 실행 — 실제 캐시 앱 대조
+### DC-15 완료 — 실제 캐시 앱 대조
 
-- [ ] [고정한 다섯 조건](../benchmark/PARENT_MEMO_CACHE_PLAN.md)을 immutable staging에 빌드하고 타입/B3·diagnostic gate를 통과한다. row off/helper/memo는 같은 JS로 만든다.
-- [ ] 양순서 CPU1,450·메모리150표본과 retention15context/dispose·크기를 확보한다. 원래 앱 종단 차이와 같은 행 구조의 기능 차이를 구분한다.
-- [ ] 전 표본·실패·trace·해시/분포를 감사하고 결과/정본4문서/HANDOFF를 갱신한다.
+- [x] [고정한 다섯 조건](../benchmark/PARENT_MEMO_CACHE_PLAN.md)을 immutable staging에 빌드하고 타입/B3·diagnostic gate를 통과한다. row off/helper/memo는 같은 JS로 만든다.
+- [x] 양순서 CPU1,450·메모리150표본과 retention15context/dispose·크기를 확보한다. 원래 앱 종단 차이와 같은 행 구조의 기능 차이를 구분한다.
+- [x] 전 표본·실패·trace·해시/분포를 감사하고 결과/정본4문서/HANDOFF를 갱신한다.
 
 기준 검사: 새 앱 타입·keyed/9동작/font·정체성/작업량·동일 JS와 측정 전후28파일/package/sibling hash. 동일 core의 기존 회귀는 재사용한다. outputs table 개선을 섞으면 새 후보로 gate부터 재검증한다.
+
+[DC-15 결과](../benchmark/PARENT_MEMO_CACHE_RESULTS.md): 양순서CPU1,450/메모리150·churn15context·dispose·독립 통계/183파일 감사를 완료했다. 기존 앱 대비 전체+21.08%/JS+70.27%여서 현재 C3를 기존 앱 개선안으로 채택하지 않는다. 공식 측정은2026-10-22UTC, 추가 churn은2026-10-23UTC이며 시간 간격을 공개한다. 최종 peer/Phase5~6 완료는 아니다.
 
 진입: 후보별 B1~B3 통과 및 immutable production staging 완료. 종료: 모든 항목의 실제 이득/손해와 불확실성이 같은 환경에서 비교됨.
 
@@ -170,7 +172,7 @@
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13의 통제 앱 CPU/메모리도 완료했으며 다음은 heap 원인/실제 캐시 앱 대조다. 전체peer·최종 채택은 미완료다.
+- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13 통제 앱 CPU/메모리·DC-14 heap 귀속·DC-15 실제 캐시 앱 대조도 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않으며 다음은 전체peer 기준 확보다. 전체peer·최종 채택은 미완료다.
 - [ ] **IC-1 TBD:** 최종 표의 비교군, 정규화·색상/통계 모드, CPU/메모리/startup 표시 범위, 빠른 구간의 수치 임계치. Phase 1에서 제안·기록하고 Phase 6 목표 판정 전에 닫음.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
 - [ ] **IC-3 조건부 TBD:** 기본 경로 격리는 DC-12에서 검증했지만 별도 렌더러는 br 5,691B다. 기능 이득·비용을 본 뒤 공개 경로/별도 예산을 결정한다. 기존 한도 변경이나 초과 해소로 표시하지 않는다.
@@ -178,7 +180,7 @@
 
 ## 상태 / 핸드오프
 
-- done: [DC-14 heap 귀속](../benchmark/PARENT_MEMO_HEAP_RESULTS.md). 동일 production의300회 churn6context와 별도14 snapshot을 확인했다. outputs WeakMap table은5→25회+196,608B,25→300회 같은 ID/262,164B였고 clear 뒤 Hole/Map만 남았다. 실제 row/memo/snapshot/output0개와 App/Table2개를 확인하고 AllocationSite 템플릿을 분리했다. Python으로 전체 snapshot 합계·shape·강한 경로를 감사했다. 기존 DC-13 공식 결과와 기본28파일/package/sibling은 보존했다.
-- next: [DC-15 캐시 대조](../benchmark/PARENT_MEMO_CACHE_PLAN.md)의 기존 앱 default/isolated와 행 앱 off/helper/memo를 빌드·타입/B3/diagnostic gate 후 동차수 공식 비교한다. 계획은 CPU1,450/메모리150표본이다. 아직 측정하지 않았다. outputs 게시 후 정리는 별도 후보 가설이며 이번 코어에 적용하지 않았다.
-- blockers: 실행 블로커 없음. on 한 context의 추가 heap 변동은 미귀속이다. 장기 누수 부재·원래 앱/전체peer·공개 예산·concurrent 새 지원·최종 B4/Test Hardening/Integration·RC-5/IC-1은 미완료다.
-- commit: 최신 `aa20ccc84f4252c46e5a89ce1abb9ead0c6ee387` — `perf: validate isolated parent memo overhead and opt-in tradeoffs`. DC-12/DC-13은 커밋했고 DC-14 후속 도구·문서·증거는 작업 트리다. 기본 runtime은 baseline이다.
+- done: [DC-15 실제 캐시 비교](../benchmark/PARENT_MEMO_CACHE_RESULTS.md). 다섯 조건의 타입/B3·diagnostic9context·원래 앱 dispose6context, CPU1,450/메모리150표본 양순서와300회 churn/15context를 완료했다. 실패 배치0개, Python 분포480/가중36개 및 upstream183파일 hash 감사를 통과했다. memo는 기존 앱 대비 전체+21.08%/JS+70.27%, 같은 행 helper 대비 전체+3.75%였다. 기존 앱 대비 합산9항목이 모두 느렸다. 10k 메모리는27.474→36.438MB다. DOM/listener 증가는0이지만 memo 한 churn context의 추가 heap은 미귀속이다.
+- next: 현재 C3를 기존 앱 성능 개선안으로 채택하지 않고 원래 앱과 React/Preact의 전체 항목 비교 조건을 고정한다. 그 근거로 다음 코어 후보를 선택한다. 공개 예산 상향·C3 API 배포·concurrent 확장·outputs 정리 후보를 이번 결과에 섞지 않는다.
+- blockers: 실행 블로커 없음. 장기 누수 부재·전체peer/색상 수치 기준·최종 B4/Test Hardening/Integration은 미완료다. C3의 캐시 없는 행 앱 이득−9.30%는 기존 앱 개선율과 구분해 보존한다.
+- commit: 최신 `defa088e9863b6e82ea7f903e86fbcc97354beca` — `perf: attribute parent memo heap growth and define cache comparison`. DC-14까지 커밋했고 DC-15 후속 도구·문서·증거는 작업 트리다. 기본28파일/package/sibling 앱은 baseline 상태로 보존했다.
