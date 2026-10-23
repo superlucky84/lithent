@@ -1,6 +1,8 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-두 클라우드 후보는 미채택이며 현재 runtime17 source는 `8056e02` compact13과 같다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
+> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보 source/증거 보존 뒤 compact13 복원을 진행한다.
+
+DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
 
 > DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
 
@@ -268,3 +270,15 @@ DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
 - blockers: DC-18의 남은 구현/검사/보존 블로커는 없다. 전체 peer 목표는 미검증이다. optional metadata own-key 차이를 공개하며 전면 동등성·모든 heap 누수 부재·보편적 성능 우위를 주장하지 않는다. compact2실패 배치/재시도와 full/compact 시점·표본은 분리 보존한다.
 - commit: 현재 HEAD는 `452dc2eeae29d1e555f7f7b467f01de2baa55c0d`이며 이번 변경은 미커밋이다. 푸시/릴리스/upstream 제출은 하지 않았다. 적용 직전29guard 뒤2소스/size guard를 반영했고 최종79파일 manifest에 의도된6기존파일 변화를 기록했다. concurrent 소스는 미수정이다. 최종 증거 SHA-256은 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.
+
+## DC-20 고정 이벤트 프록시 독립 실행
+
+진입: clean `0dc3305`에서 별도 branch/worktree 생성, R46~R48/DC-20 계약 확정. 종료: 한정 source/동작 차이와 fresh A/B/메모리/size 증거 보존 및 기본 runtime 복원.
+
+- [x] P1 baseline: native 직접 등록의 이벤트 계약 관찰과 기존 core 테스트, baseline source snapshot/hash.
+- [x] P2 후보: slot 기반 updateEvent/portal 정리 구현, 같은 공통 동작 검증·strict type/lint. phase baseline은 frozen source로 같은 공통 테스트 통과.
+- [x] P3 Test Hardening: alias/dedup·this/object·drop/readd·retained DOM·portal·native stopImmediatePropagation·외부 order/removal·동일 dispatch 중 교체를 검사한다. 알려진 차이를 예상 관찰값으로 별도 기록한다.
+- [x] P4 Integration Test: production ESM browser gates/UMD/CJS smoke 뒤 serial 양순서 update/mount/dispatch·별도 memory/size, 입력 hash와 독립 통계 검증. 정상 회귀와 관찰 차이를 혼합하지 않는다.
+- [ ] P5 보존/복원: source/patch/raw/보고서·재현 도구/commit, unchanged concurrent·원래 checkout 확인, base runtime 복원 뒤 관련 회귀와 strict 검사. 광범위 dual/e2e와 fixed peer 전체 목표는 범위 밖.
+
+DC-20 P4 종료: base/concurrent 각238/55파일, concurrent portal commit4, strict/ESLint, CJS/UMD 및 actual ESM 공통 계약·native6관찰/variant·등록 진단8조건, 시간48page/1,440update batches/480dispatch batches·메모리24context·별도settled-retention24context와 Python hash/통계 감사를 완료했다. 최초 shared teardown의 concurrent portal5실패는 fallback 수정/전체 재검증과 함께 보존한다. 미채택 판단은 native 관찰 차이·교환 비용/대조 회귀에 근거하며 크기만으로 종료하지 않았다. P5 보존/복원이 남았다.

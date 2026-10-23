@@ -1,6 +1,8 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-두 클라우드 후보는 미채택이며 현재 runtime17 source는 `8056e02` compact13과 같다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
+> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보 source/증거 보존 뒤 compact13 복원을 진행한다.
+
+DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
 
 > DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
 
@@ -193,3 +195,12 @@ DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
 - blockers: DC-18의 남은 구현/검사/보존 블로커는 없다. 전체 peer 목표는 미검증이다. optional metadata own-key 차이를 공개하며 전면 동등성·모든 heap 누수 부재·보편적 성능 우위를 주장하지 않는다. compact2실패 배치/재시도와 full/compact 시점·표본은 분리 보존한다.
 - commit: 현재 HEAD는 `452dc2eeae29d1e555f7f7b467f01de2baa55c0d`이며 이번 변경은 미커밋이다. 푸시/릴리스/upstream 제출은 하지 않았다. 적용 직전29guard 뒤2소스/size guard를 반영했고 최종79파일 manifest에 의도된6기존파일 변화를 기록했다. concurrent 소스는 미수정이다. 최종 증거 SHA-256은 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.
+
+## M-14. DC-20 고정 이벤트 프록시 — R46~R48
+
+- [x] 원래 checkout/C2/concurrent 보존 및 frozen compact13/hash 확인.
+- [x] 공통 이벤트·alias/dedup·this/currentTarget/object·stopImmediatePropagation·drop/readd·portal/retained DOM 계약 확인.
+- [x] 외부 listener order/remove/dedup과 dispatch 중 교체 차이를 baseline과 병렬 기록하고 기본 채택 여부에 반영.
+- [x] production build와 별도 등록/해제 카운터 분리, 양순서 fresh-page update/mount/dispatch raw 완전성 확인.
+- [x] 별도 GC/DOM/listener·churn/dispose와 3 bundle 형식 size, 독립 통계/해시 감사 확인.
+- [ ] 결과·실제 commit·done/next/blockers 및 runtime 복원 확인; 공식 peer/모든 앱 개선으로 확대하지 않음.

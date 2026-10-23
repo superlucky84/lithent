@@ -1,6 +1,8 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-두 클라우드 후보는 미채택이며 현재 runtime17 source는 `8056e02` compact13과 같다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
+> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보 source/증거 보존 뒤 compact13 복원을 진행한다.
+
+DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
 
 > DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
 
@@ -361,3 +363,13 @@ frame은 내부 `{ proofs: WeakMap<WDom, WDom[]>, ready: boolean, invalid: boole
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
 - blockers: DC-18의 남은 구현/검사/보존 블로커는 없다. 전체 peer 목표는 미검증이다. optional metadata own-key 차이를 공개하며 전면 동등성·모든 heap 누수 부재·보편적 성능 우위를 주장하지 않는다. compact2실패 배치/재시도와 full/compact 시점·표본은 분리 보존한다.
 - commit: 현재 HEAD는 `452dc2eeae29d1e555f7f7b467f01de2baa55c0d`이며 이번 변경은 미커밋이다. 푸시/릴리스/upstream 제출은 하지 않았다. 적용 직전29guard 뒤2소스/size guard를 반영했고 최종79파일 manifest에 의도된6기존파일 변화를 기록했다. concurrent 소스는 미수정이다. 최종 증거 SHA-256은 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.
+
+## DC-20 — 고정 이벤트 프록시 한정 후보
+
+- [x] 기준선은 restored compact13 `8056e02`; 독립 branch 시작점은 `0dc3305`. canonical 계획은 이 네 문서, 실행 도구는 `experiments/event-proxy/`, 결과는 `docs/benchmark/EVENT_PROXY_RESULTS.md`에 둔다.
+- [x] DOM의 module-private Symbol 속성에 event-name별 slot 배열을 저장한다. 일반 단일 handler는 slot.handler 참조만 교체하고 native 등록은 유지한다. 각 slot은 공유 handleEvent 함수를 쓰는 EventListenerObject로 native 등록한다. 같은 event-name에 callback이 여러 개면 교체 시 기존 remove/add 경로로 fallback해 alias 간 순서를 보존한다. 함수 callback은 currentTarget을 this로 호출하고 객체는 객체의 handleEvent를 호출한다.
+- [x] event-name별 여러 callback slot으로 onClick/onclick alias의 등록·dedup·명시적 제거를 기존 updateEvent의 imperative 순서대로 모델링한다. 한 event-name당 slot 하나로 축약하지 않는다. callback 제거 시 native slot을 해제하며 ordinary discarded DOM은 유지한다. portal cleanup은 removeEvent로 최신 slot을 제거하고 Symbol 상태가 없는 concurrent의 직접 native 등록은 원 callback으로 제거한다. concurrent의 branched render/source는 미수정이지만 공유 teardown utility는 후보에 포함되므로 candidate concurrent artifact가 바이트 단위로 같다고 주장하지 않는다.
+- [x] 외부 listener와의 교체 후 상대 순서, 원 callback을 통한 외부 remove/dedup, 같은 dispatch 중 callback 교체는 stable native proxy가 기존 직접 등록과 같다고 보장할 수 없다. 이 차이는 호환성 관찰 결과로 보존하고 기본 채택을 차단한다. 관찰 실험은 정상 회귀 통과와 구분한다.
+- [x] 실측 완료: inline-only−33.80%/inline-text−26.64% 업데이트 이득은 양순서 반복. dispatch+9.85~12.36%, eventful heap+35.91~40.32%, UMDbr+194B와 noevent update+21.32%를 공개한다. 외부 native 관찰 차이도 남아 slot 후보는 미채택이다. 초기 dispose 잔류를 별도24context의2rAF+100ms/GC 관찰로 분리했고 settled DOM/listener 증가0을 확인했다. → R46~R48, DC-20 구현 단계, M-14.
+
+측정 계획: 2,000 button, 네 workload, 두 순서×3 fresh page/variant/workload, 10 warmup+30 retained update batches/page. 1 batch=5 updates(각 nextTick 대기); 시간은 batch 전체와 1update 환산값을 모두 보존한다. mount는 fresh page의 최초 mount이며 dispatch는 20,000 native events/batch(3 warmup+10 retained)다. 메모리는 별도3 fresh context/variant/workload, 100update와10mount/dispose churn 뒤 강제GC·dispose를 관찰한다. 브라우저 전체 perf gate/별도 listener 계측이 먼저 끝난 뒤 timing, 마지막 memory로 직렬 실행한다. 코어 테스트/build를 동시에 실행하지 않는다. 이 수치는 official score가 아니고 update→nextTick JS elapsed이며 최종 paint 시간은 측정하지 않는다.

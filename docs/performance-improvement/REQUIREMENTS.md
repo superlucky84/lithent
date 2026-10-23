@@ -1,6 +1,8 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
-두 클라우드 후보는 미채택이며 현재 runtime17 source는 `8056e02` compact13과 같다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
+> DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보 source/증거 보존 뒤 compact13 복원을 진행한다.
+
+DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
 
 > DC-19 클라우드 독립 실험 완료: 이 브랜치의 앵커 범위 탐색은 **미채택 프로토타입**이다. 기본 compact13/C2와 구분하며 [결과](../benchmark/FRAGMENT_ANCHOR_RESULTS.md)를 참조한다. 아래 DC-18 수치는 로컬 이력이다.
 
@@ -146,3 +148,9 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 - next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
 - blockers: DC-18의 남은 구현/검사/보존 블로커는 없다. 전체 peer 목표는 미검증이다. optional metadata own-key 차이를 공개하며 전면 동등성·모든 heap 누수 부재·보편적 성능 우위를 주장하지 않는다. compact2실패 배치/재시도와 full/compact 시점·표본은 분리 보존한다.
 - commit: 현재 HEAD는 `452dc2eeae29d1e555f7f7b467f01de2baa55c0d`이며 이번 변경은 미커밋이다. 푸시/릴리스/upstream 제출은 하지 않았다. 적용 직전29guard 뒤2소스/size guard를 반영했고 최종79파일 manifest에 의도된6기존파일 변화를 기록했다. concurrent 소스는 미수정이다. 최종 증거 SHA-256은 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.
+
+## DC-20 클라우드 고정 이벤트 프록시 — 독립 실험
+
+- R46. 사용자 요청에 따라 `experiment/event-proxy-cloud` / 별도 worktree에서 compact13 `8056e02` 대비 base 이벤트 등록 방식만 변경한다. C2와 Fragment 후보를 결합하지 않으며 concurrent/public API/기존 size guard는 유지한다. 크기 초과만으로 시간 측정을 중단하지 않는다.
+- R47. 일반 DOM 폐기 후 보관된 참조의 이벤트, portal host의 최신 handler 정리, 함수 this/currentTarget·handleEvent 객체, prop 생략/재추가·상속 key·대소문자 alias/동일 callback dedup·stopImmediatePropagation을 검증한다. 외부 add/removeEventListener와 실행 순서·dispatch 도중 callback 교체의 관찰 차이를 숨기지 않는다. 호환성 차이가 남은 후보는 기본 채택하지 않고 제한 성능 실험으로 보존한다.
+- R48. 새 closure가 매 render 생기는 handler-only/text-update, stable-handler/text-update, event 없는 text-update를 같은 production 앱/브라우저로 양순서 비교한다. mount/update/native dispatch를 구분하고 listener 호출 수는 별도 계측한다. GC 뒤 heap/DOM/listener와 UMD raw/gzip/br 비용을 공개한다. 이 synthetic 결과를 기존 cached 앱/공식9항목·peer 목표 또는 물리적 allocation/누수 부재로 확대하지 않는다.
