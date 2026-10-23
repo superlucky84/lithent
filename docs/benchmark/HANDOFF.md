@@ -1,5 +1,16 @@
 # summary
 
+## DC-16 전체 peer 비교·진단 완료, 다음은 DC-17 C2 — 2026-10-23
+
+- [보고서](./PEER_BASELINE_RESULTS.md), [지표/차수 전환 표](./PEER_BASELINE_TABLE.html), [raw](./peer-baseline-results.json), [증거](./peer-baseline-evidence.json.gz), [도구](../../experiments/peer-baseline/README.md).
+- done: 원래 Lithent/default와 고정 React hooks19.2.0/classes19.0.0·Preact hooks/classes11.0.0의 production gate·양순서CPU1,450/메모리150을 실패0으로 완료했다. 분포480/가중69개·목표/색상/정규화를 독립 감사했다. 기본28파일/package/sibling·입력1,228개는 유지했다.
+- goal: 사용자 CPU 목표는 네 peer 최저 total 중앙값의1.10배 이내/9항목 전부다. 합산5/9·첫5/9·반대6/9로 미달이다. 선택1.630×·부분 갱신1.269×·1k생성1.117×·한 행 삭제1.103×가 합산 미달이며 마지막은 차수별 경계를 오간다. 평균이나 색상으로 목표 달성을 대체하지 않는다.
+- diagnostic: 새 CPU profile12context/120개 중 음수−1µs의1개를 통째로 제외했다.119개 함수 집계와 별도 trace4context/40구간을 Python 감사했다. 첫 시도120개(음수41개)는 전량 시간 순위에서 제외하고 원본을 보존했다. 음수 원인은 미확정이며 공식 표본과 진단을 합산하지 않는다. UTC 공식01:28~02:38, 새 profile/trace10:12로 시간 간격도 크다.
+- evidence: SHA256 `5ec4db084140ac0e1379d82c2c691d7fc437c24e1e4484d8cc823a0d7071412e`, 774entries/7941577B. CPU 정상trace1,450개 hash/size·선택10개 내용, 모든 별도 진단/제외 시도·동일 해시 회귀의 nested archive를 보존하고 디코딩 hash를 검사했다. 나머지 정상 CPU trace 내용은 임시 출력에 있다.
+- next: [정본 DESIGN의 DC-17](../performance-improvement/DESIGN.md#dc-17--c2의-diff-결과를-render에-전달하는-한정-후보)에 따라 현재 general keyed diff 결과를 render에 전달해 중복 인덱스/임시 배열 처리를 줄이는 C2 한정 후보를 검증한다. Map의 키 읽기/첫 소비·helper는 유지한다. metadata 수명/fallback과 baseline 회귀를 먼저 정하고 새 후보 비용·크기·정합성을 확인한다.
+- blockers: 실행 블로커 없음. C2 구현/이득·최종 peer 재비교·Phase5/6·메모리 예산은 미완료다. C3는 기존 앱 개선안으로 미채택 상태다.
+- commit: DC-16 측정 기준은 `6bd3b3317ae73562afc49479bd3ed0ba952ce8ab`다. 이번 DC-16 결과와 DC-17 계획을 `perf: record fixed peer baseline and C2 follow-up plan`으로 기록한다. 후속 확정 SHA·푸시 상태·재개 컨텍스트는 `git log -1`과 이 브랜치의 ctxbin에 남긴다. 모든 공식/진단 실행은 종료했다. 아래는 각 당시 이력이다.
+
 ## 영문 커밋과 DC-15 실제 캐시 비교 완료 — 2026-10-23
 
 - 사용자 요청으로 DC-14 heap 분석·증거와 캐시 비교 사전 계획을 영문 커밋했다.

@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-23. 상태: **DC-15 다섯 조건의 CPU1,450·메모리150·300회 churn/15context 완료. 현재 C3를 기존 앱 개선안으로 미채택. 기본 runtime 보존**.
+- 기준일: 2026-10-23. 상태: **DC-16 CPU1,450/메모리150·독립 감사·별도 진단 완료. CPU 목표 합산5/9 통과로 미달. 다음은 DC-17 C2 한정 후보이며 기본 runtime 보존**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 
@@ -124,6 +124,30 @@
 
 [DC-15 결과](../benchmark/PARENT_MEMO_CACHE_RESULTS.md): 양순서CPU1,450/메모리150·churn15context·dispose·독립 통계/183파일 감사를 완료했다. 기존 앱 대비 전체+21.08%/JS+70.27%여서 현재 C3를 기존 앱 개선안으로 채택하지 않는다. 공식 측정은2026-10-22UTC, 추가 churn은2026-10-23UTC이며 시간 간격을 공개한다. 최종 peer/Phase5~6 완료는 아니다.
 
+### DC-16 완료 — 원래 앱과 React/Preact 전체 비교
+
+- [x] 사용자 CPU1.10 목표·고정 네 peer/source/lock·원래 앱을 manifest에 고정하고 각 upstream production 설정으로 새 staging을 빌드한다. 설치본 재사용 시 lock/package/의존성 트리와 source 일치를 감사한다.
+- [x] 모든 앱의 keyed/9동작/font·DOM 정체성 gate를 통과하고 양순서 CPU1,450·메모리150표본을 직렬 수집한다. 과거 표본과 합산하지 않는다.
+- [x] 전체/JS/paint·분포·네 peer 최저 대비1.10 판정/가중치/색상 함수·MB/크기·실패/부하를 보고한다. Python으로 중앙값/분포/비율/가중 지표를 독립 감사한다.
+- [x] 목표 격차 상위 최대 두 항목의 원래 Lithent와 가장 빠른 peer를 별도 profile/trace로 진단하고 다음 코어 후보/미확정 원인을 기록한다.
+- [x] raw/trace/소스/빌드/도구/lock/명령/로그를 보존하고 정본4문서/HANDOFF에 실제 commit과 done/next/blockers를 갱신한다.
+
+기준 검사: 측정 전후 default28파일/package/sibling·peer source/lock/의존성·Chrome/엔진·runner hash, 앱별 gate, 표본 완전성·반대 순서·독립 통계·로컬 링크. CPU 중 build/test 금지. 최종 Phase5/6의 새 후보 검증은 별도다.
+
+### DC-17 다음 실행 — C2의 현재 diff 결과 전달
+
+진입: DC-16 전체 비교·진단을 완료하고 DESIGN DC-17의 범위를 고정함. 종료: 같은 원래 앱의 core-only 이득/손해와 정합성·메모리·크기·복원 증거가 있어 다음 분기를 판단할 수 있음.
+
+- [x] 범위: 기존 general keyed Map 이후의 현재 결과를 render에 전달해 중복 인덱스/배열 처리를 줄인다. 새 key preflight/Set/immutable 가정/공개 API 없이 시작한다.
+- [ ] metadata의 저장·현재 diff 성공 후 게시·일회 소비·실패/삭제/재진입 폐기를 결정하고 기본 경로/fallback 비용을 기록한다.
+- [ ] DESIGN의 baseline 회귀를 두 코어에 먼저 추가한다. 원본 hash·앱/helper·브라우저·별도 스냅샷을 고정한다.
+- [ ] base 한정 프로토타입과 별도 카운터로 배열/방문 제거·실패 경로를 확인한다. 실제 app/default runtime과 실험 snapshot을 혼동하지 않는다.
+- [ ] 후보 B1 dual·B2 타입/빌드/size·B3 원래 앱 정체성/keyed/9동작/font를 확인한다. 4,800B 초과를 통과로 바꾸지 않는다.
+- [ ] 같은 앱의 baseline/후보 CPU9항목 양순서580·공식 메모리60·별도3context/조건 retention을 직렬 수집하고 독립 통계·전후 hash를 감사한다. DC-16과 표본을 합치지 않는다.
+- [ ] 후보 소스/패치/증거와 채택 또는 보류 이유를 보존하고 자신의 runtime 변경만 복원한다. 최종 후보/peer 비교·Phase5/6은 남긴다.
+
+기준 검사: baseline 회귀 → 후보 B1~B3 → 실제 제거 작업/전체CPU·메모리·크기 → 복원28파일/package/sibling·local links. 진단 위치가 실제 비용 절감이나 전 항목 목표 달성을 보장하지 않는다.
+
 진입: 후보별 B1~B3 통과 및 immutable production staging 완료. 종료: 모든 항목의 실제 이득/손해와 불확실성이 같은 환경에서 비교됨.
 
 - [ ] 같은 앱·helper의 core-only 대조 및 필요 시 동일 구조의 opt-in 대조를 분리. 원래 앱 대비 최종 앱 결과는 별도 표로 제공.
@@ -132,7 +156,7 @@
 - [ ] 공식 메모리 5개(21/22/23/25/26)를 같은 조건으로 비교. retention은 fresh context 3차수의 반복 생성/삭제·갱신과 GC 뒤 DOM/listener/heap을 기록하며 공식 메모리와 분리.
 - [ ] raw/gzip/brotli, 생성/clear/append의 비용, startup·전송량 진단을 별도 기록. 손해가 있어도 전체·상대 성능과 절대량으로 검토.
 - [ ] baseline+후보+IC-1의 React/Preact 비교군에 **전체 항목** 실행. 기존 `suite`는 peer CPU를 03/04만 실행하므로 전체 비교 완료 절차로 사용하지 않음.
-- [ ] 항목별 baseline·peer 비율/분포, 가중 전체 지표, 색상 계산 설정을 보존. 임계치 미확정이면 수치와 표를 제공하되 전 항목 목표 달성 판정은 미정으로 남김.
+- [ ] 항목별 baseline·peer 비율/분포, 가중 전체 지표, 색상 계산 설정을 보존. 확정된 CPU1.10 항목별 목표를 판정하고 미정인 메모리 교환 상한과 구분한다.
 - [ ] 기준 검사: 시작 전 B3와 B1/B2 결과의 후보 해시 일치 확인, 종료 후 manifest·표본 완전성/실패 로그 감사, M-7·M-8. 성능 측정 중 무거운 테스트 실행 금지.
 
 판정: 채택 검토/추가 실험/기각과 근거를 기록한다. 한 항목 회귀=기각, 메모리 증가=기각, 첫 차수 평균 개선=채택 규칙을 사용하지 않는다.
@@ -167,20 +191,21 @@
 - `LITHENT_BENCHMARK_ROOT`는 사용자 지정 sibling checkout, `LITHENT_PRODUCTION_OUT`은 매번 새 출력 경로, `LITHENT_CHROME_BINARY`는 고정 브라우저를 지정한다.
 - core-only `prepare`는 **`LITHENT_BASELINE_SOURCE`와 `LITHENT_CANDIDATE_SOURCE`를 같은 보존 원본으로 명시**하고 `LITHENT_CANDIDATE_CORE`만 후보 ESM으로 지정한다. 기본값은 현재 upstream 실험 앱/targeted 후보를 사용하므로 그대로 실행하지 않는다.
 - `contracts`, `verify`, `cpu`, `mem`, `retention` 모드를 분리해 실행한다. 반대 차수는 새 출력 위치와 앱 순서를 사용한다. `LITHENT_PRODUCTION_ALTERNATE_ORDER=1`과 실제 실행 순서를 manifest에 남긴다.
-- React/Preact는 고정 lockfile의 `react-hooks`, `preact-hooks`, `react-classes`, `preact-classes`를 우선 후보군으로 기록하되 최종 표 포함 범위는 IC-1에서 확정한다. peer를 재빌드하면 해시를 갱신하고 과거 다른 버전 수치와 섞지 않는다.
+- React/Preact 비교군은 DC-16/IC-1의 고정 lockfile `react-hooks`19.2.0, `react-classes`19.0.0, `preact-hooks`/`preact-classes`11.0.0의 네 구현이다. peer를 재빌드하면 해시를 갱신하고 과거 다른 버전 수치와 섞지 않는다.
 - 성능 검사에 브라우저 실행·네트워크·sibling 쓰기가 필요하면 해당 환경의 실행 권한 절차를 따른다. 원래 upstream 실험 앱을 보존하고 새 staging을 사용한다.
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13 통제 앱 CPU/메모리·DC-14 heap 귀속·DC-15 실제 캐시 앱 대조도 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않으며 다음은 전체peer 기준 확보다. 전체peer·최종 채택은 미완료다.
-- [ ] **IC-1 TBD:** 최종 표의 비교군, 정규화·색상/통계 모드, CPU/메모리/startup 표시 범위, 빠른 구간의 수치 임계치. Phase 1에서 제안·기록하고 Phase 6 목표 판정 전에 닫음.
+- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13 통제 앱 CPU/메모리·DC-14 heap 귀속·DC-15 실제 캐시 앱 대조도 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16의 전체 peer 기준·별도 진단을 완료했고 DC-17 C2가 다음 후보다. 새 후보·최종 채택은 미완료다.
+- [x] **IC-1 CPU 확정:** 사용자2026-10-23 선택으로 고정 React/Preact hooks/classes 네 peer 최저 전체 시간 중앙값 대비1.10배 이하를9항목 전부 만족하는 목표를 택했다. DC-16의 같은 차수 합산/차수별 수치와 upstream 가중치/색상 함수를 보존한다. memory·size는 별도 비용, startup은 이번 범위 제외이며 최종 메모리 교환 상한은 IC-2에 남긴다.
 - [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
 - [ ] **IC-3 조건부 TBD:** 기본 경로 격리는 DC-12에서 검증했지만 별도 렌더러는 br 5,691B다. 기능 이득·비용을 본 뒤 공개 경로/별도 예산을 결정한다. 기존 한도 변경이나 초과 해소로 표시하지 않는다.
 - [ ] **IC-4 검증 대기:** C1/C2/C3/C4 중 최종 채택 조합. 각 후보의 독립 결과 뒤 결합 상호작용을 확인.
 
 ## 상태 / 핸드오프
 
-- done: [DC-15 실제 캐시 비교](../benchmark/PARENT_MEMO_CACHE_RESULTS.md). 다섯 조건의 타입/B3·diagnostic9context·원래 앱 dispose6context, CPU1,450/메모리150표본 양순서와300회 churn/15context를 완료했다. 실패 배치0개, Python 분포480/가중36개 및 upstream183파일 hash 감사를 통과했다. memo는 기존 앱 대비 전체+21.08%/JS+70.27%, 같은 행 helper 대비 전체+3.75%였다. 기존 앱 대비 합산9항목이 모두 느렸다. 10k 메모리는27.474→36.438MB다. DOM/listener 증가는0이지만 memo 한 churn context의 추가 heap은 미귀속이다.
-- next: 현재 C3를 기존 앱 성능 개선안으로 채택하지 않고 원래 앱과 React/Preact의 전체 항목 비교 조건을 고정한다. 그 근거로 다음 코어 후보를 선택한다. 공개 예산 상향·C3 API 배포·concurrent 확장·outputs 정리 후보를 이번 결과에 섞지 않는다.
-- blockers: 실행 블로커 없음. 장기 누수 부재·전체peer/색상 수치 기준·최종 B4/Test Hardening/Integration은 미완료다. C3의 캐시 없는 행 앱 이득−9.30%는 기존 앱 개선율과 구분해 보존한다.
-- commit: 최신 `defa088e9863b6e82ea7f903e86fbcc97354beca` — `perf: attribute parent memo heap growth and define cache comparison`. DC-14까지 커밋했고 DC-15 후속 도구·문서·증거는 작업 트리다. 기본28파일/package/sibling 앱은 baseline 상태로 보존했다.
+- done: DC-16의 고정 다섯 production gate·CPU1,450/메모리150표본을 양순서 실패0으로 완료했다. 분포480/가중69개와 목표·색상/정규화를 독립 감사했다. 별도 profile119/120유효·독립 trace4context/40구간과 첫 제외 시도도 보존했고 Python으로 제외/함수 합계/구간을 감사했다. [결과](../benchmark/PEER_BASELINE_RESULTS.md)·[비교표](../benchmark/PEER_BASELINE_TABLE.html)·raw/증거·재현 도구를 남겼다.
+- goal: CPU 기준은 각9항목의 고정 네 peer 최저 total 중앙값 대비1.10배 이하다. 합산5/9·첫5/9·반대6/9 통과로 미달이다. 선택1.630×/부분 갱신1.269×가 큰 격차다. 한 행 삭제1.103×는 차수별 경계를 오가므로 작은 초과를 확정하지 않는다. memory/size는 별도 비용이다.
+- next: DC-17 C2의 현재 diff 증명→render 전달 범위에서 metadata 수명/fallback을 먼저 확정하고 baseline 회귀→base 프로토타입→B1~B3/size→같은 앱 CPU580/메모리60·retention→복원/증거 순으로 진행한다. 기존 Map 소비/키 읽기·helper와 실제 sibling 앱을 유지한다.
+- blockers: 실행 블로커 없음. CDP 음수 간격 원인은 미확정이며 제외 원본을 보존했다. C2 구현/이득·메모리 교환 상한·최종 B4/Test Hardening/Integration은 미완료다. C3는 기존 앱 개선안으로 미채택이다.
+- commit: DC-16 측정 기준은 `6bd3b3317ae73562afc49479bd3ed0ba952ce8ab`다. DC-16 도구/문서/증거와 DC-17 계획을 `perf: record fixed peer baseline and C2 follow-up plan`으로 함께 기록한다. 후속 확정 SHA와 푸시 상태는 `git log -1` 및 이 브랜치의 ctxbin 컨텍스트에서 확인한다. default28파일/package/sibling·고정 입력1,228개를 보존했다.
