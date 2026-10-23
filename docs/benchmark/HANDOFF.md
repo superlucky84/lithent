@@ -57,8 +57,9 @@
 - Next: the selected candidate is applied and this experiment is complete. The fixed four-peer
   all9≤1.10×CPU target is not remeasured or proved by DC-18. C2 CPU/memory,
   event-proxy workloads and other scoped candidates remain separate work.
-  The user requested a commit, push and ctxbin handoff. Record the resulting
-  commit SHA and push state in this handoff and the branch context before stopping.
+  The user requested a commit, push and ctxbin handoff. Implementation commit
+  `ff8b80afcc69f7226167ce39e6be3536ac873372` was pushed to `origin` on this
+  branch; the branch context records the remaining target and next work.
 
 ## DC-17 C2 prototype deferred by size gate — 2026-10-23
 
