@@ -1,5 +1,7 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
+> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보 보존/compact13 복원을 진행한다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
+
 > DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
 DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
@@ -204,3 +206,12 @@ DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict
 - [x] production build와 별도 등록/해제 카운터 분리, 양순서 fresh-page update/mount/dispatch raw 완전성 확인.
 - [x] 별도 GC/DOM/listener·churn/dispose와 3 bundle 형식 size, 독립 통계/해시 감사 확인.
 - [x] 결과·실제 commit·done/next/blockers 및 runtime 복원 확인; 공식 peer/모든 앱 개선으로 확대하지 않음.
+
+## M-15. DC-21 flat event table — R49~R51
+
+- [x] baseline/slot/flat frozen source scope와 원래 worktree/C2 보존 확인.
+- [x] common event·frozen callback·동적 alias native fallback·portal/retained DOM·shared concurrent 계약 검증.
+- [x] 세 variant의 실제 native 관찰 차이와 등록 진단을 시간 lane과 분리.
+- [x] 회전/역순72page update/mount/dispatch·독립36memory/settled dispose·size/입력 hash 완전성 감사.
+- [x] heap 전체 증가분과 baseline 대비 추가분, slot 대비 추가분 절감을 구분하고 실제 갱신 이득/비용을 판정.
+- [ ] 한정 결과/미검증·실제 source commit·done/next/blockers·증거/복원/재현 감사 인계.

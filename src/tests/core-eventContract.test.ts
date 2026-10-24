@@ -2,6 +2,79 @@ import { describe, expect, it } from 'vitest';
 import { h, mount, nextTick, render } from '@/index';
 
 describe('event callback contracts', () => {
+  it('preserves callback behavior across single and multiple alias transitions', async () => {
+    const calls: string[] = [];
+    const a = () => calls.push('a');
+    const b = () => calls.push('b');
+    const c = () => calls.push('c');
+    const cases = [
+      { onClick: a },
+      { onClick: a, onclick: b },
+      { onClick: c, onclick: b },
+      { onClick: c },
+      {},
+      { onClick: a },
+      { onClick: a, onclick: a },
+      { onclick: a },
+    ];
+    const expected = [
+      ['a'],
+      ['a', 'b'],
+      ['b', 'c'],
+      ['c'],
+      [],
+      ['a'],
+      ['a'],
+      [],
+    ];
+    let stage = 0;
+    let renew = () => {};
+    const App = mount(bump => {
+      renew = bump;
+      return () => h('button', cases[stage]);
+    });
+    const host = document.createElement('div');
+    const dispose = render(h(App, {}), host);
+    const button = host.firstElementChild as HTMLElement;
+    for (; stage < cases.length; stage++) {
+      if (stage) {
+        renew();
+        await nextTick();
+      }
+      button.click();
+      expect(calls.splice(0)).toEqual(expected[stage]);
+      expect(host.firstElementChild).toBe(button);
+    }
+    dispose();
+  });
+
+  it('supports frozen function/object handlers for independent event types', () => {
+    const calls: [unknown, string, EventTarget | null][] = [];
+    const click = Object.freeze(function (this: HTMLElement, event: Event) {
+      calls.push([this, event.type, event.currentTarget]);
+    });
+    const keyboard = Object.freeze({
+      handleEvent(event: Event) {
+        calls.push([this, event.type, event.currentTarget]);
+      },
+    });
+    const host = document.createElement('div');
+    const dispose = render(
+      h('button', { onClick: click, onKeyDown: keyboard }),
+      host
+    );
+    const button = host.firstElementChild as HTMLElement;
+    button.click();
+    button.dispatchEvent(new KeyboardEvent('keydown'));
+    expect(calls).toEqual([
+      [button, 'click', button],
+      [keyboard, 'keydown', button],
+    ]);
+    expect(Reflect.ownKeys(click)).toEqual(['length', 'name', 'prototype']);
+    expect(Reflect.ownKeys(keyboard)).toEqual(['handleEvent']);
+    dispose();
+  });
+
   it('uses the native currentTarget as function this after replacement', async () => {
     const calls: [unknown, EventTarget | null, EventTarget | null, number][] =
       [];

@@ -1,5 +1,7 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
+> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보 보존/compact13 복원을 진행한다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
+
 > DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
 DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
@@ -373,3 +375,13 @@ frame은 내부 `{ proofs: WeakMap<WDom, WDom[]>, ready: boolean, invalid: boole
 - [x] 실측 완료: inline-only−33.80%/inline-text−26.64% 업데이트 이득은 양순서 반복. dispatch+9.85~12.36%, eventful heap+35.91~40.32%, UMDbr+194B와 noevent update+21.32%를 공개한다. 외부 native 관찰 차이도 남아 slot 후보는 미채택이다. 초기 dispose 잔류를 별도24context의2rAF+100ms/GC 관찰로 분리했고 settled DOM/listener 증가0을 확인했다. → R46~R48, DC-20 구현 단계, M-14.
 
 측정 계획: 2,000 button, 네 workload, 두 순서×3 fresh page/variant/workload, 10 warmup+30 retained update batches/page. 1 batch=5 updates(각 nextTick 대기); 시간은 batch 전체와 1update 환산값을 모두 보존한다. mount는 fresh page의 최초 mount이며 dispatch는 20,000 native events/batch(3 warmup+10 retained)다. 메모리는 별도3 fresh context/variant/workload, 100update와10mount/dispose churn 뒤 강제GC·dispose를 관찰한다. 브라우저 전체 perf gate/별도 listener 계측이 먼저 끝난 뒤 timing, 마지막 memory로 직렬 실행한다. 코어 테스트/build를 동시에 실행하지 않는다. 이 수치는 official score가 아니고 update→nextTick JS elapsed이며 최종 paint 시간은 측정하지 않는다.
+
+## DC-21 — flat table과 shared function proxy
+
+- [x] 정본은 이 네 문서, 실행 도구는 `experiments/event-proxy-flat/`, 결과는 `docs/benchmark/EVENT_PROXY_FLAT_RESULTS.md`다. branch 입력 `80afb8f`, native baseline `8056e02`, slot commit `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 동결한다.
+- [x] DOM private Symbol → plain record → callback으로 직접 연결한다. key는 `on`+정규화event-name으로 built-in Object key와 구분한다. 공용 function proxy가 callback.call(currentTarget,event) 또는 object.handleEvent(event)를 실행한다. 일반 event별 array/slot/closure를 만들지 않는다. Preact의 logical clock/함수 stamp는 추가하지 않아 저장 구조를 한 축으로 비교한다.
+- [x] 같은 event-name에 다른 callback을 추가하면 proxy를 제거하고 기존/current callback과 새 callback을 native 등록한다. record에는 boolean true만 남겨 그 name의 후속 갱신/삭제를 기존 native remove/add로 처리한다. alias가 사라져도 proxy로 재전환하지 않아 희소 bookkeeping을 추가하지 않는다. 같은 callback alias는 dedup하고, portal teardown은 proxy match 또는 native callback으로 제거한다.
+- [x] 단일 handler의 외부 listener 순서/remove/dedup 및 dispatch 중 교체 관찰은 DC-20의 미채택 경계로 유지한다. full native 동등성이나 기본 적용을 전제로 하지 않는다.
+- [x] 새3-way: eventful 추가heap 약0.44MB→0.087~0.099MB(추가분−77.63~80.06%, live heap 증가분 baseline대비+6.99~8.73%). Inline 갱신−29.01~37.07% 양순서 유지, stable 갱신같음/noevent+3.38%, dispatch+6.58~11.19%, UMDbr4,992B(base+168/slot−26). 초기 mount6표본/control 변동과 native 관찰 차이를 공개하며 이번 flat도 미채택이다. → R49~R51, DC-21 단계, M-15.
+
+프로토콜: 2,000buttons×inline-only/inline-text/stable-text/noevent-text. order0의 각 round에서 baseline→slot→flat을 회전하고 order1은 각 triplet을 역전한다. 2orders×3rounds×4workloads×3variants=72fresh pages,10warmup+30retained batches(5updates/batch). dispatch3warmup+10retained×20kevents/page; mount는 최초1회/page. 별도 memory3contexts/variant/workload=36,100updates/10mount-dispose churn·2GC와 최종 dispose 직후/2rAF+100ms+2GC를 모두 보존한다. gate/등록 진단→timing→memory 순서로 실행하고 CPU 수집 중 build/test/profiler를 병행하지 않는다. JS wall time·CDP heap이며 official paint/공식 메모리/peer 달성 근거로 확대하지 않는다.

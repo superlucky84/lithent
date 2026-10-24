@@ -1,5 +1,6 @@
 import { WDom, CompKey } from '@/types';
 import { checkEventKey } from '@/utils/predicator';
+import { removeEvent } from '@/utils/event';
 import {
   componentMap,
   getCurrentComponent,
@@ -30,8 +31,9 @@ const recursiveRunUnmount = (wDom: WDom) => {
   if (wDom.tag === 'portal' && wDom.el) {
     for (const key in wDom.props) {
       if (checkEventKey(key)) {
-        wDom.el.removeEventListener(
-          key.slice(2).toLowerCase(),
+        removeEvent(
+          wDom.el as HTMLElement,
+          key,
           wDom.props[key] as EventListener
         );
       }

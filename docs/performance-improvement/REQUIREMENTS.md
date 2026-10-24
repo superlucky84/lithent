@@ -1,5 +1,7 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
+> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보 보존/compact13 복원을 진행한다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
+
 > DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
 DC-19/19B 두 후보는 미채택으로 종료했고 당시 runtime17 source를 `8056e02` compact13으로 복원했다. [복원/재빌드 감사](../benchmark/fragment-anchor-restoration.json)와 HANDOFF의 구현 커밋을 확인한다.
@@ -154,3 +156,9 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 - R46. 사용자 요청에 따라 `experiment/event-proxy-cloud` / 별도 worktree에서 compact13 `8056e02` 대비 base 이벤트 등록 방식만 변경한다. C2와 Fragment 후보를 결합하지 않으며 concurrent/public API/기존 size guard는 유지한다. 크기 초과만으로 시간 측정을 중단하지 않는다.
 - R47. 일반 DOM 폐기 후 보관된 참조의 이벤트, portal host의 최신 handler 정리, 함수 this/currentTarget·handleEvent 객체, prop 생략/재추가·상속 key·대소문자 alias/동일 callback dedup·stopImmediatePropagation을 검증한다. 외부 add/removeEventListener와 실행 순서·dispatch 도중 callback 교체의 관찰 차이를 숨기지 않는다. 호환성 차이가 남은 후보는 기본 채택하지 않고 제한 성능 실험으로 보존한다.
 - R48. 새 closure가 매 render 생기는 handler-only/text-update, stable-handler/text-update, event 없는 text-update를 같은 production 앱/브라우저로 양순서 비교한다. mount/update/native dispatch를 구분하고 listener 호출 수는 별도 계측한다. GC 뒤 heap/DOM/listener와 UMD raw/gzip/br 비용을 공개한다. 이 synthetic 결과를 기존 cached 앱/공식9항목·peer 목표 또는 물리적 allocation/누수 부재로 확대하지 않는다.
+
+## DC-21 flat 이벤트 테이블 — 메모리 후속
+
+- R49. 사용자 승인에 따라 `experiment/event-proxy-flat-cloud` / 독립 worktree에서 DOM별 handler 테이블에 직접 callback을 저장하는 후보를 구현한다. Preact식 저장 구조가 대상이며 전체 Preact 이식이나 event-clock/공개 API 추가는 범위 밖이다. 공용 dispatch 함수는 DC-20도 이미 공유했으므로 절감 대상은 event별 배열·slot 객체다.
+- R50. compact13 baseline17 source, DC-20 slot18 source(`189ddef`), flat18 source를 같은 새 실행에서 직접 비교한다. 이전 DC-20 표본과 합산하지 않는다. 동일 앱·production flags·Chromium, 네 workload·세 variant의 회전 triplet과 역순, update/mount/dispatch·별도 GC/settled dispose를 측정한다. 추가 heap의 baseline 대비 절대bytes/비율과 slot 대비 절감률을 구분한다.
+- R51. this/currentTarget·handleEvent·frozen callback·여러 event type·alias dedup/동적 전환·drop/readd·portal·retained DOM을 검증한다. alias 충돌은 native 직접 등록으로 전환하고 그 event-name은 노드 수명 동안 fallback을 유지한다. 외부 native callback identity/order·진행 중 dispatch 차이는 기존 한정 후보와 같은 미채택 경계다. C2/concurrent branched source·기존 size guard·공개 계약을 변경하지 않는다.
