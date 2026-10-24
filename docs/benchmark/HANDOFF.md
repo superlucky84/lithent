@@ -1,5 +1,39 @@
 # summary
 
+## Cloud experiment handoff
+
+> **후속 작업 시작 전 확인:** 클라우드 독립 실험은 아래 별도 브랜치에 보존했다. 성능 이득이 있어도 **이벤트 후보는 미채택이며 실제 클릭 누락 버그가 미해결**이다. 원본 코어나 진행 중인 C2에 적용된 결과로 해석하지 않는다.
+
+- 보존 브랜치: [`experiment/event-proxy-flat-cloud`](https://github.com/superlucky84/lithent/tree/experiment/event-proxy-flat-cloud). 참조 snapshot은 **`6993a93cecf67e445b30ee4ea014ca419235d946`**이며 아래 링크는 모두 이 커밋에 고정한다. Fragment→slot→flat 후보/복원/추가 버그 검토 이력이 이 브랜치에 함께 보존돼 있다.
+- 먼저 읽기: [실험 전체 HANDOFF](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/HANDOFF.md), [flat 결과·검증 범위](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/EVENT_PROXY_FLAT_RESULTS.md), [재현 도구/조건](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/experiments/event-proxy-flat/README.md).
+- 후보 위치: flat source **`7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`**, 복원 **`99fe58265986074f34f2e71614bed2386ebd74e0`**, 추가 버그 검토 **`6993a93cecf67e445b30ee4ea014ca419235d946`**. **브랜치 tip은 runtime17 source를 원래 compact13으로 복원한 상태**다. 후보 소스와 복원 후 tip을 혼동하지 않는다. 이 참조 커밋은 원본의 runtime/package/size guard를 수정하지 않는다.
+
+### 확인한 효과와 적용 한계
+
+| 독립 후보 | 관찰과 상태 |
+|---|---|
+| Fragment 범위 탐색 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/FRAGMENT_ANCHOR_RESULTS.md): 배열 복사 제거는 확인했으나 getter snapshot 관찰이 달라지고 확실한 시간 이득을 입증하지 못해 미채택. |
+| Fragment snapshot 보존 루프 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/FRAGMENT_ANCHOR_SNAPSHOT_RESULTS.md): 검사한 관찰은 보존했으나 실제 갱신 시간 이득 없이 br+21B로 미채택. |
+| Slot 이벤트 프록시 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/EVENT_PROXY_RESULTS.md): 새 handler가 많은 화면의 갱신 이득과 heap/dispatch 비용을 확인. Native 관찰 차이로 미채택. |
+| Flat 이벤트 테이블 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/EVENT_PROXY_FLAT_RESULTS.md): 같은 새3-way 비교에서 slot의 **baseline 대비 추가 JS heap** 약0.44MB→0.087~0.099MB(추가분−77.63~80.06%). Native baseline 대비 inline 갱신−29.01~37.07%, live heap 증가분+6.99~8.73%, dispatch+6.58~11.19%, noevent 갱신+3.38%, UMDbr4,992B(base+168B). **미채택.** |
+
+- Flat 수치는 Linux/Chromium151/Node24의2,000button synthetic 비교다.72fresh timing pages/36GC contexts, JS update→nextTick elapsed이며 최종 paint/공식9항목/four-peer 목표 달성 자료가 아니다. 추가 heap 절감률을 전체 heap80% 절감으로 표현하지 않는다. Mac 결과·이전 slot 표본과 합산하지 않는다.
+- Native 외부 listener와의 상대 순서, 원 callback으로 remove/dedup, active dispatch 중 교체 동작이 달라진다. Alias/this/currentTarget/object/frozen callback/portal 등 공통240회귀 통과를 이 차이의 해결로 간주하지 않는다. 전파 중 신규 등록을 다루는 Preact event-clock도 이번 flat에 이식하지 않았다.
+- **기존 cached benchmark의 select/partial은 원래 listener add/remove0회**였다. Inline 예제 이득을 기존 benchmark 전체 성능 격차의 이벤트 원인 증명으로 해석하지 않는다. 최초 slot/noevent+21%도 새balanced3-way에서는 재현되지 않았으며 실행별 자료를 분리한다.
+
+### 반드시 남겨 둘 미해결 재현
+
+- [원자료](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/event-proxy-flat-alias-dispatch.json), [Chromium 재현 스크립트](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/experiments/event-proxy-flat/observe-alias-dispatch.mjs). Custom element의 먼저 등록된 native listener가 **실제 trusted mouse click 중 renew()**로 `onclick=B`를 추가한다. 기존 `onClick=A`는 그대로다.
+- Baseline/slot은 그 클릭에서 A를 실행하지만 flat은 **아무 handler도 실행하지 않는다**. 다음 클릭은 모두 A/B다. Flat→native fallback이 진행 중인 listener snapshot에서 proxy를 제거하고 A/B를 너무 늦게 등록하는 구현 버그다. Native identity/order의 계약 선택 문제와 별도로 **수정 필요**이며, 보충 재현 성공은 후보의 계약 통과를 뜻하지 않는다.
+- 실험의 F3 Test Hardening/DC-21-S1/M-15-S1은 이 발견으로 재개방됐다. 원래 성능 raw/117entry archive는 그대로 보존하고 새 버그 증거를 별도로 추가했다. 실험 종료나240회귀 통과를 전체 안정화 완료로 간주하지 않는다.
+
+### 재개 순서 / 상태
+
+- **done:** 실험 브랜치와 후보/원자료/도구/추가 버그 증거를 커밋·푸시해 보존했다. 이 원본에는 참조만 추가하며 실험 구현/정본 계획을 통합하지 않는다. 기존 원본의 작업·목표는 유지한다.
+- **next:** ctxbin 최신 인계와 이 절을 먼저 읽고 재개 환경의 git status/HEAD 및 로컬 C2 변경을 확인·보존한다. 원본의 기존 peer/C2 작업을 계속할 때 이 실험을 자동 채택하거나 다음 후보로 자동 선정하지 않는다. 이벤트 후보를 선택해 재개한다면 격리 환경에서 위 trusted-click 누락부터 수정·회귀화하고 native 계약·중첩 dispatch/갱신·삭제를 검증한 뒤 바뀐 source로 실제 대상 앱 성능/비용을 재측정한다.
+- **blockers:** 원본 참조/보존 작업의 블로커는 없다. Flat 기본 채택은 위 클릭 누락 및 native 동작 차이가 해결/결정되기 전까지 차단된다. 전체 peer1.10 목표와 광범위 통합 검증은 계속 미완료다.
+- **ctxbin:** 원본 key **`lithent/docs/select-partial-update-analysis`**의 최신 context에 이 절/고정 보고서/실제 참조 커밋과 미해결 사항을 기록한다. 아래 DC-18 이하 항목은 당시 이력으로 읽는다.
+
 ## DC-18 common-field factory adopted — 2026-10-24
 
 - User priority: keep watching size, but consider modest excess for rendering

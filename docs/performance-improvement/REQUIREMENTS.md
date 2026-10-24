@@ -1,5 +1,7 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
+> **후속 작업자 필독 — 클라우드 독립 실험 참조:** [HANDOFF 상단](../benchmark/HANDOFF.md#cloud-experiment-handoff)에 별도 브랜치의 고정 보고서·미채택 사유·실제 trusted-click 누락 재현을 남겼다. 원본 코어/C2에 적용된 결과가 아니며 성능 수치만으로 후보를 채택하지 않는다. 기존 요구사항/목표는 유지한다.
+
 - 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
 - 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
