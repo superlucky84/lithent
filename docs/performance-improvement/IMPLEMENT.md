@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보 보존/compact13 복원을 진행한다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
+> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보를 보존하고 runtime17 source를 compact13으로 복원했다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
 
 > DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
@@ -292,7 +292,7 @@ DC-20 P4 종료: base/concurrent 각238/55파일, concurrent portal commit4, str
 - [x] F1 baseline: baseline/slot 소스와 기존 증거를 보존하고 새 계약을 같은 frozen source에 실행한다.
 - [x] F2 구현: flat table·공유 function proxy·alias native fallback·portal native fallback. strict 타입/ESLint 및 base 공통 회귀 통과가 종료 기준.
 - [x] F3 Test Hardening: frozen callback, independent events, alias 공통→복수→단일→삭제 전환, this/object/portal/retained DOM, 알려진 native 관찰 차이. concurrent 전체 공통 회귀와 portal commit 테스트로 shared cleanup 경계를 검증한다.
-- [x] F4 Integration Test: ESM gates·CJS/UMD smoke·등록 진단 뒤 serial72page/36memory context, variant별6bundle size/source scope/hash·독립 Python 통계/완전성 감사. 이전 표본은 합산하지 않는다.
-- [ ] F5 보존/복원: source commit/패치/raw/압축 증거/보고서·HANDOFF, 기본17source 복원/관련 회귀/strict와 후보 재빌드 hash 재현. fixed peers/전체 monorepo/e2e는 미검증 범위로 남긴다.
+- [x] F4 Integration Test: ESM gates·CJS/UMD smoke·등록 진단 뒤 serial72page/36memory context, 3variant9production bundle size/source scope/hash·독립 Python 통계/완전성 감사. 이전 표본은 합산하지 않는다.
+- [x] F5 보존/복원: source commit/패치/raw/압축 증거/보고서·HANDOFF, 기본17source 복원/관련 회귀/strict와 후보 재빌드 hash 재현. fixed peers/전체 monorepo/e2e는 미검증 범위로 남긴다.
 
-DC-21 F4 종료: flat base/concurrent 각240/55파일·baseline/slot event8씩·concurrent portal commit4·strict/lint·3format integration·actual ESM lifecycle/native6observations×3/등록12조건을 확인했다.72timing pages/2,160update batches/720dispatch batches와36memory contexts의 immediate/settled를 보존했고 settled 추가DOM/listener는 모두0이다. Slot과flat 사이 utility1파일만 다르며 Python9bundle/source scope/회전 순서/표본·통계 감사를 완료했다. 후보 보존/복원이 남았다.
+DC-21 F4 종료: flat base/concurrent 각240/55파일·baseline/slot event8씩·concurrent portal commit4·strict/lint·3format integration·actual ESM lifecycle/native6observations×3/등록12조건을 확인했다.72timing pages/2,160update batches/720dispatch batches와36memory contexts의 immediate/settled를 보존했고 settled 추가DOM/listener는 모두0이다. Slot과flat 사이 utility1파일만 다르며 Python9bundle/source scope/회전 순서/표본·통계 감사를 완료했다. F5도 완료: source `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`, 복원17 source/관련33회귀·strict/lint, archived slot/flat 입력을 사용한9production bundle hash/size 재현과 patch 적용 감사를 확인했다.

@@ -112,4 +112,4 @@ for kind in kinds:
 summary['disposal']={v:{stage:dict(contexts=12,extraDOM=sum(z[stage]['nodes']>z['empty']['nodes'] for z in r['memory'] if z['variant']==v),extraListeners=sum(z[stage]['jsEventListeners']>z['empty']['jsEventListeners'] for z in r['memory'] if z['variant']==v)) for stage in ['disposed','settled']} for v in variants}
 (out/'audit.json').write_text(json.dumps(summary,indent=2)+'\n')
 print(json.dumps({k:dict(update=v['updateMs']['flatVsBaselinePct'],dispatch=v['dispatch20kMs']['flatVsBaselinePct'],flatVsSlotHeapSaved=summary['memory'][k]['updated']['extraOverheadSavedPct']) for k,v in summary['timing'].items()},indent=2))
-print('PASS: all inputs/9bundles, baseline17/slot18/flat18 scope, 72 timing triplets/36 memory contexts,2160 update/720 dispatch batches independently audited')
+print('PASS: all inputs/9bundles, baseline17/slot18/flat18 scope, 72 timing pages/24 rotated triplets/36 memory contexts,2160 update/720 dispatch batches independently audited')

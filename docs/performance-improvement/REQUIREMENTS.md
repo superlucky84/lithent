@@ -1,6 +1,6 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
-> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보 보존/compact13 복원을 진행한다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
+> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보를 보존하고 runtime17 source를 compact13으로 복원했다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
 
 > DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 

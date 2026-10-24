@@ -1,5 +1,7 @@
 # DC-21 flat 이벤트 테이블 메모리 후속
 
+이번 실행에서 flat 후보는 slot의 baseline 대비 추가 JS heap을 77.63~80.06% 줄였고, inline 갱신의 baseline 대비 29.01~37.07% 시간 감소를 유지했다. Native 관찰 차이가 남아 기본 채택은 하지 않았다.
+
 이 실험은 native baseline/이전 slot proxy/새 flat proxy를 같은 새 실행에서 직접 비교한다. Preact식 flat table+shared function 구조의 비용을 확인하며 Preact 자체나 전체 이식 결과로 표현하지 않는다. 이전 DC-20 CPU/메모리 표본은 합산하지 않았다.
 
 측정 UTC `2026-10-24T02:21:03.275Z` → `2026-10-24T02:23:21.734Z`. Chromium `151.0.7922.173`, Node `v24.19.0`, Linux `200000 100000` quota / `8589934592` memory limit.
@@ -79,6 +81,6 @@ Mount는 최초1회/page, variant/workload당6값으로 표본 수가 적다. Di
 
 기존4,824B guard는 유지했고 크기 초과와 무관하게 CPU/memory 측정을 완료했다. 원래 checkout·C2·concurrent branched source는 미수정이며 shared teardown을 포함한 후보 concurrent artifact의 바이트 동일성을 주장하지 않는다.
 
-[재현 도구/조건](../../experiments/event-proxy-flat/README.md), [독립 통계/manifest](./event-proxy-flat-results.json), [flat 후보 patch](./event-proxy-flat-candidate.patch), [압축 source/raw/tools](./event-proxy-flat-evidence.json.gz). 실제 source commit·archive hash·복원/재현 검증은 [HANDOFF](./HANDOFF.md)에 기록한다.
+[재현 도구/조건](../../experiments/event-proxy-flat/README.md), [독립 통계/manifest](./event-proxy-flat-results.json), [flat 후보 patch](./event-proxy-flat-candidate.patch), [압축 source/raw/tools](./event-proxy-flat-evidence.json.gz). flat source commit `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`. Runtime17 source baseline 일치·복원33회귀/strict/lint·9production bundle/53source hash 재현을 확인했다. archive hash·복원/재현 검증은 [HANDOFF](./HANDOFF.md)에 기록한다.
 
 미검증: Preact 자체 성능, event-clock/캡처 API/새 native 호환 계약, 공식 fixed four-peer/nine-action 목표, full monorepo/e2e 및 다른 UI/브라우저/장기 retention.

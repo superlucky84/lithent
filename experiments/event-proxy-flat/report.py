@@ -5,7 +5,9 @@ import sys
 out=Path(sys.argv[1]).resolve()
 a=json.loads((out/'audit.json').read_text())
 bench=Path(__file__).resolve().parents[2]/'docs/benchmark'
-lines=['# DC-21 flat 이벤트 테이블 메모리 후속','',
+extra_saved=[a['memory'][k]['updated']['extraOverheadSavedPct'] for k in ['inline-only','inline-text','stable-text']]
+inline_gain=[-a['timing'][k]['updateMs']['flatVsBaselinePct'] for k in ['inline-only','inline-text']]
+lines=['# DC-21 flat 이벤트 테이블 메모리 후속','',f"이번 실행에서 flat 후보는 slot의 baseline 대비 추가 JS heap을 {min(extra_saved):.2f}~{max(extra_saved):.2f}% 줄였고, inline 갱신의 baseline 대비 {min(inline_gain):.2f}~{max(inline_gain):.2f}% 시간 감소를 유지했다. Native 관찰 차이가 남아 기본 채택은 하지 않았다.",'',
 '이 실험은 native baseline/이전 slot proxy/새 flat proxy를 같은 새 실행에서 직접 비교한다. Preact식 flat table+shared function 구조의 비용을 확인하며 Preact 자체나 전체 이식 결과로 표현하지 않는다. 이전 DC-20 CPU/메모리 표본은 합산하지 않았다.','',
 f"측정 UTC `{a['startedAt']}` → `{a['finishedAt']}`. Chromium `{a['environment']['browser']}`, Node `{a['environment']['node']}`, Linux `{a['environment']['cpuMax']}` quota / `{a['environment']['memoryMax']}` memory limit.",'',
 '## 구현과 검증 범위','',
@@ -48,7 +50,7 @@ for name in ['lithent.mjs','lithent.umd.js','lithent.cjs']:
     texts=['/'.join(str(x[z]) for z in ['raw','gzip','br']) for x in vals]
     lines.append(f"| {name} | {' | '.join(texts)} | {vals[2]['br']-vals[0]['br']:+} / {vals[2]['br']-vals[1]['br']:+} |")
 lines+=['','기존4,824B guard는 유지했고 크기 초과와 무관하게 CPU/memory 측정을 완료했다. 원래 checkout·C2·concurrent branched source는 미수정이며 shared teardown을 포함한 후보 concurrent artifact의 바이트 동일성을 주장하지 않는다.','',
-'[재현 도구/조건](../../experiments/event-proxy-flat/README.md), [독립 통계/manifest](./event-proxy-flat-results.json), [flat 후보 patch](./event-proxy-flat-candidate.patch), [압축 source/raw/tools](./event-proxy-flat-evidence.json.gz). 실제 source commit·archive hash·복원/재현 검증은 [HANDOFF](./HANDOFF.md)에 기록한다.','',
+'[재현 도구/조건](../../experiments/event-proxy-flat/README.md), [독립 통계/manifest](./event-proxy-flat-results.json), [flat 후보 patch](./event-proxy-flat-candidate.patch), [압축 source/raw/tools](./event-proxy-flat-evidence.json.gz). flat source commit `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`. Runtime17 source baseline 일치·복원33회귀/strict/lint·9production bundle/53source hash 재현을 확인했다. archive hash·복원/재현 검증은 [HANDOFF](./HANDOFF.md)에 기록한다.','',
 '미검증: Preact 자체 성능, event-clock/캡처 API/새 native 호환 계약, 공식 fixed four-peer/nine-action 목표, full monorepo/e2e 및 다른 UI/브라우저/장기 retention.','']
 (bench/'EVENT_PROXY_FLAT_RESULTS.md').write_text('\n'.join(lines))
 (bench/'event-proxy-flat-results.json').write_text(json.dumps(a,indent=2)+'\n')

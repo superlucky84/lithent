@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보 보존/compact13 복원을 진행한다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
+> DC-21 측정 완료: flat은 slot 대비 추가 heap−77.63~80.06%, baseline 대비 inline update−29.01~37.07%다. Native 관찰 차이로 기본 미채택이며 후보를 보존하고 runtime17 source를 compact13으로 복원했다. [결과](../benchmark/EVENT_PROXY_FLAT_RESULTS.md).
 
 > DC-20 고정 이벤트 프록시: inline 업데이트−27~34%이나 native event 관찰 차이·dispatch/heap 비용 및 noevent 대조 회귀로 **미채택**. [결과](../benchmark/EVENT_PROXY_RESULTS.md). 후보를 보존하고 runtime17 source를 compact13으로 복원했다.
 
@@ -214,4 +214,4 @@ DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict
 - [x] 세 variant의 실제 native 관찰 차이와 등록 진단을 시간 lane과 분리.
 - [x] 회전/역순72page update/mount/dispatch·독립36memory/settled dispose·size/입력 hash 완전성 감사.
 - [x] heap 전체 증가분과 baseline 대비 추가분, slot 대비 추가분 절감을 구분하고 실제 갱신 이득/비용을 판정.
-- [ ] 한정 결과/미검증·실제 source commit·done/next/blockers·증거/복원/재현 감사 인계.
+- [x] 한정 결과/미검증·실제 source commit·done/next/blockers·증거/복원/재현 감사 인계.

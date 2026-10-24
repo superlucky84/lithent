@@ -1,0 +1,107 @@
+{
+  "base": "8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7",
+  "slotSourceCommit": "189ddef82e20959ea1267ab2eb8b2f5007c4ba9a",
+  "flatSourceCommit": "7e838bcd723261cb3840388f4f0ce1dd8c13e7ec",
+  "flat18MatchSourceCommit": true,
+  "restored17Sources": {
+    "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+    "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+    "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+    "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+    "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+    "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+    "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+    "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+    "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+    "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+    "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+    "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+    "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+    "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+    "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+    "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+    "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+  },
+  "removedExperimentalUtility": true,
+  "otherWorktrees": {
+    "original": {
+      "path": "/workspace/lithent",
+      "status": "",
+      "commit": "8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7",
+      "branch": "docs/select-partial-update-analysis"
+    },
+    "slotExperiment": {
+      "path": "/workspace/work/lithent-event-proxy",
+      "status": "",
+      "commit": "80afb8f806481dcdd1f3d6457184e381a9ef91ff",
+      "branch": "experiment/event-proxy-cloud"
+    }
+  },
+  "restoredFocusedTestsPassed": 33,
+  "restoredTypeLintLogsEmpty": true,
+  "all9ProductionBundleHashesSizesReproduced": true,
+  "replayAll53SourceHashesMatch": true,
+  "replayedBundles": {
+    "baseline/production": {
+      "lithent.mjs": {
+        "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e",
+        "raw": 18868,
+        "gzip": 6343,
+        "br": 5802
+      },
+      "lithent.umd.js": {
+        "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d",
+        "raw": 12759,
+        "gzip": 5187,
+        "br": 4824
+      },
+      "lithent.cjs": {
+        "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820",
+        "raw": 12606,
+        "gzip": 5234,
+        "br": 4857
+      }
+    },
+    "slot/production": {
+      "lithent.mjs": {
+        "sha256": "fe101be3e2fdd07ed587cb86931bf308823e23908f6f7e360c89c4de144d1b92",
+        "raw": 19718,
+        "gzip": 6628,
+        "br": 6038
+      },
+      "lithent.umd.js": {
+        "sha256": "c877a776d151f6b8ab3ce1f4766e5195e7264b5188bd1803989e8c01c0f69346",
+        "raw": 13347,
+        "gzip": 5423,
+        "br": 5018
+      },
+      "lithent.cjs": {
+        "sha256": "a0aca63a9bd12824af1aa7db6fd60bd4ef529b3077184c6d85b5edd3c170d88c",
+        "raw": 13190,
+        "gzip": 5463,
+        "br": 5067
+      }
+    },
+    "flat/production": {
+      "lithent.mjs": {
+        "sha256": "3734442a80ccd11a0616b83558cf2c7084067d377650b247db9fb160951ae70a",
+        "raw": 19514,
+        "gzip": 6538,
+        "br": 5974
+      },
+      "lithent.umd.js": {
+        "sha256": "050d55dc0c37a61f1b3cd6b16e713d72e074acac3e0dd8b6777e15b4f99fd98d",
+        "raw": 13260,
+        "gzip": 5375,
+        "br": 4992
+      },
+      "lithent.cjs": {
+        "sha256": "a820d7db09dfb5b315e760fbed2a131948c63ddef6f085d8f8e4cc10bb1fed74",
+        "raw": 13104,
+        "gzip": 5412,
+        "br": 5017
+      }
+    }
+  },
+  "candidatePatchAppliesToRestoredBaseline": true
+}
