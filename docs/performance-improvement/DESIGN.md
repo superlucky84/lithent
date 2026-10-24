@@ -385,3 +385,9 @@ frame은 내부 `{ proofs: WeakMap<WDom, WDom[]>, ready: boolean, invalid: boole
 - [x] 새3-way: eventful 추가heap 약0.44MB→0.087~0.099MB(추가분−77.63~80.06%, live heap 증가분 baseline대비+6.99~8.73%). Inline 갱신−29.01~37.07% 양순서 유지, stable 갱신같음/noevent+3.38%, dispatch+6.58~11.19%, UMDbr4,992B(base+168/slot−26). 초기 mount6표본/control 변동과 native 관찰 차이를 공개하며 이번 flat도 미채택이다. → R49~R51, DC-21 단계, M-15.
 
 프로토콜: 2,000buttons×inline-only/inline-text/stable-text/noevent-text. order0의 각 round에서 baseline→slot→flat을 회전하고 order1은 각 triplet을 역전한다. 2orders×3rounds×4workloads×3variants=72fresh pages,10warmup+30retained batches(5updates/batch). dispatch3warmup+10retained×20kevents/page; mount는 최초1회/page. 별도 memory3contexts/variant/workload=36,100updates/10mount-dispose churn·2GC와 최종 dispose 직후/2rAF+100ms+2GC를 모두 보존한다. gate/등록 진단→timing→memory 순서로 실행하고 CPU 수집 중 build/test/profiler를 병행하지 않는다. JS wall time·CDP heap이며 official paint/공식 메모리/peer 달성 근거로 확대하지 않는다.
+
+### DC-21-S1 추가 발견 — active dispatch 중 alias fallback
+
+공개 API/실제 trusted click에서 앞선 custom-element native listener의 renew가 onclick B를 추가하고 onClick A를 유지할 때, baseline/slot은 A를 실행하지만 flat은 해당 클릭에서 A를 누락한다. 전환 시 기존 proxy를 remove하고 새 native A/B를 add하는 구현이 active listener snapshot을 깨뜨린다. [보충 원자료](../benchmark/event-proxy-flat-alias-dispatch.json)는 기존 CPU/memory archive와 분리한다.
+
+- [ ] **DC-21-S1 TBD/수정 필요:** 전파 중 변하지 않은 기존 handler를 보존하는 rare alias transition을 설계/구현하고 trusted/synthetic click·중첩 dispatch·갱신/삭제 조합을 검증한다. Native identity/order의 별도 계약 선택과 구분한다. 현재 코어는 baseline이며 후보만 미해결이다.

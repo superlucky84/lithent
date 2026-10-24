@@ -215,3 +215,8 @@ DC-19 종료: 공통 core base/concurrent 각232/54파일·새 baseline3·strict
 - [x] 회전/역순72page update/mount/dispatch·독립36memory/settled dispose·size/입력 hash 완전성 감사.
 - [x] heap 전체 증가분과 baseline 대비 추가분, slot 대비 추가분 절감을 구분하고 실제 갱신 이득/비용을 판정.
 - [x] 한정 결과/미검증·실제 source commit·done/next/blockers·증거/복원/재현 감사 인계.
+
+### M-15-S1 보충 회귀
+
+- [x] 기존 source/UMD SHA를 고정하고 공개 API/trusted click 및 source-helper에서 alias 전환 A누락을 대조 재현한다. Baseline/slot A, flat 없음; 다음 클릭 모두 A/B.
+- [ ] DC-21-S1 구현 수정 후 같은 trusted click과 합성 이벤트·중첩 dispatch/갱신·삭제 조합에서 기존 A호출이 보존되는지 확인한다. 현 후보는 실패/미채택이며 runtime은 baseline이다.

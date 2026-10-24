@@ -52,6 +52,13 @@ for name in ['lithent.mjs','lithent.umd.js','lithent.cjs']:
 lines+=['','기존4,824B guard는 유지했고 크기 초과와 무관하게 CPU/memory 측정을 완료했다. 원래 checkout·C2·concurrent branched source는 미수정이며 shared teardown을 포함한 후보 concurrent artifact의 바이트 동일성을 주장하지 않는다.','',
 '[재현 도구/조건](../../experiments/event-proxy-flat/README.md), [독립 통계/manifest](./event-proxy-flat-results.json), [flat 후보 patch](./event-proxy-flat-candidate.patch), [압축 source/raw/tools](./event-proxy-flat-evidence.json.gz). flat source commit `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`. Runtime17 source baseline 일치·복원33회귀/strict/lint·9production bundle/53source hash 재현을 확인했다. archive hash·복원/재현 검증은 [HANDOFF](./HANDOFF.md)에 기록한다.','',
 '미검증: Preact 자체 성능, event-clock/캡처 API/새 native 호환 계약, 공식 fixed four-peer/nine-action 목표, full monorepo/e2e 및 다른 UI/브라우저/장기 retention.','']
+supplement=bench/'event-proxy-flat-alias-dispatch.json'
+if supplement.exists():
+    lines += ['## 추가 정확성 검토 — 이벤트 처리 중 alias 전환 누락', '',
+    '성능 수집 종료 뒤 같은 frozen source/bundle의 Chromium151 보충 검사에서 flat 전용 회귀를 확인했다. Custom element 생성자가 먼저 등록한 native listener가 실제 trusted click 중 renew()로 onclick B를 추가한다. 기존 onClick A는 그대로다. Baseline/slot은 그 클릭에 A를 실행하지만 flat은 아무 callback도 실행하지 않는다. 다음 클릭은 모두 A,B를 실행한다.', '',
+    '원인: flat→native fallback 전환이 기존 proxy를 제거하고 A/B를 새로 등록한다. 진행 중인 같은 target의 listener snapshot에서는 제거된 proxy가 건너뛰어지고 새 listener도 실행되지 않아 변경되지 않은 A가 누락된다. 일반적인 alias 변경8회귀 통과와 active-dispatch 전환의 정합성은 별개다. 공개 h/mount/render/renew와 실제 mouse click(isTrusted=true)으로 재현했고 standalone source helper에서도 같았다.', '',
+    '**이 누락은 수정되지 않았다.** 기존 native identity/order 선택 문제와 별도로 alias 전환 구현을 안정화해야 한다. 현재 runtime은 이미 baseline으로 복원돼 있다. 이 추가 관찰은 원래 performance raw/통계/117entry archive를 변경하지 않으며 별도 evidence로 보존한다.', '',
+    '[추가 관찰 원자료](./event-proxy-flat-alias-dispatch.json), 재현 명령은 experiments/event-proxy-flat/README.md의 supplemental correctness 절을 확인한다.', '']
 (bench/'EVENT_PROXY_FLAT_RESULTS.md').write_text('\n'.join(lines))
 (bench/'event-proxy-flat-results.json').write_text(json.dumps(a,indent=2)+'\n')
 print('Wrote DC-21 human report and independent JSON')

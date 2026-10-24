@@ -32,3 +32,13 @@ Build freezes17/18/18runtime sources and all9production bundle hashes, using the
 `audit.py` uses Python stdlib to check every input, triplet order/context/sample, 9bundles, source scope (only one module differs between slot/flat), observation differences, callback checksums/counts and distributions/memory arithmetic. `archive.py` preserves raw snapshots/tools/lock/validation with per-entry length/SHA256/base64. Final source and patch remain available after the runtime is restored to compact13. Broad monorepo dual/e2e, all browsers, and the fixed four-peer/nine-action goal are outside this experiment.
 
 Preserved flat source commit: `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`. Guarded final restoration matches all17 baseline sources; post-restore33 focused tests/strict/lint pass. Rebuilding archived slot/flat sources reproduces all9 production hashes/sizes and all53 source hashes; candidate patch applies to restored baseline.
+
+## Supplemental correctness: active-dispatch alias transition
+
+A later Chromium151 probe found an additional flat-specific regression. An earlier native listener installed by a custom element constructor calls renew() during a real trusted mouse click, adding onclick B while onClick A remains unchanged. Native baseline and slot execute A for that click; flat executes neither. The next click executes A/B for all variants. Switching to native fallback removes the old proxy from the active listener snapshot and adds replacements too late. This is an unresolved correctness bug, separate from the documented native identity/order design differences. The runtime remains restored.
+
+```sh
+XDG_CONFIG_HOME=/tmp/flat-config XDG_CACHE_HOME=/tmp/flat-cache node experiments/event-proxy-flat/observe-alias-dispatch.mjs /path/to/unpacked/run /tmp/flat-alias-observation.json
+```
+
+The probe checks the frozen standalone helper and actual production UMD public h/mount/render/renew with Playwright mouse clicks, verifies isTrusted=true, and records input SHA256. A successful probe means the known regression was reproduced; it does not mean the candidate passes that contract. Its raw result is docs/benchmark/event-proxy-flat-alias-dispatch.json. This supplement is separate from the immutable117-entry performance archive, and no timing/memory samples are changed or pooled.

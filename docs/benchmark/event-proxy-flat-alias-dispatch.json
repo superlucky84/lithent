@@ -1,0 +1,92 @@
+{
+  "at": "2026-10-24T02:48:36.464Z",
+  "scope": "supplemental native/helper and public-API trusted-click probe; no timing samples",
+  "flatSourceCommit": "7e838bcd723261cb3840388f4f0ce1dd8c13e7ec",
+  "inputs": {
+    "/workspace/work/event-flat-run-20261024/baseline/production/event-helper.mjs": "d7e09f9d60ed6b03d2c1858fd29ce1812885927b00db70c91e0e944a1ff1b25a",
+    "/workspace/work/event-flat-run-20261024/baseline/production/lithent.umd.js": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d",
+    "/workspace/work/event-flat-run-20261024/slot/production/event-helper.mjs": "e4b1201ecbacb68c48ce53ddd87439b7a8c30e68af3a8b3ab7cb86eaffed7d98",
+    "/workspace/work/event-flat-run-20261024/slot/production/lithent.umd.js": "c877a776d151f6b8ab3ce1f4766e5195e7264b5188bd1803989e8c01c0f69346",
+    "/workspace/work/event-flat-run-20261024/flat/production/event-helper.mjs": "61d591635b3bd7a9692989733f8e5ab99c07b9880bbb32da571181b2db3e770d",
+    "/workspace/work/event-flat-run-20261024/flat/production/lithent.umd.js": "050d55dc0c37a61f1b3cd6b16e713d72e074acac3e0dd8b6777e15b4f99fd98d"
+  },
+  "results": {
+    "baseline": {
+      "sourceHelper": {
+        "first": [
+          "a"
+        ],
+        "next": [
+          "a",
+          "b"
+        ]
+      },
+      "publicAPI": {
+        "firstTrustedClick": {
+          "calls": [
+            "a"
+          ],
+          "trusted": [
+            true
+          ]
+        },
+        "nextClick": [
+          "a",
+          "b"
+        ]
+      },
+      "unchangedHandlerPreservedDuringFirstClick": true
+    },
+    "slot": {
+      "sourceHelper": {
+        "first": [
+          "a"
+        ],
+        "next": [
+          "a",
+          "b"
+        ]
+      },
+      "publicAPI": {
+        "firstTrustedClick": {
+          "calls": [
+            "a"
+          ],
+          "trusted": [
+            true
+          ]
+        },
+        "nextClick": [
+          "a",
+          "b"
+        ]
+      },
+      "unchangedHandlerPreservedDuringFirstClick": true
+    },
+    "flat": {
+      "sourceHelper": {
+        "first": [],
+        "next": [
+          "a",
+          "b"
+        ]
+      },
+      "publicAPI": {
+        "firstTrustedClick": {
+          "calls": [],
+          "trusted": [
+            true
+          ]
+        },
+        "nextClick": [
+          "a",
+          "b"
+        ]
+      },
+      "unchangedHandlerPreservedDuringFirstClick": false
+    }
+  },
+  "browser": "151.0.7922.173",
+  "knownFlatRegressionReproduced": true,
+  "notes": "Probe success means reproduction confirmed; flat fails unchanged-handler preservation. This is not a passing contract result for flat."
+}

@@ -1,5 +1,14 @@
 # summary
 
+## DC-21-S1 supplemental review — 2026-10-24
+
+- Found a new flat-only correctness regression after the performance run: a custom-element native listener registered before Lithent renews on a trusted mouse click, adding onclick B while onClick A stays unchanged. Baseline/slot call A on that click; flat calls nothing. All call A/B next click. Source helper and actual UMD public h/mount/render/renew reproduce it with isTrusted=true. [Raw](./event-proxy-flat-alias-dispatch.json), [probe](../../experiments/event-proxy-flat/observe-alias-dispatch.mjs).
+- Cause: native fallback transition removes the old proxy from the in-progress listener snapshot and adds replacements too late. This is an unresolved implementation bug, separate from native identity/order/dispatch contract differences. F3/M-15-S1/DC-21-S1 track the open hardening work.
+- done: bounded supplemental review/reproduction and documentation; original performance samples/statistics/117entry archive remain immutable; runtime remains restored compact13.
+- next: fix/review active-dispatch alias transition and test real/synthetic events, reentrant updates/removal, then remeasure changed code if needed. No runtime fix was made in this review.
+- blockers: this regression and native contract differences prohibit default adoption of the preserved flat candidate.
+- commit: flat source7e838bcd723261cb3840388f4f0ce1dd8c13e7ec, restoration99fe58265986074f34f2e71614bed2386ebd74e0; supplemental evidence/docs follow in their own local commit. No push/release.
+
 ## DC-21 flat event table concluded — 2026-10-24
 
 - Branch/worktree: `experiment/event-proxy-flat-cloud` / `/workspace/work/lithent-event-flat`, started from clean `80afb8f`. Native baseline compact13 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`; slot source `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`; flat source **`7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`**. Original checkout, prior slot branch and local C2 are untouched.
