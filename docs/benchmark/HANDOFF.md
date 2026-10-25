@@ -1,6 +1,17 @@
 # summary
 
+## Comprehensive integration — 2026-10-26
+
+2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 변경은 미커밋이다**.
+
+- done: 수정 flat E를 base/concurrent와 공유 teardown에 반영했다. 기본 proxy + ref/mountCallback 직접 native 계약과 사용 예제를 공개했다. 실제 base ESM/UMD/CJS3개는 측정 artifact와 byte/hash가 같다. 양코어6형식 trusted alias, constructor/DOM setter 실패 회수, concurrent portal retry/abandon publication, native cleanup과 일반 UI 입력/정체성을 확인했다. 전체 build·B1/B4 하위 suite·strict types/lint·Playwright76/retry0, raw/trace 영구 보존과 독립 archive 감사를 완료했다. [최종 보고서](./COMPREHENSIVE_RESULTS.md)·[검증](./comprehensive-validation.json)·[증거](./comprehensive-evidence-manifest.json)에 연결한다.
+- next: 이번 E 반영에 필요한 작업은 완료했다. 남은 CPU 목표는 6/9이며 select/partial/swap의 새 병목 가설·별도 진단 없이 모든 목표 달성으로 표시하지 않는다. C2 K/EK·Fragment/C1/C3/C4는 보고서의 재개 조건으로 보류했다. 후속 목표 연구와 커밋/배포는 별도 작업이다.
+- blockers: 이번 통합의 실행 블로커는 없다. E의 일반 UI partial/select 전체−5.22%/−9.44%는4×CPU 조건이다. 최종 cached 앱 가중 전체 E/B +0.44%, 공식10k 메모리 +0.912574MB(+3.24%), UMDbr+182B/총5,006B와 dispatch 비용을 공개했다.9항목 목표 미달과 heap 전체 누수 부재의 미보장은 남아 있다. 첫 dispose 진단의 앱 전역 참조, 준비 실패와 모든 성능 실패/재시도 원자료를 보존했다.
+- commit: 실제 HEAD `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`이며 이번 변경은 미커밋이다. compact13 구현 `ff8b80afcc69f7226167ce39e6be3536ac873372`, 이전 인계 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`와 구분한다. 보존 snapshot `6993a93cecf67e445b30ee4ea014ca419235d946`, 활성 flat `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`·slot `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 검토했고 원자료를 유지했다.
+
 ## Cloud experiment handoff
+
+> 아래는 2026-10-24 보존 시점의 결과/미해결 재현이다. 현재의 재검토·반영 범위는 위 DC-22 정본을 따른다.
 
 > **후속 작업 시작 전 확인:** 클라우드 독립 실험은 아래 별도 브랜치에 보존했다. 성능 이득이 있어도 **이벤트 후보는 미채택이며 실제 클릭 누락 버그가 미해결**이다. 원본 코어나 진행 중인 C2에 적용된 결과로 해석하지 않는다.
 
@@ -10,12 +21,12 @@
 
 ### 확인한 효과와 적용 한계
 
-| 독립 후보 | 관찰과 상태 |
-|---|---|
-| Fragment 범위 탐색 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/FRAGMENT_ANCHOR_RESULTS.md): 배열 복사 제거는 확인했으나 getter snapshot 관찰이 달라지고 확실한 시간 이득을 입증하지 못해 미채택. |
-| Fragment snapshot 보존 루프 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/FRAGMENT_ANCHOR_SNAPSHOT_RESULTS.md): 검사한 관찰은 보존했으나 실제 갱신 시간 이득 없이 br+21B로 미채택. |
-| Slot 이벤트 프록시 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/EVENT_PROXY_RESULTS.md): 새 handler가 많은 화면의 갱신 이득과 heap/dispatch 비용을 확인. Native 관찰 차이로 미채택. |
-| Flat 이벤트 테이블 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/EVENT_PROXY_FLAT_RESULTS.md): 같은 새3-way 비교에서 slot의 **baseline 대비 추가 JS heap** 약0.44MB→0.087~0.099MB(추가분−77.63~80.06%). Native baseline 대비 inline 갱신−29.01~37.07%, live heap 증가분+6.99~8.73%, dispatch+6.58~11.19%, noevent 갱신+3.38%, UMDbr4,992B(base+168B). **미채택.** |
+| 독립 후보                   | 관찰과 상태                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Fragment 범위 탐색          | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/FRAGMENT_ANCHOR_RESULTS.md): 배열 복사 제거는 확인했으나 getter snapshot 관찰이 달라지고 확실한 시간 이득을 입증하지 못해 미채택.                                                                                                                                                                |
+| Fragment snapshot 보존 루프 | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/FRAGMENT_ANCHOR_SNAPSHOT_RESULTS.md): 검사한 관찰은 보존했으나 실제 갱신 시간 이득 없이 br+21B로 미채택.                                                                                                                                                                                         |
+| Slot 이벤트 프록시          | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/EVENT_PROXY_RESULTS.md): 새 handler가 많은 화면의 갱신 이득과 heap/dispatch 비용을 확인. Native 관찰 차이로 미채택.                                                                                                                                                                              |
+| Flat 이벤트 테이블          | [결과](https://github.com/superlucky84/lithent/blob/6993a93cecf67e445b30ee4ea014ca419235d946/docs/benchmark/EVENT_PROXY_FLAT_RESULTS.md): 같은 새3-way 비교에서 slot의 **baseline 대비 추가 JS heap** 약0.44MB→0.087~0.099MB(추가분−77.63~80.06%). Native baseline 대비 inline 갱신−29.01~37.07%, live heap 증가분+6.99~8.73%, dispatch+6.58~11.19%, noevent 갱신+3.38%, UMDbr4,992B(base+168B). **미채택.** |
 
 - Flat 수치는 Linux/Chromium151/Node24의2,000button synthetic 비교다.72fresh timing pages/36GC contexts, JS update→nextTick elapsed이며 최종 paint/공식9항목/four-peer 목표 달성 자료가 아니다. 추가 heap 절감률을 전체 heap80% 절감으로 표현하지 않는다. Mac 결과·이전 slot 표본과 합산하지 않는다.
 - Native 외부 listener와의 상대 순서, 원 callback으로 remove/dedup, active dispatch 중 교체 동작이 달라진다. Alias/this/currentTarget/object/frozen callback/portal 등 공통240회귀 통과를 이 차이의 해결로 간주하지 않는다. 전파 중 신규 등록을 다루는 Preact event-clock도 이번 flat에 이식하지 않았다.

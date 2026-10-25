@@ -1,8 +1,9 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
+- 기준일: 2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 변경은 미커밋이다**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
+- 완료한 DC-22 실행 순서: [Phase4A~4E](#dc-22--종합-반영-실행-phase4a4e) → [Phase5](#phase-5--test-hardening) → [Phase6](#phase-6--integration-test와-채택인계). 앞선 Phase0~4의 완료 기록은 보존하며, 과거 size 중단·미채택을 현재 후속의 자동 종료 조건으로 쓰지 않는다.
 
 ## 공통 실행 규칙
 
@@ -14,6 +15,8 @@
 - **B2 빌드·크기:** 필요한 타입/패키지 빌드를 통과하고 `pnpm size`의 기존 기준/실제 초과량을 공개한다. 현재 사용자 지시(R11/R34)는 렌더 성능 우선이므로 소폭 크기 초과만으로 CPU/메모리 평가를 멈추지 않는다. 기존 script의 실패를 통과로 표시하거나 영구 숫자 예산을 임의 변경하지 않는다. 최종 `pnpm build`와 `pnpm verify:concurrent`의 타입/코드생성·정합성 결함은 해결하며 크기 초과 결과는 위 정책으로 분리한다. 크기 스크립트는 파일이 없으면 skip하므로 대상 세 UMD가 존재하는지 먼저 확인한다.
 - **B3 앱 계약:** 기존 `targeted-update.mjs contracts`와 `verify`에서 keyed, 9개 동작, glyph font, DOM 정체성·mutation·일괄 갱신 순서·재생성을 기준/후보 양쪽에 확인한다. 러너의 기존 계약 검사로 새 API 경로를 검증할 수 없는 경우 명시적으로 확장한다.
 - **B4 전체 회귀:** `pnpm build`, `pnpm test`, `pnpm test:dual`, `pnpm test:e2e`를 최종 후보 해시에 대해 확보한다. 수정 파일의 ESLint/Prettier 및 `git diff --check`도 포함한다.
+
+DC-22 최종 B1/B4 실행에서는 같은 최종 해시의 중복 suite를 재사용한다. `pnpm test`가 core/concurrent(+concurrent helper)와 base helper/devHelper/ftags/element를 포함하므로, base SSR과 `LITHENT_CORE=concurrent pnpm test:satellites`를 추가하면 `test:dual`의 모든 하위 gate를 충족한다. literal `pnpm test:dual`을 다시 실행했다고 기록하지 않고 명령별 로그와 동일 source/산출물 hash를 연결한다. base 단계에서는 상속된 `LITHENT_CORE`를 제거한다. 이는 위 동일 해시 재사용 규칙의 실행 방식이며 체크 범위를 줄이는 예외가 아니다.
 
 ## Phase 0 — 문서와 근거 정리
 
@@ -169,22 +172,79 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 - [x] **F 기본 source 적용:** 적용 전29guard/`before-adoption.json` 뒤 측정한 `src/wDom.ts`·새 `src/utils/createWDom.ts`를 복사했다. default3JS가 측정 후보와 byte/hash 일치한다. 최종79파일 manifest와 초기29 중6변경을 기록했다. concurrent 소스 미수정이며2concurrent JS 변화는 초기 stale 산출물 재빌드다.
 - [x] **G 한정 통합:** 측정 종료 뒤 build:sequence/build:parallel·verify:concurrent ALL PASS, dual1,092 passed/3 existing skipped, strict core/concurrent/e2e 타입·ESLint·Playwright64/retry0을 통과했다. SSR/hydration·HMR·helper/context·예제/docs를 포함하며 optional metadata own-key 차이는 공개했다. root Vitest420 등 dual에 포함된 검사를 별도 pnpm test로 반복하지 않았다. 광범위 B4/Phase5/6 전체 완료는 주장하지 않는다.
 - [x] **H size guard:** reference4,800B+이번 검증24B allowance=4,824B/실제4,824B·추가 여유0, concurrent6,903/9,000B·element998/1,000B strict 통과다. full+54B 허용이나 광범위 영구 예산을 compact에 자동 이전한 것이 아니다. 형식/압축 환경 차이를 기록하고 실제 선택 artifact와 연결했다.
-- [x] **I 보존/독립 감사:** [보고서](../benchmark/NODE_SHAPE_RESULTS.md)·[raw/적용 manifest](../benchmark/node-shape-results.json)·[선택 패치](../benchmark/node-shape-candidate.patch)·[full 패치](../benchmark/node-shape-full-candidate.patch)·[증거](../benchmark/node-shape-evidence.json.gz)·[도구](../../experiments/node-shape/README.md)를 보존했다. 최종1,367entries/18packed rawlogs·33,532,452B·SHA-256 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.384분포/18가중·4,380IC access-site/724raw deopt·CPU1,160/메모리120/retention12/최종79파일 독립 감사 완료다.
+- [x] **I 보존/독립 감사:** [보고서](../benchmark/NODE_SHAPE_RESULTS.md)·[raw/적용 manifest](../benchmark/node-shape-results.json)·[선택 패치](../benchmark/node-shape-candidate.patch)·[full 패치](../benchmark/node-shape-full-candidate.patch)·[증거](../benchmark/node-shape-evidence.json.gz)·[도구](../../experiments/node-shape/README.md)를 보존했다. 최종1,367entries/18packed rawlogs·33,532,074B·SHA-256 `86b390a2c9ed09503361cd474cd122dfe16677d5afc7405689b1d956024baaef`다.384분포/18가중·4,380IC access-site/724raw deopt·CPU1,160/메모리120/retention12/최종79파일 독립 감사 완료다.
 
-판정: compact13을 기본 base에 반영했다. full22는 미채택 대안으로 유지한다. 전체 peer1.10 목표·다른 후보 연구·광범위 Phase5/6은 별도 미완료다. DOM/listener0을 전체 heap 누수 부재로, core/통합 검사를 전면 own-key 동등성으로 확대하지 않는다. 커밋/푸시/릴리스는 하지 않았다.
+판정: compact13을 기본 base에 반영했다. full22는 미채택 대안으로 유지한다. 전체 peer1.10 목표·다른 후보 연구·광범위 Phase5/6은 별도 미완료다. DOM/listener0을 전체 heap 누수 부재로, core/통합 검사를 전면 own-key 동등성으로 확대하지 않는다. compact13 구현은 이후 `ff8b80a`에 커밋·푸시됐으며 패키지는 릴리스하지 않았다.
 
-### 후속 채택 후보의 전체 성능 검증
+### DC-22 — 종합 반영 실행 (Phase4A~4E)
+
+실행 계약: [REQUIREMENTS R52~R61](./REQUIREMENTS.md#7-별도-브랜치를-포함한-종합-반영--dc-22), [DESIGN DC-22](./DESIGN.md#dc-22--별도-브랜치를-포함한-종합-반영). 이번 작업은 별도 실험 검토부터 실제 채택본 반영까지 포함한다. 계획 작성 완료와 아래 실행 완료를 구분한다.
+
+#### Phase4A — 보존 실험 검토와 현재 기준선 고정
+
+진입: 사용자 종합 반영 방향 확정. 종료: 모든 후보의 이번 역할과 현재 baseline/소스·도구·앱·브라우저가 manifest에 고정됨.
+
+- [x] `6993a93`의 DC-19/19B/20/21 보고서와 flat 활성 source·trusted-click 재현을 읽고 후보 목록/우선순위를 정본에 반영했다. 이전 native 차이/버그·heap/dispatch 손해와 inline 이득을 함께 기록했다.
+- [x] 현재 Git/sibling 상태, compact13 source/production3형식·의존 lock/러너/브라우저·엔진·환경 hash를 새 실행 manifest에 고정한다. 과거 Chrome155/156/Linux151 중 가용한 것을 임의 혼합하지 않고 이번 한 환경을 선택한다.
+- [x] `7e838bc` flat / `189ddef` slot / `f997302` range / `3afd8de` snapshot / 현재 C2 patch를 비교한다. archive/재현 도구를 해시 검증해 새 staging으로 추출하고 원래 branch·raw·실험 앱을 보존한다.
+- [x] 현재 API 문서와 native listener/ref/custom-element 소비자 사용을 조사해 DC-22-2의 필수 계약/대안표를 작성한다. 크기 허용은 확정 사항이며 다시 승인받을 진입 조건으로 삼지 않는다.
+- [x] 기준 검사: B1/B2/B3의 baseline 증거를 확인하고 필요한 현재 해시 검사를 수행한다. 원래 앱/keyed9동작/font/DOM 정체성, 별도 이벤트 fixture의 현재 A→A/B 기대값, M-12~M-16의 입력 출처를 고정한다.
+
+완료 근거: `comprehensive-initial-inputs.json`·`app-inputs.json`·`preserved-fragment-inputs.json`과 baseline242core/17declaration pairs,8앱 공통 DOM/공식 keyed9동작/font gate. 원래 앱과343설치 package metadata를 확인했고 runner 전용 배칭 기대를 peer 전체에 적용한 초기 gate 실패는 별도로 보존했다.
+
+#### Phase4B — flat 이벤트 수정과 적용 계약 확정
+
+진입: Phase4A의 frozen B와 재현 도구 준비. 종료: DC-22-1/2/4 결정 및 수정 E의 관련 회귀·production 앱 gate 통과. 성능 실측/채택은 다음 단계다.
+
+- [x] 보존 flat에서 A 누락을 재현하고, 수정 E가 첫 A/다음 A,B를 요구하는 trusted 회귀를 추가했다. 원본 flat은 누락을 보이는 negative control이며 synthetic 회귀 통과와 구분한다. baseline/slot controls와 실제 trusted click을 포함한다. 기존 `knownFlatRegressionReproduced` 성공 로그와 수정 통과를 구분한다.
+- [x] 기존 proxy 보존/lazy alias Set/native 경로의 상태·정리 모델을 확정하고 DC-22-1의 격리 구현·한정 검증을 닫았다. 큰 빈도/작은 빈도 경로와 메모리 비용을 기록한다.
+- [x] native interop 조사·Preact11 고정 source 확인과 사용자 선택으로 DC-22-2를 닫았다. 기본 경로 보존/fallback 또는 명시적 opt-in 경계를 문서화한다. 외부 등록을 자동 검출한다고 가정하거나 성능 이득만으로 동작 차이를 숨기지 않는다.
+- [x] `src/render.ts`·event utility·공유 unmount에 필요한 변경만 이식한다. callback `this`/currentTarget·object/frozen handler·alias dedup/독립 event·SVG/custom element·retained DOM·portal shared target을 검증한다.
+- [x] base/concurrent proxy + 공유 teardown의 native 직접 등록 fallback으로 DC-22-4 범위를 닫았다. 격리 E의 공통/전용 concurrent329회귀를 통과했다. concurrent proxy를 선택하면 해당 구현/회귀를 별도 기록한다.
+- [x] 기준 검사: 수정 E에 B1/B2/B3, M-14·M-15-S1. 이벤트 회귀는 base/concurrent에 실행하고 ESM/UMD/CJS 실제 공개 API·브라우저 검사를 수행한다. 기존 크기 초과는 수치로 기록하며 평가를 계속한다.
+
+#### Phase4C — C2 재평가와 조합 준비
+
+진입: Phase4A의 B 고정. E와 독립적으로 준비할 수 있으나 성능 수집은 직렬 수행한다. 종료: K와 EK가 관련 계약 gate를 통과하고4조건의 소스/빌드가 동결됨.
+
+- [x] 보존 C2 patch를 compact13에 rebase했다. createWDom import context의 첫 적용 실패/부분 source를 보존하고 rebase patch를 따로 고정했다. 키 Map/관찰 순서·first duplicate·root frame proof 수명/throw/reentry·content/cleanup/mount queue를 유지한다. 추가 비용 절감 대안을 바꾸면 새 후보 해시와 이유를 기록한다.
+- [x] K와 E를 합친 EK를 구성했고 K/EK 각각246core·4proof lifetime 회귀 포함·엄격 타입/빌드를 통과했다. event 중 renew/중첩 render·DOM setter·portal teardown이 proof 수명과 충돌하지 않는 회귀를 추가한다.
+- [x] 별도 계측에서 render 임시 배열·인덱스 방문의 실제 제거량과 proof fallback 비용을 센다. E에는 native rebind 호출을 센다. 진단 코드를 timing 번들에 넣지 않는다.
+- [x] 기준 검사: B/K/E/EK 관련 B1/B2/B3와 기존 `core-placementProof`·수명4회귀·M-3~M-6·M-15·M-16을 확보한다. 과거229/233/240통과를 새 해시 검증으로 대체하지 않는다. size 초과만으로 K/EK 실측을 생략하지 않는다.
+
+#### Phase4D — 이벤트 앱과4조건의 실제 이득/비용 비교
+
+진입: Phase4B/C의 구현·계약 gate 통과, frozen production artifacts와 사전 표본 계획. 종료: E/K/EK의 독립·결합 이득과 모든 대조군/비용이 보고되고 DC-22-5의 잠정 선택 근거가 있음.
+
+- [x] 이벤트 전용4workload를 B/E/K/EK로 확장해2순서×4round×4workload×4조건=128fresh pages와 별도48GC contexts를 수집한다. C2와 이벤트의 UI 상호작용을 확인하기 위한 수집 전 확정이며 slot은 보존 재현 대조로 유지한다. mount·dispatch·100updates·10mount-dispose·즉시/settled 회수를 기록한다.
+- [x] 실제 앱형 폼/목록에서 inline closure 갱신과 trusted input→최종 paint를 별도 측정한다. stable/noevent 대조·새 handler·삭제/중첩 갱신을 포함하고 event latency와 JS wall time을 구분한다.
+- [x] 공식 원래 앱의9항목 합계145표본×B/E/K/EK4조건×2순서=CPU1,160, 공식 메모리5×3×4×2=120을 새 조건으로 수집한다. 조건 순서를 균형 배치하고 build/test/profiler와 병행하지 않는다.
+- [x] 각 조건별3fresh context의100회 생성/clear·100회 partial과 최종 dispose에서 DOM/listener/heap 잔류를 검사한다. 이벤트 전용 GC 표본과 공식 메모리·retention을 합산하지 않는다.
+- [x] 각 순서/pooled의 전체·JS·paint·분포·메모리MB·raw/gzip/br·실패/재시도를 독립 감사한다. E/B·K/B·EK/B·EK/E·EK/K를 보고하고 과거 개선율을 합성하지 않는다.
+- [x] Fragment/C1/C3/C4의 이번 미반영 또는 추가 재개 이유를 기록한다. 최종 trace가 새 병목을 입증하면 수정 가설/기준 회귀·별도 조건을 추가하고 동일 gate를 적용한다.
+- [x] 기준 검사: 수집 전후 source/앱/도구/browser hash·B3 및 표본 완전성·계산 감사, M-7·M-8·M-12~M-16. tiny/order-dependent 차이는 불확실로 남긴다.
+
+#### Phase4E — 최종 선택과 전체 peer 목표 검증
+
+진입: Phase4D의 잠정 선택 후보/근거. 종료: 현재 B/최종 후보/고정 네 peer의9항목 목표와 비용이 같은 환경에서 검증되고 DC-22-5가 확정됨.
+
+- [x] 6앱 전체 CPU1,740·공식 메모리180을 양순서로 수집한다. 중복 앱 조건 제거/동일 해시 증거 재사용은 시작 전에 이유·범위·시간 간격을 manifest에 고정한다.9항목 중 일부만 실행하는 기존 peer `suite`로 대체하지 않는다.
+- [x] 네 peer의 결과·항목별 최저 대비1.10 판정·차수별 일관성과 가중치/색상 계산을 보존한다. 일반 inline 앱의 이득과 원래 benchmark 목표 달성 여부를 각각 보고한다.
+- [x] E/K/EK 중 최종 포함/제외와 heap·dispatch·mount·크기 교환을 정한다. 소폭 용량 증가만으로 재승인을 요구하거나 과거 guard 실패를 기각 근거로 대신하지 않는다. 미달 항목은 최종 기록에 남긴다.
+- [x] 기준 검사: 모든 앱 B3·lock/source·실제 production/브라우저 hash·표본/분포/가중 통계 감사, M-7·M-16. 코드가 바뀌면 영향 있는 Phase4D/E를 새 후보로 재검증한다.
+
+### 후속 채택 후보의 전체 성능 검증 — Phase4D/E 공통 기준
 
 진입: 후보별 정합성/B1·B2 타입/빌드·앱/B3와 immutable production staging 완료, 실제 크기 비용 공개 및 R11/R34 평가 정책 적용. 소폭 크기 초과 단독 중단은 적용하지 않음. 종료: 모든 항목의 실제 이득/손해와 불확실성이 같은 환경에서 비교됨.
 
-- [ ] 같은 앱·helper의 core-only 대조 및 필요 시 동일 구조의 opt-in 대조를 분리. 원래 앱 대비 최종 앱 결과는 별도 표로 제공.
-- [ ] 전체 9 CPU 항목을 원순서·반대 순서로 측정. 기본 표본 계획은 선택 25개/다른 항목 15개씩, 두 앱×두 차수 580개이며 정확한 러너 버전·설정을 기록. 부족한 신뢰도나 실패가 있으면 이유와 추가 계획을 먼저 기록.
-- [ ] 코드/앱/Chrome 실행 파일·엔진 해시를 시작·종료에 확인. 실패 배치는 부분 표본을 섞지 않고 별도 디렉터리에 보존하여 재시도 trace가 덮어쓰이지 않게 함.
-- [ ] 공식 메모리 5개(21/22/23/25/26)를 같은 조건으로 비교. retention은 fresh context 3차수의 반복 생성/삭제·갱신과 GC 뒤 DOM/listener/heap을 기록하며 공식 메모리와 분리.
-- [ ] raw/gzip/brotli, 생성/clear/append의 비용, startup·전송량 진단을 별도 기록. 손해가 있어도 전체·상대 성능과 절대량으로 검토.
-- [ ] baseline+후보+IC-1의 React/Preact 비교군에 **전체 항목** 실행. 기존 `suite`는 peer CPU를 03/04만 실행하므로 전체 비교 완료 절차로 사용하지 않음.
-- [ ] 항목별 baseline·peer 비율/분포, 가중 전체 지표, 색상 계산 설정을 보존. 확정된 CPU1.10 항목별 목표를 판정하고 미정인 메모리 교환 상한과 구분한다.
-- [ ] 기준 검사: 시작 전 B3와 B1/B2 결과의 후보 해시 일치 확인, 종료 후 manifest·표본 완전성/실패 로그 감사, M-7·M-8. 성능 측정 중 무거운 테스트 실행 금지.
+- [x] 같은 앱·helper의 core-only 대조 및 필요 시 동일 구조의 opt-in 대조를 분리. 원래 앱 대비 최종 앱 결과는 별도 표로 제공.
+- [x] 전체 9 CPU 항목을 원순서·반대 순서로 측정. 기본 표본 계획은 선택 25개/다른 항목 15개씩, 두 앱×두 차수 580개이며 정확한 러너 버전·설정을 기록. 부족한 신뢰도나 실패가 있으면 이유와 추가 계획을 먼저 기록.
+- [x] 코드/앱/Chrome 실행 파일·엔진 해시를 시작·종료에 확인. 실패 배치는 부분 표본을 섞지 않고 별도 디렉터리에 보존하여 재시도 trace가 덮어쓰이지 않게 함.
+- [x] 공식 메모리 5개(21/22/23/25/26)를 같은 조건으로 비교. retention은 fresh context 3차수의 반복 생성/삭제·갱신과 GC 뒤 DOM/listener/heap을 기록하며 공식 메모리와 분리.
+- [x] raw/gzip/brotli와 생성/clear/append 비용을 기록했다. startup·전송 latency 진단은 IC-1의 이번 범위 제외로 N/A다. 손해가 있어도 전체·상대 성능과 절대량으로 검토.
+- [x] baseline+후보+IC-1의 React/Preact 비교군에 **전체 항목** 실행. 기존 `suite`는 peer CPU를 03/04만 실행하므로 전체 비교 완료 절차로 사용하지 않음.
+- [x] 항목별 baseline·peer 비율/분포, 가중 전체 지표, 색상 계산 설정을 보존. 확정된 CPU1.10 항목별 목표를 판정하고 미정인 메모리 교환 상한과 구분한다.
+- [x] 기준 검사: 시작 전 B3와 B1/B2 결과의 후보 해시 일치 확인, 종료 후 manifest·표본 완전성/실패 로그 감사, M-7·M-8. 성능 측정 중 무거운 테스트 실행 금지.
 
 판정: 채택 검토/추가 실험/기각과 근거를 기록한다. 한 항목 회귀=기각, 메모리 증가=기각, 첫 차수 평균 개선=채택 규칙을 사용하지 않는다.
 
@@ -192,24 +252,28 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 진입: 검증할 후보의 구현·공개 계약이 안정됨. 종료: 정합성·수명·예외·메모리 회수의 회귀 위험을 검사함.
 
-- [ ] 공통 core suite: keyed 소비, 동일 VDOM 다중 위치·empty, 이동한 자식 renew, slot 참조, Fragment/portal/외부 형제, DOM 상태·focus 보존.
-- [ ] 같은 task의 부모/자식 양방향 갱신, 삭제 뒤 예약 갱신, render throw 후 큐 복구, 같은 컴포넌트 재예약, teardown 중 재진입.
-- [ ] concurrent: low 작업 중 high 갱신, 중단/재시작/abandon, live 연결 publication, commit 동등성, boundary pause/resume/dispose와 retention.
-- [ ] 생성 실패·unmount 뒤 metadata/callback/listener가 회수되는지 실브라우저에서 확인. 새 관리 구조가 있으면 반복 크기에 따른 잔류 기울기를 확인.
-- [ ] 기준 검사: B4 전체, 필요 시 기존 `pnpm test:e2e:mutations`와 관련 fuzz/seed 회귀. 관련 검사만 추가하고 변화 없는 구현을 재검증하려는 반복은 피함.
-- [ ] M-3~M-6·M-8 완료 및 실패 수정 기록. 수정된 후보의 성능 해시가 달라지면 Phase 4로 돌아가 필요한 비교를 다시 수행.
+- [x] DC-22 최종 해시의 trusted/synthetic alias 전환·등록/삭제/교체·중첩 dispatch·전파 중 ancestor 갱신·stopImmediatePropagation·예외를 검사한다. native interop의 기대값은 확정된 DC-22-2 계약과 연결한다.
+- [x] K/EK의 격리 event/proof·수명 회귀를 보존했다. 최종 E에는 proof가 없으므로 결합 proof hardening은 N/A다. E의 portal shared target·custom element·SVG·ordinary retained DOM과 양코어 commit/abandon을 전체 회귀/실제 package에서 확인했다. → M-15·M-16.
+- [x] 공통 core suite: keyed 소비, 동일 VDOM 다중 위치·empty, 이동한 자식 renew, slot 참조, Fragment/portal/외부 형제, DOM 상태·focus 보존.
+- [x] 같은 task의 부모/자식 양방향 갱신, 삭제 뒤 예약 갱신, render throw 후 큐 복구, 같은 컴포넌트 재예약, teardown 중 재진입.
+- [x] concurrent: low 작업 중 high 갱신, 중단/재시작/abandon, live 연결 publication, commit 동등성, boundary pause/resume/dispose와 retention.
+- [x] 생성 실패·unmount 뒤 metadata/callback/listener가 회수되는지 실브라우저에서 확인. 새 관리 구조가 있으면 반복 크기에 따른 잔류 기울기를 확인.
+- [x] 기준 검사: B4 전체, 필요 시 기존 `pnpm test:e2e:mutations`와 관련 fuzz/seed 회귀. 관련 검사만 추가하고 변화 없는 구현을 재검증하려는 반복은 피함.
+- [x] M-3~M-6·M-8 완료 및 실패 수정 기록. 수정된 후보의 성능 해시가 달라지면 Phase 4로 돌아가 필요한 비교를 다시 수행.
 
 ## Phase 6 — Integration Test와 채택·인계
 
 진입: Phase 4의 비교 증거와 Phase 5의 정합성 증거가 동일 최종 후보를 가리킴. 종료: 최종 상태와 미달/미확정 항목을 포함한 재현 가능한 인계 완료.
 
-- [ ] 실제 package import로 base/concurrent·helper·JSX/SSR/hydration·element·예제 통합 확인. 선택적 API라면 비사용자 bundle과 실제 사용 bundle을 함께 확인.
-- [ ] 원래 upstream과 별도 staging의 `isKeyed`, 9개 동작·font·DOM 계약을 최종 산출물에 실행. 실제 upstream 앱 파일을 자동 교체하거나 PR을 올리지 않음.
-- [ ] IC-1/IC-2의 전체 비교·교환 판정을 보고서에 기록. 목표 미달/미정이어도 측정을 완료한 사실과 목표 달성은 구분.
-- [ ] 채택이면 정확한 후보 SHA와 산출물/테스트/성능 연결을 기록. 기각이면 자신이 만든 변경만 guarded restore하고 두 코어 빌드·핵심 회귀·원본 해시를 확인.
-- [ ] 새 실험 증거를 영구 보관하고 손실된 trace가 있으면 그 범위 명시. 각 보고서와 HANDOFF에서 정본 문서에 연결.
-- [ ] 기준 검사: 동일 해시의 B4 재사용 가능 여부 확인, 최종 package/브라우저 통합과 B2/B3, M-1~M-10의 해당 항목 완료·미실행 이유 기록.
-- [ ] done/next/blockers/실제 commit SHA로 인계. 커밋·푸시·릴리스는 당시 사용자 요청 범위에 따름.
+- [x] DC-22 채택본을 현재 source와 필요한 공유 경로에 반영한다. 기본/호환/opt-in 및 concurrent 지원 범위의 API·문서·소비자 예제가 실제 코드와 일치해야 한다.
+- [x] 최종 실제 ESM/UMD/CJS와 측정/검증 후보 hash를 대조한다. raw/gzip/br 증가·실측 근거에 맞춰 size guard를 갱신하고 `pnpm size`를 확인한다. 소폭 증가 수용 방향 안에서 구현하며 임의의 추가 여유나 새 전역 숫자 상한을 만들지 않는다.
+- [x] 실제 package import로 base/concurrent·helper·JSX/SSR/hydration·element·예제 통합 확인. 선택적 API라면 비사용자 bundle과 실제 사용 bundle을 함께 확인.
+- [x] 원래 upstream과 별도 staging의 `isKeyed`, 9개 동작·font·DOM 계약을 최종 산출물에 실행. 실제 upstream 앱 파일을 자동 교체하거나 PR을 올리지 않음.
+- [x] IC-1/IC-2의 전체 비교·교환 판정을 보고서에 기록. 목표 미달/미정이어도 측정을 완료한 사실과 목표 달성은 구분.
+- [x] 채택이면 정확한 후보 SHA와 산출물/테스트/성능 연결을 기록. 기각이면 자신이 만든 변경만 guarded restore하고 두 코어 빌드·핵심 회귀·원본 해시를 확인.
+- [x] 새 실험 증거를 영구 보관하고 손실된 trace가 있으면 그 범위 명시. 각 보고서와 HANDOFF에서 정본 문서에 연결.
+- [x] 기준 검사: 동일 해시의 B4 재사용 가능 여부 확인, 최종 package/브라우저 통합과 B2/B3, M-1~M-10의 해당 항목 완료·미실행 이유 기록.
+- [x] done/next/blockers/실제 commit SHA로 인계. 커밋·푸시·릴리스는 당시 사용자 요청 범위에 따름.
 
 ## 재현 도구 사용 시 주의
 
@@ -223,15 +287,22 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 ## 실행 결정 대장
 
-- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13 통제 앱 CPU/메모리·DC-14 heap 귀속·DC-15 실제 캐시 앱 대조도 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16 전체 peer 기준·진단 뒤 DC-17 C2 sidecar 프로토타입의 한정 검증/계측·size 탈락·증거 보존으로 실험을 종료했다. 다른 후보·최종 채택은 미완료다.
+- [x] **IC-0 확정:** Phase 1·C1 검증/복원 뒤 C3 DC-4 계약·기준 회귀를 `ddd545e`에 커밋했다. 이어 C3 base 한정 구현/검증과 증거 보존·baseline 복원까지 완료했다. 그 결과를 `d660fdf`에 커밋한 뒤 DC-12 별도 렌더러·비참여 580표본까지 검증했다. DC-13 통제 앱 CPU/메모리·DC-14 heap 귀속·DC-15 실제 캐시 앱 대조도 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16 전체 peer 기준·진단 뒤 DC-17 C2 sidecar 프로토타입의 한정 검증/계측·size 탈락·증거 보존으로 실험을 종료했다. DC-17 당시 다른 후보·최종 채택은 미완료였다. 후속 DC-22의 E 반영 완료는 IC-4·IC-6에 기록한다.
 - [x] **IC-1 CPU 확정:** 사용자2026-10-23 선택으로 고정 React/Preact hooks/classes 네 peer 최저 전체 시간 중앙값 대비1.10배 이하를9항목 전부 만족하는 목표를 택했다. DC-16의 같은 차수 합산/차수별 수치와 upstream 가중치/색상 함수를 보존한다. memory·size는 별도 비용, startup은 이번 범위 제외이며 최종 메모리 교환 상한은 IC-2에 남긴다.
-- [ ] **IC-2 검증 대기:** 후보별 허용할 시간·메모리 교환. 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
-- [ ] **IC-3 조건부 TBD:** 기본 경로 격리는 DC-12에서 검증했지만 별도 렌더러는 br 5,691B다. 기능 이득·비용을 본 뒤 공개 경로/별도 예산을 결정한다. 기존 한도 변경이나 초과 해소로 표시하지 않는다.
-- [ ] **IC-4 검증 대기:** C1/C2/C3/C4 중 최종 채택 조합. 각 후보의 독립 결과 뒤 결합 상호작용을 확인.
+- [x] **IC-2 E 교환 판정 완료:** E 단독을 일반 UI 이득과 UMDbr+182B·공식10k+0.912574MB(+3.24%)·dispatch 비용으로 선택했다. 향후 모든 후보에 적용할 숫자 상한은 새로 만들지 않았다. 후보별 시간·메모리 교환은 실제 절대량과 전체/peer 비교 뒤 판단하며 특정 퍼센트를 사용자 합의로 꾸미지 않음.
+- [ ] **IC-3 조건부 TBD(이번 E에는 N/A):** 기본 경로 격리는 DC-12에서 검증했지만 별도 렌더러는 br 5,691B다. 기능 이득·비용을 본 뒤 공개 경로/별도 예산을 결정한다. 기존 한도 변경이나 초과 해소로 표시하지 않는다.
+- [x] **IC-4 E 단독 반영 완료:** 최종 채택은 E 단독이다. K/EK는 재평가했으나 추가 앱 이득이 작고 엇갈려 보류했다. C1/C3/C4·Fragment도 보고서의 명시한 재개 조건으로 보류하며 독립·결합 증거를 보존했다.
+- [x] **IC-5 실행 순서 확정:** DC-22 Phase4A~4E→5→6. flat 이벤트 수정과 C2/결합 비교를 실제 반영 후보로 다룬다. 후보 검토 완료와 새 구현/공식 측정 완료를 구분한다.
+- [x] **IC-6 실행 완료:** DC-22-1/2/4 계약·구현과 DC-22-5 최종 선택을 닫고 측정 artifact·회귀·size guard·채택 source를 일치시킨다. → M-15·M-16.
+
+### DC-22 계획 문서 검증 — 2026-10-25 (계획 시점 이력)
+
+- [x] 정본4문서와 HANDOFF의 로컬 경로/앵커238개, 보존 브랜치 고정 링크18개의 Git object 존재, R52~R61/DC-22-0~6/Phase4A~4E/M-12~M-16의 연결과 표본 산식을 확인했다.
+- [x] 현재 compact13 archive의 SHA-256·gzip33,532,074B·1,367entry를 확인하고 오래된 최종 증거/커밋 표기를 정정했다. Prettier와 `git diff --check`를 통과했다. 이번 변경은 문서5개이며 runtime 테스트/성능 수집은 미실행이다.
 
 ## 상태 / 핸드오프
 
-- done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.
-- next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
-- blockers: DC-18의 남은 구현/검사/보존 블로커는 없다. 전체 peer 목표는 미검증이다. optional metadata own-key 차이를 공개하며 전면 동등성·모든 heap 누수 부재·보편적 성능 우위를 주장하지 않는다. compact2실패 배치/재시도와 full/compact 시점·표본은 분리 보존한다.
-- commit: 현재 HEAD는 `452dc2eeae29d1e555f7f7b467f01de2baa55c0d`이며 이번 변경은 미커밋이다. 푸시/릴리스/upstream 제출은 하지 않았다. 적용 직전29guard 뒤2소스/size guard를 반영했고 최종79파일 manifest에 의도된6기존파일 변화를 기록했다. concurrent 소스는 미수정이다. 최종 증거 SHA-256은 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.
+- done: 수정 flat E를 base/concurrent와 공유 teardown에 반영했다. 기본 proxy + ref/mountCallback 직접 native 계약과 사용 예제를 공개했다. 실제 base ESM/UMD/CJS3개는 측정 artifact와 byte/hash가 같다. 양코어6형식 trusted alias, constructor/DOM setter 실패 회수, concurrent portal retry/abandon publication, native cleanup과 일반 UI 입력/정체성을 확인했다. 전체 build·B1/B4 하위 suite·strict types/lint·Playwright76/retry0, raw/trace 영구 보존과 독립 archive 감사를 완료했다. [최종 보고서](../benchmark/COMPREHENSIVE_RESULTS.md)·[검증](../benchmark/comprehensive-validation.json)·[증거](../benchmark/comprehensive-evidence-manifest.json)에 연결한다.
+- next: 이번 E 반영에 필요한 작업은 완료했다. 남은 CPU 목표는 6/9이며 select/partial/swap의 새 병목 가설·별도 진단 없이 모든 목표 달성으로 표시하지 않는다. C2 K/EK·Fragment/C1/C3/C4는 보고서의 재개 조건으로 보류했다. 후속 목표 연구와 커밋/배포는 별도 작업이다.
+- blockers: 이번 통합의 실행 블로커는 없다. E의 일반 UI partial/select 전체−5.22%/−9.44%는4×CPU 조건이다. 최종 cached 앱 가중 전체 E/B +0.44%, 공식10k 메모리 +0.912574MB(+3.24%), UMDbr+182B/총5,006B와 dispatch 비용을 공개했다.9항목 목표 미달과 heap 전체 누수 부재의 미보장은 남아 있다. 첫 dispose 진단의 앱 전역 참조, 준비 실패와 모든 성능 실패/재시도 원자료를 보존했다.
+- commit: 실제 HEAD `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`이며 이번 변경은 미커밋이다. compact13 구현 `ff8b80afcc69f7226167ce39e6be3536ac873372`, 이전 인계 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`와 구분한다. 보존 snapshot `6993a93cecf67e445b30ee4ea014ca419235d946`, 활성 flat `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`·slot `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 검토했고 원자료를 유지했다.

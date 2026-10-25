@@ -1,6 +1,6 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-24. 상태: **DC-18 compact13 기본 반영·한정 통합/보존 감사 완료. 가중 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B(4,800+검증24B/여유0). 전체 peer1.10 목표는 미검증**.
+- 기준일: 2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 변경은 미커밋이다**.
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
@@ -14,7 +14,9 @@
 
 ## 2. 후보 묶음과 우선순위
 
-Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **DC-12의 별도 렌더러 격리와 비참여 비용 대조까지 완료했다**. DC-13의 같은 행 앱 기능 대조·DC-14의 heap 귀속·DC-15 실제 캐시 대조까지 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16 전체 peer 기준과 별도 진단 뒤 DC-17 C2의 root-scoped sidecar base 프로토타입을 격리 구현했다. shared229+수명4=233회귀·타입/빌드는 통과했지만 br4,952/4,800B여서 이번 프로토타입은 미채택이고 공식 성능은 미측정이다. 별도 작업량 계측·수명 회귀·증거 보존으로 실험을 종료했으며 C2의 다른 전달비용 대안은 미정이다. C4는 조건부 연구다. 네 후보를 모두 구현하는 계획이 아니며, 한 번에 하나씩 기준선과 비교한다.
+아래 C1~C4는 기존 내부 후보의 설계와 이력이다. 현재 우선순위는 [DC-22](#dc-22--별도-브랜치를-포함한-종합-반영)의 flat 이벤트 수정 → compact13 위 C2 재평가 → 결합 비교다. 독립 후보의 근거를 먼저 확보하고 조합의 추가 이득도 별도로 측정한다.
+
+Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **DC-12의 별도 렌더러 격리와 비참여 비용 대조까지 완료했다**. DC-13의 같은 행 앱 기능 대조·DC-14의 heap 귀속·DC-15 실제 캐시 대조까지 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16 전체 peer 기준과 별도 진단 뒤 DC-17 C2의 root-scoped sidecar base 프로토타입을 격리 구현했다. shared229+수명4=233회귀·타입/빌드는 통과했지만 br4,952/4,800B여서 당시 프로토타입은 미채택이고 공식 성능은 미측정이다. C4는 조건부 연구다. 모든 후보를 무조건 구현하는 계획으로 해석하지 않는다.
 
 | 후보                                               | 줄이려는 작업                                           | 필요한 정보                                                | 한계와 진입 조건                                                                                              |
 | -------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -324,13 +326,75 @@ frame은 내부 `{ proofs: WeakMap<WDom, WDom[]>, ready: boolean, invalid: boole
 
 - [x] 측정/적용 직전29guard와 `before-adoption.json`을 통과한 뒤 [wDom](../../src/wDom.ts)·[새 factory](../../src/utils/createWDom.ts)의 측정 바이트를 적용했다. default ESM/UMD/CJS3개의 hash가 측정 후보와 일치한다. 최종79파일 manifest와 초기29 중6변경(wDom/baseJS3/concurrentJS2)을 구분하고 concurrent 소스는 미수정이다. generated concurrent2개는 초기 stale 산출물 재빌드다.
 - [x] build:sequence·build:parallel(pnpm build의 두 단계), verify:concurrent ALL PASS, dual1,092 passed/3 existing skipped, strict core/concurrent/e2e 타입·변경원본 ESLint와 Playwright64/retry0을 통과했다. SSR/hydration·HMR·helper/context·예제/docs를 포함한 DC-18 한정 통합 결과다. 같은 검사의 불필요한 반복을 완료 조건으로 추가하지 않는다.
-- [x] [결과](../benchmark/NODE_SHAPE_RESULTS.md)·[raw/적용 manifest](../benchmark/node-shape-results.json)·[선택 패치](../benchmark/node-shape-candidate.patch)·[full 대안](../benchmark/node-shape-full-candidate.patch)·[영구 증거](../benchmark/node-shape-evidence.json.gz)·[재현/감사](../../experiments/node-shape/README.md)를 보존했다. 최종1,367entries/33,532,452B·SHA-256 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`이며 독립 archive 감사 완료다.
+- [x] [결과](../benchmark/NODE_SHAPE_RESULTS.md)·[raw/적용 manifest](../benchmark/node-shape-results.json)·[선택 패치](../benchmark/node-shape-candidate.patch)·[full 대안](../benchmark/node-shape-full-candidate.patch)·[영구 증거](../benchmark/node-shape-evidence.json.gz)·[재현/감사](../../experiments/node-shape/README.md)를 보존했다. 최종1,367entries/33,532,074B·SHA-256 `86b390a2c9ed09503361cd474cd122dfe16677d5afc7405689b1d956024baaef`이며 독립 archive 감사 완료다.
 
-→ R1/R6~R12/R30~R39, Phase4 DC-18, M-11. compact 기본 반영·한정 통합/보존 감사는 완료했다. 전체 fixed-peer9항목1.10 목표·다른 후보 연구·광범위 Phase5/6은 별도 미완료이며 배포/커밋/푸시는 하지 않았다.
+→ R1/R6~R12/R30~R39, Phase4 DC-18, M-11. compact 기본 반영·한정 통합/보존 감사는 완료했다. 전체 fixed-peer9항목1.10 목표·다른 후보 연구·광범위 Phase5/6은 별도 미완료다. compact13 구현은 이후 `ff8b80a`에 커밋·푸시됐으며 패키지는 배포하지 않았다.
+
+## DC-22 — 별도 브랜치를 포함한 종합 반영
+
+### 실행 기준과 이식 경계
+
+2026-10-25 사용자 방향은 별도 실험을 포함해 효과 있는 변경을 최종 코어에 반영하는 것이다. **flat 이벤트를 우선 후보로 선정했고 소폭 크기 증가를 수용 가능한 비용으로 평가한다.** [REQUIREMENTS §7](./REQUIREMENTS.md#7-별도-브랜치를-포함한-종합-반영--dc-22)의 전체 후보 목록을 이번 선정의 정본으로 삼는다. 과거 미채택은 원인과 검증 범위를 이어받는 출발점이다.
+
+- 기준 B는 `fb481f3`의 compact13 source다. 클라우드 보존점 `6993a93`의 runtime은 복원 상태이며 활성 flat source는 `7e838bc`, slot은 `189ddef`다. 현재 source와 개별 patch를 비교해 필요한 event utility/render/공유 unmount 및 회귀·도구를 이식한다. 브랜치 전체 merge로 복원 커밋·실험 설정·과거 문서를 함께 적용하지 않는다.
+- flat은 DOM private Symbol의 정규화 event-name별 table과 shared proxy를 출발점으로 한다. callback이나 Event 객체에 영구 속성을 추가하는 설계는 frozen/object handler·외부 코드·중첩 dispatch 검토 없이 채택하지 않는다. HTMLElement 외 SVG, custom element, 공유 portal target도 포함한다.
+- 첫 대상은 base의 event 갱신과 공유 teardown이다. concurrent 직접 등록에는 native fallback을 유지한 채 portal commit/abandon을 검증한다. concurrent proxy 지원은 별도 이식·검증 결정이며 shared utility 변경을 concurrent artifact 무변경으로 표현하지 않는다.
+- C2는 현재 compact13에 보존 patch를 rebase한다. DC-17의 general Map·키 읽기·첫 소비·root-scoped proof 게시/한 번 소비/finally 폐기/재진입 무효화 계약을 유지한다. 크기 축소와 이벤트 최적화를 한 후보에 먼저 섞어 원인을 잃지 않는다.
+
+### 이벤트 수정과 호환성 판단
+
+**DC-21-S1 구현 버그:** 먼저 등록된 custom-element native listener가 trusted click 중 renew하여 `onclick=B`를 추가하고 기존 `onClick=A`를 유지할 때, flat이 현재 listener snapshot에서 proxy를 제거해 A까지 누락한다. baseline/slot의 첫 클릭 A, 다음 클릭 A/B가 이번 회귀의 기대값이다. 기존 probe는 flat의 빈 배열을 기대하고 `knownFlatRegressionReproduced=true`를 기록하므로 수정본 검사는 기대값을 바꾸고 버그가 남으면 실패해야 한다.
+
+rare alias 처리의 출발 대안은 현재 proxy/handler를 유지하는 전환 모델과 native 직접 등록 fallback 모델이다. dispatch 도중·바깥의 전환, nested dispatch, 삭제/재등록, alias dedup, `stopImmediatePropagation`, props 순서와 예외 복구를 대조한 뒤 상태/정리 시점을 확정한다. 특정 microtask 지연이나 event-clock을 도입하면 동기 등록·같은 이벤트 재dispatch·다른 target 전파에 주는 영향도 검증한다. event-clock 추가만으로 외부 callback identity 문제가 해결됐다고 취급하지 않는다.
+
+DC-22-1 첫 검증 후보는 기존 proxy와 A를 유지하고 새 alias B만 native 등록하는 모델이다. table의 private Symbol에 충돌한 event-name의 Set을 lazy 생성한다. 이 event-name은 이후 native 경로를 유지하되, 남아 있는 proxy의 handler와 같은 callback은 다시 등록하지 않는다. 원 proxy의 handler가 실제 제거/교체될 때 proxy를 해제한다. 일반 단일 handler의 flat 저장/dispatch는 유지하고 추가 Set은 alias 충돌 노드에만 존재한다. microtask 지연·callback/Event stamping은 추가하지 않는다. 격리 prototype `experiments/comprehensive/event.ts`와 같은 코드를 `src/utils/event.ts`에 반영했다. native 외부 identity/order 계약은 DC-22-2와 공개 events 문서에서 확정했다.
+
+**외부 native 연동 계약:** 기존 proxy 관찰에서는 교체 후 listener 상대 순서, 원 callback의 외부 remove/dedup, 진행 중 dispatch의 교체가 직접 등록과 달랐다. 이 차이와 A 누락 버그를 별도로 판단한다.
+
+| 적용 대안                               | 확인할 조건과 비용                                                                                                                                     |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 기본 event 경로 개선                    | 기존 공개 계약/소비자에 필요한 동작을 보존하거나 호환 경로로 해결할 수 있는지 확인한다. 불가능한 identity/order 동등성을 구현했다고 주장하지 않는다.   |
+| native 호환 경로와 proxy 사용 경계 구분 | 어느 event/target/등록 방식에 적용되는지 검출·소유할 수 있어야 한다. 외부 listener가 있다는 사실을 DOM에서 자동으로 모두 알 수 있다고 가정하지 않는다. |
+| 명시적 event opt-in                     | 필수 native 연동을 기본 경로에 남길 때의 대안이다. API·문서·비사용자 비용과 같은 앱/같은 JS의 on/off 검증이 필요하며 API는 아직 확정하지 않는다.       |
+
+기존 이벤트 문서와 실제 ref/custom-element/native listener 사용을 조사한 후 위 대안 중 기본 적용 경계를 결정한다. 소폭 크기 증가 수용은 이벤트 동작 변경의 포괄 승인으로 해석하지 않는다. 반대로 완전한 native 동등성의 어려움만을 이유로 이미 확인한 inline 이득을 종합 계획에서 제외하지 않는다.
+
+**DC-22-2 사용자 선택 확정 — 2026-10-25:** 위 대안 중 기본 proxy와 직접 native 사용 경계를 선택했다. Preact11도 노드별 handler table·공유 proxy를 사용하며 handler 교체 시 native 재등록을 피한다([고정11.0.0 source](https://github.com/preactjs/preact/blob/11.0.0/src/diff/props.js)). 따라서 native Event 객체 사용과 원 callback의 native 등록 identity 동등성은 별개다. Lithent의 on\*는 props로 관리하고 엄격한 native 연동은 기존 ref/mountCallback에서 직접 등록·cleanup한다. 별도 opt-in/전역 switch를 추가하지 않는다. 변경된 외부 remove/dedup/상대 순서는 마이그레이션 문서·실브라우저 관찰로 명시한다.
+
+Preact11의 logical clock은 callback/Event에 Symbol stamp를 붙여 전파 중 새 handler의 실행을 제한한다. 이번 후보는 frozen 함수/객체·같은 Event 재사용과 기존 alias 의미를 유지하므로 이 부가 계약을 그대로 이식하지 않는다. 신규 native listener의 실행은 native 전파/등록 시점에 따르고 이미 등록된 proxy는 호출 시점의 최신 handler를 읽는다. 이 경계를 별도 trusted/synthetic·ancestor 갱신·Event 재사용 회귀로 검증한다. Preact의 alias/receiver/지원 API 전체를 복제하는 작업은 아니다.
+
+### 독립 이득과 결합 효과의 비교
+
+| 조건 | 내용                                 | 분리해서 판단할 차이                                           |
+| ---- | ------------------------------------ | -------------------------------------------------------------- |
+| B    | 현재 compact13                       | 새 동일 환경의 기준선                                          |
+| E    | B + flat 수정본과 확정된 이벤트 계약 | E/B: 일반 inline 앱의 이득과 stable/noevent·dispatch·보유 비용 |
+| K    | B + C2 재평가본                      | K/B: 원래 앱의 render 중복 분석 제거 이득과 proof 관리 비용    |
+| EK   | B + E + K                            | EK/E, EK/K, EK/B: 상호작용·추가 이득·전체 비용                 |
+
+4조건은 동일 앱·helper·빌드 도구·고정 브라우저/엔진을 사용한다. 공식 원래 앱의 구조/캐시를 바꾸지 않는다. opt-in 대안을 택하면 기능 on/off는 동일 앱/동일 production JS로 별도 검증하고 원래 benchmark는 기존 API 경로를 유지한다. 개선율을 과거 DC-18/DC-21/C2 계수로 합성하지 않는다.
+
+이벤트 전용 대조는 inline-only/inline-text/stable-text/noevent-text와 실제 앱형 폼/목록 화면을 포함한다. 전용 화면은 수집 전 계획을 B/E/K/EK의4조건으로 확장했다. C2가 이벤트 UI에 주는 추가 비용도 확인하기 위해2순서×4round×4workload×4조건=128fresh pages를 사용하며 모든 시작 위치를 순환/반전한다. page당10warmup/30retained×5updates, 별도 GC3context×4workload×4조건=48context다. slot은 기존 trusted 재현/보존 보고서의 대조로 유지한다. mount/dispatch도 기록하고 페이지 내 반복을 독립 fresh sample로 세지 않는다. 실제 앱형 화면의 trusted input→최종 paint는 별도 프로토콜/trace로 측정하며 update→nextTick이나 두 rAF를 같은 지표로 표시하지 않는다.
+
+공식4조건 비교는9항목 합계145표본/조건/순서(선택25·나머지8항목각15)×4조건×2순서=1,160CPU, 메모리5항목×3반복×4조건×2순서=120표본을 기본 계획으로 한다. 생성/clear100회·partial100회/조건별3fresh context의 retention과 최종 dispose를 분리한다. 예비 gate에서 정합성 실패한 후보는 수정 후 진입하며, 시간/메모리 손해나 기존 size guard 초과만으로 결과 수집을 끊지 않는다. 각 순서의 조건 실행 순서는 시작 전에 균형 배치로 고정하고 보고한다.
+
+최종 선택 후 B+선택 후보+기존 네 fixed peer를 새 동일 환경에서 비교한다. 기본 계획은6앱×145×2=1,740CPU,6앱×5×3×2=180공식 메모리다. 중복 조건 제거 또는 동일 해시 증거 재사용은 수집 전에 이유/시간 간격/범위를 manifest에 확정한다. pooled와 차수별 수치, 실패/재시도, JS/paint, 네 peer 최저 대비9항목1.10 판정을 모두 보존한다. 이벤트 화면의 이득과 원래 benchmark의 미달은 각각 보고한다.
+
+### 채택과 남은 결정
+
+DC-19/19B Fragment는 이미 읽기 관찰/시간 한계를 검토했다. 새 최종 trace가 같은 앵커 비용을 보이고 snapshot 계약을 보존하는 수정 가설이 생기면 추가 조건으로 재개한다. C1은 자체 갱신 검색 비용이 남을 때, C3는 실제 캐시 앱 손해와 다른 사용 사례가 있을 때, C4는 앞선 내부 후보로 해소되지 않는 구조 비용이 확인될 때 연다. 재개하지 않는 이유도 최종 검토표에 남기며 과거 보존 결과를 삭제하지 않는다.
+
+- [x] **DC-22-0 우선순위 확정:** flat 이벤트 수정·반영 검토 → C2 재평가 → 결합 → 전체 peer·통합 → 채택본 반영. 근거: 사용자2026-10-25 방향과 DC-21의 반복 inline 이득. → R52~R54, Phase4A~4E, M-12~M-16.
+- [x] **DC-22-1 격리 구현/한정 검증 완료:** 기존 proxy 보존 + 충돌 event-name의 lazy Set/native alias 경로를 선택했다. Chrome156 production trusted 클릭에서 기존 flat의 첫 A 누락과 E의 첫 A/다음 A,B·중첩 A2회를 확인했다. baseline/E242core·K/EK246core를 통과했다. 최종 hardening/채택도 완료했으며 해당 실제 source/산출물은 종합 보고서에 연결한다. → R55/R61, Phase4B, M-15-S1.
+- [x] **DC-22-2 사용자 선택 확정:** 기본 proxy + 기존 ref/mountCallback의 직접 native 등록 경로. on\*의 외부 순서/remove/dedup 차이를 문서화하고 alias·frozen/object·Event 재사용은 보존한다. 최종 코드/검증은 종합 보고서에 연결한다. → R56/R61, Phase4B, M-14·M-15.
+- [x] **DC-22-3 비교 구조 확정:** compact13 B/E/K/EK와 최종 B/선택 후보/네 peer의 대조. 소폭 초과는 평가 중단 조건이 아니며 해시/환경을 고정한다. → R53/R57/R58, Phase4C~4E, M-16.
+- [x] **DC-22-4 이식 범위 확정:** E/EK의 concurrent branched render에도 같은 proxy utility를 연결한다. 공유 teardown과 native 직접 등록 fallback을 유지한다. 격리 E의 공통/전용 concurrent329회귀가 통과했으며 실제 concurrent 산출물/consumer·portal publication 통합도 Phase6에서 완료했다. C2 proof는 base만 지원하고 concurrent 성능 이득을 추론하지 않는다. → R60, Phase4B·5·6, M-6·M-15.
+- [x] **DC-22-5 최종 선택 완료:** E 단독을 선택해 기본 반영했다. E의 일반 UI partial/select 전체−5.22%/−9.44% 대비 EK의 추가 이득은 partial−1.94%·select+1.04%로 엇갈리고 원래 앱 가중 전체는 거의 같다. C2의 배열/방문 제거는 확인했으나 추가 proof 관리의 일관된 앱 이득이 부족해 이번에는 보류한다. heap/dispatch/br 비용을 공개하고 새 peer 비교의9항목 목표는 6/9로 미달이며 실제 비용과 일반 inline UI 이득을 구분해 채택했다. → R59, Phase4D~6, M-8·M-16.
+- [x] **DC-22-6 비용 정책 확정:** 소폭 크기 증가를 수용 가능한 비용으로 실측 평가한다. 채택본 hash와 raw/gzip/br에 맞춰 guard/근거를 갱신하고 임의의 새 숫자 상한·추가 여유를 만들지 않는다. → R53, Phase6, M-16.
 
 ## 상태 / 핸드오프
 
-- done: DC-18 compact13을 기본 base에 반영했다. [결과](../benchmark/NODE_SHAPE_RESULTS.md)의 독립 same-baseline 대조는 total−5.8917%/JS−14.4232%,10k 메모리+2.4747%,UMD4,824B다. default3JS는 측정 후보와 일치하고4,800B reference+검증24B allowance/여유0을 적용했다. build 두 단계·verify:concurrent·dual1,092/3 existing skipped·strict/lint·64e2e/retry0·384분포/18가중·최종1,367entry/79파일 보존 감사를 완료했다. full22는 미채택 대안, DC-17 C2는 당시 미측정/보류 역사로 보존한다.
-- next: 별도 후속에서 같은 새 환경의 네 fixed peer/전체9항목1.10 목표와 다른 원인/후보를 검토한다. DC-18 한정 작업은 완료했으며 새 실험을 자동 선정하거나 전 연구/광범위 Phase5/6 완료로 표시하지 않는다.
-- blockers: DC-18의 남은 구현/검사/보존 블로커는 없다. 전체 peer 목표는 미검증이다. optional metadata own-key 차이를 공개하며 전면 동등성·모든 heap 누수 부재·보편적 성능 우위를 주장하지 않는다. compact2실패 배치/재시도와 full/compact 시점·표본은 분리 보존한다.
-- commit: 현재 HEAD는 `452dc2eeae29d1e555f7f7b467f01de2baa55c0d`이며 이번 변경은 미커밋이다. 푸시/릴리스/upstream 제출은 하지 않았다. 적용 직전29guard 뒤2소스/size guard를 반영했고 최종79파일 manifest에 의도된6기존파일 변화를 기록했다. concurrent 소스는 미수정이다. 최종 증거 SHA-256은 `3fdb0309e89519c0bc9806b50bf27af3c8fd302e241607c2f20ad1402819950b`다.
+- done: 수정 flat E를 base/concurrent와 공유 teardown에 반영했다. 기본 proxy + ref/mountCallback 직접 native 계약과 사용 예제를 공개했다. 실제 base ESM/UMD/CJS3개는 측정 artifact와 byte/hash가 같다. 양코어6형식 trusted alias, constructor/DOM setter 실패 회수, concurrent portal retry/abandon publication, native cleanup과 일반 UI 입력/정체성을 확인했다. 전체 build·B1/B4 하위 suite·strict types/lint·Playwright76/retry0, raw/trace 영구 보존과 독립 archive 감사를 완료했다. [최종 보고서](../benchmark/COMPREHENSIVE_RESULTS.md)·[검증](../benchmark/comprehensive-validation.json)·[증거](../benchmark/comprehensive-evidence-manifest.json)에 연결한다.
+- next: 이번 E 반영에 필요한 작업은 완료했다. 남은 CPU 목표는 6/9이며 select/partial/swap의 새 병목 가설·별도 진단 없이 모든 목표 달성으로 표시하지 않는다. C2 K/EK·Fragment/C1/C3/C4는 보고서의 재개 조건으로 보류했다. 후속 목표 연구와 커밋/배포는 별도 작업이다.
+- blockers: 이번 통합의 실행 블로커는 없다. E의 일반 UI partial/select 전체−5.22%/−9.44%는4×CPU 조건이다. 최종 cached 앱 가중 전체 E/B +0.44%, 공식10k 메모리 +0.912574MB(+3.24%), UMDbr+182B/총5,006B와 dispatch 비용을 공개했다.9항목 목표 미달과 heap 전체 누수 부재의 미보장은 남아 있다. 첫 dispose 진단의 앱 전역 참조, 준비 실패와 모든 성능 실패/재시도 원자료를 보존했다.
+- commit: 실제 HEAD `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`이며 이번 변경은 미커밋이다. compact13 구현 `ff8b80afcc69f7226167ce39e6be3536ac873372`, 이전 인계 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`와 구분한다. 보존 snapshot `6993a93cecf67e445b30ee4ea014ca419235d946`, 활성 flat `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`·slot `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 검토했고 원자료를 유지했다.

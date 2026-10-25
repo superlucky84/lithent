@@ -21,6 +21,7 @@ import {
   makeParentGetter,
 } from '@/utils';
 import { cloneWDom } from '@/wDom';
+import { updateEvent } from '@/utils/event';
 
 const DF = () => new DocumentFragment();
 
@@ -679,25 +680,6 @@ const wDomChildrenToDom = (
       }
     }
   });
-};
-
-const updateEvent = (
-  element: HTMLElement,
-  eventKey: string,
-  newEventHandler: ((e: Event) => void) | undefined,
-  oldEventHandler: (e: Event) => void
-) => {
-  const eventName = eventKey.slice(2).toLowerCase();
-
-  if (oldEventHandler !== newEventHandler) {
-    if (oldEventHandler) {
-      element.removeEventListener(eventName, oldEventHandler);
-    }
-
-    if (newEventHandler) {
-      element.addEventListener(eventName, newEventHandler);
-    }
-  }
 };
 
 const updateStyle = (

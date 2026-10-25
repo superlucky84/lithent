@@ -1,0 +1,190 @@
+{
+  "at": "2026-10-25T11:51:59.104Z",
+  "scope": "Source-helper and production public-API trusted dispatch correctness; no timing samples",
+  "inputs": {
+    "baseline": {
+      "helper": "d7e09f9d60ed6b03d2c1858fd29ce1812885927b00db70c91e0e944a1ff1b25a",
+      "bundle": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+    },
+    "slot": {
+      "helper": "e4b1201ecbacb68c48ce53ddd87439b7a8c30e68af3a8b3ab7cb86eaffed7d98",
+      "bundle": "c877a776d151f6b8ab3ce1f4766e5195e7264b5188bd1803989e8c01c0f69346"
+    },
+    "flat-original": {
+      "helper": "61d591635b3bd7a9692989733f8e5ab99c07b9880bbb32da571181b2db3e770d",
+      "bundle": "050d55dc0c37a61f1b3cd6b16e713d72e074acac3e0dd8b6777e15b4f99fd98d"
+    },
+    "event": {
+      "helper": "15d1adc970b5f6d291173cf8ad754c60a241418f7576c9c1b55f748171830db9",
+      "bundle": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2"
+    }
+  },
+  "results": {
+    "baseline": {
+      "source": {
+        "first": [
+          "a"
+        ],
+        "next": [
+          "a",
+          "b"
+        ]
+      },
+      "publicAPI": {
+        "ordinary": {
+          "first": {
+            "calls": [
+              "a"
+            ],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        },
+        "nested": {
+          "first": {
+            "calls": [
+              "a",
+              "a"
+            ],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        }
+      }
+    },
+    "slot": {
+      "source": {
+        "first": [
+          "a"
+        ],
+        "next": [
+          "a",
+          "b"
+        ]
+      },
+      "publicAPI": {
+        "ordinary": {
+          "first": {
+            "calls": [
+              "a"
+            ],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        },
+        "nested": {
+          "first": {
+            "calls": [
+              "a",
+              "a"
+            ],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        }
+      }
+    },
+    "flat-original": {
+      "source": {
+        "first": [],
+        "next": [
+          "a",
+          "b"
+        ]
+      },
+      "publicAPI": {
+        "ordinary": {
+          "first": {
+            "calls": [],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        },
+        "nested": {
+          "first": {
+            "calls": [
+              "a"
+            ],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        }
+      }
+    },
+    "event": {
+      "source": {
+        "first": [
+          "a"
+        ],
+        "next": [
+          "a",
+          "b"
+        ]
+      },
+      "publicAPI": {
+        "ordinary": {
+          "first": {
+            "calls": [
+              "a"
+            ],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        },
+        "nested": {
+          "first": {
+            "calls": [
+              "a",
+              "a"
+            ],
+            "trusted": [
+              true
+            ]
+          },
+          "next": [
+            "a",
+            "b"
+          ]
+        }
+      }
+    }
+  },
+  "browser": "156.0.8078.47",
+  "complete": true,
+  "finishedAt": "2026-10-25T11:52:02.030Z"
+}
