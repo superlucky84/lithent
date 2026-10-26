@@ -2,7 +2,7 @@
 
 > **현재 결정은 DC-23이다.** DC-22의 proxy 적용/검증/측정은 당시 이력으로 보존하며 아래 R62~R66이 현재 이벤트 계약을 정의한다.
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료. compact13 유지 + native 이벤트 직접 등록. 전체 검증 통과, 원래 proxy 실험/증거 보존. 현재 CPU 목표는6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
@@ -13,7 +13,8 @@
 - R68. 현재 UMD raw/gzip/Brotli를 기준으로 같은 compressor에서 실제 후보를 비교한다. source map 주석·identifier 출력·제한적인 압축을 구분하고 디버깅/성능/정합성 비용을 공개한다. 단순 이름 단축이나 raw 감소를 압축 크기 감소로 추론하지 않는다.
 - R69. 후보는 별도 출력에 보존하고 현재 DC-23 산출물/증거를 덮어쓰지 않는다. 이번 조사는 가능한 절감과 추천까지이며, 미검증 후보를 기본 빌드에 채택하지 않는다. → DESIGN DC-24, IMPLEMENT DC-24, M-18.
 - R70. 2026-10-26 사용자 요청: 용량을 더 줄일 수 있는지 다시 확인한다. R67~R69를 그대로 따르며 결과는 추천까지다. 함수 이동·closure scope 변경이 있는 압축은 후보에서 뺀다. → DESIGN DC-24-5, IMPLEMENT S4/S5.
-- 미착수 후속(성능 DC-25, 정합성 BUG-1)은 요구사항으로 확정하지 않았다. [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에서 결정 항목과 함께 관리한다.
+- R71. 2026-10-26 사용자 결정: BUG-1 수정으로 늘어난 크기를 출력 절감(구문 4종 + Module 태그 제거)으로 상쇄해 base guard 4,824B 안에 둔다. guard 숫자는 올리지 않는다. hidden map은 쓰지 않는다. → DESIGN DC-24-6, IMPLEMENT S5.
+- 정합성 BUG-1은 사용자 요청으로 수정했다. 미착수 후속(성능 DC-25)은 요구사항으로 확정하지 않았다. 둘 다 [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에서 관리한다.
 
 ## DC-23 — 이벤트 proxy 제외와 compact13 유지
 

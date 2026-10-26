@@ -100,6 +100,15 @@ DC-24가 열어 둔 세 영역을 확인했다: Terser compress flag 29개를 �
 
 > 후속: 같은 날 사용자 요청으로 양코어에서 수정했다. 위 크기 수치는 수정 전 코드 기준이다. 수정 후 base UMD는 4,860B, 출력 후보 적용 시 4,819B다. [DESIGN BUG-1](../performance-improvement/DESIGN.md#bug-1--portal-대상이-형제-dom처럼-쓰이는-문제-정합성-수정함).
 
+### 채택 — 2026-10-26
+
+사용자 결정으로 **구문 4종 + Module 태그 제거**를 기본 빌드에 넣었다. hidden map은 쓰지 않았다.
+
+- `vite.config.js`: UMD 후처리 Terser compress는 `defaults: false`에 `booleans`·`lhs_constants`·`if_return`·`join_vars`만 켠다. Rollup `output.generatedCode.symbols: false`로 UMD/CJS의 Module 태그를 뺀다.
+- 결과(BUG-1 수정 포함): base UMD 12,746 / 5,207 / **4,819B**, guard 4,824B(여유 5B). guard 숫자는 올리지 않았다. ESM bytes는 반영 전과 같고, CJS는 태그만 빠졌다.
+- 검증: 실제 빌드 해시가 측정 후보와 같다. 반영 전 UMD와 jsdom DOM·로그·예외·export가 같고, CJS/ESM export 21개가 같다. 전체 build, `pnpm test`, SSR, concurrent satellites, Playwright 78(UMD를 쓰는 CSP·element fixture 포함), `verify:concurrent`가 통과했다. 상세는 [IMPLEMENT S5](../performance-improvement/IMPLEMENT.md#dc-24--추가-크기-조사).
+- 남은 일: concurrent 빌드에는 같은 옵션을 적용하지 않았다. 릴리스 때 CHANGELOG에 Module 태그 제거를 적는다.
+
 - done: 대조 해시 재현, Terser flag 29개·조합, Module 태그, 소스 편집 3종, 실제 hidden 빌드, jsdom 동등성, BUG-1 재현을 기록했다.
 - next: 사용자가 46B/76B 후보 채택 여부를 정한다. 채택 시 위 검증을 수행하고 size guard·CHANGELOG를 갱신한다.
 - blockers: 없음. 후보는 미채택이며 기본 빌드는 그대로다.

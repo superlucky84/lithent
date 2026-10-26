@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료. compact13 유지 + native 이벤트 직접 등록. 전체 검증 통과, 원래 proxy 실험/증거 보존. 현재 CPU 목표는6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
@@ -12,13 +12,14 @@
 - [x] portal을 지우면 portal 대상 안의 그 portal 내용만 사라진다. 부모의 다른 형제와 대상 안의 다른 내용은 남는다. portal을 품은 컴포넌트·keyed 행을 지워도 대상 컨테이너는 문서에 남는다.
 - [x] 같은 자리에서 portal ↔ 요소/컴포넌트를 전환하면 양쪽 모두 올바르게 그려지고 지워진다.
 - 증거: `src/tests/core-portalSiblings.test.tsx` 11개(base/concurrent), `experiments/bundle-size-recheck/portal-anchor-repro.cjs`(Chromium, 수정 후 오류 0). 수동 확인이 필요하면 같은 스크립트를 `dist/lithent.umd.js`에 실행한다.
-- [ ] `pnpm size`: base UMD 4,860B로 guard 4,824B를 36B 넘는다. DESIGN TODO의 크기 결정 뒤 통과를 확인한다.
+- [x] `pnpm size`: 수정만으로는 4,860B였고, 채택한 출력 절감과 함께 base UMD 4,819/4,824B로 통과한다.
 
 ## M-18. 번들 여유 조사 — R67~R69, DC-24
 
 - [x] current/후보의 Node/zlib와 raw/gzip/Brotli·source/bundle hash를 고정했다.
 - [x] map 주석 제거와 map 파일 생성을 구분하고 실제 빌드로 재현했다. 크기상 유효한 후보의 AST/closure를 확인했다. hidden은 전체 실행 AST가 같고 표준 rename은 byte가 같으며 custom alphabet은 크기 악화로 미채택이다.
 - [x] 제한 압축의 scope/메모리/성능 추가 검증 필요 여부를 명시했다. 크기 절감만으로 안전성을 선언하지 않았다.
+- [x] 채택한 출력(구문 4종 + Module 태그 제거)은 함수·scope 구조가 같고, 반영 전 UMD와 DOM·로그·예외·export가 같다. UMD/CJS에서 `Object.prototype.toString.call(lithent)`만 `[object Module]`→`[object Object]`로 바뀐다. 소스맵 연결 주석은 남아 있다.
 - [x] 추천·실측·채택 상태를 구분하고 DC-23 증거/현재 코드를 보존했다.
 
 ## M-17. native 복원 — R62~R66, DC-23

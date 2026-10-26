@@ -23,10 +23,18 @@ export default defineConfig({
         order: 'post',
         async handler(code, _chunk, outputOptions) {
           if (outputOptions.format !== 'umd') return null;
-          // Rename and reprint only; preserve the scopes that isolate parent
-          // getters from old diff trees. The ESM output keeps its normal build.
+          // Rename, reprint and a few syntax-only rewrites; preserve the
+          // scopes that isolate parent getters from old diff trees, so no
+          // option that inlines or moves functions. The ESM output keeps its
+          // normal build. See docs/benchmark/BUNDLE_SIZE_RESULTS.md.
           const result = await minify(code, {
-            compress: false,
+            compress: {
+              defaults: false,
+              booleans: true,
+              lhs_constants: true,
+              if_return: true,
+              join_vars: true,
+            },
             mangle: true,
             sourceMap: !!outputOptions.sourcemap,
           });
@@ -51,6 +59,8 @@ export default defineConfig({
       },
     },
     rollupOptions: {
+      // No Symbol.toStringTag "Module" marker on the UMD/CJS exports object.
+      output: { generatedCode: { symbols: false } },
       treeshake: {
         moduleSideEffects: false,
         propertyReadSideEffects: false,

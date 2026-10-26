@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료. compact13 유지 + native 이벤트 직접 등록. 전체 검증 통과, 원래 proxy 실험/증거 보존. 현재 CPU 목표는6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 - 완료한 DC-22 실행 순서: [Phase4A~4E](#dc-22--종합-반영-실행-phase4a4e) → [Phase5](#phase-5--test-hardening) → [Phase6](#phase-6--integration-test와-채택인계). 앞선 Phase0~4의 완료 기록은 보존하며, 과거 size 중단·미채택을 현재 후속의 자동 종료 조건으로 쓰지 않는다.
@@ -12,7 +12,7 @@
 - [x] S2 Test Hardening: 유효한 후보만 실제 빌드로 재현하고 export·parent getter scope·source map 보존과 필요한 브라우저 동작을 확인한다. 출력만 달라지면 전체 suite를 불필요하게 반복하지 않는다.
 - [x] S3 Integration Test/인계: 현재 기본 빌드와 후보를 구분하고 실제 절감·기능/디버깅 비용·남은 검증을 보고서/네 문서에 기록한다. 기본 채택은 검증된 범위로만 판단한다.
 - [x] S4 재확인(2026-10-26): 소스 사본 빌드로 대조 해시를 재현하고 Terser flag 29개·Module 태그·소스 편집 3종·실제 hidden 빌드를 비교했다. jsdom 동등성 확인만 했고 전체 suite·Playwright·package probe는 실행하지 않았다(미채택). → [재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26), [도구](../../experiments/bundle-size-recheck/README.md).
-- [ ] S5 채택 시(사용자 결정 대기): 선택한 출력 옵션을 `vite.config.js`에 반영하고 전체 build, `pnpm test`/dual, UMD Playwright fixture, 양코어 package probe, `pnpm size` guard·CHANGELOG를 갱신한다. → DESIGN TODO.
+- [x] S5 채택(2026-10-26, 사용자 결정): `vite.config.js`에 구문 4종과 `generatedCode.symbols: false`를 반영했다. 실제 빌드 해시가 측정 후보와 같다(UMD `1501e239…`, CJS `8a22f1e4…`, ESM `6665eac4…`는 반영 전과 동일). jsdom 동등성(반영 전 UMD와 DOM·로그·예외·export 동일), CJS/ESM export 21개 동일, Chromium portal 재현 통과. 전체 build, `pnpm test` 996 passed / 3 skipped, base SSR 15, concurrent satellites 172, Playwright 78(UMD를 쓰는 CSP·element fixture 포함, retry 0), `pnpm size` 4,819/4,824B, `pnpm verify:concurrent`, ESLint/Prettier가 통과했다. 고정 Chrome이 필요한 기존 package probe 스크립트는 이 환경에 그 브라우저가 없어 실행하지 않았다. CHANGELOG는 릴리스 때 적는다(Module 태그 제거, portal 수정).
 
 미착수 후속(DC-25 같은 순서 keyed 빠른 경로)은 [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에 있다. 착수 전에는 실행 Phase를 만들지 않는다.
 
@@ -24,7 +24,7 @@
 - [x] B1 구현: 공용 `checkPortalElement`를 추가하고, 양코어 render의 기준점·이동·삭제·교체 경로와 diff의 `tag='portal'` 덮어쓰기를 수정했다.
 - [x] B2 Test Hardening: 대상 안의 다른 내용을 지우지 않는지, 같은 자리 portal ↔ 컴포넌트 전환, keyed 행 삭제를 추가했다.
 - [x] B3 Integration Test: 전체 build, `pnpm test` 996 passed / 3 skipped, base SSR 15, concurrent satellites 172, Playwright 78(retry 0), strict tsc 3종, ESLint/Prettier, `pnpm verify:concurrent`가 통과했다. Chromium 재현도 통과한다.
-- [ ] B4 크기: base UMD 4,860B로 guard를 36B 넘는다. DESIGN TODO의 크기 결정을 따른다(S5).
+- [x] B4 크기: 수정만으로는 4,860B였고, S5 출력 절감과 함께 4,819/4,824B로 통과한다.
 
 ## DC-23 — 복원 실행
 

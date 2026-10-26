@@ -1,9 +1,16 @@
 # summary
 
-## 최신 — BUG-1 portal 정합성 수정 (2026-10-26)
+## 최신 — 출력 절감 채택 (2026-10-26)
+
+- done: 사용자 결정으로 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 `vite.config.js`에 채택했다. BUG-1 수정과 합쳐 base UMD Brotli **4,819/4,824B**(여유 5B)로 `pnpm size`가 통과한다. ESM bytes는 그대로이고, UMD/CJS에서는 `Object.prototype.toString.call(lithent)`만 `[object Object]`로 바뀐다. 소스맵 연결은 유지했다(hidden map 미채택). 전체 build, `pnpm test` 996/3 skipped, SSR 15, concurrent satellites 172, Playwright 78, `verify:concurrent`, ESLint/Prettier, jsdom 동등성, Chromium portal 재현이 통과했다. [IMPLEMENT S5](../performance-improvement/IMPLEMENT.md#dc-24--추가-크기-조사).
+- next: DC-25(같은 순서 keyed 빠른 경로)는 결정 항목부터. 릴리스 때 CHANGELOG에 portal 수정과 Module 태그 제거를 적는다. concurrent 빌드에는 같은 출력 옵션을 적용하지 않았다.
+- blockers: 없음.
+- commit: tip은 `git log -1`.
+
+## 이전 — BUG-1 portal 정합성 수정 (2026-10-26)
 
 - done: portal 노드의 `el`(portal 대상)을 형제 DOM처럼 다루던 버그를 양코어에서 고쳤다. 처음 찾은 삽입 기준점 오류(A)에 더해 같은 원인의 증상을 회귀 테스트로 확인하고 함께 고쳤다: 이동 시 대상 컨테이너 끌려옴(B), 삭제 시 형제 일괄 삭제(C), portal ↔ 요소 전환 누락(D), 컴포넌트 삭제 시 대상 컨테이너 제거(E). 회귀 11개는 수정 전 base 10개, concurrent 6개가 실패했고 지금은 모두 통과한다. 전체 build, `pnpm test` 996/3 skipped, SSR 15, concurrent satellites 172, Playwright 78, tsc/ESLint/Prettier, `verify:concurrent`가 통과했다. [DESIGN BUG-1](../performance-improvement/DESIGN.md#bug-1--portal-대상이-형제-dom처럼-쓰이는-문제-정합성-수정함).
-- blockers: **`pnpm size` 실패** — base UMD Brotli 4,824→4,860B(+36B)로 guard 4,824B를 넘는다. 출력 후보(구문 4종 + Module 태그 제거)를 같이 적용하면 4,819B로 통과하고, hidden map까지 쓰면 4,791B다. 어느 쪽인지 사용자 결정이 필요하다. concurrent는 6,935B로 예산 안이다.
+- blockers(당시): **`pnpm size` 실패** — base UMD Brotli 4,824→4,860B(+36B)로 guard 4,824B를 넘었다. 이후 출력 절감 채택으로 해소했다. 출력 후보(구문 4종 + Module 태그 제거)를 같이 적용하면 4,819B로 통과하고, hidden map까지 쓰면 4,791B다. 어느 쪽인지 사용자 결정이 필요하다. concurrent는 6,935B로 예산 안이다.
 - next: 크기 결정 → 채택 시 `vite.config.js` 반영과 검증(IMPLEMENT S5). 그 뒤 DC-25는 결정 항목부터. 릴리스 때 CHANGELOG에 portal 수정을 적는다.
 - commit: tip은 `git log -1`.
 

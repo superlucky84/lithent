@@ -1,12 +1,12 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료. compact13 유지 + native 이벤트 직접 등록. 전체 검증 통과, 원래 proxy 실험/증거 보존. 현재 CPU 목표는6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
 ## TODO — 미착수 후속 작업
 
-2026-10-26 사용자 요청으로 정리한 목록이다. BUG-1은 사용자 요청으로 수정했다(아래). 나머지는 **구현·측정하지 않았다.** 착수하면 REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL 순서로 정식 DC를 연다.
+2026-10-26 사용자 요청으로 정리한 목록이다. BUG-1 수정과 크기 후속 채택은 끝났다(아래). **DC-25는 구현·측정하지 않았다.** 착수하면 REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL 순서로 정식 DC를 연다.
 
 ### DC-25 — 같은 순서 keyed 빠른 경로 (성능)
 
@@ -41,12 +41,12 @@
   - diff가 portal을 대체하는 새 노드에 `tag='portal'`을 덮어쓰던 코드는 제거했다. 삭제 판정은 이제 `op`로 한다.
 - [x] BUG-1-1 수정과 양코어 회귀 11개(`src/tests/core-portalSiblings.test.tsx`). 수정 전 base 10개, concurrent 6개가 실패했다. 1개는 대상의 다른 내용을 지우지 않는지 보는 안전장치다.
 - [x] BUG-1-2 검증: 전체 build, `pnpm test` 996 passed / 기존 3 skipped(이전 974 + 신규 11 × 2코어), base SSR 15, concurrent satellites 172, Playwright 78 passed(retry 0), strict tsc(base/concurrent/e2e), 변경 파일 ESLint·Prettier, `pnpm verify:concurrent`. Chromium 재현 스크립트도 수정된 UMD에서 오류 없이 통과한다.
-- [ ] BUG-1-3 **크기 결정 대기:** base UMD Brotli 4,824→4,860B(+36B)로 `pnpm size` guard(4,824B)를 36B 넘는다. concurrent는 6,903→6,935B(+32B)로 예산 안이다. 선택지는 아래 크기 후속에 있다. 성능 측정은 하지 않았다. 바뀐 경로는 portal 판정 비교 몇 개뿐이다.
+- [x] BUG-1-3 크기: 수정만으로는 base UMD Brotli 4,824→4,860B(+36B)로 guard를 넘었다. 사용자 결정으로 아래 출력 절감을 함께 채택해 4,819B다. concurrent는 6,903→6,935B(+32B)로 예산 안이다. 성능 측정은 하지 않았다. 바뀐 경로는 portal 판정 비교 몇 개뿐이다.
 - 릴리스 때 CHANGELOG에 portal 수정과 동작 변화(D·E)를 적는다.
 
-### 크기 후속 (결정 대기)
+### 크기 후속 (채택함)
 
-BUG-1 수정이 들어간 현재 코드 기준 base UMD Brotli다. 출력 후보의 근거와 채택 전 검증 목록은 [재확인 결과](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26)에 있다.
+BUG-1 수정이 들어간 코드 기준 base UMD Brotli다. 출력 후보의 근거와 채택 전 검증 목록은 [재확인 결과](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26)에 있다.
 
 | 선택                                            | Brotli | 4,824B guard                |
 | ----------------------------------------------- | -----: | --------------------------- |
@@ -54,7 +54,7 @@ BUG-1 수정이 들어간 현재 코드 기준 base UMD Brotli다. 출력 후보
 | 수정 + 구문 4종 + Module 태그 제거              | 4,819B | 통과(여유 5B)               |
 | 수정 + 구문 4종 + Module 태그 제거 + hidden map | 4,791B | 통과(4,800B reference 아래) |
 
-- [ ] 출력 후보 채택 또는 BUG-1용 allowance 추가를 사용자가 정한다.
+- [x] 사용자 결정(2026-10-26): **수정 + 구문 4종 + Module 태그 제거**를 채택했다. `vite.config.js`의 UMD 후처리 compress를 `booleans`·`lhs_constants`·`if_return`·`join_vars`만 켜고, Rollup `output.generatedCode.symbols: false`로 UMD/CJS의 `Symbol.toStringTag: "Module"`을 뺐다. guard 4,824B는 그대로이며 여유는 5B다. hidden map은 쓰지 않아 소스맵 자동 연결이 유지된다. 검증은 IMPLEMENT S5.
 
 ## DC-24 — 번들 출력 후보 조사
 
@@ -63,7 +63,8 @@ BUG-1 수정이 들어간 현재 코드 기준 base UMD Brotli다. 출력 후보
 - [x] DC-24-3. 실제 빌드12개·여섯 형식의 동일 실행 AST/map과 크기/대가를 확인했다. 기본 빌드는 유지하며 구문 후보는 정적 검사만 통과한 미채택 상태다. → M-18.
 
 - [x] DC-24-4. 사용자 후속 결정으로 추가 번들 축소를 보류하고 현재 기본 빌드를 유지한다. hidden map/구문 압축은 미채택 조사 결과로만 보존한다.
-- [x] DC-24-5. 사용자 요청으로 독립 재확인했다. Terser flag 29개를 하나씩 재서 구문 4종(−24B)을 찾았고, Rollup Module 태그 제거(−22B)를 추가 후보로 확인했다. 둘을 합치면 4,778B, hidden map까지 합치면 4,748B다. 함수·scope 구조는 그대로다. 전체 compress(−102B)는 함수 33개를 옮겨 제외했고, 소스 편집 3종은 모두 Brotli가 늘었다. 미채택이며 결정은 위 TODO에 둔다. → [재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26).
+- [x] DC-24-5. 사용자 요청으로 독립 재확인했다. Terser flag 29개를 하나씩 재서 구문 4종(−24B)을 찾았고, Rollup Module 태그 제거(−22B)를 추가 후보로 확인했다. 둘을 합치면 4,778B, hidden map까지 합치면 4,748B다. 함수·scope 구조는 그대로다. 전체 compress(−102B)는 함수 33개를 옮겨 제외했고, 소스 편집 3종은 모두 Brotli가 늘었다. → [재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26).
+- [x] DC-24-6. 사용자 결정으로 구문 4종 + Module 태그 제거를 기본 빌드에 채택했다(BUG-1 수정과 함께 4,819B). hidden map은 채택하지 않았다. → 위 TODO 크기 후속, IMPLEMENT S5, M-18.
 
 ## DC-23 — native 이벤트 복원
 

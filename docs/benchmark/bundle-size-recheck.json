@@ -182,5 +182,22 @@
     "alsoIn": "published lithent@1.25.2 UMD",
     "cause": "src/render.ts findChildFragmentNextElement returns a portal node el (the portal target) as the next sibling element",
     "repro": "experiments/bundle-size-recheck/portal-anchor-repro.cjs"
+  },
+  "adoption": {
+    "date": "2026-10-26",
+    "decision": "User chose option 1: syntax4 + noModuleToStringTag on top of the BUG-1 fix. Hidden map not adopted.",
+    "config": "vite.config.js: UMD terser compress {defaults:false, booleans, lhs_constants, if_return, join_vars}; rollupOptions.output.generatedCode.symbols=false",
+    "baseUmd": {
+      "raw": 12746,
+      "gzip": 5207,
+      "br": 4819,
+      "guard": 4824,
+      "sha256": "1501e239c466353d106e0f2b59102734b757ad85cce44173e661248e965271ad"
+    },
+    "baseCjsSha256": "8a22f1e48116a4db0241c9ce8be27281918e3adee12d4e95c1c5fb6685a429ef",
+    "baseEsmSha256": "6665eac483edf71244af648bcd5793cfec5e3eec9aeec6618294b4d5cdb4eb47",
+    "fixOnlyBaseUmdBr": 4860,
+    "concurrentUmdBr": 6935,
+    "note": "ESM bytes identical to the fix-only build. Earlier candidate rows above were measured before the BUG-1 fix."
   }
 }
