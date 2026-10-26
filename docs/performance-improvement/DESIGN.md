@@ -4,6 +4,33 @@
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
+## TODO — 미착수 후속 작업
+
+2026-10-26 사용자 요청으로 정리한 목록이다. 아래 항목은 **구현·측정하지 않았다.** 기본 runtime은 DC-23 그대로다. 착수하면 REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL 순서로 정식 DC를 연다.
+
+### DC-25 — 같은 순서 keyed 빠른 경로 (성능)
+
+- 배경: 고정 네 peer 목표는 6/9다. 1.10선까지 필요한 감소는 부분 갱신 −1.9%(15.438→15.14ms), swap −1.5%(16.698→16.45ms), select −21.2%(5.912→4.66ms)다. select 격차는 대부분 JS다(Lithent 3.050ms, Preact classes 1.306ms). 출처: [최종 비교 pooled](../benchmark/comprehensive-final-results.json).
+- 가설: 행 하나만 바뀌어도 1,000행 전체에 반복하는 작업을 **하나의 후보로 묶어** 줄인다. 이전에는 조각마다 따로 측정해 각 효과가 순서·노이즈 범위(±1~2%)에 묻혔다.
+  1. `src/diff.ts` `diffLoopChildren`: 길이와 위치별 key가 같으면 Map set/get/delete와 `used`/filter를 건너뛴다. [진단](../benchmark/FOLLOWUP_ANALYSIS.md)에서 select 4.25→3.35ms, +42B였고 공식 측정은 없다. 고유 key를 전제했다.
+  2. `src/render.ts` `updateChildren`: 순서가 유지된 결과면 `matchedIndexes`/`oiSeq` 재분석을 생략한다. C2(K)는 select JS −13%였지만 전체 시간 변화가 없었다. WeakMap frame 대신 list 노드 단위 표시는 고려만 하고 구현하지 않았다.
+  3. `src/diff.ts` `makeNewWDomTree`: 같은 VDOM 객체의 조기 반환을 다시 평가한다. [당시](../benchmark/PERFORMANCE_CLOSEOUT.md) select/swap/삭제 JS −21~32%, 부분 갱신 전체 +7~10%로 기각했다. compact13 이전 layout에서의 결과다.
+- [ ] DC-25-1 중복 key 정책: (a) Set으로 중복을 확인해 현재 "첫 등장만 매칭"을 유지한다(비용 일부 남음). (b) 위치 매칭으로 바꾸고 개발 경고를 낸다(가장 빠름, 계약 변경). 길이·위치 key 비교만으로는 첫 등장 소비를 보장하지 못한다(아래 C2 제약 2).
+- [ ] DC-25-2 크기 허용치: base guard 여유가 0B(4,824B)다. 진입 전 허용 바이트를 정한다. 아래 크기 재확인의 출력 절감(46B/76B)을 먼저 채택하면 여유로 쓸 수 있다.
+- [ ] DC-25-3 측정 범위: 동일 환경 CPU 9항목 × 양순서, 공식 메모리, 고정 네 peer 재비교. 조각별 카운터로 제거된 작업을 귀속한다.
+- 다시 하지 않을 것: proxy E, C1, C3, full22, keymatch·ordered 단독.
+
+### BUG-1 — portal 형제가 삽입 기준점이 되는 문제 (정합성)
+
+- 증상: 부모 children이 `[p, null, portal(...), em]`일 때 `null` 자리가 컴포넌트(Fragment 출력)로 바뀌면 `insertBefore`가 `NotFoundError`를 던진다. 그다음 갱신에서 부모의 `p`, `em`이 DOM에서 사라진다. jsdom·Playwright Chromium에서 재현했고 배포판 `lithent@1.25.2`에도 있다.
+- 원인: `src/render.ts` `findChildFragmentNextElement`가 portal 노드의 `el`(portal 대상 컨테이너)을 다음 형제 요소로 돌려준다. `startFindNextBrotherElement`와 `updateChildren` 배치 단계의 anchor 탐색이 이 함수를 쓴다.
+- [ ] BUG-1-1 portal 노드를 anchor 후보에서 제외하는 수정과 양코어 회귀(삽입·교체·keyed 배치·portal 앞/뒤/연속)를 추가한다. concurrent의 대응 경로도 확인한다.
+- 재현: [portal-anchor-repro.cjs](../../experiments/bundle-size-recheck/portal-anchor-repro.cjs). 발견 경위: [크기 재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26).
+
+### 크기 재확인 후속 (선택)
+
+- [ ] 구문 4종 + Module 태그 제거(4,778B, −46B) 또는 hidden map 포함(4,748B, −76B)의 채택 여부를 사용자가 정한다. 근거와 채택 전 검증 목록은 [재확인 결과](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26)에 있다.
+
 ## DC-24 — 번들 출력 후보 조사
 
 - [x] DC-24-1. 현재 native 코드/compact13을 고정하고 source map 연결 주석, 안전한 identifier/reprint 옵션부터 비교한다. source map 파일 생성과 번들의 자동 연결을 구분한다.
@@ -11,6 +38,7 @@
 - [x] DC-24-3. 실제 빌드12개·여섯 형식의 동일 실행 AST/map과 크기/대가를 확인했다. 기본 빌드는 유지하며 구문 후보는 정적 검사만 통과한 미채택 상태다. → M-18.
 
 - [x] DC-24-4. 사용자 후속 결정으로 추가 번들 축소를 보류하고 현재 기본 빌드를 유지한다. hidden map/구문 압축은 미채택 조사 결과로만 보존한다.
+- [x] DC-24-5. 사용자 요청으로 독립 재확인했다. Terser flag 29개를 하나씩 재서 구문 4종(−24B)을 찾았고, Rollup Module 태그 제거(−22B)를 추가 후보로 확인했다. 둘을 합치면 4,778B, hidden map까지 합치면 4,748B다. 함수·scope 구조는 그대로다. 전체 compress(−102B)는 함수 33개를 옮겨 제외했고, 소스 편집 3종은 모두 Brotli가 늘었다. 미채택이며 결정은 위 TODO에 둔다. → [재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26).
 
 ## DC-23 — native 이벤트 복원
 

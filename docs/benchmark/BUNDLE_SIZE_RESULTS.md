@@ -53,3 +53,54 @@ Vite `build.sourcemap: 'hidden'`은 `.map` 파일을 생성하면서 JS 끝의 `
 - commit: DC-23 복원·검증과 DC-24 조사 구현은 `4baf0e51483134ab3426817035e06e21f0285022`에 커밋했다. 검증 당시 시작 HEAD는 `463c6cd`이며 JSON/아카이브의 head·uncommitted 값은 당시 이력으로 유지한다. 이후 인계 문서 커밋의 tip은 `git log -1` 및 브랜치 ctxbin을 따른다.
 
 증거: [archive](./bundle-size-evidence.tar.gz). 재현은 [도구 안내](../../experiments/native-events/README.md#dc-24-bundle-size-investigation)를 따른다. 정본은 [요구](../performance-improvement/REQUIREMENTS.md), [설계](../performance-improvement/DESIGN.md), [실행](../performance-improvement/IMPLEMENT.md), [체크](../performance-improvement/MANUAL_TEST_CHECKLIST.md)다.
+
+## 재확인 — 2026-10-26
+
+사용자 요청으로 DC-24를 독립적으로 다시 확인했다. 기본 빌드·runtime·`dist`는 바꾸지 않았다. 같은 설정으로 소스 사본에서 다시 만든 대조 UMD는 현재 해시 `ec4c46d2…`(12,759 / 5,187 / 4,824B)와 정확히 같다. Node 22.22.0 / zlib 1.3.1-470d3a2, Vite 5.4.8, Terser 5.18.1, gzip level 9와 기본 Brotli를 사용했다. 실제 hidden map 빌드도 DC-24의 해시 `01b6510f…`(4,798B)를 그대로 재현했다.
+
+DC-24가 열어 둔 세 영역을 확인했다: Terser compress flag 29개를 하나씩, Rollup이 붙이는 Module 태그, 소스 수준 편집.
+
+### 결과 (base minified UMD)
+
+| 후보                                                     |     raw |   gzip |     Brotli |    감소 |
+| -------------------------------------------------------- | ------: | -----: | ---------: | ------: |
+| 현재                                                     | 12,759B | 5,187B |     4,824B |    기준 |
+| 구문 4종 (booleans·lhs_constants·if_return·join_vars)    | 12,748B | 5,188B |     4,800B |     24B |
+| Module 태그 제거 (`output.generatedCode.symbols: false`) | 12,698B | 5,159B |     4,802B |     22B |
+| 구문 4종 + 태그 제거                                     | 12,687B | 5,159B | **4,778B** | **46B** |
+| hidden map 단독 (DC-24)                                  | 12,719B | 5,155B |     4,798B |     26B |
+| 구문 4종 + 태그 제거 + hidden map (실제 hidden 빌드)     | 12,647B | 5,126B | **4,748B** | **76B** |
+
+- DC-24의 구문 후보에는 lhs_constants·join_vars가 없었고, Brotli를 3B 늘리는 conditionals가 들어 있었다. flag를 하나씩 재서 Brotli가 줄어드는 것만 골랐다: booleans −17B, lhs_constants −16B, if_return −12B, join_vars −3B(단독 값, 합산은 비선형).
+- 구문 4종은 UMD 후처리에만 적용되므로 ESM/CJS bytes는 그대로다. 함수 노드 168개, 자기 변수에 묶인 함수 118개가 대조군과 같다. parent getter(`e=>()=>e`)를 포함한 closure scope는 바뀌지 않았다.
+- Module 태그는 Rollup이 UMD/CJS 끝에 붙이는 `Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" })`다. 빼면 `Object.prototype.toString.call(lithent)`가 `[object Module]`에서 `[object Object]`로 바뀐다. 저장소 안에서 이 값에 의존하는 코드는 없다. CJS도 Brotli 4,857→4,832B로 줄고 ESM은 변화가 없다. 번들러 interop은 `__esModule`을 보는데, 이 빌드는 원래 그 표시를 내보내지 않는다.
+- 동등성: jsdom 시나리오(keyed 목록 9단계, hooks, lmount/useRenew, ref/style, portal, 이벤트, dispose)에서 위 후보 모두 DOM 스냅샷 9개·lifecycle 로그 23개·예외·export 이름이 대조군과 같았다. 전체 테스트·Playwright·package probe는 채택할 때 수행할 검증이며 이번에는 실행하지 않았다.
+
+### 제외한 후보
+
+| 후보                             | Brotli 변화 | 제외 이유                                                                                                                              |
+| -------------------------------- | ----------: | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Terser 기본 compress 전체        |    약 −102B | 단일 사용 함수 33개를 호출 위치로 옮기고(묶인 함수 118→85) 함수 1개를 없앤다. `vite.config.js`가 일부러 지키는 closure scope가 바뀐다. |
+| 소스 E1: hook 등록 함수 공통화   |        +12B | raw는 35B 줄지만 Brotli는 커진다.                                                                                                      |
+| 소스 E2: `Object.prototype` 별칭 |        +10B | 같은 이유.                                                                                                                             |
+| 소스 E3: 자식 수 비교 헬퍼       |         +6B | diff hot path에 함수 호출도 추가된다.                                                                                                  |
+| E1+E2+E3                         |        +12B |                                                                                                                                        |
+
+반복 패턴은 Brotli가 이미 거의 비용 없이 압축한다. 헬퍼로 묶어 raw를 줄여도 압축 크기는 오히려 커질 수 있다. 소스 수준의 미세 축소 여지는 사실상 없다. 기능 제거나 공개 property 이름 변경은 범위 밖이다.
+
+### 판단
+
+- 현재 크기는 기능과 scope 정책을 유지하는 범위에서 거의 최소다. 남은 여지는 출력 단계의 46B(소스맵 자동 연결 유지)와 76B(hidden map)다.
+- 채택한다면 구문 4종 + Module 태그 제거(4,778B)를 먼저 추천한다. 런타임 로직·함수 구조·ESM이 그대로이고 소스맵 연결도 유지된다. hidden map은 DC-24와 같은 디버깅 대가가 있다.
+- 채택 전 검증: 전체 build, `pnpm test`/dual, UMD를 쓰는 Playwright fixture(element-umd, csp 등), 양코어 package probe. benchmark 앱은 ESM을 번들하므로 UMD 후처리는 CPU 측정값에 영향이 없다. Module 태그 제거는 UMD/CJS에서 관찰 가능한 차이이므로 CHANGELOG에 적는다. concurrent 빌드에는 같은 후보를 아직 재지 않았다.
+
+### 부수 발견 — BUG-1
+
+동등성 시나리오에서 대조군 자체가 예외를 냈다. 빈 자리(`null`)가 portal 형제 바로 앞에서 컴포넌트로 바뀌면 `insertBefore`가 portal 대상 컨테이너를 기준점으로 써서 `NotFoundError`가 난다. 그다음 갱신에서는 부모의 다른 자식(`p`, `em`)이 DOM에서 사라진다. jsdom과 Playwright Chromium에서 재현했고 배포판 `lithent@1.25.2` UMD에서도 같다. 원인은 `src/render.ts`의 `findChildFragmentNextElement`가 portal 노드의 `el`(portal 대상)을 다음 형제 요소로 돌려주는 것이다. 이번 작업 범위 밖이라 수정하지 않고 [DESIGN TODO](../performance-improvement/DESIGN.md#todo--미착수-후속-작업)에 올렸다.
+
+- done: 대조 해시 재현, Terser flag 29개·조합, Module 태그, 소스 편집 3종, 실제 hidden 빌드, jsdom 동등성, BUG-1 재현을 기록했다.
+- next: 사용자가 46B/76B 후보 채택 여부를 정한다. 채택 시 위 검증을 수행하고 size guard·CHANGELOG를 갱신한다.
+- blockers: 없음. 후보는 미채택이며 기본 빌드는 그대로다.
+- commit: 이 재확인과 TODO 정리는 `48cb583` 이후의 브랜치 커밋이다. tip은 `git log -1`로 확인한다.
+
+원자료: [bundle-size-recheck.json](./bundle-size-recheck.json). 재현: [도구 안내](../../experiments/bundle-size-recheck/README.md).

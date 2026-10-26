@@ -11,6 +11,10 @@
 - [x] S1 후보: 별도 디렉터리에서 map 주석·identifier/reprint·scope를 보존하는 제한 압축을 비교한다. baseline: 실제 bytes/compressor와 AST/closure 경계를 고정한다.
 - [x] S2 Test Hardening: 유효한 후보만 실제 빌드로 재현하고 export·parent getter scope·source map 보존과 필요한 브라우저 동작을 확인한다. 출력만 달라지면 전체 suite를 불필요하게 반복하지 않는다.
 - [x] S3 Integration Test/인계: 현재 기본 빌드와 후보를 구분하고 실제 절감·기능/디버깅 비용·남은 검증을 보고서/네 문서에 기록한다. 기본 채택은 검증된 범위로만 판단한다.
+- [x] S4 재확인(2026-10-26): 소스 사본 빌드로 대조 해시를 재현하고 Terser flag 29개·Module 태그·소스 편집 3종·실제 hidden 빌드를 비교했다. jsdom 동등성 확인만 했고 전체 suite·Playwright·package probe는 실행하지 않았다(미채택). → [재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26), [도구](../../experiments/bundle-size-recheck/README.md).
+- [ ] S5 채택 시(사용자 결정 대기): 선택한 출력 옵션을 `vite.config.js`에 반영하고 전체 build, `pnpm test`/dual, UMD Playwright fixture, 양코어 package probe, `pnpm size` guard·CHANGELOG를 갱신한다. → DESIGN TODO.
+
+미착수 후속(DC-25 같은 순서 keyed 빠른 경로, BUG-1 portal anchor)은 [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에 있다. 착수 전에는 실행 Phase를 만들지 않는다.
 
 ## DC-23 — 복원 실행
 

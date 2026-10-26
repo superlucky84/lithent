@@ -1,5 +1,13 @@
 # summary
 
+## 최신 — 크기 재확인과 TODO 정리 (2026-10-26)
+
+- done: DC-24를 독립 재확인했다. base UMD는 구문 4종 + Module 태그 제거로 4,824→4,778B(−46B, 소스맵 연결 유지), hidden map까지 4,748B(−76B)다. 함수·scope 구조와 jsdom 동작은 같다. 전체 compress(−102B)는 함수 33개를 옮겨 제외했고 소스 편집 3종은 Brotli가 늘었다. 현재 크기는 정책 안에서 거의 최소다. [재확인](./BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26)·[원자료](./bundle-size-recheck.json)·[도구](../../experiments/bundle-size-recheck/README.md).
+- found: BUG-1 — portal 형제 앞에 컴포넌트가 새로 생기면 portal 대상이 삽입 기준점이 되어 `NotFoundError`가 나고 형제 DOM이 사라진다. 배포판 1.25.2에도 있다. 수정하지 않았다.
+- next: 사용자 결정 대기 — (1) 46B/76B 출력 후보 채택 여부, (2) BUG-1 수정, (3) DC-25 같은 순서 keyed 빠른 경로의 중복 key 정책·크기 허용치. 목록은 [DESIGN TODO](../performance-improvement/DESIGN.md#todo--미착수-후속-작업).
+- blockers: 없음. 기본 runtime·빌드·`dist`는 DC-23 그대로다. 새 CPU/메모리 측정은 하지 않았다.
+- commit: `48cb583` 이후의 브랜치 커밋. tip은 `git log -1`.
+
 ## 후속 — DC-24 크기 조사 완료
 
 - done: 출력41개/실제 Vite 빌드12개를 비교했다. hidden map은 base UMD br4,824→4,798B지만 자동 map 연결을 잃는다. 제한 구문 조합은 최대45B 절감 후보이며 runtime/heap/performance는 미검증이다. [결과](./BUNDLE_SIZE_RESULTS.md)·[검증](./bundle-size-proof.json)에 기록했다.
