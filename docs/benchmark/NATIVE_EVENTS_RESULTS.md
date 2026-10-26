@@ -65,6 +65,6 @@ base guard는 4,800B reference + compact13의 24B = **4,824B**로 복원했고 p
 - done: 이벤트 proxy 제외, compact13 유지, 공개 계약/guard 수정과 최종 검증·자료 보존 완료.
 - next: 추가 성능 연구가 필요하면 아직 목표를 넘는 partial/select/swap에서 새 가설을 세운다. 배포/버전 변경은 별도 작업이다.
 - blockers: 이번 복원의 실행 블로커 없음. CPU 목표는 6/9로 남는다.
-- commit: 시작/최신 `463c6cd`; 이 복원 작업은 미커밋이다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`와 구분한다.
+- commit: DC-23 복원·검증과 DC-24 조사 구현은 `4baf0e51483134ab3426817035e06e21f0285022`에 커밋했다. 검증 당시 시작 HEAD는 `463c6cd`이며 JSON/아카이브의 head·uncommitted 값은 당시 이력으로 유지한다. 이후 인계 문서 커밋의 tip은 `git log -1` 및 브랜치 ctxbin을 따른다.
 
 재현 명령과 로그 보존 절차: [검증 도구](../../experiments/native-events/README.md). 정본은 [요구](../performance-improvement/REQUIREMENTS.md), [설계](../performance-improvement/DESIGN.md), [실행](../performance-improvement/IMPLEMENT.md), [검증](../performance-improvement/MANUAL_TEST_CHECKLIST.md)이다.

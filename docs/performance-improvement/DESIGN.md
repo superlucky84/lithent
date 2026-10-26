@@ -10,6 +10,8 @@
 - [x] DC-24-2. parent getter의 독립 scope를 유지한다. 전체 compress 기본값, closure inlining/collapse, 공개 property mangling은 안전한 절감으로 취급하지 않는다. 제한된 구문 압축은 별도 후보로만 측정한다.
 - [x] DC-24-3. 실제 빌드12개·여섯 형식의 동일 실행 AST/map과 크기/대가를 확인했다. 기본 빌드는 유지하며 구문 후보는 정적 검사만 통과한 미채택 상태다. → M-18.
 
+- [x] DC-24-4. 사용자 후속 결정으로 추가 번들 축소를 보류하고 현재 기본 빌드를 유지한다. hidden map/구문 압축은 미채택 조사 결과로만 보존한다.
+
 ## DC-23 — native 이벤트 복원
 
 - [x] DC-23-1. 사용자 승인으로 compact13 유지 + proxy 제외를 확정했다. cached 공식 benchmark에 확실한 추가 이득이 없고 크기·heap·dispatch·native 연동 복잡성이 늘어난 점을 우선한다. inline UI partial/select의 과거 전체 −5.22%/−9.44% 이득은 포기하는 교환이다.
@@ -411,6 +413,6 @@ DC-19/19B Fragment는 이미 읽기 관찰/시간 한계를 검토했다. 새 �
 ## 상태 / 핸드오프
 
 - done: DC-23 compact13/native 복원·검증을 유지한다. DC-24 추가 크기 조사에서 출력41개/실제 빌드12개를 비교했고 hidden map의 동일 실행 AST·소스맵6형식을 확인했다. [조사 결과](../benchmark/BUNDLE_SIZE_RESULTS.md)·[검증](../benchmark/bundle-size-proof.json)에 연결한다. 기본 runtime/빌드와 DC-23 증거는 그대로다.
-- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 작업이다.
+- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 사용자는 추가 축소를 보류하고 현재 설정 유지를 확정했다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 요청에 따른다.
 - blockers: 조사 실행 블로커 없음. 미채택 구문 후보의 추가 검증은 미실행으로 명시한다.
-- commit: 시작/최신 `463c6cd`; DC-23 복원과 이번 DC-24 조사 문서/도구는 미커밋이다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 기존 원자료/아카이브를 덮어쓰지 않았다.
+- commit: DC-23 복원·검증과 DC-24 조사 구현 커밋은 `4baf0e51483134ab3426817035e06e21f0285022`다. 후속 인계 문서 커밋을 포함한 tip은 `git log -1` 및 브랜치 ctxbin 최신 인계로 확인한다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 원자료의 `463c6cd`/uncommitted 표시는 검증 당시 기준이며 수정하지 않는다.

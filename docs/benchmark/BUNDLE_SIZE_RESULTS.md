@@ -45,11 +45,11 @@ Vite `build.sourcemap: 'hidden'`은 `.map` 파일을 생성하면서 JS 끝의 `
 
 ## 판단과 인계
 
-**작은 절감 경로는 있다. 다만 현재는 26B를 위해 기본 디버깅 편의를 줄이거나, 추가 9~16B를 위해 구문 압축 정책을 바꾸는 일을 우선 추천하지 않는다.** 수동 source map 운영이 이미 확정된 배포라면 hidden map은 실행 구문 변경 없이 쓸 수 있는 선택이다. 수백 바이트 여유가 필요하다면 별도 코드 구조 후보와 성능/수명 검증이 필요하다.
+**사용자는 추가 축소를 보류하고 현재 설정 유지를 확정했다. 작은 절감 경로는 있다. 다만 현재는 26B를 위해 기본 디버깅 편의를 줄이거나, 추가 9~16B를 위해 구문 압축 정책을 바꾸는 일을 우선 추천하지 않는다.** 수동 source map 운영이 이미 확정된 배포라면 hidden map은 실행 구문 변경 없이 쓸 수 있는 선택이다. 수백 바이트 여유가 필요하다면 별도 코드 구조 후보와 성능/수명 검증이 필요하다.
 
 - done: 출력41개·실제 빌드12개, 여섯 형식의 동일 실행 구문/소스맵 검증과 크기 비교를 보존했다.
 - next: 이번 조사 완료. 기본 런타임은 [DC-23](./NATIVE_EVENTS_RESULTS.md)을 유지한다. 구문 압축 채택 또는 새 코드 구조 후보는 별도 검증 작업이다.
 - blockers: 조사 실행 블로커 없음. 구문 후보의 runtime/heap/performance는 미검증으로 남으며 미채택이다.
-- commit: 최신/시작 `463c6cd`; DC-23 복원과 이번 문서/조사 도구는 미커밋이다. 기존 DC-23 여섯 산출물과 runtime source hash가 유지됐음을 확인했다. 기존 실험/검증 archive를 덮어쓰지 않았다.
+- commit: DC-23 복원·검증과 DC-24 조사 구현은 `4baf0e51483134ab3426817035e06e21f0285022`에 커밋했다. 검증 당시 시작 HEAD는 `463c6cd`이며 JSON/아카이브의 head·uncommitted 값은 당시 이력으로 유지한다. 이후 인계 문서 커밋의 tip은 `git log -1` 및 브랜치 ctxbin을 따른다.
 
 증거: [archive](./bundle-size-evidence.tar.gz). 재현은 [도구 안내](../../experiments/native-events/README.md#dc-24-bundle-size-investigation)를 따른다. 정본은 [요구](../performance-improvement/REQUIREMENTS.md), [설계](../performance-improvement/DESIGN.md), [실행](../performance-improvement/IMPLEMENT.md), [체크](../performance-improvement/MANUAL_TEST_CHECKLIST.md)다.

@@ -3,15 +3,15 @@
 ## 후속 — DC-24 크기 조사 완료
 
 - done: 출력41개/실제 Vite 빌드12개를 비교했다. hidden map은 base UMD br4,824→4,798B지만 자동 map 연결을 잃는다. 제한 구문 조합은 최대45B 절감 후보이며 runtime/heap/performance는 미검증이다. [결과](./BUNDLE_SIZE_RESULTS.md)·[검증](./bundle-size-proof.json)에 기록했다.
-- next: 기본 빌드·compact13/native를 유지한다. 이번 조사 종료이며 구문 압축/새 구조 후보 채택은 별도 검증 작업이다.
-- blockers: 조사 실행 블로커 없음. 최신 `463c6cd`; DC-23/DC-24 작업은 미커밋이다. 기존 산출물과 모든 역사 증거는 유지했다.
+- next: 사용자 후속 결정으로 추가 축소를 보류하고 기본 빌드·compact13/native를 유지한다. 이번 작업은 종료이며 추가 최적화·배포는 별도 요청에 따른다.
+- blockers: 없음. DC-23/DC-24 구현·검증·조사 커밋은 `4baf0e51483134ab3426817035e06e21f0285022`다. 기존 산출물과 모든 역사 증거는 유지했다.
 
 ## 현재 — DC-23 native 복원 완료
 
 - done: DC-23 완료. compact13을 유지하고 양코어 이벤트·공유 portal teardown을 native 직접 등록으로 복원했다. 모든 runtime source와 측정 B의 base 세 JS가 일치한다. 전체 build·verify/size·타입/lint, 1,161회 테스트 통과(기존3 skipped), Playwright78/retry0와 양코어6형식18 package probe를 통과했다. [복원 결과](./NATIVE_EVENTS_RESULTS.md)·[검증](./native-events-validation.json)·[증거](./native-events-evidence.tar.gz)에 연결한다.
 - next: 이번 복원은 완료했다. native B의 CPU 목표는6/9이며 partial/select/swap 연구와 배포·버전 변경은 별도 작업이다. 보존 B를 재사용했고 새 timing을 수집하지 않았다.
 - blockers: 이번 복원의 실행 블로커 없음. 일반 inline UI의 proxy 이득은 포기하며, 모든 앱의 성능 향상을 주장하지 않는다.
-- commit: 시작/최신 `463c6cd`; 이번 DC-23은 미커밋이다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 기존56개 아카이브·raw/trace·실험 도구는 byte/hash를 유지한다.
+- commit: DC-23/DC-24 구현은 `4baf0e51483134ab3426817035e06e21f0285022`다. 후속 인계 문서 커밋을 포함한 tip은 `git log -1` 및 ctxbin `lithent/docs/select-partial-update-analysis` 최신 인계로 확인한다. 검증 당시 HEAD `463c6cd`와 원자료는 그대로 보존한다.
 
 ## DC-22 종료 시점 인계 — 이력
 
