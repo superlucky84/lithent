@@ -1,6 +1,6 @@
 # DC-22 comprehensive integration
 
-2026-10-26. The measured E event implementation is adopted in the working tree. The fresh six-app comparison is complete: 6/9 pooled CPU goals pass. HEAD is `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`; these changes are uncommitted.
+2026-10-26. The measured E event implementation is adopted in the working tree. The fresh six-app comparison is complete: 6/9 pooled CPU goals pass. Validation ran at `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`. Implementation and evidence are committed as `95d6faf42c860bfb87e180f594287a9e3d717334`; this follow-up handoff records that implementation SHA.
 
 Canonical scope: [requirements](../performance-improvement/REQUIREMENTS.md#7-별도-브랜치를-포함한-종합-반영--dc-22), [design](../performance-improvement/DESIGN.md#dc-22--별도-브랜치를-포함한-종합-반영), [implementation](../performance-improvement/IMPLEMENT.md#dc-22--종합-반영-실행-phase4a4e), [manual checks](../performance-improvement/MANUAL_TEST_CHECKLIST.md#m-16-종합-조합최종-목표코어-반영--r53r57r59-dc-22-356-phase4c6).
 

@@ -2,12 +2,12 @@
 
 ## Comprehensive integration — 2026-10-26
 
-2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 변경은 미커밋이다**.
+2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 구현·검증·증거를 커밋했다**.
 
 - done: 수정 flat E를 base/concurrent와 공유 teardown에 반영했다. 기본 proxy + ref/mountCallback 직접 native 계약과 사용 예제를 공개했다. 실제 base ESM/UMD/CJS3개는 측정 artifact와 byte/hash가 같다. 양코어6형식 trusted alias, constructor/DOM setter 실패 회수, concurrent portal retry/abandon publication, native cleanup과 일반 UI 입력/정체성을 확인했다. 전체 build·B1/B4 하위 suite·strict types/lint·Playwright76/retry0, raw/trace 영구 보존과 독립 archive 감사를 완료했다. [최종 보고서](./COMPREHENSIVE_RESULTS.md)·[검증](./comprehensive-validation.json)·[증거](./comprehensive-evidence-manifest.json)에 연결한다.
-- next: 이번 E 반영에 필요한 작업은 완료했다. 남은 CPU 목표는 6/9이며 select/partial/swap의 새 병목 가설·별도 진단 없이 모든 목표 달성으로 표시하지 않는다. C2 K/EK·Fragment/C1/C3/C4는 보고서의 재개 조건으로 보류했다. 후속 목표 연구와 커밋/배포는 별도 작업이다.
+- next: 이번 E 반영에 필요한 작업은 완료했다. 남은 CPU 목표는 6/9이며 select/partial/swap의 새 병목 가설·별도 진단 없이 모든 목표 달성으로 표시하지 않는다. C2 K/EK·Fragment/C1/C3/C4는 보고서의 재개 조건으로 보류했다. 후속 목표 연구와 배포는 별도 작업이다.
 - blockers: 이번 통합의 실행 블로커는 없다. E의 일반 UI partial/select 전체−5.22%/−9.44%는4×CPU 조건이다. 최종 cached 앱 가중 전체 E/B +0.44%, 공식10k 메모리 +0.912574MB(+3.24%), UMDbr+182B/총5,006B와 dispatch 비용을 공개했다.9항목 목표 미달과 heap 전체 누수 부재의 미보장은 남아 있다. 첫 dispose 진단의 앱 전역 참조, 준비 실패와 모든 성능 실패/재시도 원자료를 보존했다.
-- commit: 실제 HEAD `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`이며 이번 변경은 미커밋이다. compact13 구현 `ff8b80afcc69f7226167ce39e6be3536ac873372`, 이전 인계 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`와 구분한다. 보존 snapshot `6993a93cecf67e445b30ee4ea014ca419235d946`, 활성 flat `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`·slot `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 검토했고 원자료를 유지했다.
+- commit: DC-22 구현·검증·증거 커밋은 `95d6faf42c860bfb87e180f594287a9e3d717334`다. 평가 시작 HEAD `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`는 원자료의 당시 기준으로 보존한다. 이 후속 인계 기록을 포함한 브랜치 tip은 `git log -1`로 확인한다. compact13 구현 `ff8b80afcc69f7226167ce39e6be3536ac873372`, 이전 인계 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`와 구분한다. 보존 snapshot `6993a93cecf67e445b30ee4ea014ca419235d946`, 활성 flat `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`·slot `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 검토했고 원자료를 유지했다.
 
 ## Cloud experiment handoff
 
@@ -372,7 +372,7 @@
 - blockers: Phase 1 완료의 블로커 없음. DC-6은 C1 구현 전, IC-1 최종 색상/수치 임계치는 최종 판정 전에 닫는다.
   base **4,800B** 크기 게이트를 유지하며, 한도 변경은 별도 명시적 결정이 필요하다.
 - commit: Phase 0 문서 체크포인트 `dbbd320a5b92c63262d43b667692396ae5d53322`,
-  런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. 이번 실행 변경은 미커밋이다.
+  런타임 기준 `085137b0447a8bbe7d28d3bf55c0a997779132b2`. 이번 실행 구현·검증·증거를 커밋했다.
 
 ## 범용 코어 구조 개선 계획 — 2026-10-21
 
