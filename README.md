@@ -20,13 +20,13 @@ It trims away unnecessary magic and complex APIs so your UI code stays simple, e
 
 ## Why Lithent?
 
-**Lightweight DOM manipulation without the framework weight.** The ~5KB Brotli core drives complete UIs. Need state management? Opt into helpers like expansion packs instead of adopting a full stack.
+**Lightweight DOM manipulation without the framework weight.** The ~4.8KB Brotli core (minified UMD) drives complete UIs. Need state management? Opt into helpers like expansion packs instead of adopting a full stack.
 
 Bring in only what you need — let the stack scale with your project.
 
 **Design philosophy:**
 
-- **Small Bundle** — ~5KB Brotli core with optional extensions
+- **Small Bundle** — ~4.8KB Brotli core (minified UMD) with optional extensions
 - **Closure-based State** — No magic, just JavaScript
 - **Manual or Reactive** — Choose your update strategy
 - **Progressive Enhancement** — From static HTML to full SPA
@@ -148,9 +148,9 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 
 > **[📖 View full API reference](https://superlucky84.github.io/lithent/#/)**
 
-Event props such as `onClick` use a stable native listener that calls the latest
-handler. For exact native callback identity, registration order or listener
-options, use `ref` and `mountCallback` with cleanup. See the
+Event props such as `onClick` register the original native callback. Replacing a
+handler follows native removal and registration rules. For listener options,
+use `ref` and `mountCallback` with cleanup. See the
 [DOM event contract and example](skills/lithent/reference/events.md).
 
 <br />
@@ -159,7 +159,7 @@ options, use `ref` and `mountCallback` with cleanup. See the
 
 | Package                                                                             | Description                                                                                                                      |
 | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| [lithent](https://www.npmjs.com/package/lithent)                                    | Core library (~5KB Brotli)                                                                                                       |
+| [lithent](https://www.npmjs.com/package/lithent)                                    | Core library (~4.8KB Brotli, minified UMD)                                                                                       |
 | [lithent/helper](https://www.npmjs.com/package/lithent)                             | Reactive state helpers                                                                                                           |
 | [lithent/ssr](https://www.npmjs.com/package/lithent)                                | Server‑side rendering                                                                                                            |
 | [lithent/ftags](https://www.npmjs.com/package/lithent)                              | Function‑style tag API                                                                                                           |

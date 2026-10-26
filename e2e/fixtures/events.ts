@@ -10,6 +10,7 @@ declare global {
       dispose: () => void;
       removeNative: () => void;
       addNative: () => void;
+      replaceHandler: () => void;
       retainedClick: () => void;
     };
   }
@@ -24,10 +25,43 @@ const probe = (window.eventProbe = {
   dispose: () => {},
   removeNative: () => {},
   addNative: () => {},
+  replaceHandler: () => {},
   retainedClick: () => {},
 });
 
-if (mode === 'native') {
+if (mode === 'interop') {
+  const App = mount(renew => {
+    const button = ref<HTMLButtonElement | null>(null);
+    let changed = false;
+    const original = () => probe.calls.push('original');
+    const latest = () => probe.calls.push('latest');
+    const external = () => probe.calls.push('external');
+    probe.replaceHandler = () => {
+      changed = true;
+      renew();
+    };
+    mountCallback(() => {
+      const element = button.value!;
+      probe.removeNative = () => element.removeEventListener('click', original);
+      probe.addNative = () => element.addEventListener('click', original);
+      probe.addNative();
+      probe.addNative();
+      element.addEventListener('click', external);
+      return () => {
+        probe.removeNative();
+        element.removeEventListener('click', latest);
+        element.removeEventListener('click', external);
+      };
+    });
+    return () =>
+      h(
+        'button',
+        { ref: button, onClick: changed ? latest : original },
+        'interop'
+      );
+  });
+  probe.dispose = render(h(App, {}), document.getElementById('app'));
+} else if (mode === 'native') {
   const App = mount(() => {
     const button = ref<HTMLButtonElement | null>(null);
     mountCallback(() => {

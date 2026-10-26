@@ -1,11 +1,27 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
-> **DC-22 반영 결과:** 별도 브랜치의 이벤트 수정 E를 base/concurrent에 반영하고 성능·정합성·패키지 통합·영구 증거 감사를 완료했다. 일반 inline UI 이득과 비용을 근거로 채택했으며9항목 CPU 목표는 6/9로 미달이다. [최종 보고서](../benchmark/COMPREHENSIVE_RESULTS.md)와 아래 R52~R61을 따른다.
+> **현재 결정은 DC-23이다.** DC-22의 proxy 적용/검증/측정은 당시 이력으로 보존하며 아래 R62~R66이 현재 이벤트 계약을 정의한다.
 
-- 기준일: 2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 구현·검증·증거를 커밋했다**.
+- 기준일: 2026-10-26. 상태: **DC-23 완료. compact13 유지 + native 이벤트 직접 등록. 전체 검증 통과, 원래 proxy 실험/증거 보존. 현재 CPU 목표는6/9이며 새 timing은 수집하지 않았다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
+
+## DC-24 — 동작을 유지하는 추가 번들 절감 조사
+
+- R67. 사용자 후속 요청은 현재 compact13/native에서 작은 번들 여유를 찾는 것이다. 기능/API·native 이벤트·메모리 수명·compact13 layout을 바꾸지 않는 출력/코드 후보를 먼저 조사한다.
+- R68. 현재 UMD raw/gzip/Brotli를 기준으로 같은 compressor에서 실제 후보를 비교한다. source map 주석·identifier 출력·제한적인 압축을 구분하고 디버깅/성능/정합성 비용을 공개한다. 단순 이름 단축이나 raw 감소를 압축 크기 감소로 추론하지 않는다.
+- R69. 후보는 별도 출력에 보존하고 현재 DC-23 산출물/증거를 덮어쓰지 않는다. 이번 조사는 가능한 절감과 추천까지이며, 미검증 후보를 기본 빌드에 채택하지 않는다. → DESIGN DC-24, IMPLEMENT DC-24, M-18.
+
+## DC-23 — 이벤트 proxy 제외와 compact13 유지
+
+2026-10-26 사용자 승인: 기본 proxy를 제거하고 제품의 작은 크기·단순한 native 이벤트 동작을 우선한다. DC-22를 충분히 검토한 뒤 내린 후속 제품 선택이며 이전 실측 이득을 부정하지 않는다. 아래 DC-22/R56/R60/R61의 proxy 기본 계약은 당시 이력이다. 현재 계약은 R62~R66이 우선한다.
+
+- R62. compact13(`src/wDom.ts`, `src/utils/createWDom.ts`)은 유지한다. base/concurrent render와 공유 portal teardown의 이벤트 처리만 `fb481f3`의 native 직접 등록으로 복원하고 runtime event utility를 제거한다. 새 옵션/API를 추가하지 않는다.
+- R63. 함수/객체 원본을 native listener로 등록한다. 교체 시 이전 callback을 제거하고 새 callback을 등록하므로 상대 순서·dedup·remove·진행 중 dispatch는 브라우저 규칙을 따른다. inline callback 갱신의 등록 비용이 돌아오는 점을 공개한다.
+- R64. proxy source·수정 회귀·모든 raw/trace와 별도 브랜치를 보존한다. `95d6faf` 및 `experiments/comprehensive/`와 기존 보고서/manifest를 과거 증거로 유지한다. 전체 revert로 자료를 삭제하지 않는다.
+- R65. 최종 build의 runtime source와 세 base JS가 고정 native B와 일치할 때 기존 B CPU/메모리 자료를 재사용한다. 신규 성능 측정으로 표현하거나 compact13 개선율과 합산하지 않는다. 일치하지 않으면 차이를 해결하거나 새 대조를 수행한다.
+- R66. 양코어 정합성·전체 빌드·타입·B1/B4 하위 suite·실브라우저 회귀·패키지 형식을 검증한다. raw/gzip/Brotli를 같은 compressor로 비교하고 base guard에서 proxy 182B allowance를 제거한다. 공개 크기는 Brotli와 gzip을 구분한다.
 
 ## 1. 사용자 목표와 판단 기준
 
@@ -16,7 +32,7 @@
 - R3. 사용자가2026-10-23에 확정한 CPU 목표는 **전체9항목 각각에서, 고정한 React/Preact hooks/classes 네 구현의 가장 빠른 전체 시간 중앙값의1.10배 이내**다. 같은 환경/차수의 합산 중앙값으로 항목별 판정하고 양차수의 일관성을 함께 공개한다. 평균·색상 이름으로 전 항목 달성을 대체하지 않는다. 메모리/size/startup은 별도 비용이며 이 CPU 임계치를 적용하지 않는다.
 - R4. DC-16 비교군은 upstream 기본 `react-hooks`19.2.0, `react-classes`19.0.0, `preact-hooks`11.0.0, `preact-classes`11.0.0의 고정 lock/source다. 버전 차이도 실제 구현의 조건으로 기록하며 유리한 구현만 사후 선택/제외하지 않는다. 네 구현 모두의 결과와 항목별 최저값을 공개한다. 원래 Lithent baseline을 함께 비교하며 C3는 포함하지 않는다.
 - R5. JS 실행 시간이 아닌 **공식 클릭→최종 paint 전체 시간**을 렌더링 성능의 주 지표로 삼는다. JS, 메모리, 번들, 생성·삭제 비용은 별도 지표로 함께 공개한다.
-- R6. 기존 API를 사용하는 앱의 결과·DOM 정체성·수명·배칭·예외 복구 계약을 보존한다. DC-22 이벤트의 기본 proxy 전환과 native 연동 경계는2026-10-25 사용자 선택을 반영한 R56/R61을 따른다. 추가 옵트인 기능이 필요하면 새 계약을 명시하고 기존 기본 동작과 구분한다.
+- R6. 기존 API를 사용하는 앱의 결과·DOM 정체성·수명·배칭·예외 복구 계약을 보존한다. 현재 이벤트 계약은 DC-23/R62~R66의 native 직접 등록을 따른다. DC-22/R56/R61은 이전 선택 이력이다. 추가 옵트인 기능이 필요하면 새 계약을 명시하고 기존 기본 동작과 구분한다.
 
 ## 2. 현재 근거와 한계
 
@@ -150,7 +166,7 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 
 ## 상태 / 핸드오프
 
-- done: 수정 flat E를 base/concurrent와 공유 teardown에 반영했다. 기본 proxy + ref/mountCallback 직접 native 계약과 사용 예제를 공개했다. 실제 base ESM/UMD/CJS3개는 측정 artifact와 byte/hash가 같다. 양코어6형식 trusted alias, constructor/DOM setter 실패 회수, concurrent portal retry/abandon publication, native cleanup과 일반 UI 입력/정체성을 확인했다. 전체 build·B1/B4 하위 suite·strict types/lint·Playwright76/retry0, raw/trace 영구 보존과 독립 archive 감사를 완료했다. [최종 보고서](../benchmark/COMPREHENSIVE_RESULTS.md)·[검증](../benchmark/comprehensive-validation.json)·[증거](../benchmark/comprehensive-evidence-manifest.json)에 연결한다.
-- next: 이번 E 반영에 필요한 작업은 완료했다. 남은 CPU 목표는 6/9이며 select/partial/swap의 새 병목 가설·별도 진단 없이 모든 목표 달성으로 표시하지 않는다. C2 K/EK·Fragment/C1/C3/C4는 보고서의 재개 조건으로 보류했다. 후속 목표 연구와 배포는 별도 작업이다.
-- blockers: 이번 통합의 실행 블로커는 없다. E의 일반 UI partial/select 전체−5.22%/−9.44%는4×CPU 조건이다. 최종 cached 앱 가중 전체 E/B +0.44%, 공식10k 메모리 +0.912574MB(+3.24%), UMDbr+182B/총5,006B와 dispatch 비용을 공개했다.9항목 목표 미달과 heap 전체 누수 부재의 미보장은 남아 있다. 첫 dispose 진단의 앱 전역 참조, 준비 실패와 모든 성능 실패/재시도 원자료를 보존했다.
-- commit: DC-22 구현·검증·증거 커밋은 `95d6faf42c860bfb87e180f594287a9e3d717334`다. 평가 시작 HEAD `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`는 원자료의 당시 기준으로 보존한다. 이 후속 인계 기록을 포함한 브랜치 tip은 `git log -1`로 확인한다. compact13 구현 `ff8b80afcc69f7226167ce39e6be3536ac873372`, 이전 인계 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`와 구분한다. 보존 snapshot `6993a93cecf67e445b30ee4ea014ca419235d946`, 활성 flat `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`·slot `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 검토했고 원자료를 유지했다.
+- done: DC-23 compact13/native 복원·검증을 유지한다. DC-24 추가 크기 조사에서 출력41개/실제 빌드12개를 비교했고 hidden map의 동일 실행 AST·소스맵6형식을 확인했다. [조사 결과](../benchmark/BUNDLE_SIZE_RESULTS.md)·[검증](../benchmark/bundle-size-proof.json)에 연결한다. 기본 runtime/빌드와 DC-23 증거는 그대로다.
+- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 작업이다.
+- blockers: 조사 실행 블로커 없음. 미채택 구문 후보의 추가 검증은 미실행으로 명시한다.
+- commit: 시작/최신 `463c6cd`; DC-23 복원과 이번 DC-24 조사 문서/도구는 미커밋이다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 기존 원자료/아카이브를 덮어쓰지 않았다.

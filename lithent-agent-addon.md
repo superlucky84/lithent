@@ -69,7 +69,7 @@ CODING GUIDELINES:
    - Suggest `nextTickRender` for deferring expensive renders
    - Avoid creating new functions in updater when possible
    - Move event handlers to mounter scope when they don't need updater closure
-   - Event props use stable listeners that read the latest handler. For exact native identity, registration order or options, use `ref`/`mountCallback` and return native listener cleanup; see [event contracts](skills/lithent/reference/events.md).
+   - Event props register original callbacks directly; replacing a callback removes and re-registers it in native order. For listener options or independent setup, use `ref`/`mountCallback` and return native listener cleanup; see [event contracts](skills/lithent/reference/events.md).
 
 7. SSR AND HYDRATION
 

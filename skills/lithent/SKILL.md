@@ -17,7 +17,7 @@ This file provides AI agent skills for working with the Lithent library.
 
 ## Overview
 
-Lithent is a lightweight (~5KB Brotli) JSX-based virtual DOM library with closure-based state management. It offers two component modes:
+Lithent is a lightweight (~4.8KB Brotli, minified UMD) JSX-based virtual DOM library with closure-based state management. It offers two component modes:
 
 - **Manual Mode** (`mount`): Explicit control with `renew()` function
 - **Light API Mode** (`lmount`): Auto-reactive with `lstate`/`lstore`
@@ -183,11 +183,11 @@ const Component = mount(renew => {
 
 ## DOM Events
 
-Event props receive the native Event through a stable internal listener. Updating
-an inline handler replaces its stored callback, preserving the listener's position.
-For exact native callback identity, order or listener options, register through
-`ref` and `mountCallback`, returning cleanup. See [DOM events](reference/events.md)
-for alias behavior, propagation and retained DOM contracts.
+Event props register the original native callback. Changing its identity removes
+the old callback and registers the new one, following native identity, dedup and
+ordering rules. Keep stable handlers in the mounter when possible. For listener
+options or independent registration, use `ref` and `mountCallback` with cleanup.
+See [DOM events](reference/events.md) for dispatch timing and retained DOM.
 
 ## Context API
 

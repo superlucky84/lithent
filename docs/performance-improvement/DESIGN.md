@@ -1,8 +1,24 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 구현·검증·증거를 커밋했다**.
+- 기준일: 2026-10-26. 상태: **DC-23 완료. compact13 유지 + native 이벤트 직접 등록. 전체 검증 통과, 원래 proxy 실험/증거 보존. 현재 CPU 목표는6/9이며 새 timing은 수집하지 않았다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
+
+## DC-24 — 번들 출력 후보 조사
+
+- [x] DC-24-1. 현재 native 코드/compact13을 고정하고 source map 연결 주석, 안전한 identifier/reprint 옵션부터 비교한다. source map 파일 생성과 번들의 자동 연결을 구분한다.
+- [x] DC-24-2. parent getter의 독립 scope를 유지한다. 전체 compress 기본값, closure inlining/collapse, 공개 property mangling은 안전한 절감으로 취급하지 않는다. 제한된 구문 압축은 별도 후보로만 측정한다.
+- [x] DC-24-3. 실제 빌드12개·여섯 형식의 동일 실행 AST/map과 크기/대가를 확인했다. 기본 빌드는 유지하며 구문 후보는 정적 검사만 통과한 미채택 상태다. → M-18.
+
+## DC-23 — native 이벤트 복원
+
+- [x] DC-23-1. 사용자 승인으로 compact13 유지 + proxy 제외를 확정했다. cached 공식 benchmark에 확실한 추가 이득이 없고 크기·heap·dispatch·native 연동 복잡성이 늘어난 점을 우선한다. inline UI partial/select의 과거 전체 −5.22%/−9.44% 이득은 포기하는 교환이다.
+- [x] DC-23-2. `src/render.ts`, `lithentConcurrent/src/render.ts`, `src/hook/internal/unmount.ts`를 `fb481f3`와 정확히 일치시킨다. `src/utils/event.ts`만 제거한다. on\* 이름 소문자 정규화와 native add/remove, portal target의 원 callback 제거를 복원한다. compact13과 다른 실험은 건드리지 않는다.
+- [x] DC-23-3. 원 함수/handleEvent 객체 identity·중복 등록·제거·교체 후 listener 순서를 native에 맡긴다. trusted target dispatch 도중 교체되면 그 클릭에서 새 callback이 실행되지 않을 수 있고, 다음 클릭에서 실행된다. ancestor에 도달하기 전 교체한 경우는 native propagation 규칙을 따른다. capture/passive/once는 기존 ref/mountCallback으로 설정한다.
+- [x] DC-23-4. proxy 구현은 `experiments/comprehensive/event.ts`와 커밋 `95d6faf`에 보존한다. alias/trusted/error/portal/frozen Event 회귀는 유지하고 proxy 전용 기대값만 native 계약으로 바꾼다. 외부 remove/dedup 및 교체 후 순서 회귀를 추가한다.
+- [x] DC-23-5. 고정 B source/ESM/UMD/CJS 일치·크기 감소·최종 검증을 보고서로 연결하고 native B의 기존 peer 목표 결과를 명시한다. → IMPLEMENT DC-23, MANUAL M-17.
+
+이 결정이 아래 DC-22 기본 proxy 채택을 대체한다. DC-22 표와 이력은 당시의 유효한 측정·선택으로 보존한다.
 
 ## 1. 실제 경로와 정보의 한계
 
@@ -394,7 +410,7 @@ DC-19/19B Fragment는 이미 읽기 관찰/시간 한계를 검토했다. 새 �
 
 ## 상태 / 핸드오프
 
-- done: 수정 flat E를 base/concurrent와 공유 teardown에 반영했다. 기본 proxy + ref/mountCallback 직접 native 계약과 사용 예제를 공개했다. 실제 base ESM/UMD/CJS3개는 측정 artifact와 byte/hash가 같다. 양코어6형식 trusted alias, constructor/DOM setter 실패 회수, concurrent portal retry/abandon publication, native cleanup과 일반 UI 입력/정체성을 확인했다. 전체 build·B1/B4 하위 suite·strict types/lint·Playwright76/retry0, raw/trace 영구 보존과 독립 archive 감사를 완료했다. [최종 보고서](../benchmark/COMPREHENSIVE_RESULTS.md)·[검증](../benchmark/comprehensive-validation.json)·[증거](../benchmark/comprehensive-evidence-manifest.json)에 연결한다.
-- next: 이번 E 반영에 필요한 작업은 완료했다. 남은 CPU 목표는 6/9이며 select/partial/swap의 새 병목 가설·별도 진단 없이 모든 목표 달성으로 표시하지 않는다. C2 K/EK·Fragment/C1/C3/C4는 보고서의 재개 조건으로 보류했다. 후속 목표 연구와 배포는 별도 작업이다.
-- blockers: 이번 통합의 실행 블로커는 없다. E의 일반 UI partial/select 전체−5.22%/−9.44%는4×CPU 조건이다. 최종 cached 앱 가중 전체 E/B +0.44%, 공식10k 메모리 +0.912574MB(+3.24%), UMDbr+182B/총5,006B와 dispatch 비용을 공개했다.9항목 목표 미달과 heap 전체 누수 부재의 미보장은 남아 있다. 첫 dispose 진단의 앱 전역 참조, 준비 실패와 모든 성능 실패/재시도 원자료를 보존했다.
-- commit: DC-22 구현·검증·증거 커밋은 `95d6faf42c860bfb87e180f594287a9e3d717334`다. 평가 시작 HEAD `fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4`는 원자료의 당시 기준으로 보존한다. 이 후속 인계 기록을 포함한 브랜치 tip은 `git log -1`로 확인한다. compact13 구현 `ff8b80afcc69f7226167ce39e6be3536ac873372`, 이전 인계 `8056e0243c49a29ec9f4efcf5b00f90f6c1bbca7`와 구분한다. 보존 snapshot `6993a93cecf67e445b30ee4ea014ca419235d946`, 활성 flat `7e838bcd723261cb3840388f4f0ce1dd8c13e7ec`·slot `189ddef82e20959ea1267ab2eb8b2f5007c4ba9a`를 검토했고 원자료를 유지했다.
+- done: DC-23 compact13/native 복원·검증을 유지한다. DC-24 추가 크기 조사에서 출력41개/실제 빌드12개를 비교했고 hidden map의 동일 실행 AST·소스맵6형식을 확인했다. [조사 결과](../benchmark/BUNDLE_SIZE_RESULTS.md)·[검증](../benchmark/bundle-size-proof.json)에 연결한다. 기본 runtime/빌드와 DC-23 증거는 그대로다.
+- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 작업이다.
+- blockers: 조사 실행 블로커 없음. 미채택 구문 후보의 추가 검증은 미실행으로 명시한다.
+- commit: 시작/최신 `463c6cd`; DC-23 복원과 이번 DC-24 조사 문서/도구는 미커밋이다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 기존 원자료/아카이브를 덮어쓰지 않았다.

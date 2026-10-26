@@ -1,4 +1,3 @@
-import { updateEvent } from '@/utils/event';
 import { WDom, Props } from '@/types';
 import {
   checkStyleData,
@@ -859,6 +858,25 @@ const wDomChildrenToDom = (
       }
     }
   });
+};
+
+const updateEvent = (
+  element: HTMLElement,
+  eventKey: string,
+  newEventHandler: ((e: Event) => void) | undefined,
+  oldEventHandler: (e: Event) => void
+) => {
+  const eventName = eventKey.slice(2).toLowerCase();
+
+  if (oldEventHandler !== newEventHandler) {
+    if (oldEventHandler) {
+      element.removeEventListener(eventName, oldEventHandler);
+    }
+
+    if (newEventHandler) {
+      element.addEventListener(eventName, newEventHandler);
+    }
+  }
 };
 
 const updateStyle = (

@@ -7,37 +7,35 @@ uses the object as its receiver. Frozen functions and handler objects work.
 
 ## Updating an event prop
 
-The normal path keeps one internal listener for each element and event type.
-Renewing an inline callback changes the callback stored on the element without
-removing and adding the native listener. Dispatch reads the latest callback
-when that listener runs, including updates queued by an earlier native listener
-during a trusted browser event. Callbacks and Event objects are not stamped or
-mutated, and the same Event object can be dispatched again.
+Lithent registers the original callback directly. When its identity changes,
+Lithent removes the old callback and registers the new one. Keep handlers in the
+mounter scope when they do not need a fresh updater closure to avoid this work.
+Callbacks and Event objects are not stamped or mutated; the same Event object
+can be dispatched again.
 
-The internal listener keeps its registration position when the callback changes.
-Consequently, registering an external native listener with the same callback
-does not deduplicate against an event prop. Removing the original callback with
-`removeEventListener` does not remove the managed prop listener. Update/remove
-the prop to change that listener, or use direct native registration below.
+External `addEventListener` calls with the same callback and capture flag share
+native deduplication with event props. `removeEventListener` with the original
+callback removes that registration. Lithent does not track external mutations:
+an unchanged prop does not automatically restore a listener removed externally.
+A newly registered replacement goes behind existing listeners of the same event
+type and phase. If that callback is already registered, native deduplication
+preserves its existing position.
 
-Event names retain their existing lowercase normalization. Distinct aliases such
-as `onClick` and `onclick` enter a native listener path for that event type.
-Existing callback registration is preserved when the second alias is added;
-new native registrations follow the browser's dispatch timing. Alias removal,
-replacement, deduplication and `stopImmediatePropagation` between prop aliases
-preserve their native callback identity behavior. The retained proxy still has
-the external identity differences described above. Use a single spelling for
-ordinary event props.
+Event names use lowercase normalization. Aliases such as `onClick` and `onclick`
+follow native callback identity, deduplication and removal rules. There is no
+per-prop owner reference count; prefer one spelling for ordinary event props.
 
-An existing ancestor listener reads its latest callback when propagation reaches
-it. A newly registered listener follows the browser's native propagation rules;
+Changes during dispatch follow browser rules. Replacing a target callback from
+an earlier native listener can remove the old callback before it runs, while
+the new callback waits for the next dispatch. An ancestor callback replaced
+before propagation reaches that ancestor can run during the current event.
 Lithent does not add an event-clock filter.
 
 ## Native identity, ordering and listener options
 
 Use the existing `ref` and `mountCallback` APIs when integrating a library that
-requires exact callback identity, registration order, capture, passive or once
-options. Own that listener's setup and cleanup in the component:
+requires capture, passive or once options, or needs to own listener setup
+and registration order independently of prop updates. Own that listener's setup and cleanup in the component:
 
 ```tsx
 import { mount, mountCallback, ref } from 'lithent';

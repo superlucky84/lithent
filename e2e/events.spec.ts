@@ -28,7 +28,7 @@ for (const mode of ['alias', 'nested']) {
 }
 
 for (const mode of ['replace', 'ancestor']) {
-  test(`events: ${mode} proxy reads the latest handler during trusted dispatch`, async ({
+  test(`events: ${mode} replacement follows native trusted dispatch timing`, async ({
     page,
   }, info) => {
     await ready(
@@ -39,12 +39,40 @@ for (const mode of ['replace', 'ancestor']) {
     await page.locator('event-edge').click();
     expect(
       await page.evaluate(() => ({
-        calls: window.eventProbe.calls,
+        calls: window.eventProbe.calls.splice(0),
         trusted: window.eventProbe.trusted,
       }))
-    ).toEqual({ calls: ['latest'], trusted: [true] });
+    ).toEqual({
+      calls: mode === 'replace' ? [] : ['latest'],
+      trusted: [true],
+    });
+    await page.locator('event-edge').click();
+    expect(await page.evaluate(() => window.eventProbe.calls)).toEqual([
+      'latest',
+    ]);
   });
 }
+
+test('events: event props share native callback identity, dedup and replacement order', async ({
+  page,
+}, info) => {
+  await ready(
+    page,
+    '/e2e/fixtures/events.html?mode=interop',
+    info.project.name
+  );
+  const clickCalls = async () => {
+    await page.getByRole('button').click();
+    return page.evaluate(() => window.eventProbe.calls.splice(0));
+  };
+  expect(await clickCalls()).toEqual(['original', 'external']);
+  await page.evaluate(() => window.eventProbe.removeNative());
+  expect(await clickCalls()).toEqual(['external']);
+  await page.evaluate(() => window.eventProbe.addNative());
+  expect(await clickCalls()).toEqual(['external', 'original']);
+  await page.evaluate(() => window.eventProbe.replaceHandler());
+  expect(await clickCalls()).toEqual(['external', 'latest']);
+});
 
 test('events: a thrown callback preserves the next listener and following dispatch', async ({
   page,

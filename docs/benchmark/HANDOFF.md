@@ -1,5 +1,20 @@
 # summary
 
+## 후속 — DC-24 크기 조사 완료
+
+- done: 출력41개/실제 Vite 빌드12개를 비교했다. hidden map은 base UMD br4,824→4,798B지만 자동 map 연결을 잃는다. 제한 구문 조합은 최대45B 절감 후보이며 runtime/heap/performance는 미검증이다. [결과](./BUNDLE_SIZE_RESULTS.md)·[검증](./bundle-size-proof.json)에 기록했다.
+- next: 기본 빌드·compact13/native를 유지한다. 이번 조사 종료이며 구문 압축/새 구조 후보 채택은 별도 검증 작업이다.
+- blockers: 조사 실행 블로커 없음. 최신 `463c6cd`; DC-23/DC-24 작업은 미커밋이다. 기존 산출물과 모든 역사 증거는 유지했다.
+
+## 현재 — DC-23 native 복원 완료
+
+- done: DC-23 완료. compact13을 유지하고 양코어 이벤트·공유 portal teardown을 native 직접 등록으로 복원했다. 모든 runtime source와 측정 B의 base 세 JS가 일치한다. 전체 build·verify/size·타입/lint, 1,161회 테스트 통과(기존3 skipped), Playwright78/retry0와 양코어6형식18 package probe를 통과했다. [복원 결과](./NATIVE_EVENTS_RESULTS.md)·[검증](./native-events-validation.json)·[증거](./native-events-evidence.tar.gz)에 연결한다.
+- next: 이번 복원은 완료했다. native B의 CPU 목표는6/9이며 partial/select/swap 연구와 배포·버전 변경은 별도 작업이다. 보존 B를 재사용했고 새 timing을 수집하지 않았다.
+- blockers: 이번 복원의 실행 블로커 없음. 일반 inline UI의 proxy 이득은 포기하며, 모든 앱의 성능 향상을 주장하지 않는다.
+- commit: 시작/최신 `463c6cd`; 이번 DC-23은 미커밋이다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 기존56개 아카이브·raw/trace·실험 도구는 byte/hash를 유지한다.
+
+## DC-22 종료 시점 인계 — 이력
+
 ## Comprehensive integration — 2026-10-26
 
 2026-10-26. 상태: **DC-22 E 단독을 base/concurrent에 반영하고 전체 빌드·회귀·통합·영구 증거 감사를 완료했다. 공식4조건1,160CPU/120메모리와 최종6앱1,740CPU/180메모리, 이벤트128page/48GC·일반 UI320표본을 독립 감사했다. CPU9항목 목표는 6/9로 미달이며 일반 inline UI 이득을 근거로 채택했다. 구현·검증·증거를 커밋했다**.
@@ -11,7 +26,7 @@
 
 ## Cloud experiment handoff
 
-> 아래는 2026-10-24 보존 시점의 결과/미해결 재현이다. 현재의 재검토·반영 범위는 위 DC-22 정본을 따른다.
+> 아래는 2026-10-24 보존 시점의 결과/미해결 재현이다. DC-22 당시의 재검토 범위다. 현재 선택은 위 DC-23과 정본을 따른다.
 
 > **후속 작업 시작 전 확인:** 클라우드 독립 실험은 아래 별도 브랜치에 보존했다. 성능 이득이 있어도 **이벤트 후보는 미채택이며 실제 클릭 누락 버그가 미해결**이다. 원본 코어나 진행 중인 C2에 적용된 결과로 해석하지 않는다.
 
