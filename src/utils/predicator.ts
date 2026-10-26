@@ -83,6 +83,13 @@ export const checkFragmentFunction = (
 // A diffed node (resolved already): empty when it has no type.
 export const checkEmptyElement = (wDom: WDom) => !wDom.type;
 
+// Whether the node's element is a portal target, which lies outside the
+// parent the portal sits in: a portal's own element, or the one a node
+// replacing or deleting a portal still holds, with that portal's props (op),
+// until it is drawn.
+export const checkPortalElement = ({ el, op, props }: WDom) =>
+  !!el && (el === (op && op.portal) || el === (props && props.portal));
+
 export const checkEventKey = (key: string) => key[0] === 'o' && key[1] === 'n';
 
 export const checkExistyKey = (target: WDom) => checkExisty(getKey(target));

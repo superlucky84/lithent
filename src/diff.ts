@@ -78,10 +78,6 @@ const remakeNewWDom = (
       originalWDom.children = undefined;
     }
   }
-  if (originalWDom && originalWDom.tag === 'portal') {
-    remakeWDom.tag = 'portal';
-  }
-
   return remakeWDom;
 };
 

@@ -6,7 +6,7 @@
 
 ## TODO — 미착수 후속 작업
 
-2026-10-26 사용자 요청으로 정리한 목록이다. 아래 항목은 **구현·측정하지 않았다.** 기본 runtime은 DC-23 그대로다. 착수하면 REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL 순서로 정식 DC를 연다.
+2026-10-26 사용자 요청으로 정리한 목록이다. BUG-1은 사용자 요청으로 수정했다(아래). 나머지는 **구현·측정하지 않았다.** 착수하면 REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL 순서로 정식 DC를 연다.
 
 ### DC-25 — 같은 순서 keyed 빠른 경로 (성능)
 
@@ -16,20 +16,45 @@
   2. `src/render.ts` `updateChildren`: 순서가 유지된 결과면 `matchedIndexes`/`oiSeq` 재분석을 생략한다. C2(K)는 select JS −13%였지만 전체 시간 변화가 없었다. WeakMap frame 대신 list 노드 단위 표시는 고려만 하고 구현하지 않았다.
   3. `src/diff.ts` `makeNewWDomTree`: 같은 VDOM 객체의 조기 반환을 다시 평가한다. [당시](../benchmark/PERFORMANCE_CLOSEOUT.md) select/swap/삭제 JS −21~32%, 부분 갱신 전체 +7~10%로 기각했다. compact13 이전 layout에서의 결과다.
 - [ ] DC-25-1 중복 key 정책: (a) Set으로 중복을 확인해 현재 "첫 등장만 매칭"을 유지한다(비용 일부 남음). (b) 위치 매칭으로 바꾸고 개발 경고를 낸다(가장 빠름, 계약 변경). 길이·위치 key 비교만으로는 첫 등장 소비를 보장하지 못한다(아래 C2 제약 2).
-- [ ] DC-25-2 크기 허용치: base guard 여유가 0B(4,824B)다. 진입 전 허용 바이트를 정한다. 아래 크기 재확인의 출력 절감(46B/76B)을 먼저 채택하면 여유로 쓸 수 있다.
+- [ ] DC-25-2 크기 허용치: base guard는 4,824B인데 BUG-1 수정 후 4,860B다(아래). 진입 전 허용 바이트를 정한다. 아래 출력 절감을 채택하면 일부를 여유로 쓸 수 있다.
 - [ ] DC-25-3 측정 범위: 동일 환경 CPU 9항목 × 양순서, 공식 메모리, 고정 네 peer 재비교. 조각별 카운터로 제거된 작업을 귀속한다.
 - 다시 하지 않을 것: proxy E, C1, C3, full22, keymatch·ordered 단독.
 
-### BUG-1 — portal 형제가 삽입 기준점이 되는 문제 (정합성)
+### BUG-1 — portal 대상이 형제 DOM처럼 쓰이는 문제 (정합성, 수정함)
 
-- 증상: 부모 children이 `[p, null, portal(...), em]`일 때 `null` 자리가 컴포넌트(Fragment 출력)로 바뀌면 `insertBefore`가 `NotFoundError`를 던진다. 그다음 갱신에서 부모의 `p`, `em`이 DOM에서 사라진다. jsdom·Playwright Chromium에서 재현했고 배포판 `lithent@1.25.2`에도 있다.
-- 원인: `src/render.ts` `findChildFragmentNextElement`가 portal 노드의 `el`(portal 대상 컨테이너)을 다음 형제 요소로 돌려준다. `startFindNextBrotherElement`와 `updateChildren` 배치 단계의 anchor 탐색이 이 함수를 쓴다.
-- [ ] BUG-1-1 portal 노드를 anchor 후보에서 제외하는 수정과 양코어 회귀(삽입·교체·keyed 배치·portal 앞/뒤/연속)를 추가한다. concurrent의 대응 경로도 확인한다.
-- 재현: [portal-anchor-repro.cjs](../../experiments/bundle-size-recheck/portal-anchor-repro.cjs). 발견 경위: [크기 재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26).
+- 증상(처음 발견): 부모 children이 `[p, null, portal(...), em]`일 때 `null` 자리가 컴포넌트로 바뀌면 `insertBefore`가 `NotFoundError`를 던지고, 그다음 갱신에서 `p`, `em`이 DOM에서 사라진다. jsdom·Playwright Chromium에서 재현했고 배포판 `lithent@1.25.2`에도 있다.
+- 원인: portal 노드의 `el`은 부모 안의 DOM이 아니라 **portal 대상 컨테이너**다. 렌더 코드 여러 곳이 이를 형제 DOM처럼 다뤘다. 회귀 테스트를 쓰며 같은 원인의 증상을 더 찾았다.
 
-### 크기 재확인 후속 (선택)
+| 증상                                                                                   | base 수정 전 | concurrent 수정 전    |
+| -------------------------------------------------------------------------------------- | ------------ | --------------------- |
+| A. portal 앞에 새 노드를 넣을 때 portal 대상을 기준점으로 사용                         | 실패         | 통과(`parentEl` 검사) |
+| B. portal을 품은 keyed 컴포넌트가 이동하면 portal 대상 컨테이너가 목록 안으로 옮겨짐   | 실패         | 실패                  |
+| C. portal 삭제 시 자식 수가 같으면 부모의 다른 형제까지 일괄 삭제                      | 실패         | 실패                  |
+| D. 같은 자리에서 portal ↔ 요소/컴포넌트 전환 시 새 노드가 그려지지 않음               | 실패         | 실패                  |
+| E. portal을 품은 컴포넌트/keyed 행 삭제 시 portal 대상 컨테이너 자체가 문서에서 제거됨 | 실패         | 실패                  |
 
-- [ ] 구문 4종 + Module 태그 제거(4,778B, −46B) 또는 hidden map 포함(4,748B, −76B)의 채택 여부를 사용자가 정한다. 근거와 채택 전 검증 목록은 [재확인 결과](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26)에 있다.
+- 수정(양코어 동일):
+  - 공용 `checkPortalElement`(`src/utils/predicator.ts`)를 추가했다. `el`이 그 노드를 만든 props(`props.portal`)나, 교체·삭제 중인 노드가 아직 들고 있는 이전 portal props(`op.portal`)의 대상과 같은지로 판정한다.
+  - 기준점 탐색(`findChildFragmentNextElement`)과 이동(`getElementFromFragment`)에서 portal을 건너뛴다.
+  - 삭제(`deleteRealDom`, `findChildWithRemoveElement`)는 portal의 자식을 portal 대상에서 지우고, 대상 자체는 남긴다. 일괄 삭제 판정도 portal 대상의 자식 수로 한다.
+  - portal이 교체에 끼면 `typeReplace`가 삭제 후 추가로 처리한다.
+  - diff가 portal을 대체하는 새 노드에 `tag='portal'`을 덮어쓰던 코드는 제거했다. 삭제 판정은 이제 `op`로 한다.
+- [x] BUG-1-1 수정과 양코어 회귀 11개(`src/tests/core-portalSiblings.test.tsx`). 수정 전 base 10개, concurrent 6개가 실패했다. 1개는 대상의 다른 내용을 지우지 않는지 보는 안전장치다.
+- [x] BUG-1-2 검증: 전체 build, `pnpm test` 996 passed / 기존 3 skipped(이전 974 + 신규 11 × 2코어), base SSR 15, concurrent satellites 172, Playwright 78 passed(retry 0), strict tsc(base/concurrent/e2e), 변경 파일 ESLint·Prettier, `pnpm verify:concurrent`. Chromium 재현 스크립트도 수정된 UMD에서 오류 없이 통과한다.
+- [ ] BUG-1-3 **크기 결정 대기:** base UMD Brotli 4,824→4,860B(+36B)로 `pnpm size` guard(4,824B)를 36B 넘는다. concurrent는 6,903→6,935B(+32B)로 예산 안이다. 선택지는 아래 크기 후속에 있다. 성능 측정은 하지 않았다. 바뀐 경로는 portal 판정 비교 몇 개뿐이다.
+- 릴리스 때 CHANGELOG에 portal 수정과 동작 변화(D·E)를 적는다.
+
+### 크기 후속 (결정 대기)
+
+BUG-1 수정이 들어간 현재 코드 기준 base UMD Brotli다. 출력 후보의 근거와 채택 전 검증 목록은 [재확인 결과](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26)에 있다.
+
+| 선택                                            | Brotli | 4,824B guard                |
+| ----------------------------------------------- | -----: | --------------------------- |
+| 수정만                                          | 4,860B | 36B 초과                    |
+| 수정 + 구문 4종 + Module 태그 제거              | 4,819B | 통과(여유 5B)               |
+| 수정 + 구문 4종 + Module 태그 제거 + hidden map | 4,791B | 통과(4,800B reference 아래) |
+
+- [ ] 출력 후보 채택 또는 BUG-1용 allowance 추가를 사용자가 정한다.
 
 ## DC-24 — 번들 출력 후보 조사
 

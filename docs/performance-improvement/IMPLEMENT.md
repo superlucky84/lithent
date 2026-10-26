@@ -14,7 +14,17 @@
 - [x] S4 재확인(2026-10-26): 소스 사본 빌드로 대조 해시를 재현하고 Terser flag 29개·Module 태그·소스 편집 3종·실제 hidden 빌드를 비교했다. jsdom 동등성 확인만 했고 전체 suite·Playwright·package probe는 실행하지 않았다(미채택). → [재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26), [도구](../../experiments/bundle-size-recheck/README.md).
 - [ ] S5 채택 시(사용자 결정 대기): 선택한 출력 옵션을 `vite.config.js`에 반영하고 전체 build, `pnpm test`/dual, UMD Playwright fixture, 양코어 package probe, `pnpm size` guard·CHANGELOG를 갱신한다. → DESIGN TODO.
 
-미착수 후속(DC-25 같은 순서 keyed 빠른 경로, BUG-1 portal anchor)은 [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에 있다. 착수 전에는 실행 Phase를 만들지 않는다.
+미착수 후속(DC-25 같은 순서 keyed 빠른 경로)은 [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에 있다. 착수 전에는 실행 Phase를 만들지 않는다.
+
+## BUG-1 — portal 형제 정합성 수정
+
+진입: 사용자 요청(2026-10-26). 종료: 양코어 회귀 통과와 전체 검증. 크기 결정은 별도다.
+
+- [x] B0 재현: 회귀 11개를 먼저 작성했다. 수정 전 base 10개, concurrent 6개가 실패했다(A~E, DESIGN 표).
+- [x] B1 구현: 공용 `checkPortalElement`를 추가하고, 양코어 render의 기준점·이동·삭제·교체 경로와 diff의 `tag='portal'` 덮어쓰기를 수정했다.
+- [x] B2 Test Hardening: 대상 안의 다른 내용을 지우지 않는지, 같은 자리 portal ↔ 컴포넌트 전환, keyed 행 삭제를 추가했다.
+- [x] B3 Integration Test: 전체 build, `pnpm test` 996 passed / 3 skipped, base SSR 15, concurrent satellites 172, Playwright 78(retry 0), strict tsc 3종, ESLint/Prettier, `pnpm verify:concurrent`가 통과했다. Chromium 재현도 통과한다.
+- [ ] B4 크기: base UMD 4,860B로 guard를 36B 넘는다. DESIGN TODO의 크기 결정을 따른다(S5).
 
 ## DC-23 — 복원 실행
 

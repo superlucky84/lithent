@@ -1,6 +1,13 @@
 # summary
 
-## 최신 — 크기 재확인과 TODO 정리 (2026-10-26)
+## 최신 — BUG-1 portal 정합성 수정 (2026-10-26)
+
+- done: portal 노드의 `el`(portal 대상)을 형제 DOM처럼 다루던 버그를 양코어에서 고쳤다. 처음 찾은 삽입 기준점 오류(A)에 더해 같은 원인의 증상을 회귀 테스트로 확인하고 함께 고쳤다: 이동 시 대상 컨테이너 끌려옴(B), 삭제 시 형제 일괄 삭제(C), portal ↔ 요소 전환 누락(D), 컴포넌트 삭제 시 대상 컨테이너 제거(E). 회귀 11개는 수정 전 base 10개, concurrent 6개가 실패했고 지금은 모두 통과한다. 전체 build, `pnpm test` 996/3 skipped, SSR 15, concurrent satellites 172, Playwright 78, tsc/ESLint/Prettier, `verify:concurrent`가 통과했다. [DESIGN BUG-1](../performance-improvement/DESIGN.md#bug-1--portal-대상이-형제-dom처럼-쓰이는-문제-정합성-수정함).
+- blockers: **`pnpm size` 실패** — base UMD Brotli 4,824→4,860B(+36B)로 guard 4,824B를 넘는다. 출력 후보(구문 4종 + Module 태그 제거)를 같이 적용하면 4,819B로 통과하고, hidden map까지 쓰면 4,791B다. 어느 쪽인지 사용자 결정이 필요하다. concurrent는 6,935B로 예산 안이다.
+- next: 크기 결정 → 채택 시 `vite.config.js` 반영과 검증(IMPLEMENT S5). 그 뒤 DC-25는 결정 항목부터. 릴리스 때 CHANGELOG에 portal 수정을 적는다.
+- commit: tip은 `git log -1`.
+
+## 이전 — 크기 재확인과 TODO 정리 (2026-10-26)
 
 - done: DC-24를 독립 재확인했다. base UMD는 구문 4종 + Module 태그 제거로 4,824→4,778B(−46B, 소스맵 연결 유지), hidden map까지 4,748B(−76B)다. 함수·scope 구조와 jsdom 동작은 같다. 전체 compress(−102B)는 함수 33개를 옮겨 제외했고 소스 편집 3종은 Brotli가 늘었다. 현재 크기는 정책 안에서 거의 최소다. [재확인](./BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26)·[원자료](./bundle-size-recheck.json)·[도구](../../experiments/bundle-size-recheck/README.md).
 - found: BUG-1 — portal 형제 앞에 컴포넌트가 새로 생기면 portal 대상이 삽입 기준점이 되어 `NotFoundError`가 나고 형제 DOM이 사라진다. 배포판 1.25.2에도 있다. 수정하지 않았다.

@@ -5,6 +5,15 @@
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
 
+## M-19. portal 주변 형제 정합성 — BUG-1 (DESIGN TODO)
+
+- [x] portal 바로 앞에 요소·컴포넌트가 새로 생기거나, 마지막 portal 뒤에 추가될 때 부모 안의 올바른 위치에 들어간다. 오류는 없다.
+- [x] keyed 형제가 portal 주위에서 이동하거나, portal을 품은 keyed 컴포넌트가 이동해도 portal 대상 컨테이너는 원래 자리에 있다.
+- [x] portal을 지우면 portal 대상 안의 그 portal 내용만 사라진다. 부모의 다른 형제와 대상 안의 다른 내용은 남는다. portal을 품은 컴포넌트·keyed 행을 지워도 대상 컨테이너는 문서에 남는다.
+- [x] 같은 자리에서 portal ↔ 요소/컴포넌트를 전환하면 양쪽 모두 올바르게 그려지고 지워진다.
+- 증거: `src/tests/core-portalSiblings.test.tsx` 11개(base/concurrent), `experiments/bundle-size-recheck/portal-anchor-repro.cjs`(Chromium, 수정 후 오류 0). 수동 확인이 필요하면 같은 스크립트를 `dist/lithent.umd.js`에 실행한다.
+- [ ] `pnpm size`: base UMD 4,860B로 guard 4,824B를 36B 넘는다. DESIGN TODO의 크기 결정 뒤 통과를 확인한다.
+
 ## M-18. 번들 여유 조사 — R67~R69, DC-24
 
 - [x] current/후보의 Node/zlib와 raw/gzip/Brotli·source/bundle hash를 고정했다.

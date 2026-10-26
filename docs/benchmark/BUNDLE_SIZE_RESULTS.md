@@ -98,6 +98,8 @@ DC-24가 열어 둔 세 영역을 확인했다: Terser compress flag 29개를 �
 
 동등성 시나리오에서 대조군 자체가 예외를 냈다. 빈 자리(`null`)가 portal 형제 바로 앞에서 컴포넌트로 바뀌면 `insertBefore`가 portal 대상 컨테이너를 기준점으로 써서 `NotFoundError`가 난다. 그다음 갱신에서는 부모의 다른 자식(`p`, `em`)이 DOM에서 사라진다. jsdom과 Playwright Chromium에서 재현했고 배포판 `lithent@1.25.2` UMD에서도 같다. 원인은 `src/render.ts`의 `findChildFragmentNextElement`가 portal 노드의 `el`(portal 대상)을 다음 형제 요소로 돌려주는 것이다. 이번 작업 범위 밖이라 수정하지 않고 [DESIGN TODO](../performance-improvement/DESIGN.md#todo--미착수-후속-작업)에 올렸다.
 
+> 후속: 같은 날 사용자 요청으로 양코어에서 수정했다. 위 크기 수치는 수정 전 코드 기준이다. 수정 후 base UMD는 4,860B, 출력 후보 적용 시 4,819B다. [DESIGN BUG-1](../performance-improvement/DESIGN.md#bug-1--portal-대상이-형제-dom처럼-쓰이는-문제-정합성-수정함).
+
 - done: 대조 해시 재현, Terser flag 29개·조합, Module 태그, 소스 편집 3종, 실제 hidden 빌드, jsdom 동등성, BUG-1 재현을 기록했다.
 - next: 사용자가 46B/76B 후보 채택 여부를 정한다. 채택 시 위 검증을 수행하고 size guard·CHANGELOG를 갱신한다.
 - blockers: 없음. 후보는 미채택이며 기본 빌드는 그대로다.
