@@ -4,7 +4,7 @@
   "version": "0.21.0",
   "description": "lithentExamples",
   "private": true,
-  "packageManager": "pnpm@7.6.0",
+  "packageManager": "pnpm@12.15.0",
   "main": "./dist/lithentExamples.umd.js",
   "module": "./dist/lithentExamples.mjs",
   "types": "./dist/index.d.ts",
@@ -30,6 +30,6 @@
     "lithent-tag": "workspace:*"
   },
   "volta": {
-    "node": "20.3.0"
+    "node": "24.22.1"
   }
 }

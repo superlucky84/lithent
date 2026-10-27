@@ -3,7 +3,7 @@
   "name": "lithent",
   "version": "1.25.3",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
-  "packageManager": "pnpm@9.12.3",
+  "packageManager": "pnpm@12.15.0",
   "main": "./dist/lithent.cjs",
   "module": "./dist/lithent.mjs",
   "scripts": {
@@ -224,7 +224,6 @@
     "vitest": "^2.1.2"
   },
   "volta": {
-    "node": "20.3.0",
-    "pnpm": "9.12.3"
+    "node": "24.22.1"
   }
 }

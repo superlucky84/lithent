@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Lane-aware state helpers for lithent-concurrent. Meaningless on the base core, so they ship here rather than in lithent/helper.",
   "private": true,
-  "packageManager": "pnpm@9.12.3",
+  "packageManager": "pnpm@12.15.0",
   "main": "./dist/lithentConcurrentHelper.cjs",
   "module": "./dist/lithentConcurrentHelper.mjs",
   "types": "./dist/types/index.d.ts",
@@ -33,6 +33,6 @@
     "lithent-concurrent": "workspace:*"
   },
   "volta": {
-    "node": "20.3.0"
+    "node": "24.22.1"
   }
 }

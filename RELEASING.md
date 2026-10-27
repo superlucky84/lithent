@@ -1,7 +1,12 @@
 # PR #99 릴리스 — lithent 1.25.2 / lithent-concurrent 0.2.2
 
-저장소 루트의 `main`에서 실행한다. Node/pnpm 버전은 root `package.json`의
-Volta 설정과 `packageManager`를 따른다(Node 20.3.0, pnpm 9.12.3).
+저장소 루트의 `main`에서 실행한다. Node 버전은 root `package.json`의 Volta
+설정(24.22.1), pnpm 버전은 `packageManager`(12.15.0)를 따른다.
+
+Volta 2.0.2는 pnpm 11 이상을 실행하지 못하므로 pnpm은 Volta로 고정하지 않는다.
+Volta의 pnpm을 쓴다면 기본 pnpm을 10.34.9 이상으로 두면 이 저장소 안에서
+`packageManager`의 버전으로 자동 전환된다(`volta install pnpm@10.34.9`).
+`pnpm -v`가 12.15.0을 출력하는지 먼저 확인한다.
 
 이번 npm 발행 대상은 아래 두 패키지다.
 
@@ -89,7 +94,9 @@ Concurrent 명령은 해당 디렉터리 안에서 실행한다. 괄호는 원�
 ## 5. npm 발행 — core → Concurrent
 
 아래 명령은 **하나씩** 실행하고 성공을 확인한 뒤 다음으로 진행한다.
-필요하면 npm이 요청하는 로그인 또는 OTP 절차를 완료한다.
+pnpm 11부터 `pnpm publish`는 npm CLI를 거치지 않는다. registry가 OTP를
+요구하면 pnpm이 직접 묻는다. `--otp <code>` 또는 `PNPM_CONFIG_OTP`로 미리
+넘길 수도 있다. 인증은 `~/.npmrc`의 토큰(`npm login`)을 그대로 쓴다.
 
 먼저 core를 발행하고 정확한 버전이 registry에 조회되는지 확인한다.
 
