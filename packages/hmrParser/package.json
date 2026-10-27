@@ -3,7 +3,7 @@
   "name": "@lithent/hmr-parser",
   "version": "0.2.3",
   "description": "Lithent HMR parser utilities for build tools",
-  "packageManager": "pnpm@9.12.3",
+  "packageManager": "pnpm@12.15.0",
   "main": "./dist/lithentHmrParser.umd.js",
   "module": "./dist/lithentHmrParser.mjs",
   "types": "./dist/index.d.ts",
@@ -50,7 +50,6 @@
     "vitest": "^2.1.5"
   },
   "volta": {
-    "node": "20.3.0",
-    "pnpm": "9.12.3"
+    "node": "24.22.1"
   }
 }

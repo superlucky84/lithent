@@ -4,7 +4,7 @@
   "version": "0.21.1",
   "description": "Lithent development helper utilities",
   "private": true,
-  "packageManager": "pnpm@7.6.0",
+  "packageManager": "pnpm@12.15.0",
   "main": "./dist/lithentDevHelper.cjs",
   "module": "./dist/lithentDevHelper.mjs",
   "types": "./dist/index.d.ts",
@@ -32,6 +32,6 @@
     "lithent": "workspace:*"
   },
   "volta": {
-    "node": "20.3.0"
+    "node": "24.22.1"
   }
 }

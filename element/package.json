@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Register lithent components as standard Custom Elements",
   "private": true,
-  "packageManager": "pnpm@9.12.3",
+  "packageManager": "pnpm@12.15.0",
   "main": "./dist/lithentElement.cjs",
   "module": "./dist/lithentElement.mjs",
   "types": "./dist/index.d.ts",
@@ -32,6 +32,6 @@
     "lithent": "workspace:*"
   },
   "volta": {
-    "node": "20.3.0"
+    "node": "24.22.1"
   }
 }

@@ -30,7 +30,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      # Installs the pnpm version in package.json `packageManager`.
+      # pnpm 12 needs v6.1.0 or later; the v6 tag predates it.
+      - uses: pnpm/action-setup@v6.1.0
 
       - uses: actions/setup-node@v4
         with:
