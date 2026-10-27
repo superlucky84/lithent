@@ -6,13 +6,16 @@ import { emitDeclarationFormats } from './scripts/emit-declaration-formats.mjs';
 import { minify } from 'terser';
 export default defineConfig({
   plugins: [
-    checker({
-      typescript: true,
-      eslint: {
-        useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
-    }),
+    // Builds still type-check and lint. Tests skip the checker: on Node
+    // 24.19+, vitest aborts when it exits while the checker is still running.
+    !process.env.VITEST &&
+      checker({
+        typescript: true,
+        eslint: {
+          useFlatConfig: true,
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
+      }),
     dts({
       outputDir: ['dist'],
       afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
