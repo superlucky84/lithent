@@ -6,6 +6,7 @@ import {
   checkVirtualType,
   hasAccessorMethods,
   isPendingCustomElement,
+  checkPortalElement,
 } from '@/utils/predicator';
 
 import { componentMap, xmlnsRef } from '@/utils/universalRef';
@@ -154,8 +155,13 @@ export const typeDelete = (newWDom: WDom) => {
 const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
   if (parent && newWDom.el) {
     const nt = newWDom.el.nodeType;
-    if (nt === 11 || newWDom?.tag === 'portal') {
-      findChildWithRemoveElement(newWDom, parent);
+    // A portal's children are in its target, which itself stays.
+    const isPortal = checkPortalElement(newWDom);
+    if (nt === 11 || isPortal) {
+      findChildWithRemoveElement(
+        newWDom,
+        isPortal ? (newWDom.el as HTMLElement) : parent
+      );
     } else if (nt === 1 || nt === 3) {
       parent.removeChild(newWDom.el);
     }
@@ -176,7 +182,7 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
       return (
         (nt === 1 || nt === 3) &&
         (item.el as HTMLElement).tagName !== 'HTML' &&
-        item.tag !== 'portal'
+        !checkPortalElement(item)
       );
     })
   ) {
@@ -201,13 +207,13 @@ const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
 
   items.forEach(item => {
     const nt = item.el && item.el.nodeType;
-    if (nt) {
-      if (nt === 1 || nt === 3) {
-        const el = item.el as HTMLElement;
-        el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
-      } else if (nt === 11) {
-        findChildWithRemoveElement(item, parent);
-      }
+    if (checkPortalElement(item)) {
+      findChildWithRemoveElement(item, item.el as HTMLElement);
+    } else if (nt === 1 || nt === 3) {
+      const el = item.el as HTMLElement;
+      el.tagName === 'HTML' ? (el.innerHTML = '') : el.remove();
+    } else if (nt === 11) {
+      findChildWithRemoveElement(item, parent);
     }
   });
 };
@@ -276,7 +282,8 @@ const getElementFromFragment = (newWDom: WDom) => {
     return ((newWDom && newWDom.children) || []).reduce((acc, item) => {
       const element = getElementFromFragment(item);
 
-      if (element) {
+      // A portal's target does not move with its siblings.
+      if (element && !checkPortalElement(item)) {
         acc.appendChild(element);
       }
       return acc;
@@ -341,7 +348,13 @@ const findChildFragmentNextElement = (
 ): HTMLElement | DocumentFragment | Text | undefined =>
   candidiateBrothers.reduce<HTMLElement | DocumentFragment | Text | undefined>(
     (targetEl, bItem) => {
-      if (targetEl || (moving.size && moving.has(bItem))) return targetEl;
+      // A portal's target is not in the parent: no anchor there.
+      if (
+        targetEl ||
+        checkPortalElement(bItem) ||
+        (moving.size && moving.has(bItem))
+      )
+        return targetEl;
       const { type, el } = bItem;
       if (type && checkVirtualType(type)) {
         const found = findChildFragmentNextElement(
@@ -372,13 +385,19 @@ const typeReplace = (newWDom: WDom) => {
   }
 
   if (parentWDom && parentWDom.type && orignalElement) {
-    if (orignalElement.nodeType === 11) {
+    // A portal being replaced, or replacing: one side is drawn in the
+    // portal's target, not in the parent, so delete and add instead.
+    if (
+      orignalElement.nodeType === 11 ||
+      checkPortalElement(newWDom) ||
+      newWDom.tag === 'portal'
+    ) {
       typeSortedReplace(newWDom);
     } else {
       const parentElement = findRealParentElement(parentWDom);
       const newElement = takeDom(newWDom) || wDomToDom(newWDom);
 
-      if (parentElement && newWDom.tag !== 'portal') {
+      if (parentElement) {
         parentElement.replaceChild(newElement, orignalElement);
       }
     }

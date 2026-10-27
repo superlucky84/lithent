@@ -1,0 +1,442 @@
+{
+  "at": "2026-10-25T14:50:47.849Z",
+  "environment": "JSDOM structural counters; no timing or official B3",
+  "inputs": {
+    "src/main.tsx": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+    "cacheUpdate.ts": "8ff83de7781eaca123b8290c16409f6ebc0affadd29b8ea23e7eba968b9c9150"
+  },
+  "variants": {
+    "baseline": {
+      "samples": [
+        {
+          "name": "create1k",
+          "rows": 1000,
+          "counts": {
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3
+          }
+        },
+        {
+          "name": "select",
+          "rows": 1000,
+          "counts": {
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1012,
+            "updateChildren": 11,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 1000,
+            "createdArrays": 1,
+            "clearDiffMeta": 1011
+          }
+        },
+        {
+          "name": "select-next",
+          "rows": 1000,
+          "counts": {
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1021,
+            "updateChildren": 19,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 1000,
+            "createdArrays": 1,
+            "clearDiffMeta": 1019
+          }
+        },
+        {
+          "name": "partial",
+          "rows": 1000,
+          "counts": {
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1903,
+            "updateChildren": 803,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 1000,
+            "createdArrays": 1,
+            "clearDiffMeta": 1903
+          }
+        },
+        {
+          "name": "swap",
+          "rows": 1000,
+          "counts": {
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1003,
+            "updateChildren": 3,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 1000,
+            "createdArrays": 1,
+            "clearDiffMeta": 1003
+          }
+        },
+        {
+          "name": "remove",
+          "rows": 999,
+          "counts": {
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 1999,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 999,
+            "mapDelete": 999,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1002,
+            "updateChildren": 3,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 999,
+            "createdArrays": 1,
+            "clearDiffMeta": 1002
+          }
+        },
+        {
+          "name": "replace1k",
+          "rows": 1000,
+          "counts": {
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 999,
+            "diffKeyReads": 1999,
+            "mapHas": 999,
+            "mapSet": 999,
+            "mapGet": 1000,
+            "unusedVisits": 999,
+            "wDomUpdate": 3,
+            "updateChildren": 3,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 1000,
+            "createdArrays": 1,
+            "clearDiffMeta": 1003
+          }
+        },
+        {
+          "name": "append1k",
+          "rows": 2000,
+          "counts": {
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 3000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 2000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1003,
+            "updateChildren": 3,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 2000,
+            "createdArrays": 1,
+            "clearDiffMeta": 2003
+          }
+        },
+        {
+          "name": "clear",
+          "rows": 0,
+          "counts": {
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3
+          }
+        },
+        {
+          "name": "create10k",
+          "rows": 10000,
+          "counts": {
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3
+          }
+        },
+        {
+          "name": "clear10k",
+          "rows": 0,
+          "counts": {
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3
+          }
+        }
+      ],
+      "bundleSHA256": "e366eca2524e7d0758e84ca63496456fb6023d2f688ededc66a02ffec6521c0c"
+    },
+    "candidate": {
+      "samples": [
+        {
+          "name": "create1k",
+          "rows": 1000,
+          "counts": {
+            "frameStart": 1,
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "select",
+          "rows": 1000,
+          "counts": {
+            "frameStart": 1,
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "proofWrites": 1,
+            "proofWriteChildren": 1000,
+            "wDomUpdate": 1012,
+            "updateChildren": 11,
+            "proofReads": 1,
+            "proofDeletes": 1,
+            "fastLoops": 1,
+            "fastChildren": 1000,
+            "clearDiffMeta": 1011,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "select-next",
+          "rows": 1000,
+          "counts": {
+            "frameStart": 1,
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "proofWrites": 1,
+            "proofWriteChildren": 1000,
+            "wDomUpdate": 1021,
+            "updateChildren": 19,
+            "proofReads": 1,
+            "proofDeletes": 1,
+            "fastLoops": 1,
+            "fastChildren": 1000,
+            "clearDiffMeta": 1019,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "partial",
+          "rows": 1000,
+          "counts": {
+            "frameStart": 1,
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "proofWrites": 1,
+            "proofWriteChildren": 1000,
+            "wDomUpdate": 1903,
+            "updateChildren": 803,
+            "proofReads": 1,
+            "proofDeletes": 1,
+            "fastLoops": 1,
+            "fastChildren": 1000,
+            "clearDiffMeta": 1903,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "swap",
+          "rows": 1000,
+          "counts": {
+            "frameStart": 1,
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 2000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 1000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1003,
+            "updateChildren": 3,
+            "proofReads": 1,
+            "proofDeletes": 1,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 1000,
+            "createdArrays": 1,
+            "clearDiffMeta": 1003,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "remove",
+          "rows": 999,
+          "counts": {
+            "frameStart": 1,
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 1999,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 999,
+            "mapDelete": 999,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1002,
+            "updateChildren": 3,
+            "proofReads": 1,
+            "proofDeletes": 1,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 999,
+            "createdArrays": 1,
+            "clearDiffMeta": 1002,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "replace1k",
+          "rows": 1000,
+          "counts": {
+            "frameStart": 1,
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 999,
+            "diffKeyReads": 1999,
+            "mapHas": 999,
+            "mapSet": 999,
+            "mapGet": 1000,
+            "unusedVisits": 999,
+            "wDomUpdate": 3,
+            "updateChildren": 3,
+            "proofReads": 1,
+            "proofDeletes": 1,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 1000,
+            "createdArrays": 1,
+            "clearDiffMeta": 1003,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "append1k",
+          "rows": 2000,
+          "counts": {
+            "frameStart": 1,
+            "diffLoopChildren": 1,
+            "mapBuildVisits": 1000,
+            "diffKeyReads": 3000,
+            "mapHas": 1000,
+            "mapSet": 1000,
+            "mapGet": 2000,
+            "mapDelete": 1000,
+            "unusedVisits": 1000,
+            "wDomUpdate": 1003,
+            "updateChildren": 3,
+            "proofReads": 1,
+            "proofDeletes": 1,
+            "placementProbeVisits": 1,
+            "matchedArrays": 1,
+            "oiArrays": 1,
+            "moverArrays": 1,
+            "matchAnalysisVisits": 2000,
+            "createdArrays": 1,
+            "clearDiffMeta": 2003,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "clear",
+          "rows": 0,
+          "counts": {
+            "frameStart": 1,
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "create10k",
+          "rows": 10000,
+          "counts": {
+            "frameStart": 1,
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3,
+            "frameEnd": 1
+          }
+        },
+        {
+          "name": "clear10k",
+          "rows": 0,
+          "counts": {
+            "frameStart": 1,
+            "wDomUpdate": 3,
+            "updateChildren": 2,
+            "clearDiffMeta": 3,
+            "frameEnd": 1
+          }
+        }
+      ],
+      "bundleSHA256": "568745677a9fba43c503c5eb9f6b2791ec37e03033626eb089dbfc020a35b31b"
+    }
+  }
+}

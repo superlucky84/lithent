@@ -1,6 +1,12 @@
 // Measures real production adapters with the unchanged local official runner.
 import { createServer } from 'node:http';
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  existsSync,
+  cpSync,
+} from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { resolve, extname } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -13,11 +19,17 @@ const root = fileURLToPath(new URL('../../', import.meta.url)).replace(
   /\/$/,
   ''
 );
-const bench = resolve(root, '../js-framework-benchmark');
+const bench = resolve(
+  process.env.LITHENT_BENCHMARK_ROOT ||
+    resolve(root, '../js-framework-benchmark')
+);
 const out =
   process.env.LITHENT_PRODUCTION_OUT || '/tmp/lithent-production-review';
 mkdirSync(out + '/traces', { recursive: true });
 const mode = process.argv[2] || 'verify';
+const chromeBinaryPath =
+  process.env.LITHENT_CHROME_BINARY ||
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 if (!['verify', 'cpu', 'mem', 'extras', 'retention', 'startup'].includes(mode))
   throw Error('Unknown mode');
 const folders = {
@@ -30,6 +42,9 @@ const folders = {
   svelte: bench + '/frameworks/keyed/svelte',
   vue: bench + '/frameworks/keyed/vue/dist',
 };
+// Optional production builds staged outside the checkout (e.g. peer installs).
+if (process.env.LITHENT_PRODUCTION_FOLDERS)
+  Object.assign(folders, JSON.parse(process.env.LITHENT_PRODUCTION_FOLDERS));
 const names = process.argv[3]?.split(',') || Object.keys(folders);
 for (const name of names)
   if (!folders[name]) throw Error('Unknown app: ' + name);
@@ -46,6 +61,11 @@ const framework = name => ({
 });
 const hash = file =>
   createHash('sha256').update(readFileSync(file)).digest('hex');
+const frameworkPath = resolve(
+  chromeBinaryPath,
+  '../../Frameworks/Google Chrome Framework.framework/Versions/Current/Google Chrome Framework'
+);
+const chromeFrameworkPath = existsSync(frameworkPath) ? frameworkPath : null;
 const mime = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -104,6 +124,10 @@ let output = {
   startedAt: new Date().toISOString(),
   mode,
   chrome: null,
+  chromeBinaryPath,
+  chromeBinarySha256: hash(chromeBinaryPath),
+  chromeFrameworkPath,
+  chromeFrameworkSha256: chromeFrameworkPath && hash(chromeFrameworkPath),
   machine: {
     cpu: cpus()[0].model,
     cores: cpus().length,
@@ -123,7 +147,11 @@ if (process.env.LITHENT_PRODUCTION_RESUME === '1') {
   );
   if (
     JSON.stringify(previous.build) !== JSON.stringify(output.build) ||
-    JSON.stringify(previous.versions) !== JSON.stringify(output.versions)
+    JSON.stringify(previous.versions) !== JSON.stringify(output.versions) ||
+    (previous.chromeBinarySha256 &&
+      previous.chromeBinarySha256 !== output.chromeBinarySha256) ||
+    (previous.chromeFrameworkSha256 &&
+      previous.chromeFrameworkSha256 !== output.chromeFrameworkSha256)
   )
     throw Error('Cannot resume across different builds or versions');
   const resumedAt = output.startedAt;
@@ -148,6 +176,8 @@ try {
       [
         bench + '/webdriver-ts/dist/isKeyed.js',
         '--headless',
+        '--chromeBinary',
+        chromeBinaryPath,
         '--framework',
         ...names.map(name => 'keyed/' + name),
       ],
@@ -167,8 +197,7 @@ try {
     const { chromium } = require('@playwright/test');
     const browser = await chromium.launch({
       headless: true,
-      executablePath:
-        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: chromeBinaryPath,
     });
     output.chrome = browser.version();
     try {
@@ -260,10 +289,19 @@ try {
       await browser.close();
     }
   } else if (mode === 'cpu' || mode === 'mem') {
+    if (mode === 'mem') {
+      const { registerOfficialMemoryBenchmarks } = await import(
+        './official-memory.mjs'
+      );
+      output.memoryRegistration = await registerOfficialMemoryBenchmarks(bench);
+    }
     const { startBrowser } = await import(
       bench + '/webdriver-ts/dist/puppeteerAccess.js'
     );
-    const metadataBrowser = await startBrowser({ headless: true });
+    const metadataBrowser = await startBrowser({
+      headless: true,
+      chromeBinaryPath,
+    });
     try {
       output.chrome = await metadataBrowser.version();
     } finally {
@@ -350,6 +388,7 @@ try {
           chromePort: 9998,
           remoteDebuggingPort: 9999,
           browser: 'chrome',
+          chromeBinaryPath,
           puppeteerSleep: 0,
         };
         let result;
@@ -365,6 +404,24 @@ try {
             at: new Date().toISOString(),
             ...result,
           });
+          // The upstream runner reuses trace filenames on retry. Preserve the
+          // failed attempt before another batch can overwrite its evidence.
+          const failedDir =
+            out +
+            '/failed-attempts/' +
+            name +
+            '-' +
+            id +
+            '-' +
+            Date.now() +
+            '-' +
+            attempt;
+          mkdirSync(failedDir, { recursive: true });
+          cpSync(out + '/traces', failedDir + '/traces', { recursive: true });
+          writeFileSync(
+            failedDir + '/result.json',
+            JSON.stringify(result, null, 2)
+          );
           writeFileSync(
             out + '/production-' + mode + '.json',
             JSON.stringify(output, null, 2)
@@ -411,8 +468,7 @@ try {
     const { chromium } = require('@playwright/test');
     const browser = await chromium.launch({
       headless: true,
-      executablePath:
-        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: chromeBinaryPath,
       args: ['--js-flags=--expose-gc'],
     });
     output.chrome = browser.version();
@@ -556,6 +612,13 @@ try {
     }
     log(JSON.stringify(output.samples, null, 2));
   }
+  if (hash(chromeBinaryPath) !== output.chromeBinarySha256)
+    throw Error('Chrome binary changed during the run');
+  if (
+    chromeFrameworkPath &&
+    hash(chromeFrameworkPath) !== output.chromeFrameworkSha256
+  )
+    throw Error('Chrome framework changed during the run');
   complete = true;
 } finally {
   output.complete = complete;

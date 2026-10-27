@@ -1,0 +1,1514 @@
+{
+  "decision": "DC-23: compact13 + native event registration",
+  "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+  "uncommitted": true,
+  "newPerformanceCollection": false,
+  "baselineCommit": "fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4",
+  "preservedEventCommit": "95d6faf42c860bfb87e180f594287a9e3d717334",
+  "sourceAndBaseArtifactsMatchMeasuredB": true,
+  "artifacts": {
+    "node": "v24.11.1",
+    "zlib": "1.3.1-470d3a2",
+    "sources": {
+      "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+      "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+      "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+      "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+      "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+      "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+      "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+      "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+      "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+      "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+      "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+      "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+      "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+      "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+      "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+      "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+      "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+      "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+      "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+      "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+      "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+      "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+      "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+    },
+    "bundles": {
+      "dist/lithent.mjs": {
+        "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e",
+        "raw": 18868,
+        "gzip": 6343,
+        "br": 5802,
+        "previousProxy": {
+          "sha256": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45",
+          "raw": 19531,
+          "gzip": 6566,
+          "br": 6002
+        }
+      },
+      "dist/lithent.umd.js": {
+        "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d",
+        "raw": 12759,
+        "gzip": 5187,
+        "br": 4824,
+        "previousProxy": {
+          "sha256": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2",
+          "raw": 13252,
+          "gzip": 5412,
+          "br": 5006
+        }
+      },
+      "dist/lithent.cjs": {
+        "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820",
+        "raw": 12606,
+        "gzip": 5234,
+        "br": 4857,
+        "previousProxy": {
+          "sha256": "6632c90c646f5695824dfb2caaf7bd59b9f85c18a36b6de5c56087246854d776",
+          "raw": 13098,
+          "gzip": 5434,
+          "br": 5035
+        }
+      },
+      "lithentConcurrent/dist/lithentConcurrent.mjs": {
+        "sha256": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c",
+        "raw": 27645,
+        "gzip": 9015,
+        "br": 8206,
+        "previousProxy": {
+          "sha256": "5ec069e06ff94766bae858cdbe113cebea9eb45801526ecb467a9d943fa9f39c",
+          "raw": 28315,
+          "gzip": 9225,
+          "br": 8403
+        }
+      },
+      "lithentConcurrent/dist/lithentConcurrent.umd.js": {
+        "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0",
+        "raw": 18419,
+        "gzip": 7484,
+        "br": 6903,
+        "previousProxy": {
+          "sha256": "6c540d468240bed97bc8053f22e38c9dbd62bd1dfd3aa7a3cb6e01e0f8e8b6ff",
+          "raw": 18914,
+          "gzip": 7673,
+          "br": 7076
+        }
+      },
+      "lithentConcurrent/dist/lithentConcurrent.cjs": {
+        "sha256": "218f069c7acaca3d490f7ab04395977dde6c14c07614d91abc96d0a6d7f3c4cb",
+        "raw": 18358,
+        "gzip": 7413,
+        "br": 6836,
+        "previousProxy": {
+          "sha256": "11db27ee2a98082f2fb5819a008430d23a51430f3726e9117938a6c08cd85066",
+          "raw": 18853,
+          "gzip": 7607,
+          "br": 7003
+        }
+      }
+    }
+  },
+  "sameCompressorProxy": {
+    "node": "v24.11.1",
+    "zlib": "1.3.1-470d3a2",
+    "files": {
+      "lithent.mjs": {
+        "sha256": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45",
+        "raw": 19531,
+        "gzip": 6564,
+        "br": 6002
+      },
+      "lithent.umd.js": {
+        "sha256": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2",
+        "raw": 13252,
+        "gzip": 5395,
+        "br": 5006
+      },
+      "lithent.cjs": {
+        "sha256": "6632c90c646f5695824dfb2caaf7bd59b9f85c18a36b6de5c56087246854d776",
+        "raw": 13098,
+        "gzip": 5435,
+        "br": 5035
+      },
+      "lithentConcurrent.mjs": {
+        "sha256": "5ec069e06ff94766bae858cdbe113cebea9eb45801526ecb467a9d943fa9f39c",
+        "raw": 28315,
+        "gzip": 9214,
+        "br": 8403
+      },
+      "lithentConcurrent.umd.js": {
+        "sha256": "6c540d468240bed97bc8053f22e38c9dbd62bd1dfd3aa7a3cb6e01e0f8e8b6ff",
+        "raw": 18914,
+        "gzip": 7669,
+        "br": 7076
+      },
+      "lithentConcurrent.cjs": {
+        "sha256": "11db27ee2a98082f2fb5819a008430d23a51430f3726e9117938a6c08cd85066",
+        "raw": 18853,
+        "gzip": 7600,
+        "br": 7003
+      }
+    }
+  },
+  "commands": [
+    {
+      "startedAt": "2026-10-26T13:17:58.096Z",
+      "finishedAt": "2026-10-26T13:18:33.125Z",
+      "name": "full-build",
+      "command": [
+        "pnpm",
+        "build"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "full-build-2026-10-26T13-17-58.096Z.log",
+      "logSHA256": "eb9d26d1a1f855e6f4bb1510889e83fc2b3ecbc55e7356adefd2c2c449ba1426",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:19:25.134Z",
+      "finishedAt": "2026-10-26T13:20:36.984Z",
+      "name": "full-tests",
+      "command": [
+        "pnpm",
+        "test"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "full-tests-2026-10-26T13-19-25.134Z.log",
+      "logSHA256": "79746d723cdcbbf6160b58256c9abf94dff9bdb6510a6b96a0724e9a065f32f5",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:19:34.519Z",
+      "finishedAt": "2026-10-26T13:19:35.249Z",
+      "name": "lint",
+      "command": [
+        "pnpm",
+        "exec",
+        "eslint",
+        "src/render.ts",
+        "src/hook/internal/unmount.ts",
+        "lithentConcurrent/src/render.ts",
+        "e2e/events.spec.ts",
+        "e2e/fixtures/events.ts"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "lint-2026-10-26T13-19-34.519Z.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:23:31.688Z",
+      "finishedAt": "2026-10-26T13:23:36.278Z",
+      "name": "package-formats",
+      "command": [
+        "pnpm",
+        "exec",
+        "node",
+        "experiments/native-events/packages.mjs",
+        "/private/tmp/lithent-native-restore-20261026"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "package-formats-2026-10-26T13-23-31.688Z.log",
+      "logSHA256": "6c7c4bf1dcea3724a6b9f054e6335abbab2ca6bdf734e6603a28d1a0d93875d6",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:23:36.384Z",
+      "finishedAt": "2026-10-26T13:24:14.173Z",
+      "name": "playwright",
+      "command": [
+        "pnpm",
+        "exec",
+        "playwright",
+        "test",
+        "--reporter=list,json"
+      ],
+      "extra": {
+        "PLAYWRIGHT_JSON_OUTPUT_NAME": "/private/tmp/lithent-native-restore-20261026/playwright.json"
+      },
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "playwright-2026-10-26T13-23-36.384Z.log",
+      "logSHA256": "3a0e71ff25b87389977ca11a04fcbcbdf1329c5f987f944a88b669db1f2f7875",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:20:39.408Z",
+      "finishedAt": "2026-10-26T13:23:27.418Z",
+      "name": "satellites-concurrent",
+      "command": [
+        "pnpm",
+        "run",
+        "test:satellites"
+      ],
+      "extra": {
+        "LITHENT_CORE": "concurrent"
+      },
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "satellites-concurrent-2026-10-26T13-20-39.408Z.log",
+      "logSHA256": "dcc32c0b5c42ada361ccd9270944e6e6f9bc84b3ac9da0d5747c43237cea1d82",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:19:29.417Z",
+      "finishedAt": "2026-10-26T13:19:30.264Z",
+      "name": "size",
+      "command": [
+        "pnpm",
+        "size"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "size-2026-10-26T13-19-29.417Z.log",
+      "logSHA256": "83a51150b0d36baa14ade46534ac04ede0689ad681517fa0929e2625cc56a8b2",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:20:37.152Z",
+      "finishedAt": "2026-10-26T13:20:39.267Z",
+      "name": "ssr-base",
+      "command": [
+        "pnpm",
+        "--filter",
+        "lithent-ssr",
+        "test"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "ssr-base-2026-10-26T13-20-37.152Z.log",
+      "logSHA256": "a55a3250e7564e4fd0e87225ca4dc1fcc3260ad36ee47d506b0b4bb5e21c3760",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:19:30.352Z",
+      "finishedAt": "2026-10-26T13:19:32.700Z",
+      "name": "types-base",
+      "command": [
+        "pnpm",
+        "exec",
+        "tsc",
+        "--noEmit"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "types-base-2026-10-26T13-19-30.352Z.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:19:32.788Z",
+      "finishedAt": "2026-10-26T13:19:33.586Z",
+      "name": "types-concurrent",
+      "command": [
+        "pnpm",
+        "exec",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "lithentConcurrent/tsconfig.json"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "types-concurrent-2026-10-26T13-19-32.788Z.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:19:33.671Z",
+      "finishedAt": "2026-10-26T13:19:34.434Z",
+      "name": "types-e2e",
+      "command": [
+        "pnpm",
+        "exec",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "e2e/tsconfig.json"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "types-e2e-2026-10-26T13-19-33.671Z.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exitCode": 0
+    },
+    {
+      "startedAt": "2026-10-26T13:19:26.415Z",
+      "finishedAt": "2026-10-26T13:19:29.307Z",
+      "name": "verify-concurrent",
+      "command": [
+        "pnpm",
+        "verify:concurrent"
+      ],
+      "extra": {},
+      "node": "v24.11.1",
+      "head": "463c6cda2944cc597b9ff230ca0c972873c4b8d6",
+      "sources": {
+        "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+        "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "log": "verify-concurrent-2026-10-26T13-19-26.415Z.log",
+      "logSHA256": "1afa7c12724a094f41b162918c3870c75c684125392ba776f0835fe923038d0d",
+      "exitCode": 0
+    }
+  ],
+  "unitExecutionCounts": {
+    "full-tests": 974,
+    "satellites-concurrent": 172,
+    "ssr-base": 15
+  },
+  "existingSkipped": 3,
+  "playwright": {
+    "startTime": "2026-10-26T13:23:36.783Z",
+    "duration": 37381.627,
+    "expected": 78,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "playwrightRetries": 0,
+  "packageProbes": 18,
+  "nativeBaselineGoal": {
+    "main": {
+      "pass": 6,
+      "total": 9,
+      "items": [
+        {
+          "id": "01_run1k",
+          "baselineRatio": 1.0553145336225598
+        },
+        {
+          "id": "02_replace1k",
+          "baselineRatio": 0.9403403335809305
+        },
+        {
+          "id": "03_update10th1k_x16",
+          "baselineRatio": 1.1447646844217438
+        },
+        {
+          "id": "04_select1k",
+          "baselineRatio": 1.408530805687204
+        },
+        {
+          "id": "05_swap1k",
+          "baselineRatio": 1.1204787056227852
+        },
+        {
+          "id": "06_remove-one-1k",
+          "baselineRatio": 0.9748631159780985
+        },
+        {
+          "id": "07_create10k",
+          "baselineRatio": 0.9992745724487879
+        },
+        {
+          "id": "08_create1k-after1k_x2",
+          "baselineRatio": 1.0167997796750208
+        },
+        {
+          "id": "09_clear1k_x8",
+          "baselineRatio": 0.9301866622810624
+        }
+      ]
+    },
+    "reverse": {
+      "pass": 7,
+      "total": 9,
+      "items": [
+        {
+          "id": "01_run1k",
+          "baselineRatio": 1.0504208416833667
+        },
+        {
+          "id": "02_replace1k",
+          "baselineRatio": 0.9353593015446608
+        },
+        {
+          "id": "03_update10th1k_x16",
+          "baselineRatio": 1.0730032526201663
+        },
+        {
+          "id": "04_select1k",
+          "baselineRatio": 1.361947318908749
+        },
+        {
+          "id": "05_swap1k",
+          "baselineRatio": 1.1024917724494594
+        },
+        {
+          "id": "06_remove-one-1k",
+          "baselineRatio": 0.9618069815195072
+        },
+        {
+          "id": "07_create10k",
+          "baselineRatio": 1.0027936234316581
+        },
+        {
+          "id": "08_create1k-after1k_x2",
+          "baselineRatio": 1.0268449455195408
+        },
+        {
+          "id": "09_clear1k_x8",
+          "baselineRatio": 0.9036086607858861
+        }
+      ]
+    },
+    "pooled": {
+      "pass": 6,
+      "total": 9,
+      "items": [
+        {
+          "id": "01_run1k",
+          "baselineRatio": 1.051279998398751
+        },
+        {
+          "id": "02_replace1k",
+          "baselineRatio": 0.938981222398274
+        },
+        {
+          "id": "03_update10th1k_x16",
+          "baselineRatio": 1.1215401380312386
+        },
+        {
+          "id": "04_select1k",
+          "baselineRatio": 1.3957743153918791
+        },
+        {
+          "id": "05_swap1k",
+          "baselineRatio": 1.116478887365852
+        },
+        {
+          "id": "06_remove-one-1k",
+          "baselineRatio": 0.9680013195332151
+        },
+        {
+          "id": "07_create10k",
+          "baselineRatio": 1.0018685944017667
+        },
+        {
+          "id": "08_create1k-after1k_x2",
+          "baselineRatio": 1.0236239398413627
+        },
+        {
+          "id": "09_clear1k_x8",
+          "baselineRatio": 0.9147996596848033
+        }
+      ]
+    }
+  },
+  "preservation": {
+    "archives": [
+      {
+        "file": "comprehensive-evidence.tar.gz",
+        "bytes": 4039857,
+        "sha256": "fad30b5a6f92d76d385351420ad74992f8dd1b646337f534a4057a6fdaa10ad1",
+        "entries": 1401
+      },
+      {
+        "file": "comprehensive-traces-001.tar.gz",
+        "bytes": 6667653,
+        "sha256": "f3439e77cf8d8ff123adfebd55b3fab3714b4369cf9de5aaf747c5048716627e",
+        "entries": 159
+      },
+      {
+        "file": "comprehensive-traces-002.tar.gz",
+        "bytes": 7162862,
+        "sha256": "f7dd3f6d7476aaeb57c38db7a4034a39f55fa736fbd00c18917d8bccc3f53808",
+        "entries": 177
+      },
+      {
+        "file": "comprehensive-traces-003.tar.gz",
+        "bytes": 6514085,
+        "sha256": "30cc6cac3ce0955fe25f2776c7dd6d08fa909f5d83cd01c75a9ce67be3ef6541",
+        "entries": 156
+      },
+      {
+        "file": "comprehensive-traces-004.tar.gz",
+        "bytes": 6114947,
+        "sha256": "ae8e5d929183c5df0dab9d0e07fd9982f54a5c619bdefc862a7c5f7477eead79",
+        "entries": 133
+      },
+      {
+        "file": "comprehensive-traces-005.tar.gz",
+        "bytes": 6040191,
+        "sha256": "9961d7e8aab6dade2d3928c348ec30c94d4eec73aa991b8d7d6fe9685fd46ff0",
+        "entries": 131
+      },
+      {
+        "file": "comprehensive-traces-006.tar.gz",
+        "bytes": 6171265,
+        "sha256": "1b9efe8341caed8c5a4ddc448e6c3765c2c11d16292f517c944bbcdebe6fe306",
+        "entries": 136
+      },
+      {
+        "file": "comprehensive-traces-007.tar.gz",
+        "bytes": 7032427,
+        "sha256": "5fb381d5d66a3dbc520e8a01fc06e7b759110c17bdabd7fd70927693ca65f56d",
+        "entries": 167
+      },
+      {
+        "file": "comprehensive-traces-008.tar.gz",
+        "bytes": 7684214,
+        "sha256": "9be6c980263909d9e91749f60900610a781a76796171dd507ac2f669d7fd1320",
+        "entries": 196
+      },
+      {
+        "file": "comprehensive-traces-009.tar.gz",
+        "bytes": 6810046,
+        "sha256": "1673e83f73b7d49e22cfdd7e08c382fefb80aeb3d76da79d8e5ef102447a6760",
+        "entries": 165
+      },
+      {
+        "file": "comprehensive-traces-010.tar.gz",
+        "bytes": 6114878,
+        "sha256": "490eaaee96712967b57291133155b22e13e765ec7c41df4ef7751d9235e93372",
+        "entries": 133
+      },
+      {
+        "file": "comprehensive-traces-011.tar.gz",
+        "bytes": 6145446,
+        "sha256": "b3950e6b708c3678eab8912264603863e61d25124876830805fd02b37617434c",
+        "entries": 134
+      },
+      {
+        "file": "comprehensive-traces-012.tar.gz",
+        "bytes": 6320120,
+        "sha256": "a6d761ec09e45a80716e3228076d8d89dfdc5d623bc6811273d90fa46fc81d16",
+        "entries": 141
+      },
+      {
+        "file": "comprehensive-traces-013.tar.gz",
+        "bytes": 6302687,
+        "sha256": "f131eb347c19eea7d8b39cbd6523bd598d6060963fc3dc07fd689c4deafbce17",
+        "entries": 141
+      },
+      {
+        "file": "comprehensive-traces-014.tar.gz",
+        "bytes": 6335073,
+        "sha256": "7dfd3ec60171dbceca8a0ee730fc7fa70823ed72502bf4a3a93bd99dac167350",
+        "entries": 141
+      },
+      {
+        "file": "comprehensive-traces-015.tar.gz",
+        "bytes": 6352622,
+        "sha256": "60262a410e8a39b8d496a461176ebda02a979427ff3d5def8777c1869171d472",
+        "entries": 142
+      },
+      {
+        "file": "comprehensive-traces-016.tar.gz",
+        "bytes": 6231096,
+        "sha256": "ea86b7a20d07b1f142b65f8bc07d3284786fee14f5cc35037a77085587870a77",
+        "entries": 143
+      },
+      {
+        "file": "comprehensive-traces-017.tar.gz",
+        "bytes": 6276294,
+        "sha256": "d7e8b34d3b954530f5b9df41bdbbc6145ccf22154aabdf57931385250d5f7482",
+        "entries": 140
+      },
+      {
+        "file": "comprehensive-traces-018.tar.gz",
+        "bytes": 6130587,
+        "sha256": "de62cb53952d1ae4ac3f0e1d9425aac2fc04d87a303967bb61f5878329cb9fcd",
+        "entries": 131
+      },
+      {
+        "file": "comprehensive-traces-019.tar.gz",
+        "bytes": 6162888,
+        "sha256": "2bea3b92ff0e6416971755561924676da3e5b6f0518ebd5f0eac642a6fea0d62",
+        "entries": 132
+      },
+      {
+        "file": "comprehensive-traces-020.tar.gz",
+        "bytes": 6310314,
+        "sha256": "588335c7736a6d932c872bb93deecbe3793ca1224debdca214902739745bf530",
+        "entries": 140
+      },
+      {
+        "file": "comprehensive-traces-021.tar.gz",
+        "bytes": 6287579,
+        "sha256": "f2c42da69720cc71ad18bd248afab194eac7ac94167843f94c1eebddbc61d9f9",
+        "entries": 140
+      },
+      {
+        "file": "comprehensive-traces-022.tar.gz",
+        "bytes": 6300674,
+        "sha256": "0f1deeeb8f14290db8c3ba30383d0211ec4d203c2f055910c41de5427bc44d19",
+        "entries": 144
+      },
+      {
+        "file": "comprehensive-traces-023.tar.gz",
+        "bytes": 6318973,
+        "sha256": "95e6d865dc6523cb71edac3bcb934e84189ffc1d21d2aa57e25a18235a130302",
+        "entries": 142
+      },
+      {
+        "file": "comprehensive-traces-024.tar.gz",
+        "bytes": 6205569,
+        "sha256": "75b9f8666f0bd99932ca10de8b546ca7bf3053516638163aef068dc51ebb65d8",
+        "entries": 137
+      },
+      {
+        "file": "comprehensive-traces-025.tar.gz",
+        "bytes": 6170440,
+        "sha256": "cd03553f740a96d74be9f3d383bae50c998f32ade3f720a00ec2e80f58dedc66",
+        "entries": 133
+      },
+      {
+        "file": "comprehensive-traces-026.tar.gz",
+        "bytes": 6808263,
+        "sha256": "47585918a250cc482e1bccdbcfdeb2e7610ae3c6d52d63d17a915f1f31907b67",
+        "entries": 154
+      },
+      {
+        "file": "comprehensive-traces-027.tar.gz",
+        "bytes": 7618239,
+        "sha256": "ab5fbc0ad2512584acfccb453b1db8a214e7320cef261f102ea885f1c742a4fb",
+        "entries": 192
+      },
+      {
+        "file": "comprehensive-traces-028.tar.gz",
+        "bytes": 6778065,
+        "sha256": "db46b7636dcac083dd4df9178aeeaf4cd0962fd55ca0dbf47724384815ec793c",
+        "entries": 160
+      },
+      {
+        "file": "comprehensive-traces-029.tar.gz",
+        "bytes": 6152109,
+        "sha256": "ce6a9176c369212255060c56dd7d429b7742775edc823ca63fff18d6359703da",
+        "entries": 135
+      },
+      {
+        "file": "comprehensive-traces-030.tar.gz",
+        "bytes": 6269938,
+        "sha256": "20844d0e70d125bbc67020ee29f3906caaaa2b79b3f1efb836ce92d23cd6f99a",
+        "entries": 141
+      },
+      {
+        "file": "comprehensive-traces-031.tar.gz",
+        "bytes": 6250661,
+        "sha256": "7648ab70e7751941c7811be610e41506aa618958b38c2d569021165ff3790c1b",
+        "entries": 140
+      },
+      {
+        "file": "comprehensive-traces-032.tar.gz",
+        "bytes": 6150392,
+        "sha256": "fa51fa3d1804a2451f804c2cfd4ac834b5ea8358fbc039cb8c32c75ba3e4bbad",
+        "entries": 134
+      },
+      {
+        "file": "comprehensive-traces-033.tar.gz",
+        "bytes": 6042609,
+        "sha256": "e292e791a5543c2d971eaa9f5399ce23c887578f9fdb90a28523fe24a4e4c4ad",
+        "entries": 126
+      },
+      {
+        "file": "comprehensive-traces-034.tar.gz",
+        "bytes": 6162273,
+        "sha256": "b80fb2ebf9139091c84dab85fe999aedf6f9e273305b9a57e53e541f2399d33d",
+        "entries": 131
+      },
+      {
+        "file": "comprehensive-traces-035.tar.gz",
+        "bytes": 6285553,
+        "sha256": "78b20d219450a261e9c513bb8cbbb15fb2e4cc45e1c2eb7292258ca8a2ca764d",
+        "entries": 139
+      },
+      {
+        "file": "comprehensive-traces-036.tar.gz",
+        "bytes": 6333626,
+        "sha256": "55eab2908007ea234f2ebe2884599d88fa9b4c9de1f9b882845c1e35d7d26333",
+        "entries": 142
+      },
+      {
+        "file": "comprehensive-traces-037.tar.gz",
+        "bytes": 6274752,
+        "sha256": "59eac5f44f1b44e88a63f0c6819f3b9cc85e1a151b6c7ad87fd7ba808a5d46df",
+        "entries": 144
+      },
+      {
+        "file": "comprehensive-traces-038.tar.gz",
+        "bytes": 6357328,
+        "sha256": "808ae372a1ea95211070d3177bb5b0fb6562b217b25537df8c9ef8bdedff85b0",
+        "entries": 142
+      },
+      {
+        "file": "comprehensive-traces-039.tar.gz",
+        "bytes": 6367005,
+        "sha256": "a4cbd287c0b61310aa90a1e6697e033225c23bdf6df2a3f817722927a279509e",
+        "entries": 138
+      },
+      {
+        "file": "comprehensive-traces-040.tar.gz",
+        "bytes": 6234979,
+        "sha256": "20e60a30b2eafcaa193beee72c92a29cb0cd4180a66314d4f3477efd405d9017",
+        "entries": 135
+      },
+      {
+        "file": "comprehensive-traces-041.tar.gz",
+        "bytes": 6231368,
+        "sha256": "5eceff53821070f0082ad340c169bf5c02c8718bd1885312ad31ed61e1ce90bd",
+        "entries": 137
+      },
+      {
+        "file": "comprehensive-traces-042.tar.gz",
+        "bytes": 6144410,
+        "sha256": "9672037fe36e4828e4ab7476fdb48d206b83db29b2e5fdfab55e2574e96ffa74",
+        "entries": 134
+      },
+      {
+        "file": "comprehensive-traces-043.tar.gz",
+        "bytes": 6285462,
+        "sha256": "2fbbfc07ccb27c8e4d5e4f9266571ab7a22105ba530a45d6333247e454954f16",
+        "entries": 144
+      },
+      {
+        "file": "comprehensive-traces-044.tar.gz",
+        "bytes": 6384591,
+        "sha256": "7ac291aabfc1e2c274d4bc12709fc4b3a615e4659dc2bc459804e73093f522af",
+        "entries": 143
+      },
+      {
+        "file": "comprehensive-traces-045.tar.gz",
+        "bytes": 6357924,
+        "sha256": "1696bf77f8c40913e377371058f89df1d5aaa54a8a32c9b4066e24a629605217",
+        "entries": 139
+      },
+      {
+        "file": "comprehensive-traces-046.tar.gz",
+        "bytes": 6293226,
+        "sha256": "53c196165d589e78a0e76b39de590e4110a798f3a2a4bbaab0d3823eeeda959e",
+        "entries": 137
+      },
+      {
+        "file": "comprehensive-traces-047.tar.gz",
+        "bytes": 6217044,
+        "sha256": "ebe70f11f9a618a3161f7e496cc8bb49303ccad7ad4bdd8e5fe79f18a1ad8828",
+        "entries": 139
+      },
+      {
+        "file": "comprehensive-traces-048.tar.gz",
+        "bytes": 6196580,
+        "sha256": "8ce7377664ae3789d73de15cb4eb916e3c06b8ab8c50784fa3a6af0afa8915cf",
+        "entries": 139
+      },
+      {
+        "file": "comprehensive-traces-049.tar.gz",
+        "bytes": 6288962,
+        "sha256": "c72cf313e703b1a3f0c1f1547b46b41fb5dba3ff86600131d3babd8ffe444c5b",
+        "entries": 143
+      },
+      {
+        "file": "comprehensive-traces-050.tar.gz",
+        "bytes": 6299893,
+        "sha256": "9571b0c250374ba7fc140e4ffba05d676f3cecc49b373345cfb9f26a30e26f0e",
+        "entries": 141
+      },
+      {
+        "file": "comprehensive-traces-051.tar.gz",
+        "bytes": 6130256,
+        "sha256": "f14ab5cf79649cd0d4f8e162807cd6aaec953875249606b50617b0aff74d7aa2",
+        "entries": 133
+      },
+      {
+        "file": "comprehensive-traces-052.tar.gz",
+        "bytes": 6064526,
+        "sha256": "cd80e5227f6316ab67868c169faa724b12b0184228d0e6b14cde301c2524a748",
+        "entries": 128
+      },
+      {
+        "file": "comprehensive-traces-053.tar.gz",
+        "bytes": 7136119,
+        "sha256": "14493b506de369c9eb3a403ad6ba13b778e31a315f7bec2d7be4017d7a3b7968",
+        "entries": 162
+      },
+      {
+        "file": "comprehensive-traces-054.tar.gz",
+        "bytes": 7936813,
+        "sha256": "f20144e24e541b78336762855979a556dd9f8bb4a608d809bda8f4bf9c6ee441",
+        "entries": 193
+      },
+      {
+        "file": "comprehensive-traces-055.tar.gz",
+        "bytes": 1842398,
+        "sha256": "5bacff4f793f1660a830f96fc8b44c803cba48ee88a768eda2d8ba9e4b1c2868",
+        "entries": 45
+      }
+    ],
+    "archiveCount": 56,
+    "bytes": 352098151,
+    "manifestSHA256": "60317d590af3750413a549eb841f106b22b2aa046ea879b564eb506f9fad9448",
+    "historicalScriptsAndRawDataUnchanged": true
+  },
+  "reusedResultsSHA256": "7058ffb4392cb8d8050f9d5d2d46252a55b1dce24be0cf4cf3a7c43f9ac6bc37",
+  "complete": true,
+  "evidence": {
+    "file": "native-events-evidence.tar.gz",
+    "bytes": 301894,
+    "sha256": "6e398c1db684dd96a132ffcf3058e7e6bfc86fed90650a0d5df68fa1264b71d5",
+    "entries": {
+      "repo/README.md": {
+        "bytes": 8185,
+        "sha256": "4d86937181a523e1d5fb646de8645e236409fe28443295f3a95ccb0269c4f971"
+      },
+      "repo/dist/lithent.cjs": {
+        "bytes": 12606,
+        "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820"
+      },
+      "repo/dist/lithent.mjs": {
+        "bytes": 18868,
+        "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e"
+      },
+      "repo/dist/lithent.umd.js": {
+        "bytes": 12759,
+        "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+      },
+      "repo/docs/benchmark/NATIVE_EVENTS_RESULTS.md": {
+        "bytes": 7962,
+        "sha256": "f1222319272199a9de32dfcad69c870a92bc0e9ea94b79d824deea3d7d14a947"
+      },
+      "repo/docs/performance-improvement/BOTTLENECK_ANALYSIS.md": {
+        "bytes": 8021,
+        "sha256": "5735bbb99db26b74606071b97c79c42514fd8fb04622164cb5d8ebdf8b1908e8"
+      },
+      "repo/docs/performance-improvement/CODE_WALKTHROUGH.md": {
+        "bytes": 23662,
+        "sha256": "773f3394276ee835b1877f299acfb1a8df839a1404baaf115dc2a8bab38ad2c4"
+      },
+      "repo/docs/performance-improvement/DESIGN.md": {
+        "bytes": 83256,
+        "sha256": "d6460092903e9c6c9d8159823b86f842c9e9558bfc70ead87b1b4a4b68ec0777"
+      },
+      "repo/docs/performance-improvement/IMPLEMENT.md": {
+        "bytes": 56319,
+        "sha256": "c7d0b5dfa0f3471411aa5f9d3dbfe2e34b00153293bd7253868aabdd02c54055"
+      },
+      "repo/docs/performance-improvement/MANUAL_TEST_CHECKLIST.md": {
+        "bytes": 35869,
+        "sha256": "66eeec90a621eda1cdfac41e8e1d63d18e5cb71db99f8226c444f63eb7fe0e0e"
+      },
+      "repo/docs/performance-improvement/REQUIREMENTS.md": {
+        "bytes": 47446,
+        "sha256": "1a3f8cdee792879dfefebc314206dc2058c8ac59adbba9f6dc52eb03754b17d1"
+      },
+      "repo/e2e/events.spec.ts": {
+        "bytes": 3978,
+        "sha256": "70ac27cb74de67846ee6f585b6f4ba8d4ace4df6af24ee4bdec0821ac5600490"
+      },
+      "repo/e2e/fixtures/events.ts": {
+        "bytes": 4442,
+        "sha256": "32970707dba93ecff7574654c949a5f0d407757223fd9886aefa80414b18e676"
+      },
+      "repo/experiments/native-events/README.md": {
+        "bytes": 2296,
+        "sha256": "6420f65df89893c4c97dbf9f04f6f143fb1e845d5dc91d5281d58593ab3b7fc5"
+      },
+      "repo/experiments/native-events/compare-proxy.mjs": {
+        "bytes": 2251,
+        "sha256": "11957098d6ec772ecee1d0fb5cb3f4d65c4de4f46f3a53cbac5a23479f168638"
+      },
+      "repo/experiments/native-events/finalize.py": {
+        "bytes": 8171,
+        "sha256": "d425596d3bb95653ea27918a54ba553f32b7f03ff44f8cb66cfa16339eb15990"
+      },
+      "repo/experiments/native-events/packages.mjs": {
+        "bytes": 9378,
+        "sha256": "c9a788925212f3d376b84f129a7164e534b7b5527d814c13b6fdbf64daf8ca63"
+      },
+      "repo/experiments/native-events/verify.mjs": {
+        "bytes": 5487,
+        "sha256": "bece6a7a3f252e0be3392271ce8da190ee1e3f14693f04a4e1a31318f6d80c31"
+      },
+      "repo/lithent-agent-addon.md": {
+        "bytes": 7401,
+        "sha256": "c6d16ea67da2aa59012d51aaf952672135227f41a1f142cda5cacef1e6e8b89e"
+      },
+      "repo/lithentConcurrent/dist/lithentConcurrent.cjs": {
+        "bytes": 18358,
+        "sha256": "218f069c7acaca3d490f7ab04395977dde6c14c07614d91abc96d0a6d7f3c4cb"
+      },
+      "repo/lithentConcurrent/dist/lithentConcurrent.mjs": {
+        "bytes": 27645,
+        "sha256": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c"
+      },
+      "repo/lithentConcurrent/dist/lithentConcurrent.umd.js": {
+        "bytes": 18419,
+        "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0"
+      },
+      "repo/lithentConcurrent/src/diff.ts": {
+        "bytes": 17580,
+        "sha256": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8"
+      },
+      "repo/lithentConcurrent/src/index.ts": {
+        "bytes": 1140,
+        "sha256": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb"
+      },
+      "repo/lithentConcurrent/src/render.ts": {
+        "bytes": 27480,
+        "sha256": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75"
+      },
+      "repo/lithentConcurrent/src/renderGate.ts": {
+        "bytes": 567,
+        "sha256": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4"
+      },
+      "repo/lithentConcurrent/src/scheduler.ts": {
+        "bytes": 12962,
+        "sha256": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1"
+      },
+      "repo/lithentConcurrent/src/tests/concurrent-portalEvents.test.ts": {
+        "bytes": 3722,
+        "sha256": "9b778e9b7d15458e9e50820bbccd15a063d3220a5d8f2c86fd3293b4e4fd0906"
+      },
+      "repo/lithentConcurrent/src/wDom.ts": {
+        "bytes": 29731,
+        "sha256": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c"
+      },
+      "repo/scripts/size-report.js": {
+        "bytes": 2155,
+        "sha256": "3fe12aa642e7a1be251e4773e2a3d5c6b1abc4f267a0861a4b421b5180965705"
+      },
+      "repo/skills/lithent/SKILL.md": {
+        "bytes": 10607,
+        "sha256": "95f10b18077d3f6e317d0e24ebde668653addfbe4e9109aab16412efca0049f7"
+      },
+      "repo/skills/lithent/reference/events.md": {
+        "bytes": 3472,
+        "sha256": "f9335bbc45cc7b2531c47fe15c3304dd7a4ee0db5e2cde3d6400189741784ef8"
+      },
+      "repo/src/diff.ts": {
+        "bytes": 9895,
+        "sha256": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29"
+      },
+      "repo/src/hook/internal/unmount.ts": {
+        "bytes": 1517,
+        "sha256": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4"
+      },
+      "repo/src/hook/internal/useUpdate.ts": {
+        "bytes": 1306,
+        "sha256": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed"
+      },
+      "repo/src/hook/mountCallback.ts": {
+        "bytes": 1225,
+        "sha256": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d"
+      },
+      "repo/src/hook/mountReadyCallback.ts": {
+        "bytes": 1044,
+        "sha256": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12"
+      },
+      "repo/src/hook/ref.ts": {
+        "bytes": 113,
+        "sha256": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a"
+      },
+      "repo/src/hook/updateCallback.ts": {
+        "bytes": 687,
+        "sha256": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664"
+      },
+      "repo/src/hook/useRenew.ts": {
+        "bytes": 426,
+        "sha256": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000"
+      },
+      "repo/src/index.ts": {
+        "bytes": 1060,
+        "sha256": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e"
+      },
+      "repo/src/render.ts": {
+        "bytes": 21783,
+        "sha256": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc"
+      },
+      "repo/src/tests/core-eventContract.test.ts": {
+        "bytes": 7594,
+        "sha256": "93e6ae6c6b49a487f7d38a06985814658eb17a3b9426cf77c2d9e8d422be2e47"
+      },
+      "repo/src/tests/core-eventDispatch.test.ts": {
+        "bytes": 4390,
+        "sha256": "ff88d1797cfe8a93b8e23800d8cf2e8e4aba8e4550007e3c3c816820a561ba14"
+      },
+      "repo/src/tests/core-portal-events.test.ts": {
+        "bytes": 5312,
+        "sha256": "deaf20131e2f698f71efcb4fb999f99eb0287f321c329867f0b8e3bff485bf5c"
+      },
+      "repo/src/types/index.ts": {
+        "bytes": 3328,
+        "sha256": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c"
+      },
+      "repo/src/utils/createWDom.ts": {
+        "bytes": 547,
+        "sha256": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c"
+      },
+      "repo/src/utils/index.ts": {
+        "bytes": 1335,
+        "sha256": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120"
+      },
+      "repo/src/utils/predicator.ts": {
+        "bytes": 5352,
+        "sha256": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d"
+      },
+      "repo/src/utils/redraw.ts": {
+        "bytes": 1771,
+        "sha256": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3"
+      },
+      "repo/src/utils/universalRef.ts": {
+        "bytes": 2092,
+        "sha256": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34"
+      },
+      "repo/src/wDom.ts": {
+        "bytes": 13222,
+        "sha256": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+      },
+      "run/artifacts.json": {
+        "bytes": 4605,
+        "sha256": "d20b675c549b82ecb17578884267307b2a1b946f678c1d76c46e6c68a2166c50"
+      },
+      "run/full-build-2026-10-26T13-17-58.096Z.json": {
+        "bytes": 2703,
+        "sha256": "5bea82599870296c753bd8460c163b4c35c096771417da4d926b31e7e58a2c16"
+      },
+      "run/full-build-2026-10-26T13-17-58.096Z.log": {
+        "bytes": 23203,
+        "sha256": "eb9d26d1a1f855e6f4bb1510889e83fc2b3ecbc55e7356adefd2c2c449ba1426"
+      },
+      "run/full-tests-2026-10-26T13-19-25.134Z.json": {
+        "bytes": 2702,
+        "sha256": "934779dcc4b463391843b35f2cc08fc33c4d0cb356130093d95c4365af5ef670"
+      },
+      "run/full-tests-2026-10-26T13-19-25.134Z.log": {
+        "bytes": 135810,
+        "sha256": "79746d723cdcbbf6160b58256c9abf94dff9bdb6510a6b96a0724e9a065f32f5"
+      },
+      "run/lint-2026-10-26T13-19-34.519Z.json": {
+        "bytes": 2856,
+        "sha256": "b183ad215a46b193e99ba58b598639dae721835410f2ee9b3526e2b63aab375f"
+      },
+      "run/lint-2026-10-26T13-19-34.519Z.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/package-formats-2026-10-26T13-23-31.688Z.json": {
+        "bytes": 2822,
+        "sha256": "6e27cc9509116b414f976cddafd162ab08723c093e8a2543f1161640eead6133"
+      },
+      "run/package-formats-2026-10-26T13-23-31.688Z.log": {
+        "bytes": 71,
+        "sha256": "6c7c4bf1dcea3724a6b9f054e6335abbab2ca6bdf734e6603a28d1a0d93875d6"
+      },
+      "run/packages.json": {
+        "bytes": 10569,
+        "sha256": "778acc7fd27d069fbcbaad4e0ab02421af43bdabbad272e684bcca95ff1a5f64"
+      },
+      "run/playwright-2026-10-26T13-23-36.384Z.json": {
+        "bytes": 2861,
+        "sha256": "310d60b2f6a485398701ea7676d1decb23c29970eafebda4f9e6a622b3238a39"
+      },
+      "run/playwright-2026-10-26T13-23-36.384Z.log": {
+        "bytes": 11879,
+        "sha256": "3a0e71ff25b87389977ca11a04fcbcbdf1329c5f987f944a88b669db1f2f7875"
+      },
+      "run/playwright.json": {
+        "bytes": 89064,
+        "sha256": "4361e1e072bb574ef87dcccf3f97d530179da70e4103a700ed6e934a1cd8dcd8"
+      },
+      "run/preservation.json": {
+        "bytes": 10897,
+        "sha256": "406fe541da3bece52fbd61262b49f2da0d2c83d40b6f09c0bcc459f5b780d5d6"
+      },
+      "run/previous-proxy/lithent.cjs": {
+        "bytes": 13098,
+        "sha256": "6632c90c646f5695824dfb2caaf7bd59b9f85c18a36b6de5c56087246854d776"
+      },
+      "run/previous-proxy/lithent.mjs": {
+        "bytes": 19531,
+        "sha256": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45"
+      },
+      "run/previous-proxy/lithent.umd.js": {
+        "bytes": 13252,
+        "sha256": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2"
+      },
+      "run/previous-proxy/lithentConcurrent.cjs": {
+        "bytes": 18853,
+        "sha256": "11db27ee2a98082f2fb5819a008430d23a51430f3726e9117938a6c08cd85066"
+      },
+      "run/previous-proxy/lithentConcurrent.mjs": {
+        "bytes": 28315,
+        "sha256": "5ec069e06ff94766bae858cdbe113cebea9eb45801526ecb467a9d943fa9f39c"
+      },
+      "run/previous-proxy/lithentConcurrent.umd.js": {
+        "bytes": 18914,
+        "sha256": "6c540d468240bed97bc8053f22e38c9dbd62bd1dfd3aa7a3cb6e01e0f8e8b6ff"
+      },
+      "run/same-compressor-proxy.json": {
+        "bytes": 1119,
+        "sha256": "fdb4a693cd02cb6e1bcfffaa009dc23eaa4b312378c4addd2f182adae5e202ac"
+      },
+      "run/satellites-concurrent-2026-10-26T13-20-39.408Z.json": {
+        "bytes": 2782,
+        "sha256": "5a0e57aee4740d8d6b3a0a5a55635f79682ebf0001ed1c4418573dd963f6c912"
+      },
+      "run/satellites-concurrent-2026-10-26T13-20-39.408Z.log": {
+        "bytes": 23961,
+        "sha256": "dcc32c0b5c42ada361ccd9270944e6e6f9bc84b3ac9da0d5747c43237cea1d82"
+      },
+      "run/size-2026-10-26T13-19-29.417Z.json": {
+        "bytes": 2690,
+        "sha256": "f528da3044fe055db858a90c0114723644625e1154c89c93595b1d1c9b98bab9"
+      },
+      "run/size-2026-10-26T13-19-29.417Z.log": {
+        "bytes": 466,
+        "sha256": "83a51150b0d36baa14ade46534ac04ede0689ad681517fa0929e2625cc56a8b2"
+      },
+      "run/ssr-base-2026-10-26T13-20-37.152Z.json": {
+        "bytes": 2733,
+        "sha256": "25144aaf32c8ae1bf680440f35185d57afa08265350346e486a8971ba797eebb"
+      },
+      "run/ssr-base-2026-10-26T13-20-37.152Z.log": {
+        "bytes": 2191,
+        "sha256": "a55a3250e7564e4fd0e87225ca4dc1fcc3260ad36ee47d506b0b4bb5e21c3760"
+      },
+      "run/summary.json": {
+        "bytes": 56690,
+        "sha256": "ee07ca0b01240c9af2d1f3b3824ab11562fe0d5680fdd7aca704421186ff7340"
+      },
+      "run/types-base-2026-10-26T13-19-30.352Z.json": {
+        "bytes": 2729,
+        "sha256": "ae6cfae45ee24f95b29ae94594640850dcc1119a74740c9f21a3f4a975ef1e73"
+      },
+      "run/types-base-2026-10-26T13-19-30.352Z.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/types-concurrent-2026-10-26T13-19-32.788Z.json": {
+        "bytes": 2790,
+        "sha256": "8df76a3a767d6196b2ddc80e497059e71e77510117c1dfa096e7268cdf6704c7"
+      },
+      "run/types-concurrent-2026-10-26T13-19-32.788Z.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/types-e2e-2026-10-26T13-19-33.671Z.json": {
+        "bytes": 2762,
+        "sha256": "dba0c870fdecd06de57933740775ddfab3268a4c7ed428ee2a4fc6b8f271a026"
+      },
+      "run/types-e2e-2026-10-26T13-19-33.671Z.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "run/verify-concurrent-2026-10-26T13-19-26.415Z.json": {
+        "bytes": 2729,
+        "sha256": "1d0d7068d1f6140e08e60efe36a4feed65327c34316e9cb4315780af23953461"
+      },
+      "run/verify-concurrent-2026-10-26T13-19-26.415Z.log": {
+        "bytes": 742,
+        "sha256": "1afa7c12724a094f41b162918c3870c75c684125392ba776f0835fe923038d0d"
+      }
+    }
+  }
+}

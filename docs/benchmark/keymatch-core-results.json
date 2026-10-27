@@ -1,0 +1,4332 @@
+{
+  "date": "2026-10-20T11:47:55.808Z",
+  "decision": "not-adopted-no-overall-gain",
+  "environment": {
+    "node": "v20.3.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "build": {
+    "lithent-before": {
+      "date": "2026-10-20T06:38:24.698Z",
+      "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+      "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+      "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+      "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+      "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+      "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+      "vite": "5.4.21"
+    },
+    "lithent": {
+      "date": "2026-10-20T06:38:24.793Z",
+      "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+      "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+      "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+      "core": "0c7e3bc665d24f3703d48310540dca358f61445ef80fc2695e0051b07305ea98",
+      "coreOrigin": "local-unreleased",
+      "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+      "bundle": "9924e91972a605bdbec777f70471b5e52c4c358ca6c5ccae3c75807cf205361d",
+      "vite": "5.4.21"
+    }
+  },
+  "browser": {
+    "binary": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/MacOS/Google Chrome",
+    "binarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+    "frameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7"
+  },
+  "limitations": [
+    "Non-isolated machine; repeated directions inform adoption, not statistical significance.",
+    "CPU timings use the base core with the original upstream app; concurrent correctness and builds were checked separately.",
+    "Failed whole batches were retried and excluded from completed samples; details remain in runs.*.failedBatches.",
+    "No additional memory or retention measurements after the CPU adoption gate failed."
+  ],
+  "weights": [
+    0.64280248137063,
+    0.5607178150466176,
+    0.5643800750716564,
+    0.1925635870170522,
+    0.13200612879341714,
+    0.5277091212292658,
+    0.5644449600965534,
+    0.5508359820582848,
+    0.4225836631419211
+  ],
+  "main": [
+    {
+      "name": "lithent-before",
+      "id": "01_run1k",
+      "count": 15,
+      "total": 27.601,
+      "script": 8.185,
+      "paint": 18.848
+    },
+    {
+      "name": "lithent",
+      "id": "01_run1k",
+      "count": 15,
+      "total": 27.362,
+      "script": 8.1,
+      "paint": 18.758
+    },
+    {
+      "name": "lithent",
+      "id": "09_clear1k_x8",
+      "count": 15,
+      "total": 13.578,
+      "script": 10.568,
+      "paint": 1.694
+    },
+    {
+      "name": "lithent-before",
+      "id": "09_clear1k_x8",
+      "count": 15,
+      "total": 11.902,
+      "script": 9.409,
+      "paint": 1.389
+    },
+    {
+      "name": "lithent-before",
+      "id": "03_update10th1k_x16",
+      "count": 15,
+      "total": 18.968,
+      "script": 6.347,
+      "paint": 10.123
+    },
+    {
+      "name": "lithent",
+      "id": "03_update10th1k_x16",
+      "count": 15,
+      "total": 19.674,
+      "script": 6.391,
+      "paint": 10.735
+    },
+    {
+      "name": "lithent",
+      "id": "05_swap1k",
+      "count": 15,
+      "total": 18.861,
+      "script": 3.676,
+      "paint": 14.319
+    },
+    {
+      "name": "lithent-before",
+      "id": "05_swap1k",
+      "count": 15,
+      "total": 17.848,
+      "script": 3.586,
+      "paint": 12.825
+    },
+    {
+      "name": "lithent-before",
+      "id": "04_select1k",
+      "count": 25,
+      "total": 7.584,
+      "script": 4.482,
+      "paint": 2.27
+    },
+    {
+      "name": "lithent",
+      "id": "04_select1k",
+      "count": 25,
+      "total": 7.617,
+      "script": 4.371,
+      "paint": 2.617
+    },
+    {
+      "name": "lithent",
+      "id": "06_remove-one-1k",
+      "count": 15,
+      "total": 12.255,
+      "script": 1.174,
+      "paint": 10.294
+    },
+    {
+      "name": "lithent-before",
+      "id": "06_remove-one-1k",
+      "count": 15,
+      "total": 12.064,
+      "script": 1.197,
+      "paint": 10.031
+    },
+    {
+      "name": "lithent-before",
+      "id": "02_replace1k",
+      "count": 15,
+      "total": 30.796,
+      "script": 11.461,
+      "paint": 18.705
+    },
+    {
+      "name": "lithent",
+      "id": "02_replace1k",
+      "count": 15,
+      "total": 31.177,
+      "script": 11.616,
+      "paint": 18.936
+    },
+    {
+      "name": "lithent",
+      "id": "08_create1k-after1k_x2",
+      "count": 15,
+      "total": 31.025,
+      "script": 7.997,
+      "paint": 22.084
+    },
+    {
+      "name": "lithent-before",
+      "id": "08_create1k-after1k_x2",
+      "count": 15,
+      "total": 30.458,
+      "script": 7.957,
+      "paint": 21.472
+    },
+    {
+      "name": "lithent-before",
+      "id": "07_create10k",
+      "count": 15,
+      "total": 286.435,
+      "script": 63.455,
+      "paint": 214.062
+    },
+    {
+      "name": "lithent",
+      "id": "07_create10k",
+      "count": 15,
+      "total": 286.142,
+      "script": 63.401,
+      "paint": 214.665
+    }
+  ],
+  "comparison": {
+    "ratios": [
+      {
+        "id": "01_run1k",
+        "total": 0.9913408934458896,
+        "script": 0.9896151496640194
+      },
+      {
+        "id": "02_replace1k",
+        "total": 1.0123717365891673,
+        "script": 1.0135241252944769
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "total": 1.0372205820328975,
+        "script": 1.0069324090121317
+      },
+      {
+        "id": "04_select1k",
+        "total": 1.0043512658227849,
+        "script": 0.9752342704149933
+      },
+      {
+        "id": "05_swap1k",
+        "total": 1.0567570596145228,
+        "script": 1.0250976017847184
+      },
+      {
+        "id": "06_remove-one-1k",
+        "total": 1.015832228116711,
+        "script": 0.9807852965747702
+      },
+      {
+        "id": "07_create10k",
+        "total": 0.9989770803149056,
+        "script": 0.9991490032306359
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "total": 1.0186157988049116,
+        "script": 1.0050270202337563
+      },
+      {
+        "id": "09_clear1k_x8",
+        "total": 1.1408166694673165,
+        "script": 1.1231799341056434
+      }
+    ],
+    "weightedRatio": {
+      "total": 1.0252278961062826,
+      "script": 1.0107101073984281
+    }
+  },
+  "reverse": [
+    {
+      "name": "lithent",
+      "id": "01_run1k",
+      "count": 15,
+      "total": 27.694,
+      "script": 8.429,
+      "paint": 18.889
+    },
+    {
+      "name": "lithent-before",
+      "id": "01_run1k",
+      "count": 15,
+      "total": 27.275,
+      "script": 8.221,
+      "paint": 18.557
+    },
+    {
+      "name": "lithent-before",
+      "id": "09_clear1k_x8",
+      "count": 15,
+      "total": 11.656,
+      "script": 9.227,
+      "paint": 1.232
+    },
+    {
+      "name": "lithent",
+      "id": "09_clear1k_x8",
+      "count": 15,
+      "total": 12.17,
+      "script": 9.651,
+      "paint": 1.331
+    },
+    {
+      "name": "lithent",
+      "id": "03_update10th1k_x16",
+      "count": 15,
+      "total": 19.081,
+      "script": 6.294,
+      "paint": 10.586
+    },
+    {
+      "name": "lithent-before",
+      "id": "03_update10th1k_x16",
+      "count": 15,
+      "total": 18.825,
+      "script": 6.376,
+      "paint": 10.866
+    },
+    {
+      "name": "lithent-before",
+      "id": "05_swap1k",
+      "count": 15,
+      "total": 17.372,
+      "script": 3.588,
+      "paint": 12.811
+    },
+    {
+      "name": "lithent",
+      "id": "05_swap1k",
+      "count": 15,
+      "total": 18.742,
+      "script": 3.964,
+      "paint": 13.501
+    },
+    {
+      "name": "lithent",
+      "id": "04_select1k",
+      "count": 25,
+      "total": 7.823,
+      "script": 4.411,
+      "paint": 2.64
+    },
+    {
+      "name": "lithent-before",
+      "id": "04_select1k",
+      "count": 25,
+      "total": 7.958,
+      "script": 4.513,
+      "paint": 2.582
+    },
+    {
+      "name": "lithent-before",
+      "id": "06_remove-one-1k",
+      "count": 15,
+      "total": 12.625,
+      "script": 1.259,
+      "paint": 10.533
+    },
+    {
+      "name": "lithent",
+      "id": "06_remove-one-1k",
+      "count": 15,
+      "total": 12.526,
+      "script": 1.226,
+      "paint": 10.503
+    },
+    {
+      "name": "lithent",
+      "id": "02_replace1k",
+      "count": 15,
+      "total": 31.472,
+      "script": 11.664,
+      "paint": 19.225
+    },
+    {
+      "name": "lithent-before",
+      "id": "02_replace1k",
+      "count": 15,
+      "total": 31.334,
+      "script": 11.678,
+      "paint": 19.122
+    },
+    {
+      "name": "lithent-before",
+      "id": "08_create1k-after1k_x2",
+      "count": 15,
+      "total": 31.407,
+      "script": 8.053,
+      "paint": 22.222
+    },
+    {
+      "name": "lithent",
+      "id": "08_create1k-after1k_x2",
+      "count": 15,
+      "total": 30.835,
+      "script": 7.933,
+      "paint": 21.766
+    },
+    {
+      "name": "lithent",
+      "id": "07_create10k",
+      "count": 15,
+      "total": 287.688,
+      "script": 64.289,
+      "paint": 215.648
+    },
+    {
+      "name": "lithent-before",
+      "id": "07_create10k",
+      "count": 15,
+      "total": 288.058,
+      "script": 64.192,
+      "paint": 216.338
+    }
+  ],
+  "reverseComparison": {
+    "ratios": [
+      {
+        "id": "01_run1k",
+        "total": 1.0153620531622365,
+        "script": 1.0253010582654178
+      },
+      {
+        "id": "02_replace1k",
+        "total": 1.0044041616135828,
+        "script": 0.9988011645829764
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "total": 1.0135989375830012,
+        "script": 0.9871392722710162
+      },
+      {
+        "id": "04_select1k",
+        "total": 0.9830359386780598,
+        "script": 0.9773986261910037
+      },
+      {
+        "id": "05_swap1k",
+        "total": 1.0788625374165324,
+        "script": 1.10479375696767
+      },
+      {
+        "id": "06_remove-one-1k",
+        "total": 0.9921584158415842,
+        "script": 0.9737887212073074
+      },
+      {
+        "id": "07_create10k",
+        "total": 0.998715536454464,
+        "script": 1.0015110917248256
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "total": 0.9817874996019996,
+        "script": 0.9850987209735501
+      },
+      {
+        "id": "09_clear1k_x8",
+        "total": 1.0440974605353466,
+        "script": 1.0459520971063183
+      }
+    ],
+    "weightedRatio": {
+      "total": 1.007203182485892,
+      "script": 1.0034663244677322
+    }
+  },
+  "pooled": [
+    {
+      "name": "lithent-before",
+      "id": "01_run1k",
+      "count": 30,
+      "total": 27.4655,
+      "script": 8.203,
+      "paint": 18.6725
+    },
+    {
+      "name": "lithent",
+      "id": "01_run1k",
+      "count": 30,
+      "total": 27.547,
+      "script": 8.281500000000001,
+      "paint": 18.759999999999998
+    },
+    {
+      "name": "lithent",
+      "id": "09_clear1k_x8",
+      "count": 30,
+      "total": 12.747499999999999,
+      "script": 10.0115,
+      "paint": 1.516
+    },
+    {
+      "name": "lithent-before",
+      "id": "09_clear1k_x8",
+      "count": 30,
+      "total": 11.745,
+      "script": 9.282,
+      "paint": 1.3325
+    },
+    {
+      "name": "lithent-before",
+      "id": "03_update10th1k_x16",
+      "count": 30,
+      "total": 18.8965,
+      "script": 6.3615,
+      "paint": 10.292
+    },
+    {
+      "name": "lithent",
+      "id": "03_update10th1k_x16",
+      "count": 30,
+      "total": 19.1905,
+      "script": 6.3134999999999994,
+      "paint": 10.718499999999999
+    },
+    {
+      "name": "lithent",
+      "id": "05_swap1k",
+      "count": 30,
+      "total": 18.8495,
+      "script": 3.7505,
+      "paint": 13.616
+    },
+    {
+      "name": "lithent-before",
+      "id": "05_swap1k",
+      "count": 30,
+      "total": 17.584,
+      "script": 3.5869999999999997,
+      "paint": 12.818
+    },
+    {
+      "name": "lithent-before",
+      "id": "04_select1k",
+      "count": 50,
+      "total": 7.8255,
+      "script": 4.500500000000001,
+      "paint": 2.3595
+    },
+    {
+      "name": "lithent",
+      "id": "04_select1k",
+      "count": 50,
+      "total": 7.67,
+      "script": 4.391,
+      "paint": 2.624
+    },
+    {
+      "name": "lithent",
+      "id": "06_remove-one-1k",
+      "count": 30,
+      "total": 12.472000000000001,
+      "script": 1.214,
+      "paint": 10.4625
+    },
+    {
+      "name": "lithent-before",
+      "id": "06_remove-one-1k",
+      "count": 30,
+      "total": 12.123000000000001,
+      "script": 1.2025000000000001,
+      "paint": 10.246500000000001
+    },
+    {
+      "name": "lithent-before",
+      "id": "02_replace1k",
+      "count": 30,
+      "total": 30.933,
+      "script": 11.537500000000001,
+      "paint": 18.8495
+    },
+    {
+      "name": "lithent",
+      "id": "02_replace1k",
+      "count": 30,
+      "total": 31.265,
+      "script": 11.6495,
+      "paint": 19.0915
+    },
+    {
+      "name": "lithent",
+      "id": "08_create1k-after1k_x2",
+      "count": 30,
+      "total": 30.917,
+      "script": 7.9704999999999995,
+      "paint": 21.822
+    },
+    {
+      "name": "lithent-before",
+      "id": "08_create1k-after1k_x2",
+      "count": 30,
+      "total": 31.1175,
+      "script": 8.019,
+      "paint": 22.0415
+    },
+    {
+      "name": "lithent-before",
+      "id": "07_create10k",
+      "count": 30,
+      "total": 286.9495,
+      "script": 63.946,
+      "paint": 215.45600000000002
+    },
+    {
+      "name": "lithent",
+      "id": "07_create10k",
+      "count": 30,
+      "total": 287.2905,
+      "script": 64.065,
+      "paint": 215.212
+    }
+  ],
+  "pooledComparison": {
+    "ratios": [
+      {
+        "id": "01_run1k",
+        "total": 1.002967359050445,
+        "script": 1.0095696696330614
+      },
+      {
+        "id": "02_replace1k",
+        "total": 1.0107328742766626,
+        "script": 1.0097074756229685
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "total": 1.0155584367475459,
+        "script": 0.9924546097618485
+      },
+      {
+        "id": "04_select1k",
+        "total": 0.9801290652354482,
+        "script": 0.9756693700699921
+      },
+      {
+        "id": "05_swap1k",
+        "total": 1.0719688353048225,
+        "script": 1.0455812656816281
+      },
+      {
+        "id": "06_remove-one-1k",
+        "total": 1.0287882537325745,
+        "script": 1.0095634095634094
+      },
+      {
+        "id": "07_create10k",
+        "total": 1.0011883624122015,
+        "script": 1.0018609451724894
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "total": 0.9935566803245762,
+        "script": 0.9939518643222346
+      },
+      {
+        "id": "09_clear1k_x8",
+        "total": 1.0853554704129416,
+        "script": 1.0785929756517991
+      }
+    ],
+    "weightedRatio": {
+      "total": 1.0166380983613166,
+      "script": 1.0104211320322396
+    }
+  },
+  "memory": null,
+  "sizes": {
+    "before": [
+      {
+        "file": "dist/lithent.umd.js",
+        "raw": 12741,
+        "gzip": 5178,
+        "br": 4798,
+        "sha256": "1b64873b03874d40999175c2244c84fea27aff6994764ff918f197b30c050773"
+      },
+      {
+        "file": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+        "raw": 18419,
+        "gzip": 7489,
+        "br": 6903,
+        "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0"
+      }
+    ],
+    "after": [
+      {
+        "file": "dist/lithent.umd.js",
+        "raw": 12736,
+        "gzip": 5176,
+        "br": 4793,
+        "sha256": "9ae8833c70d4c36fe8c26a7c828d88a84257a847a13bc619c8012f7f969e5a40"
+      },
+      {
+        "file": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+        "raw": 18414,
+        "gzip": 7490,
+        "br": 6903,
+        "sha256": "6bfecd11681336fe05e6659a935f995937fb4e1ad620ebea7840bb1b49620549"
+      }
+    ]
+  },
+  "runs": {
+    "cpu": {
+      "startedAt": "2026-10-20T06:39:42.628Z",
+      "mode": "cpu",
+      "chrome": "Chrome/155.0.8059.85",
+      "chromeBinaryPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/MacOS/Google Chrome",
+      "chromeBinarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "chromeFrameworkPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/Current/Google Chrome Framework",
+      "chromeFrameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7",
+      "machine": {
+        "cpu": "Apple M4 Pro",
+        "cores": 12,
+        "memoryGB": 24
+      },
+      "loadStart": [
+        6.2900390625,
+        5.14990234375,
+        3.65087890625
+      ],
+      "alternatingOrder": true,
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-20T06:38:24.698Z",
+          "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+          "vite": "5.4.21"
+        },
+        "lithent": {
+          "date": "2026-10-20T06:38:24.793Z",
+          "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "0c7e3bc665d24f3703d48310540dca358f61445ef80fc2695e0051b07305ea98",
+          "coreOrigin": "local-unreleased",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "9924e91972a605bdbec777f70471b5e52c4c358ca6c5ccae3c75807cf205361d",
+          "vite": "5.4.21"
+        }
+      },
+      "versions": {
+        "lithent": "1.25.2",
+        "vite": "5.4.21"
+      },
+      "samples": [
+        {
+          "name": "lithent-before",
+          "id": "01_run1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 27.565,
+              "script": 8.101,
+              "paint": 18.915
+            },
+            {
+              "total": 27.123,
+              "script": 7.954,
+              "paint": 18.628
+            },
+            {
+              "total": 26.971,
+              "script": 8.066,
+              "paint": 18.369
+            },
+            {
+              "total": 27.794,
+              "script": 8.185,
+              "paint": 19.05
+            },
+            {
+              "total": 27.509,
+              "script": 8.229,
+              "paint": 18.724
+            },
+            {
+              "total": 27.422,
+              "script": 8.056,
+              "paint": 18.851
+            },
+            {
+              "total": 27.897,
+              "script": 8.367,
+              "paint": 18.995
+            },
+            {
+              "total": 27.621,
+              "script": 8.34,
+              "paint": 18.718
+            },
+            {
+              "total": 27.588,
+              "script": 8.602,
+              "paint": 18.448
+            },
+            {
+              "total": 27.601,
+              "script": 8.387,
+              "paint": 18.689
+            },
+            {
+              "total": 28.676,
+              "script": 8.705,
+              "paint": 19.428
+            },
+            {
+              "total": 28.427,
+              "script": 9.025,
+              "paint": 18.848
+            },
+            {
+              "total": 27.535,
+              "script": 8.175,
+              "paint": 18.814
+            },
+            {
+              "total": 27.981,
+              "script": 8.153,
+              "paint": 19.243
+            },
+            {
+              "total": 27.932,
+              "script": 8.056,
+              "paint": 19.335
+            }
+          ],
+          "load": [
+            5.6064453125,
+            5.06103515625,
+            3.66064453125
+          ],
+          "finishedAt": "2026-10-20T06:40:07.596Z"
+        },
+        {
+          "name": "lithent",
+          "id": "01_run1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 28.06,
+              "script": 7.998,
+              "paint": 19.528
+            },
+            {
+              "total": 27.881,
+              "script": 7.909,
+              "paint": 19.395
+            },
+            {
+              "total": 27.627,
+              "script": 8.378,
+              "paint": 18.718
+            },
+            {
+              "total": 26.869,
+              "script": 7.917,
+              "paint": 18.412
+            },
+            {
+              "total": 27.903,
+              "script": 8.46,
+              "paint": 18.917
+            },
+            {
+              "total": 27.247,
+              "script": 7.927,
+              "paint": 18.762
+            },
+            {
+              "total": 27.222,
+              "script": 7.894,
+              "paint": 18.822
+            },
+            {
+              "total": 27.042,
+              "script": 8.072,
+              "paint": 18.45
+            },
+            {
+              "total": 27.319,
+              "script": 8.114,
+              "paint": 18.643
+            },
+            {
+              "total": 27.684,
+              "script": 8.1,
+              "paint": 19.028
+            },
+            {
+              "total": 27.5,
+              "script": 8.189,
+              "paint": 18.758
+            },
+            {
+              "total": 27.825,
+              "script": 8.767,
+              "paint": 18.505
+            },
+            {
+              "total": 27.095,
+              "script": 7.773,
+              "paint": 18.798
+            },
+            {
+              "total": 27.35,
+              "script": 8.366,
+              "paint": 18.454
+            },
+            {
+              "total": 27.362,
+              "script": 8.228,
+              "paint": 18.595
+            }
+          ],
+          "load": [
+            4.2177734375,
+            4.7802734375,
+            3.59228515625
+          ],
+          "finishedAt": "2026-10-20T06:40:30.558Z"
+        },
+        {
+          "name": "lithent",
+          "id": "09_clear1k_x8",
+          "warnings": [],
+          "result": [
+            {
+              "total": 13.048,
+              "script": 10.568,
+              "paint": 0.883
+            },
+            {
+              "total": 14.358,
+              "script": 11.73,
+              "paint": 0.722
+            },
+            {
+              "total": 13.578,
+              "script": 10.601,
+              "paint": 2.296
+            },
+            {
+              "total": 15.661,
+              "script": 12.442,
+              "paint": 2.141
+            },
+            {
+              "total": 12.58,
+              "script": 10.143,
+              "paint": 0.931
+            },
+            {
+              "total": 12.684,
+              "script": 9.669,
+              "paint": 1.064
+            },
+            {
+              "total": 13.913,
+              "script": 11.156,
+              "paint": 1.952
+            },
+            {
+              "total": 12.929,
+              "script": 10.534,
+              "paint": 1.804
+            },
+            {
+              "total": 14.329,
+              "script": 11.411,
+              "paint": 1.694
+            },
+            {
+              "total": 14.203,
+              "script": 10.548,
+              "paint": 1.752
+            },
+            {
+              "total": 14.308,
+              "script": 11.482,
+              "paint": 2.512
+            },
+            {
+              "total": 13.095,
+              "script": 10.042,
+              "paint": 1.57
+            },
+            {
+              "total": 14.829,
+              "script": 11.933,
+              "paint": 1.489
+            },
+            {
+              "total": 12.484,
+              "script": 9.896,
+              "paint": 1.387
+            },
+            {
+              "total": 12.131,
+              "script": 9.65,
+              "paint": 1.908
+            }
+          ],
+          "load": [
+            3.232421875,
+            4.49365234375,
+            3.52197265625
+          ],
+          "finishedAt": "2026-10-20T06:40:54.637Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "09_clear1k_x8",
+          "warnings": [],
+          "result": [
+            {
+              "total": 12.992,
+              "script": 10.015,
+              "paint": 1.513
+            },
+            {
+              "total": 11.649,
+              "script": 9.462,
+              "paint": 1.271
+            },
+            {
+              "total": 11.822,
+              "script": 9.409,
+              "paint": 1.071
+            },
+            {
+              "total": 11.902,
+              "script": 8.955,
+              "paint": 1.318
+            },
+            {
+              "total": 10.901,
+              "script": 8.379,
+              "paint": 1.982
+            },
+            {
+              "total": 12.49,
+              "script": 9.689,
+              "paint": 1.58
+            },
+            {
+              "total": 12.116,
+              "script": 9.089,
+              "paint": 0.657
+            },
+            {
+              "total": 13.172,
+              "script": 10.36,
+              "paint": 2.213
+            },
+            {
+              "total": 14.802,
+              "script": 12.018,
+              "paint": 2.469
+            },
+            {
+              "total": 11.394,
+              "script": 9.247,
+              "paint": 0.649
+            },
+            {
+              "total": 11.303,
+              "script": 8.626,
+              "paint": 0.99
+            },
+            {
+              "total": 12.891,
+              "script": 10.256,
+              "paint": 1.046
+            },
+            {
+              "total": 11.537,
+              "script": 8.802,
+              "paint": 1.505
+            },
+            {
+              "total": 12.944,
+              "script": 10.244,
+              "paint": 1.389
+            },
+            {
+              "total": 11.191,
+              "script": 8.7,
+              "paint": 1.526
+            }
+          ],
+          "load": [
+            2.8408203125,
+            4.29345703125,
+            3.47705078125
+          ],
+          "finishedAt": "2026-10-20T06:41:18.874Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "03_update10th1k_x16",
+          "warnings": [],
+          "result": [
+            {
+              "total": 20.19,
+              "script": 6.249,
+              "paint": 12.044
+            },
+            {
+              "total": 19.105,
+              "script": 6.668,
+              "paint": 9.913
+            },
+            {
+              "total": 17.408,
+              "script": 5.896,
+              "paint": 9.106
+            },
+            {
+              "total": 18.968,
+              "script": 6.347,
+              "paint": 10.593
+            },
+            {
+              "total": 17.611,
+              "script": 6.16,
+              "paint": 9.556
+            },
+            {
+              "total": 19.386,
+              "script": 6.764,
+              "paint": 10.228
+            },
+            {
+              "total": 16.902,
+              "script": 6.064,
+              "paint": 9.553
+            },
+            {
+              "total": 18.265,
+              "script": 6.821,
+              "paint": 9.908
+            },
+            {
+              "total": 17.548,
+              "script": 6.021,
+              "paint": 9.523
+            },
+            {
+              "total": 18.29,
+              "script": 5.574,
+              "paint": 10.123
+            },
+            {
+              "total": 20.342,
+              "script": 5.969,
+              "paint": 11.958
+            },
+            {
+              "total": 17.789,
+              "script": 6.389,
+              "paint": 9.023
+            },
+            {
+              "total": 19.245,
+              "script": 6.481,
+              "paint": 10.25
+            },
+            {
+              "total": 19.13,
+              "script": 6.648,
+              "paint": 10.746
+            },
+            {
+              "total": 22.95,
+              "script": 7.131,
+              "paint": 12.991
+            }
+          ],
+          "load": [
+            3.21240234375,
+            4.275390625,
+            3.48876953125
+          ],
+          "finishedAt": "2026-10-20T06:41:40.335Z"
+        },
+        {
+          "name": "lithent",
+          "id": "03_update10th1k_x16",
+          "warnings": [],
+          "result": [
+            {
+              "total": 18.378,
+              "script": 6.248,
+              "paint": 10.431
+            },
+            {
+              "total": 19.047,
+              "script": 6.13,
+              "paint": 10.735
+            },
+            {
+              "total": 17.955,
+              "script": 6.527,
+              "paint": 10.03
+            },
+            {
+              "total": 20.671,
+              "script": 5.467,
+              "paint": 12.906
+            },
+            {
+              "total": 23.5,
+              "script": 6.485,
+              "paint": 13.104
+            },
+            {
+              "total": 18.155,
+              "script": 6.746,
+              "paint": 10.105
+            },
+            {
+              "total": 25.044,
+              "script": 6.466,
+              "paint": 14.584
+            },
+            {
+              "total": 22.243,
+              "script": 6.391,
+              "paint": 13.076
+            },
+            {
+              "total": 17.201,
+              "script": 5.964,
+              "paint": 9.954
+            },
+            {
+              "total": 18.473,
+              "script": 5.692,
+              "paint": 10.702
+            },
+            {
+              "total": 18.587,
+              "script": 6.596,
+              "paint": 9.695
+            },
+            {
+              "total": 21.104,
+              "script": 6.827,
+              "paint": 11.092
+            },
+            {
+              "total": 21.103,
+              "script": 6.356,
+              "paint": 11.815
+            },
+            {
+              "total": 24.452,
+              "script": 6.4,
+              "paint": 15.128
+            },
+            {
+              "total": 19.674,
+              "script": 6.247,
+              "paint": 10.639
+            }
+          ],
+          "load": [
+            2.7353515625,
+            4.07568359375,
+            3.43896484375
+          ],
+          "finishedAt": "2026-10-20T06:42:01.799Z"
+        },
+        {
+          "name": "lithent",
+          "id": "05_swap1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 20.476,
+              "script": 3.836,
+              "paint": 15.418
+            },
+            {
+              "total": 20.465,
+              "script": 3.676,
+              "paint": 14.756
+            },
+            {
+              "total": 16.602,
+              "script": 3.355,
+              "paint": 11.993
+            },
+            {
+              "total": 20.374,
+              "script": 4.138,
+              "paint": 14.531
+            },
+            {
+              "total": 16.573,
+              "script": 3.301,
+              "paint": 12.117
+            },
+            {
+              "total": 18.861,
+              "script": 3.96,
+              "paint": 13.604
+            },
+            {
+              "total": 18.754,
+              "script": 3.744,
+              "paint": 13.206
+            },
+            {
+              "total": 18.689,
+              "script": 3.792,
+              "paint": 13.557
+            },
+            {
+              "total": 17.285,
+              "script": 3.676,
+              "paint": 12.172
+            },
+            {
+              "total": 19.117,
+              "script": 3.073,
+              "paint": 14.459
+            },
+            {
+              "total": 20.785,
+              "script": 4.329,
+              "paint": 14.844
+            },
+            {
+              "total": 18.838,
+              "script": 3.287,
+              "paint": 14.676
+            },
+            {
+              "total": 20.318,
+              "script": 4.355,
+              "paint": 13.891
+            },
+            {
+              "total": 20.076,
+              "script": 3.336,
+              "paint": 15.07
+            },
+            {
+              "total": 18.404,
+              "script": 3.093,
+              "paint": 14.319
+            }
+          ],
+          "load": [
+            3.34423828125,
+            4.13330078125,
+            3.47412109375
+          ],
+          "finishedAt": "2026-10-20T06:42:24.624Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "05_swap1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 17.604,
+              "script": 3.378,
+              "paint": 12.825
+            },
+            {
+              "total": 18.83,
+              "script": 3.481,
+              "paint": 13.877
+            },
+            {
+              "total": 15.995,
+              "script": 3.082,
+              "paint": 11.901
+            },
+            {
+              "total": 19.96,
+              "script": 4.088,
+              "paint": 14.092
+            },
+            {
+              "total": 23.504,
+              "script": 4.123,
+              "paint": 16.761
+            },
+            {
+              "total": 21.966,
+              "script": 3.482,
+              "paint": 15.721
+            },
+            {
+              "total": 19.669,
+              "script": 4.079,
+              "paint": 13.995
+            },
+            {
+              "total": 17.848,
+              "script": 3.753,
+              "paint": 12.69
+            },
+            {
+              "total": 17.407,
+              "script": 3.698,
+              "paint": 12.614
+            },
+            {
+              "total": 21.068,
+              "script": 3.743,
+              "paint": 15.475
+            },
+            {
+              "total": 16.686,
+              "script": 3.481,
+              "paint": 12.011
+            },
+            {
+              "total": 17.564,
+              "script": 3.586,
+              "paint": 12.309
+            },
+            {
+              "total": 16.369,
+              "script": 3.227,
+              "paint": 12.279
+            },
+            {
+              "total": 17.868,
+              "script": 3.154,
+              "paint": 13.26
+            },
+            {
+              "total": 17.553,
+              "script": 3.608,
+              "paint": 12.766
+            }
+          ],
+          "load": [
+            3.240234375,
+            4.05517578125,
+            3.46484375
+          ],
+          "finishedAt": "2026-10-20T06:42:46.849Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "04_select1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 7.804,
+              "script": 4.184,
+              "paint": 3.689
+            },
+            {
+              "total": 7.868,
+              "script": 4.595,
+              "paint": 2.995
+            },
+            {
+              "total": 8.059,
+              "script": 4.967,
+              "paint": 2.142
+            },
+            {
+              "total": 6.989,
+              "script": 3.849,
+              "paint": 2.71
+            },
+            {
+              "total": 6.257,
+              "script": 4.052,
+              "paint": 2.073
+            },
+            {
+              "total": 7.165,
+              "script": 5.004,
+              "paint": 1.357
+            },
+            {
+              "total": 8.582,
+              "script": 5.019,
+              "paint": 2.335
+            },
+            {
+              "total": 8.736,
+              "script": 3.866,
+              "paint": 2.021
+            },
+            {
+              "total": 7.574,
+              "script": 4.843,
+              "paint": 2.136
+            },
+            {
+              "total": 7.059,
+              "script": 3.895,
+              "paint": 1.875
+            },
+            {
+              "total": 8.675,
+              "script": 5.086,
+              "paint": 2.343
+            },
+            {
+              "total": 11.177,
+              "script": 5.301,
+              "paint": 3.558
+            },
+            {
+              "total": 7.46,
+              "script": 4.127,
+              "paint": 1.857
+            },
+            {
+              "total": 8.858,
+              "script": 5.477,
+              "paint": 1.735
+            },
+            {
+              "total": 7.196,
+              "script": 4.591,
+              "paint": 2.051
+            },
+            {
+              "total": 6.96,
+              "script": 4.377,
+              "paint": 1.969
+            },
+            {
+              "total": 8.767,
+              "script": 4.95,
+              "paint": 3.015
+            },
+            {
+              "total": 7.785,
+              "script": 4.657,
+              "paint": 2.119
+            },
+            {
+              "total": 7.108,
+              "script": 4.021,
+              "paint": 1.625
+            },
+            {
+              "total": 7.377,
+              "script": 4.558,
+              "paint": 2.287
+            },
+            {
+              "total": 7.172,
+              "script": 3.91,
+              "paint": 2.274
+            },
+            {
+              "total": 6.713,
+              "script": 3.947,
+              "paint": 2.27
+            },
+            {
+              "total": 8.335,
+              "script": 4.482,
+              "paint": 3.666
+            },
+            {
+              "total": 8.483,
+              "script": 4.439,
+              "paint": 3.023
+            },
+            {
+              "total": 7.584,
+              "script": 3.871,
+              "paint": 2.717
+            }
+          ],
+          "load": [
+            2.93115234375,
+            3.91748046875,
+            3.435546875
+          ],
+          "finishedAt": "2026-10-20T06:43:21.366Z"
+        },
+        {
+          "name": "lithent",
+          "id": "04_select1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 7.328,
+              "script": 3.968,
+              "paint": 2.675
+            },
+            {
+              "total": 10.421,
+              "script": 4.523,
+              "paint": 1.846
+            },
+            {
+              "total": 9.72,
+              "script": 4.819,
+              "paint": 3.738
+            },
+            {
+              "total": 9.032,
+              "script": 4.48,
+              "paint": 3.686
+            },
+            {
+              "total": 6.968,
+              "script": 3.899,
+              "paint": 2.903
+            },
+            {
+              "total": 7.747,
+              "script": 3.67,
+              "paint": 3.067
+            },
+            {
+              "total": 6.877,
+              "script": 3.967,
+              "paint": 2.153
+            },
+            {
+              "total": 6.589,
+              "script": 3.589,
+              "paint": 2.848
+            },
+            {
+              "total": 7.755,
+              "script": 4.8,
+              "paint": 2.525
+            },
+            {
+              "total": 7.599,
+              "script": 4.371,
+              "paint": 2.81
+            },
+            {
+              "total": 7.512,
+              "script": 4.71,
+              "paint": 2.53
+            },
+            {
+              "total": 9.129,
+              "script": 4.548,
+              "paint": 2.617
+            },
+            {
+              "total": 10.587,
+              "script": 4.656,
+              "paint": 3.836
+            },
+            {
+              "total": 7.365,
+              "script": 3.978,
+              "paint": 2.427
+            },
+            {
+              "total": 7.23,
+              "script": 4.103,
+              "paint": 2.625
+            },
+            {
+              "total": 7.587,
+              "script": 4.486,
+              "paint": 1.818
+            },
+            {
+              "total": 7.212,
+              "script": 3.682,
+              "paint": 2.256
+            },
+            {
+              "total": 7.657,
+              "script": 4.721,
+              "paint": 2.603
+            },
+            {
+              "total": 6.348,
+              "script": 3.958,
+              "paint": 1.686
+            },
+            {
+              "total": 7.198,
+              "script": 4.788,
+              "paint": 1.689
+            },
+            {
+              "total": 9.633,
+              "script": 4.106,
+              "paint": 4.158
+            },
+            {
+              "total": 8.837,
+              "script": 5.604,
+              "paint": 1.939
+            },
+            {
+              "total": 8.721,
+              "script": 4.068,
+              "paint": 3.417
+            },
+            {
+              "total": 7.617,
+              "script": 4.021,
+              "paint": 2.866
+            },
+            {
+              "total": 8.097,
+              "script": 4.731,
+              "paint": 2.164
+            }
+          ],
+          "load": [
+            4.02197265625,
+            4.384765625,
+            3.91552734375
+          ],
+          "finishedAt": "2026-10-20T06:50:13.816Z"
+        },
+        {
+          "name": "lithent",
+          "id": "06_remove-one-1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 15.632,
+              "script": 1.304,
+              "paint": 13.076
+            },
+            {
+              "total": 11.83,
+              "script": 1.084,
+              "paint": 9.859
+            },
+            {
+              "total": 12.027,
+              "script": 1.115,
+              "paint": 9.988
+            },
+            {
+              "total": 12.484,
+              "script": 1.39,
+              "paint": 10.497
+            },
+            {
+              "total": 12.607,
+              "script": 1.223,
+              "paint": 10.523
+            },
+            {
+              "total": 14.634,
+              "script": 2.085,
+              "paint": 11.226
+            },
+            {
+              "total": 13.719,
+              "script": 1.224,
+              "paint": 11.452
+            },
+            {
+              "total": 12.255,
+              "script": 1.174,
+              "paint": 10.263
+            },
+            {
+              "total": 11.573,
+              "script": 1.116,
+              "paint": 9.943
+            },
+            {
+              "total": 12.248,
+              "script": 1.153,
+              "paint": 10.23
+            },
+            {
+              "total": 11.422,
+              "script": 1.124,
+              "paint": 9.988
+            },
+            {
+              "total": 12.115,
+              "script": 1.162,
+              "paint": 10.285
+            },
+            {
+              "total": 12.427,
+              "script": 1.215,
+              "paint": 10.586
+            },
+            {
+              "total": 12.68,
+              "script": 1.424,
+              "paint": 10.596
+            },
+            {
+              "total": 12.078,
+              "script": 1.106,
+              "paint": 10.294
+            }
+          ],
+          "load": [
+            3.73388671875,
+            4.30029296875,
+            3.8994140625
+          ],
+          "finishedAt": "2026-10-20T06:50:35.303Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "06_remove-one-1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 11.658,
+              "script": 1.45,
+              "paint": 9.607
+            },
+            {
+              "total": 11.281,
+              "script": 1.106,
+              "paint": 9.596
+            },
+            {
+              "total": 11.737,
+              "script": 1.093,
+              "paint": 9.69
+            },
+            {
+              "total": 12.064,
+              "script": 1.095,
+              "paint": 10.383
+            },
+            {
+              "total": 12.134,
+              "script": 1.422,
+              "paint": 10.161
+            },
+            {
+              "total": 12.078,
+              "script": 1.648,
+              "paint": 9.692
+            },
+            {
+              "total": 12.265,
+              "script": 1.282,
+              "paint": 10.247
+            },
+            {
+              "total": 12.112,
+              "script": 1.148,
+              "paint": 10.512
+            },
+            {
+              "total": 12.181,
+              "script": 1.182,
+              "paint": 10.351
+            },
+            {
+              "total": 12.136,
+              "script": 1.346,
+              "paint": 9.774
+            },
+            {
+              "total": 12.051,
+              "script": 1.445,
+              "paint": 9.991
+            },
+            {
+              "total": 11.646,
+              "script": 1.139,
+              "paint": 9.911
+            },
+            {
+              "total": 11.746,
+              "script": 1.123,
+              "paint": 10.031
+            },
+            {
+              "total": 14.109,
+              "script": 1.197,
+              "paint": 12.192
+            },
+            {
+              "total": 11.896,
+              "script": 1.208,
+              "paint": 10.246
+            }
+          ],
+          "load": [
+            3.97998046875,
+            4.30029296875,
+            3.9072265625
+          ],
+          "finishedAt": "2026-10-20T06:50:56.807Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "02_replace1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 30.548,
+              "script": 11.441,
+              "paint": 18.538
+            },
+            {
+              "total": 30.866,
+              "script": 11.425,
+              "paint": 18.858
+            },
+            {
+              "total": 30.57,
+              "script": 11.446,
+              "paint": 18.573
+            },
+            {
+              "total": 30.259,
+              "script": 11.281,
+              "paint": 18.384
+            },
+            {
+              "total": 33.189,
+              "script": 11.881,
+              "paint": 20.679
+            },
+            {
+              "total": 30.796,
+              "script": 11.461,
+              "paint": 18.766
+            },
+            {
+              "total": 30.652,
+              "script": 11.474,
+              "paint": 18.571
+            },
+            {
+              "total": 30.444,
+              "script": 11.418,
+              "paint": 18.439
+            },
+            {
+              "total": 30.374,
+              "script": 11.401,
+              "paint": 18.427
+            },
+            {
+              "total": 30.813,
+              "script": 11.508,
+              "paint": 18.705
+            },
+            {
+              "total": 30.912,
+              "script": 11.498,
+              "paint": 18.841
+            },
+            {
+              "total": 30.806,
+              "script": 11.393,
+              "paint": 18.861
+            },
+            {
+              "total": 31.269,
+              "script": 11.667,
+              "paint": 19.024
+            },
+            {
+              "total": 30.524,
+              "script": 11.547,
+              "paint": 18.416
+            },
+            {
+              "total": 31.304,
+              "script": 11.677,
+              "paint": 19.063
+            }
+          ],
+          "load": [
+            3.20751953125,
+            4.1015625,
+            3.8447265625
+          ],
+          "finishedAt": "2026-10-20T06:51:19.184Z"
+        },
+        {
+          "name": "lithent",
+          "id": "02_replace1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 30.832,
+              "script": 11.5,
+              "paint": 18.78
+            },
+            {
+              "total": 30.402,
+              "script": 11.478,
+              "paint": 18.372
+            },
+            {
+              "total": 30.787,
+              "script": 11.448,
+              "paint": 18.793
+            },
+            {
+              "total": 30.855,
+              "script": 11.592,
+              "paint": 18.687
+            },
+            {
+              "total": 31.313,
+              "script": 11.756,
+              "paint": 18.979
+            },
+            {
+              "total": 31.034,
+              "script": 11.614,
+              "paint": 18.845
+            },
+            {
+              "total": 31.177,
+              "script": 11.786,
+              "paint": 18.795
+            },
+            {
+              "total": 31.687,
+              "script": 11.616,
+              "paint": 19.454
+            },
+            {
+              "total": 32.474,
+              "script": 12.012,
+              "paint": 19.8
+            },
+            {
+              "total": 30.835,
+              "script": 11.716,
+              "paint": 18.534
+            },
+            {
+              "total": 31.35,
+              "script": 11.491,
+              "paint": 19.246
+            },
+            {
+              "total": 33.569,
+              "script": 12.119,
+              "paint": 20.643
+            },
+            {
+              "total": 31.204,
+              "script": 11.716,
+              "paint": 18.936
+            },
+            {
+              "total": 33.23,
+              "script": 12.155,
+              "paint": 20.426
+            },
+            {
+              "total": 31.147,
+              "script": 11.611,
+              "paint": 18.971
+            }
+          ],
+          "load": [
+            2.8046875,
+            3.9326171875,
+            3.7900390625
+          ],
+          "finishedAt": "2026-10-20T06:51:41.803Z"
+        },
+        {
+          "name": "lithent",
+          "id": "08_create1k-after1k_x2",
+          "warnings": [],
+          "result": [
+            {
+              "total": 30.572,
+              "script": 7.951,
+              "paint": 21.647
+            },
+            {
+              "total": 30.661,
+              "script": 8.005,
+              "paint": 21.694
+            },
+            {
+              "total": 33.105,
+              "script": 7.908,
+              "paint": 23.935
+            },
+            {
+              "total": 31.025,
+              "script": 7.955,
+              "paint": 22.084
+            },
+            {
+              "total": 31.043,
+              "script": 7.858,
+              "paint": 22.104
+            },
+            {
+              "total": 33.222,
+              "script": 8.482,
+              "paint": 23.455
+            },
+            {
+              "total": 31.267,
+              "script": 8.095,
+              "paint": 22.261
+            },
+            {
+              "total": 31.192,
+              "script": 7.997,
+              "paint": 22.227
+            },
+            {
+              "total": 31.069,
+              "script": 7.996,
+              "paint": 22.105
+            },
+            {
+              "total": 30.415,
+              "script": 7.9,
+              "paint": 21.629
+            },
+            {
+              "total": 33.112,
+              "script": 8.328,
+              "paint": 23.805
+            },
+            {
+              "total": 30.927,
+              "script": 8.341,
+              "paint": 21.653
+            },
+            {
+              "total": 30.962,
+              "script": 8.071,
+              "paint": 21.982
+            },
+            {
+              "total": 30.598,
+              "script": 8.042,
+              "paint": 21.673
+            },
+            {
+              "total": 30.697,
+              "script": 7.986,
+              "paint": 21.784
+            }
+          ],
+          "load": [
+            2.533203125,
+            3.7763671875,
+            3.736328125
+          ],
+          "finishedAt": "2026-10-20T06:52:05.869Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "08_create1k-after1k_x2",
+          "warnings": [],
+          "result": [
+            {
+              "total": 30.3,
+              "script": 8.048,
+              "paint": 21.352
+            },
+            {
+              "total": 30.458,
+              "script": 7.935,
+              "paint": 21.561
+            },
+            {
+              "total": 30.67,
+              "script": 8.343,
+              "paint": 21.417
+            },
+            {
+              "total": 30.535,
+              "script": 8.166,
+              "paint": 21.464
+            },
+            {
+              "total": 30.416,
+              "script": 7.9,
+              "paint": 21.582
+            },
+            {
+              "total": 30.509,
+              "script": 7.91,
+              "paint": 21.668
+            },
+            {
+              "total": 30.296,
+              "script": 7.917,
+              "paint": 21.458
+            },
+            {
+              "total": 30.261,
+              "script": 8.111,
+              "paint": 21.224
+            },
+            {
+              "total": 33.013,
+              "script": 8.116,
+              "paint": 23.658
+            },
+            {
+              "total": 29.965,
+              "script": 7.842,
+              "paint": 21.211
+            },
+            {
+              "total": 30.275,
+              "script": 7.961,
+              "paint": 21.428
+            },
+            {
+              "total": 30.231,
+              "script": 7.841,
+              "paint": 21.472
+            },
+            {
+              "total": 31.914,
+              "script": 7.953,
+              "paint": 22.606
+            },
+            {
+              "total": 33.202,
+              "script": 8.378,
+              "paint": 23.708
+            },
+            {
+              "total": 31.212,
+              "script": 7.957,
+              "paint": 22.319
+            }
+          ],
+          "load": [
+            2.310546875,
+            3.630859375,
+            3.68505859375
+          ],
+          "finishedAt": "2026-10-20T06:52:30.591Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 283.99,
+              "script": 63.987,
+              "paint": 213.097
+            },
+            {
+              "total": 288.437,
+              "script": 63.266,
+              "paint": 217.073
+            },
+            {
+              "total": 283.032,
+              "script": 63.455,
+              "paint": 212.906
+            },
+            {
+              "total": 282.525,
+              "script": 64.032,
+              "paint": 211.389
+            },
+            {
+              "total": 286.435,
+              "script": 64.096,
+              "paint": 214.194
+            },
+            {
+              "total": 286.678,
+              "script": 64.656,
+              "paint": 214.062
+            },
+            {
+              "total": 292.961,
+              "script": 62.874,
+              "paint": 220.934
+            },
+            {
+              "total": 291.631,
+              "script": 62.924,
+              "paint": 219.216
+            },
+            {
+              "total": 293.308,
+              "script": 62.687,
+              "paint": 221.216
+            },
+            {
+              "total": 285.747,
+              "script": 62.873,
+              "paint": 216.49
+            },
+            {
+              "total": 286.985,
+              "script": 66.316,
+              "paint": 213.934
+            },
+            {
+              "total": 286.73,
+              "script": 65.256,
+              "paint": 214.17
+            },
+            {
+              "total": 283.938,
+              "script": 63.355,
+              "paint": 213.262
+            },
+            {
+              "total": 284.148,
+              "script": 64.29,
+              "paint": 212.844
+            },
+            {
+              "total": 281.671,
+              "script": 62.368,
+              "paint": 212.762
+            }
+          ],
+          "load": [
+            2.2421875,
+            3.4892578125,
+            3.63134765625
+          ],
+          "finishedAt": "2026-10-20T06:53:02.049Z"
+        },
+        {
+          "name": "lithent",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 287.171,
+              "script": 62.932,
+              "paint": 216.153
+            },
+            {
+              "total": 288.346,
+              "script": 64.179,
+              "paint": 216.803
+            },
+            {
+              "total": 287.41,
+              "script": 63.401,
+              "paint": 217.378
+            },
+            {
+              "total": 287.866,
+              "script": 66.288,
+              "paint": 214.665
+            },
+            {
+              "total": 285.41,
+              "script": 65.293,
+              "paint": 212.212
+            },
+            {
+              "total": 283.568,
+              "script": 62.678,
+              "paint": 212.639
+            },
+            {
+              "total": 288.148,
+              "script": 65.346,
+              "paint": 215.155
+            },
+            {
+              "total": 282.272,
+              "script": 63.251,
+              "paint": 211.759
+            },
+            {
+              "total": 286.142,
+              "script": 62.511,
+              "paint": 215.269
+            },
+            {
+              "total": 291.54,
+              "script": 63.725,
+              "paint": 218.1
+            },
+            {
+              "total": 283.129,
+              "script": 63.986,
+              "paint": 212.339
+            },
+            {
+              "total": 283.372,
+              "script": 62.498,
+              "paint": 213.906
+            },
+            {
+              "total": 292.865,
+              "script": 63.333,
+              "paint": 221.188
+            },
+            {
+              "total": 283.343,
+              "script": 63.6,
+              "paint": 212.52
+            },
+            {
+              "total": 282.186,
+              "script": 62.637,
+              "paint": 212.661
+            }
+          ],
+          "load": [
+            2.53125,
+            3.45361328125,
+            3.61376953125
+          ],
+          "finishedAt": "2026-10-20T06:53:33.514Z"
+        }
+      ],
+      "failedBatches": [
+        {
+          "name": "lithent",
+          "id": "04_select1k",
+          "attempt": 1,
+          "at": "2026-10-20T06:46:25.201Z",
+          "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "warnings": []
+        },
+        {
+          "name": "lithent",
+          "id": "04_select1k",
+          "attempt": 2,
+          "at": "2026-10-20T06:49:39.226Z",
+          "error": "Runtime.callFunctionOn timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+          "warnings": []
+        }
+      ],
+      "complete": true,
+      "finishedAt": "2026-10-20T06:53:33.726Z",
+      "loadEnd": [
+        2.53125,
+        3.45361328125,
+        3.61376953125
+      ]
+    },
+    "verify": {
+      "startedAt": "2026-10-20T06:39:22.743Z",
+      "mode": "verify",
+      "chrome": "155.0.8059.85",
+      "chromeBinaryPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/MacOS/Google Chrome",
+      "chromeBinarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "chromeFrameworkPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/Current/Google Chrome Framework",
+      "chromeFrameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7",
+      "machine": {
+        "cpu": "Apple M4 Pro",
+        "cores": 12,
+        "memoryGB": 24
+      },
+      "loadStart": [
+        8.0634765625,
+        5.37158203125,
+        3.69140625
+      ],
+      "alternatingOrder": false,
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-20T06:38:24.698Z",
+          "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+          "vite": "5.4.21"
+        },
+        "lithent": {
+          "date": "2026-10-20T06:38:24.793Z",
+          "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "0c7e3bc665d24f3703d48310540dca358f61445ef80fc2695e0051b07305ea98",
+          "coreOrigin": "local-unreleased",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "9924e91972a605bdbec777f70471b5e52c4c358ca6c5ccae3c75807cf205361d",
+          "vite": "5.4.21"
+        }
+      },
+      "versions": {
+        "lithent": "1.25.2",
+        "vite": "5.4.21"
+      },
+      "samples": [
+        {
+          "name": "lithent-before",
+          "scenarios": 9,
+          "fontLoaded": true
+        },
+        {
+          "name": "lithent",
+          "scenarios": 9,
+          "fontLoaded": true
+        }
+      ],
+      "complete": true,
+      "finishedAt": "2026-10-20T06:39:26.850Z",
+      "loadEnd": [
+        7.97802734375,
+        5.3984375,
+        3.71044921875
+      ]
+    },
+    "reverse": {
+      "startedAt": "2026-10-20T06:54:20.790Z",
+      "mode": "cpu",
+      "chrome": "Chrome/155.0.8059.85",
+      "chromeBinaryPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/MacOS/Google Chrome",
+      "chromeBinarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "chromeFrameworkPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/Current/Google Chrome Framework",
+      "chromeFrameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7",
+      "machine": {
+        "cpu": "Apple M4 Pro",
+        "cores": 12,
+        "memoryGB": 24
+      },
+      "loadStart": [
+        2.5146484375,
+        3.32958984375,
+        3.55859375
+      ],
+      "alternatingOrder": true,
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-20T06:38:24.698Z",
+          "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+          "vite": "5.4.21"
+        },
+        "lithent": {
+          "date": "2026-10-20T06:38:24.793Z",
+          "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "0c7e3bc665d24f3703d48310540dca358f61445ef80fc2695e0051b07305ea98",
+          "coreOrigin": "local-unreleased",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "9924e91972a605bdbec777f70471b5e52c4c358ca6c5ccae3c75807cf205361d",
+          "vite": "5.4.21"
+        }
+      },
+      "versions": {
+        "lithent": "1.25.2",
+        "vite": "5.4.21"
+      },
+      "samples": [
+        {
+          "name": "lithent",
+          "id": "01_run1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 28.497,
+              "script": 8.549,
+              "paint": 19.298
+            },
+            {
+              "total": 28.467,
+              "script": 8.693,
+              "paint": 19.13
+            },
+            {
+              "total": 27.694,
+              "script": 8.49,
+              "paint": 18.649
+            },
+            {
+              "total": 33.768,
+              "script": 10.656,
+              "paint": 22.08
+            },
+            {
+              "total": 28.016,
+              "script": 8.525,
+              "paint": 18.889
+            },
+            {
+              "total": 28.338,
+              "script": 8.349,
+              "paint": 19.389
+            },
+            {
+              "total": 27.594,
+              "script": 8.137,
+              "paint": 18.915
+            },
+            {
+              "total": 28.089,
+              "script": 8.399,
+              "paint": 19.135
+            },
+            {
+              "total": 27.457,
+              "script": 8.561,
+              "paint": 18.373
+            },
+            {
+              "total": 27.111,
+              "script": 8.26,
+              "paint": 18.336
+            },
+            {
+              "total": 28.354,
+              "script": 8.429,
+              "paint": 19.364
+            },
+            {
+              "total": 27.094,
+              "script": 8.303,
+              "paint": 18.29
+            },
+            {
+              "total": 27.241,
+              "script": 8.131,
+              "paint": 18.598
+            },
+            {
+              "total": 27.388,
+              "script": 8.633,
+              "paint": 18.231
+            },
+            {
+              "total": 26.54,
+              "script": 7.749,
+              "paint": 18.254
+            }
+          ],
+          "load": [
+            2.24853515625,
+            3.2109375,
+            3.509765625
+          ],
+          "finishedAt": "2026-10-20T06:54:45.431Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "01_run1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 26.775,
+              "script": 7.958,
+              "paint": 18.309
+            },
+            {
+              "total": 27.509,
+              "script": 8.592,
+              "paint": 18.393
+            },
+            {
+              "total": 27.16,
+              "script": 8.088,
+              "paint": 18.557
+            },
+            {
+              "total": 27.877,
+              "script": 8.608,
+              "paint": 18.768
+            },
+            {
+              "total": 27.197,
+              "script": 8.107,
+              "paint": 18.576
+            },
+            {
+              "total": 27.226,
+              "script": 8.1,
+              "paint": 18.614
+            },
+            {
+              "total": 27.22,
+              "script": 7.9,
+              "paint": 18.801
+            },
+            {
+              "total": 27.137,
+              "script": 8.514,
+              "paint": 18.102
+            },
+            {
+              "total": 27.355,
+              "script": 8.402,
+              "paint": 18.427
+            },
+            {
+              "total": 27.655,
+              "script": 8.672,
+              "paint": 18.46
+            },
+            {
+              "total": 27.272,
+              "script": 7.904,
+              "paint": 18.754
+            },
+            {
+              "total": 27.395,
+              "script": 8.26,
+              "paint": 18.601
+            },
+            {
+              "total": 27.348,
+              "script": 8.148,
+              "paint": 18.656
+            },
+            {
+              "total": 27.275,
+              "script": 8.221,
+              "paint": 18.54
+            },
+            {
+              "total": 27.38,
+              "script": 8.32,
+              "paint": 18.542
+            }
+          ],
+          "load": [
+            2.357421875,
+            3.16015625,
+            3.48193359375
+          ],
+          "finishedAt": "2026-10-20T06:55:09.025Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "09_clear1k_x8",
+          "warnings": [],
+          "result": [
+            {
+              "total": 11.656,
+              "script": 9.005,
+              "paint": 0.842
+            },
+            {
+              "total": 11.271,
+              "script": 8.828,
+              "paint": 0.78
+            },
+            {
+              "total": 11.668,
+              "script": 9.103,
+              "paint": 1.69
+            },
+            {
+              "total": 12.179,
+              "script": 9.442,
+              "paint": 1.49
+            },
+            {
+              "total": 12.046,
+              "script": 9.223,
+              "paint": 2.29
+            },
+            {
+              "total": 12.761,
+              "script": 10.027,
+              "paint": 0.697
+            },
+            {
+              "total": 11.123,
+              "script": 8.872,
+              "paint": 1.382
+            },
+            {
+              "total": 12.169,
+              "script": 9.861,
+              "paint": 1.462
+            },
+            {
+              "total": 12.928,
+              "script": 10.617,
+              "paint": 0.926
+            },
+            {
+              "total": 11.618,
+              "script": 9.35,
+              "paint": 1.232
+            },
+            {
+              "total": 11.367,
+              "script": 8.64,
+              "paint": 1.577
+            },
+            {
+              "total": 11.46,
+              "script": 9.317,
+              "paint": 0.284
+            },
+            {
+              "total": 11.442,
+              "script": 9.227,
+              "paint": 1.347
+            },
+            {
+              "total": 12.233,
+              "script": 9.927,
+              "paint": 1.071
+            },
+            {
+              "total": 10.972,
+              "script": 9.192,
+              "paint": 0.604
+            }
+          ],
+          "load": [
+            2.6298828125,
+            3.173828125,
+            3.47802734375
+          ],
+          "finishedAt": "2026-10-20T06:55:33.899Z"
+        },
+        {
+          "name": "lithent",
+          "id": "09_clear1k_x8",
+          "warnings": [],
+          "result": [
+            {
+              "total": 12.811,
+              "script": 9.981,
+              "paint": 1.653
+            },
+            {
+              "total": 12.325,
+              "script": 9.896,
+              "paint": 0.985
+            },
+            {
+              "total": 11.773,
+              "script": 9.487,
+              "paint": 0.607
+            },
+            {
+              "total": 13.588,
+              "script": 10.611,
+              "paint": 1.598
+            },
+            {
+              "total": 12.047,
+              "script": 9.543,
+              "paint": 1.061
+            },
+            {
+              "total": 12.513,
+              "script": 9.9,
+              "paint": 1.512
+            },
+            {
+              "total": 10.814,
+              "script": 8.912,
+              "paint": 0.308
+            },
+            {
+              "total": 14.191,
+              "script": 11.08,
+              "paint": 1.124
+            },
+            {
+              "total": 11.817,
+              "script": 8.737,
+              "paint": 1.609
+            },
+            {
+              "total": 13.721,
+              "script": 10.879,
+              "paint": 0.992
+            },
+            {
+              "total": 11.963,
+              "script": 9.651,
+              "paint": 1.754
+            },
+            {
+              "total": 12.192,
+              "script": 9.635,
+              "paint": 2.057
+            },
+            {
+              "total": 11.947,
+              "script": 9.834,
+              "paint": 1.52
+            },
+            {
+              "total": 12.17,
+              "script": 9.64,
+              "paint": 1.331
+            },
+            {
+              "total": 11.712,
+              "script": 9.375,
+              "paint": 0.876
+            }
+          ],
+          "load": [
+            4.587890625,
+            3.57958984375,
+            3.6142578125
+          ],
+          "finishedAt": "2026-10-20T06:55:58.787Z"
+        },
+        {
+          "name": "lithent",
+          "id": "03_update10th1k_x16",
+          "warnings": [],
+          "result": [
+            {
+              "total": 18.624,
+              "script": 6.489,
+              "paint": 10.127
+            },
+            {
+              "total": 21.714,
+              "script": 6.243,
+              "paint": 12.062
+            },
+            {
+              "total": 19.934,
+              "script": 6.925,
+              "paint": 10.165
+            },
+            {
+              "total": 21.365,
+              "script": 6.107,
+              "paint": 13.241
+            },
+            {
+              "total": 19.3,
+              "script": 6.561,
+              "paint": 11.078
+            },
+            {
+              "total": 22.894,
+              "script": 6.271,
+              "paint": 13.953
+            },
+            {
+              "total": 17.436,
+              "script": 5.764,
+              "paint": 10.586
+            },
+            {
+              "total": 16.644,
+              "script": 5.664,
+              "paint": 9.788
+            },
+            {
+              "total": 19.68,
+              "script": 7.117,
+              "paint": 10.867
+            },
+            {
+              "total": 18.842,
+              "script": 7.101,
+              "paint": 9.556
+            },
+            {
+              "total": 19.081,
+              "script": 6.319,
+              "paint": 10.838
+            },
+            {
+              "total": 17.174,
+              "script": 6.209,
+              "paint": 9.114
+            },
+            {
+              "total": 20.795,
+              "script": 6.308,
+              "paint": 12.063
+            },
+            {
+              "total": 17.563,
+              "script": 5.259,
+              "paint": 10.527
+            },
+            {
+              "total": 18.733,
+              "script": 6.294,
+              "paint": 10.582
+            }
+          ],
+          "load": [
+            5.5947265625,
+            3.892578125,
+            3.72607421875
+          ],
+          "finishedAt": "2026-10-20T06:56:20.244Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "03_update10th1k_x16",
+          "warnings": [],
+          "result": [
+            {
+              "total": 18.507,
+              "script": 6.002,
+              "paint": 11.044
+            },
+            {
+              "total": 17.031,
+              "script": 5.98,
+              "paint": 9.29
+            },
+            {
+              "total": 19.327,
+              "script": 6.239,
+              "paint": 11.219
+            },
+            {
+              "total": 18.159,
+              "script": 6.376,
+              "paint": 10.028
+            },
+            {
+              "total": 19.251,
+              "script": 6.295,
+              "paint": 11.171
+            },
+            {
+              "total": 17.581,
+              "script": 6.433,
+              "paint": 9.015
+            },
+            {
+              "total": 23.62,
+              "script": 7.429,
+              "paint": 13.233
+            },
+            {
+              "total": 18.597,
+              "script": 6.381,
+              "paint": 10.866
+            },
+            {
+              "total": 18.825,
+              "script": 6.38,
+              "paint": 10.737
+            },
+            {
+              "total": 20.629,
+              "script": 6.663,
+              "paint": 11.491
+            },
+            {
+              "total": 19.396,
+              "script": 6.441,
+              "paint": 10.334
+            },
+            {
+              "total": 17.588,
+              "script": 5.419,
+              "paint": 9.644
+            },
+            {
+              "total": 17.266,
+              "script": 6.404,
+              "paint": 8.159
+            },
+            {
+              "total": 19.77,
+              "script": 6.038,
+              "paint": 12.454
+            },
+            {
+              "total": 19.43,
+              "script": 6.041,
+              "paint": 11.403
+            }
+          ],
+          "load": [
+            7.28662109375,
+            4.41650390625,
+            3.91845703125
+          ],
+          "finishedAt": "2026-10-20T06:56:41.752Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "05_swap1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 16.663,
+              "script": 3.768,
+              "paint": 11.47
+            },
+            {
+              "total": 17.958,
+              "script": 3.609,
+              "paint": 13.281
+            },
+            {
+              "total": 17.876,
+              "script": 3.355,
+              "paint": 13.684
+            },
+            {
+              "total": 17.218,
+              "script": 3.087,
+              "paint": 13.101
+            },
+            {
+              "total": 16.798,
+              "script": 3.697,
+              "paint": 11.997
+            },
+            {
+              "total": 17.466,
+              "script": 3.588,
+              "paint": 12.875
+            },
+            {
+              "total": 17.692,
+              "script": 3.641,
+              "paint": 12.714
+            },
+            {
+              "total": 17.743,
+              "script": 3.175,
+              "paint": 13.313
+            },
+            {
+              "total": 16.506,
+              "script": 3.632,
+              "paint": 11.625
+            },
+            {
+              "total": 20.967,
+              "script": 3.376,
+              "paint": 16.051
+            },
+            {
+              "total": 17.372,
+              "script": 3.641,
+              "paint": 12.811
+            },
+            {
+              "total": 17.348,
+              "script": 3.475,
+              "paint": 12.752
+            },
+            {
+              "total": 12.249,
+              "script": 1.367,
+              "paint": 9.638
+            },
+            {
+              "total": 19.619,
+              "script": 3.864,
+              "paint": 13.45
+            },
+            {
+              "total": 17.192,
+              "script": 3.492,
+              "paint": 12.531
+            }
+          ],
+          "load": [
+            6.30908203125,
+            4.37353515625,
+            3.91357421875
+          ],
+          "finishedAt": "2026-10-20T06:57:03.932Z"
+        },
+        {
+          "name": "lithent",
+          "id": "05_swap1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 15.956,
+              "script": 3.253,
+              "paint": 11.272
+            },
+            {
+              "total": 17.869,
+              "script": 4.128,
+              "paint": 12.228
+            },
+            {
+              "total": 17.087,
+              "script": 3.17,
+              "paint": 13.027
+            },
+            {
+              "total": 21.895,
+              "script": 4.28,
+              "paint": 15.166
+            },
+            {
+              "total": 23.704,
+              "script": 5.111,
+              "paint": 14.744
+            },
+            {
+              "total": 18.086,
+              "script": 3.757,
+              "paint": 12.824
+            },
+            {
+              "total": 21.069,
+              "script": 3.964,
+              "paint": 15.639
+            },
+            {
+              "total": 18.083,
+              "script": 3.488,
+              "paint": 13.501
+            },
+            {
+              "total": 22.691,
+              "script": 4.661,
+              "paint": 15.5
+            },
+            {
+              "total": 19.056,
+              "script": 4.508,
+              "paint": 13.212
+            },
+            {
+              "total": 17.12,
+              "script": 3.197,
+              "paint": 12.314
+            },
+            {
+              "total": 23.257,
+              "script": 4.354,
+              "paint": 16.169
+            },
+            {
+              "total": 19.28,
+              "script": 4.283,
+              "paint": 13.628
+            },
+            {
+              "total": 18.742,
+              "script": 3.208,
+              "paint": 13.47
+            },
+            {
+              "total": 18.507,
+              "script": 3.47,
+              "paint": 13.517
+            }
+          ],
+          "load": [
+            5.3837890625,
+            4.29736328125,
+            3.8984375
+          ],
+          "finishedAt": "2026-10-20T06:57:26.339Z"
+        },
+        {
+          "name": "lithent",
+          "id": "04_select1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 7.333,
+              "script": 4.033,
+              "paint": 2.221
+            },
+            {
+              "total": 8.32,
+              "script": 4.451,
+              "paint": 3.035
+            },
+            {
+              "total": 10.643,
+              "script": 5.088,
+              "paint": 3.904
+            },
+            {
+              "total": 7.154,
+              "script": 4.33,
+              "paint": 2.606
+            },
+            {
+              "total": 8.671,
+              "script": 4.079,
+              "paint": 3.224
+            },
+            {
+              "total": 7.941,
+              "script": 4.957,
+              "paint": 2.502
+            },
+            {
+              "total": 7.621,
+              "script": 4.56,
+              "paint": 2.911
+            },
+            {
+              "total": 6.965,
+              "script": 3.638,
+              "paint": 2.193
+            },
+            {
+              "total": 8.898,
+              "script": 4.953,
+              "paint": 3.021
+            },
+            {
+              "total": 7.823,
+              "script": 4.593,
+              "paint": 2.45
+            },
+            {
+              "total": 7.275,
+              "script": 3.773,
+              "paint": 2.623
+            },
+            {
+              "total": 7.244,
+              "script": 4.255,
+              "paint": 2.85
+            },
+            {
+              "total": 7.159,
+              "script": 3.767,
+              "paint": 2.26
+            },
+            {
+              "total": 8.984,
+              "script": 4.142,
+              "paint": 3.75
+            },
+            {
+              "total": 8.877,
+              "script": 5.074,
+              "paint": 2.781
+            },
+            {
+              "total": 8.152,
+              "script": 4.898,
+              "paint": 2.774
+            },
+            {
+              "total": 7.516,
+              "script": 4.502,
+              "paint": 2.64
+            },
+            {
+              "total": 8.162,
+              "script": 4.989,
+              "paint": 2.32
+            },
+            {
+              "total": 8.347,
+              "script": 4.349,
+              "paint": 2.762
+            },
+            {
+              "total": 6.98,
+              "script": 4.043,
+              "paint": 2.018
+            },
+            {
+              "total": 7.529,
+              "script": 4.103,
+              "paint": 2.439
+            },
+            {
+              "total": 7.474,
+              "script": 3.923,
+              "paint": 2.342
+            },
+            {
+              "total": 10.353,
+              "script": 5.221,
+              "paint": 3.29
+            },
+            {
+              "total": 7.683,
+              "script": 4.411,
+              "paint": 2.755
+            },
+            {
+              "total": 8.179,
+              "script": 4.692,
+              "paint": 2.254
+            }
+          ],
+          "load": [
+            5.091796875,
+            4.33056640625,
+            3.923828125
+          ],
+          "finishedAt": "2026-10-20T06:58:01.077Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "04_select1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 9.395,
+              "script": 5.773,
+              "paint": 1.723
+            },
+            {
+              "total": 8.694,
+              "script": 4.409,
+              "paint": 3.23
+            },
+            {
+              "total": 7.539,
+              "script": 4.672,
+              "paint": 2.11
+            },
+            {
+              "total": 8.909,
+              "script": 4.378,
+              "paint": 3.681
+            },
+            {
+              "total": 10.392,
+              "script": 4.978,
+              "paint": 3.867
+            },
+            {
+              "total": 7.195,
+              "script": 4.513,
+              "paint": 1.919
+            },
+            {
+              "total": 8.17,
+              "script": 4.559,
+              "paint": 2.555
+            },
+            {
+              "total": 10.878,
+              "script": 5.261,
+              "paint": 3.286
+            },
+            {
+              "total": 7.626,
+              "script": 4.785,
+              "paint": 1.689
+            },
+            {
+              "total": 6.859,
+              "script": 4.488,
+              "paint": 1.523
+            },
+            {
+              "total": 8.182,
+              "script": 4.379,
+              "paint": 2.361
+            },
+            {
+              "total": 7.857,
+              "script": 4.709,
+              "paint": 2.432
+            },
+            {
+              "total": 8.049,
+              "script": 4.273,
+              "paint": 3.616
+            },
+            {
+              "total": 7.813,
+              "script": 4.362,
+              "paint": 3.276
+            },
+            {
+              "total": 7.958,
+              "script": 4.977,
+              "paint": 2.435
+            },
+            {
+              "total": 9.105,
+              "script": 4.06,
+              "paint": 3.289
+            },
+            {
+              "total": 7.715,
+              "script": 3.967,
+              "paint": 2.295
+            },
+            {
+              "total": 8.935,
+              "script": 4.558,
+              "paint": 3.262
+            },
+            {
+              "total": 7.459,
+              "script": 4.377,
+              "paint": 2.94
+            },
+            {
+              "total": 7.589,
+              "script": 4.417,
+              "paint": 3.027
+            },
+            {
+              "total": 6.916,
+              "script": 3.911,
+              "paint": 2.582
+            },
+            {
+              "total": 7.838,
+              "script": 4.773,
+              "paint": 2.358
+            },
+            {
+              "total": 8.475,
+              "script": 5.675,
+              "paint": 1.386
+            },
+            {
+              "total": 7.611,
+              "script": 4.143,
+              "paint": 2.856
+            },
+            {
+              "total": 8.112,
+              "script": 4.753,
+              "paint": 2.967
+            }
+          ],
+          "load": [
+            4.4228515625,
+            4.24560546875,
+            3.9072265625
+          ],
+          "finishedAt": "2026-10-20T06:58:35.806Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "06_remove-one-1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 14.836,
+              "script": 1.408,
+              "paint": 10.764
+            },
+            {
+              "total": 11.676,
+              "script": 1.092,
+              "paint": 10.01
+            },
+            {
+              "total": 12.827,
+              "script": 1.316,
+              "paint": 10.861
+            },
+            {
+              "total": 11.834,
+              "script": 1.141,
+              "paint": 10.084
+            },
+            {
+              "total": 12.663,
+              "script": 1.16,
+              "paint": 10.814
+            },
+            {
+              "total": 12.636,
+              "script": 1.382,
+              "paint": 10.677
+            },
+            {
+              "total": 11.81,
+              "script": 1.133,
+              "paint": 9.64
+            },
+            {
+              "total": 12.262,
+              "script": 1.328,
+              "paint": 10.333
+            },
+            {
+              "total": 12.63,
+              "script": 1.398,
+              "paint": 10.348
+            },
+            {
+              "total": 15.08,
+              "script": 1.523,
+              "paint": 12.743
+            },
+            {
+              "total": 12.625,
+              "script": 1.141,
+              "paint": 10.869
+            },
+            {
+              "total": 13.186,
+              "script": 1.167,
+              "paint": 11.354
+            },
+            {
+              "total": 11.924,
+              "script": 1.169,
+              "paint": 9.955
+            },
+            {
+              "total": 11.697,
+              "script": 1.454,
+              "paint": 9.417
+            },
+            {
+              "total": 12.394,
+              "script": 1.259,
+              "paint": 10.533
+            }
+          ],
+          "load": [
+            4.08544921875,
+            4.1767578125,
+            3.89208984375
+          ],
+          "finishedAt": "2026-10-20T06:58:57.508Z"
+        },
+        {
+          "name": "lithent",
+          "id": "06_remove-one-1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 12.811,
+              "script": 1.156,
+              "paint": 10.428
+            },
+            {
+              "total": 12.526,
+              "script": 1.279,
+              "paint": 10.503
+            },
+            {
+              "total": 13.423,
+              "script": 1.178,
+              "paint": 11.559
+            },
+            {
+              "total": 14.399,
+              "script": 1.478,
+              "paint": 11.981
+            },
+            {
+              "total": 12.408,
+              "script": 1.211,
+              "paint": 10.587
+            },
+            {
+              "total": 12.473,
+              "script": 1.412,
+              "paint": 10.217
+            },
+            {
+              "total": 13.795,
+              "script": 1.213,
+              "paint": 11.448
+            },
+            {
+              "total": 12.075,
+              "script": 1.95,
+              "paint": 9.33
+            },
+            {
+              "total": 11.691,
+              "script": 1.226,
+              "paint": 9.93
+            },
+            {
+              "total": 12.295,
+              "script": 1.139,
+              "paint": 10.236
+            },
+            {
+              "total": 13.436,
+              "script": 1.29,
+              "paint": 11.04
+            },
+            {
+              "total": 12.471,
+              "script": 1.739,
+              "paint": 9.965
+            },
+            {
+              "total": 14.544,
+              "script": 1.425,
+              "paint": 10.541
+            },
+            {
+              "total": 13.294,
+              "script": 1.145,
+              "paint": 11.42
+            },
+            {
+              "total": 11.982,
+              "script": 1.092,
+              "paint": 9.975
+            }
+          ],
+          "load": [
+            3.28271484375,
+            3.986328125,
+            3.82958984375
+          ],
+          "finishedAt": "2026-10-20T06:59:21.300Z"
+        },
+        {
+          "name": "lithent",
+          "id": "02_replace1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 31.62,
+              "script": 11.826,
+              "paint": 19.225
+            },
+            {
+              "total": 31.184,
+              "script": 11.499,
+              "paint": 19.102
+            },
+            {
+              "total": 31.448,
+              "script": 11.751,
+              "paint": 19.105
+            },
+            {
+              "total": 33.119,
+              "script": 11.782,
+              "paint": 20.677
+            },
+            {
+              "total": 31.148,
+              "script": 11.617,
+              "paint": 18.946
+            },
+            {
+              "total": 33.177,
+              "script": 11.935,
+              "paint": 20.58
+            },
+            {
+              "total": 31.659,
+              "script": 11.81,
+              "paint": 19.256
+            },
+            {
+              "total": 31.217,
+              "script": 11.635,
+              "paint": 19.033
+            },
+            {
+              "total": 31.012,
+              "script": 11.513,
+              "paint": 18.931
+            },
+            {
+              "total": 32.54,
+              "script": 11.478,
+              "paint": 20.473
+            },
+            {
+              "total": 31.472,
+              "script": 11.664,
+              "paint": 19.225
+            },
+            {
+              "total": 31.765,
+              "script": 12.1,
+              "paint": 19.081
+            },
+            {
+              "total": 31.164,
+              "script": 11.327,
+              "paint": 19.232
+            },
+            {
+              "total": 32.871,
+              "script": 11.857,
+              "paint": 20.348
+            },
+            {
+              "total": 30.822,
+              "script": 11.593,
+              "paint": 18.665
+            }
+          ],
+          "load": [
+            3.638671875,
+            4.00390625,
+            3.83984375
+          ],
+          "finishedAt": "2026-10-20T06:59:43.894Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "02_replace1k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 30.928,
+              "script": 11.64,
+              "paint": 18.725
+            },
+            {
+              "total": 31.656,
+              "script": 11.754,
+              "paint": 19.313
+            },
+            {
+              "total": 31.334,
+              "script": 11.468,
+              "paint": 19.281
+            },
+            {
+              "total": 31.016,
+              "script": 11.658,
+              "paint": 18.794
+            },
+            {
+              "total": 30.813,
+              "script": 11.116,
+              "paint": 19.135
+            },
+            {
+              "total": 30.938,
+              "script": 11.678,
+              "paint": 18.713
+            },
+            {
+              "total": 31.563,
+              "script": 11.797,
+              "paint": 19.174
+            },
+            {
+              "total": 31.443,
+              "script": 11.751,
+              "paint": 19.097
+            },
+            {
+              "total": 31.45,
+              "script": 11.635,
+              "paint": 19.227
+            },
+            {
+              "total": 31.742,
+              "script": 11.69,
+              "paint": 19.451
+            },
+            {
+              "total": 31.637,
+              "script": 11.781,
+              "paint": 19.281
+            },
+            {
+              "total": 30.782,
+              "script": 11.476,
+              "paint": 18.751
+            },
+            {
+              "total": 31.355,
+              "script": 11.71,
+              "paint": 19.078
+            },
+            {
+              "total": 31.086,
+              "script": 11.787,
+              "paint": 18.72
+            },
+            {
+              "total": 31.228,
+              "script": 11.528,
+              "paint": 19.122
+            }
+          ],
+          "load": [
+            3.85888671875,
+            4.03369140625,
+            3.853515625
+          ],
+          "finishedAt": "2026-10-20T07:00:06.626Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "08_create1k-after1k_x2",
+          "warnings": [],
+          "result": [
+            {
+              "total": 31.407,
+              "script": 8.241,
+              "paint": 22.066
+            },
+            {
+              "total": 35.235,
+              "script": 9.134,
+              "paint": 24.647
+            },
+            {
+              "total": 31.257,
+              "script": 8.023,
+              "paint": 22.222
+            },
+            {
+              "total": 31.299,
+              "script": 8.271,
+              "paint": 22.017
+            },
+            {
+              "total": 31.493,
+              "script": 8.053,
+              "paint": 22.372
+            },
+            {
+              "total": 31.922,
+              "script": 8.41,
+              "paint": 22.508
+            },
+            {
+              "total": 31.902,
+              "script": 8.015,
+              "paint": 22.671
+            },
+            {
+              "total": 32.864,
+              "script": 8.141,
+              "paint": 23.495
+            },
+            {
+              "total": 31.776,
+              "script": 7.976,
+              "paint": 22.78
+            },
+            {
+              "total": 31.428,
+              "script": 8.31,
+              "paint": 22.12
+            },
+            {
+              "total": 31.012,
+              "script": 8.056,
+              "paint": 21.98
+            },
+            {
+              "total": 31.111,
+              "script": 7.813,
+              "paint": 22.316
+            },
+            {
+              "total": 31.124,
+              "script": 7.994,
+              "paint": 22.164
+            },
+            {
+              "total": 30.513,
+              "script": 8.005,
+              "paint": 21.563
+            },
+            {
+              "total": 30.76,
+              "script": 7.85,
+              "paint": 22.017
+            }
+          ],
+          "load": [
+            3.34716796875,
+            3.90087890625,
+            3.8095703125
+          ],
+          "finishedAt": "2026-10-20T07:00:31.429Z"
+        },
+        {
+          "name": "lithent",
+          "id": "08_create1k-after1k_x2",
+          "warnings": [],
+          "result": [
+            {
+              "total": 31.065,
+              "script": 7.95,
+              "paint": 22.095
+            },
+            {
+              "total": 31.348,
+              "script": 7.928,
+              "paint": 22.519
+            },
+            {
+              "total": 30.632,
+              "script": 8.029,
+              "paint": 21.724
+            },
+            {
+              "total": 30.876,
+              "script": 8.196,
+              "paint": 21.743
+            },
+            {
+              "total": 30.652,
+              "script": 7.906,
+              "paint": 21.825
+            },
+            {
+              "total": 31.322,
+              "script": 7.929,
+              "paint": 22.408
+            },
+            {
+              "total": 30.907,
+              "script": 7.92,
+              "paint": 22.024
+            },
+            {
+              "total": 30.302,
+              "script": 7.891,
+              "paint": 21.524
+            },
+            {
+              "total": 30.988,
+              "script": 8.272,
+              "paint": 21.766
+            },
+            {
+              "total": 30.835,
+              "script": 8.295,
+              "paint": 21.608
+            },
+            {
+              "total": 30.73,
+              "script": 7.933,
+              "paint": 21.819
+            },
+            {
+              "total": 30.934,
+              "script": 7.75,
+              "paint": 22.149
+            },
+            {
+              "total": 30.561,
+              "script": 7.947,
+              "paint": 21.707
+            },
+            {
+              "total": 30.298,
+              "script": 7.856,
+              "paint": 21.53
+            },
+            {
+              "total": 30.769,
+              "script": 8.207,
+              "paint": 21.636
+            }
+          ],
+          "load": [
+            2.8623046875,
+            3.74609375,
+            3.755859375
+          ],
+          "finishedAt": "2026-10-20T07:00:56.179Z"
+        },
+        {
+          "name": "lithent",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 291.719,
+              "script": 64.164,
+              "paint": 220.11
+            },
+            {
+              "total": 290.651,
+              "script": 66.812,
+              "paint": 216.651
+            },
+            {
+              "total": 285.687,
+              "script": 64.343,
+              "paint": 214.338
+            },
+            {
+              "total": 286.796,
+              "script": 63.609,
+              "paint": 215.122
+            },
+            {
+              "total": 286.712,
+              "script": 63.629,
+              "paint": 215.034
+            },
+            {
+              "total": 285.253,
+              "script": 63.71,
+              "paint": 214.316
+            },
+            {
+              "total": 287.9,
+              "script": 64.903,
+              "paint": 215.704
+            },
+            {
+              "total": 287.688,
+              "script": 64.144,
+              "paint": 216.107
+            },
+            {
+              "total": 287.676,
+              "script": 64.978,
+              "paint": 215.412
+            },
+            {
+              "total": 283.938,
+              "script": 64.336,
+              "paint": 212.578
+            },
+            {
+              "total": 285.983,
+              "script": 65.115,
+              "paint": 213.674
+            },
+            {
+              "total": 291.269,
+              "script": 64.147,
+              "paint": 218.902
+            },
+            {
+              "total": 288.527,
+              "script": 64.857,
+              "paint": 215.648
+            },
+            {
+              "total": 293.001,
+              "script": 64.289,
+              "paint": 218.507
+            },
+            {
+              "total": 288.954,
+              "script": 63.757,
+              "paint": 217.449
+            }
+          ],
+          "load": [
+            2.6015625,
+            3.59423828125,
+            3.69970703125
+          ],
+          "finishedAt": "2026-10-20T07:01:27.658Z"
+        },
+        {
+          "name": "lithent-before",
+          "id": "07_create10k",
+          "warnings": [],
+          "result": [
+            {
+              "total": 288.433,
+              "script": 64.223,
+              "paint": 216.37
+            },
+            {
+              "total": 286.914,
+              "script": 63.631,
+              "paint": 215.69
+            },
+            {
+              "total": 288.172,
+              "script": 63.905,
+              "paint": 216.338
+            },
+            {
+              "total": 283.64,
+              "script": 63.434,
+              "paint": 213.126
+            },
+            {
+              "total": 287.262,
+              "script": 64.498,
+              "paint": 214.975
+            },
+            {
+              "total": 289.547,
+              "script": 64.92,
+              "paint": 216.812
+            },
+            {
+              "total": 294.83,
+              "script": 65.173,
+              "paint": 220.719
+            },
+            {
+              "total": 294.454,
+              "script": 63.739,
+              "paint": 221.314
+            },
+            {
+              "total": 292.534,
+              "script": 66.072,
+              "paint": 217.69
+            },
+            {
+              "total": 289.424,
+              "script": 65.119,
+              "paint": 217.029
+            },
+            {
+              "total": 285.97,
+              "script": 64.529,
+              "paint": 214.301
+            },
+            {
+              "total": 287.584,
+              "script": 63.746,
+              "paint": 215.903
+            },
+            {
+              "total": 288.058,
+              "script": 63.357,
+              "paint": 216.464
+            },
+            {
+              "total": 283.867,
+              "script": 64.192,
+              "paint": 212.973
+            },
+            {
+              "total": 286.241,
+              "script": 63.368,
+              "paint": 215.222
+            }
+          ],
+          "load": [
+            2.705078125,
+            3.52294921875,
+            3.6689453125
+          ],
+          "finishedAt": "2026-10-20T07:01:59.187Z"
+        }
+      ],
+      "complete": true,
+      "finishedAt": "2026-10-20T07:01:59.389Z",
+      "loadEnd": [
+        2.705078125,
+        3.52294921875,
+        3.6689453125
+      ]
+    }
+  },
+  "contracts": {
+    "startedAt": "2026-10-20T06:38:51.476Z",
+    "chrome": "155.0.8059.85",
+    "load": [
+      8.8828125,
+      5.2470703125,
+      3.591796875
+    ],
+    "build": {
+      "lithent-before": {
+        "date": "2026-10-20T06:38:24.698Z",
+        "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+        "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+        "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+        "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+        "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+        "vite": "5.4.21"
+      },
+      "lithent": {
+        "date": "2026-10-20T06:38:24.793Z",
+        "libraryHead": "3464879bdd17be4db623e7cdec228514378d44c8",
+        "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+        "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+        "core": "0c7e3bc665d24f3703d48310540dca358f61445ef80fc2695e0051b07305ea98",
+        "coreOrigin": "local-unreleased",
+        "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+        "bundle": "9924e91972a605bdbec777f70471b5e52c4c358ca6c5ccae3c75807cf205361d",
+        "vite": "5.4.21"
+      }
+    },
+    "throttle": 4,
+    "samples": [
+      {
+        "name": "lithent-before",
+        "selection": {
+          "attributes": 2,
+          "childList": 0
+        },
+        "partial": {
+          "text": 100,
+          "childList": 0
+        },
+        "clear": {
+          "removals": 1,
+          "removedNodes": 1000
+        },
+        "batchedOrders": 2,
+        "recreateCycles": 20
+      },
+      {
+        "name": "lithent",
+        "selection": {
+          "attributes": 2,
+          "childList": 0
+        },
+        "partial": {
+          "text": 100,
+          "childList": 0
+        },
+        "clear": {
+          "removals": 1,
+          "removedNodes": 1000
+        },
+        "batchedOrders": 2,
+        "recreateCycles": 20
+      }
+    ],
+    "finishedAt": "2026-10-20T06:38:53.342Z"
+  },
+  "traceDirectories": [
+    "/tmp/lithent-keymatch-core-20261020/main/traces",
+    "/tmp/lithent-keymatch-core-20261020/main/reverse/traces"
+  ],
+  "evidence": {
+    "file": "keymatch-core-evidence.json.gz",
+    "sha256": "0094afab1520f2f51ddcbfff049247b48e30cd65d3fd2255f5b6f4ef2dce0174",
+    "bytes": 215314,
+    "files": 81
+  }
+}

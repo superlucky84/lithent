@@ -1,0 +1,548 @@
+{
+  "at": "2026-10-25T15:10:15.027Z",
+  "browser": "156.0.8078.47",
+  "scope": "Separate diagnostic root disposer, 3 fresh contexts/condition. Observe populated disposal with app-owned store/renew callback retained, then release those globals and check DOM weak references/post-GC counters. No timing.",
+  "input": {
+    "at": "2026-10-25T15:09:44.318Z",
+    "source": "8a9f490d1766a47528bfec32f06c061d5dd0771f32b43b4cef05c48b994f2a63",
+    "note": "Original app with diagnostic disposer and app-global release exports; observe populated disposal before clearing store rows/caches and renewTable. Not an official score bundle.",
+    "variants": {
+      "baseline": {
+        "core": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e",
+        "bundle": "7a3d834f2262b7b4a340544dbe147268276656962db5f55439ec4eb9e3ba8754"
+      },
+      "event": {
+        "core": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45",
+        "bundle": "57dbaa019772e4b642357f2c8d1b1469dd90bf33d07c9a7654cf026f9a0e0ee6"
+      },
+      "c2": {
+        "core": "9f4ca618709a8e1adc1a09ba52287496c41affbaf0306e732840d36f30b7a2bd",
+        "bundle": "2419e0cf8ca834e2ce2cfd2e82c0a8e90b645d20db75a07a6a3f627eb399b8da"
+      },
+      "combined": {
+        "core": "f006e23b6bc5159eebf09832dd1405e86debf90ab656e023752b5ad6e81ee921",
+        "bundle": "5817f0c5390d64740e9fcf01ce8ab47da9fe18a92f854f429344718babefd4b4"
+      }
+    }
+  },
+  "samples": [
+    {
+      "round": 0,
+      "name": "baseline",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 2909816
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 2906152
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1138420
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 0,
+      "name": "event",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 3011672
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 3007924
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139128
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 0,
+      "name": "c2",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 2910396
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 2906732
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139000
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 0,
+      "name": "combined",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 3012276
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 3008528
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139716
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 1,
+      "name": "combined",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 3012276
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 3008528
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139716
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 1,
+      "name": "c2",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 2910396
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 2906732
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139000
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 1,
+      "name": "event",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 3011672
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 3007924
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139128
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 1,
+      "name": "baseline",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 2909816
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 2906152
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1138420
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 2,
+      "name": "baseline",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 2909816
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 2906152
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1138420
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 2,
+      "name": "event",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 3011672
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 3007924
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139128
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 2,
+      "name": "c2",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 2910396
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 2906732
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139000
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    },
+    {
+      "round": 2,
+      "name": "combined",
+      "empty": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 635412
+      },
+      "observed": {
+        "rows": 1000,
+        "weakRefs": 8022
+      },
+      "mounted": {
+        "documents": 1,
+        "nodes": 10043,
+        "jsEventListeners": 2006,
+        "heapBytes": 3013912
+      },
+      "disposed": {
+        "documents": 1,
+        "nodes": 10042,
+        "jsEventListeners": 2006,
+        "heapBytes": 3010164
+      },
+      "retainedAppState": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 8022
+      },
+      "released": {
+        "documents": 1,
+        "nodes": 9,
+        "jsEventListeners": 0,
+        "heapBytes": 1139736
+      },
+      "state": {
+        "remaining": 0,
+        "outside": "outside",
+        "weakRemaining": 0
+      },
+      "errors": []
+    }
+  ],
+  "complete": true,
+  "finishedAt": "2026-10-25T15:10:23.587Z"
+}

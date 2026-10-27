@@ -20,12 +20,13 @@ It trims away unnecessary magic and complex APIs so your UI code stays simple, e
 
 ## Why Lithent?
 
-**Lightweight DOM manipulation without the framework weight.** The 4KB core drives complete UIs. Need state management? Opt into helpers like expansion packs instead of adopting a full stack.
+**Lightweight DOM manipulation without the framework weight.** The ~4.8KB Brotli core (minified UMD) drives complete UIs. Need state management? Opt into helpers like expansion packs instead of adopting a full stack.
 
 Bring in only what you need — let the stack scale with your project.
 
 **Design philosophy:**
-- **Small Bundle** — 4KB core with optional extensions
+
+- **Small Bundle** — ~4.8KB Brotli core (minified UMD) with optional extensions
 - **Closure-based State** — No magic, just JavaScript
 - **Manual or Reactive** — Choose your update strategy
 - **Progressive Enhancement** — From static HTML to full SPA
@@ -66,16 +67,27 @@ npm install lithent
 Lithent offers two complementary styles you can freely mix in the same project.
 
 **Manual Mode** — Explicit control with `renew()`
+
 ```tsx
 import { mount } from 'lithent';
 
 const Counter = mount(renew => {
   let count = 0;
-  return () => <button onClick={() => { count++; renew(); }}>{count}</button>;
+  return () => (
+    <button
+      onClick={() => {
+        count++;
+        renew();
+      }}
+    >
+      {count}
+    </button>
+  );
 });
 ```
 
 **Light API Mode** — Automatic reactivity
+
 ```tsx
 import { lmount } from 'lithent';
 import { lstate } from 'lithent/helper';
@@ -100,12 +112,14 @@ for the lookup contract and an external-data migration example.
 ## Key features
 
 ### Core
+
 - **mount / lmount** — Component initialization
 - **Portal** — Render outside parent DOM
 - **Hooks** — Lifecycle callbacks (`mountCallback`, `updateCallback`, `mountReadyCallback`)
 - **Ref** — Direct DOM access
 
 ### Helpers (optional)
+
 - **state / lstate** — Reactive state management
 - **computed** — Derived values
 - **effect** — Side effects
@@ -113,6 +127,7 @@ for the lookup contract and an external-data migration example.
 - **context / lcontext** — Cross-component data sharing
 
 ### Custom Elements (optional)
+
 - **lithent/element** — Register a component as a standard Custom Element and embed it in any page (plain HTML, server templates, React, Vue) with a script and a tag. Shadow DOM style isolation, attribute/property props, DOM events. Under 1KB on top of the core.
 
 ```js
@@ -125,6 +140,7 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 > **[🧩 Custom Elements guide](https://superlucky84.github.io/lithent/#/guide/element)**
 
 ### Template options
+
 - **JSX** — Via Vite plugin
 - **FTags** — Function-style tags (no build step)
 - **HTM** — Tagged template literals
@@ -132,21 +148,26 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 
 > **[📖 View full API reference](https://superlucky84.github.io/lithent/#/)**
 
+Event props such as `onClick` register the original native callback. Replacing a
+handler follows native removal and registration rules. For listener options,
+use `ref` and `mountCallback` with cleanup. See the
+[DOM event contract and example](skills/lithent/reference/events.md).
+
 <br />
 
 ## Ecosystem
 
-| Package | Description |
-|--------|-------------|
-| [lithent](https://www.npmjs.com/package/lithent) | Core library (~4KB) |
-| [lithent/helper](https://www.npmjs.com/package/lithent) | Reactive state helpers |
-| [lithent/ssr](https://www.npmjs.com/package/lithent) | Server‑side rendering |
-| [lithent/ftags](https://www.npmjs.com/package/lithent) | Function‑style tag API |
-| [lithent/tag](https://www.npmjs.com/package/lithent) | HTM template support |
-| [lithent/element](./element/README.md) | Register components as Custom Elements, embeddable in any page ([guide](https://superlucky84.github.io/lithent/#/guide/element)) |
-| [lithent-concurrent](./lithentConcurrent/README.md) | Separate core with priority scheduling and interruptible low-priority builds |
-| [lithent-concurrent/helper](./lithentConcurrent/README.md#lithent-concurrenthelper) | Deferred state and component-local pending queries |
-| [create-lithent](https://www.npmjs.com/package/create-lithent) | Project scaffolding tool |
+| Package                                                                             | Description                                                                                                                      |
+| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| [lithent](https://www.npmjs.com/package/lithent)                                    | Core library (~4.8KB Brotli, minified UMD)                                                                                       |
+| [lithent/helper](https://www.npmjs.com/package/lithent)                             | Reactive state helpers                                                                                                           |
+| [lithent/ssr](https://www.npmjs.com/package/lithent)                                | Server‑side rendering                                                                                                            |
+| [lithent/ftags](https://www.npmjs.com/package/lithent)                              | Function‑style tag API                                                                                                           |
+| [lithent/tag](https://www.npmjs.com/package/lithent)                                | HTM template support                                                                                                             |
+| [lithent/element](./element/README.md)                                              | Register components as Custom Elements, embeddable in any page ([guide](https://superlucky84.github.io/lithent/#/guide/element)) |
+| [lithent-concurrent](./lithentConcurrent/README.md)                                 | Separate core with priority scheduling and interruptible low-priority builds                                                     |
+| [lithent-concurrent/helper](./lithentConcurrent/README.md#lithent-concurrenthelper) | Deferred state and component-local pending queries                                                                               |
+| [create-lithent](https://www.npmjs.com/package/create-lithent)                      | Project scaffolding tool                                                                                                         |
 
 For expensive component trees, select the concurrent core with an exact
 `/^lithent$/` bundler alias. `deferRender` defers rendering while state writes

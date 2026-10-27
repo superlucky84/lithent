@@ -1,0 +1,79 @@
+[
+  {
+    "scope": "core",
+    "order": "main",
+    "kind": "cpu",
+    "name": "event",
+    "id": "02_replace1k",
+    "attempt": 1,
+    "at": "2026-10-25T12:55:04.254Z",
+    "error": "Protocol error (Input.dispatchMouseEvent): Target closed",
+    "warnings": []
+  },
+  {
+    "scope": "core",
+    "order": "reverse",
+    "kind": "cpu",
+    "name": "event",
+    "id": "06_remove-one-1k",
+    "attempt": 1,
+    "at": "2026-10-25T13:50:25.514Z",
+    "error": "Protocol error (Input.dispatchMouseEvent): Target closed",
+    "warnings": []
+  },
+  {
+    "scope": "final-event",
+    "order": "reverse",
+    "kind": "cpu",
+    "name": "preact-classes",
+    "id": "05_swap1k",
+    "attempt": 1,
+    "at": "2026-10-25T15:43:49.183Z",
+    "error": "Attempted to use detached Frame '9E22DAC0EDFAA5760BF2F839F299F99F'.",
+    "warnings": []
+  },
+  {
+    "scope": "final-event",
+    "order": "reverse",
+    "kind": "mem",
+    "name": "preact-hooks",
+    "id": "21_ready-memory",
+    "attempt": 1,
+    "at": "2026-10-25T16:17:35.433Z",
+    "error": "Protocol error (Runtime.evaluate): Target closed",
+    "warnings": []
+  },
+  {
+    "scope": "final-event",
+    "order": "reverse",
+    "kind": "mem",
+    "name": "preact-hooks",
+    "id": "21_ready-memory",
+    "attempt": 2,
+    "at": "2026-10-25T16:34:42.691Z",
+    "error": "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+    "warnings": []
+  },
+  {
+    "scope": "final-event",
+    "order": "reverse",
+    "kind": "mem",
+    "name": "preact-hooks",
+    "id": "21_ready-memory",
+    "attempt": 3,
+    "at": "2026-10-25T16:50:55.005Z",
+    "error": "Runtime.evaluate timed out. Increase the 'protocolTimeout' setting in launch/connect calls for a higher timeout if needed.",
+    "warnings": []
+  },
+  {
+    "scope": "final-event",
+    "order": "reverse",
+    "kind": "mem",
+    "name": "baseline",
+    "id": "25_run-clear-memory",
+    "attempt": 1,
+    "at": "2026-10-25T17:23:18.195Z",
+    "error": "Protocol error (Runtime.evaluate): Target closed",
+    "warnings": []
+  }
+]

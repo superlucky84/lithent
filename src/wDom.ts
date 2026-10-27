@@ -19,10 +19,10 @@ import {
   initMountHookState,
   needDiffRef,
   componentMap,
-  wdomSymbol,
   lmountComponentSet,
 } from '@/utils/universalRef';
 import { bindRedraw, componentUpdate } from '@/utils/redraw';
+import { createWDom } from '@/utils/createWDom';
 import { runUpdateCallback } from '@/hook/updateCallback';
 import {
   checkFragmentFunction,
@@ -37,12 +37,7 @@ import {
  * It allows grouping multiple elements together.
  */
 export const Fragment = (_props: Props, ...children: WDom[]) =>
-  ({
-    type: 'f', // fragment
-    nr: undefined,
-    [wdomSymbol]: true,
-    children,
-  }) as WDom;
+  createWDom('f', undefined, undefined, undefined, children);
 
 /**
  * Element creation
@@ -201,16 +196,7 @@ const makeNode = (
     return node;
   }
 
-  return {
-    type: 'e', // element
-    // Declared on every new node: a diff sets it, and a drawn node keeps it
-    // ('N'), so the node keeps its shape and reading it is a plain lookup.
-    nr: undefined,
-    [wdomSymbol]: true,
-    tag,
-    props,
-    children,
-  } as WDom;
+  return createWDom('e', tag, props, undefined, children);
 };
 
 /**
@@ -235,21 +221,16 @@ const remakeChildren = (
  */
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   if (item === null || item === undefined || typeof item === 'boolean') {
-    return { type: null, nr: undefined, [wdomSymbol]: true } as WDom;
+    return createWDom(null);
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
-    const node = {
-      type: 'l', // loop (array mapping)
-      nr: undefined,
-      [wdomSymbol]: true,
-      children,
-    } as WDom;
+    const node = createWDom('l', undefined, undefined, undefined, children);
     nodeParentPointer.value = node;
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 't', nr: undefined, [wdomSymbol]: true, text: item } as WDom; // text node
+    return createWDom('t', undefined, undefined, item);
   }
 
   return item;
@@ -337,15 +318,14 @@ export const cloneWDom = (wDom: WDom): WDom | TagFunctionResolver =>
           children: wDom.compChild as WDom[],
         }
       )
-    : ({
-        type: wDom.type,
-        tag: wDom.tag,
-        props: wDom.props,
-        text: wDom.text,
-        children: wDom.children && [...wDom.children],
-        getParent: wDom.getParent,
-        [wdomSymbol]: true,
-      } as WDom);
+    : createWDom(
+        wDom.type,
+        wDom.tag,
+        wDom.props,
+        wDom.text,
+        wDom.children && [...wDom.children],
+        wDom.getParent
+      );
 
 export const copyResolver = ({
   ctor,

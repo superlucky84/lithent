@@ -249,10 +249,6 @@ const completeWork = (frame: Frame, effects: Effects) => {
     });
   }
 
-  if (originalWDom && originalWDom.tag === 'portal') {
-    wip.tag = 'portal';
-  }
-
   // Build this subtree's elements now rather than at commit — but only at the
   // TOP of a fresh subtree, because `prepareDom` recurses. A node whose parent
   // is also being created is reached by that recursion, and preparing it again

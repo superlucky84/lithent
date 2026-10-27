@@ -74,6 +74,13 @@ hidden instance saves, polling, permanent disposal and route/language cleanup.
 The mock timer clock is controlled only in the retention test; the cleanup
 check tracks the demo's real intervals and request timers.
 
+`events.spec.ts` runs trusted alias transitions, nested dispatch, latest handler
+native replacement timing on the target and ancestor, callback exceptions,
+original prop callback dedup/remove and replacement order, and direct native
+registration through ref/mountCallback for both built cores. The alias test
+depends on the browser's microtask checkpoint between native listeners;
+synthetic dispatch alone does not detect the preserved flat proxy regression.
+
 ```sh
 pnpm exec playwright test e2e/lifecycle-docs.spec.ts e2e/release-docs.spec.ts
 ```

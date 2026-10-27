@@ -1,0 +1,901 @@
+{
+  "status": "C3 base prototype validated; default adoption deferred; baseline restored",
+  "checkpoint": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+  "tests": {
+    "candidate": 33,
+    "dualPassed": 1070,
+    "dualSkipped": 3,
+    "suites": [
+      {
+        "passed": 409,
+        "skipped": 0
+      },
+      {
+        "passed": 312,
+        "skipped": 0
+      },
+      {
+        "passed": 8,
+        "skipped": 0
+      },
+      {
+        "passed": 51,
+        "skipped": 0
+      },
+      {
+        "passed": 11,
+        "skipped": 0
+      },
+      {
+        "passed": 10,
+        "skipped": 0
+      },
+      {
+        "passed": 15,
+        "skipped": 0
+      },
+      {
+        "passed": 82,
+        "skipped": 3
+      },
+      {
+        "passed": 51,
+        "skipped": 0
+      },
+      {
+        "passed": 11,
+        "skipped": 0
+      },
+      {
+        "passed": 10,
+        "skipped": 0
+      },
+      {
+        "passed": 15,
+        "skipped": 0
+      },
+      {
+        "passed": 85,
+        "skipped": 0
+      }
+    ]
+  },
+  "sizes": {
+    "baseline": {
+      "raw": 12741,
+      "gzip": 5178,
+      "brotli": 4798
+    },
+    "candidate": {
+      "raw": 15481,
+      "gzip": 6169,
+      "brotli": 5691
+    }
+  },
+  "compression": {
+    "node": "v20.3.0",
+    "zlib": "1.2.13.1-motley",
+    "gzipLevel": 9,
+    "recordedGate": {
+      "node": "v22.13.0",
+      "zlib": "1.3.0.1-motley-82a5fec",
+      "raw": 15481,
+      "gzip": 6157,
+      "brotli": 5691
+    },
+    "note": "The recorded size gate and current aggregator can use different Node/zlib versions; compare gzip values only with their recorded compressor."
+  },
+  "budget": 4800,
+  "overBudget": 891,
+  "editor": {
+    "kind": "C3 production DOM/work-count/retention contract; not official CPU performance",
+    "at": "2026-10-22T02:31:59.335Z",
+    "browserVersion": "155.0.8059.85",
+    "manifest": {
+      "at": "2026-10-22T02:31:58.178Z",
+      "browser": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "builds": {
+        "baseline": {
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "appSource": "be0505eb841d6fcb6dce540d4db626dd2689b29787d307a540e4f06634c569da",
+          "bundle": "249509ff3a7bffc06758e83cdfb4b7ba9aa6b2167c68c2b6bdcc018edc80f47b"
+        },
+        "candidate": {
+          "core": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+          "appSource": "be0505eb841d6fcb6dce540d4db626dd2689b29787d307a540e4f06634c569da",
+          "bundle": "21fbc5e6092cf8c2f090a5012b6249a8d27afb7b7d3cfb2bfcff4e2b1d8a8eec"
+        }
+      },
+      "types": {
+        "base": {
+          "exitCode": 0,
+          "output": "",
+          "declaration": "69ed6c62dd2bf3ce0c2cc561f750d89335a6d8100bd5771be8a8edad34f0839e"
+        },
+        "concurrent": {
+          "exitCode": 2,
+          "output": "../../../../tmp/lithent-c3-parent-memo-20261022/final/types/concurrent/consumer.ts(1,10): error TS2305: Module '\"lithent\"' has no exported member 'useParentMemo'.\n../../../../tmp/lithent-c3-parent-memo-20261022/final/types/concurrent/consumer.ts(2,34): error TS7006: Parameter 'next' implicitly has an 'any' type.\n",
+          "declaration": "4ea4f531f7fc31a03fd8d5b4d42e7d8ff3075bcbf1e78b8b82bfcbdab42802d6"
+        }
+      },
+      "unsupportedRuntimeImport": {
+        "exitCode": 1,
+        "error": "file:///private/tmp/lithent-c3-parent-memo-20261022/final/unsupported-import.mjs:1\nimport { useParentMemo } from \"/Users/n250109005/project/lithent/lithentConcurrent/dist/lithentConcurrent.mjs\";\n         ^^^^^^^^^^^^^\nSyntaxError: The requested module '/Users/n250109005/project/lithent/lithentConcurrent/dist/lithentConcurrent.mjs' does not provide an export named 'useParentMemo'\n    at ModuleJob._instantiate (node:internal/modules/esm/module_job:122:21)\n    at async ModuleJob.run (node:internal/modules/esm/module_job:188:5)\n    at async DefaultModuleLoader.import (node:internal/modules/esm/loader:246:24)\n    at async loadESM (node:internal/process/esm_loader:40:7)\n    at async handleMainPromise (node:internal/modules/run_main:66:12)\n\nNode.js v20.3.0\n"
+      }
+    },
+    "runs": [
+      {
+        "variant": "baseline",
+        "optIn": false,
+        "contextIndex": 0,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 2000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 4001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 5001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 6000,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "baseline",
+        "optIn": false,
+        "contextIndex": 1,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 2000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 4001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 5001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 6000,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "baseline",
+        "optIn": false,
+        "contextIndex": 2,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 2000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 4001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 5001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 6000,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "candidate",
+        "optIn": false,
+        "contextIndex": 0,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 2000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 4001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 5001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 6000,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "candidate",
+        "optIn": false,
+        "contextIndex": 1,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 2000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 4001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 5001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 6000,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "candidate",
+        "optIn": false,
+        "contextIndex": 2,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 2000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 4001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 5001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 6000,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "candidate",
+        "optIn": true,
+        "contextIndex": 0,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 1001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 1002,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 1002,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "candidate",
+        "optIn": true,
+        "contextIndex": 1,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 1001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 1002,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 1002,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      },
+      {
+        "variant": "candidate",
+        "optIn": true,
+        "contextIndex": 2,
+        "checks": {
+          "states": [
+            {
+              "stage": "mount",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "refresh",
+              "renders": 1000,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "self-then-refresh-and-reverse",
+              "renders": 1001,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "one-prop-change",
+              "renders": 1002,
+              "mounts": 1000,
+              "unmounts": 0
+            },
+            {
+              "stage": "remove-one",
+              "renders": 1002,
+              "mounts": 1000,
+              "unmounts": 1
+            }
+          ],
+          "registeredBeforeDestroy": 999,
+          "focusAfterRefresh": true,
+          "remainingInputs": 0
+        },
+        "retention": {
+          "retainedKeys": 1000,
+          "registered": 0,
+          "retainedOutputsAndHost": 0,
+          "unmounts": 1000
+        },
+        "errors": []
+      }
+    ]
+  },
+  "original": {
+    "build": {
+      "lithent-before": {
+        "date": "2026-10-22T02:31:56.843Z",
+        "libraryHead": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+        "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+        "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+        "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+        "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+        "vite": "5.4.21"
+      },
+      "lithent": {
+        "date": "2026-10-22T02:31:56.927Z",
+        "libraryHead": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+        "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+        "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+        "core": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+        "coreOrigin": "local-unreleased",
+        "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+        "bundle": "179b5035b81fc11d54c072564529efd06dca8781fc4f2c03cfa2eaa0dedf63c3",
+        "vite": "5.4.21"
+      }
+    },
+    "contracts": {
+      "startedAt": "2026-10-22T02:32:24.772Z",
+      "chrome": "155.0.8059.85",
+      "load": [
+        3.587890625,
+        3.75634765625,
+        3.36572265625
+      ],
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-22T02:31:56.843Z",
+          "libraryHead": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+          "vite": "5.4.21"
+        },
+        "lithent": {
+          "date": "2026-10-22T02:31:56.927Z",
+          "libraryHead": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+          "coreOrigin": "local-unreleased",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "179b5035b81fc11d54c072564529efd06dca8781fc4f2c03cfa2eaa0dedf63c3",
+          "vite": "5.4.21"
+        }
+      },
+      "throttle": 4,
+      "samples": [
+        {
+          "name": "lithent-before",
+          "selection": {
+            "attributes": 2,
+            "childList": 0
+          },
+          "partial": {
+            "text": 100,
+            "childList": 0
+          },
+          "clear": {
+            "removals": 1,
+            "removedNodes": 1000
+          },
+          "batchedOrders": 2,
+          "recreateCycles": 20
+        },
+        {
+          "name": "lithent",
+          "selection": {
+            "attributes": 2,
+            "childList": 0
+          },
+          "partial": {
+            "text": 100,
+            "childList": 0
+          },
+          "clear": {
+            "removals": 1,
+            "removedNodes": 1000
+          },
+          "batchedOrders": 2,
+          "recreateCycles": 20
+        }
+      ],
+      "finishedAt": "2026-10-22T02:32:25.487Z"
+    },
+    "verify": {
+      "startedAt": "2026-10-22T02:32:27.260Z",
+      "mode": "verify",
+      "chrome": "155.0.8059.85",
+      "chromeBinaryPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/MacOS/Google Chrome",
+      "chromeBinarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "chromeFrameworkPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/Current/Google Chrome Framework",
+      "chromeFrameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7",
+      "machine": {
+        "cpu": "Apple M4 Pro",
+        "cores": 12,
+        "memoryGB": 24
+      },
+      "loadStart": [
+        3.587890625,
+        3.75634765625,
+        3.36572265625
+      ],
+      "alternatingOrder": false,
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-22T02:31:56.843Z",
+          "libraryHead": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+          "vite": "5.4.21"
+        },
+        "lithent": {
+          "date": "2026-10-22T02:31:56.927Z",
+          "libraryHead": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+          "coreOrigin": "local-unreleased",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "179b5035b81fc11d54c072564529efd06dca8781fc4f2c03cfa2eaa0dedf63c3",
+          "vite": "5.4.21"
+        }
+      },
+      "versions": {
+        "lithent": "1.25.2",
+        "vite": "5.4.21"
+      },
+      "samples": [
+        {
+          "name": "lithent-before",
+          "scenarios": 9,
+          "fontLoaded": true
+        },
+        {
+          "name": "lithent",
+          "scenarios": 9,
+          "fontLoaded": true
+        }
+      ],
+      "complete": true,
+      "finishedAt": "2026-10-22T02:32:31.286Z",
+      "loadEnd": [
+        3.46044921875,
+        3.72705078125,
+        3.357421875
+      ]
+    }
+  },
+  "restoration": {
+    "at": "2026-10-22T02:35:45.176Z",
+    "head": "ddd545e5b8c3878cfd5a6340464106e4c417da4f",
+    "files": {
+      "src/diff.ts": {
+        "actual": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "expected": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+        "equal": true
+      },
+      "src/hook/internal/unmount.ts": {
+        "actual": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "expected": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+        "equal": true
+      },
+      "src/hook/internal/useUpdate.ts": {
+        "actual": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "expected": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+        "equal": true
+      },
+      "src/hook/mountCallback.ts": {
+        "actual": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "expected": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+        "equal": true
+      },
+      "src/hook/mountReadyCallback.ts": {
+        "actual": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "expected": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+        "equal": true
+      },
+      "src/hook/ref.ts": {
+        "actual": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "expected": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+        "equal": true
+      },
+      "src/hook/updateCallback.ts": {
+        "actual": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "expected": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+        "equal": true
+      },
+      "src/hook/useRenew.ts": {
+        "actual": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "expected": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+        "equal": true
+      },
+      "src/index.ts": {
+        "actual": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "expected": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+        "equal": true
+      },
+      "src/render.ts": {
+        "actual": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "expected": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+        "equal": true
+      },
+      "src/types/index.ts": {
+        "actual": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "expected": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+        "equal": true
+      },
+      "src/utils/index.ts": {
+        "actual": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "expected": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+        "equal": true
+      },
+      "src/utils/predicator.ts": {
+        "actual": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "expected": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+        "equal": true
+      },
+      "src/utils/redraw.ts": {
+        "actual": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "expected": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+        "equal": true
+      },
+      "src/utils/universalRef.ts": {
+        "actual": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "expected": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+        "equal": true
+      },
+      "src/wDom.ts": {
+        "actual": "76a9f33aedf0b4f34e5f836a003aa6481581e3cdbde65a5e36cc606d83b8abbb",
+        "expected": "76a9f33aedf0b4f34e5f836a003aa6481581e3cdbde65a5e36cc606d83b8abbb",
+        "equal": true
+      },
+      "lithentConcurrent/src/diff.ts": {
+        "actual": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "expected": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+        "equal": true
+      },
+      "lithentConcurrent/src/index.ts": {
+        "actual": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "expected": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+        "equal": true
+      },
+      "lithentConcurrent/src/render.ts": {
+        "actual": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "expected": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+        "equal": true
+      },
+      "lithentConcurrent/src/renderGate.ts": {
+        "actual": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "expected": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+        "equal": true
+      },
+      "lithentConcurrent/src/scheduler.ts": {
+        "actual": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "expected": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+        "equal": true
+      },
+      "lithentConcurrent/src/wDom.ts": {
+        "actual": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "expected": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+        "equal": true
+      },
+      "dist/lithent.mjs": {
+        "actual": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "expected": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+        "equal": true
+      },
+      "dist/lithent.umd.js": {
+        "actual": "1b64873b03874d40999175c2244c84fea27aff6994764ff918f197b30c050773",
+        "expected": "1b64873b03874d40999175c2244c84fea27aff6994764ff918f197b30c050773",
+        "equal": true
+      },
+      "dist/lithent.cjs": {
+        "actual": "60275b5d55315fff6b3038b8dcaa1809dec0a9e1dffea0f58c65c376a545be52",
+        "expected": "60275b5d55315fff6b3038b8dcaa1809dec0a9e1dffea0f58c65c376a545be52",
+        "equal": true
+      },
+      "lithentConcurrent/dist/lithentConcurrent.mjs": {
+        "actual": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c",
+        "expected": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c",
+        "equal": true
+      },
+      "lithentConcurrent/dist/lithentConcurrent.umd.js": {
+        "actual": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0",
+        "expected": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0",
+        "equal": true
+      },
+      "element/dist/lithentElement.umd.js": {
+        "actual": "5a4c46084d86263a417e8d3aeccbd370334f42eda82b0de53519c8fc9c2ba826",
+        "expected": "5a4c46084d86263a417e8d3aeccbd370334f42eda82b0de53519c8fc9c2ba826",
+        "equal": true
+      }
+    },
+    "upstreamApp": "314efbb41cf0669c13449c4b4800c4ed5e2b193167f20ccebf7d3f7303e5d76b",
+    "upstreamAppPreserved": true
+  },
+  "evidence": {
+    "file": "docs/benchmark/parent-memo-evidence.json.gz",
+    "sha256": "94ed789b1277de331a0f473cd610d057f025d1c22950a36253b377cae43783d8",
+    "bytes": 451691,
+    "files": 153
+  },
+  "patch": {
+    "file": "docs/benchmark/parent-memo-candidate.patch",
+    "sha256": "c82acf365bfd38113b50e3c9ab6c6b350b0648675619731ef4f59ad1d2481e5e"
+  },
+  "unmeasured": [
+    "official CPU times and reverse order",
+    "official five memory scenarios",
+    "full peers",
+    "100-cycle churn",
+    "final B4/e2e",
+    "concurrent parent memo support"
+  ],
+  "limits": [
+    "Parent diff failure does not transactionally restore the base live tree or hook cursor. Memo snapshots invalidate; explicit retry may need the previous tree.",
+    "First diagnostic test assumptions were corrected; they are not performance samples. Screen-v1 has a different candidate hash and is not combined here."
+  ]
+}

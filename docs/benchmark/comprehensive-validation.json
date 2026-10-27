@@ -1,0 +1,440 @@
+{
+  "at": "2026-10-25T23:25:37.929Z",
+  "head": "fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4",
+  "status": " M README.md\n M docs/benchmark/HANDOFF.md\n M docs/performance-improvement/DESIGN.md\n M docs/performance-improvement/IMPLEMENT.md\n M docs/performance-improvement/MANUAL_TEST_CHECKLIST.md\n M docs/performance-improvement/REQUIREMENTS.md\n M e2e/README.md\n M lithent-agent-addon.md\n M lithentConcurrent/src/render.ts\n M scripts/size-report.js\n M skills/lithent/SKILL.md\n M src/hook/internal/unmount.ts\n M src/render.ts\n?? docs/benchmark/COMPREHENSIVE_RESULTS.md\n?? docs/benchmark/comprehensive-adoption.json\n?? docs/benchmark/comprehensive-audits.json\n?? docs/benchmark/comprehensive-colors.json\n?? docs/benchmark/comprehensive-core-results.json\n?? docs/benchmark/comprehensive-counts.json\n?? docs/benchmark/comprehensive-environment.json\n?? docs/benchmark/comprehensive-event-dispatch.json\n?? docs/benchmark/comprehensive-event-results.json\n?? docs/benchmark/comprehensive-failed-batches.json\n?? docs/benchmark/comprehensive-final-results.json\n?? docs/benchmark/comprehensive-initial-inputs.json\n?? docs/benchmark/comprehensive-retention.json\n?? docs/benchmark/comprehensive-root-dispose.json\n?? docs/benchmark/comprehensive-selection.json\n?? docs/benchmark/comprehensive-table.html\n?? docs/benchmark/comprehensive-ui-results.json\n?? e2e/events.spec.ts\n?? e2e/fixtures/events.html\n?? e2e/fixtures/events.ts\n?? experiments/comprehensive/\n?? skills/lithent/reference/events.md\n?? src/tests/core-eventContract.test.ts\n?? src/tests/core-eventDispatch.test.ts\n?? src/utils/event.ts\n",
+  "pass": true,
+  "steps": {
+    "full-build": {
+      "file": "full-build-2026-10-25T17-31-38.293Z.json",
+      "at": "2026-10-25T17:31:38.293Z",
+      "finishedAt": "2026-10-25T17:32:13.610Z",
+      "name": "full-build",
+      "executable": "pnpm",
+      "args": [
+        "build"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "verify-concurrent": {
+      "file": "verify-concurrent-2026-10-25T17-32-41.009Z.json",
+      "at": "2026-10-25T17:32:41.009Z",
+      "finishedAt": "2026-10-25T17:32:43.542Z",
+      "name": "verify-concurrent",
+      "executable": "pnpm",
+      "args": [
+        "verify:concurrent"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "size": {
+      "file": "size-2026-10-25T17-32-43.542Z.json",
+      "at": "2026-10-25T17:32:43.542Z",
+      "finishedAt": "2026-10-25T17:32:44.471Z",
+      "name": "size",
+      "executable": "pnpm",
+      "args": [
+        "size"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "types-base": {
+      "file": "types-base-2026-10-25T17-32-44.472Z.json",
+      "at": "2026-10-25T17:32:44.472Z",
+      "finishedAt": "2026-10-25T17:32:46.810Z",
+      "name": "types-base",
+      "executable": "pnpm",
+      "args": [
+        "exec",
+        "tsc",
+        "--noEmit"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "types-concurrent": {
+      "file": "types-concurrent-2026-10-25T17-32-46.811Z.json",
+      "at": "2026-10-25T17:32:46.811Z",
+      "finishedAt": "2026-10-25T17:32:48.727Z",
+      "name": "types-concurrent",
+      "executable": "pnpm",
+      "args": [
+        "exec",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "lithentConcurrent/tsconfig.json"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "types-e2e": {
+      "file": "types-e2e-2026-10-25T17-33-53.598Z.json",
+      "at": "2026-10-25T17:33:53.598Z",
+      "finishedAt": "2026-10-25T17:33:54.430Z",
+      "name": "types-e2e",
+      "executable": "pnpm",
+      "args": [
+        "exec",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "e2e/tsconfig.json"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "lint": {
+      "file": "lint-2026-10-25T17-33-54.430Z.json",
+      "at": "2026-10-25T17:33:54.430Z",
+      "finishedAt": "2026-10-25T17:33:55.277Z",
+      "name": "lint",
+      "executable": "pnpm",
+      "args": [
+        "exec",
+        "eslint",
+        "src/render.ts",
+        "src/hook/internal/unmount.ts",
+        "src/utils/event.ts",
+        "lithentConcurrent/src/render.ts",
+        "src/tests/core-eventContract.test.ts",
+        "src/tests/core-eventDispatch.test.ts",
+        "e2e/events.spec.ts",
+        "e2e/fixtures/events.ts",
+        "experiments/comprehensive/event.ts",
+        "experiments/comprehensive/ui.tsx"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "full-tests": {
+      "file": "full-tests-2026-10-25T17-32-41.009Z.json",
+      "at": "2026-10-25T17:32:41.009Z",
+      "finishedAt": "2026-10-25T17:33:11.903Z",
+      "name": "full-tests",
+      "executable": "pnpm",
+      "args": [
+        "test"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "ssr-base": {
+      "file": "ssr-base-2026-10-25T17-33-11.903Z.json",
+      "at": "2026-10-25T17:33:11.903Z",
+      "finishedAt": "2026-10-25T17:33:13.489Z",
+      "name": "ssr-base",
+      "executable": "pnpm",
+      "args": [
+        "--filter",
+        "lithent-ssr",
+        "test"
+      ],
+      "extra": {},
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "satellites-concurrent": {
+      "file": "satellites-concurrent-2026-10-25T17-33-13.490Z.json",
+      "at": "2026-10-25T17:33:13.490Z",
+      "finishedAt": "2026-10-25T17:33:22.881Z",
+      "name": "satellites-concurrent",
+      "executable": "pnpm",
+      "args": [
+        "run",
+        "test:satellites"
+      ],
+      "extra": {
+        "LITHENT_CORE": "concurrent"
+      },
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "packages": {
+      "file": "packages-2026-10-25T23-24-49.424Z.json",
+      "at": "2026-10-25T23:24:49.424Z",
+      "finishedAt": "2026-10-25T23:24:53.855Z",
+      "name": "packages",
+      "executable": "/Users/superlucky84/.volta/tools/image/node/20.3.0/bin/node",
+      "args": [
+        "/Users/superlucky84/project/lithent/experiments/comprehensive/package-dispatch.mjs",
+        "/private/tmp/lithent-final-20261025"
+      ],
+      "status": 0,
+      "node": "v20.3.0"
+    },
+    "e2e": {
+      "file": "e2e-2026-10-25T23-24-53.855Z.json",
+      "at": "2026-10-25T23:24:53.855Z",
+      "finishedAt": "2026-10-25T23:25:32.229Z",
+      "name": "e2e",
+      "executable": "pnpm",
+      "args": [
+        "exec",
+        "playwright",
+        "test",
+        "--reporter=list,json"
+      ],
+      "status": 0,
+      "node": "v20.3.0",
+      "report": "/private/tmp/lithent-final-20261025/integration/e2e-2026-10-25T23-24-53.855Z.report.json"
+    }
+  },
+  "unitCounts": {
+    "full-tests": {
+      "suites": [
+        {
+          "passed": 434,
+          "skipped": 0
+        },
+        {
+          "passed": 337,
+          "skipped": 0
+        },
+        {
+          "passed": 8,
+          "skipped": 0
+        },
+        {
+          "passed": 51,
+          "skipped": 0
+        },
+        {
+          "passed": 11,
+          "skipped": 0
+        },
+        {
+          "passed": 30,
+          "skipped": 0
+        },
+        {
+          "passed": 6,
+          "skipped": 0
+        },
+        {
+          "passed": 5,
+          "skipped": 0
+        },
+        {
+          "passed": 10,
+          "skipped": 0
+        },
+        {
+          "passed": 82,
+          "skipped": 3
+        }
+      ],
+      "passed": 974,
+      "skipped": 3,
+      "note": "Execution counts from the repository scripts; suites may overlap, not a claim of distinct tests."
+    },
+    "ssr-base": {
+      "suites": [
+        {
+          "passed": 15,
+          "skipped": 0
+        }
+      ],
+      "passed": 15,
+      "skipped": 0,
+      "note": "Execution counts from the repository scripts; suites may overlap, not a claim of distinct tests."
+    },
+    "satellites-concurrent": {
+      "suites": [
+        {
+          "passed": 51,
+          "skipped": 0
+        },
+        {
+          "passed": 11,
+          "skipped": 0
+        },
+        {
+          "passed": 10,
+          "skipped": 0
+        },
+        {
+          "passed": 15,
+          "skipped": 0
+        },
+        {
+          "passed": 85,
+          "skipped": 0
+        }
+      ],
+      "passed": 172,
+      "skipped": 0,
+      "note": "Execution counts from the repository scripts; suites may overlap, not a claim of distinct tests."
+    }
+  },
+  "e2e": {
+    "startTime": "2026-10-25T23:24:54.423Z",
+    "duration": 37776.833,
+    "expected": 76,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "eventBrowserTests": 12,
+  "packageFormats": 6,
+  "creationFailures": [
+    {
+      "name": "base",
+      "empty": {
+        "documents": 1,
+        "nodes": 4,
+        "jsEventListeners": 13
+      },
+      "observed": {
+        "caught": [
+          "failure-dom-setter",
+          "failure-component"
+        ],
+        "refs": 3,
+        "bodyChildren": 0
+      },
+      "settled": {
+        "documents": 1,
+        "nodes": 4,
+        "jsEventListeners": 13
+      },
+      "remaining": 0
+    },
+    {
+      "name": "concurrent",
+      "empty": {
+        "documents": 1,
+        "nodes": 6,
+        "jsEventListeners": 15
+      },
+      "observed": {
+        "caught": [
+          "failure-dom-setter",
+          "failure-component"
+        ],
+        "refs": 3,
+        "bodyChildren": 0
+      },
+      "settled": {
+        "documents": 1,
+        "nodes": 6,
+        "jsEventListeners": 15
+      },
+      "remaining": 0
+    }
+  ],
+  "interactiveTable": {
+    "cpuRows": 9,
+    "memoryRows": 5,
+    "orderAndMetricControls": true,
+    "errors": []
+  },
+  "artifacts": {
+    "dist/diff.d.cts": "d49d568cfbb634a9d39f50a47cdebf95d7dcf8097ee65a1c6bc6e5eb7b1f067b",
+    "dist/diff.d.ts": "ef1dc6a829a6d4ab0ab0a994e1d1c33ff7737977b08027e20d27da2997a34345",
+    "dist/index.d.cts": "e5a33fc18efb4bbc8d78d6eeb59950a9c78c09630cabb4dc8def3914e274eda7",
+    "dist/index.d.ts": "ebae87ee8575ee2cd9ac5307bfd681fb8d2c7562b5168635980818fbc8e31c62",
+    "dist/lithent-agent-addon.md": "06a0f32f95ce5f1312fa8ded58f6f8cb223133bcca6bbf9ee49816a6d31d1666",
+    "dist/lithent.cjs": "6632c90c646f5695824dfb2caaf7bd59b9f85c18a36b6de5c56087246854d776",
+    "dist/lithent.cjs.map": "c974167c72c7d7ca30ddcfa15119c3d2d6a9d1372bd922065192d565204591b9",
+    "dist/lithent.mjs": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45",
+    "dist/lithent.mjs.map": "78566e09403bdd31b29e77cb511e123d26550bbbfc33651aa90c6e6465462d81",
+    "dist/lithent.umd.js": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2",
+    "dist/lithent.umd.js.map": "b899c339a90dfbb556f0411411484f03bc90096d63ba84efa8ad7eb3b3edc63e",
+    "dist/render.d.cts": "c0ed62983bc9edb44b0337b471b9b4235951afa36388c12505241816f4328aee",
+    "dist/render.d.ts": "83c96c2123300335d6aa180fdd5f02e320c1be5bdfdc73cf215d87547cd1898e",
+    "dist/wDom.d.cts": "8e0ad1883dbcf6daf052c70f1150e2b40a93dd51f64961152db7da823332bb6b",
+    "dist/wDom.d.ts": "f2748d0360ddff09c2c355f6201672518ed36fb94015525dc34606abd3738f21",
+    "dist/hook/mountCallback.d.cts": "6646be3fbc535d955db819c6b52566bb3648776dd7ed3535b557ecbe50fdc7b5",
+    "dist/hook/mountCallback.d.ts": "10df7534aedee40288fc5d40315d3acc4eb8ae685510a85ad6792610dc4697fd",
+    "dist/hook/mountReadyCallback.d.cts": "9a19232cd97800e95becf8e7f13d264cf276bdb9fd56c7963806ade92f866ca6",
+    "dist/hook/mountReadyCallback.d.ts": "45e5a4835f43769d56d85523bde1a23ed931d455a3f1b667ddd771f909a1c836",
+    "dist/hook/ref.d.cts": "bcbdae8991e6ae9ddca0edb437fc0491eb26edfe77d0a2ffd08e37ec7cea2da0",
+    "dist/hook/ref.d.ts": "bcbdae8991e6ae9ddca0edb437fc0491eb26edfe77d0a2ffd08e37ec7cea2da0",
+    "dist/hook/updateCallback.d.cts": "f52499a70fbad23995aad342c9b0ad46f0bc7c6d174bde40376f9be314433d07",
+    "dist/hook/updateCallback.d.ts": "f52499a70fbad23995aad342c9b0ad46f0bc7c6d174bde40376f9be314433d07",
+    "dist/hook/useRenew.d.cts": "705ba79ca90aa3e8130b48f199b948d3cbea80736f0edf7379ec5fa6adc7901f",
+    "dist/hook/useRenew.d.ts": "34cd96b2b4d2d30741e597399ec9250dfe6720cf92833927c0615c0a24173462",
+    "dist/types/index.d.cts": "2af50f77bdb4f4fba5047544029491aac7d7f54bdb25e6937366596c53dee407",
+    "dist/types/index.d.ts": "19ab0d6d8937647bcaad13cf2d655c899aa6eb12c7b95f51927c8c6371786c08",
+    "dist/utils/createWDom.d.cts": "2cf54cbbd3637c7a24639aa31785ec42a4065eff85df8862cfa4defc8eaad773",
+    "dist/utils/createWDom.d.ts": "5d1b54255e1237f4f05bb8892253b7ca8cda17c3429f7a66268e1c329c424f6c",
+    "dist/utils/event.d.cts": "b10ab718389ad251f8fdecb659d13b1418c62c09f2e2d1f44925400edcddb8d7",
+    "dist/utils/event.d.ts": "b10ab718389ad251f8fdecb659d13b1418c62c09f2e2d1f44925400edcddb8d7",
+    "dist/utils/index.d.cts": "3a36b60f753490fe7cb6c07b269a2085c1f71e013b2a86ed807b2e3716ce552c",
+    "dist/utils/index.d.ts": "e69493e826945d9005780d16eba6e126c5eacd75c2246b53d4e15147b732e222",
+    "dist/utils/predicator.d.cts": "c75019ec1dedc0212276875435755c72dd46042267237baa4d0a55f0252f529d",
+    "dist/utils/predicator.d.ts": "3f066d9f1bf3978ee235c11803e8ea97c8db72138c9406f81688b1da79653fb5",
+    "dist/utils/redraw.d.cts": "ec0de4fbbfc1bd52d1b76df111023dc13599e0f31c01a3b99ff9eac820ac961c",
+    "dist/utils/redraw.d.ts": "ac9c14b1962a24dc31443163fe9a5b0c831edda84aae92f8dd110afa80d6d464",
+    "dist/utils/universalRef.d.cts": "498f39b9c4a7e66281726b515e487e56a33509e4e4ea7153df439c9757a7fc79",
+    "dist/utils/universalRef.d.ts": "283605a635bb8c037303cc4dca5ffda6d267f356017f53cac7b2582d67e6e8cc",
+    "lithentConcurrent/dist/lithentConcurrent.cjs": "11db27ee2a98082f2fb5819a008430d23a51430f3726e9117938a6c08cd85066",
+    "lithentConcurrent/dist/lithentConcurrent.cjs.map": "31c9b8b557077e3d6a4f00e2e0ff0c33e56d46363a9f1486ca1d5cd66b3bc186",
+    "lithentConcurrent/dist/lithentConcurrent.mjs": "5ec069e06ff94766bae858cdbe113cebea9eb45801526ecb467a9d943fa9f39c",
+    "lithentConcurrent/dist/lithentConcurrent.mjs.map": "6acb3ace4c6589d62e079b835abd8ce0dd9730d04c180a59142bf9498ca4061b",
+    "lithentConcurrent/dist/lithentConcurrent.umd.js": "6c540d468240bed97bc8053f22e38c9dbd62bd1dfd3aa7a3cb6e01e0f8e8b6ff",
+    "lithentConcurrent/dist/lithentConcurrent.umd.js.map": "b2b1bfdac3ca10426e2e994ed09477ee767280d3f19ee7e110f0c19000b14f8d",
+    "dist/hook/internal/unmount.d.cts": "7347e6fa6c3421478ee9dcd58bb89e8cca344c13d8f8afcab43c2e72b5341326",
+    "dist/hook/internal/unmount.d.ts": "86744e8b0f84c7c4a00b9c22d7db9d66efa58dad9e4296496e19fbbf64fc07c6",
+    "dist/hook/internal/useUpdate.d.cts": "d79feae6f67e3fdb31815136f8916db447fd78382d02b7a30ebc01954742942a",
+    "dist/hook/internal/useUpdate.d.ts": "0e0d862e508800c1d881f413b873570edffbcdb78d40a21b6e7f94d189c18ffc",
+    "dist/skills/lithent/SKILL.md": "af24ff96bb80e5289dc630b87018a2d2351de1cfd0d52721b70d1dffa168374b",
+    "dist/skills/lithent/constraints/mistakes.md": "35256fec2ac2e79f3a5b341530aed3893b57c61f8cf2f0825c5e94f084400ccb",
+    "dist/skills/lithent/constraints/rules.md": "2969a1b4ffe0864771574e3357536e0fb1b5e0ebafb9765b8005aaacebc126f0",
+    "dist/skills/lithent/constraints/troubleshooting.md": "dabcecd591fe757c81ea34c9c1c0e2a3dde34b100c2ddf3e720890cd51488c01",
+    "dist/skills/lithent/examples/quick-examples.md": "474894fcb49a3ccd9fa9e45cb8b83d6ae355c9e2f9c5f126c61e97df3ec134c6",
+    "dist/skills/lithent/reference/children-type.md": "5ddd5e8f11c0397c57ad382bf4438eac1af4d32c70ef96470b2e698d7d41ff5b",
+    "dist/skills/lithent/reference/concurrent.md": "7003b6d9eb15146b9a79879e850dc35b4f3ce9eaa1facda9ef49a8cc4bd2270f",
+    "dist/skills/lithent/reference/element.md": "8c1493f905c45910631b3f7b25be8564fe3c6edd2fb1f91ec01898cca37292f6",
+    "dist/skills/lithent/reference/events.md": "a389b423a52edcc98314da29d3da81fa58e4234768df281c6cb6c6552df43cc4",
+    "dist/skills/lithent/reference/lstore-inference.md": "49c19639df250826d470e08030ca8372c399b13f9a701b7a5c0f7aa671a672bb",
+    "dist/skills/lithent/reference/props-types.md": "e3d9aa5de27ee91698698dc5304e10cdc7db8c1c3cbafd744d5076024ff9003a",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/diff.d.cts": "758c06f22bcaf7359d790c3ea5a0f5e506995ca0b7e3ee1a383e22df7c6e7435",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/diff.d.ts": "a0e0191436da63517213e0df0a60f5d90f719da2b2841808ab236e53bee9a59b",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/index.d.cts": "b8e23aef927d70ee05d093043963ea36b13af4504a355d5285b3f7e3fd27c123",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/index.d.ts": "4ea4f531f7fc31a03fd8d5b4d42e7d8ff3075bcbf1e78b8b82bfcbdab42802d6",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/render.d.cts": "e353b12efe2c58571b113aed5a3482c9b530ebbdbd4944b0e37bc78f03a4ba24",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/render.d.ts": "5e67adb997ffc3ac5a96d6c3906f35e3fff56998875f2cf6f1e72669ebb8f556",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/renderGate.d.cts": "2cc859b23e226e123df66c2bc775e32c17405b4b392dd448d91908241a98878b",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/renderGate.d.ts": "9d72c9d5528f7ad824246dbd4a8161d18f311bae1c042c5b9548fb11b56aa478",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/scheduler.d.cts": "a85dad931143271f687244a2099697e8c8a9def84bda33d85786dafeab92a133",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/scheduler.d.ts": "2517d62be55ed9608a8f39bbe1e1b48f1da77aa5aefa90a89c770ff7177b43ed",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/wDom.d.cts": "7f845477f4a6fd946ee5aa64b15a63a29f5cc3f947457288ee6ababee84174ea",
+    "lithentConcurrent/dist/types/lithentConcurrent/src/wDom.d.ts": "04e96e5f5d9a2fbc4dade409cf154a37ff29add338d87a270c46b9483fc7440d",
+    "lithentConcurrent/dist/types/src/hook/mountCallback.d.cts": "6646be3fbc535d955db819c6b52566bb3648776dd7ed3535b557ecbe50fdc7b5",
+    "lithentConcurrent/dist/types/src/hook/mountCallback.d.ts": "10df7534aedee40288fc5d40315d3acc4eb8ae685510a85ad6792610dc4697fd",
+    "lithentConcurrent/dist/types/src/hook/mountReadyCallback.d.cts": "9a19232cd97800e95becf8e7f13d264cf276bdb9fd56c7963806ade92f866ca6",
+    "lithentConcurrent/dist/types/src/hook/mountReadyCallback.d.ts": "45e5a4835f43769d56d85523bde1a23ed931d455a3f1b667ddd771f909a1c836",
+    "lithentConcurrent/dist/types/src/hook/ref.d.cts": "bcbdae8991e6ae9ddca0edb437fc0491eb26edfe77d0a2ffd08e37ec7cea2da0",
+    "lithentConcurrent/dist/types/src/hook/ref.d.ts": "bcbdae8991e6ae9ddca0edb437fc0491eb26edfe77d0a2ffd08e37ec7cea2da0",
+    "lithentConcurrent/dist/types/src/hook/updateCallback.d.cts": "f52499a70fbad23995aad342c9b0ad46f0bc7c6d174bde40376f9be314433d07",
+    "lithentConcurrent/dist/types/src/hook/updateCallback.d.ts": "f52499a70fbad23995aad342c9b0ad46f0bc7c6d174bde40376f9be314433d07",
+    "lithentConcurrent/dist/types/src/hook/useRenew.d.cts": "705ba79ca90aa3e8130b48f199b948d3cbea80736f0edf7379ec5fa6adc7901f",
+    "lithentConcurrent/dist/types/src/hook/useRenew.d.ts": "34cd96b2b4d2d30741e597399ec9250dfe6720cf92833927c0615c0a24173462",
+    "lithentConcurrent/dist/types/src/types/index.d.cts": "2af50f77bdb4f4fba5047544029491aac7d7f54bdb25e6937366596c53dee407",
+    "lithentConcurrent/dist/types/src/types/index.d.ts": "19ab0d6d8937647bcaad13cf2d655c899aa6eb12c7b95f51927c8c6371786c08",
+    "lithentConcurrent/dist/types/src/utils/event.d.cts": "b10ab718389ad251f8fdecb659d13b1418c62c09f2e2d1f44925400edcddb8d7",
+    "lithentConcurrent/dist/types/src/utils/event.d.ts": "b10ab718389ad251f8fdecb659d13b1418c62c09f2e2d1f44925400edcddb8d7",
+    "lithentConcurrent/dist/types/src/utils/index.d.cts": "133c037f3fb467c65345e4da16f72280069572b81e8f1ba55650c240b11ab902",
+    "lithentConcurrent/dist/types/src/utils/index.d.ts": "8eefd1c9a2e83944fc7fdc9e2290f84a5d06f2d293a74ca5db3175e3e1a1f197",
+    "lithentConcurrent/dist/types/src/utils/predicator.d.cts": "23b33604b6e970ecd68983df2a93ca3a77ea56ec6f28a076bb88b91b7cc11a49",
+    "lithentConcurrent/dist/types/src/utils/predicator.d.ts": "105582d0a61d3756f7afa54a68d0661d61f2b3aad34f3e923cda31a95fe29774",
+    "lithentConcurrent/dist/types/src/utils/universalRef.d.cts": "498f39b9c4a7e66281726b515e487e56a33509e4e4ea7153df439c9757a7fc79",
+    "lithentConcurrent/dist/types/src/utils/universalRef.d.ts": "283605a635bb8c037303cc4dca5ffda6d267f356017f53cac7b2582d67e6e8cc",
+    "lithentConcurrent/dist/types/src/hook/internal/unmount.d.cts": "7347e6fa6c3421478ee9dcd58bb89e8cca344c13d8f8afcab43c2e72b5341326",
+    "lithentConcurrent/dist/types/src/hook/internal/unmount.d.ts": "86744e8b0f84c7c4a00b9c22d7db9d66efa58dad9e4296496e19fbbf64fc07c6",
+    "lithentConcurrent/dist/types/src/hook/internal/useUpdate.d.cts": "d79feae6f67e3fdb31815136f8916db447fd78382d02b7a30ebc01954742942a",
+    "lithentConcurrent/dist/types/src/hook/internal/useUpdate.d.ts": "0e0d862e508800c1d881f413b873570edffbcdb78d40a21b6e7f94d189c18ffc"
+  }
+}

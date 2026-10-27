@@ -1,0 +1,1639 @@
+{
+  "at": "2026-10-25T15:11:18.578870+00:00",
+  "selected": "event",
+  "scope": "Provisional E selection before the fresh six-app final run. Default proxy in base and concurrent, direct native via ref/mountCallback.",
+  "reason": [
+    "E inline-only/text update ratios 0.82051/0.84783; real uncached UI partial/select total ratios 0.94783/0.90560, both orders improve.",
+    "Original cached app weighted total E/B 1.004684 and EK/B 1.004677. EK adds no clear original-app gain.",
+    "EK/E uncached UI partial improves 1.94% pooled, select regresses 1.04%; per-order extra gain varies. C2 counters improve but extra proof machinery has insufficient consistent app-level gain for this integration. Keep K/EK sources, full timings, lifetime checks and counter evidence.",
+    "E costs +182B Brotli (+3.77%), about +0.913MB official 10k heap (+3.24%), and +4\u201311% synthetic 20k dispatch. User accepted modest size growth; these costs are explicitly weighed against inline UI gain, not hidden.",
+    "C1/C3/C4 and Fragment range/snapshot remain conditional based on preserved source/report review; no new trace evidence or consumer contract justifies reopening them now."
+  ],
+  "nextProtocol": {
+    "names": [
+      "baseline",
+      "event",
+      "react-hooks",
+      "react-classes",
+      "preact-hooks",
+      "preact-classes"
+    ],
+    "cpuSamples": 1740,
+    "officialMemorySamples": 180,
+    "orders": [
+      "main",
+      "reverse"
+    ],
+    "historicalSamplesPooled": false,
+    "reuse": "Reuse frozen source/app production bytes and already-passed eight-app B3 gates; collect all CPU and memory samples fresh. Peer bundles are preserved production bytes, not freshly rebuilt."
+  },
+  "source": {
+    "at": "2026-10-25T11:33:14.953Z",
+    "node": "v20.3.0",
+    "sources": {
+      "diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+      "hook/internal/unmount.ts": "63645732e461a8864d7b80ec63e2f5a42e6cecfb510a67df327ea89d22b0f2e4",
+      "hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+      "hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+      "hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+      "hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+      "hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+      "hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+      "index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+      "render.ts": "c7851fca5cd74c4a46bc3e007246b9d73bb5ec66d04999776c25d6a1c2f6e41b",
+      "types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+      "utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+      "utils/event.ts": "b031bb96252c91fde631d3171b85f55de1a5842176d4499c8cbe0e36b0a9458b",
+      "utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+      "utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+      "utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+      "utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+      "wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+    },
+    "bundles": {
+      "lithent.mjs": {
+        "sha256": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45",
+        "raw": 19531,
+        "gzip": 6566,
+        "br": 6002
+      },
+      "lithent.umd.js": {
+        "sha256": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2",
+        "raw": 13252,
+        "gzip": 5412,
+        "br": 5006
+      },
+      "lithent.cjs": {
+        "sha256": "6632c90c646f5695824dfb2caaf7bd59b9f85c18a36b6de5c56087246854d776",
+        "raw": 13098,
+        "gzip": 5434,
+        "br": 5035
+      }
+    }
+  },
+  "metrics": {
+    "eventRatios": {
+      "main": {
+        "inline-only": {
+          "event/baseline": {
+            "updateMs": 0.8205128177696744,
+            "pageUpdateMedians": 0.8258064515880938,
+            "mountMs": 1.0317460274284869,
+            "dispatch20kMs": 1.0621468931500273
+          },
+          "c2/baseline": {
+            "updateMs": 0.9743589739670964,
+            "pageUpdateMedians": 0.967741936476248,
+            "mountMs": 0.9682539678409857,
+            "dispatch20kMs": 1.0169491523711445
+          },
+          "combined/baseline": {
+            "updateMs": 0.7692307695246777,
+            "pageUpdateMedians": 0.774193547642814,
+            "mountMs": 1.0158730125316116,
+            "dispatch20kMs": 1.0621468931500273
+          },
+          "combined/event": {
+            "updateMs": 0.9375000034924597,
+            "pageUpdateMedians": 0.9374999991268851,
+            "mountMs": 0.9846153854971101,
+            "dispatch20kMs": 1
+          },
+          "combined/c2": {
+            "updateMs": 0.789473684829688,
+            "pageUpdateMedians": 0.7999999984105429,
+            "mountMs": 1.0491803248653935,
+            "dispatch20kMs": 1.0444444451067183
+          }
+        },
+        "inline-text": {
+          "event/baseline": {
+            "updateMs": 0.8695652157011916,
+            "pageUpdateMedians": 0.8548387095869685,
+            "mountMs": 1.0000000023652638,
+            "dispatch20kMs": 1.0568181800478993
+          },
+          "c2/baseline": {
+            "updateMs": 0.9999999967606171,
+            "pageUpdateMedians": 0.9784946233457962,
+            "mountMs": 1.0000000023652638,
+            "dispatch20kMs": 0.9886363626357692
+          },
+          "combined/baseline": {
+            "updateMs": 0.8043478235517872,
+            "pageUpdateMedians": 0.7956989233873389,
+            "mountMs": 1.0317460298688383,
+            "dispatch20kMs": 1.0795454530830473
+          },
+          "combined/event": {
+            "updateMs": 0.9249999988824128,
+            "pageUpdateMedians": 0.9308176085893396,
+            "mountMs": 1.0317460274284869,
+            "dispatch20kMs": 1.0215053766714326
+          },
+          "combined/c2": {
+            "updateMs": 0.8043478261573779,
+            "pageUpdateMedians": 0.8131868120711604,
+            "mountMs": 1.0317460274284869,
+            "dispatch20kMs": 1.091954022614451
+          }
+        },
+        "stable-text": {
+          "event/baseline": {
+            "updateMs": 0.9696969692864694,
+            "pageUpdateMedians": 1.007575754856193,
+            "mountMs": 1.0483870987899593,
+            "dispatch20kMs": 1.1176470588235294
+          },
+          "c2/baseline": {
+            "updateMs": 0.9393939408306905,
+            "pageUpdateMedians": 0.9545454550585799,
+            "mountMs": 0.9677419373445779,
+            "dispatch20kMs": 0.9941176474094391
+          },
+          "combined/baseline": {
+            "updateMs": 0.9696969692864694,
+            "pageUpdateMedians": 0.9772727264004141,
+            "mountMs": 1.0645161301176704,
+            "dispatch20kMs": 1.1176470588235294
+          },
+          "combined/event": {
+            "updateMs": 1,
+            "pageUpdateMedians": 0.9699248137822609,
+            "mountMs": 1.0153846144676208,
+            "dispatch20kMs": 1
+          },
+          "combined/c2": {
+            "updateMs": 1.0322580625003632,
+            "pageUpdateMedians": 1.023809522345313,
+            "mountMs": 1.0999999990065892,
+            "dispatch20kMs": 1.1242603546330703
+          }
+        },
+        "noevent-text": {
+          "event/baseline": {
+            "updateMs": 1.0312500029103833,
+            "pageUpdateMedians": 1.0793650768496403,
+            "mountMs": 0.9999999973390784,
+            "dispatch20kMs": 1
+          },
+          "c2/baseline": {
+            "updateMs": 0.9375000034924597,
+            "pageUpdateMedians": 0.9682539678409858,
+            "mountMs": 1.0178571391033426,
+            "dispatch20kMs": 0.9791666678954951
+          },
+          "combined/baseline": {
+            "updateMs": 0.9375000034924597,
+            "pageUpdateMedians": 0.9365079356819713,
+            "mountMs": 1.017857144425186,
+            "dispatch20kMs": 0.9791666678954951
+          },
+          "combined/event": {
+            "updateMs": 0.9090909099119097,
+            "pageUpdateMedians": 0.8676470600803314,
+            "mountMs": 1.017857147133624,
+            "dispatch20kMs": 0.9791666678954951
+          },
+          "combined/c2": {
+            "updateMs": 1,
+            "pageUpdateMedians": 0.9672131143135909,
+            "mountMs": 1.0000000052284777,
+            "dispatch20kMs": 1
+          }
+        }
+      },
+      "reverse": {
+        "inline-only": {
+          "event/baseline": {
+            "updateMs": 0.820512820022973,
+            "pageUpdateMedians": 0.8258064523819955,
+            "mountMs": 1,
+            "dispatch20kMs": 1.103448274798966
+          },
+          "c2/baseline": {
+            "updateMs": 0.9743589721056759,
+            "pageUpdateMedians": 0.9741935480025508,
+            "mountMs": 0.968253967765898,
+            "dispatch20kMs": 1.011494252184515
+          },
+          "combined/baseline": {
+            "updateMs": 0.7692307680551352,
+            "pageUpdateMedians": 0.767741935868417,
+            "mountMs": 1.063492064468204,
+            "dispatch20kMs": 1.0804597704299361
+          },
+          "combined/event": {
+            "updateMs": 0.9374999991268851,
+            "pageUpdateMedians": 0.9296874995998222,
+            "mountMs": 1.063492064468204,
+            "dispatch20kMs": 0.9791666678954951
+          },
+          "combined/c2": {
+            "updateMs": 0.789473684829688,
+            "pageUpdateMedians": 0.7880794709044889,
+            "mountMs": 1.0983606572995035,
+            "dispatch20kMs": 1.0681818192208972
+          }
+        },
+        "inline-text": {
+          "event/baseline": {
+            "updateMs": 0.8478260866044149,
+            "pageUpdateMedians": 0.8524590163266992,
+            "mountMs": 1.0158730148968753,
+            "dispatch20kMs": 1.0561797752432744
+          },
+          "c2/baseline": {
+            "updateMs": 1.0326086936451648,
+            "pageUpdateMedians": 1.0000000000000002,
+            "mountMs": 1.0317460297937506,
+            "dispatch20kMs": 0.9719101115412189
+          },
+          "combined/baseline": {
+            "updateMs": 0.8043478251714787,
+            "pageUpdateMedians": 0.8087431695234952,
+            "mountMs": 1.0317460297937506,
+            "dispatch20kMs": 1.0898876400543815
+          },
+          "combined/event": {
+            "updateMs": 0.9487179480321621,
+            "pageUpdateMedians": 0.9487179489383801,
+            "mountMs": 1.0156249990541255,
+            "dispatch20kMs": 1.0319148932797384
+          },
+          "combined/c2": {
+            "updateMs": 0.77894736904847,
+            "pageUpdateMedians": 0.8087431695234951,
+            "mountMs": 1,
+            "dispatch20kMs": 1.1213872837747085
+          }
+        },
+        "stable-text": {
+          "event/baseline": {
+            "updateMs": 0.9696969714758042,
+            "pageUpdateMedians": 1.000000001146243,
+            "mountMs": 0.96923076884281,
+            "dispatch20kMs": 1.0941176467082079
+          },
+          "c2/baseline": {
+            "updateMs": 0.9696969714758042,
+            "pageUpdateMedians": 0.9846153855323792,
+            "mountMs": 0.9384615353931337,
+            "dispatch20kMs": 1.0352941172964432
+          },
+          "combined/baseline": {
+            "updateMs": 0.9393939384361053,
+            "pageUpdateMedians": 0.9461538470708408,
+            "mountMs": 0.9538461521179719,
+            "dispatch20kMs": 1.129411765757729
+          },
+          "combined/event": {
+            "updateMs": 0.9687499972351361,
+            "pageUpdateMedians": 0.9461538459863185,
+            "mountMs": 0.984126982737861,
+            "dispatch20kMs": 1.0322580658082867
+          },
+          "combined/c2": {
+            "updateMs": 0.9687499972351361,
+            "pageUpdateMedians": 0.9609375000363799,
+            "mountMs": 1.0163934441046572,
+            "dispatch20kMs": 1.0909090922945295
+          }
+        },
+        "noevent-text": {
+          "event/baseline": {
+            "updateMs": 1.032258057693537,
+            "pageUpdateMedians": 0.9921875004638422,
+            "mountMs": 1.0181818170980974,
+            "dispatch20kMs": 1.0000000015522044
+          },
+          "c2/baseline": {
+            "updateMs": 0.9677419326928106,
+            "pageUpdateMedians": 0.9062500020736479,
+            "mountMs": 1.0363636396147988,
+            "dispatch20kMs": 0.989583332411712
+          },
+          "combined/baseline": {
+            "updateMs": 0.9677419326928106,
+            "pageUpdateMedians": 0.9531250004547472,
+            "mountMs": 1.0363636341961948,
+            "dispatch20kMs": 1.0208333336243716
+          },
+          "combined/event": {
+            "updateMs": 0.9375000034924597,
+            "pageUpdateMedians": 0.9606299212690812,
+            "mountMs": 1.0178571418117808,
+            "dispatch20kMs": 1.0208333320398297
+          },
+          "combined/c2": {
+            "updateMs": 1,
+            "pageUpdateMedians": 1.051724136026308,
+            "mountMs": 0.9999999947715223,
+            "dispatch20kMs": 1.0315789486232556
+          }
+        }
+      },
+      "pooled": {
+        "inline-only": {
+          "event/baseline": {
+            "updateMs": 0.820512820022973,
+            "pageUpdateMedians": 0.8258064515880938,
+            "mountMs": 1.015873010166348,
+            "dispatch20kMs": 1.0795454549110564
+          },
+          "c2/baseline": {
+            "updateMs": 0.9743589721056759,
+            "pageUpdateMedians": 0.9741935470659948,
+            "mountMs": 0.9682539654757221,
+            "dispatch20kMs": 1.0056818178450797
+          },
+          "combined/baseline": {
+            "updateMs": 0.7692307680551352,
+            "pageUpdateMedians": 0.774193547642814,
+            "mountMs": 1.0317460297937506,
+            "dispatch20kMs": 1.0681818192208972
+          },
+          "combined/event": {
+            "updateMs": 0.9374999991268851,
+            "pageUpdateMedians": 0.9374999991268851,
+            "mountMs": 1.015625003783498,
+            "dispatch20kMs": 0.9894736848379436
+          },
+          "combined/c2": {
+            "updateMs": 0.789473684829688,
+            "pageUpdateMedians": 0.7947019870686618,
+            "mountMs": 1.0655737715330025,
+            "dispatch20kMs": 1.0621468940442207
+          }
+        },
+        "inline-text": {
+          "event/baseline": {
+            "updateMs": 0.8478260866044149,
+            "pageUpdateMedians": 0.8532608695696187,
+            "mountMs": 1.0158730172996828,
+            "dispatch20kMs": 1.044943821739103
+          },
+          "c2/baseline": {
+            "updateMs": 1,
+            "pageUpdateMedians": 0.994565216101713,
+            "mountMs": 1.0158730172996828,
+            "dispatch20kMs": 0.9775280903861643
+          },
+          "combined/baseline": {
+            "updateMs": 0.8043478251714787,
+            "pageUpdateMedians": 0.8043478242031848,
+            "mountMs": 1.031746032234102,
+            "dispatch20kMs": 1.0730337077099676
+          },
+          "combined/event": {
+            "updateMs": 0.9487179480321621,
+            "pageUpdateMedians": 0.9426751570230739,
+            "mountMs": 1.0156249990541255,
+            "dispatch20kMs": 1.0268817187933745
+          },
+          "combined/c2": {
+            "updateMs": 0.8043478251714787,
+            "pageUpdateMedians": 0.808743168553489,
+            "mountMs": 1.0156249990541255,
+            "dispatch20kMs": 1.0977011487067085
+          }
+        },
+        "stable-text": {
+          "event/baseline": {
+            "updateMs": 0.9696969714758042,
+            "pageUpdateMedians": 1,
+            "mountMs": 1.0000000023283064,
+            "dispatch20kMs": 1.1058823518893297
+          },
+          "c2/baseline": {
+            "updateMs": 0.9696969669603008,
+            "pageUpdateMedians": 0.9696969703811369,
+            "mountMs": 0.9375000013096724,
+            "dispatch20kMs": 1
+          },
+          "combined/baseline": {
+            "updateMs": 0.9393939429516086,
+            "pageUpdateMedians": 0.9772727275036336,
+            "mountMs": 1.0000000023283064,
+            "dispatch20kMs": 1.1176470588235294
+          },
+          "combined/event": {
+            "updateMs": 0.9687500018917489,
+            "pageUpdateMedians": 0.9772727275036336,
+            "mountMs": 1,
+            "dispatch20kMs": 1.010638298833597
+          },
+          "combined/c2": {
+            "updateMs": 0.9687500064028427,
+            "pageUpdateMedians": 1.0078124995270628,
+            "mountMs": 1.0666666676600773,
+            "dispatch20kMs": 1.1176470588235294
+          }
+        },
+        "noevent-text": {
+          "event/baseline": {
+            "updateMs": 1.0322580625003632,
+            "pageUpdateMedians": 1.0158730148968753,
+            "mountMs": 1,
+            "dispatch20kMs": 1
+          },
+          "c2/baseline": {
+            "updateMs": 0.9677419326928106,
+            "pageUpdateMedians": 0.9206349207850962,
+            "mountMs": 1.0178571444727025,
+            "dispatch20kMs": 0.9791666678954951
+          },
+          "combined/baseline": {
+            "updateMs": 0.9677419326928106,
+            "pageUpdateMedians": 0.9365079356819713,
+            "mountMs": 1.0178571444727025,
+            "dispatch20kMs": 1
+          },
+          "combined/event": {
+            "updateMs": 0.9374999991268851,
+            "pageUpdateMedians": 0.9218750000727595,
+            "mountMs": 1.0178571444727025,
+            "dispatch20kMs": 1
+          },
+          "combined/c2": {
+            "updateMs": 1,
+            "pageUpdateMedians": 1.0172413782472416,
+            "mountMs": 1,
+            "dispatch20kMs": 1.0212765944630056
+          }
+        }
+      }
+    },
+    "uiRatios": {
+      "main": {
+        "event/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9499718767577026,
+            "script": 0.9357258499730166,
+            "paint": 1.0065597667638484
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.8986133212093658,
+            "script": 0.8807047949162334,
+            "paint": 1.012293756065998
+          }
+        ],
+        "c2/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9948753202924817,
+            "script": 0.9859147328656231,
+            "paint": 1.0057397959183672
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9859968174585133,
+            "script": 0.9808781051415367,
+            "paint": 0.9352960207052733
+          }
+        ],
+        "combined/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9186613336666458,
+            "script": 0.8875876956287101,
+            "paint": 1.012481778425656
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9132075471698112,
+            "script": 0.8611207394569614,
+            "paint": 1.0614687803299903
+          }
+        ],
+        "combined/event": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9670405578763857,
+            "script": 0.9485552800046139,
+            "paint": 1.0058834178131788
+          },
+          {
+            "id": "04_select1k",
+            "total": 1.016240829749557,
+            "script": 0.9777632010495245,
+            "paint": 1.048577820389901
+          }
+        ],
+        "combined/c2": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9233934292355047,
+            "script": 0.900268213914281,
+            "paint": 1.0067035057523326
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9261769723797666,
+            "script": 0.8779080040049474,
+            "paint": 1.1349014181943964
+          }
+        ]
+      },
+      "reverse": {
+        "event/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9381588855421686,
+            "script": 0.8986215130793445,
+            "paint": 1.0416853831641362
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9254373912246954,
+            "script": 0.893914569923932,
+            "paint": 0.955849178214631
+          }
+        ],
+        "c2/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9890499497991968,
+            "script": 0.986432215347878,
+            "paint": 0.9730482436438774
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9992213978199139,
+            "script": 1.0047981275599767,
+            "paint": 0.8785046728971962
+          }
+        ],
+        "combined/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9332643072289157,
+            "script": 0.880874850754369,
+            "paint": 0.9840086245620339
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9223229825043511,
+            "script": 0.90040959625512,
+            "paint": 1.02642603931679
+          }
+        ],
+        "combined/event": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.994782783184509,
+            "script": 0.980251238072231,
+            "paint": 0.9446313065976714
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9966346629713947,
+            "script": 1.0072658244419717,
+            "paint": 1.073836817262306
+          }
+        ],
+        "combined/c2": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9435967388890651,
+            "script": 0.8929907570422537,
+            "paint": 1.01126396454621
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.923041664756841,
+            "script": 0.8961099464244118,
+            "paint": 1.1683785766691124
+          }
+        ]
+      },
+      "pooled": {
+        "event/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9478264960481747,
+            "script": 0.9006830749213923,
+            "paint": 1.0115619938815907
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9056002911605476,
+            "script": 0.8865952443166972,
+            "paint": 0.9904761904761904
+          }
+        ],
+        "c2/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9914847572450131,
+            "script": 0.9863656077198308,
+            "paint": 0.9861885909663487
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9882625904189981,
+            "script": 0.9923932293934907,
+            "paint": 0.9081517352703792
+          }
+        ],
+        "combined/baseline": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9294630535691882,
+            "script": 0.8799739780982327,
+            "paint": 0.9992351988482993
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.915040262044493,
+            "script": 0.8833144615741951,
+            "paint": 1.0347054075867634
+          }
+        ],
+        "combined/event": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9806257341870583,
+            "script": 0.9770073432045262,
+            "paint": 0.9878140982877474
+          },
+          {
+            "id": "04_select1k",
+            "total": 1.0104239927660004,
+            "script": 0.9962995710122147,
+            "paint": 1.0446544980443286
+          }
+        ],
+        "combined/c2": [
+          {
+            "id": "03_update10th1k_x16",
+            "total": 0.9374456306840648,
+            "script": 0.8921377339305835,
+            "paint": 1.0132293234797682
+          },
+          {
+            "id": "04_select1k",
+            "total": 0.9259080237536254,
+            "script": 0.8900851350165297,
+            "paint": 1.139353003910416
+          }
+        ]
+      }
+    },
+    "coreRatios": {
+      "main": {
+        "event/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0158290005777009,
+              "script": 1.0170951859956237,
+              "paint": 1.0027322404371586
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9987315623527706,
+              "script": 1.004920913884007,
+              "paint": 0.9912654337628728
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9706999114036199,
+              "script": 1.0131851085832473,
+              "paint": 0.9459127808193318
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9912135278514589,
+              "script": 0.9724618447246185,
+              "paint": 1.0577507598784195
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.002202643171806,
+              "script": 0.9683564740071037,
+              "paint": 0.9628258770518183
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.00354150470761,
+              "script": 0.9405099150141644,
+              "paint": 1.018046818603692
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0135918770483219,
+              "script": 1.0943752716005064,
+              "paint": 0.9933286567814034
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 0.9915563431668926,
+              "script": 1.0399943867527364,
+              "paint": 0.9731117678407054
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 0.9792563944800914,
+              "script": 0.9900077717330965,
+              "paint": 1.0304878048780488
+            }
+          ],
+          "weighted": {
+            "total": 0.9969138784295672,
+            "script": 1.0114440001921847,
+            "paint": 0.9939101813223751
+          }
+        },
+        "c2/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0072405160793376,
+              "script": 0.974288840262582,
+              "paint": 1.0093989071038252
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.995651070923785,
+              "script": 0.9858230814294082,
+              "paint": 0.9948778778239069
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9808884951271991,
+              "script": 0.9744053774560497,
+              "paint": 0.9730035869360015
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9908819628647215,
+              "script": 0.8838752488387526,
+              "paint": 1.023881893182805
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.018232990699951,
+              "script": 1.0116241524055538,
+              "paint": 0.9902639201802381
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 0.9907575364947742,
+              "script": 1.08876298394712,
+              "paint": 0.9995875012890585
+            },
+            {
+              "id": "07_create10k",
+              "total": 0.9911482573365459,
+              "script": 0.9991875602244601,
+              "paint": 0.9885634116252631
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0027103096007506,
+              "script": 0.9927027785573954,
+              "paint": 1.0108037401288699
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0221499516568515,
+              "script": 1.0069945597868326,
+              "paint": 0.9878048780487805
+            }
+          ],
+          "weighted": {
+            "total": 0.9982590581330337,
+            "script": 0.9956092706824776,
+            "paint": 0.9963907170325684
+          }
+        },
+        "combined/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0128249566724437,
+              "script": 1.0173687089715535,
+              "paint": 0.9943715846994534
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9751748631899395,
+              "script": 1.0111306385471588,
+              "paint": 0.9572976761740443
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9743070497405393,
+              "script": 1.0023267838676317,
+              "paint": 0.9870681517840288
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9819297082228117,
+              "script": 0.9280026542800267,
+              "paint": 1.0568823273990449
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0159691629955947,
+              "script": 1.0439134646432031,
+              "paint": 0.9717573221757322
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 0.9926578560939795,
+              "script": 1.0349386213408878,
+              "paint": 0.9927812725585234
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.014729210002544,
+              "script": 1.1158954786781794,
+              "paint": 0.9906872112430758
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 0.9935369540289795,
+              "script": 1.0552904855458882,
+              "paint": 0.977375127174071
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.028302716005977,
+              "script": 1.0112135006106362,
+              "paint": 0.9253048780487805
+            }
+          ],
+          "weighted": {
+            "total": 0.9977352862802372,
+            "script": 1.0303317988896867,
+            "paint": 0.9802155644360369
+          }
+        },
+        "combined/event": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 0.9970427661510463,
+              "script": 1.00026892564206,
+              "paint": 0.9916621253405994
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9764133826837942,
+              "script": 1.006179316777428,
+              "paint": 0.965732934457438
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 1.0037160179933504,
+              "script": 0.9892829803521306,
+              "paint": 1.0435086318730666
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9906338852650944,
+              "script": 0.9542818150801774,
+              "paint": 0.9991789819376027
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.013736263736264,
+              "script": 1.0780260086695566,
+              "paint": 1.0092762828012702
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 0.9891547598553968,
+              "script": 1.100401606425703,
+              "paint": 0.9751823338735819
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0011220817569437,
+              "script": 1.0196643762301025,
+              "paint": 0.9973408141199849
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0019974768713205,
+              "script": 1.0147078666846578,
+              "paint": 1.0043811610076672
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0500852706220267,
+              "script": 1.0214197600089716,
+              "paint": 0.8979289940828401
+            }
+          ],
+          "weighted": {
+            "total": 1.0008239506625827,
+            "script": 1.0186740923807083,
+            "paint": 0.9862214743910583
+          }
+        },
+        "combined/c2": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0055442970213742,
+              "script": 1.0442167321729365,
+              "paint": 0.9851126028583801
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9794343537291159,
+              "script": 1.0256714998811507,
+              "paint": 0.9622263169304139
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9932903225806452,
+              "script": 1.0286548156009552,
+              "paint": 1.014454792394257
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9909653672410909,
+              "script": 1.049924924924925,
+              "paint": 1.0322307039864291
+            },
+            {
+              "id": "05_swap1k",
+              "total": 0.9977767095301047,
+              "script": 1.0319182891797,
+              "paint": 0.9813114487689932
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.0019180470793374,
+              "script": 0.950563746747615,
+              "paint": 0.9931909625502942
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0237915493383059,
+              "script": 1.1168028137054686,
+              "paint": 1.0021483696370284
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 0.9908514398586132,
+              "script": 1.0630477806050325,
+              "paint": 0.966928680981595
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0060194341731878,
+              "script": 1.0041896361631752,
+              "paint": 0.9367283950617283
+            }
+          ],
+          "weighted": {
+            "total": 0.9994753147005988,
+            "script": 1.034875657780293,
+            "paint": 0.9837662552249542
+          }
+        }
+      },
+      "reverse": {
+        "event/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.014751642272675,
+              "script": 1.0312586064445057,
+              "paint": 0.9979336595976074
+            },
+            {
+              "id": "02_replace1k",
+              "total": 1.0026498239500528,
+              "script": 1.0068168688619297,
+              "paint": 1.0041037426132633
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 1.0265263973150898,
+              "script": 1.0140632847815167,
+              "paint": 0.999615827890895
+            },
+            {
+              "id": "04_select1k",
+              "total": 1.034889687018984,
+              "script": 0.9904037061548644,
+              "paint": 1.0272564789991063
+            },
+            {
+              "id": "05_swap1k",
+              "total": 0.9963279556946786,
+              "script": 0.9468522619424232,
+              "paint": 1.0055320533680443
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 0.9767462114614179,
+              "script": 0.9114359415305245,
+              "paint": 0.9920339333747155
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0216086164639218,
+              "script": 1.102657788823562,
+              "paint": 0.9969627350959854
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0181315304240934,
+              "script": 1.059268600252207,
+              "paint": 0.998820476527483
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0117415075737206,
+              "script": 1.0355815786510527,
+              "paint": 0.824367088607595
+            }
+          ],
+          "weighted": {
+            "total": 1.0111906627272134,
+            "script": 1.018231550582651,
+            "paint": 0.980578778261762
+          }
+        },
+        "c2/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 0.9943528869424917,
+              "script": 0.9754888460479207,
+              "paint": 0.9847743338771071
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9933935896039784,
+              "script": 0.9849797804737147,
+              "paint": 0.9836397461151237
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9689557247966955,
+              "script": 0.9163736815670517,
+              "paint": 0.9564925086438724
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9770822644090986,
+              "script": 0.85638649900728,
+              "paint": 1.1081322609472744
+            },
+            {
+              "id": "05_swap1k",
+              "total": 0.9865759691789069,
+              "script": 0.927238215754508,
+              "paint": 0.9792547998698341
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.4839749172618013,
+              "script": 1.4385210662080825,
+              "paint": 1.535899027519139
+            },
+            {
+              "id": "07_create10k",
+              "total": 0.993891424759592,
+              "script": 0.9949366619062633,
+              "paint": 0.9945290292434096
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 0.9999317079833366,
+              "script": 0.9981785063752276,
+              "paint": 0.9960839820712432
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0007170386304562,
+              "script": 0.9989866006080396,
+              "paint": 0.7064873417721519
+            }
+          ],
+          "weighted": {
+            "total": 1.0426598891649264,
+            "script": 1.0179642323205835,
+            "paint": 1.0114043706375977
+          }
+        },
+        "combined/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0145211478621643,
+              "script": 1.0287799504268798,
+              "paint": 1.002936378466558
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9929580021053396,
+              "script": 1.0190641247833623,
+              "paint": 0.976143576274896
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9978701432812702,
+              "script": 0.961577096936213,
+              "paint": 0.9571648098348059
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9752009577561142,
+              "script": 0.941760423560556,
+              "paint": 1.0746201966041107
+            },
+            {
+              "id": "05_swap1k",
+              "total": 0.9993980255237179,
+              "script": 0.963302752293578,
+              "paint": 0.9904816140579239
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.0247343668350462,
+              "script": 0.9320722269991402,
+              "paint": 1.0328988206083178
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0138248675226167,
+              "script": 1.0933842758313703,
+              "paint": 0.9954392352322728
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.023082701632179,
+              "script": 1.06585400028023,
+              "paint": 1.0025949516395376
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0251859818947746,
+              "script": 1.0353563787861728,
+              "paint": 1.0625
+            }
+          ],
+          "weighted": {
+            "total": 1.010373537197492,
+            "script": 1.0129031790748735,
+            "paint": 1.0042854804941985
+          }
+        },
+        "combined/event": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 0.9997728563316297,
+              "script": 0.9975964748297503,
+              "paint": 1.0050130775937227
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9903337919050033,
+              "script": 1.012164333256828,
+              "paint": 0.9721541060432675
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9720842502357749,
+              "script": 0.9482417038137692,
+              "paint": 0.957532667179093
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.942323582878863,
+              "script": 0.9508853992649516,
+              "paint": 1.046107003044802
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0030813848105855,
+              "script": 1.0173738723688608,
+              "paint": 0.9850323624595471
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.0491306286223807,
+              "script": 1.0226415094339623,
+              "paint": 1.04119303368443
+            },
+            {
+              "id": "07_create10k",
+              "total": 0.9923808894953853,
+              "script": 0.9915898539998654,
+              "paint": 0.9984718587665508
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0048629976188082,
+              "script": 1.0062169312169313,
+              "paint": 1.0037789324515825
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0132884479092843,
+              "script": 0.9997825377840601,
+              "paint": 1.2888675623800383
+            }
+          ],
+          "weighted": {
+            "total": 0.9991919174495566,
+            "script": 0.9947670335841308,
+            "paint": 1.0241762342383756
+          }
+        },
+        "combined/c2": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0202828001854427,
+              "script": 1.0546301524562396,
+              "paint": 1.0184428492545554
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9995615156940841,
+              "script": 1.0346041055718476,
+              "paint": 0.9923791511375646
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 1.0298408046359822,
+              "script": 1.0493285831734722,
+              "paint": 1.0007028818154433
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9980745667775249,
+              "script": 1.0996908809891808,
+              "paint": 0.969758064516129
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0129965220574777,
+              "script": 1.0388945752302967,
+              "paint": 1.0114646506604636
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 0.690533482011855,
+              "script": 0.6479378362223551,
+              "paint": 0.6725043782837128
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0200559560797562,
+              "script": 1.0989486242636641,
+              "paint": 1.0009152130929309
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0231525747848655,
+              "script": 1.067798989331836,
+              "paint": 1.0065365668813946
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0244514106583074,
+              "script": 1.0364066726780885,
+              "paint": 1.503919372900336
+            }
+          ],
+          "weighted": {
+            "total": 0.969034627395811,
+            "script": 0.9950282602423343,
+            "paint": 0.9929613808778468
+          }
+        }
+      },
+      "pooled": {
+        "event/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0146665897775984,
+              "script": 1.025258086717137,
+              "paint": 1.0011183546548101
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9999637510421575,
+              "script": 1.0081675514847441,
+              "paint": 0.9922983380624241
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9942386045327222,
+              "script": 1.0018925056775172,
+              "paint": 0.9934856540690713
+            },
+            {
+              "id": "04_select1k",
+              "total": 1.021946240217761,
+              "script": 0.9819416832339297,
+              "paint": 1.048227262717463
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0036804964107555,
+              "script": 0.9667634720877701,
+              "paint": 0.9829039053637986
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 0.99782693728541,
+              "script": 0.8817626527050612,
+              "paint": 1.0012901228196924
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0171980603972817,
+              "script": 1.097194295501936,
+              "paint": 0.9967153524426828
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.003699010172278,
+              "script": 1.053915726004347,
+              "paint": 0.9890005237845818
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 0.9956990200860197,
+              "script": 1.0182633053221288,
+              "paint": 0.9763313609467453
+            }
+          ],
+          "weighted": {
+            "total": 1.0046843819109679,
+            "script": 1.0087484337101693,
+            "paint": 0.9957035834421074
+          }
+        },
+        "c2/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0039405647502067,
+              "script": 0.9781830695113559,
+              "paint": 1.0041733722484383
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9951245151701889,
+              "script": 0.9889738054955953,
+              "paint": 0.9826509931090395
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.974885408708938,
+              "script": 0.9361594751450921,
+              "paint": 0.97619389759065
+            },
+            {
+              "id": "04_select1k",
+              "total": 1.0066349098332765,
+              "script": 0.8661365142478463,
+              "paint": 1.0733318652279233
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0096118749239567,
+              "script": 0.9811229428848014,
+              "paint": 0.980635229298331
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.155373984093181,
+              "script": 1.073734729493892,
+              "paint": 1.0789039116523893
+            },
+            {
+              "id": "07_create10k",
+              "total": 0.9920038192949281,
+              "script": 0.9921525915996425,
+              "paint": 0.9943333746955617
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 0.999571873822653,
+              "script": 0.9977564327280376,
+              "paint": 1.0016189705252132
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 0.9960980800780384,
+              "script": 0.9996078431372548,
+              "paint": 0.9850098619329387
+            }
+          ],
+          "weighted": {
+            "total": 1.0139887922408604,
+            "script": 0.986592847568505,
+            "paint": 1.0052299439080092
+          }
+        },
+        "combined/baseline": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.012359917728697,
+              "script": 1.0275292498279422,
+              "paint": 0.9990998608875917
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9858629064414399,
+              "script": 1.0186686891079868,
+              "paint": 0.9636265369544657
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9812515915457092,
+              "script": 0.97186474892758,
+              "paint": 0.9885040954160081
+            },
+            {
+              "id": "04_select1k",
+              "total": 1.0044232732221843,
+              "script": 0.9282637508283632,
+              "paint": 1.065624311825589
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0100681348095875,
+              "script": 0.9938689899967731,
+              "paint": 0.9814859828228814
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.0085184058411925,
+              "script": 0.9458987783595115,
+              "paint": 1.0058313551450098
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0153277292045009,
+              "script": 1.0976225052129878,
+              "paint": 0.9962749663627758
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0142994143233894,
+              "script": 1.0624693262287037,
+              "paint": 0.9956192562258941
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0169822196603555,
+              "script": 1.024033613445378,
+              "paint": 0.9790927021696253
+            }
+          ],
+          "weighted": {
+            "total": 1.0046771958933924,
+            "script": 1.0153191433149578,
+            "paint": 0.99317101871709
+          }
+        },
+        "combined/event": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 0.9977266699503655,
+              "script": 1.002215211116332,
+              "paint": 0.9979837611029372
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.985898644239832,
+              "script": 1.0104160638851918,
+              "paint": 0.9711056644880174
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 0.9869377301104529,
+              "script": 0.9700289636065985,
+              "paint": 0.9949857769635023
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9828533377725986,
+              "script": 0.9453349080479163,
+              "paint": 1.0165966386554623
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0063642149286298,
+              "script": 1.0280373831775702,
+              "paint": 0.9985574148874784
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 1.0107147523846858,
+              "script": 1.0727362691736766,
+              "paint": 1.00453538112663
+            },
+            {
+              "id": "07_create10k",
+              "total": 0.9981612910350514,
+              "script": 1.0003902770118356,
+              "paint": 0.999558162640088
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0105613376556901,
+              "script": 1.0081160191591272,
+              "paint": 1.006692344727973
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0213751335945849,
+              "script": 1.0056668133802815,
+              "paint": 1.002828282828283
+            }
+          ],
+          "weighted": {
+            "total": 0.9999928474875245,
+            "script": 1.0065137247159048,
+            "paint": 0.997456507371137
+          }
+        },
+        "combined/c2": {
+          "items": [
+            {
+              "id": "01_run1k",
+              "total": 1.0083863061959102,
+              "script": 1.0504467740800674,
+              "paint": 0.9949475742923888
+            },
+            {
+              "id": "02_replace1k",
+              "total": 0.9906930152080867,
+              "script": 1.0300259556394527,
+              "paint": 0.9806396611940709
+            },
+            {
+              "id": "03_update10th1k_x16",
+              "total": 1.0065301857837856,
+              "script": 1.0381401617250674,
+              "paint": 1.0126104023552502
+            },
+            {
+              "id": "04_select1k",
+              "total": 0.9978029406793983,
+              "script": 1.0717291507268554,
+              "paint": 0.9928190398030365
+            },
+            {
+              "id": "05_swap1k",
+              "total": 1.0004519161243672,
+              "script": 1.0129912843282356,
+              "paint": 1.0008675534991325
+            },
+            {
+              "id": "06_remove-one-1k",
+              "total": 0.8728934697562443,
+              "script": 0.8809427062169849,
+              "paint": 0.932271488018367
+            },
+            {
+              "id": "07_create10k",
+              "total": 1.0235119154341061,
+              "script": 1.1063041255007928,
+              "paint": 1.0019526566407455
+            },
+            {
+              "id": "08_create1k-after1k_x2",
+              "total": 1.0147338484469495,
+              "script": 1.0648584077014966,
+              "paint": 0.9940099833610648
+            },
+            {
+              "id": "09_clear1k_x8",
+              "total": 1.0209659470287114,
+              "script": 1.0244353527994172,
+              "paint": 0.9939927913496197
+            }
+          ],
+          "weighted": {
+            "total": 0.9908168646254069,
+            "script": 1.0291166673438286,
+            "paint": 0.9880038141879877
+          }
+        }
+      }
+    }
+  }
+}

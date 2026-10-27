@@ -1,0 +1,39 @@
+diff --git a/src/wDom.ts b/src/wDom.ts
+index 920ed04..bfa1d6c 100644
+--- a/src/wDom.ts
++++ b/src/wDom.ts
+@@ -127,6 +127,12 @@ const syncAncestorComponentChildren = (
+   walk(parent, new Set<WDom>());
+ };
+ 
++// A component's current parent array may survive many local renews. Weak
++// array keys let old lists go even when application state keeps the key alive.
++// Slot description arrays can alias a node more than once; they deliberately
++// keep indexOf's first-occurrence semantics above.
++const parentPositions = new WeakMap<Props, WeakMap<WDom[], number>>();
++
+ /**
+  * It re-renders starting from a specific component.
+  */
+@@ -153,7 +159,20 @@ export const replaceWDom = (
+     if (!isRoot && getParent) {
+       const parent = getParent();
+       const brothers = (parent && parent.children) || [];
+-      const index = brothers.indexOf(originalWDom);
++      const key = originalWDom.compKey;
++      let positions = key && parentPositions.get(key);
++      let index = positions && positions.get(brothers);
++
++      if (index === undefined || brothers[index] !== originalWDom) {
++        index = brothers.indexOf(originalWDom);
++        if (index !== -1 && key) {
++          if (!positions) {
++            positions = new WeakMap();
++            parentPositions.set(key, positions);
++          }
++          positions.set(brothers, index);
++        }
++      }
+ 
+       if (index !== -1) {
+         brothers.splice(index, 1, newWDomTree);
