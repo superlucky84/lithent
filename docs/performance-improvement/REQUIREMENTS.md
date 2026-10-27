@@ -1,11 +1,28 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
-> **현재 결정은 DC-23이다.** DC-22의 proxy 적용/검증/측정은 당시 이력으로 보존하며 아래 R62~R66이 현재 이벤트 계약을 정의한다.
+> **DC-25 첫 후보는 검증 후 미채택으로 종료했다.** 기본 이벤트 계약은 DC-23/R62~R66을 유지한다. DC-22의 proxy 적용/검증/측정은 당시 이력이다.
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
+
+## DC-25 — 같은 순서 keyed 빠른 경로
+
+2026-10-27 사용자 요청으로 기존 TODO를 정식 작업으로 연다. 사용자 결정은 **중복 key의 기존 첫 등장 매칭 유지**, **크기가 초과해도 성능·메모리를 측정한 뒤 한도 변경 판단**이다. 문서 위치는 이 폴더를 유지하며 새 정본을 만들지 않는다.
+
+- R72. 최신 `main`에서 분기한다. 릴리스 태그 `lithent@1.25.3`은 `7842b57cf400834ce65ecad703bd4babb6c9249c`이며, 분기 기준 main에는 후속 도구 변경도 포함되어 있다. Node 24.22.1·pnpm 12.15.0과 현재 lock을 사용하고 브라우저/엔진·의존성·빌드 해시를 측정 전에 고정한다. 이전 분석 브랜치나 릴리스 태그 자체를 새 대조군으로 대신하지 않는다. → DC-25-3, P0/P1, M-20-1.
+- R73. 일반 keyed 목록의 같은 순서 갱신에서 Map 매칭·render 배치 재분석의 중복 작업을 함께 줄이는 후보를 평가한다. 같은 VDOM 객체의 조기 반환은 결합 후보의 조건부 구성 요소다. 앱의 행 수/id/변경 주기나 고유 key·불변 props를 가정하지 않으며 공개 API·이벤트 계약·앱 구현은 유지한다. → DC-25-4/5, P2, M-20-3.
+- R74. 중복 key의 첫 등장 소비, Map의 SameValueZero(NaN, ±0), falsy/object/Symbol key와 혼합·unkeyed 항목의 기존 처리를 보존한다. key/children getter의 순서·횟수·throw 및 앞선 updater/pre callback이 뒤 항목 key를 바꾸는 관찰도 기준 코어와 대조한다. Set/위치 비교만으로 같은 동작이라고 간주하지 않는다. → DC-25-1, P1/P2/P4, M-20-2.
+- R75. 순서 유지 증명은 현재 diff가 성공한 정확한 list/children과 해당 render에만 적용한다. fallback은 이미 처리한 자식의 diff·콜백을 재실행하지 않으며, stale metadata·복제·삭제·throw·동기 재진입·concurrent 중단 뒤 증명이 재사용되지 않아야 한다. 콘텐츠 좌→우 순서와 `clearDiffMeta`·mount queue 시점, portal 대상 보존을 유지한다. → DC-25-4, P2/P4/P5, M-20-3/4.
+- R76. 첫 프로토타입은 격리한 base 코어에서 검증하고 공통 기준 회귀를 base/concurrent에 먼저 확보한다. 채택 후보는 양코어에 구현하거나 concurrent를 기존 경로로 유지하는 이유·지원 범위를 명시한다. 공유 WDom/type 변경은 concurrent에도 영향을 줄 수 있으므로 해당 중단/재개·portal commit/abandon 검증을 생략하지 않는다. → DC-25-6, P1/P4/P5, M-20-4.
+- R77. 현행 base guard 4,824B·concurrent 9,000B·element 1,000B와 source map 연결/출력 정책을 유지한다. 같은 compressor에서 raw/gzip/Brotli와 초과량을 공개하며, 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 최종 한도 변경은 결과를 본 뒤 결정하고 검증 전 allowance·압축 정책을 바꾸지 않는다. → DC-25-2, P3/P5, M-20-5.
+- R78. 새 동일 환경의 기준선/후보를 공식 CPU 9항목×양순서, 공식 메모리, 별도 retention으로 비교한다. 최종 후보는 고정 네 peer(React hooks 19.2.0/classes 19.0.0, Preact hooks/classes 11.0.0)와 다시 비교하며 항목별 가장 빠른 peer 전체 시간 중앙값의 1.10배 이하를 9항목 모두 만족하는지 판정한다. 계측 build와 공식 build를 나누고 이전 표본·개선율을 합산하지 않는다. → DC-25-3, P3, M-20-6.
+- R79. 기존 보고서·archive·실험 앱은 보존한다. 새 출력을 별도로 만들고 소스/번들/환경 해시, 카운터, 원자료, 실패·재시도, 순서별/pooled 결과, 채택/보류 이유를 연결한다. Test Hardening과 Integration Test를 거친 실제 최종 해시를 기준으로 완료를 판정한다. → P0~P5, M-20-7.
+
+비범위: proxy E·C1·C3·full22 및 keymatch/ordered 단독 실험의 반복, 벤치마크 앱 변경, 새 memo/immutable 계약, 버전 변경·추가 배포. 기존 데이터 마이그레이션은 없으며 내부 metadata의 수명/복제 처리는 R75의 검증 대상이다.
+
+최종 판단: [DC-25 결과](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)에서 CPU/메모리·정합성/통합을 검증한 뒤 첫 결합 후보를 미채택으로 종료했다. 안정적인 전체 이득과 목표 개선이 입증되지 않아 R77의 allowance 변경은 N/A다. 기존 runtime/guard와 9항목1.10 목표는 유지하며, 과거6/9를 이번 baseline/candidate8/9와 직접 개선율로 연결하지 않는다.
 
 ## DC-24 — 동작을 유지하는 추가 번들 절감 조사
 
@@ -14,7 +31,7 @@
 - R69. 후보는 별도 출력에 보존하고 현재 DC-23 산출물/증거를 덮어쓰지 않는다. 이번 조사는 가능한 절감과 추천까지이며, 미검증 후보를 기본 빌드에 채택하지 않는다. → DESIGN DC-24, IMPLEMENT DC-24, M-18.
 - R70. 2026-10-26 사용자 요청: 용량을 더 줄일 수 있는지 다시 확인한다. R67~R69를 그대로 따르며 결과는 추천까지다. 함수 이동·closure scope 변경이 있는 압축은 후보에서 뺀다. → DESIGN DC-24-5, IMPLEMENT S4/S5.
 - R71. 2026-10-26 사용자 결정: BUG-1 수정으로 늘어난 크기를 출력 절감(구문 4종 + Module 태그 제거)으로 상쇄해 base guard 4,824B 안에 둔다. guard 숫자는 올리지 않는다. hidden map은 쓰지 않는다. → DESIGN DC-24-6, IMPLEMENT S5.
-- 정합성 BUG-1은 사용자 요청으로 수정했다. 미착수 후속(성능 DC-25)은 요구사항으로 확정하지 않았다. 둘 다 [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에서 관리한다.
+- 정합성 BUG-1과 출력 절감은 1.25.3에 배포되었다. 후속 성능 작업은 위 R72~R79와 [DESIGN DC-25](./DESIGN.md#dc-25--같은-순서-keyed-빠른-경로)가 현재 계약이다.
 
 ## DC-23 — 이벤트 proxy 제외와 compact13 유지
 
@@ -169,7 +186,7 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 
 ## 상태 / 핸드오프
 
-- done: DC-23 compact13/native 복원·검증을 유지한다. DC-24 추가 크기 조사에서 출력41개/실제 빌드12개를 비교했고 hidden map의 동일 실행 AST·소스맵6형식을 확인했다. [조사 결과](../benchmark/BUNDLE_SIZE_RESULTS.md)·[검증](../benchmark/bundle-size-proof.json)에 연결한다. 기본 runtime/빌드와 DC-23 증거는 그대로다.
-- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 사용자는 추가 축소를 보류하고 현재 설정 유지를 확정했다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 요청에 따른다.
-- blockers: 조사 실행 블로커 없음. 미채택 구문 후보의 추가 검증은 미실행으로 명시한다.
-- commit: DC-23 복원·검증과 DC-24 조사 구현 커밋은 `4baf0e51483134ab3426817035e06e21f0285022`다. 후속 인계 문서 커밋을 포함한 tip은 `git log -1` 및 브랜치 ctxbin 최신 인계로 확인한다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 원자료의 `463c6cd`/uncommitted 표시는 검증 당시 기준이며 수정하지 않는다.
+- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
+- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
+- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
+- commit: 분기 기준 `14d47e83770958eb78a91c564bf39e47c4a25dba`, 배포 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`. 브랜치는 `perf/dc25-keyed-fast-path`, 이번 작업은 미커밋이다. 커밋/푸시·버전 변경·배포는 수행하지 않았다.

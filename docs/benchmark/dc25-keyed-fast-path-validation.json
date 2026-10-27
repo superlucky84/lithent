@@ -1,0 +1,53 @@
+{
+  "head": "14d47e83770958eb78a91c564bf39e47c4a25dba",
+  "branch": "perf/dc25-keyed-fast-path",
+  "decision": "defer; retain released main runtime and existing guards",
+  "counts": {
+    "initialDual": 1150,
+    "defaultTests": 1008,
+    "ssr": 15,
+    "concurrentSatellites": 172,
+    "candidateCore": 259,
+    "candidateFinalContracts": 10,
+    "candidateConcurrent": 347,
+    "candidatePackages": 169
+  },
+  "browser": {
+    "startTime": "2026-10-27T07:37:26.400Z",
+    "duration": 48881.038,
+    "expected": 78,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "retries": 0,
+  "officialFailedBatches": 0,
+  "officialWarnings": 0,
+  "audit": {
+    "scope": "final-candidate",
+    "distributions": 576,
+    "weighted": 45,
+    "ratios": 405,
+    "samples": {
+      "cpu": 1740,
+      "memory": 180
+    },
+    "pass": true
+  },
+  "retentionContexts": 6,
+  "disposalContexts": 6,
+  "defaultSourcesUnchanged": 28,
+  "defaultBundlesMatchFrozenBaseline": true,
+  "concurrentBundlesUnchanged": true,
+  "formatProbes": 9,
+  "candidateExportsMatchBaseline": true,
+  "table": {
+    "pass": true,
+    "modes": 12,
+    "numericCells": 576,
+    "goalCells": 81,
+    "htmlSHA256": "15e48380c51bfbe9e7a6b86e093fc4fa1d696928c8bec370b5059a7ea504f7b4",
+    "note": "JSDOM controls/numeric/color inspection; not a Chrome visual inspection."
+  },
+  "preservation": "See separate evidence manifest and independent decoded archive audit."
+}

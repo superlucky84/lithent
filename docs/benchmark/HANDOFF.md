@@ -1,6 +1,34 @@
 # summary
 
-## 최신 — 출력 절감 채택 (2026-10-26)
+## 최신 — DC-25 첫 후보 검증 완료·미채택 (2026-10-27)
+
+- done: main `14d47e83770958eb78a91c564bf39e47c4a25dba`에서 분기한 `perf/dc25-keyed-fast-path`에서 첫 결합 후보 구현·측정·회귀·통합·보존을 완료했다. [최종 결과](./DC25_KEYED_FAST_PATH_RESULTS.md), [6앱 비교표](./dc25-keyed-fast-path-table.html), [통계](./dc25-keyed-fast-path-final-results.json), [실측 patch](./dc25-keyed-fast-path-candidate.patch), [검증](./dc25-keyed-fast-path-validation.json)을 연결한다.
+- decision: **미채택**. 가중 전체 pooled −0.171%이나 main +0.402%/reverse −1.260%로 방향이 다르고, baseline/candidate 목표는 모두8/9다. partial/select JS는 줄었지만 select 전체는 pooled +2.775%였으며 size는 +268B(5,087B/기존 guard263B 초과)다. 전체 이득/목표 개선을 입증하지 못해 default compact13/native/portal 수정과 guard4,824B·실제4,819B를 유지한다. 과거6/9→이번8/9를 후보의 성과로 설명하지 않는다.
+- evidence: Chrome156.0.8078.48/V8 15.6.75.19·Node24.22.1 고정, 6앱 CPU1,740/공식 메모리180·양순서·실패/재시도/warnings0. 독립576분포/45가중/405비율 감사 통과. 주 archive13개/2,574entries/86,108,985B와 최종 default closeout1개/11entries/22,577B의 모든 압축/member 해시를 감사했다. 이전 archive를 덮어쓰지 않았다.
+- validation: candidate frozen core259 + 최종 공통6/수명4 별도, unchanged concurrent347, 후보 satellite169/기존3 skipped, 형식9개와 export21 동등. 후보 overlay와 최종 default Playwright 각각78/retry0. default pnpm test1,008 + SSR15 + concurrent satellites172, strict types·verify:concurrent 및 동일 default build/bundle hash를 확보했다. literal test:dual 최종 재실행으로 표현하지 않는다.
+- lifetime: 조건별3context retention의100회 생성/삭제·100회 partial 뒤 DOM/listener 증가0. 실제 갱신 뒤 populated dispose 진단도 각각3context에서 앱 전역 상태 해제 후 DOM WeakRef8,022개 모두0이다. 공식10k 메모리는28.164620→28.164690MB이며 모든 JS heap 누수 부재를 보장하지 않는다.
+- next/limits: 새 가설이 생기면 select 전체 격차·차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 반복하지 않는다. 기존 concurrent의 실제 sparse array hole 예외는 DESIGN BUG-2에 미착수로 기록했다. CPU9/9 목표는 미달이며 새 allowance/버전/배포는 없다.
+- blockers/commit: 이번 검증/보존 블로커 없음. 기본 runtime·lock·기존 archive·sibling 변경은 보존했다. HEAD는 기준 main `14d47e8`이며 이번 작업은 미커밋이다. 커밋/푸시는 수행하지 않았다. 임시 실행 디렉터리는 `/private/tmp/lithent-dc25-20261027`이고 재현 시 성공 배치를 반복하지 않는다.
+
+## 이전 — DC-25 P3 공식 수집 중 (2026-10-27)
+
+- done: P1 기준선과 격리 base 후보의 타입/빌드·회귀·proof 수명·구조 계측, 새로 빌드한 6앱의 DOM/keyed/9동작/font gate를 통과했다. baseline/candidate UMD Brotli는 4,819/5,087B다. 후보는 현행 guard를 263B 넘으며 기본 runtime/guard는 유지한다.
+- decisions: 중복 key의 첫 등장 소비 유지. snapshot/Set + mismatch suffix Map으로 prefix 재실행을 피하고, root frame과 list의 희소 `so/sc`로 render 증명을 전달한다. 단순 동일 VDOM 반환은 getter 관찰 회귀로 제외했다. concurrent 실행 경로는 유지한다. [결과와 준비 실패/기존 한계](./DC25_KEYED_FAST_PATH_RESULTS.md)를 따른다.
+- next: `/private/tmp/lithent-dc25-20261027`에서 Chrome156.0.8078.48/V8 15.6.75.19·Node24.22.1 고정 6앱 CPU 1,740/메모리 180을 양순서로 직렬 수집 중이다. baseline/candidate 580/60은 동일 표본의 부분집합이다. 수집 중 빌드·테스트·다른 benchmark를 돌리지 않는다. 완료 뒤 독립 감사·retention·P4/P5·채택 판단을 수행한다.
+- blockers/limits: 시작 시 실행 블로커 없음. 기존 concurrent의 실제 sparse array hole 예외를 baseline 관찰로 구분했다. timing/메모리 결론·후보 채택·새 size allowance·영구 archive 보존은 미완료다. 중단 시 `measurement-plan.json`, 각 phase의 complete 여부와 live process부터 확인하고 성공 배치를 반복하지 않는다.
+- commit: 분기 기준 `14d47e83770958eb78a91c564bf39e47c4a25dba`; 이번 작업은 미커밋이다. 기존 runtime·lock·archive·sibling 변경은 보존한다.
+
+## 이전 — main에서 DC-25 설계 착수 (2026-10-27)
+
+- done: 기존 분석 브랜치는 main에 병합되어 `lithent@1.25.3`(`7842b57cf400834ce65ecad703bd4babb6c9249c`)으로 배포되었다. 최신 main `14d47e83770958eb78a91c564bf39e47c4a25dba`에서 **`perf/dc25-keyed-fast-path`**를 생성했다. main에는 후속 Node 24.22.1/pnpm 12.15.0 전환도 포함되어 있으며 로컬 버전과 일치한다.
+- decisions: 사용자 선택으로 중복 key의 기존 첫 등장 매칭을 유지한다. 소폭 크기 초과 후보도 CPU/메모리를 측정하며 최종 한도 변경은 결과를 보고 결정한다. 기존 guard와 source map/출력 정책은 유지한다.
+- docs: 로컬 `doc-driven-designer-v1` agent/skill을 따라 [REQUIREMENTS R72~R79](../performance-improvement/REQUIREMENTS.md#dc-25--같은-순서-keyed-빠른-경로) → [DESIGN DC-25](../performance-improvement/DESIGN.md#dc-25--같은-순서-keyed-빠른-경로) → [IMPLEMENT P0~P5](../performance-improvement/IMPLEMENT.md#dc-25--실행-계획) → [MANUAL M-20](../performance-improvement/MANUAL_TEST_CHECKLIST.md#m-20-dc-25-같은-순서-keyed-빠른-경로--r72r79) 초안을 작성했다. 별도 정본을 만들지 않았다.
+- verification: P0 문서 준비 완료. 상대 링크/앵커 266개, 변경 문서 5개의 Prettier, 요구/결정/단계 매핑과 `git diff --check`를 통과했다. 기존 분석 tip `de32bd9`가 분기 기준 main의 조상임을 확인했다.
+- next: P1에서 현재 main의 양코어 기준 회귀·빌드/크기·앱/러너/브라우저 환경과 key 관찰 순서를 고정한다. P2 구현 전에 DC-25-4(매칭 fallback·증명 저장 수명)를 확정하고, 조기 반환 포함 여부(DC-25-5)와 concurrent 적용 범위(DC-25-6)는 해당 단계에서 결정한다.
+- blockers/limits: 문서 준비의 블로커는 없다. DC-25 구현·기준선 테스트·새 timing/메모리 측정은 미실행이다. 과거 6/9·Brotli 4,819/4,824B는 역사 근거이며 이번 main의 실측으로 표시하지 않는다. 기존 runtime·lock·실험 자료는 변경하지 않았다.
+- commit: 분기/설계 기준 `14d47e83770958eb78a91c564bf39e47c4a25dba`; 이번 문서는 미커밋이다. 아래 인계는 각 시점의 이력이며 현재 작업은 이 절을 우선한다.
+
+## 이전 — 출력 절감 채택 (2026-10-26)
 
 - done: 사용자 결정으로 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 `vite.config.js`에 채택했다. BUG-1 수정과 합쳐 base UMD Brotli **4,819/4,824B**(여유 5B)로 `pnpm size`가 통과한다. ESM bytes는 그대로이고, UMD/CJS에서는 `Object.prototype.toString.call(lithent)`만 `[object Object]`로 바뀐다. 소스맵 연결은 유지했다(hidden map 미채택). 전체 build, `pnpm test` 996/3 skipped, SSR 15, concurrent satellites 172, Playwright 78, `verify:concurrent`, ESLint/Prettier, jsdom 동등성, Chromium portal 재현이 통과했다. [IMPLEMENT S5](../performance-improvement/IMPLEMENT.md#dc-24--추가-크기-조사).
 - next: DC-25(같은 순서 keyed 빠른 경로)는 결정 항목부터. 릴리스 때 CHANGELOG에 portal 수정과 Module 태그 제거를 적는다. concurrent 빌드에는 같은 출력 옵션을 적용하지 않았다.

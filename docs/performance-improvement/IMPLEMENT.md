@@ -1,9 +1,72 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 - 완료한 DC-22 실행 순서: [Phase4A~4E](#dc-22--종합-반영-실행-phase4a4e) → [Phase5](#phase-5--test-hardening) → [Phase6](#phase-6--integration-test와-채택인계). 앞선 Phase0~4의 완료 기록은 보존하며, 과거 size 중단·미채택을 현재 후속의 자동 종료 조건으로 쓰지 않는다.
+
+## DC-25 — 실행 계획
+
+최종 상태: 첫 후보는 전체 이득 불확실·목표 개선 없음·size +268B를 근거로 미채택이다. 아래 체크의 조건부 조기 반환은 관찰 회귀로 제외했고, allowance 변경/실제 기본 반영/복원은 기본 소스를 수정하지 않아 N/A다. 후보와 최종 default의 검증을 구분하며 전체 B4는 default pnpm test1,008 + SSR15 + concurrent satellites172, 각각의 browser78 및 동일 default build hash 재사용으로 충족했다.
+
+이번 첫 후보의 실행 순서는 아래 P0~P5다. 뒤의 기존 Phase 0~6/DC-17~24 완료 체크는 과거 검증이며 새 기준선/후보의 완료로 재사용하지 않는다. 각 단계는 R72~R79, DESIGN DC-25-1~7, MANUAL M-20과 연결한다.
+
+### P0 — 분기와 문서 정리
+
+진입: 1.25.3 배포 및 main에서 새 브랜치로 진행하라는 사용자 요청. 종료: 분기 기준·확정 정책·단계별 미결정과 네 정본의 연결이 일치한다.
+
+- [x] `git fetch origin main --tags` 후 clean main `14d47e83770958eb78a91c564bf39e47c4a25dba`에서 `perf/dc25-keyed-fast-path` 생성. 릴리스 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`, package 1.25.3 확인.
+- [x] 로컬 designer agent/skill을 읽고 REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL 순서로 초안 작성. 사용자 선택인 중복 key 유지·초과 후보 실측을 반영.
+- [x] 기준 검사: 문서 상대 링크/앵커 266개, R72~R79·DC-25-1~6·P0~P5·M-20 매핑, 변경 문서 5개의 Prettier와 `git diff --check`를 통과했다. 변경 범위는 문서 5개뿐이며 runtime/lock/기존 증거는 변경하지 않았다. 문서만 변경해 런타임 테스트는 실행하지 않았다.
+
+### P1 — 현재 main 기준선과 회귀 고정
+
+진입: P0 문서 검사 완료. 종료: 실제 도구/브라우저·앱·러너·코어/산출물·기준 관찰이 고정되고 P2의 설계 선택에 필요한 증거가 있다.
+
+- [x] 새 출력 경로를 선택하고 manifest를 만든다. 위치는 `experiments/dc25-keyed-fast-path/`와 `docs/benchmark/DC25_KEYED_FAST_PATH_RESULTS.md`다. 기존 archive·`/tmp` 완료 배치를 덮어쓰지 않는다. sibling 저장소의 branch/HEAD/diff와 원래 cached 앱을 확인하고 별도 staging으로 추출한다.
+- [x] Node 24.22.1·pnpm 12.15.0·현재 lock/의존성, 머신/OS·browser/V8 실행 파일 해시와 CPU·GC·warmup 설정을 고정한다. 과거 hard-coded Chrome/Node 경로를 새 환경과 혼용하지 않는다. 브라우저 버전/해시·실제 러너별 표본 수는 이 단계에서 확정한다.
+- [x] 기준 회귀: `core-keyedConsumption`, `core-placementProof`, `core-cachedIdentity`, loop move/lifecycle, structural/fuzz, portal siblings를 base/concurrent에서 확인한다. 새 getter/throw·callback 후속 key mutation·중복/±0·자체 renew·same-object metadata 사례도 먼저 baseline 기대값으로 고정한다. 기존 코어 차이는 기록하고 한쪽 기대값을 다른 쪽에 강제하지 않는다.
+- [x] 기준 B1/B2/B3: 양코어 관련 회귀와 `test:dual` 하위 suite, 필요한 core/concurrent/element 빌드·strict types, 세 UMD 존재·`pnpm size`, 원래 앱 contracts/keyed 9동작/font/DOM 정체성을 확보한다. baseline의 raw/gzip/br와 실제 guard 결과를 기록한다.
+- [x] getter/콜백의 key 관찰 순서와 중간 fallback 요구를 원자료로 남기고 DC-25-4의 매칭·증명 저장 방식을 P2 코드 작성 전에 문서로 확정한다. Set/snapshot·list 필드·root sidecar의 작업/shape/수명 비용과 탈락 사유를 기록한다. 안전한 Map 생략을 설계하지 못하면 그 부분을 보류하고 평가 범위를 명시한다.
+
+### P2 — 격리 결합 후보와 구조 검증
+
+진입: P1 기준선 및 DC-25-4 확정. 종료: 현재 계약을 만족하는 base 결합 후보와 제거 작업/fallback 비용, 다음 공식 측정의 정확한 해시가 있다.
+
+검증 시점 정리(2026-10-27): baseline의 전체 `test:dual`은 P1에서 확보했다. 후보의 P2 진입 검사는 frozen 공통 core·unchanged concurrent·proof lifetime·타입/빌드·B3 앱 계약이며, 후보를 연결한 전체 satellite/패키지 `test:dual` 하위 suite는 P4/P5에서 채택 전에 확보한다. 기존 공통 B1의 전체 범위를 완료한 것으로 표시하지 않는다. 동일 최종 해시라면 이 검증 순서 때문에 성능 표본을 중복 수집하지 않으며, 수정이 생기면 P2/P3 관련 검사를 다시 수행한다.
+
+- [x] 소스/빌드 사본으로 base 후보를 격리한다. 순서 유지 매칭과 render 재분석 생략을 함께 구현하고 keymatch/ordered 단독 재실험을 반복하지 않는다. 동일 VDOM 조기 반환은 정합성 대조 후 조건부로 추가한다.
+- [x] 기준 회귀: P1 사례를 동일 baseline/candidate에서 대조한다. 중복/중간 mismatch에서 prefix diff·callback이 재실행되지 않고 원래 first-match/삭제·좌→우 content·cleanup/mount 시점을 유지해야 한다. portal 경계·하위 arity 변화·예외/동기 재진입은 실패 시 기존 경로로 돌아간다.
+- [x] 별도 계측 build에서 Map/Set/snapshot·key 읽기·content 방문·render 배열/인덱스·증명 stage/consume/discard·clone/fallback 비용을 기록한다. 제거된 배치 분석과 남아 있는 O(n) 작업을 구분한다. 메타데이터 수명 회귀와 새 WDom own-field/shape 영향을 확인한다.
+- [x] 위 P2 범위의 후보 core/lifetime·B2/B3와 raw/gzip/br·guard 초과를 확보했다. 전체 satellite/패키지 suite는 P4/P5에 남아 있다. 정합성 실패는 공식 후보 측정을 막지만 소폭 size 초과만으로 측정을 중단하지 않는다. 조기 반환에 관찰 차이가 남아 DC-25-5를 제외로 닫고 결합 후보를 고정했다.
+
+### P3 — 공식 CPU·메모리와 peer 재비교
+
+진입: P2 정합성/B1~B3 통과와 production 소스/번들·표본 계획 고정. 종료: baseline/후보의 효과·비용과 최종 peer 9항목 목표를 감사할 원자료가 있다.
+
+- [x] 측정 전 기준 검사: baseline/candidate production source/build hash·원래 앱·runner/browser manifest와 B3를 다시 대조한다. 계측 코드가 공식 번들에 섞이지 않고 측정 중 빌드/테스트/다른 benchmark를 함께 실행하지 않도록 한다.
+- [x] CPU 9항목×양순서 baseline/candidate 580표본·공식 메모리 60표본, 조건별 3 fresh contexts의 별도 retention을 수집한다. 전체/JS/paint·분포·순서별/pooled 수치, 실패/재시도·trace, churn/dispose의 DOM/listener/heap 관찰을 보존한다.
+- [x] 조기 반환을 포함했다면 partial/select/swap뿐 아니라 생성·추가·삭제의 회귀도 대조해 DC-25-5를 결정한다. 관찰 차이 또는 이득 불확실/손해가 크면 제외 후보의 해시로 필요한 비교를 다시 수행한다. 손해 항목 하나만으로 자동 기각하지 않고 교환 근거를 기록한다.
+- [x] baseline/최종 후보/고정 네 peer의 CPU 1,740·메모리 180 계획을 수행한다. 앞선 동일 해시/환경 자료 재사용은 수집 전에 manifest에 정한 경우에만 허용하며 실제 신규 표본 수·중복 제외·시간 간격을 공개한다. 네 peer 최저 전체 중앙값 대비 1.10배/9항목을 각각 판정한다.
+- [x] 별도 계산으로 통계·비율·가중값·초과 바이트·증거 해시를 감사한다. 과거 6/9나 진단 카운터를 신규 목표 달성으로 표시하지 않는다. 실측 결과 뒤 채택/보류, size 한도 변경의 필요와 정확한 제안을 기록한다.
+
+### P4 — Test Hardening
+
+진입: 고정 후보의 P2/P3 증거. 종료: 최종 코드의 fallback·수명 경계와 concurrent 범위가 정해지고 실패가 해결되었다.
+
+- [x] 기준 검사: P1/P2 회귀와 수명/관찰 counter의 동일 해시 결과를 재사용하거나 변경된 부분을 재실행한다. hit/miss·중복/혼합·getter/throw·key mutation·retired/hoisted clone·후속 자체 renew·DOM 실패 뒤 복구를 보강한다.
+- [x] Fragment/portal/외부 형제·입력 값/선택/focus·native listener identity·콜백/재예약/mount/unmount 순서를 실제 브라우저에서 확인한다. portal 대상 컨테이너가 보존되고 다른 내용이 지워지지 않아야 한다.
+- [x] DC-25-6을 확정한다. concurrent 적용 시 priority 중단·retry·abandon·동기 재진입·portal commit 전 metadata 게시 금지와 폐기를 검사한다. 기존 경로 유지 시 그 범위와 공유 factory/type 영향 없음 또는 해당 회귀 결과를 명시한다.
+- [x] hardening 수정으로 측정 코드/실행 번들 해시가 달라지면 필요한 P2/P3를 다시 수행한다. 다른 해시의 성능 증거로 최종 코드를 승인하지 않는다.
+
+### P5 — Integration Test와 채택·인계
+
+진입: P4 완료, 최종 후보와 측정 해시 일치. 종료: 채택/보류 이유·실제 통합 상태와 미달 목표가 문서/증거로 재현된다.
+
+- [x] 기준 검사/최종 B4: `pnpm build`, `pnpm test` 및 `test:dual`의 모든 하위 suite, `pnpm test:e2e`, base/concurrent/e2e strict types, 변경 파일 ESLint/Prettier·`git diff --check`, `pnpm verify:concurrent`를 확보한다. 동일 해시의 중복 suite는 공통 실행 규칙대로 재사용하며 실행하지 않은 literal 명령을 실행했다고 기록하지 않는다.
+- [x] SSR/hydration·helper/context·HMR·element/CSP·문서/예제, ESM/UMD/CJS exports/package probe와 source map 연결을 확인한다. 최종 base/concurrent/element UMD의 raw/gzip/br 및 `pnpm size` 실제 결과를 공개한다.
+- [x] size 한도 초과 시 사용자에게 실측 이득·메모리 비용·정확한 allowance 제안을 제시하고 최종 한도 결정을 기록한다. 기존 guard를 바꿔 실패를 숨기지 않는다. 채택 시 실제 코드/패키지 해시가 측정 후보와 일치함을 검증하고, 보류 시 후보·패치·원자료를 보존하고 자신의 runtime 변경만 복원한다.
+- [x] 결과·manifest·원자료/실패 trace·재현 도구·감사 결과를 영구 보존한다. 네 문서와 benchmark HANDOFF의 done/next/blockers/실제 commit을 갱신한다. 미달 항목·미실행 검증을 남기며 릴리스/버전 변경은 별도 요청으로 진행한다.
 
 ## DC-24 — 추가 크기 조사
 
@@ -14,7 +77,7 @@
 - [x] S4 재확인(2026-10-26): 소스 사본 빌드로 대조 해시를 재현하고 Terser flag 29개·Module 태그·소스 편집 3종·실제 hidden 빌드를 비교했다. jsdom 동등성 확인만 했고 전체 suite·Playwright·package probe는 실행하지 않았다(미채택). → [재확인](../benchmark/BUNDLE_SIZE_RESULTS.md#재확인--2026-10-26), [도구](../../experiments/bundle-size-recheck/README.md).
 - [x] S5 채택(2026-10-26, 사용자 결정): `vite.config.js`에 구문 4종과 `generatedCode.symbols: false`를 반영했다. 실제 빌드 해시가 측정 후보와 같다(UMD `1501e239…`, CJS `8a22f1e4…`, ESM `6665eac4…`는 반영 전과 동일). jsdom 동등성(반영 전 UMD와 DOM·로그·예외·export 동일), CJS/ESM export 21개 동일, Chromium portal 재현 통과. 전체 build, `pnpm test` 996 passed / 3 skipped, base SSR 15, concurrent satellites 172, Playwright 78(UMD를 쓰는 CSP·element fixture 포함, retry 0), `pnpm size` 4,819/4,824B, `pnpm verify:concurrent`, ESLint/Prettier가 통과했다. 고정 Chrome이 필요한 기존 package probe 스크립트는 이 환경에 그 브라우저가 없어 실행하지 않았다. CHANGELOG는 릴리스 때 적는다(Module 태그 제거, portal 수정).
 
-미착수 후속(DC-25 같은 순서 keyed 빠른 경로)은 [DESIGN TODO](./DESIGN.md#todo--미착수-후속-작업)에 있다. 착수 전에는 실행 Phase를 만들지 않는다.
+DC-25는 2026-10-27 정식 착수했으며 현재 계획은 위 P0~P5와 [DESIGN DC-25](./DESIGN.md#dc-25--같은-순서-keyed-빠른-경로)를 따른다. 위 S0~S5는 DC-24 당시 완료 이력이다.
 
 ## BUG-1 — portal 형제 정합성 수정
 
@@ -333,7 +396,7 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 ## 상태 / 핸드오프
 
-- done: DC-23 compact13/native 복원·검증을 유지한다. DC-24 추가 크기 조사에서 출력41개/실제 빌드12개를 비교했고 hidden map의 동일 실행 AST·소스맵6형식을 확인했다. [조사 결과](../benchmark/BUNDLE_SIZE_RESULTS.md)·[검증](../benchmark/bundle-size-proof.json)에 연결한다. 기본 runtime/빌드와 DC-23 증거는 그대로다.
-- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 사용자는 추가 축소를 보류하고 현재 설정 유지를 확정했다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 요청에 따른다.
-- blockers: 조사 실행 블로커 없음. 미채택 구문 후보의 추가 검증은 미실행으로 명시한다.
-- commit: DC-23 복원·검증과 DC-24 조사 구현 커밋은 `4baf0e51483134ab3426817035e06e21f0285022`다. 후속 인계 문서 커밋을 포함한 tip은 `git log -1` 및 브랜치 ctxbin 최신 인계로 확인한다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 원자료의 `463c6cd`/uncommitted 표시는 검증 당시 기준이며 수정하지 않는다.
+- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
+- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
+- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
+- commit: 분기 기준 `14d47e83770958eb78a91c564bf39e47c4a25dba`, 배포 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`. 브랜치는 `perf/dc25-keyed-fast-path`, 이번 작업은 미커밋이다. 커밋/푸시·버전 변경·배포는 수행하지 않았다.

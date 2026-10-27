@@ -1,0 +1,27 @@
+{
+  "pass": true,
+  "stats": {
+    "startTime": "2026-10-27T08:08:56.531Z",
+    "duration": 46996.066,
+    "expected": 78,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "retries": 0,
+  "command": {
+    "at": "2026-10-27T08:08:56.283Z",
+    "finishedAt": "2026-10-27T08:09:44.033Z",
+    "args": [
+      "/Users/n250109005/project/lithent/node_modules/@playwright/test/cli.js",
+      "test",
+      "--config",
+      "/private/tmp/lithent-dc25-20261027/default-browser/playwright.config.mjs",
+      "--reporter=list,json"
+    ],
+    "status": 0,
+    "serverSHA256": "be49c79659cefb2b9e99cb0a5550a00b03379056af0b12a1faf62d16a97105f4",
+    "note": "Final unchanged default base/concurrent on the same fixed browser. The original server/config source and artifacts are unchanged."
+  },
+  "scope": "Final unchanged default base/concurrent with original e2e server and the same fixed Chrome."
+}

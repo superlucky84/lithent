@@ -1,24 +1,56 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
+## DC-25 — 같은 순서 keyed 빠른 경로
+
+2026-10-27 사용자 요청으로 설계에 착수했다. 기준은 최신 main `14d47e8`이며 compact13·native 이벤트·1.25.3 portal 수정과 base 출력 정책을 유지한다. 아래 결정이 과거 C2/DC-17/DC-22의 실험 선택보다 우선한다. → R72~R79, IMPLEMENT P0~P5, MANUAL M-20.
+
+### 가설과 적용 범위
+
+- 과거 [최종 비교 pooled](../benchmark/comprehensive-final-results.json)는 목표 6/9, partial −1.9%·swap −1.5%·select −21.2%의 추가 감소 필요를 보였다. 이는 후보 선정의 역사 근거이며 portal 수정·새 toolchain이 포함된 main의 현재 격차로 사용하지 않는다. 새 기준선에서 다시 계산한다.
+- 후보는 [base diff](../../src/diff.ts)의 `diffLoopChildren` 매칭과 [base render](../../src/render.ts)의 `updateChildren` 순서/배치 재분석 생략을 묶는다. 같은 VDOM 조기 반환은 별도 정합성·부분 갱신 대조를 통과할 때만 포함한다. 일반 경로와 fallback은 계속 O(n)이며 행 하나의 변경을 O(1)로 만들었다고 주장하지 않는다.
+- 과거 [keymatch 진단](../benchmark/FOLLOWUP_ANALYSIS.md)은 고유 key를 전제했고 공식 측정이 아니었다. [동일 VDOM 실험](../benchmark/PERFORMANCE_CLOSEOUT.md)은 select/swap/삭제 JS가 줄었지만 부분 갱신 전체 +7~10%로 기각했다. DC-22 C2(K)도 JS 개선을 전체 이득으로 입증하지 못했다. 새 결합 후보의 효과와 비용은 현재 해시에서 다시 측정한다.
+
+### 결정 대장
+
+- [x] **DC-25-1 중복 key 유지:** 사용자 선택(2026-10-27). 첫 등장 소비와 SameValueZero를 보존한다. 중복이면 기존 경로로 전환할 수 있으며 위치 매칭/개발 경고로 계약을 바꾸지 않는다. → R74, P1/P2/P4, M-20-2.
+- [x] **DC-25-2 초과 후보도 실측:** 사용자 선택(2026-10-27). 기존 base 4,824B·concurrent 9,000B·element 1,000B guard와 출력 정책을 유지하고 초과를 공개한다. 소폭 초과 후보도 CPU/메모리까지 평가한다. 최종 한도 변경/allowance는 결과 뒤 판단할 TBD이며 사전 숫자 여유를 만들지 않는다. 과거 4,819B/여유 5B는 P1에서 재확인한다. → R77, P1/P3/P5, M-20-5.
+- [x] **DC-25-3 측정 계약:** 기존 RC-5 목표를 유지한다. 같은 새 환경의 baseline/candidate CPU 9항목×양순서·공식 메모리·retention, 이어 최종 후보/고정 네 peer 재비교를 수행한다. 계측 카운터는 시간 표본과 분리하고 원래 앱을 고정한다. → R72/R78, P1/P3, M-20-1/6.
+- [x] **DC-25-4 첫 격리 후보 확정(2026-10-27):** 원본 key를 기존 순서로 한 번 읽어 index snapshot과 Set 유일성 검사를 만든다. dense·고유 key·동일 길이에서 새 key를 기존 callback 교차 순서로 비교하고, 중간 mismatch는 남은 snapshot으로 Map을 만들어 처리한 prefix를 재실행하지 않는다. 중복/혼합/길이 차이는 처음부터 일반 매칭이다. 새 원본 snapshot/Set의 생성·메모리 비용도 계수한다. 증명은 list의 희소 `so`(root frame)/`sc`(정확한 children) 두 필드에 두고 공통 factory는 확장하지 않는다. root frame은 ready/invalid만 보유해 다른 subtree를 강하게 붙잡지 않는다. 이전 WeakMap 방식의 생성/stage/get/delete 비용을 피하려는 선택이며 속도·메모리 우월성은 아직 미측정이다. 수명/shape 대조에 실패하면 보류한다. → R74/R75, P2/P4, M-20-2/3.
+- [x] **DC-25-5 첫 후보에서 조기 반환 제외:** 동일 객체라도 기존 타입 비교가 children getter를 읽는다. 기준/후보의 관찰 회귀는 통과했으며, 비교 전 단순 반환을 넣은 negative control은 getter 읽기 0회로 실패했다. 이 shortcut은 R74를 위반하므로 시간 측정 후보에 넣지 않는다. 관찰을 보존하는 다른 반환 위치까지 불가능하다고 주장하지 않는다. → R73/R75, P2/P4, M-20-3.
+- [x] **DC-25-6 첫 후보는 base만 최적화:** concurrent의 기존 프레임/매칭 경로는 유지한다. `so/sc`는 공유 factory에 추가하지 않고 새 utility는 concurrent에서 사용하지 않는다. 후보 shared 타입/유틸을 연결한 frozen concurrent 347회귀가 통과했다. 실제 통합 시 concurrent bundle hash 및 중단/commit/abandon을 P5에서 다시 확인한다. → R76, P4/P5, M-20-4.
+
+- [x] **DC-25-7 첫 후보 미채택:** pooled 가중 전체 −0.171%, main +0.402%/reverse −1.260%로 방향이 다르고 baseline/candidate 목표 모두8/9다. partial/select JS는 줄었지만 select 전체는 pooled +2.775%였고 size는 +268B다. 개별 회귀/size만으로 탈락시킨 것이 아니라 전체 이득과 목표 개선 근거가 부족해 기본 runtime·guard를 유지했다. 구현·원자료·후보 patch와 full 검증은 [결과](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)에 보존했다. → R77~R79, P3/P5, M-20-5~7.
+
+### 매칭과 render 사이의 계약
+
+1. **관찰 순서를 먼저 고정한다.** 현재 base는 원본 children의 key를 읽어 Map을 만든 다음 새 children을 읽고, 새 key 조회와 자식 diff/사용자 콜백을 좌→우로 교차 실행한다. concurrent의 기존 차이는 별도로 기록한다. 두 배열의 key를 미리 전부 읽는 preflight나 getter를 다시 읽는 Set 검사는 동등하다고 가정하지 않는다.
+2. **중복과 mismatch를 안전하게 처리한다.** 기존 key 관찰에서 얻은 정보로 유일성과 위치를 증명할 수 있는지 검토한다. snapshot·Set·추가 배열이 필요하면 비용도 계수한다. 콜백이 뒤 key를 바꾸거나 중간 mismatch가 나면 처리한 prefix를 재실행하지 않고 기존 첫 등장 매칭/삭제 결과를 이어가야 한다. 이를 만족할 설계가 없으면 Map 생략은 보류한다.
+3. **성공한 현재 결과에만 순서 증명을 붙인다.** 같은 길이·현재 매칭의 모든 `origIndex === index`, 직접 결과 `N/U/T`, 추가/삭제/교체/이동 없음과 직접 portal 제외를 첫 범위로 한다. 미사용 자식 정리와 root diff/부모 연결 게시까지 성공해야 render가 사용할 수 있다. 하위 컴포넌트의 출력 arity 변화는 기존 content 경로로 처리한다.
+4. **수명을 제한한다.** 정확한 list node/children 및 갱신 세대에 연결하고 DOM setter/사용자 callback 실행 전에 한 번 소비한다. root 종료/throw·중첩 renew·삭제·clone·wrapper 교체·concurrent abandon에서 폐기한다. node metadata를 쓰면 모든 WDom의 shape를 넓히는 비용과 clone 전파 방지·in-place mutation의 검출 범위를 명시한다. 과거 DC-17의 root-scoped sidecar는 비교안이며 자동 채택하지 않는다.
+5. **생략 범위를 제한한다.** 증명이 있으면 render의 `matchedIndexes`/`oiSeq`·movers/created·LIS/placement 재분석 중 불필요한 부분만 생략한다. 콘텐츠 좌→우 방문, 전체 자식 `clearDiffMeta`, 마지막 `execMountedQueue`와 하위 Fragment/portal/입력 갱신은 유지한다. 증명이 없으면 기존 render를 사용하며 이미 끝난 diff를 다시 실행하지 않는다.
+6. **동일 VDOM 반환은 별도 증명한다.** baseline은 같은 객체에서도 `nr='N'`과 상속 metadata를 설정한다. 반환 위치를 앞당겨 이 처리를 누락하면 과거 `oi/nr`가 남을 수 있다. empty·같은 객체의 다른 위치 재사용·retired/hoisted node·자체 renew·mutable props/slots를 기준과 대조하고, 필요한 정리를 포함한 후보를 평가한다.
+
+격리 후보의 증명 필드는 typeUpdate에서 props/DOM callback 전에 로컬로 옮기고 비운다. updateChildren은 기존 위치에서 children을 한 번 읽은 뒤 frame/배열을 재검증하므로 extra children getter를 만들지 않는다. 중첩 replace는 바깥 frame을 invalid로 만들고, root finally는 성공/실패 모두 현재 frame을 invalid로 만든 뒤 이전 frame을 복원한다. cloneWDom의 명시적 필드 복사는 `so/sc`를 복사하지 않는다. 미방문 list에 남은 무효 frame은 다른 노드나 root를 참조하지 않으며, 다음 render에서는 사용할 수 없다. filter 생략은 모든 위치를 매칭하고 원본 길이가 여전히 같을 때만 허용하며 빈 삭제 처리의 부모 탐색 시점은 유지한다.
+
+### 검증·채택 경계
+
+- 기준 회귀는 `core-keyedConsumption`, `core-placementProof`, `core-cachedIdentity`, loop move/lifecycle, structural/fuzz, `core-portalSiblings`를 양코어에 확보한다. 빠른 경로 hit/miss, 중복/falsy/NaN/±0/object/Symbol, mixed/empty, getter/throw·뒤 key mutation, focus/native events·좌→우 callback/cleanup, 자체 renew·reentry·실패 복구를 추가한다.
+- 카운터로 Map/Set/snapshot·key 접근·diff/content 방문·배치 배열·proof 생성/소비/폐기와 fallback 비용을 귀속한다. 변경 수만큼만 방문한다고 추론하거나 개별 후보의 과거 개선율을 합산하지 않는다.
+- 공식 baseline/candidate CPU는 2조건×양순서 총 580표본, 메모리는 60표본을 기본 계획으로 삼는다. 별도 retention은 조건별 3 fresh contexts다. 최종 baseline/candidate/네 peer는 6조건×양순서 CPU 1,740·메모리 180을 계획한다. 동일 해시/환경 표본의 재사용은 수집 전에 범위와 시간 간격을 manifest에 정하며, 그 외에는 새로 수집한다. 실제 러너 표본 수를 P1에서 대조한다.
+- 항목별 전체·JS·paint, 순서별/pooled 중앙값과 분포, 메모리 절대 MB, raw/gzip/br를 공개한다. 9/9 목표와 후보 채택은 구분한다. 일부 손해는 공개 후 판단하고 정합성 실패는 채택을 막는다. 이득이 불확실하면 후보·증거를 보존하고 기존 경로를 유지한다.
+
 ## TODO — 미착수 후속 작업
 
-2026-10-26 사용자 요청으로 정리한 목록이다. BUG-1 수정과 크기 후속 채택은 끝났다(아래). **DC-25는 구현·측정하지 않았다.** 착수하면 REQUIREMENTS → DESIGN → IMPLEMENT → MANUAL 순서로 정식 DC를 연다.
+DC-25 첫 후보는 위 정식 설계/측정 뒤 미채택으로 종료했다. 새 성능 후보는 아직 선택하지 않았다. 아래 BUG-1/출력 절감은 완료 이력이며 1.25.3에 배포되어 있다.
 
-### DC-25 — 같은 순서 keyed 빠른 경로 (성능)
+### BUG-2 — concurrent의 실제 sparse array hole (미착수)
 
-- 배경: 고정 네 peer 목표는 6/9다. 1.10선까지 필요한 감소는 부분 갱신 −1.9%(15.438→15.14ms), swap −1.5%(16.698→16.45ms), select −21.2%(5.912→4.66ms)다. select 격차는 대부분 JS다(Lithent 3.050ms, Preact classes 1.306ms). 출처: [최종 비교 pooled](../benchmark/comprehensive-final-results.json).
-- 가설: 행 하나만 바뀌어도 1,000행 전체에 반복하는 작업을 **하나의 후보로 묶어** 줄인다. 이전에는 조각마다 따로 측정해 각 효과가 순서·노이즈 범위(±1~2%)에 묻혔다.
-  1. `src/diff.ts` `diffLoopChildren`: 길이와 위치별 key가 같으면 Map set/get/delete와 `used`/filter를 건너뛴다. [진단](../benchmark/FOLLOWUP_ANALYSIS.md)에서 select 4.25→3.35ms, +42B였고 공식 측정은 없다. 고유 key를 전제했다.
-  2. `src/render.ts` `updateChildren`: 순서가 유지된 결과면 `matchedIndexes`/`oiSeq` 재분석을 생략한다. C2(K)는 select JS −13%였지만 전체 시간 변화가 없었다. WeakMap frame 대신 list 노드 단위 표시는 고려만 하고 구현하지 않았다.
-  3. `src/diff.ts` `makeNewWDomTree`: 같은 VDOM 객체의 조기 반환을 다시 평가한다. [당시](../benchmark/PERFORMANCE_CLOSEOUT.md) select/swap/삭제 JS −21~32%, 부분 갱신 전체 +7~10%로 기각했다. compact13 이전 layout에서의 결과다.
-- [ ] DC-25-1 중복 key 정책: (a) Set으로 중복을 확인해 현재 "첫 등장만 매칭"을 유지한다(비용 일부 남음). (b) 위치 매칭으로 바꾸고 개발 경고를 낸다(가장 빠름, 계약 변경). 길이·위치 key 비교만으로는 첫 등장 소비를 보장하지 못한다(아래 C2 제약 2).
-- [ ] DC-25-2 크기 허용치: base guard는 4,824B인데 BUG-1 수정 후 4,860B다(아래). 진입 전 허용 바이트를 정한다. 아래 출력 절감을 채택하면 일부를 여유로 쓸 수 있다.
-- [ ] DC-25-3 측정 범위: 동일 환경 CPU 9항목 × 양순서, 공식 메모리, 고정 네 peer 재비교. 조각별 카운터로 제거된 작업을 귀속한다.
-- 다시 하지 않을 것: proxy E, C1, C3, full22, keymatch·ordered 단독.
+- 기존 dense keyed 배열과 길이가 같은 다음 배열에 실제 hole이 있으면 base는 대응 DOM을 삭제하지만 현재 concurrent frame은 undefined를 노드로 방문해 `undefined.type` TypeError를 던진다. null/undefined 값으로 채운 dense 배열과는 다르다.
+- `src/tests/core-keyedFastPath.test.tsx`는 각 코어의 기존 관찰을 구분해 기록한다. 이 예외를 새로운 지원 계약으로 확정한 것이 아니며, 후속 수정에서는 기대값을 함께 갱신한다. DC-25 후보와 무관한 기존 경로라 이번에는 수정하지 않았다. → [한계/원자료](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md#관찰된-한계와-준비-실패).
 
 ### BUG-1 — portal 대상이 형제 DOM처럼 쓰이는 문제 (정합성, 수정함)
 
@@ -42,7 +74,7 @@
 - [x] BUG-1-1 수정과 양코어 회귀 11개(`src/tests/core-portalSiblings.test.tsx`). 수정 전 base 10개, concurrent 6개가 실패했다. 1개는 대상의 다른 내용을 지우지 않는지 보는 안전장치다.
 - [x] BUG-1-2 검증: 전체 build, `pnpm test` 996 passed / 기존 3 skipped(이전 974 + 신규 11 × 2코어), base SSR 15, concurrent satellites 172, Playwright 78 passed(retry 0), strict tsc(base/concurrent/e2e), 변경 파일 ESLint·Prettier, `pnpm verify:concurrent`. Chromium 재현 스크립트도 수정된 UMD에서 오류 없이 통과한다.
 - [x] BUG-1-3 크기: 수정만으로는 base UMD Brotli 4,824→4,860B(+36B)로 guard를 넘었다. 사용자 결정으로 아래 출력 절감을 함께 채택해 4,819B다. concurrent는 6,903→6,935B(+32B)로 예산 안이다. 성능 측정은 하지 않았다. 바뀐 경로는 portal 판정 비교 몇 개뿐이다.
-- 릴리스 때 CHANGELOG에 portal 수정과 동작 변화(D·E)를 적는다.
+- portal 수정과 동작 변화(D·E)는 [CHANGELOG 1.25.3](../../CHANGELOG.md)에 반영되었다.
 
 ### 크기 후속 (채택함)
 
@@ -86,7 +118,7 @@ BUG-1 수정이 들어간 코드 기준 base UMD Brotli다. 출력 후보의 근
 
 ## 2. 후보 묶음과 우선순위
 
-아래 C1~C4는 기존 내부 후보의 설계와 이력이다. 현재 우선순위는 [DC-22](#dc-22--별도-브랜치를-포함한-종합-반영)의 flat 이벤트 수정 → compact13 위 C2 재평가 → 결합 비교다. 독립 후보의 근거를 먼저 확보하고 조합의 추가 이득도 별도로 측정한다.
+아래 C1~C4는 기존 내부 후보의 설계와 이력이다. [DC-22](#dc-22--별도-브랜치를-포함한-종합-반영) 당시 우선순위는 flat 이벤트 수정 → compact13 위 C2 재평가 → 결합 비교였다. 현재 작업은 위 DC-25이며 native 이벤트를 유지한 같은 순서 keyed 결합 후보를 평가한다.
 
 Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **DC-12의 별도 렌더러 격리와 비참여 비용 대조까지 완료했다**. DC-13의 같은 행 앱 기능 대조·DC-14의 heap 귀속·DC-15 실제 캐시 대조까지 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16 전체 peer 기준과 별도 진단 뒤 DC-17 C2의 root-scoped sidecar base 프로토타입을 격리 구현했다. shared229+수명4=233회귀·타입/빌드는 통과했지만 br4,952/4,800B여서 당시 프로토타입은 미채택이고 공식 성능은 미측정이다. C4는 조건부 연구다. 모든 후보를 무조건 구현하는 계획으로 해석하지 않는다.
 
@@ -466,7 +498,7 @@ DC-19/19B Fragment는 이미 읽기 관찰/시간 한계를 검토했다. 새 �
 
 ## 상태 / 핸드오프
 
-- done: DC-23 compact13/native 복원·검증을 유지한다. DC-24 추가 크기 조사에서 출력41개/실제 빌드12개를 비교했고 hidden map의 동일 실행 AST·소스맵6형식을 확인했다. [조사 결과](../benchmark/BUNDLE_SIZE_RESULTS.md)·[검증](../benchmark/bundle-size-proof.json)에 연결한다. 기본 runtime/빌드와 DC-23 증거는 그대로다.
-- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 사용자는 추가 축소를 보류하고 현재 설정 유지를 확정했다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 요청에 따른다.
-- blockers: 조사 실행 블로커 없음. 미채택 구문 후보의 추가 검증은 미실행으로 명시한다.
-- commit: DC-23 복원·검증과 DC-24 조사 구현 커밋은 `4baf0e51483134ab3426817035e06e21f0285022`다. 후속 인계 문서 커밋을 포함한 tip은 `git log -1` 및 브랜치 ctxbin 최신 인계로 확인한다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 원자료의 `463c6cd`/uncommitted 표시는 검증 당시 기준이며 수정하지 않는다.
+- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
+- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
+- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
+- commit: 분기 기준 `14d47e83770958eb78a91c564bf39e47c4a25dba`, 배포 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`. 브랜치는 `perf/dc25-keyed-fast-path`, 이번 작업은 미커밋이다. 커밋/푸시·버전 변경·배포는 수행하지 않았다.

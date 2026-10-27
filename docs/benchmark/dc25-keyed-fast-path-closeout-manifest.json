@@ -1,0 +1,84 @@
+{
+  "format": "dc25-closeout@1",
+  "command": [
+    "experiments/dc25-keyed-fast-path/closeout.py",
+    "/tmp/lithent-dc25-20261027"
+  ],
+  "note": "Supplemental unchanged-default browser checks and derived report tooling; the original 13 archives and measured inputs are untouched. This snapshot supersedes only the derived report generator/README in the earlier repo tooling snapshot.",
+  "parts": [
+    {
+      "file": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "sha256": "aba26f8e5e66b650281036a0dd4b2c6488e17b8034ee4916acf103c3fbdca8db",
+      "bytes": 22577,
+      "entries": 11
+    }
+  ],
+  "entries": [
+    {
+      "path": "repo/experiments/dc25-keyed-fast-path/README.md",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 8008,
+      "sha256": "099877e36caf02c7057b8a1d81717771393515514c5aa6585452028f7857d1c4"
+    },
+    {
+      "path": "repo/experiments/dc25-keyed-fast-path/closeout.py",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 2862,
+      "sha256": "f15184e4a8a0b650b433fbdc59d0ec5f632a7853c74bd92ec6103d3b39ad7980"
+    },
+    {
+      "path": "repo/experiments/dc25-keyed-fast-path/default-browser.mjs",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 2085,
+      "sha256": "647b472ce4d35140d6b150859fef636dba9dec5a1c7db96dcaa246156510d870"
+    },
+    {
+      "path": "repo/experiments/dc25-keyed-fast-path/report.mjs",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 19700,
+      "sha256": "22e3ebcfcf8afd34c8ae5c323b2fc6e645038b851bf89b461fd3fc5cc456902d"
+    },
+    {
+      "path": "run/default-browser/closeout-auditor.py",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 1620,
+      "sha256": "58b0cea860131e76a057cb605f930d93c7c2dbe8df6010b76123e40fe7f177de"
+    },
+    {
+      "path": "run/default-browser/command.json",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 557,
+      "sha256": "29ff020fa3428baa62138546adc943a1fb63a8224d2ef2052cbd2af8527a48d6"
+    },
+    {
+      "path": "run/default-browser/playwright.config.mjs",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 470,
+      "sha256": "4ba960fe4796fabe2abae5c76d6790f729a836b22806baebd2667525e490d7b1"
+    },
+    {
+      "path": "run/default-browser/report.json",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 89212,
+      "sha256": "f8608392e8d6ce189f7edb17a1a3dd571b645a0636bd79528884ae9c82b84b40"
+    },
+    {
+      "path": "run/default-browser/run.log",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 11435,
+      "sha256": "b93bfaf00450d7e4af156fd08541ed56280c049330ccd5f3f6be74e923044677"
+    },
+    {
+      "path": "run/default-browser/test-results/.last-run.json",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 45,
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903"
+    },
+    {
+      "path": "run/default-browser/validation.json",
+      "part": "dc25-keyed-fast-path-closeout-evidence.tar.gz",
+      "bytes": 902,
+      "sha256": "c6241e0726d29be9190f4ccd20f13d612b41c7b9e316302ef3c94d0c642add2a"
+    }
+  ]
+}

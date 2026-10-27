@@ -1,11 +1,25 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-26. 상태: **DC-23 완료(compact13 유지 + native 이벤트 직접 등록). 후속으로 BUG-1 portal 정합성을 양코어에서 수정하고 base UMD 출력 절감(구문 4종 + Module 태그 제거)을 채택했다. base UMD Brotli 4,819/4,824B. 현재 CPU 목표는 6/9이며 새 timing은 수집하지 않았다.**
+- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
 
-## M-19. portal 주변 형제 정합성 — BUG-1 (DESIGN TODO)
+## M-20. DC-25 같은 순서 keyed 빠른 경로 — R72~R79
+
+이번 브랜치의 M-20 검증은 완료했으며 [최종 결과/증거](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)와 검증 JSON에 연결한다. candidate/default와 과거 M-1~M-19를 구분한다. 자동 대체한 항목은 실제 source/bundle hash·명령·원자료를 기록했다. 후보 미채택으로 새 allowance/릴리스는 N/A이며 기본 runtime을 유지한다.
+
+- [x] **M-20-1 기준선 — DC-25-3, P1:** main `14d47e8`의 양코어·앱·현재 lock/Node 24.22.1/pnpm 12.15.0·browser/V8/runner 해시와 1.25.3 태그를 구분한다. 원래 cached 앱의 keyed 9동작/font/DOM 정체성 및 실제 UMD 크기를 확인한다. 과거 6/9·4,819B를 새 측정으로 기록하면 실패다.
+- [x] **M-20-2 매칭 관찰 — DC-25-1/4, P1/P2/P4:** unique/duplicate·NaN/±0/falsy/object/Symbol·mixed/empty·key 변경·중간 mismatch를 대조한다. getter/throw 순서·횟수와 pre/updater callback의 뒤 key mutation이 baseline과 같고, fallback에서 prefix callback/마운트가 두 번 실행되지 않아야 한다.
+- [x] **M-20-3 실제 생략과 동일 객체 — DC-25-4/5, P2/P4:** 빠른 경로 hit/miss와 Map/Set/snapshot·key 접근·render 배열/인덱스·content 방문·proof 생성/소비/폐기 수치를 연결한다. same-object/hoisted/retired clone·자체 renew·mutable props/slots·하위 arity 변화에서도 metadata·좌→우 callback/cleanup/mount 시점과 DOM이 기준과 같아야 한다. 조기 반환 포함/제외 이유를 기록한다.
+- [x] **M-20-4 DOM·수명·concurrent — DC-25-4/6, P4/P5:** portal 전후 삽입/이동/교체/삭제, Fragment/외부 형제·입력 focus/선택/값·native listener identity를 실제 브라우저에서 확인한다. portal 대상과 다른 내용이 보존되고 throw/동기 재진입·삭제·clone·concurrent interrupt/retry/abandon 뒤 낡은 proof를 재사용하지 않아야 한다. concurrent 적용 또는 기존 경로 유지 범위를 명시한다.
+- [x] **M-20-5 번들 비용 — DC-25-2, P1/P3/P5:** baseline/최종 후보 raw/gzip/br·compressor와 세 UMD의 존재를 확인한다. base 4,824B/concurrent 9,000B/element 1,000B guard의 실제 통과/초과를 공개한다. 소폭 초과만으로 실측을 생략하거나 사전 allowance를 만들면 실패다. 최종 한도는 성능·메모리 결과를 본 사용자 결정과 연결한다.
+- [x] **M-20-6 성능과 목표 — DC-25-3/5, P3:** 새 동일 환경 baseline/candidate CPU 9항목×양순서·공식 메모리·retention과 최종 네 peer 비교의 raw/실패/재시도·순서별/pooled 분포를 확인한다. 계측 build·진단·과거 표본을 섞지 않는다. partial/select/swap 및 생성/추가/삭제의 손해도 공개하고 항목별 최저 peer 대비 1.10배/9항목 판정을 남긴다. 후보 채택과 9/9 목표 달성을 구분한다.
+- [x] **M-20-7 최종 통합과 인계 — R79, P5:** B1~B4·SSR/hydration·helper/HMR·element/CSP·예제/docs·ESM/UMD/CJS probe·source map 연결과 concurrent 검증을 실제 최종 해시에 연결한다. hardening으로 해시가 바뀌면 필요한 성능/회귀를 다시 확보한다. 새 결과/manifest/영구 증거와 미실행·미달·채택/보류·다음/블로커/commit이 네 정본 및 HANDOFF와 같아야 한다.
+
+통과: 해당 단계의 체크에 재현 가능한 증거가 있고 기존 계약·최종 코드/측정 해시가 일치한다. 문서 준비 완료를 구현·성능 검증 완료로 표시하지 않는다.
+
+## M-19. portal 주변 형제 정합성 — BUG-1 (1.25.3 배포 완료)
 
 - [x] portal 바로 앞에 요소·컴포넌트가 새로 생기거나, 마지막 portal 뒤에 추가될 때 부모 안의 올바른 위치에 들어간다. 오류는 없다.
 - [x] keyed 형제가 portal 주위에서 이동하거나, portal을 품은 keyed 컴포넌트가 이동해도 portal 대상 컨테이너는 원래 자리에 있다.
@@ -24,7 +38,7 @@
 
 ## M-17. native 복원 — R62~R66, DC-23
 
-아래는 현재 최종본에 대한 gate다. 기존 M-14~M-16의 proxy 채택 완료 체크는 DC-22 당시 이력으로 유지한다.
+아래는 DC-23 당시 최종본에 대한 gate다. 기존 M-14~M-16의 proxy 채택 완료 체크는 DC-22 당시 이력으로 유지한다. 새 DC-25 후보는 M-20을 별도로 통과해야 한다.
 
 - [x] compact13 두 파일을 유지하고 event runtime만 `fb481f3`로 복원했다. proxy 실험 source·56 archive·기존 manifest가 그대로다.
 - [x] 양코어 trusted alias 첫/다음 클릭·중첩 dispatch·target 교체 시 첫 클릭 누락/다음 새 callback·ancestor 전파·throw 후 다음 callback을 native 계약대로 확인했다.
@@ -238,7 +252,7 @@ DC-17 전용 추가 gate(기준 회귀와 후보 검증 분리):
 
 ## 상태 / 핸드오프
 
-- done: DC-23 compact13/native 복원·검증을 유지한다. DC-24 추가 크기 조사에서 출력41개/실제 빌드12개를 비교했고 hidden map의 동일 실행 AST·소스맵6형식을 확인했다. [조사 결과](../benchmark/BUNDLE_SIZE_RESULTS.md)·[검증](../benchmark/bundle-size-proof.json)에 연결한다. 기본 runtime/빌드와 DC-23 증거는 그대로다.
-- next: 이번 번들 조사는 완료했다. hidden map은 Brotli26B를 줄이지만 자동 디버깅 연결을 잃어 기본 변경은 추천하지 않는다. 구문 압축은 추가9~16B 후보로 보류하며 runtime/heap/performance를 검증하지 않았다. 사용자는 추가 축소를 보류하고 현재 설정 유지를 확정했다. 새로운 구조 후보·CPU6/9 목표 연구·배포는 별도 요청에 따른다.
-- blockers: 조사 실행 블로커 없음. 미채택 구문 후보의 추가 검증은 미실행으로 명시한다.
-- commit: DC-23 복원·검증과 DC-24 조사 구현 커밋은 `4baf0e51483134ab3426817035e06e21f0285022`다. 후속 인계 문서 커밋을 포함한 tip은 `git log -1` 및 브랜치 ctxbin 최신 인계로 확인한다. native B `fb481f3`, compact13 `ff8b80a`, 보존 E `95d6faf`. 원자료의 `463c6cd`/uncommitted 표시는 검증 당시 기준이며 수정하지 않는다.
+- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
+- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
+- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
+- commit: 분기 기준 `14d47e83770958eb78a91c564bf39e47c4a25dba`, 배포 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`. 브랜치는 `perf/dc25-keyed-fast-path`, 이번 작업은 미커밋이다. 커밋/푸시·버전 변경·배포는 수행하지 않았다.

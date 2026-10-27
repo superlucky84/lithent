@@ -1,0 +1,250 @@
+--- a/src/diff.ts
++++ b/src/diff.ts
+@@ -14,6 +14,7 @@
+ 
+ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
+ import { keys, isEnumerableProp } from '@/utils';
++import { childOrderRef } from '@/utils/childOrder';
+ 
+ /**
+  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
+@@ -250,48 +251,62 @@
+  */
+ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
+   const origChildren = originalWDom.children || [];
+-  const keyMap = new Map<unknown, number>();
++  const frame = childOrderRef.value;
++  const originalKeys: unknown[] = [];
++  const unique = new Set<unknown>();
++  let eligible = true;
++  // Preserve the original key read order, before reading the new children.
+   origChildren.forEach((item, index) => {
+     const key = getKey(item);
+-    if (checkExisty(key) && !keyMap.has(key)) {
+-      keyMap.set(key, index);
+-    }
++    originalKeys[index] = key;
++    if (!checkExisty(key) || unique.has(key)) eligible = false;
++    unique.add(key);
+   });
+-
+   const used: boolean[] = [];
+   const getParent = makeParentGetter(newWDom);
+-  const remaked = (newWDom.children || []).map((item, index) => {
++  const children = newWDom.children || [];
++  let positional = eligible && unique.size === origChildren.length && children.length === origChildren.length;
++  const mapRemaining = (start: number) => {
++    const map = new Map<unknown, number>();
++    originalKeys.forEach((key, index) => {
++      if (index >= start && checkExisty(key) && !map.has(key)) map.set(key, index);
++    });
++    return map;
++  };
++  let keyMap = positional ? undefined : mapRemaining(0);
++  let sameOrder = children.length === origChildren.length;
++  let matchedCount = 0;
++  const remaked = children.map((item, index) => {
++    // Earlier updaters may mutate this key: do not pre-read the new keys.
+     const key = getKey(item);
+-    // Unkeyed items among keyed ones (a hidden row's null, a nested array)
+-    // pair with the unkeyed original at the same index, as in React.
+-    const origIndex = checkExisty(key)
+-      ? keyMap.get(key)
+-      : index < origChildren.length && !checkExistyKey(origChildren[index])
+-        ? index
+-        : undefined;
++    const oldKey = originalKeys[index];
++    if (positional && !(key === oldKey || (key !== key && oldKey !== oldKey))) {
++      positional = false;
++      keyMap = mapRemaining(index);
++    }
++    const origIndex = positional ? index : checkExisty(key)
++      ? keyMap!.get(key)
++      : index < origChildren.length && !checkExistyKey(origChildren[index]) ? index : undefined;
+     let original: WDom | undefined;
+-
+     if (origIndex !== undefined) {
+-      keyMap.delete(key);
++      matchedCount++;
++      if (keyMap) keyMap.delete(key);
+       used[origIndex] = true;
+       original = origChildren[origIndex];
+     }
+-
+     const child = makeNewWDomTree(item, original);
+-    if (original) {
+-      child.oi = origIndex;
+-    }
++    if (original) child.oi = origIndex;
+     child.getParent = getParent;
+-
++    sameOrder = sameOrder && origIndex === index &&
++      (child.nr === 'N' || child.nr === 'U' || child.nr === 'T') && child.tag !== 'portal';
+     return child;
+   });
+-
+-  // Originals left unmatched, including ones whose key was already taken
+-  // (no key, or a duplicate) and so never made it into keyMap.
+-  typeDeleteUnused(
+-    origChildren.filter((_item, index) => !used[index]),
+-    originalWDom
+-  );
+-
++  // Keep even the empty deletion call's parent lookup at its original point.
++  typeDeleteUnused(positional && matchedCount === origChildren.length && origChildren.length === children.length ? [] :
++    origChildren.filter((_item, index) => !used[index]), originalWDom);
++  if (sameOrder && matchedCount === origChildren.length && frame && !frame.invalid) {
++    newWDom.so = frame;
++    newWDom.sc = remaked;
++  }
+   return remaked;
+ };
+--- a/src/render.ts
++++ b/src/render.ts
+@@ -22,6 +22,7 @@
+   makeParentGetter,
+ } from '@/utils';
+ import { cloneWDom } from '@/wDom';
++import { childOrderRef, ChildOrderFrame } from '@/utils/childOrder';
+ 
+ const DF = () => new DocumentFragment();
+ 
+@@ -288,6 +289,10 @@
+     return;
+   }
+ 
++  const frame = newWDom.type === 'l' ? newWDom.so as ChildOrderFrame | undefined : undefined;
++  const proofChildren = frame ? newWDom.sc : undefined;
++  if (frame) newWDom.so = newWDom.sc = undefined;
++
+   if (newWDom.el) {
+     const { op: oldProps, props } = newWDom;
+     updateProps(props, newWDom.el, oldProps);
+@@ -299,7 +304,7 @@
+     }
+   }
+ 
+-  updateChildren(newWDom);
++  updateChildren(newWDom, frame, proofChildren);
+   runUpdatedQueueFromWDom(newWDom);
+ };
+ 
+@@ -310,8 +315,14 @@
+  * children that can stay in place, and a right-to-left placement pass that
+  * inserts only added children and non-LIS moves before a running anchor.
+  */
+-const updateChildren = (newWDom: WDom) => {
++const updateChildren = (newWDom: WDom, frame?: ChildOrderFrame, proofChildren?: WDom[]) => {
+   const children = newWDom.children || [];
++  if (frame && frame === childOrderRef.value && frame.ready && !frame.invalid && children === proofChildren) {
++    children.forEach(wDomUpdate);
++    children.forEach(clearDiffMeta);
++    execMountedQueue();
++    return;
++  }
+ 
+   if (
+     newWDom.type !== 'l' ||
+--- a/src/types/index.ts
++++ b/src/types/index.ts
+@@ -77,6 +77,8 @@
+   ae?: HTMLElement; // afterElement (insert before)
+   el?: HTMLElement | DocumentFragment | Text;
+   nr?: RenderType; // needRerender
++  so?: object; // scoped same-order frame; sparse, list nodes only
++  sc?: WDom[]; // children owned by that single-use proof
+   oi?: number; // originalIndex (matched keyed position in previous children)
+   il?: boolean; // isLegacy
+   rs?: TagFunctionResolver; // resolver: untouched description of a component drawn without a diff
+--- /dev/null
++++ b/src/utils/childOrder.ts
+@@ -0,0 +1,3 @@
++export type ChildOrderFrame = { ready: boolean; invalid: boolean };
++// Frames hold no nodes/arrays. Unvisited list metadata cannot retain a root tree.
++export const childOrderRef: { value?: ChildOrderFrame } = {};
+--- a/src/wDom.ts
++++ b/src/wDom.ts
+@@ -23,6 +23,7 @@
+ } from '@/utils/universalRef';
+ import { bindRedraw, componentUpdate } from '@/utils/redraw';
+ import { createWDom } from '@/utils/createWDom';
++import { childOrderRef } from '@/utils/childOrder';
+ import { runUpdateCallback } from '@/hook/updateCallback';
+ import {
+   checkFragmentFunction,
+@@ -134,37 +135,47 @@
+   if (originalWDom.il) {
+     return;
+   }
+-  needDiffRef.value = true;
+-
+-  let newWDomTree: WDom;
++  const previous = childOrderRef.value;
++  if (previous) previous.invalid = true;
++  const frame = { ready: false, invalid: false };
++  childOrderRef.value = frame;
+   try {
+-    const newWDom = makeWDomResolver(tag, props, children);
+-    newWDomTree = makeNewWDomTree(newWDom, originalWDom);
+-    // NOTE: we/ae are short for wrapElement/afterElement
+-    const { isRoot, getParent, we, ae } = originalWDom;
+-
+-    newWDomTree.getParent = getParent;
+-
+-    if (!isRoot && getParent) {
+-      const parent = getParent();
+-      const brothers = (parent && parent.children) || [];
+-      const index = brothers.indexOf(originalWDom);
+-
+-      if (index !== -1) {
+-        brothers.splice(index, 1, newWDomTree);
++    needDiffRef.value = true;
++  
++    let newWDomTree: WDom;
++    try {
++      const newWDom = makeWDomResolver(tag, props, children);
++      newWDomTree = makeNewWDomTree(newWDom, originalWDom);
++      // NOTE: we/ae are short for wrapElement/afterElement
++      const { isRoot, getParent, we, ae } = originalWDom;
++  
++      newWDomTree.getParent = getParent;
++  
++      if (!isRoot && getParent) {
++        const parent = getParent();
++        const brothers = (parent && parent.children) || [];
++        const index = brothers.indexOf(originalWDom);
++  
++        if (index !== -1) {
++          brothers.splice(index, 1, newWDomTree);
++        }
++  
++        syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
++      } else {
++        newWDomTree.isRoot = true;
++        newWDomTree.we = we;
++        newWDomTree.ae = ae;
+       }
+-
+-      syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
+-    } else {
+-      newWDomTree.isRoot = true;
+-      newWDomTree.we = we;
+-      newWDomTree.ae = ae;
+-    }
++    } finally {
++      needDiffRef.value = false;
++    }
++  
++    frame.ready = true;
++    wDomUpdate(newWDomTree);
+   } finally {
+-    needDiffRef.value = false;
+-  }
+-
+-  wDomUpdate(newWDomTree);
++    frame.invalid = true;
++    childOrderRef.value = previous;
++  }
+ };
+ 
+ // ============================================================================
