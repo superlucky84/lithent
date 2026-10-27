@@ -1,5 +1,39 @@
 # Release notes
 
+## 2026-10-27
+
+### lithent 1.25.3
+
+- Stop treating a portal's target container as a sibling element (#100). A
+  portal near other nodes could throw `NotFoundError` on insert, drag its
+  target into a keyed list on reorder, delete its siblings when removed, fail
+  to show a node that replaced it, or remove its target from the document when
+  a parent component or keyed row was deleted. Deleting a portal now clears
+  only its children and keeps the target.
+- Create virtual nodes with one shared object layout. On the same benchmark
+  app, total time fell 5.9% and script time 14.4% across all nine actions,
+  while 10k-row memory rose 2.5% (+0.68 MB).
+- Compatibility note: virtual nodes now always carry their common fields, some
+  set to `undefined`, so code that inspects them with `Object.keys` or `in`
+  sees more keys. Rendering behavior is unchanged.
+- Compatibility note: the UMD and CJS builds no longer tag their exports object
+  as a module, so `Object.prototype.toString.call(lithent)` returns
+  `[object Object]` instead of `[object Module]`. Named exports are unchanged.
+- Shrink the base UMD build with syntax-only minification. The base bundle is
+  4,819B Brotli; its budget is now 4,824B.
+- Document the native DOM event contract that event props follow; see
+  [events.md](./skills/lithent/reference/events.md).
+
+### lithent-concurrent 0.2.3
+
+- Include the portal fixes above (#100).
+
+See [RELEASING.md](./RELEASING.md) for the two-package publication order,
+[NODE_SHAPE_RESULTS](./docs/benchmark/NODE_SHAPE_RESULTS.md) for the node
+layout benchmark and
+[BUNDLE_SIZE_RESULTS](./docs/benchmark/BUNDLE_SIZE_RESULTS.md) for the build
+size changes.
+
 ## 2026-10-16
 
 ### lithent 1.25.2
