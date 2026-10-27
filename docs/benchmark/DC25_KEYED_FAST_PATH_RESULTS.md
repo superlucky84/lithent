@@ -103,4 +103,4 @@ B ESM/UMD/CJS는 `6665eac4…`/`1501e239…`/`8a22f1e4…`, K는 `49c999b6…`/`
 - done: 첫 DC-25 결합 후보를 격리 구현하고 정합성·CPU/메모리·수명·형식/통합을 검증했다. 기본 채택은 보류했고 source/guard·sibling은 유지했다. 후보 패치는 현재 main에 `git apply --check`로 적용 가능함을 확인했다.
 - next: 새 성능 가설이 있을 때 현재 select 전체 격차와 차수별 분포부터 검토한다. 기존 keymatch/ordered 단독이나 proxy E/C1/C3/full22를 자동 반복하지 않는다. 실제 sparse array hole의 concurrent 예외는 별도 정합성 후속이다.
 - blockers: 이번 검증/보존 작업의 실행 블로커 없음. 전체 CPU 목표 9/9는 달성하지 못했다.
-- commit: 기준 main `14d47e83770958eb78a91c564bf39e47c4a25dba`; 이번 작업은 미커밋이다. 버전 변경·배포·커밋/푸시는 수행하지 않았다.
+- commit: 실험·검증·증거는 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 보존했다. 기준/측정 당시 main `14d47e83770958eb78a91c564bf39e47c4a25dba`는 원자료대로 유지한다. 이후 인계 문서 tip과 원격 반영은 `git log -1` 및 `origin/perf/dc25-keyed-fast-path`로 확인한다. 버전 변경·배포는 없다.

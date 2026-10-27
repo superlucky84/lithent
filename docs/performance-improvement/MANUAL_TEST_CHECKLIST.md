@@ -255,4 +255,4 @@ DC-17 전용 추가 gate(기준 회귀와 후보 검증 분리):
 - done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
 - next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
 - blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
-- commit: 분기 기준 `14d47e83770958eb78a91c564bf39e47c4a25dba`, 배포 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`. 브랜치는 `perf/dc25-keyed-fast-path`, 이번 작업은 미커밋이다. 커밋/푸시·버전 변경·배포는 수행하지 않았다.
+- commit: 실험·회귀·재현 도구·증거는 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 보존했다. 분기/측정 당시 HEAD `14d47e83770958eb78a91c564bf39e47c4a25dba`와 릴리스 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`는 원자료대로 유지한다. 최종 인계 tip/원격 반영은 `git log -1`과 `origin/perf/dc25-keyed-fast-path`로 확인한다. 버전 변경·배포는 없다.

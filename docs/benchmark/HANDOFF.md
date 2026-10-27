@@ -1,6 +1,14 @@
 # summary
 
-## 최신 — DC-25 첫 후보 검증 완료·미채택 (2026-10-27)
+## 최신 — DC-25 기록 커밋 인계 (2026-10-27)
+
+- done: 사용자 요청으로 DC-25 미채택 평가·회귀·재현 도구·원자료를 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 커밋했다. CPU/메모리·브라우저·archive 검증 결과와 미채택 판단은 아래 직전 인계를 따른다.
+- validation: 커밋 범위는 보고서·도구·회귀·증거뿐이다. runtime/package/lock/build/size/workflow는 기준 main과 같다. source/doc Prettier와 공백 검사를 통과했다. immutable candidate.patch의 diff context/실측 소스 공백은 바이트 보존하며 공백 검사에서 그 파일만 제외했고, `git apply --check`와 archive SHA-256은 통과했다.
+- next: 현재 origin/main `14d47e8`는 분기 기준과 같아 병합 충돌이 없다. 기존 Deploy docs workflow의 경로 필터에도 해당하지 않는다. 병합 여부는 사용자 판단에 따르며 새 성능 가설/BUG-2는 별도 후속이다.
+- blockers: 커밋/푸시 작업의 알려진 블로커 없음. runtime·guard·버전·배포 설정은 유지한다. 압축 자료 86,131,562B가 저장소 이력에 추가된다.
+- commit: 증거 커밋 `87c41803d476c04f9aee311cff92dbb1021fbac5`. 이 인계 문서의 최종 tip/원격 반영은 `git log -1`과 `origin/perf/dc25-keyed-fast-path`로 확인한다. 아래 미커밋/미푸시 표기는 각 측정 당시의 이력이며 원자료의 HEAD를 현재 커밋으로 바꾸지 않는다.
+
+## 이전 — DC-25 첫 후보 검증 완료·미채택 (2026-10-27)
 
 - done: main `14d47e83770958eb78a91c564bf39e47c4a25dba`에서 분기한 `perf/dc25-keyed-fast-path`에서 첫 결합 후보 구현·측정·회귀·통합·보존을 완료했다. [최종 결과](./DC25_KEYED_FAST_PATH_RESULTS.md), [6앱 비교표](./dc25-keyed-fast-path-table.html), [통계](./dc25-keyed-fast-path-final-results.json), [실측 patch](./dc25-keyed-fast-path-candidate.patch), [검증](./dc25-keyed-fast-path-validation.json)을 연결한다.
 - decision: **미채택**. 가중 전체 pooled −0.171%이나 main +0.402%/reverse −1.260%로 방향이 다르고, baseline/candidate 목표는 모두8/9다. partial/select JS는 줄었지만 select 전체는 pooled +2.775%였으며 size는 +268B(5,087B/기존 guard263B 초과)다. 전체 이득/목표 개선을 입증하지 못해 default compact13/native/portal 수정과 guard4,824B·실제4,819B를 유지한다. 과거6/9→이번8/9를 후보의 성과로 설명하지 않는다.
