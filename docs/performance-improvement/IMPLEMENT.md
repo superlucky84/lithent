@@ -1,9 +1,64 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
+- 기준일: 2026-10-29. 상태: **C4 P2 owner/중첩 확장과 새 3앱 비교 완료. CPU870/메모리90 양순서에서 C4는 기존 앱 대비 가중 전체 −3.44%, Preact class 대비 +1.29%다. 해당 한 peer의1.10 범위7/9이며 선택/교환은 미달이다. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B. 추가 class pilot100표본은 방향이 갈려 미채택이다. 기본 runtime/guard·공개 API는 유지하며 portal BUG-3·concurrent/SSR/HMR은 남아 있다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 - 완료한 DC-22 실행 순서: [Phase4A~4E](#dc-22--종합-반영-실행-phase4a4e) → [Phase5](#phase-5--test-hardening) → [Phase6](#phase-6--integration-test와-채택인계). 앞선 Phase0~4의 완료 기록은 보존하며, 과거 size 중단·미채택을 현재 후속의 자동 종료 조건으로 쓰지 않는다.
+
+## DC-26 — 진단과 조건부 후속 계획
+
+R80~R84 / DC-26-1~6 / M-21. **D0 완료 후 사용자 요청으로 D1/D2 및 한정 D3/D4 실험을 진행 중이다.** 제품 수준 양코어/SSR/HMR 통합과 최종 API 채택은 별도다.
+
+### D0 — 기록 대조와 진단 (완료)
+
+진입: 사용자 원인 분석 요청, HEAD `4de76ef`. 기준 검사: clean tree, 최신 DC-25 및 10월 28일 미채택 기록, 현재 source/peer source. 종료: 재계산 가능한 격차·기시도 표·관찰 반례·미결정 개선안을 연결한다.
+
+- [x] DC-25 baseline/Preact class 9항목과 전체/JS/paint 가중 비율을 재계산했다.
+- [x] 현재 source와 로컬 Preact class/Vue 앱, 공식 문서를 대조했다. Vue timing/컴파일 산출물 부재를 명시했다.
+- [x] 부모 getter 생성 시 대입 제거의 메모리 내 negative control을 실행했다. 최종 HTML은 같아도 render 전/mountReady의 부모 관찰은 다르다.
+- [x] [보고서](../benchmark/RENDER_GAP_DIAGNOSIS.md), [JSON](../benchmark/render-gap-diagnosis.json), [재현 도구](../../experiments/render-gap-diagnosis/analyze.mjs)와 네 정본을 연결했다. 제품 소스/빌드/guard는 변경하지 않았다.
+- [x] 별도 Python으로 입력/소스/snapshot 해시, 가중 비율 3개, 9항목 표본 수를 검산했다. 상대 파일 링크 199개·변경 문서/도구 포맷·`git diff --check`를 확인했다. 새 runtime이 없어 전체 suite는 재실행하지 않았다.
+
+### D1 — 정보 계약 설계 (첫 격리 계약 확정)
+
+진입: DC-26-5 또는 6의 후속 방향 선택. 기준: 기존 C4/DC-5와 targeted/C3의 상쇄 비용. 종료: 정보 생산자·소유권·외부 mutation 처리·fallback·lifecycle/재진입·양코어 지원·크기 비용의 계약을 닫는다.
+
+- [x] C4를 선택하고 DESIGN DC-26-C4-P1로 정보 생산자·소유권·key/출력 제한·scheduler/dispose·양코어 비범위를 정했다. 일반 편집 목록에서 명시적 key 알림과 구조 변경을 검증한다.
+
+### D2 — 격리한 원리 검증 (첫 C4 실험 완료)
+
+진입: D1 계약 확정. 기준: 같은 앱 구조의 구기능/새 기능, 기존 A 앱은 별도 대조. 종료: n=1k/10k × k=1/2/100/1k의 작업량·오류·할당과 생성/교체/삭제 비용을 확보한다.
+
+- [x] 진단과 production 빌드를 분리했다. C4의 새 API 이득을 기존 앱 무수정 이득으로 표시하지 않는다. 실험 후 코드가 같아지는 경우도 유지 비용을 공개한다. 이번 첫 비교는 두 앱 모두 source core를 같은 Vite 설정으로 앱과 함께 묶으며, 배포된 prebuilt core와 과거 수치를 직접 연결하지 않는다.
+
+#### D2 첫 C4 한정 검증
+
+- [x] plain keyed item의 O(k) slot 갱신과 구조 변경의 전체 keyed fallback, key/index Map·자체 scheduler/dispose를 구현했다.
+- [x] strict source/core/B/C types, JSDOM 일반 목록22회귀, 공식 B/C keyed/9동작/font, Chrome9진단과 조건별3contexts retention을 통과했다. 실패 setup/타입 수정 전 입력도 보존했다.
+- [x] CPU9항목×양순서580표본과 공식 메모리60표본 수집 완료. 과거 peer와 합산하지 않았다.
+- [x] 공식 메모리60표본·독립192분포/9가중값/표본/순서/번들 감사·영구 보존과 [보고서](../benchmark/C4_LIST_BOUNDARY_RESULTS.md)를 완료했다. 아래 D3/D4의 전체 제품 지원 범위를 완료한 것으로 표시하지 않는다.
+
+### D3 — Test Hardening (제안, 미착수)
+
+진입: D2에서 구현 후보를 남길 근거 확보. 기준: 공통 B1, 부모 반례, key/slots/portal/focus/native/lifetime 회귀. 종료: invalidation 누락·throw/reentry·clone/dispose·concurrent interrupt/abandon을 검사하고 오류 후보를 배제한다.
+
+- [ ] 변경 관련 양코어·helper 회귀와 수명 검증, 필요한 브라우저 계약을 수행한다.
+
+### D4 — Integration Test와 성능 판정 (제안, 미착수)
+
+진입: D3 정합성 통과. 기준: 공통 B2~B4와 새로 고정한 도구/브라우저·앱/peer. 종료: 공식 9항목 양순서·메모리·크기·일반 예제·통합을 확인하고 후보를 채택/보류한다. Vue 비교를 주장하려면 같은 실행에 Vue를 포함한다.
+
+- [ ] 기존 네 peer의 항목별 1.10 목표와 Vue 추가 비교를 구분한다. JS만 좋아지거나 작은 pooled 차이만 있는 경우 전체 개선을 단정하지 않는다. 후보/실제 산출물 해시·미실행 검증·인계를 보존한다.
+
+## C4 P2 — 후속 실행 E0~E4
+
+- [x] **E0 계약:** R89~R94와 P2-1~5를 기록했다. 진입은 사용자 후속 요청, 기준은 P1 원자료/소스 보존. 종료는 owner·배치·오류·지원 범위와 수집 계획 확정이다.
+- [x] **E1 구현/기준:** 별도 owner controller/View와 edit·세션 cleanup·fault 처리를 구현한다. baseline은 P1의 raw node와 기존 base 문맥이다. 종료는 parent renew/중첩/queue/오류 회귀와 strict types 통과다.
+- [x] **E2 Test Hardening(한정):** 제거/재마운트·중첩 자체 renew/Fragment/portal·callback 재알림·두 owner 거부·throw/reentry/focus·retention을 확인한다. 진입은 E1, 종료는 한정 계약 회귀와 실제 Chrome 정합성 통과다.
+- [x] **E3 Integration Test/측정(한정):** source core/B/C와 고정 Preact class를 빌드하고 공식 keyed/9동작/font 뒤 CPU870/메모리90을 양순서 직렬 수집한다. 진입은 E2와 고정 manifest, 종료는 원자료·분포·실제 비용·peer 비교의 독립 검산이다. 전체 제품 D3/D4 지원 완료로 표시하지 않는다.
+- [x] **E4 보존/판단:** 실제 후보 source/bundle과 원자료/trace/실패를 새 archive에 보존하고 네 문서/HANDOFF를 맞춘다. 진입은 E3, 종료는 검증된 범위와 미지원 경계·다음 단계·최신 commit을 재현 가능하게 남기는 것이다.
+
+- [x] **E3 추가 진단(R95):** 기존 선택150trace의 선정 이벤트 coverage/구간을 확인했고 GC 주원인이나 scheduler 원인으로 단정하지 않았다. 별도 class 표현 앱은 DOM/keyed/9동작/font 뒤 선택100표본을 양순서 수집했으나 전체 방향이 갈려 미채택이다. 다중 root 교체 오류 후 owner remount도 별도 확인했다.
 
 ## DC-25 — 실행 계획
 
@@ -396,7 +451,7 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 ## 상태 / 핸드오프
 
-- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
-- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
-- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
-- commit: 실험·회귀·재현 도구·증거는 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 보존했다. 분기/측정 당시 HEAD `14d47e83770958eb78a91c564bf39e47c4a25dba`와 릴리스 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`는 원자료대로 유지한다. 최종 인계 tip/원격 반영은 `git log -1`과 `origin/perf/dc25-keyed-fast-path`로 확인한다. 버전 변경·배포는 없다.
+- done: C4 P2 owner/View·edit·배치/수명/오류 정책을 격리 구현했다. strict types·JSDOM19(기존 portal 관찰1 포함)·Chrome owner12+앱9·3앱 공식 keyed/9동작/font·B/C 각각3context100회 churn/partial을 확인했다. CPU870/메모리90 양순서·독립288분포/9 C/B가중/180 peer비율·가중 감사 통과. 추가 선택100표본/18분포와 기존150trace·다중 root fault 진단을 분리했다. [최종 보고서](../benchmark/C4_OWNER_RESULTS.md).
+- next: 영구 보존과 최종 검증을 완료했다. 후속 C4 가설은 구조 검증 key snapshot이며 비용 미검증이다. 선택은 native PrePaint 사이 구간을 원인 귀속하기 전 단순 scheduler/GC 탓으로 돌리지 않는다. 제품화에는 BUG-3·owner handover/clone·변경 정보 계약·concurrent/SSR/HMR이 남아 있다.
+- result/limits: C4/B 전체 −3.44%, C4/Preact class +1.29%, 단일 peer1.10 목표7/9. 10k 메모리+0.262MB(+0.93%), 앱 br+1,110B. class pilot은 양차수 방향이 갈려 미채택이다. 네 peer/Vue 우위·일반 rollback·공개 채택은 입증하지 않았다.
+- commit: HEAD `4de76ef`, 이번 분석/실험/문서는 미커밋이다. default runtime/guard·sibling·P1 archive를 유지했다. 실행 입력은 `/private/tmp/lithent-c4-owner-20261029-v2`, 초기 준비 실패는 suffix 없는 경로에 보존한다. 성공한 수집은 반복하지 않는다. archive1,553entries/44,227,718B와 모든 decoded hash를 확인했다. frozen21·runner343/peer258package 해시, JSON/감사 집계 일치·포맷·로컬 링크/앵커를 검증했다.

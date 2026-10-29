@@ -1,9 +1,30 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
+- 기준일: 2026-10-29. 상태: **C4 P2 owner/중첩 확장과 새 3앱 비교 완료. CPU870/메모리90 양순서에서 C4는 기존 앱 대비 가중 전체 −3.44%, Preact class 대비 +1.29%다. 해당 한 peer의1.10 범위7/9이며 선택/교환은 미달이다. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B. 추가 class pilot100표본은 방향이 갈려 미채택이다. 기본 runtime/guard·공개 API는 유지하며 portal BUG-3·concurrent/SSR/HMR은 남아 있다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
+
+## M-21. DC-26 진단과 후속 경계 — R80~R84
+
+- [x] **M-21-1 비교 기준:** DC-25 JSON의 baseline/Preact class 9항목·가중 전체 1.02172·선택 1.371배 재계산. Vue의 현재 동일 세션 숫자는 없음. candidate/과거 자료 혼합 또는 독립 중앙값을 합산하면 실패다.
+- [x] **M-21-2 설명과 증거:** A 앱에 행별 mount가 없고, Preact class도 map 순회하며, 로컬 Vue 앱에 v-memo가 있음을 source snapshot으로 확인했다. Vue 컴파일 산출물/정확한 비용 기여율은 미검증이다.
+- [x] **M-21-3 기시도 구분:** DC-25·C1/C3·targeted/retained·proxy·layout·identity·h 후보의 기존 보고서를 연결했다. C4는 기존 미구현 설계 분기다.
+- [x] **M-21-4 관찰 반례:** `node experiments/render-gap-diagnosis/analyze.mjs`의 JSDOM probe. 기준은 render 전/mountReady에 부모 연결이 있고 negative control은 없다. 완료 후 DOM/부모 연결만 확인해서 동등하다고 하면 실패다. 제품 소스는 수정하지 않았다.
+- [ ] **M-21-5 후속 계약/통합:** 사용자 요청으로 DC-26-C4-P1 한정 계약과 실험을 진행한다. compiler 분기/제품 API와 전체 D3/D4는 미완료다. 새 경로 선택 시 일반 앱·생성/삭제·외부 mutation/fallback·양코어/SSR/HMR·메모리/크기·공식 전체 시간을 검증한다. 이번 진단의 검증 완료로 대체하지 않는다.
+
+- [x] **M-21-6 C4 첫 한정 실험 — R85~R88:** 안정된 owner/plain keyed item 계약, B/C의 동일 row cache/source core와 실제 알림 비용, 일반 목록22·Chrome9·공식 keyed/9동작/font, 조건별3context 수명, CPU580/메모리60·양순서·독립 감사·앱/번들 비용과 증거를 연결한다. 원본 runtime·sibling을 보존했고 미지원 제품 경계를 [보고서](../benchmark/C4_LIST_BOUNDARY_RESULTS.md)에 명시했다. 독립192분포/9가중 감사 통과이며 전체 제품 M-21-5는 완료하지 않았다.
+
+자동 대체한 진단 결과는 [JSON](../benchmark/render-gap-diagnosis.json), 설명은 [보고서](../benchmark/RENDER_GAP_DIAGNOSIS.md)에 있다. 새 runtime이 없으므로 이번 D0에 전체 런타임 suite/브라우저 성능 수집은 N/A다.
+
+## M-22. C4 P2 owner/중첩 확장 — R89~R94
+
+- [x] M-22-1: 부모 renew 양순서와 조건부 제거/재마운트 뒤 올바른 content와 key/index를 사용한다. pending 작업이 제거된 owner를 되살리지 않으며 동시 두 mount는 거부한다.
+- [ ] M-22-2(부분 확인): 중첩/root component props·자체 renew·Fragment·mount/unmount·focus와 중복 setup 부재를 확인했다. portal은 기존 BUG-3을 재현했으며 teardown 지원 완료가 아니므로 전체 체크는 열어 둔다.
+- [x] M-22-3: edit의 자동 알림, lifecycle 중 다음 배치 보존, 순수 view 재진입 거부, view retry와 diff/DOM fault·remount 정책, 멱등 dispose를 확인한다.
+- [x] M-22-4: strict types/관련 회귀·Chrome·retention과 새 B/C/P CPU870·메모리90 양순서/해시/분포/비율을 검산한다. 한 peer만 비교했음을 밝히며 concurrent/SSR/HMR은 미완료로 남긴다.
+
+- [x] M-22-5(R95): class 값 한 축의 실제 DOM 차이와 양쪽 keyed/9동작/font를 확인하고 선택100표본/18분포를 별도로 검산했다. 양차수 +14.20%/−13.99%로 방향이 갈려 미채택이며 전체870/90에 합산하지 않는다.
 
 ## M-20. DC-25 같은 순서 keyed 빠른 경로 — R72~R79
 
@@ -252,7 +273,4 @@ DC-17 전용 추가 gate(기준 회귀와 후보 검증 분리):
 
 ## 상태 / 핸드오프
 
-- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
-- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
-- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
-- commit: 실험·회귀·재현 도구·증거는 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 보존했다. 분기/측정 당시 HEAD `14d47e83770958eb78a91c564bf39e47c4a25dba`와 릴리스 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`는 원자료대로 유지한다. 최종 인계 tip/원격 반영은 `git log -1`과 `origin/perf/dc25-keyed-fast-path`로 확인한다. 버전 변경·배포는 없다.
+현재 인계 정본은 [IMPLEMENT 상태 / 핸드오프](./IMPLEMENT.md#상태--핸드오프)다. DC-26 분석 완료와 후속 구현 미착수를 구분한다.

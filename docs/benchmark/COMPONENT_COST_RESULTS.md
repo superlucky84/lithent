@@ -145,6 +145,8 @@ predicator 함수로 묶으면 압축 전은 96B 줄지만 Brotli는 1B만 준�
 
 ## 남은 단서 (미착수)
 
+2026-10-29 후속: [생성 시 부모 연결 제거의 반례](./RENDER_GAP_DIAGNOSIS.md#5-새로-확인한-부모-getter-제거의-반례)를 재현했다. render 전과 부모 mountReady에서 자식의 부모를 읽을 수 있으므로 무조건 제거는 보류한다. 아래는 당시 미착수 가설이다.
+
 `h`가 자식에게 붙이는 부모 getter는 마운트(`src/render.ts`의 `wDomChildrenToDom`)와 diff
 (`src/diff.ts`의 자식 생성 경로)에서 `makeParentGetter`로 모두 덮어써진다. 마운트나 diff
 전에 이 getter를 읽는 경로가 없다면, `h`는 포인터·getter·`map`을 만들지 않아도 된다. 아직

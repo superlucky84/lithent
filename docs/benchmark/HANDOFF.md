@@ -1,6 +1,31 @@
 # summary
 
-## 최신 — 컴포넌트 비용·`h` 경량화 실험 기록 (2026-10-28)
+## 최신 — C4 P2 owner 확장·Preact class 재비교 (2026-10-29)
+
+- done: 목록당 하나의 View가 content/세션을 소유하도록 확장하고 parent renew·nested/root component·자체 renew·다중 DOM 출력·콜백 중 알림·edit·fault/remount·멱등 dispose를 검증했다. 기본 runtime/public exports는 바꾸지 않았다. [보고서](./C4_OWNER_RESULTS.md), [집계](./c4-owner-results.json), [도구](../../experiments/c4-owner/README.md).
+- result: 새 B/C/Preact class CPU870·메모리90 양순서에서 C4/B 가중 전체 −3.44%, C4/P +1.29%. 한 peer1.10 이내7/9이며 선택1.233·교환1.142는 미달. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B다. P1 세션과 합산하지 않았다.
+- diagnostics: 기존 선택150trace에서 C4 JS0.8505/P1.291ms와 선정 이벤트 미포함 구간2.259/0.677ms를 관찰했다. 원인을 scheduler/GC/VDOM으로 귀속하지 않는다. class="undefined"→빈 문자열 단독 pilot100표본은 전체 변화 방향이 갈려 미채택이다. [별도 진단](./c4-owner-selection-diagnostics.json).
+- validation/limits: strict types, JSDOM19(기존 portal 한계 관찰1 포함), Chrome owner12+앱9, 3앱 공식 keyed/9동작/font, B/C각3context retention 통과. 독립288분포/9 C/B가중/180 peer비율·가중 + pilot18분포 감사. 기존 중첩 portal 삭제 BUG-3·owner handover/clone·concurrent/SSR/HMR·최종 공개 API는 남는다. 다중 root 교체 오류의 owner remount도 별도 확인했다.
+- next: key snapshot으로 구조 검증 중복 작업을 줄이는 한정 가설을 검토할 수 있다. 증명/쓰기/메모리 비용은 미검증이다. 기본 채택·네 peer/Vue 목표 달성은 아니다. 현재 인계 정본은 [IMPLEMENT](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- commit: 기준 HEAD `4de76ef`, 이번 작업은 미커밋. 입력/번들/원자료/trace·준비 실패·도구는 별도 영구 archive/manifest(1,553entries/44,227,718B)로 보존하고 decoded hash를 모두 확인했다. sibling과 첫 C4 자료는 유지한다.
+
+## 이전 — C4 첫 목록 경계 실험 완료 (2026-10-29)
+
+- done: 사용자 후속 요청으로 plain keyed VDOM을 소유하는 격리 base C4를 구현했다. set은 전체 keyed 구조 갱신, invalidate(keys)는 알려진 slot만 갱신하며 행별 mount를 추가하지 않는다. [보고서](./C4_LIST_BOUNDARY_RESULTS.md), [결과 JSON](./c4-list-boundary-results.json), [도구](../../experiments/c4-list-boundary/README.md).
+- result: 새 B/C CPU580·메모리60 양순서에서 가중 전체 −4.72%(main −4.97/reverse −4.21), 선택 −40.90%, partial −9.86%. 교체 전체 +1.08%, 한 행 삭제 JS +12.56%도 공개한다. 10k 메모리 +0.261MB(+0.93%), 앱 전체 Brotli +727B다. 기존 peer/Vue와 같은 실행의 비교는 하지 않았다.
+- validation: strict source/core/B/C types, JSDOM22·실제 Chrome9·공식 B/C keyed/9동작/font·조건별3contexts의100회 churn/partial을 확인했다. 독립192분포/9가중·양순서/표본/앱hash 감사 통과. 최종 포맷 재빌드 JS/HTML도 측정 해시와 같다. 공식 실패/재시도/warnings0이며 준비 실패는 분리 보존했다.
+- next: 한정 원리 검증은 후속 설계에 투자할 근거가 있다. 알림 누락/소유권·owner clone/부모 재렌더·nested component·예외 복구·concurrent/SSR/HMR을 설계하고 제품 API와 네 peer 재비교로 이어갈 수 있다. 현재 기본 채택은 하지 않았다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- evidence/commit: 영구 archive/manifest에 입력·번들·raw/trace·실패·도구를 보존했다. 기준 HEAD `4de76ef`, 이번 작업은 미커밋. default runtime/guard·sibling·기존 증거는 유지했다.
+
+## 이전 — 남은 격차 원인 분석 (2026-10-29)
+
+- done: [진단 보고서](./RENDER_GAP_DIAGNOSIS.md), [원자료 재계산/소스/반례](./render-gap-diagnosis.json), [도구](../../experiments/render-gap-diagnosis/analyze.mjs)를 보존했다. DC-25 baseline/Preact class 가중 전체 1.02172배, 선택 1.371배/JS 2.23배다. Vue의 최신 동시 측정은 없다.
+- found: h 생성 시 부모 대입만 빼면 최종 DOM은 같아도 render 전/부모 mountReady의 getParent 관찰이 달라진다. 무조건 제거는 후보로 진행하지 않는다. 일반 context가 실패한다는 결론은 아니다.
+- next: 기시도 후보를 재실행하기보다 기존 C4의 변경 정보 계약 설계를 우선 제안한다. compiler가 동적 필드를 전달하는 경로는 별도 후보다. 공개 API/구현 선택은 TBD이며 코어 최적화는 미착수다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- limits: 새 CPU/메모리/production profile 없음. 기존 runtime·guard·앱·archive를 유지한다. 원인별 시간 기여율과 Vue의 현재 배수는 미확정이다.
+- commit: 분석 기준 `4de76ef`, 이번 진단/문서는 미커밋이다.
+
+## 이전 — 컴포넌트 비용·`h` 경량화 실험 기록 (2026-10-28)
 
 - done: 행 컴포넌트 앱(B/C)의 비용, 래퍼 재사용, 가벼운 컴포넌트, `h` 후보 V1~V4를 공식 러너로 측정하고 [결과](./COMPONENT_COST_RESULTS.md)와 [원자료·패치](./component-cost-evidence.tar.gz)를 남겼다.
 - decision: **모두 미채택**. 가중 전체 변화는 모두 세션 흔들림(약 ±2%) 안이었다. 이득이 가장 큰 V1은 4세션 pooled −0.6%이며 guard를 4B 넘는다. 한도 안의 V2~V4는 이득이 없었다. runtime·concurrent·guard 4,824B·실제 4,819B와 PR #2136의 A 앱을 유지한다.

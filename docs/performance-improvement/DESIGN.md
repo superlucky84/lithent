@@ -1,8 +1,52 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
+- 기준일: 2026-10-29. 상태: **C4 P2 owner/중첩 확장과 새 3앱 비교 완료. CPU870/메모리90 양순서에서 C4는 기존 앱 대비 가중 전체 −3.44%, Preact class 대비 +1.29%다. 해당 한 peer의1.10 범위7/9이며 선택/교환은 미달이다. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B. 추가 class pilot100표본은 방향이 갈려 미채택이다. 기본 runtime/guard·공개 API는 유지하며 portal BUG-3·concurrent/SSR/HMR은 남아 있다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
+
+## DC-26 — 남은 격차 진단과 후속 분기
+
+요구사항 R80~R84, 계획 D0~D4, 검증 M-21. [진단 보고서](../benchmark/RENDER_GAP_DIAGNOSIS.md)와 [재현 결과](../benchmark/render-gap-diagnosis.json)가 근거다. 아래는 분석 결론과 제안이며 새 runtime 계약이 아니다.
+
+- [x] **DC-26-1 비교 기준:** DC-25 baseline/Preact class pooled를 재계산했다. 전체 가중 +2.17%, 선택 +37.14%, 선택 JS 2.23배다. Vue 동시 측정은 없으므로 최신 배수를 제시하지 않는다. → M-21-1.
+- [x] **DC-26-2 원인 범위:** 캐시 적중 뒤에도 전체 key 매칭·diff 메타데이터·render 방문이 남는다. 변경된 행은 정적 자식까지 재생성한다. Preact도 목록 순회하며 더 이른 SCU 생략을 제공하고, Vue는 memo/컴파일 정보를 사용한다. 정확한 비용 비중과 언어/아키텍처의 필연적 한계는 입증하지 않았다. → M-21-2.
+- [x] **DC-26-3 반복 제외:** 보고서의 기시도 표를 따른다. 미세 최적화의 안정적인 전체 이득 부재를 C4/모든 내부 최적화의 불가능성으로 일반화하지 않는다. → M-21-3.
+- [x] **DC-26-4 부모 연결:** 생성 시 부모 대입을 생략한 negative control에서 render 전과 부모 mountReady의 getParent 관찰이 달라졌다. 무조건 제거는 보류하며 일반 context 실패로 확대하지 않는다. → M-21-4.
+- [x] **DC-26-5 후속 선택:** 우선 제안은 기존 C4의 소유권·구조 version·변경 항목 계약 구체화다. 행별 mount를 추가하지 않는 갱신 단위와 실제 변경 항목 탐색 비용까지 설계한다. 첫 격리 실험의 정보 생산자와 제한은 아래 DC-26-C4-P1로 정했다. 최종 제품 API/양코어 지원은 미결정이다. → D1, M-21-5.
+- [ ] **DC-26-6 별도 compiler 경로 TBD:** 정적 구조와 동적 필드를 증명할 수 있는 경우만 metadata를 생성한다. spread/getter/임의 함수는 일반 경로를 유지한다. JSX/template 중 시작점, opt-in 형태, 런타임 크기·HMR/SSR/concurrent 지원을 먼저 정하며 C4와 동시에 구현하지 않는다. → D1, M-21-5.
+
+기존 API만을 고수하는 경우에는 현재 production trace를 먼저 수집한다. 변경 없는 자식의 commit 방문/정리를 줄이는 가설은 추가 작업 큐와 관찰 보존 비용까지 포함해 평가할 수 있지만, 아직 시간 근거가 없으며 DC-25 반복을 바로 시작하지 않는다. 제품 구현을 선택할 때 이 절의 TBD를 확정한다.
+
+### DC-26-C4-P1 — 첫 격리 프로토타입 계약 (2026-10-29)
+
+사용자의 “한번 진행” 요청으로 D1/D2와 한정 검증을 진행한다. 공개 API 채택 결정과 구분한다.
+
+- 첫 정보 생산자는 명시적 호출자다. boundary가 배열 snapshot·고유 key→현재 index를 소유하고, `set(items)`는 구조 변경, `invalidate(keys)`는 항목 변경을 알린다. 알리지 않은 외부 mutation은 지원하지 않는다. 선택은 이전/다음 key, 부분 갱신은 실제 수정 루프에서 모은 key를 전달하며 그 비용도 측정한다.
+- item key는 고유한 number/string이며 수명 중 불변이다. 잘못된 중복/누락/변경 key는 명시적으로 거부한다. 일반 keyed runtime의 중복 key 계약을 바꾸지 않는다. 알려주지 않은 외부 쓰기·키 변경의 자동 감지는 약속하지 않는다. 구조 변경은 기존 `makeNewWDomTree`/`wDomUpdate`를 사용하고 index map을 다시 만든다.
+- item은 한 개의 keyed element root이며 view는 컴포넌트/hook 없는 순수 VDOM 생성 또는 cacheUpdate다. 행별 mount/resolver를 추가하지 않는다. 한 boundary의 노드는 한 번 mount하고 부모가 재생성/clone하지 않는 소유 범위다. 잘못된 item root는 오류로 처리하며 하위 VDOM의 component/portal 부재는 호출자 계약으로 둔다.
+- 항목 갱신은 기존 자식 배열의 정확한 slot에 기존 diff/render로 반영하고 현재 parent getter를 연결한다. DOM 직접 쓰기는 하지 않는다. 자체 microtask로 invalidation을 중복 제거하며 구조 변경은 pending 항목 갱신보다 우선한다. throw/동기 재진입은 명시적 reject와 복구 규칙을 검사한다.
+- disposal은 pending 작업을 무효화하고 데이터/Map/Set/VDOM 참조를 해제한다. nested component·SSR/HMR·concurrent 지원은 첫 프로토타입 비범위이며 제품 채택의 D3/D4 완료로 표시하지 않는다. 원본 base/concurrent/public exports/guard와 sibling은 유지한다.
+- 비교는 원래 A 앱 B와 같은 row cache/view를 사용하는 C4 앱 C다. 같은 source core/toolchain으로 각각 production 빌드한다. 9 CPU 항목 양순서 B/C, 공식 메모리와 별도 retention을 수집한다. 정보 전달 API를 채택한 앱의 효과이며 기존 앱 무수정 코어 이득으로 표현하지 않는다. Vue/네 peer 재검증은 이 원리 검증 이후 단계다.
+
+첫 실험 판단: [C4 보고서](../benchmark/C4_LIST_BOUNDARY_RESULTS.md)에서 main/reverse 가중 전체 −4.97%/−4.21%, pooled −4.72%다. 선택/partial 이득이 반복됐고 10k 메모리는 +0.93%다. 다음 설계 분기로 유지하며 기본 채택하지 않는다. 제품 API의 알림 누락·owner 수명/부모 재렌더·예외 복구·양코어 지원과 고정 peer 재비교는 열린 결정이다.
+
+### DC-26-C4-P2 — owner와 갱신 배치 계약
+
+R89~R94, IMPLEMENT E0~E4, M-22. 첫 실험의 raw node 대신 `boundary.View`를 렌더한다. controller는 원하는 items/indexes/dirty를, mount 세션은 현재 content·owner compKey·세대를 보유한다. 부모 updater는 같은 content를 돌려줘 전체 item map을 피하고, 실제 owner wrapper는 componentMap의 최신 vd로 찾는다. cleanup은 세션을 종료하며 명시적 dispose는 controller를 영구 종료한다. controller의 동시 두 mount는 거부한다. 같은 component identity/위치의 부모 renew를 지원하며, 다른 부모 subtree로 교체해 기존 owner cleanup보다 새 setup이 앞서는 handover는 지원하지 않는다. 이 경우 별도 commit으로 먼저 unmount한 뒤 remount한다.
+
+- [x] P2-1: base의 needDiffRef를 save/restore하는 문맥에서 view와 diff를 처리한다. root는 기존 getKey로 검증하며 element와 component resolver를 허용한다. Fragment 다중 root는 keyed component가 감싼 경우를 검증한다. 단순 행은 컴포넌트로 감싸지 않는다.
+- [x] P2-2: flush가 현재 items/indexes/dirty 배치를 분리한다. 변경 item은 index로 정렬해 콘텐츠/콜백을 좌→우로 처리한다. 따라서 slot lookup/view 수는 k이지만 정렬 비용은 O(k log k)다. lifecycle에서 발생한 set/invalidate는 다음 배치로 보존하고, 순수 view에서 쓰기는 거부한다. 구조 변경은 해당 배치의 item 알림보다 우선한다. view 오류는 batch를 다시 pending에 합쳐 명시적으로 재시도한다. diff/commit 오류는 fault로 잠그고 unmount/remount 뒤에만 재개한다.
+- [x] P2-3: edit는 소유 item을 key로 찾고 fn 실행 뒤 invalidate하며 key 변경/throw도 알린다. edit는 이미 발생한 mutation을 rollback하지 않는다. 이번 CPU 앱은 첫 실험과 동일하게 set/invalidate를 사용하고 edit 자체는 정합성/브라우저에서 검증한다. 외부 mutation 자동 감지는 지원하지 않는다. 직접 invalidate API와 함께 비용을 공개한다.
+- [x] P2-4: 첫 범위는 base다. concurrent/SSR/HMR·동시 다중 owner·일반 DOM 예외 rollback은 지원하지 않는다. 이 한계를 공개한 격리 결과를 얻은 뒤 공개 제품 API를 결정한다.
+- [x] P2-5: 새 baseline/C4 P2/Preact class11을 같은 browser/runner/환경에서 비교한다. raw source·lock·peer install inventory·실제 번들을 고정하고 CPU870/메모리90 양순서와 별도 수명을 수집한다. 첫 C4 세션과 합산하지 않는다.
+
+P2 진단에서 기존 base의 중첩 portal 삭제 한계를 확인했다. 일반 element 안의 portal은 바깥 element를 삭제해도 target의 내용이 남을 수 있으며, 기존 일반 컴포넌트 경로에서도 같은 관찰이다. P2가 만든 회귀로 분류하지 않으며 portal teardown 지원 완료를 선언하지 않는다. 별도 BUG-3 정합성 후속으로 남기고 이번 성능 후보에는 기본 코어 수정을 섞지 않는다.
+
+P2 공식 수집 후 class 표현의 한 변수 진단(R95)을 추가한다. 같은 P2 소스에서 tr class의 비선택 값을 undefined에서 빈 문자열로만 바꾸며 current/empty를 새 production 빌드와 별도 staging으로 비교한다. DOM에서 class 문자열을 먼저 확인하고 공식9동작/keyed/font 뒤 선택25×2앱×2차수=100표본을 수집한다. 기본 앱과 P2의870/90표본을 덮어쓰거나 합산하지 않는다. 초기1k행 class 속성 수/생성 비용이 달라질 수 있어 선택 pilot만으로 채택하지 않는다.
+
+P2 최종 판단: [보고서](../benchmark/C4_OWNER_RESULTS.md). 기존 앱 대비 전체 가중은 main−1.17%/reverse−4.82%/pooled−3.44%이며 차수별 크기가 다르다. Preact class 단독 대비7/9이고 선택1.233배·교환1.142배는 남는다. 기능 확장한 후보는 보존하되 기본 채택하지 않는다. 다음 C4 후보는 구조 검증의 추가 n회 Map.get/중복 keyOf를 key snapshot 증명으로 대체하는 한정 가설이다. 이득과 snapshot 쓰기/메모리 비용은 미검증이며 기존 Map/LIS 실험을 자동 반복하지 않는다. 선택의 PrePaint 사이 미포함 구간은 원인 미귀속으로 남긴다.
+
+추가 class pilot은 +14.20%/−13.99%로 전체 방향이 갈려 미채택이다. 다중 DOM root 교체 실패 진단은 owner 재마운트로 복구됐으나 일반 rollback 보장은 아니다. 제품 공개 전 BUG-3, owner handover/clone·동기 edit/외부 알림·concurrent/SSR/HMR 계약을 확장해야 한다.
 
 ## DC-25 — 같은 순서 keyed 빠른 경로
 
@@ -45,7 +89,11 @@
 
 ## TODO — 미착수 후속 작업
 
-DC-25 첫 후보는 위 정식 설계/측정 뒤 미채택으로 종료했다. 새 성능 후보는 아직 선택하지 않았다. 아래 BUG-1/출력 절감은 완료 이력이며 1.25.3에 배포되어 있다.
+DC-25 첫 후보는 위 정식 설계/측정 뒤 미채택으로 종료했다. 후속 구현 후보는 아직 선택하지 않았으며 DC-26에서 C4 계약 설계와 별도 compiler 조사를 제안했다. 아래 BUG-1/출력 절감은 완료 이력이며 1.25.3에 배포되어 있다.
+
+### BUG-3 — 일반 element 아래 중첩 portal의 삭제 (미착수)
+
+C4 P2의 별도 baseline 진단에서 일반 li 안의 portal button이 li 제거 뒤 target에 남았다. 변경 없는 일반 mount/renew 경로에서도 재현되므로 C4가 만든 회귀로 분류하지 않는다. 현재 증거는 `experiments/c4-owner/check.mjs`의 portal 관찰과 P2 보고서다. base를 먼저 재현했으며 concurrent의 동일 증상과 해결은 아직 검증하지 않았다. portal teardown 제품 지원과 별도 정합성 후속으로 추적하고 이번 성능 후보에 core 수정을 섞지 않는다.
 
 ### BUG-2 — concurrent의 실제 sparse array hole (미착수)
 
@@ -118,7 +166,7 @@ BUG-1 수정이 들어간 코드 기준 base UMD Brotli다. 출력 후보의 근
 
 ## 2. 후보 묶음과 우선순위
 
-아래 C1~C4는 기존 내부 후보의 설계와 이력이다. [DC-22](#dc-22--별도-브랜치를-포함한-종합-반영) 당시 우선순위는 flat 이벤트 수정 → compact13 위 C2 재평가 → 결합 비교였다. 현재 작업은 위 DC-25이며 native 이벤트를 유지한 같은 순서 keyed 결합 후보를 평가한다.
+아래 C1~C4는 기존 내부 후보의 설계와 이력이다. [DC-22](#dc-22--별도-브랜치를-포함한-종합-반영) 당시 우선순위는 flat 이벤트 수정 → compact13 위 C2 재평가 → 결합 비교였다. DC-25의 같은 순서 keyed 결합 후보는 미채택으로 종료했다. 현재 분석과 후속 제안은 위 DC-26을 따른다.
 
 Phase 1에서 선택했던 C1과 후속 C3 base 한정 프로토타입은 검증 후 기본 채택을 보류했다. **DC-12의 별도 렌더러 격리와 비참여 비용 대조까지 완료했다**. DC-13의 같은 행 앱 기능 대조·DC-14의 heap 귀속·DC-15 실제 캐시 대조까지 완료했다. 현재 C3는 기존 앱 개선안으로 채택하지 않는다. DC-16 전체 peer 기준과 별도 진단 뒤 DC-17 C2의 root-scoped sidecar base 프로토타입을 격리 구현했다. shared229+수명4=233회귀·타입/빌드는 통과했지만 br4,952/4,800B여서 당시 프로토타입은 미채택이고 공식 성능은 미측정이다. C4는 조건부 연구다. 모든 후보를 무조건 구현하는 계획으로 해석하지 않는다.
 
@@ -498,7 +546,4 @@ DC-19/19B Fragment는 이미 읽기 관찰/시간 한계를 검토했다. 새 �
 
 ## 상태 / 핸드오프
 
-- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
-- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
-- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
-- commit: 실험·회귀·재현 도구·증거는 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 보존했다. 분기/측정 당시 HEAD `14d47e83770958eb78a91c564bf39e47c4a25dba`와 릴리스 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`는 원자료대로 유지한다. 최종 인계 tip/원격 반영은 `git log -1`과 `origin/perf/dc25-keyed-fast-path`로 확인한다. 버전 변경·배포는 없다.
+현재 인계 정본은 [IMPLEMENT 상태 / 핸드오프](./IMPLEMENT.md#상태--핸드오프)다. DC-26 분석 완료와 후속 구현 미착수를 구분한다.
