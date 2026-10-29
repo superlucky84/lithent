@@ -1,6 +1,13 @@
 # summary
 
-## 최신 — DC-25 기록 커밋 인계 (2026-10-27)
+## 최신 — 컴포넌트 비용·`h` 경량화 실험 기록 (2026-10-28)
+
+- done: 행 컴포넌트 앱(B/C)의 비용, 래퍼 재사용, 가벼운 컴포넌트, `h` 후보 V1~V4를 공식 러너로 측정하고 [결과](./COMPONENT_COST_RESULTS.md)와 [원자료·패치](./component-cost-evidence.tar.gz)를 남겼다.
+- decision: **모두 미채택**. 가중 전체 변화는 모두 세션 흔들림(약 ±2%) 안이었다. 이득이 가장 큰 V1은 4세션 pooled −0.6%이며 guard를 4B 넘는다. 한도 안의 V2~V4는 이득이 없었다. runtime·concurrent·guard 4,824B·실제 4,819B와 PR #2136의 A 앱을 유지한다.
+- next: 새 작업은 정하지 않았다. 남은 단서는 `h`가 붙이는 부모 getter가 마운트/diff에서 덮어써진다는 점이다. 그 전에 읽는 경로가 있는지는 미확인이다.
+- state: main 병합을 위해 `src/wDom.ts`의 래퍼 재사용 변경을 되돌렸다. 같은 내용이 archive의 `wrapper-reuse.patch`에 있다. 브랜치 `perf/component-wrapper-reuse`의 변경은 `docs/benchmark`의 이 인계, 결과 문서, archive뿐이다. main 소스로 다시 빌드한 `dist`는 npm `lithent@1.25.3`과 바이트 단위로 같고 UMD Brotli는 4,819B다. 문서는 미커밋이다.
+
+## 이전 — DC-25 기록 커밋 인계 (2026-10-27)
 
 - done: 사용자 요청으로 DC-25 미채택 평가·회귀·재현 도구·원자료를 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 커밋했다. CPU/메모리·브라우저·archive 검증 결과와 미채택 판단은 아래 직전 인계를 따른다.
 - validation: 커밋 범위는 보고서·도구·회귀·증거뿐이다. runtime/package/lock/build/size/workflow는 기준 main과 같다. source/doc Prettier와 공백 검사를 통과했다. immutable candidate.patch의 diff context/실측 소스 공백은 바이트 보존하며 공백 검사에서 그 파일만 제외했고, `git apply --check`와 archive SHA-256은 통과했다.
