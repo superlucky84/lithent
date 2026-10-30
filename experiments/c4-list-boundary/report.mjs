@@ -94,7 +94,7 @@ ${memoryTable}
 
 독립 Python 감사는 **192분포·9가중값**, CPU580/메모리60 표본, 양순서, 실제 앱 bundle hash를 검증했다. 공식 CPU/메모리의 실패 배치·재시도·warnings는 모두 0이다. 최초 sandbox의 포트 차단, strict TS 준비 오류와 보고서 template 오류는 성능 표본과 분리해 보존했다. 측정 뒤 포맷한 최종 source를 다시 빌드했고 세 앱 JS/HTML hash가 모두 측정 번들과 동일했다. 이 등가성은 별도 JSON과 source snapshot으로 남겼다.
 
-[영구 manifest](./c4-list-boundary-evidence-manifest.json)와 [archive](./c4-list-boundary-evidence.tar.gz)는 실제 입력/소스·앱/진단 번들·CPU/메모리 원자료와 trace·검증·실패 준비·재현 도구를 보존한다. 의존 node_modules와 설치된 Chrome 자체는 포함하지 않으며 lock/설치 inventory·browser/engine hash를 기록한다. archive를 다시 열어 모든 member의 decoded hash를 대조한다. 기본 runtime과 sibling·기존 archive는 변경하지 않았다.
+[영구 manifest](./c4-list-boundary-evidence-manifest.json)와 [archive](https://github.com/superlucky84/lithent/releases/download/benchmark-evidence/c4-list-boundary-evidence.tar.gz)는 실제 입력/소스·앱/진단 번들·CPU/메모리 원자료와 trace·검증·실패 준비·재현 도구를 보존한다. 의존 node_modules와 설치된 Chrome 자체는 포함하지 않으며 lock/설치 inventory·browser/engine hash를 기록한다. archive를 다시 열어 모든 member의 decoded hash를 대조한다. 기본 runtime과 sibling·기존 archive는 변경하지 않았다.
 `;
 fs.writeFileSync('docs/benchmark/C4_LIST_BOUNDARY_RESULTS.md', text);
 fs.copyFileSync(

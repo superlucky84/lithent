@@ -108,7 +108,7 @@ const text = [
   '- 실제 Chrome owner fixture12검사와 기존 앱 진단9개, 세 앱의 공식 keyed/9동작/font를 확인했다. B/C 각각3 fresh contexts에서100회 생성/삭제와100회 partial 후 clear를 수행했고 최종 강제 GC 뒤 DOM/listener 수가 초기값과 같았다. JS heap 수치는 별도 JSON이며 전체 누수 부재의 증명이 아니다.',
   `- 수집 후 추가한 다중 DOM root 교체 오류 진단의 ${d.faultProbe.ownerOnlyLeavesOldElement ? 'owner 재마운트 뒤 잔존 DOM이 관찰됐다' : 'owner unmount/remount로 복구됐다'}. 이 추가 사례는 별도 fault-probe.json에 있으며 일반적인 DOM rollback 전체를 증명하지 않는다.`,
   `- 공식 실패 배치/재시도 ${failed}, CPU/메모리 warnings ${warnings}다. Preact 빌드의 오래된 browserslist 안내는 준비 로그에 따로 남겼다. 초기 v1 strict types와 portal/fault-test 관찰도 성능 표본과 분리했다.`,
-  '- 독립 Python으로 분포·가중값·표본 수·반대 순서·peer 비율/1.10 판정·실제 앱 해시를 검산했다. [영구 manifest](./c4-owner-evidence-manifest.json)와 [archive](./c4-owner-evidence.tar.gz)에 source/lock·실제 번들·raw/trace·도구/실패·감사를 보존하고 decoded member hash를 대조했다. node_modules와 Chrome 자체는 제외하고 설치 inventory와 binary/engine hash를 남겼다.',
+  '- 독립 Python으로 분포·가중값·표본 수·반대 순서·peer 비율/1.10 판정·실제 앱 해시를 검산했다. [영구 manifest](./c4-owner-evidence-manifest.json)와 [archive](https://github.com/superlucky84/lithent/releases/download/benchmark-evidence/c4-owner-evidence.tar.gz)에 source/lock·실제 번들·raw/trace·도구/실패·감사를 보존하고 decoded member hash를 대조했다. node_modules와 Chrome 자체는 제외하고 설치 inventory와 binary/engine hash를 남겼다.',
   '',
   '## 판단과 후속',
   '',

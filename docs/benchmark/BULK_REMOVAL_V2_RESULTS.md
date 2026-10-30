@@ -148,4 +148,4 @@ A 앱의 일반 element 행은 HEAD에서도 한 번에 지워졌다(Chrome 삭�
 - 기존 portal BUG-3(일반 element 안 중첩 portal)은 이번 변경과 별개다. portal 행은 기존 경로로 떨어진다.
 - concurrent는 같은 변경과 공유 테스트만 확인했다. concurrent 앱의 공식 timing은 측정하지 않았다.
 
-[도구/명령](../../experiments/bulk-removal-v2/README.md), [집계](./bulk-removal-v2-results.json), [증거 archive](./bulk-removal-v2-evidence.tar.gz)와 [manifest](./bulk-removal-v2-evidence-manifest.json). staging은 `/private/tmp/lithent-bulk-removal-v2-20261030`이다.
+[도구/명령](../../experiments/bulk-removal-v2/README.md), [집계](./bulk-removal-v2-results.json), [증거 archive](https://github.com/superlucky84/lithent/releases/download/benchmark-evidence/bulk-removal-v2-evidence.tar.gz)와 [manifest](./bulk-removal-v2-evidence-manifest.json). staging은 `/private/tmp/lithent-bulk-removal-v2-20261030`이다.

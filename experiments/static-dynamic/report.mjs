@@ -127,7 +127,7 @@ lines.push(
   '',
   'block은 일반 h의 내부 표현 관찰과 다른, 순수 값 tuple의 불투명 opt-in description이다. materialize 전 subtree 관찰/외부 WDom mutation을 지원하지 않는다. blueprint 내부 per-node hook/VDOM callback·component/portal/Fragment/ref/style/input/SVG/custom element·동적 구조/getter/spread는 지원하지 않으며 일반 h 경로를 사용한다. 자동 JSX/template compiler·concurrent/SSR/HMR·제품 API·일반 rollback은 범위 밖이다. 기존 portal BUG-3을 해결한 것으로 표시하지 않는다. 기본 runtime/exports/guard는 유지했다.',
   '',
-  `[도구/명령](../../experiments/static-dynamic/README.md), [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프). staging은 \`${out}\`이다. [증거 archive](./static-dynamic-evidence.tar.gz)와 [manifest](./static-dynamic-evidence-manifest.json)에 실제 원본/overlay/patch·앱/번들·raw/trace·입력/runner/lock·준비 실패와 도구를 보존했다. 기존 C4 자료는 유지한다.`,
+  `[도구/명령](../../experiments/static-dynamic/README.md), [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프). staging은 \`${out}\`이다. [증거 archive](https://github.com/superlucky84/lithent/releases/download/benchmark-evidence/static-dynamic-evidence.tar.gz)와 [manifest](./static-dynamic-evidence-manifest.json)에 실제 원본/overlay/patch·앱/번들·raw/trace·입력/runner/lock·준비 실패와 도구를 보존했다. 기존 C4 자료는 유지한다.`,
   ''
 );
 fs.writeFileSync('docs/benchmark/STATIC_DYNAMIC_RESULTS.md', lines.join('\n'));

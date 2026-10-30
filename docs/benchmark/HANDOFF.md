@@ -1,6 +1,13 @@
 # summary
 
-## 최신 — DC-28 select 프레임 대기 진단과 bulk removal v2 (2026-10-30)
+## 최신 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
+
+- done: 2026-10-29~30의 새 archive 5개(c4-list-boundary·c4-owner·c4-key-snapshot·static-dynamic·bulk-removal-v2, 합계 224,675,015B)를 GitHub Release [`benchmark-evidence`](https://github.com/superlucky84/lithent/releases/tag/benchmark-evidence)로 옮겼다. 업로드한 asset의 크기·SHA-256이 각 manifest와 같다. 결과 문서와 `report.mjs`의 archive 링크를 release 주소로 바꿨고 `docs/benchmark/*.tar.gz`를 `.gitignore`에 넣었다. 그 전 archive는 git에 그대로 둔다.
+- history: archive를 이력에서 빼려고 `perf/c4-key-snapshot`의 4커밋을 main 위의 `perf/c4-bulk-removal`로 다시 쌓았다. archive 외 tree는 같다. SHA 대응은 `7f4df5c`→`b3cd570`, `4109bd3`→`b4f6b57`, `a56bae1`→`c578a2f`, `c53569e`→`b1ca5e3`이며, 아래 기록의 옛 SHA는 이 대응으로 읽는다.
+- workflow: main 하나만 오래 두고, 실험마다 짧은 브랜치를 만들어 채택 여부와 상관없이 main에 병합한다(merge commit). 병합과 release는 분리한다. 증거 archive는 release에 둔다. [CONTRIBUTING](../../CONTRIBUTING.md).
+- validation: 리뷰에서 base 457·concurrent 360·부속 169(skip 3)·e2e 78·`verify:concurrent`·tsc 통과, base 4,817/4,824B·concurrent 6,953/9,000B를 확인했다. `verify:release`는 로컬 pnpm 12.15.0 실행 파일 오류(ENOEXEC)로 실행하지 못했다.
+
+## 이전 — DC-28 select 프레임 대기 진단과 bulk removal v2 (2026-10-30)
 
 - done: 보존 trace 7세션으로 select 공식 전체가 runner 강제 GC 시간 mod 16.67ms가 정하는 BeginFrame 대기를 포함함을 확인했다. Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. 2026-10-19 bulk removal의 select 기각 근거가 이 대기였으므로, base·concurrent `findChildWithRemoveElement`에 정체성 비교 방식으로 다시 옮겨 측정했다. [select 대기](./SELECT_VSYNC_PHASE.md), [bulk removal v2](./BULK_REMOVAL_V2_RESULTS.md), [집계](./bulk-removal-v2-results.json), [도구](../../experiments/bulk-removal-v2/README.md).
 - decision: **채택 권장(기본 경로, 새 API 없음).** 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS −10.40%이고 교차 진단 −4.98%(29/40)다. C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base 4,817B·concurrent 6,953B다. 외부 노드 삭제 버그를 고친다.

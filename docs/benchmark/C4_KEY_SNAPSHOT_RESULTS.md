@@ -96,4 +96,4 @@ set의 기존 순회에서 keys[index]를 저장하고 items/keys/indexes를 검
 
 중첩 portal을 보통 요소 아래에서 삭제할 때 target 내용이 남는 기존 BUG-3은 P3에서도 지원 한계다. 단일 owner 수명/동일 위치 parent renew를 유지하며 새 owner를 먼저 만드는 교대·일반 clone·concurrent/SSR/HMR·최종 API는 별도 설계/검증이 필요하다. 모든 diff/DOM 오류의 rollback을 약속하지 않는다.
 
-[도구와 명령](../../experiments/c4-key-snapshot/README.md), [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프). staging은 `/private/tmp/lithent-c4-key-snapshot-20261030-v2`이다. [새 archive](./c4-key-snapshot-evidence.tar.gz)와 [manifest](./c4-key-snapshot-evidence-manifest.json)에 실제 소스/번들·raw/trace·runner/lock/설치 inventory·준비 이력과 도구를 보존한다. 기존 P1/P2 자료는 유지한다.
+[도구와 명령](../../experiments/c4-key-snapshot/README.md), [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프). staging은 `/private/tmp/lithent-c4-key-snapshot-20261030-v2`이다. [새 archive](https://github.com/superlucky84/lithent/releases/download/benchmark-evidence/c4-key-snapshot-evidence.tar.gz)와 [manifest](./c4-key-snapshot-evidence-manifest.json)에 실제 소스/번들·raw/trace·runner/lock/설치 inventory·준비 이력과 도구를 보존한다. 기존 P1/P2 자료는 유지한다.

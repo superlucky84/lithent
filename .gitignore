@@ -13,3 +13,7 @@ AGENTS.md
 playwright-report
 test-results
 .e2e-work
+
+# Benchmark evidence archives go to the `benchmark-evidence` GitHub release
+# (see CONTRIBUTING.md). Archives committed before 2026-10-30 stay tracked.
+docs/benchmark/*.tar.gz

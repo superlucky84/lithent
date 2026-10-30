@@ -87,7 +87,7 @@ P3 최종 판단: [key snapshot 결과](../benchmark/C4_KEY_SNAPSHOT_RESULTS.md)
 - R76. 첫 프로토타입은 격리한 base 코어에서 검증하고 공통 기준 회귀를 base/concurrent에 먼저 확보한다. 채택 후보는 양코어에 구현하거나 concurrent를 기존 경로로 유지하는 이유·지원 범위를 명시한다. 공유 WDom/type 변경은 concurrent에도 영향을 줄 수 있으므로 해당 중단/재개·portal commit/abandon 검증을 생략하지 않는다. → DC-25-6, P1/P4/P5, M-20-4.
 - R77. 현행 base guard 4,824B·concurrent 9,000B·element 1,000B와 source map 연결/출력 정책을 유지한다. 같은 compressor에서 raw/gzip/Brotli와 초과량을 공개하며, 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 최종 한도 변경은 결과를 본 뒤 결정하고 검증 전 allowance·압축 정책을 바꾸지 않는다. → DC-25-2, P3/P5, M-20-5.
 - R78. 새 동일 환경의 기준선/후보를 공식 CPU 9항목×양순서, 공식 메모리, 별도 retention으로 비교한다. 최종 후보는 고정 네 peer(React hooks 19.2.0/classes 19.0.0, Preact hooks/classes 11.0.0)와 다시 비교하며 항목별 가장 빠른 peer 전체 시간 중앙값의 1.10배 이하를 9항목 모두 만족하는지 판정한다. 계측 build와 공식 build를 나누고 이전 표본·개선율을 합산하지 않는다. → DC-25-3, P3, M-20-6.
-- R79. 기존 보고서·archive·실험 앱은 보존한다. 새 출력을 별도로 만들고 소스/번들/환경 해시, 카운터, 원자료, 실패·재시도, 순서별/pooled 결과, 채택/보류 이유를 연결한다. Test Hardening과 Integration Test를 거친 실제 최종 해시를 기준으로 완료를 판정한다. → P0~P5, M-20-7.
+- R79. 기존 보고서·archive·실험 앱은 보존한다. 새 출력을 별도로 만들고 소스/번들/환경 해시, 카운터, 원자료, 실패·재시도, 순서별/pooled 결과, 채택/보류 이유를 연결한다. Test Hardening과 Integration Test를 거친 실제 최종 해시를 기준으로 완료를 판정한다. 2026-10-30 이후의 새 증거 archive는 git에 커밋하지 않고 GitHub Release `benchmark-evidence`에 첨부하며, git에는 결과 문서·집계 JSON·SHA-256 manifest와 release 링크를 둔다([CONTRIBUTING](../../CONTRIBUTING.md#benchmark-evidence)). → P0~P5, M-20-7.
 
 비범위: proxy E·C1·C3·full22 및 keymatch/ordered 단독 실험의 반복, 벤치마크 앱 변경, 새 memo/immutable 계약, 버전 변경·추가 배포. 기존 데이터 마이그레이션은 없으며 내부 metadata의 수명/복제 처리는 R75의 검증 대상이다.
 
