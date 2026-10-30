@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
+- 기준일: 2026-10-31. 상태: **DC-29 C4 제품화의 API·이름·배치를 사용자가 정했다: controller 형태(A1) `createKeyedList`, 코어 bridge + `lithent/helper`(S2, base guard 4,865B). 다음은 I2(양코어 bridge)이며 구현은 아직 없다. 직전 DC-28 bulk removal v2는 lithent 1.25.4·lithent-concurrent 0.2.4로 배포됐다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
@@ -25,6 +25,15 @@
 - [x] M-22-4: strict types/관련 회귀·Chrome·retention과 새 B/C/P CPU870·메모리90 양순서/해시/분포/비율을 검산한다. 한 peer만 비교했음을 밝히며 concurrent/SSR/HMR은 미완료로 남긴다.
 
 - [x] M-22-5(R95): class 값 한 축의 실제 DOM 차이와 양쪽 keyed/9동작/font를 확인하고 선택100표본/18분포를 별도로 검산했다. 양차수 +14.20%/−13.99%로 방향이 갈려 미채택이며 전체870/90에 합산하지 않는다.
+
+## M-26. C4 제품 API·크기 한도 — R111~R115
+
+- [x] M-26-1: `experiments/c4-product-size/measure.sh`를 scratch worktree에서 두 번 실행해 같은 값을 얻었다. baseline 4,817B, 코어 P2 5,779B(축약 5,693B), 코어 P1 5,421B, bridge 4,851/4,858B, 목록 모듈 UMD 1,388B다. 실행 뒤 worktree는 원래대로 돌아왔다(baseline 4,817B 재현). 2026-10-31, main `7796eb1`.
+- [x] M-26-2: 공식 결과 재계산은 공식 사이트와 같은 방식이다(항목 평균 전체 시간 ÷ 가장 빠른 값, CPU 가중 기하평균). Lithent 1.403·119위, Preact class 1.306·94위, Vue 1.292·89위.
+- [x] M-26-3 (I1): 사용자 결정(A1 `createKeyedList`, S2·base guard 4,865B)이 네 정본과 HANDOFF에 같은 내용으로 기록됐다. 2026-10-31.
+- [ ] M-26-4 (I2): base·concurrent 크기가 결정한 guard 이하이고, bridge 증가가 측정값과 ±5B 안이다.
+- [ ] M-26-5 (I3): 문서의 API 예제(set/edit/invalidate/dispose와 오류)가 그대로 동작한다.
+- [ ] M-26-6 (I6): 새 API를 쓰는 벤치마크 앱이 `rebuild-ci keyed/lithent`를 통과하고, 공식형 측정 결과가 DC-29-9 gate로 판정된다.
 
 ## M-25. select 프레임 대기와 bulk removal v2 — R107~R110
 

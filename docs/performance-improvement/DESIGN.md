@@ -1,8 +1,102 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
+- 기준일: 2026-10-31. 상태: **DC-29 C4 제품화의 API·이름·배치를 사용자가 정했다: controller 형태(A1) `createKeyedList`, 코어 bridge + `lithent/helper`(S2, base guard 4,865B). 다음은 I2(양코어 bridge)이며 구현은 아직 없다. 직전 DC-28 bulk removal v2는 lithent 1.25.4·lithent-concurrent 0.2.4로 배포됐다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
+
+## DC-29 — C4 제품 API와 크기 한도 선택지
+
+R111~R115 / I0~I6 / M-26. 근거: [C4 P1](../benchmark/C4_LIST_BOUNDARY_RESULTS.md), [P2](../benchmark/C4_OWNER_RESULTS.md), [P3](../benchmark/C4_KEY_SNAPSHOT_RESULTS.md), 아래 DC-26-C4-P1~P3, [P2 소스](../../experiments/c4-owner/boundary.ts), [크기 도구](../../experiments/c4-product-size/README.md). DC-29-1~3은 2026-10-31 사용자 결정으로 닫혔다. 표의 비교는 결정 당시의 근거로 남긴다.
+
+- [x] DC-29-0 선택지 정리: 공식 격차 재계산, P2의 코어 의존 확인, 배치별 크기 실측을 마쳤다(아래).
+- [x] DC-29-1 API 형태: **A1(P2 형태의 controller)로 확정.** 2026-10-31 사용자 선택. 측정 근거가 있는 유일한 형태이고 기존 코어 계약을 바꾸지 않는다.
+- [x] DC-29-2 이름: **`createKeyedList`로 확정.** 2026-10-31 사용자 선택. helper의 `create` 동사형 명명과 맞춘다.
+- [x] DC-29-3 배치와 크기 한도: **S2로 확정.** 코어 bridge 하나 + `lithent/helper`, base guard 4,824 → 4,865B(I2에서 실측값으로 고정). 2026-10-31 사용자 선택. 기본 코어 증가가 가장 작고 README "~4.8KB"를 유지한다.
+- [ ] DC-29-4~9: 알리지 않은 변경·concurrent·SSR·HMR·handover/BUG-3·채택 gate. 아래 "그 외 열린 결정". 각각 I3~I6의 진입 조건으로 정한다.
+
+### 동기 — 공식 결과의 격차 (R111)
+
+| 항목            | 가중치 | Lithent 1.25.2 | Preact class |       Vue | 가중 손해 비중 | C4 P2 변화(로컬) |
+| --------------- | -----: | -------------: | -----------: | --------: | -------------: | ---------------: |
+| 부분 갱신       |   0.56 |           1.71 |         1.31 |      1.37 |          21.5% |          −14.93% |
+| 선택            |   0.19 |           2.66 |         1.59 |      1.58 |          13.4% |          −26.72% |
+| 생성 계열 4항목 |   2.32 |      1.29~1.39 |    1.25~1.36 | 1.18~1.26 |          46.2% |     −0.25~+1.25% |
+| 전체 삭제       |   0.42 |           1.39 |         1.57 |      1.56 |          10.0% |           −5.17% |
+| 교환·한 행 삭제 |   0.66 |      1.38·1.17 |    1.25·1.12 | 1.18·1.33 |           8.9% |    +3.08%·+2.92% |
+
+- 배율은 항목별 평균 전체 시간을 그 항목에서 가장 빠른 프레임워크의 값으로 나눈 것이다. 가중치는 공식 `computeGeometricMean`의 CPU 값이다. 데이터는 js-framework-benchmark `ca8715d9`의 `webdriver-ts-results/src/results.ts`다. 생성 계열은 1k 생성·교체·1만 행 생성·1k 추가다.
+- C4 P2 변화는 [P2 보고서](../benchmark/C4_OWNER_RESULTS.md)의 로컬 baseline 대비 값(CPU 870 양순서)이며 공식 환경이 아니다.
+- 순위 추정(측정 아님): 1.25.3의 [노드 구조 개선율](../benchmark/NODE_SHAPE_RESULTS.md)을 공식 평균에 곱하면 1.321(약 99위), 선택 개선을 빼면 1.339(약 102위)다. 여기에 C4 P2를 더하면 1.275(약 83위), 선택 제외 1.311(약 97위)다. 참고로 Vue는 1.292(89위), Preact class는 1.306(94위)다. 선택은 강제 GC 위상의 영향을 받으므로([DC-28](#dc-28--select-대기-해석과-대량-삭제의-정체성-비교)) 선택 제외 값을 보수 추정으로 둔다.
+
+### P2가 코어에서 쓰는 것
+
+- 공개 API: `h`, `Fragment`, `mount`, `mountCallback`, `componentMap`. 실험 코드는 `compKeyRef`를 직접 읽지만, 같은 값을 공개 `getComponentKey()`로 읽을 수 있다.
+- 비공개: `makeNewWDomTree`(diff), `wDomUpdate`(commit), `needDiffRef`(diff 문맥 저장/복원), `getKey`(한 줄이라 재구현 가능).
+- 갱신 순서는 diff → 부모 `children`의 같은 자리에 새 노드 배치 → commit이다. commit이 형제 anchor를 찾을 때 부모 `children`에서 `indexOf`로 자기 자리를 찾으므로([render.ts](../../src/render.ts) `startFindNextBrotherElement`), 배치가 commit보다 먼저여야 한다.
+- 따라서 목록 모듈을 코어 밖에 두면, 코어는 이 순서를 묶은 bridge 하나만 내주면 된다. 예: `patchWDom(description, previous, place)`.
+
+### DC-29-1 API 형태
+
+| 후보                    | 형태                                                                | 변경 정보                      | 측정 근거                                                                                                                                                                                                   | 장점                                                                           | 단점·위험                                                                     |
+| ----------------------- | ------------------------------------------------------------------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| A0 새 API 없음          | 기본 경로 최적화만                                                  | —                              | [DC-25](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md) 가중 −0.171%. [격차 진단](../benchmark/RENDER_GAP_DIAGNOSIS.md)상 강한 미세 후보 없음                                                                 | 사용자 코드 변화 없음                                                          | 부분 갱신·선택 격차가 그대로                                                  |
+| A1 controller (P2 형태) | `createX(keyOf, view)` → `{ View, set, edit, invalidate, dispose }` | 호출자가 명시                  | P2 가중 −3.44%, Preact class 대비 7/9                                                                                                                                                                       | 유일하게 측정됨. 코어 계약 변경 없음. 잘못된 key·중복·view 중 쓰기는 명시 오류 | 알리지 않은 변경은 화면이 갱신되지 않음(감지 없음). 명령형. manual 모드 중심  |
+| A2 선언형 컴포넌트      | `<KeyedList items keyOf view changed />`, A1 위의 얇은 층           | props의 변경 key·배열 identity | 미측정                                                                                                                                                                                                      | JSX에서 읽기 쉬움. 두 모드 모두 사용                                           | 부모 렌더마다 props 비교. `changed` 누락 시 stale. 같은 의미를 두 곳에서 정의 |
+| A3 반응형 자동 추적     | 항목의 lstate 변경이 해당 slot 갱신을 예약                          | 의존성 추적                    | 미측정. 과거 [행별 renew](../benchmark/TARGETED_UPDATE_RESULTS.md)·[retained row](../benchmark/STRUCTURAL_UPDATE_RESULTS.md)·[C3](../benchmark/PARENT_MEMO_CACHE_RESULTS.md)에서 행별 생성/메모리 비용 관찰 | 알림 누락이 없음. light 모드와 맞음                                            | 행마다 구독 비용(1만 행 생성·메모리). 범위가 큼. manual 모드와 맞지 않음      |
+
+결정(2026-10-31 사용자 선택, 당시 권장안): **A1을 첫 제품 API로 한다.** A2는 A1 위의 선택적 sugar로 나중에 검토하고, A3는 별도 연구로 보류한다. 근거는 측정된 유일한 형태라는 점, 기존 코어 계약을 바꾸지 않는다는 점, 오용 대부분을 명시 오류로 알린다는 점이다. 새 기능을 opt-in 별도 계약으로 두는 것은 [RC-3](./REQUIREMENTS.md#6-요구사항-결정-대장)과 맞다.
+
+A1 표면 초안(이름은 DC-29-2):
+
+```tsx
+const rows = createKeyedList<Row>(
+  row => row.id,
+  row => <tr key={row.id}>…</tr>
+);
+// 안정적인 부모 안에서: <tbody><rows.View /></tbody>
+rows.set(items); // 구조 변경: 일반 keyed 경로
+rows.edit(id, row => {
+  row.label += '!';
+}); // 항목 수정 + 갱신 예약
+rows.invalidate([id1, id2]); // 바깥에서 바꾼 항목 알림
+rows.dispose();
+```
+
+- P2에서 빼는 것: `metrics`(진단), `has`. `flush`(동기 반영)를 공개할지는 TBD다.
+- 계약은 P2와 같다. key는 고유·불변 string/number이고, view는 keyed root 하나를 돌려주는 순수 함수다. owner는 controller당 하나이며, 갱신은 microtask에 모아 반영한다.
+
+### DC-29-2 이름
+
+`createKeyedList`(**확정**, 2026-10-31 사용자 선택: helper의 `createContext`·`createLContext`와 같은 `create` 동사형), `createListBoundary`(실험 이름, 내부 용어), `keyedList`.
+
+### DC-29-3 배치와 크기 한도
+
+측정: 2026-10-31, main `7796eb1` 사본(scratch worktree), 루트 vite 설정의 Terser 후처리, `scripts/size-report.js`와 같은 Brotli. 재현과 원자료: [experiments/c4-product-size](../../experiments/c4-product-size/README.md), [results.json](../../experiments/c4-product-size/results.json). P2 사본은 진단 카운터만 뺐다.
+
+| 선택지 | 배치                                    | base UMD Brotli |  증가 | 목록 코드 비용을 누가 내는가                                                         | 비고                                                                   |
+| ------ | --------------------------------------- | --------------: | ----: | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| S1     | `lithent` 코어에 전체(P2)               |          5,779B | +962B | UMD/CDN 사용자 전원. ESM bundler는 import하지 않으면 tree-shake                      | 오류 문구 축약 시 5,693B(+876B). guard 약 5,800B, README "~4.8KB" 변경 |
+| S1'    | 코어에 최소(P1: set/invalidate만)       |          5,421B | +604B | S1과 같음                                                                            | owner 수명·오류 복구가 없어 제품 품질 미달                             |
+| S2     | 코어 bridge + `lithent/helper`          |          4,858B |  +41B | import한 사용자만(ESM). 목록 모듈 단독 UMD 1,388B가 helper UMD(현재 3,790B)에 더해짐 | 내부 3개를 개별 export하면 4,851B(+34B)                                |
+| S3     | 코어 bridge + 새 subpath `lithent/list` |          4,858B |  +41B | S2와 같음                                                                            | 별도 guard 가능. exports map·d.ts·`verify:release`·문서 추가           |
+| S4     | 코어에 넣고 다른 곳을 줄여 4,824B 유지  |               — |     — | —                                                                                    | [DC-24](#dc-24--번들-출력-후보-조사)상 그만한 여유가 없어 비현실적     |
+
+결정(2026-10-31 사용자 선택, 당시 권장안): **S2.**
+
+- 기본 코어 증가가 +41B로 가장 작다. base guard는 4,824 → 4,865B(bridge 실측분)로 올리고, README의 "~4.8KB" 표기는 그대로 유지된다. 성능을 위한 소폭 크기 증가는 [RC-6](./REQUIREMENTS.md#6-요구사항-결정-대장)의 선례가 있다.
+- 같은 렌더링 helper인 `cacheUpdate`와 같은 곳에 있어 찾기 쉽다. 벤치마크 앱은 이미 `lithent/helper`를 쓰고, 새 subpath 패키징이 필요 없다.
+- 비용: bridge가 helper용 반공개 export가 된다. 기존 `componentMap`·`getComponentKey`와 같은 관례이며, 문서에 내부용으로 표시한다. helper UMD는 약 1.4KB 커진다. helper에는 현재 guard가 없다(신설 여부 TBD).
+- S3는 helper UMD를 키우지 않는 대신 패키징 비용이 든다. 목록 기능을 독립 제품으로 알릴 때 다시 본다.
+- concurrent에도 같은 bridge가 필요하다(현재 6,953/9,000B, 크기 미측정). helper 소스는 두 코어가 공유하므로, bridge가 양쪽에 있어야 helper가 빌드된다.
+
+### 그 외 열린 결정 (R114)
+
+- [ ] DC-29-4 알리지 않은 외부 변경: 문서화만 / 개발 모드 검사(비용 있음) / A2·A3로 보완. **TBD.**
+- [ ] DC-29-5 concurrent: (a) bridge를 두고 스케줄러 밖에서 동기 반영 (b) concurrent에서는 명시 오류 (c) 스케줄러 통합. P2는 base만 검증했다. **TBD.**
+- [ ] DC-29-6 SSR/hydration: `renderToString`에서 View의 초기 content 출력과 hydration 연결을 검증한다. **TBD.**
+- [ ] DC-29-7 HMR: View/owner를 가진 모듈 교체 시 owner 재연결. **TBD.**
+- [ ] DC-29-8 owner handover/clone(P2에서 거부)과 BUG-3(일반 element 안의 중첩 portal 삭제)을 제품 공개 전에 해결할지. **TBD.**
+- [ ] DC-29-9 채택 gate: 공식 9항목 양순서 baseline/후보와 Preact class·Vue 동시 비교, 메모리, 크기. 기준값 **TBD.**
 
 ## DC-28 — select 대기 해석과 대량 삭제의 정체성 비교
 

@@ -1,6 +1,13 @@
 # summary
 
-## 최신 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
+## 최신 — DC-29 C4 제품 API·크기 한도 선택지 (2026-10-31)
+
+- done: 공식 js-framework-benchmark 결과(Chrome 156, lithent 1.25.2)를 공식 방식으로 다시 계산했다. Lithent 가중 1.403·201개 중 119위이고, 가중 손해의 21.5%·13.4%가 부분 갱신·선택이다. C4 P2 소스의 코어 의존과 배치별 크기를 실측했다: 코어 전체 5,779B(+962), 코어 최소 5,421B(+604), bridge만 4,858B(+41), 목록 모듈 단독 1,388B. [DESIGN DC-29](../performance-improvement/DESIGN.md#dc-29--c4-제품-api와-크기-한도-선택지), [크기 도구](../../experiments/c4-product-size/README.md).
+- decision: 2026-10-31 사용자 결정. API A1(P2 형태 controller), 이름 `createKeyedList`, 배치 S2(코어 bridge + `lithent/helper`, base guard 4,865B).
+- next/limits: 다음은 I2(양코어 bridge)다. 순위 추정(1.25.3 반영 1.32~1.34, C4 추가 1.28~1.31)은 로컬 개선율을 곱한 값이며 측정이 아니다. concurrent bridge 크기는 미측정이다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- commit: 브랜치 `perf/c4-list-boundary-api`, 기준 main `7796eb1`. 문서와 측정 도구만 바꿨다.
+
+## 이전 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
 
 - done: 2026-10-29~30의 새 archive 5개(c4-list-boundary·c4-owner·c4-key-snapshot·static-dynamic·bulk-removal-v2, 합계 224,675,015B)를 GitHub Release [`benchmark-evidence`](https://github.com/superlucky84/lithent/releases/tag/benchmark-evidence)로 옮겼다. 업로드한 asset의 크기·SHA-256이 각 manifest와 같다. 결과 문서와 `report.mjs`의 archive 링크를 release 주소로 바꿨고 `docs/benchmark/*.tar.gz`를 `.gitignore`에 넣었다. 그 전 archive는 git에 그대로 둔다.
 - history: archive를 이력에서 빼려고 `perf/c4-key-snapshot`의 4커밋을 main 위의 `perf/c4-bulk-removal`로 다시 쌓았다. archive 외 tree는 같다. SHA 대응은 `7f4df5c`→`b3cd570`, `4109bd3`→`b4f6b57`, `a56bae1`→`c578a2f`, `c53569e`→`b1ca5e3`이며, 아래 기록의 옛 SHA는 이 대응으로 읽는다.

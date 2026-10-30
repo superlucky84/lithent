@@ -1,9 +1,21 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
+- 기준일: 2026-10-31. 상태: **DC-29 C4 제품화의 API·이름·배치를 사용자가 정했다: controller 형태(A1) `createKeyedList`, 코어 bridge + `lithent/helper`(S2, base guard 4,865B). 다음은 I2(양코어 bridge)이며 구현은 아직 없다. 직전 DC-28 bulk removal v2는 lithent 1.25.4·lithent-concurrent 0.2.4로 배포됐다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 - 완료한 DC-22 실행 순서: [Phase4A~4E](#dc-22--종합-반영-실행-phase4a4e) → [Phase5](#phase-5--test-hardening) → [Phase6](#phase-6--integration-test와-채택인계). 앞선 Phase0~4의 완료 기록은 보존하며, 과거 size 중단·미채택을 현재 후속의 자동 종료 조건으로 쓰지 않는다.
+
+## DC-29 — 실행 I0~I6
+
+R111~R115 / [DESIGN DC-29](./DESIGN.md#dc-29--c4-제품-api와-크기-한도-선택지) / M-26. 구현 단계(I2~I6)의 세부는 I1 결정에 따라 바뀔 수 있다.
+
+- [x] **I0 선택지 정리:** 진입은 사용자 요청과 main `7796eb1`. 공식 결과 격차를 재계산하고, C4 P1~P3 기록과 P2 소스의 코어 의존을 정리했다. 배치별 크기를 `experiments/c4-product-size/measure.sh`로 실측했고, 두 번 실행해 같은 값을 얻었다. 종료: 네 정본에 R111~R115·DC-29·M-26을 기록했고, DC-29-1~3은 사용자 결정을 기다린다.
+- [x] **I1 결정 확정:** 진입은 I0. 2026-10-31 사용자 결정(I1): API는 A1(P2 형태 controller), 이름은 `createKeyedList`, 배치는 S2(코어 bridge 하나 + `lithent/helper`, base guard 4,865B)다. 이유: 측정 근거가 있는 유일한 형태이고 기존 코어 계약을 바꾸지 않으며(RC-3), 기본 코어 증가가 +41B로 가장 작다(RC-6). DC-29-4~9는 각 구현 단계의 진입 조건으로 남는다. 배정: DC-29-4는 I3, DC-29-5~8은 I4, DC-29-9는 I6의 진입 조건이다. 종료: 네 정본에 같은 결정을 기록하고 문서 링크/앵커, Prettier, `git diff --check`를 통과했다.
+- [ ] **I2 코어 bridge:** 진입은 I1의 S2 결정(충족). base·concurrent에 같은 bridge를 넣고 단위 테스트(배치가 commit보다 먼저, diff 문맥 복원, throw 시 복원)를 추가한다. guard는 실측값으로 갱신한다. baseline: `pnpm test:dual`, `pnpm size`, `pnpm verify:concurrent`. 종료: 기존 테스트가 모두 통과하고, 두 코어 크기가 새 guard 이하다.
+- [ ] **I3 목록 모듈 제품화:** 진입은 I2. P2 소스를 정한 이름/위치로 옮긴다. 진단 코드를 빼고 오류 문구·d.ts·export·문서(README, `skills/`)를 정리한다. P2의 정합성 검사를 공유 테스트로 옮긴다. 종료: 새 테스트가 base에서 통과하고, concurrent는 DC-29-5 결정대로 통과하거나 명시 오류를 낸다.
+- [ ] **I4 지원 범위:** 진입은 I3. DC-29-5~8 결정대로 concurrent·SSR·HMR·handover·BUG-3를 구현하거나, 명시 오류와 문서로 막는다. 종료: 결정별 테스트가 통과한다.
+- [ ] **I5 Test Hardening:** 진입은 I4. 알리지 않은 변경, 중복/변경 key, view 중 쓰기, throw/재진입, dispose/remount를 검사한다. n=1k/10k × k=1/2/100/1k 작업량과 1만 행 메모리/retention도 확인한다. 종료: 실패 0, 작업량 계수가 설계와 일치한다.
+- [ ] **I6 Integration Test와 채택 판단:** 진입은 I5. `test:dual`·e2e·`verify:release`·`size`를 돌린다. 새 API를 쓰는 벤치마크 앱으로 `rebuild-ci keyed/lithent`를 통과시키고, 공식형 CPU·메모리를 양순서(baseline/후보/Preact class/Vue)로 측정한다. 종료: DC-29-9 gate 판정과 결과 문서. 채택하면 [RELEASING.md](../../RELEASING.md) 절차와 js-framework-benchmark PR로 이어진다.
 
 ## DC-28 — 실행 H0~H4
 
@@ -467,6 +479,7 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 - [x] **IC-4 E 단독 반영 완료:** 최종 채택은 E 단독이다. K/EK는 재평가했으나 추가 앱 이득이 작고 엇갈려 보류했다. C1/C3/C4·Fragment도 보고서의 명시한 재개 조건으로 보류하며 독립·결합 증거를 보존했다.
 - [x] **IC-5 실행 순서 확정:** DC-22 Phase4A~4E→5→6. flat 이벤트 수정과 C2/결합 비교를 실제 반영 후보로 다룬다. 후보 검토 완료와 새 구현/공식 측정 완료를 구분한다.
 - [x] **IC-6 실행 완료:** DC-22-1/2/4 계약·구현과 DC-22-5 최종 선택을 닫고 측정 artifact·회귀·size guard·채택 source를 일치시킨다. → M-15·M-16.
+- [x] **IC-7 DC-29 결정 확정:** 2026-10-31 사용자 선택. A1 controller `createKeyedList`, S2(코어 bridge + `lithent/helper`, base guard 4,865B). → I1, M-26-3.
 
 ### DC-22 계획 문서 검증 — 2026-10-25 (계획 시점 이력)
 
@@ -475,11 +488,9 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 ## 상태 / 핸드오프
 
-- done: HEAD `a56bae1`에서 DC-28을 진행했다. 보존 trace로 select 공식 전체가 runner 강제 GC 시간 mod 16.67ms가 정하는 BeginFrame 대기를 포함함을 확인했다. Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. 이 근거로 2026-10-19 bulk removal을 base·concurrent `findChildWithRemoveElement`에 정체성 비교 방식으로 다시 옮겼다. 공유 6검사·`test:dual` 1,166/skip 3·e2e 78·`verify:concurrent`를 통과했다.
-- result: 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36), active +0.32%(main−0.32/reverse−0.37)로 중립이다. 행 component 앱 C는 전체 삭제 −7.84%(main−8.80/reverse−5.95), JS −10.40%, active −8.41%, 가중 −0.68%(main−1.55/reverse+0.41)다. 교차 진단에서는 C −4.98%(29/40), A +0.97%(27/40 느림·동률 1, script만 p=0.024)였다. 메모리 ±0.6% 이내, base Brotli 4,819→4,817B, concurrent 6,935→6,953B다. A 앱 select는 전체 −8.91%·active −0.28%로 지난번과 반대 방향이었다. [select 대기](../benchmark/SELECT_VSYNC_PHASE.md), [bulk removal v2](../benchmark/BULK_REMOVAL_V2_RESULTS.md).
-- decision: **채택 권장(기본 경로, 새 API 없음).** 사용자 요청으로 이 브랜치에 커밋했다. 과거 판단 중 DC-25의 select 손해는 약해지지만(가중 active −0.70%, 8/9 유지) 재진행하지 않았다. C4 P2/P3·DC-27·DC-22 판단은 유지한다.
-- validation: 1,160개 trace의 공식 구간 재계산이 공식 값과 1e-6ms 이내로 일치했다. 표본 수·양순서·source/test/tool hash(`preserve.py`가 `initial.json`과 대조)·Chrome 156.0.8078.74 binary/framework·runner·bundle guard를 통과했다. 페이지 재사용 교차 진단 두 번(60/150라운드)은 서로 어긋나 보고하지 않고 보존만 했다.
-- preservation: staging `/private/tmp/lithent-bulk-removal-v2-20261030`의 source/apps/raw/trace·진단과 도구·후보 patch·공유 테스트를 새 archive/manifest(1,443 entries/54,681,015B, SHA-256 `bc3c52cf00d10cb2a394a78bae874cd4b2fc31282a5ca93692a6424e6d795a9c`)에 보존했다. 압축을 풀어 전체 member를 다시 대조했다. select 분석은 기존 archive의 trace를 읽으며 [JSON](../benchmark/select-vsync-phase.json)으로 남겼다.
-- blockers/limits: 수집/검산 블로커 없음. 이득은 목록이 부모 element의 유일한 내용일 때의 전체 삭제에만 있다. 공식 A 앱의 R3 결과는 바뀌지 않는다. 일반 element 행 삭제의 약 +1% 가능 비용은 확정하지 않았다. 기존 portal BUG-3과 concurrent 앱의 공식 timing은 범위 밖이다.
-- commit: 측정 기준 HEAD는 `a56bae1`이다. 사용자 요청으로 DC-28 코드(`src/render.ts`, `lithentConcurrent/src/render.ts`, 공유 테스트)·도구·문서·증거를 이 변경을 포함하는 커밋에 보존한다. 최종 SHA는 `git log -1 --format=%H`로 확인한다. push하지 않았다. main 병합/release는 별도이며 성공한 수집은 반복하지 않는다.
-- history (2026-10-31): 증거 archive 5개를 GitHub Release [`benchmark-evidence`](https://github.com/superlucky84/lithent/releases/tag/benchmark-evidence)로 옮기고, archive를 이력에서 빼려고 브랜치를 main 위의 `perf/c4-bulk-removal`로 다시 쌓았다. archive 외 tree는 같고 SHA만 바뀌었다: `7f4df5c`→`b3cd570`, `4109bd3`→`b4f6b57`, `a56bae1`→`c578a2f`, `c53569e`→`b1ca5e3`. 병합/release 절차는 [CONTRIBUTING](../../CONTRIBUTING.md)을 따른다.
+- done: DC-29 I0·I1. 공식 결과(Chrome 156, lithent 1.25.2)에서 가중 손해의 21.5%·13.4%가 부분 갱신·선택임을 다시 계산했다. C4 P1~P3 기록과 P2 소스의 코어 의존(공개 5개, 비공개 3개)을 정리했다. 배치별 base UMD Brotli 실측: 코어 전체 5,779B(+962), 코어 최소 5,421B(+604), bridge만 4,858B(+41), 목록 모듈 단독 1,388B. [DESIGN DC-29](./DESIGN.md#dc-29--c4-제품-api와-크기-한도-선택지).
+- decision: 2026-10-31 사용자 결정(I1): API는 A1(P2 형태 controller), 이름은 `createKeyedList`, 배치는 S2(코어 bridge 하나 + `lithent/helper`, base guard 4,865B)다. 이유: 측정 근거가 있는 유일한 형태이고 기존 코어 계약을 바꾸지 않으며(RC-3), 기본 코어 증가가 +41B로 가장 작다(RC-6). DC-29-4~9는 각 구현 단계의 진입 조건으로 남는다.
+- next: I2. base·concurrent에 같은 bridge(`patchWDom` 형태: diff → 부모 children 배치 → commit, diff 문맥 저장/복원)와 단위 테스트를 넣고 base guard를 실측값(약 4,865B)으로 고정한다.
+- blockers: 없음. DC-29-4~9는 I3~I6 진입 때 정한다.
+- limits: 순위 추정은 로컬 개선율을 공식 평균에 곱한 값이며 측정이 아니다. concurrent bridge 크기와, 목록 모듈을 넣은 helper 번들의 실제 크기는 측정하지 않았다.
+- commit: 기준 main `7796eb1`(1.25.4 배포). 브랜치 `perf/c4-list-boundary-api`. DC-28 인계와 브랜치 재작성 SHA 대응은 [HANDOFF](../benchmark/HANDOFF.md)의 2026-10-31 항목에 있다. 최종 SHA는 `git log -1 --format=%H`로 확인한다.

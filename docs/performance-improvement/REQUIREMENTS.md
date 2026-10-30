@@ -2,10 +2,22 @@
 
 > **DC-25 첫 후보는 검증 후 미채택으로 종료했다.** 기본 이벤트 계약은 DC-23/R62~R66을 유지한다. DC-22의 proxy 적용/검증/측정은 당시 이력이다.
 
-- 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
+- 기준일: 2026-10-31. 상태: **DC-29 C4 제품화의 API·이름·배치를 사용자가 정했다: controller 형태(A1) `createKeyedList`, 코어 bridge + `lithent/helper`(S2, base guard 4,865B). 다음은 I2(양코어 bridge)이며 구현은 아직 없다. 직전 DC-28 bulk removal v2는 lithent 1.25.4·lithent-concurrent 0.2.4로 배포됐다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
+
+## DC-29 — C4 목록 경계의 제품 API와 크기 한도
+
+2026-10-31 사용자 요청 순서: 공식 벤치마크 격차 확인("성능 개선할 수 있는 여지 확인해봐") → 과거 기록 확인 → "API 후보랑 크기 한도 정리부터 해줘". 이번 단계는 선택지 정리와 결정 기록이다. 구현·공식 측정·배포는 하지 않는다. 위치는 기존 네 정본이고, 크기 도구는 `experiments/c4-product-size/`다. 기준 main `7796eb1`(lithent 1.25.4), 작업 브랜치 `perf/c4-list-boundary-api`.
+
+- R111. 동기: js-framework-benchmark 공식 결과(Chrome 156, 2026-10-25, lithent 1.25.2)에서 Lithent는 가중 1.403으로 201개 중 119위다. 가중 손해의 21.5%가 부분 갱신, 13.4%가 선택이다. C4 P2는 로컬에서 두 항목을 −14.93%/−26.72% 줄였다. 로컬 개선율을 공식 평균에 곱한 순위 추정은 측정이 아니며 판단 보조로만 쓴다.
+- R112. API 후보는 C4 P1~P3의 계약(명시 알림, 고유·불변 key, item당 keyed root 하나, 행별 mount 없음, 알리지 않은 외부 변경 미지원)을 출발점으로 비교한다. 후보마다 manual(`mount`/renew)·light(`lmount`/lstate) 모드와의 관계, 벤치마크 앱에서의 쓰임, 잘못 썼을 때 실패하는 방식(조용한 stale 화면인지 명시 오류인지), 측정 근거 유무를 적는다.
+- R113. 크기 한도 선택지는 같은 빌드·압축 방법의 base UMD Brotli 실측으로 비교한다. 현재 4,817/4,824B(여유 7B)다. guard를 바꾸는 선택지는 새 한도, README 크기 표기 영향, UMD/CDN 사용자와 ESM bundler 사용자의 부담 차이를 함께 적는다.
+- R114. 이름·알리지 않은 변경·concurrent·SSR/hydration·HMR·owner handover/clone·BUG-3·채택 측정 gate는 TBD로 기록하고 구현 단계의 진입 조건에 연결한다. API·이름·배치/크기(DC-29-1~3)는 사용자가 정한다.
+- R115. 이번 단계는 문서와 측정 도구만 추가한다. runtime·public export·guard·벤치마크 앱은 바꾸지 않는다.
+
+DC-29 현재: 선택지는 [DESIGN DC-29](./DESIGN.md#dc-29--c4-제품-api와-크기-한도-선택지)에 있다. 2026-10-31 사용자 결정(I1): API는 A1(P2 형태 controller), 이름은 `createKeyedList`, 배치는 S2(코어 bridge 하나 + `lithent/helper`, base guard 4,865B)다. 이유: 측정 근거가 있는 유일한 형태이고 기존 코어 계약을 바꾸지 않으며(RC-3), 기본 코어 증가가 +41B로 가장 작다(RC-6). DC-29-4~9는 각 구현 단계의 진입 조건으로 남는다.
 
 ## DC-28 — select 프레임 대기 진단과 bulk removal 재평가
 

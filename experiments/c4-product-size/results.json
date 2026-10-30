@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-31",
+  "base": { "commit": "7796eb1", "lithent": "1.25.4" },
+  "method": "experiments/c4-product-size/measure.sh in a scratch worktree; root vite.config.js (VITEST=1 skips only vite-plugin-checker); zlib.brotliCompressSync defaults as scripts/size-report.js",
+  "baseUmdBrotli": {
+    "baseline": 4817,
+    "S1_core_P2": 5779,
+    "S1_core_P2_shortErrors": 5693,
+    "S1prime_core_P1_minimal": 5421,
+    "bridge_threeInternals": 4851,
+    "bridge_patchWDomFunction": 4858
+  },
+  "listModuleOutsideCore": {
+    "umdBrotli": 1388,
+    "esBrotli": 1516,
+    "lithentExternal": true
+  },
+  "currentHelperUmdBrotli": 3790,
+  "guards": { "base": 4824, "concurrent": 9000, "concurrentCurrent": 6953 },
+  "notMeasured": [
+    "concurrent bridge",
+    "helper bundle with the module included",
+    "runtime timing (see C4 P2 results)"
+  ]
+}
