@@ -1,0 +1,291 @@
+{
+  "at": "2026-10-29T01:14:01.888Z",
+  "scope": "existing DC-25 baseline reanalysis; source inspection; untimed JSDOM negative control",
+  "head": "4de76efa4be8ab1167cdad823931cb88d054272c",
+  "node": "v24.22.1",
+  "timingInput": {
+    "file": "docs/benchmark/dc25-keyed-fast-path-final-results.json",
+    "sha256": "88f4cd36a9ac3017b6c051eb888208f8289f310a583901d8e127e6044b8d4927",
+    "weights": [
+      0.64280248137063, 0.5607178150466176, 0.5643800750716564,
+      0.1925635870170522, 0.13200612879341714, 0.5277091212292658,
+      0.5644449600965534, 0.5508359820582848, 0.4225836631419211
+    ]
+  },
+  "sources": [
+    {
+      "file": "src/wDom.ts",
+      "sha256": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f"
+    },
+    {
+      "file": "src/diff.ts",
+      "sha256": "f88813b713851b1db82da6e888aa38d5914f367c1a71fea9764cd2a2b095372a"
+    },
+    {
+      "file": "src/render.ts",
+      "sha256": "2bd3a2c95ff3a31422dbca7add660b2053786480cafff48af7f0ed5dc07412c6"
+    },
+    {
+      "file": "src/utils/createWDom.ts",
+      "sha256": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c"
+    },
+    {
+      "file": "src/hook/mountReadyCallback.ts",
+      "sha256": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12"
+    },
+    {
+      "file": "helper/src/hook/cacheUpdate.ts",
+      "sha256": "8ff83de7781eaca123b8290c16409f6ebc0affadd29b8ea23e7eba968b9c9150"
+    },
+    {
+      "file": "packages/lithentTemplateParser/src/codegen/createElement.ts",
+      "sha256": "50f7c84b2bcc80a35d25cd8c9d87618042ce9d1fee2aa2257fd8ba1dcc10b98f"
+    }
+  ],
+  "peerSources": [
+    {
+      "file": "frameworks/keyed/preact-classes/src/Row.jsx",
+      "sha256": "3dc71acf943438b202f2d39a3f7b2ed4f32bf9143392df2eddc75153e9bf7d6c",
+      "source": "'use strict';\n\nvar preact = require('preact');\nvar { render, h, Component } = preact;\n\nexport class Row extends Component {\n\tconstructor(props) {\n\t\tsuper(props);\n\t\tthis.onDelete = this.onDelete.bind(this);\n\t\tthis.onClick = this.onClick.bind(this);\n\t}\n\n\tshouldComponentUpdate(nextProps, nextState) {\n\t\treturn nextProps.data !== this.props.data || nextProps.styleClass !== this.props.styleClass;\n\t}\n\n\tonDelete() {\n\t\tthis.props.onDelete(this.props.data.id);\n\t}\n\t\n\tonClick() {\n\t\tthis.props.onClick(this.props.data.id);\n\t}\n\n\trender() {\n\t\tlet {styleClass, data} = this.props;\n\t\treturn (<tr className={styleClass}>\n\t\t\t<td className=\"col-md-1\">{data.id}</td>\n\t\t\t<td className=\"col-md-4\">\n\t\t\t\t<a onClick={this.onClick}>{data.label}</a>\n\t\t\t</td>\n\t\t\t<td className=\"col-md-1\"><a onClick={this.onDelete}><span className=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span></a></td>\n\t\t\t<td className=\"col-md-6\"></td>\n\t\t</tr>);\n\t}\n}\n\n"
+    },
+    {
+      "file": "frameworks/keyed/preact-classes/src/Main.jsx",
+      "sha256": "c0092e32b0c5ba36fa123253f53be72b88749d0f7dcc689464fca22a0e2587cf",
+      "source": "'use strict';\n\nvar preact = require('preact');\nvar { render, h, Component } = preact;\nconst {Row} = require('./Row');\nconst {Store} = require('./Store');\n\nexport class Main extends Component{\n    constructor(props) {\n        super(props);\n        this.state = {store: new Store()};\n        this.select = this.select.bind(this);\n        this.delete = this.delete.bind(this);\n        this.add = this.add.bind(this);\n        this.run = this.run.bind(this);\n        this.update = this.update.bind(this);\n        this.runLots = this.runLots.bind(this);\n        this.clear = this.clear.bind(this);\n        this.swapRows = this.swapRows.bind(this);\n        this.start = 0;\n        this.length = 0;\n\n        window.app = this;\n    }\n    run() {\n        this.state.store.run();\n        this.setState({store: this.state.store});\n    }\n    add() {\n        this.state.store.add();\n        this.setState({store: this.state.store});\n    }\n    update() {\n        this.state.store.update();\n        this.setState({store: this.state.store});\n    }\n    select(id) {\n        this.state.store.select(id);\n        this.setState({store: this.state.store});\n    }\n    delete(id) {\n        this.state.store.delete(id);\n        this.setState({store: this.state.store});\n    }\n    runLots() {\n        this.state.store.runLots();\n        this.setState({store: this.state.store});\n    }\n    clear() {\n        this.state.store.clear();\n        this.setState({store: this.state.store});\n    }\n    swapRows() {\n        this.state.store.swapRows();\n        this.setState({store: this.state.store});\n    }\n    render () {\n        let rows = this.state.store.data.map((d,i) => {\n        \treturn <Row key={d.id} data={d} onClick={this.select} onDelete={this.delete} styleClass={d.id === this.state.store.selected ? 'danger':''}></Row>\n        });\n        return (<div className=\"container\">\n            <div className=\"jumbotron\">\n                <div className=\"row\">\n                    <div className=\"col-md-6\">\n                        <h1>preact</h1>\n                    </div>\n                    <div className=\"col-md-6\">\n                        <div className=\"row\">\n                            <div className=\"col-sm-6 smallpad\">\n                                <button type=\"button\" className=\"btn btn-primary btn-block\" id=\"run\" onClick={this.run}>Create 1,000 rows</button>\n                            </div>\n                            <div className=\"col-sm-6 smallpad\">\n                                <button type=\"button\" className=\"btn btn-primary btn-block\" id=\"runlots\" onClick={this.runLots}>Create 10,000 rows</button>\n                            </div>\n                            <div className=\"col-sm-6 smallpad\">\n                                <button type=\"button\" className=\"btn btn-primary btn-block\" id=\"add\" onClick={this.add}>Append 1,000 rows</button>\n                            </div>\n                            <div className=\"col-sm-6 smallpad\">\n                                <button type=\"button\" className=\"btn btn-primary btn-block\" id=\"update\" onClick={this.update}>Update every 10th row</button>\n                            </div>\n                            <div className=\"col-sm-6 smallpad\">\n                                <button type=\"button\" className=\"btn btn-primary btn-block\" id=\"clear\" onClick={this.clear}>Clear</button>\n                            </div>\n                            <div className=\"col-sm-6 smallpad\">\n                                <button type=\"button\" className=\"btn btn-primary btn-block\" id=\"swaprows\" onClick={this.swapRows}>Swap Rows</button>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <table className=\"table table-hover table-striped test-data\">\n                <tbody>\n                    {rows}\n                </tbody>\n            </table>\n            <span className=\"preloadicon glyphicon glyphicon-remove\" aria-hidden=\"true\"></span>\n            </div>);\n    }\n}\n\nrender(<Main/>, document.getElementById('main'));\n"
+    },
+    {
+      "file": "frameworks/keyed/preact-classes/src/Store.es6.js",
+      "sha256": "5fa8e63e20876d76d3c999b4f7d148358b4ad4da120b2e2bd143e451778c4908",
+      "source": "'use strict';\n\nfunction _random(max) {\n    return Math.round(Math.random()*1000)%max;\n}\n\nexport class Store {\n    constructor() {\n        this.data = [];\n        this.selected = undefined;\n        this.id = 1;\n\t}\n    buildData(count = 1000) {\n        var adjectives = [\"pretty\", \"large\", \"big\", \"small\", \"tall\", \"short\", \"long\", \"handsome\", \"plain\", \"quaint\", \"clean\", \"elegant\", \"easy\", \"angry\", \"crazy\", \"helpful\", \"mushy\", \"odd\", \"unsightly\", \"adorable\", \"important\", \"inexpensive\", \"cheap\", \"expensive\", \"fancy\"];\n        var colours = [\"red\", \"yellow\", \"blue\", \"green\", \"pink\", \"brown\", \"purple\", \"brown\", \"white\", \"black\", \"orange\"];\n        var nouns = [\"table\", \"chair\", \"house\", \"bbq\", \"desk\", \"car\", \"pony\", \"cookie\", \"sandwich\", \"burger\", \"pizza\", \"mouse\", \"keyboard\"];\n        var data = [];\n        for (var i = 0; i < count; i++)\n            data.push({id: this.id++, label: adjectives[_random(adjectives.length)] + \" \" + colours[_random(colours.length)] + \" \" + nouns[_random(nouns.length)] });\n        return data;\n    }\n    updateData(mod = 10) {\n        for (let i=0;i<this.data.length;i+=10) {\n        \tthis.data[i] = Object.assign({}, this.data[i], {label: this.data[i].label + ' !!!'});\n        }\n    }\n    delete(id) {\n        var idx = this.data.findIndex(d => d.id === id);\n        this.data.splice(idx, 1);\n    }\n    run() {\n        this.data = this.buildData();\n        this.selected = undefined;\n    }\n    add() {\n        this.data = this.data.concat(this.buildData(1000));\n    }\n    update() {\n        this.updateData();\n    }\n    select(id) {\n        this.selected = id;\n    }\n    runLots() {\n        this.data = this.buildData(10000);\n        this.selected = undefined;\n    }\n    clear() {\n        this.data = [];\n        this.selected = undefined;\n    }\n    swapRows() {\n    \tif(this.data.length > 998) {\n    \t\tvar a = this.data[1];\n    \t\tthis.data[1] = this.data[998];\n    \t\tthis.data[998] = a;\n    \t}\n    }\n}"
+    },
+    {
+      "file": "frameworks/keyed/vue/src/App.vue",
+      "sha256": "9106cc0b702d1d97ebd7a0a0b22d0684327a49ada355157b3c51a22a3468bca8",
+      "source": "<script setup>\nimport { ref, shallowRef } from 'vue'\nimport { buildData } from './data'\n\nconst selected = ref()\nconst rows = shallowRef([])\n\nfunction setRows(update = rows.value.slice()) {\n  rows.value = update\n}\n\nfunction add() {\n  rows.value = rows.value.concat(buildData(1000))\n}\n\nfunction remove(id) {\n  rows.value.splice(\n    rows.value.findIndex((d) => d.id === id),\n    1\n  )\n  setRows()\n}\n\nfunction select(id) {\n  selected.value = id\n}\n\nfunction run() {\n  setRows(buildData())\n  selected.value = undefined\n}\n\nfunction update() {\n  const _rows = rows.value\n  for (let i = 0; i < _rows.length; i += 10) {\n    _rows[i].label += ' !!!'\n  }\n  setRows()\n}\n\nfunction runLots() {\n  setRows(buildData(10000))\n  selected.value = undefined\n}\n\nfunction clear() {\n  setRows([])\n  selected.value = undefined\n}\n\nfunction swapRows() {\n  const _rows = rows.value\n  if (_rows.length > 998) {\n    const d1 = _rows[1]\n    const d998 = _rows[998]\n    _rows[1] = d998\n    _rows[998] = d1\n    setRows()\n  }\n}\n</script>\n\n<template>\n  <div class=\"jumbotron\">\n    <div class=\"row\">\n      <div class=\"col-md-6\">\n        <h1>Vue.js 3 (keyed)</h1>\n      </div>\n      <div class=\"col-md-6\">\n        <div class=\"row\">\n          <div class=\"col-sm-6 smallpad\">\n            <button\n              type=\"button\"\n              class=\"btn btn-primary btn-block\"\n              id=\"run\"\n              @click=\"run\"\n            >\n              Create 1,000 rows\n            </button>\n          </div>\n          <div class=\"col-sm-6 smallpad\">\n            <button\n              type=\"button\"\n              class=\"btn btn-primary btn-block\"\n              id=\"runlots\"\n              @click=\"runLots\"\n            >\n              Create 10,000 rows\n            </button>\n          </div>\n          <div class=\"col-sm-6 smallpad\">\n            <button\n              type=\"button\"\n              class=\"btn btn-primary btn-block\"\n              id=\"add\"\n              @click=\"add\"\n            >\n              Append 1,000 rows\n            </button>\n          </div>\n          <div class=\"col-sm-6 smallpad\">\n            <button\n              type=\"button\"\n              class=\"btn btn-primary btn-block\"\n              id=\"update\"\n              @click=\"update\"\n            >\n              Update every 10th row\n            </button>\n          </div>\n          <div class=\"col-sm-6 smallpad\">\n            <button\n              type=\"button\"\n              class=\"btn btn-primary btn-block\"\n              id=\"clear\"\n              @click=\"clear\"\n            >\n              Clear\n            </button>\n          </div>\n          <div class=\"col-sm-6 smallpad\">\n            <button\n              type=\"button\"\n              class=\"btn btn-primary btn-block\"\n              id=\"swaprows\"\n              @click=\"swapRows\"\n            >\n              Swap Rows\n            </button>\n          </div>\n        </div>\n      </div>\n    </div>\n  </div>\n  <table class=\"table table-hover table-striped test-data\">\n    <tbody>\n      <tr\n        v-for=\"{ id, label } of rows\"\n        :key=\"id\"\n        :class=\"{ danger: id === selected }\"\n        :data-label=\"label\"\n        v-memo=\"[label, id === selected]\"\n      >\n        <td class=\"col-md-1\">{{ id }}</td>\n        <td class=\"col-md-4\">\n          <a @click=\"select(id)\">{{ label }}</a>\n        </td>\n        <td class=\"col-md-1\">\n          <a @click=\"remove(id)\">\n            <span class=\"glyphicon glyphicon-remove\" aria-hidden=\"true\"></span>\n          </a>\n        </td>\n        <td class=\"col-md-6\"></td>\n      </tr>\n    </tbody>\n  </table>\n  <span\n    class=\"preloadicon glyphicon glyphicon-remove\"\n    aria-hidden=\"true\"\n  ></span>\n</template>\n"
+    },
+    {
+      "file": "frameworks/keyed/vue/package.json",
+      "sha256": "f10a6e38f5b89ba109dd66b5bdf6ed93a6af5bff95cafceb0fbaf28bae4fbadc",
+      "source": "{\n  \"name\": \"js-framework-benchmark-vue\",\n  \"private\": true,\n  \"version\": \"0.0.0\",\n  \"js-framework-benchmark\": {\n    \"frameworkVersionFromPackage\": \"vue\",\n    \"frameworkHomeURL\": \"https://vue.js.org/\",\n    \"customURL\": \"/dist\"\n  },\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build-prod\": \"vite build\",\n    \"preview\": \"vite preview\"\n  },\n  \"dependencies\": {\n    \"vue\": \"^3.6.0-alpha.2\"\n  },\n  \"devDependencies\": {\n    \"@vitejs/plugin-vue\": \"^6.0.0\",\n    \"vite\": \"^7.0.5\"\n  }\n}\n"
+    }
+  ],
+  "rows": [
+    {
+      "id": "01_run1k",
+      "lithent": {
+        "total": 26.9605,
+        "script": 7.536,
+        "paint": 18.7675
+      },
+      "preactClasses": {
+        "total": 25.5395,
+        "script": 6.253,
+        "paint": 18.7875
+      },
+      "ratios": {
+        "total": 1.055639303823489,
+        "script": 1.2051815128738206,
+        "paint": 0.9989354624085162
+      },
+      "countPerCondition": 30
+    },
+    {
+      "id": "02_replace1k",
+      "lithent": {
+        "total": 28.244500000000002,
+        "script": 8.866499999999998,
+        "paint": 18.589
+      },
+      "preactClasses": {
+        "total": 29.0125,
+        "script": 10.0305,
+        "paint": 18.6425
+      },
+      "ratios": {
+        "total": 0.9735286514433434,
+        "script": 0.8839539404815312,
+        "paint": 0.9971302132224755
+      },
+      "countPerCondition": 30
+    },
+    {
+      "id": "03_update10th1k_x16",
+      "lithent": {
+        "total": 15.649000000000001,
+        "script": 4.176500000000001,
+        "paint": 10.019
+      },
+      "preactClasses": {
+        "total": 14.6135,
+        "script": 2.591,
+        "paint": 10.782
+      },
+      "ratios": {
+        "total": 1.0708591370992575,
+        "script": 1.6119258973369357,
+        "paint": 0.9292339083657949
+      },
+      "countPerCondition": 30
+    },
+    {
+      "id": "04_select1k",
+      "lithent": {
+        "total": 6.342,
+        "script": 3.114,
+        "paint": 2.371
+      },
+      "preactClasses": {
+        "total": 4.6245,
+        "script": 1.3940000000000001,
+        "paint": 2.544
+      },
+      "ratios": {
+        "total": 1.3713915017839764,
+        "script": 2.233859397417503,
+        "paint": 0.9319968553459119
+      },
+      "countPerCondition": 50
+    },
+    {
+      "id": "05_swap1k",
+      "lithent": {
+        "total": 16.965,
+        "script": 3.3200000000000003,
+        "paint": 12.681000000000001
+      },
+      "preactClasses": {
+        "total": 15.528500000000001,
+        "script": 1.5375,
+        "paint": 12.776
+      },
+      "ratios": {
+        "total": 1.0925073252406865,
+        "script": 2.159349593495935,
+        "paint": 0.9925641828428304
+      },
+      "countPerCondition": 30
+    },
+    {
+      "id": "06_remove-one-1k",
+      "lithent": {
+        "total": 11.966000000000001,
+        "script": 1.1545,
+        "paint": 10.1565
+      },
+      "preactClasses": {
+        "total": 12.163,
+        "script": 0.707,
+        "paint": 9.931000000000001
+      },
+      "ratios": {
+        "total": 0.9838033379922717,
+        "script": 1.632956152758133,
+        "paint": 1.0227066760648473
+      },
+      "countPerCondition": 30
+    },
+    {
+      "id": "07_create10k",
+      "lithent": {
+        "total": 270.872,
+        "script": 53.5865,
+        "paint": 210.4405
+      },
+      "preactClasses": {
+        "total": 272.621,
+        "script": 50.298,
+        "paint": 214.95850000000002
+      },
+      "ratios": {
+        "total": 0.9935845000935366,
+        "script": 1.0653803332140444,
+        "paint": 0.9789819895468194
+      },
+      "countPerCondition": 30
+    },
+    {
+      "id": "08_create1k-after1k_x2",
+      "lithent": {
+        "total": 29.5615,
+        "script": 7.3695,
+        "paint": 21.338
+      },
+      "preactClasses": {
+        "total": 29.616500000000002,
+        "script": 6.617,
+        "paint": 22.018
+      },
+      "ratios": {
+        "total": 0.9981429270845642,
+        "script": 1.113722230618105,
+        "paint": 0.9691161776728132
+      },
+      "countPerCondition": 30
+    },
+    {
+      "id": "09_clear1k_x8",
+      "lithent": {
+        "total": 12.278500000000001,
+        "script": 9.8255,
+        "paint": 1.3935
+      },
+      "preactClasses": {
+        "total": 13.128,
+        "script": 10.618500000000001,
+        "paint": 1.552
+      },
+      "ratios": {
+        "total": 0.9352909811090799,
+        "script": 0.9253190186937891,
+        "paint": 0.8978737113402061
+      },
+      "countPerCondition": 30
+    }
+  ],
+  "weighted": {
+    "total": 1.0217217318406737,
+    "script": 1.2409728149994719,
+    "paint": 0.9712700218480447
+  },
+  "selectionToExisting110Goal": {
+    "thresholdMs": 5.086950000000001,
+    "reductionMs": 1.2550499999999989,
+    "reductionFraction": 0.19789498580889286
+  },
+  "parentProbe": {
+    "baseline": {
+      "before": {
+        "parentPresent": true,
+        "parentCorrect": true
+      },
+      "mountReady": {
+        "parentPresent": true,
+        "parentCorrect": true
+      },
+      "after": {
+        "parentCorrect": true
+      },
+      "html": "<section><span>child</span></section>"
+    },
+    "withoutCreationParent": {
+      "before": {
+        "parentPresent": false,
+        "parentCorrect": false
+      },
+      "mountReady": {
+        "parentPresent": false,
+        "parentCorrect": false
+      },
+      "after": {
+        "parentCorrect": true
+      },
+      "html": "<section><span>child</span></section>"
+    }
+  },
+  "limitations": [
+    "No new browser timing, Vue timing, CPU profile or memory measurement.",
+    "Separate medians for total/script/paint are not additive.",
+    "The negative control is not a proposed optimization and does not modify repository sources.",
+    "Peer snapshots describe local source only, not a new timed artifact."
+  ]
+}

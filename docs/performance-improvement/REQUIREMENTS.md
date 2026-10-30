@@ -2,10 +2,79 @@
 
 > **DC-25 첫 후보는 검증 후 미채택으로 종료했다.** 기본 이벤트 계약은 DC-23/R62~R66을 유지한다. DC-22의 proxy 적용/검증/측정은 당시 이력이다.
 
-- 기준일: 2026-10-27. 상태: **DC-25 첫 결합 후보의 구현·측정·통합·증거 보존을 완료했고 기본 채택은 보류했다. 가중 전체 −0.171%(main +0.402%/reverse −1.260%)로 효과가 불확실하고 size는 +268B다. 이번 baseline/candidate 모두 CPU 목표 8/9이며 9/9는 미달이다. main `14d47e8`의 runtime·4,824B guard(실제 4,819B)는 유지한다.**
+- 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
+
+## DC-28 — select 프레임 대기 진단과 bulk removal 재평가
+
+2026-10-30 사용자 요청 순서: C4 제품 적합성 판단(기록만) → select 차이 원인 규명("그걸 밝혀보자") → 기본 경로 후보 재판단("진행해봐") → 가능성이 높은 후보 재진행("그럼 가능성이 높은 부분 다시 진행해보자"). 위치는 기존 네 정본이며 도구는 `experiments/select-vsync-phase/`·`experiments/bulk-removal-v2/`, 결과는 `docs/benchmark/`다. 기준 HEAD `a56bae1`. 데이터 마이그레이션/배포는 없다.
+
+- R107. 새 측정 없이 보존 trace로 select 공식 구간을 main thread active와 대기로 나눈다. 강제 GC 시간과 BeginFrame 위상의 관계를 확인한다. 공식 점수 정의는 바꾸지 않으며 active는 해석용 진단이다.
+- R108. select에 기대 기각/보류한 과거 판단을 active로 다시 본다. 재진행 대상은 새 API가 없는 기본 경로 후보로 한정한다. C4 같은 opt-in 경로는 이 재해석으로 기본 후보로 올리지 않는다.
+- R109. bulk removal을 현재 core의 base·concurrent에 같은 변경으로 옮긴다. Fragment/component 래퍼를 통과한 root가 부모의 자식과 순서·정체성까지 같을 때만 한 번에 지운다. portal·`<html>`·부분 삭제는 기존 경로를 쓴다. unmount callback 순서, 바깥 형제, 외부 노드, portal target의 남 소유 내용을 보존한다. base guard 4,824B·concurrent 9,000B를 지킨다.
+- R110. 공식 A 앱과 행 component 앱 C를 각각 HEAD/후보 core로 빌드한다. CPU 1,160·메모리 120을 양순서 직렬 수집하고 공식 전체와 active를 함께 보고한다. 실제 Chrome 삭제 기록 수와 수집 뒤 교차 진단으로 전체 삭제 차이를 확인한다. 과거 표본과 합산하지 않는다.
+
+DC-28 결과: [select 프레임 대기](../benchmark/SELECT_VSYNC_PHASE.md), [bulk removal v2](../benchmark/BULK_REMOVAL_V2_RESULTS.md). 2026-10-19 bulk removal의 select 기각 근거는 프레임 대기였다. v2는 공식 A 앱에서 중립이고 component 행 목록의 전체 삭제를 줄이며 외부 노드 삭제 버그를 고쳐 채택 권장이다. 사용자 요청으로 이 브랜치에 커밋했다. main 병합/release는 별도다.
+
+## DC-27 — 정적 구조와 동적 필드 정보의 원리 검증
+
+2026-10-30 사용자 “1을 진행” 요청. 위치는 기존 네 정본이며 구현은 `experiments/static-dynamic/`, 결과는 `docs/benchmark/`다. 기준 HEAD `4109bd3`의 base와 원래 A 앱을 사용한다. C4의 알려진 변경 행 알림·행별 component·Map 미세 조정과 결합하지 않는다. 데이터 마이그레이션/배포는 없다.
+
+- R101. 수동 `defineBlock(schema)`가 고정 HTML 구조·정적 attrs와 동적 scalar text/attr/event slot을 선언한다. 같은 blueprint의 갱신에서는 정적 WDom 생성/비교를 생략한다. 최초 생성은 인스턴스별 WDom/DOM을 소유하며 static props/계획만 공유한다. VDOM/DOM 인스턴스를 행 사이에 공유하지 않는다.
+- R102. 기본 h/getter/관찰 계약을 변경하지 않는다. block은 순수 값 배열을 받는 opt-in 불투명 description이며 materialize 전 내부 WDom 관찰·외부 subtree mutation을 지원하지 않는다. 첫 범위는 일반 HTML의 고정 arity/text·class/title/aria/data 등 scalar attrs와 직접 event다. per-node hook/VDOM callback·component/portal/Fragment·spread/getter/ref/style/input/custom element/SVG/동적 구조는 blueprint에서 제외하고 기존 일반 h 경로를 사용한다. 자동 컴파일/SSR/HMR/concurrent/public export는 비범위다.
+- R103. blueprint/key 불일치·plain과의 전환은 완전한 일반 WDom을 materialize해 정상 diff/render로 처리한다. 동일 위치 캐시 재사용·keyed 이동/삽입/삭제·같은 description의 중복 배치/clone·부모 renew·제거/재마운트에서 인스턴스와 최신 값이 어긋나지 않아야 한다. dynamic 값의 평가/복사·비교와 binding/metadata/생성 비용을 측정에 포함한다.
+- R104. DOM 쓰기는 기존 base updater를 재사용한다. class undefined/빈 문자열 등 기존 관찰을 임의 정규화하지 않는다. static children의 parent 연결과 patch 후 WDom 상태를 유지한다. 오류는 일반 rollback을 약속하지 않으며 부분 commit 오류 후 unmount/remount 계약을 검증한다. metadata는 WeakMap으로 소유하고 별도 전역 행 registry를 두지 않는다.
+- R105. 일반 목록 fixture에서 초기 생성·text/attr/event 교체·불변 갱신·fallback·수명/오류를 검증하고 정적 노드 생성/방문과 slot 비교/실제 DOM 쓰기를 별도 계수한다. 진단 build와 공식 build를 분리한다. strict types·일반 core 회귀·실제 Chrome keyed/9동작/font·조건별 retention을 통과한 입력만 측정한다.
+- R106. stock 원래 A / 같은 앱의 overlay control / blueprint 행을 쓰는 overlay candidate를 같은 source/toolchain에서 새로 빌드한다. 세 앱 CPU870·공식 메모리90을 양순서 직렬 수집해 global hook 비용과 opt-in 정보의 이득을 구분한다. source/browser/runner/dependency/실제 bundle과 raw/trace를 고정·보존한다. peer/Vue는 이번 비교에 없으며 과거 개선율을 합산하지 않는다. 실제 전체/JS·메모리/크기와 회귀를 본 뒤 다음 compiler 설계로 진행할 근거가 있는지 판단한다.
+
+DC-27 결과: [정적/동적 정보 실험](../benchmark/STATIC_DYNAMIC_RESULTS.md). 일반 fixture와 실제 앱의 부분 갱신에서 생성/비교 감소를 확인했지만 전체 이득이 불안정하고 JS·메모리/크기가 늘어 이번 수동 blueprint 경로를 미채택했다. compiler 전반의 불가능성이나 C4와의 누적 개선으로 일반화하지 않는다.
+
+## DC-26 — 남은 성능 격차의 원인 분석
+
+2026-10-29 사용자 요청: Preact class/Vue 대비 느린 이유를 기존 기록과 대조하고, 해 본 실험을 반복하지 않으며 개선점을 먼저 정리한다. 이번 범위는 분석·진단·문서이며 제품 코드 최적화 구현은 아니다. 정본 위치는 이 디렉터리, 근거는 [진단 보고서](../benchmark/RENDER_GAP_DIAGNOSIS.md)다.
+
+- R80. 현재 runtime과 연결되는 최신 동일 세션 baseline으로 격차를 구분한다. 미채택 candidate·과거 버전·다른 머신의 수치를 섞지 않는다. Vue의 최신 동시 측정 부재를 공개한다. → DC-26-1, D0, M-21-1.
+- R81. 캐시 적중 전후의 작업과 실제 DOM 변경을 구분한다. Preact class도 O(n) 순회한다는 점, Vue 앱의 v-memo와 compiler 정보, 공식 A 앱과 행 컴포넌트 C의 차이를 설명한다. 소스 관찰을 원인별 시간 기여율로 표시하지 않는다. → DC-26-2, D0, M-21-2.
+- R82. DC-25, C1/C3, targeted/retained, 이벤트 proxy, compact13, 동일 VDOM, h V1~V4의 채택 여부와 재개 조건을 연결한다. 기존 C4를 새로 발명한 후보로 표시하지 않는다. → DC-26-3, D0/D1, M-21-3.
+- R83. 부모 getter 제거는 렌더 전·mountReady 관찰을 포함해 검토한다. 최종 DOM만 같은 것을 기존 동작 보존으로 판단하지 않는다. 진단은 격리한 메모리 빌드로 수행하고 제품 코드를 바꾸지 않는다. → DC-26-4, D0, M-21-4.
+- R84. 후속 C4/컴파일러 경로는 변경 정보 생산·유효성·fallback·수명·양코어 비용을 설계한 뒤 평가한다. API/채택은 TBD이며 기존 R6/R77의 계약과 guard를 자동 변경하지 않는다. → DC-26-5/6, D1~D4, M-21-5.
+
+- R85. 첫 C4 프로토타입은 DESIGN DC-26-C4-P1의 명시적 변경 알림·plain VDOM/안정된 단일 owner 제한으로 격리한다. 기본 base/concurrent/public exports는 변경하지 않는다. → D1/D2, M-21-6.
+- R86. B/C는 같은 원래 row cache/view와 같은 source core/toolchain으로 빌드한다. 변경 key 수집과 구조 갱신 Map/배열 비용까지 포함하며 새 API 도입 효과로 보고한다. → D2/한정 D4, M-21-6.
+- R87. 일반 편집 목록과 실제 브라우저·공식 keyed/9동작/font·조건별 retention을 확인하고, CPU580/공식 메모리60표본을 양순서로 수집한다. 과거 peer 절대값으로 목표/순위를 추정하지 않는다. → 한정 D3/D4, M-21-6.
+- R88. 첫 원리 검증 완료와 제품 D3/D4의 완료를 구분한다. nested components·owner clone/부모 갱신·예외 복구·concurrent·SSR/HMR 계약을 확장하기 전 기본 채택이나 공개 지원을 선언하지 않는다. → M-21-5/6.
+
+2026-10-29 후속 사용자 요청으로 C4의 격리 원리 검증을 진행한다. DC-26-C4-P1의 명시적 변경 알림 계약·한정 base 실험 앱·공식 B/C 성능 수집은 허용 범위다. 제품 API 채택·기본 runtime 변경·배포는 포함하지 않는다. 데이터 마이그레이션은 없다.
+
+첫 실험 결과: [C4 보고서](../benchmark/C4_LIST_BOUNDARY_RESULTS.md). 한정 계약에서는 작은 갱신과 가중 전체 이득을 관찰했으므로 후속 제품 설계에 투자할 근거가 있다. 공개 채택과 네 peer/Vue 우위 검증은 아직 아니다.
+
+### C4 P2 — 소유 컴포넌트와 중첩 수명 확장
+
+2026-10-29 사용자 “더 진행” 요청. 첫 실험을 보존하고 별도 `experiments/c4-owner/`에서 확장한다.
+
+- R89. raw node를 재사용하는 대신 목록당 하나의 `View` 컴포넌트가 현재 content와 수명을 소유한다. 부모 renew 전후·pending invalidate와 parent renew의 양순서·조건부 제거/재마운트를 검사한다. 한 controller의 동시 두 mount는 명시적으로 거부한다.
+- R90. view 계산/diff 때 base의 기존 needDiffRef 문맥을 보존해 중첩 컴포넌트와 keyed component root의 props·자체 renew·mount/unmount를 지원한다. 행마다 강제로 컴포넌트를 추가하지 않는다.
+- R91. item 수정 API `edit(key, fn)`는 수정 뒤 자동 알림하며 stable key를 검증한다. 직접 외부 mutation은 기존 invalidate 계약을 계속 요구한다. 순수 view에서의 쓰기와 flush 재진입은 거부하고, lifecycle 중 알림은 다음 배치로 보존한다.
+- R92. view 오류는 명시적 재시도, diff/DOM 오류는 fault 상태와 owner 재마운트를 요구한다. 모든 예외의 rollback을 약속하지 않는다. dispose는 멱등이며 pending 작업과 소유 VDOM 참조를 해제한다.
+- R93. base 한정 격리 후보를 관련 회귀·strict types·실제 브라우저·수명으로 검증한다. concurrent/SSR/HMR과 최종 공개 API는 계속 미완료다. 새 public export/기본 guard를 추가하지 않는다.
+- R94. 새 baseline/C4 P2/고정 Preact class11의 공식 CPU9항목×양순서870·공식 메모리90표본을 수집한다. peer는 고정 source/lock/설치 inventory에서 다시 빌드한다. 이번 한 peer 비교를 네 peer 목표나 Vue 비교로 대신하지 않는다.
+- R95. P2 공식 수집 이후, 앱의 선택 해제 class 값 undefined→빈 문자열 한 축을 별도 selection pilot으로 확인한다. 기존 C4 자료/기본 앱을 덮어쓰지 않으며 양순서100표본·실제 DOM 값과 9동작 정합성을 확인한다. 전체 성능·메모리 개선 또는 제품 채택으로 일반화하지 않는다.
+
+P2 결과는 [owner 확장 보고서](../benchmark/C4_OWNER_RESULTS.md)와 [선택/class 진단](../benchmark/c4-owner-selection-diagnostics.json)에 연결한다. 기능 확장과 한 peer 재비교를 완료했으며 기존 네 peer/Vue 목표 달성이나 기본 채택으로 표시하지 않는다.
+
+### C4 P3 — key snapshot 검증 비용 축소
+
+2026-10-29 사용자 요청으로 `perf/c4-key-snapshot`을 만들고 P1/P2와 진단·증거를 `7f4df5c`에 커밋했다. 이어 같은 P2 계약의 한 변수 후보를 평가한다.
+
+- R96. 기준선은 해당 커밋의 P2 controller와 같은 앱/코어다. set에서 key snapshot 배열을 함께 소유해 구조 view의 추가 Map.get·중복 keyOf를 대체한다. key 변경 검사는 유지하며 일반 keyed core 매칭은 바꾸지 않는다.
+- R97. items/keys/indexes를 한 세대로 게시하고 flush가 같은 batch의 세 배열/Map을 캡처한다. lifecycle의 다음 set, view throw/retry, 제거/재마운트, dispose에서 snapshot이 어긋나거나 낡은 key를 재사용하지 않아야 한다.
+- R98. P2의 순수 keyOf/view, 고유 불변 string/number key, 단일 owner·중첩 component·오류/지원 범위를 유지한다. keyOf/getter의 기존 호출 횟수를 보장하는 일반 core 최적화로 표시하지 않는다.
+- R99. P2/P3의 n=1k/10k 구조 갱신에서 실제 keyOf/Map.get 호출과 남는 작업을 계수한다. 상쇄되는 snapshot 배열 쓰기/저장 비용을 기록하고 시간 이득으로 대신하지 않는다.
+- R100. 새 P2/P3/Preact class11 CPU870·공식 메모리90을 양순서 수집한다. 과거 원래 A 앱·P2 세션의 수치와 합산하거나 개선율을 곱하지 않는다. 최종 후보 채택/보류와 public runtime·guard 유지 여부를 문서/증거로 남긴다.
+
+P3 최종 판단: [key snapshot 결과](../benchmark/C4_KEY_SNAPSHOT_RESULTS.md). keyOf/Map.get 호출은 줄었지만 snapshot 저장을 포함한 실제 전체/JS는 악화했고 목표 항목 수도 늘지 않아 미채택이다. P2 실험 기준과 기본 runtime/guard를 유지한다. 이번 결과를 원래 A 앱의 누적 개선이나 Vue 비교로 사용하지 않는다.
 
 ## DC-25 — 같은 순서 keyed 빠른 경로
 
@@ -18,7 +87,7 @@
 - R76. 첫 프로토타입은 격리한 base 코어에서 검증하고 공통 기준 회귀를 base/concurrent에 먼저 확보한다. 채택 후보는 양코어에 구현하거나 concurrent를 기존 경로로 유지하는 이유·지원 범위를 명시한다. 공유 WDom/type 변경은 concurrent에도 영향을 줄 수 있으므로 해당 중단/재개·portal commit/abandon 검증을 생략하지 않는다. → DC-25-6, P1/P4/P5, M-20-4.
 - R77. 현행 base guard 4,824B·concurrent 9,000B·element 1,000B와 source map 연결/출력 정책을 유지한다. 같은 compressor에서 raw/gzip/Brotli와 초과량을 공개하며, 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 최종 한도 변경은 결과를 본 뒤 결정하고 검증 전 allowance·압축 정책을 바꾸지 않는다. → DC-25-2, P3/P5, M-20-5.
 - R78. 새 동일 환경의 기준선/후보를 공식 CPU 9항목×양순서, 공식 메모리, 별도 retention으로 비교한다. 최종 후보는 고정 네 peer(React hooks 19.2.0/classes 19.0.0, Preact hooks/classes 11.0.0)와 다시 비교하며 항목별 가장 빠른 peer 전체 시간 중앙값의 1.10배 이하를 9항목 모두 만족하는지 판정한다. 계측 build와 공식 build를 나누고 이전 표본·개선율을 합산하지 않는다. → DC-25-3, P3, M-20-6.
-- R79. 기존 보고서·archive·실험 앱은 보존한다. 새 출력을 별도로 만들고 소스/번들/환경 해시, 카운터, 원자료, 실패·재시도, 순서별/pooled 결과, 채택/보류 이유를 연결한다. Test Hardening과 Integration Test를 거친 실제 최종 해시를 기준으로 완료를 판정한다. → P0~P5, M-20-7.
+- R79. 기존 보고서·archive·실험 앱은 보존한다. 새 출력을 별도로 만들고 소스/번들/환경 해시, 카운터, 원자료, 실패·재시도, 순서별/pooled 결과, 채택/보류 이유를 연결한다. Test Hardening과 Integration Test를 거친 실제 최종 해시를 기준으로 완료를 판정한다. 2026-10-30 이후의 새 증거 archive는 git에 커밋하지 않고 GitHub Release `benchmark-evidence`에 첨부하며, git에는 결과 문서·집계 JSON·SHA-256 manifest와 release 링크를 둔다([CONTRIBUTING](../../CONTRIBUTING.md#benchmark-evidence)). → P0~P5, M-20-7.
 
 비범위: proxy E·C1·C3·full22 및 keymatch/ordered 단독 실험의 반복, 벤치마크 앱 변경, 새 memo/immutable 계약, 버전 변경·추가 배포. 기존 데이터 마이그레이션은 없으며 내부 metadata의 수명/복제 처리는 R75의 검증 대상이다.
 
@@ -56,7 +125,7 @@
 
 ## 2. 현재 근거와 한계
 
-현재 기본은 **compact13 layout + DC-22 E 이벤트 최적화**다. [종합 보고서](../benchmark/COMPREHENSIVE_RESULTS.md)가 최신 근거다. base/concurrent 지원·최종 artifact/회귀/비용을 연결했고9항목 목표는 6/9로 미달이다. 아래 DC-18 수치는 당시 layout 선택의 이력이며 DC-22 표본과 합산하지 않는다.
+현재 기본은 **compact13 + native 이벤트 + 1.25.3 portal 수정**이다. 최신 동일 세션 peer 근거는 DC-25 baseline이며 위 DC-26에서 재분석했다. 다음은 **DC-22 당시 이력**이다: [종합 보고서](../benchmark/COMPREHENSIVE_RESULTS.md)는 당시 E 이벤트 최적화의 근거다. base/concurrent 지원·최종 artifact/회귀/비용을 연결했고9항목 목표는 6/9로 미달이다. 아래 DC-18 수치는 당시 layout 선택의 이력이며 DC-22 표본과 합산하지 않는다.
 
 DC-18에서는 compact13 WDom factory를 반영했다. 선택한 측정 후보와 default ESM/UMD/CJS3개의 SHA-256이 일치한다. [DC-18 결과](../benchmark/NODE_SHAPE_RESULTS.md)와 [raw/적용 manifest](../benchmark/node-shape-results.json)가 당시 근거다. full22는 미채택 대안으로 보존한다. 두 실험은 각각 자신의 fresh baseline과 비교했으며 후보 간 무작위 직접 대조나 raw 합산을 하지 않았다.
 
@@ -70,14 +139,14 @@ full22는 별도 baseline 대비 total−4.8664%/JS−12.1886%였지만10k 메�
 
 [영구 증거](../benchmark/node-shape-evidence.json.gz)는1,367entries/33,532,074B·SHA-256 `86b390a2c9ed09503361cd474cd122dfe16677d5afc7405689b1d956024baaef`다. 독립 감사는384분포/18가중값·4,380IC access-site 검사·724raw deopt·CPU1,160/메모리120/retention12·최종79파일을 확인했다. [선택 패치](../benchmark/node-shape-candidate.patch)·[full 대안](../benchmark/node-shape-full-candidate.patch)·[재현/감사 도구](../../experiments/node-shape/README.md)를 보존했다. 아래 기존 조사와 DC-16/17은 당시 기준의 역사이며 전체 fixed-peer1.10 목표·광범위 Phase5/6은 별도로 남는다.
 
-| 근거                                                                                                                                                            | 관찰                                                                                                            | 이번 설계에 주는 의미                                                                                                                                 |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [원본 진단](../benchmark/SELECT_PARTIAL_UPDATE_ANALYSIS.md)                                                                                                     | 1,000행 진단에서 선택은 1~2 class 변경에 캐시 검사·keyed 매칭 1,000행, 부분 갱신은 100 text 변경에 diff 1,903회 | 작은 변경에도 전체 목록 처리 비용이 남음. Table 컴포넌트 갱신은 1회이며 1,001회가 아님. LIS·DOM 이동은 0회                                            |
-| [초기 행별 renew](../benchmark/TARGETED_UPDATE_RESULTS.md)                                                                                                      | 전체 가중 시간 +4.7%, 선택·부분 갱신 개선                                                                       | 갱신 범위 축소는 효과가 있으나 행 컴포넌트의 생성·유지 비용이 있음                                                                                    |
-| [행 VDOM 재사용](../benchmark/STRUCTURAL_UPDATE_RESULTS.md)                                                                                                     | 첫 차수 전체 −2.1%, JS −9.4%; 1,000행 메모리 3.506→4.145MB                                                      | 선택 7.920→3.507ms, 부분 갱신 18.438→14.403ms.전체 삭제 11.554→16.371ms와 생성·추가 손해도 함께 판단. 메모리 +0.639MB 자체를 치명적으로 단정하지 않음 |
-| [앱 full/static/scalar](../benchmark/OVERALL_UPDATE_RESULTS.md)                                                                                                 | 첫 차수 전체 각각 −3.0/−1.9/−0.3%                                                                               | full 메모리·전체 역순 미완료. 위 행 재사용과 다른 차수이므로 직접 순위 확정·표본 합산 금지                                                            |
-| [ordered](../benchmark/ORDERED_CORE_RESULTS.md), [keymatch](../benchmark/KEYMATCH_CORE_RESULTS.md), [type identity](../benchmark/TYPE_IDENTITY_CORE_RESULTS.md) | 전체 이득을 일관되게 입증하지 못해 복원                                                                         | 순회 내부 비용 실험이며 전체 방문 범위 축소 실험이 아님                                                                                               |
-| [동일 VDOM 조기 반환](../benchmark/PERFORMANCE_CLOSEOUT.md), [bulk removal](../benchmark/BULK_REMOVAL_RESULTS.md)                                               | JS 또는 삭제 이득과 다른 작업 손해가 공존                                                                       | 같은 실패안을 근거 없이 반복하지 않음. 다른 진입 조건·비용 구조를 검증할 때만 별도 후보로 기록                                                        |
+| 근거                                                                                                                                                            | 관찰                                                                                                            | 이번 설계에 주는 의미                                                                                                                                                                                                   |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [원본 진단](../benchmark/SELECT_PARTIAL_UPDATE_ANALYSIS.md)                                                                                                     | 1,000행 진단에서 선택은 1~2 class 변경에 캐시 검사·keyed 매칭 1,000행, 부분 갱신은 100 text 변경에 diff 1,903회 | 작은 변경에도 전체 목록 처리 비용이 남음. Table 컴포넌트 갱신은 1회이며 1,001회가 아님. LIS·DOM 이동은 0회                                                                                                              |
+| [초기 행별 renew](../benchmark/TARGETED_UPDATE_RESULTS.md)                                                                                                      | 전체 가중 시간 +4.7%, 선택·부분 갱신 개선                                                                       | 갱신 범위 축소는 효과가 있으나 행 컴포넌트의 생성·유지 비용이 있음                                                                                                                                                      |
+| [행 VDOM 재사용](../benchmark/STRUCTURAL_UPDATE_RESULTS.md)                                                                                                     | 첫 차수 전체 −2.1%, JS −9.4%; 1,000행 메모리 3.506→4.145MB                                                      | 선택 7.920→3.507ms, 부분 갱신 18.438→14.403ms.전체 삭제 11.554→16.371ms와 생성·추가 손해도 함께 판단. 메모리 +0.639MB 자체를 치명적으로 단정하지 않음                                                                   |
+| [앱 full/static/scalar](../benchmark/OVERALL_UPDATE_RESULTS.md)                                                                                                 | 첫 차수 전체 각각 −3.0/−1.9/−0.3%                                                                               | full 메모리·전체 역순 미완료. 위 행 재사용과 다른 차수이므로 직접 순위 확정·표본 합산 금지                                                                                                                              |
+| [ordered](../benchmark/ORDERED_CORE_RESULTS.md), [keymatch](../benchmark/KEYMATCH_CORE_RESULTS.md), [type identity](../benchmark/TYPE_IDENTITY_CORE_RESULTS.md) | 전체 이득을 일관되게 입증하지 못해 복원                                                                         | 순회 내부 비용 실험이며 전체 방문 범위 축소 실험이 아님                                                                                                                                                                 |
+| [동일 VDOM 조기 반환](../benchmark/PERFORMANCE_CLOSEOUT.md), [bulk removal](../benchmark/BULK_REMOVAL_RESULTS.md)                                               | JS 또는 삭제 이득과 다른 작업 손해가 공존                                                                       | 같은 실패안을 근거 없이 반복하지 않음. 다른 진입 조건·비용 구조를 검증할 때만 별도 후보로 기록. bulk removal은 DC-28에서 select 기각 근거가 프레임 대기로 확인돼 [v2](../benchmark/BULK_REMOVAL_V2_RESULTS.md)로 재측정 |
 
 위 앱 후보 수치는 코어 개선율이 아니다. 진단 표본과 공식 CPU 표본을 분리한다. 공식 시나리오의 행 수·반복·스로틀은 README 문구나 ID만으로 추정하지 않고 실제 고정 러너에서 확인한다. 현재 로컬 러너의 부분 갱신 `03_update10th1k_x16`과 전체 삭제 `09_clear1k_x8`는 `#run`으로 1,000행을 준비한다. 문서 설명과 실행 코드가 다르면 manifest에 불일치를 기록하고 실행 조건을 기준으로 삼는다.
 
@@ -186,7 +255,4 @@ upstream은 [제출 규칙](https://github.com/krausest/js-framework-benchmark#4
 
 ## 상태 / 핸드오프
 
-- done: DC-25 P0~P5의 첫 후보 구현·측정·수명/회귀·통합 검증과 증거 보존 완료. CPU 1,740/공식 메모리180, 별도 retention/dispose 각6 contexts를 확인했다. candidate overlay와 최종 default의 Playwright는 각각78/retry0이다. 주 archive13개/2,574entries와 default closeout1개/11entries의 해시·decoded 감사를 통과했다. [최종 결과와 판단](../benchmark/DC25_KEYED_FAST_PATH_RESULTS.md)을 따른다.
-- next: 현재 후보는 미채택으로 종료했다. 새 가설이 있을 때 select 전체 격차와 차수별 분포부터 검토한다. keymatch/ordered 단독·proxy E/C1/C3/full22를 자동 재실행하지 않는다. 기존 concurrent sparse array hole 예외(BUG-2)는 별도 정합성 후속이며 이번에는 수정하지 않았다.
-- blockers: 이번 실행/보존 작업의 블로커는 없다. CPU 전체 목표9/9는 달성하지 못했고 새 allowance·배포는 없다. root runtime과 실제 base/concurrent bundle, lock·기존 archive·sibling은 보존했다.
-- commit: 실험·회귀·재현 도구·증거는 `87c41803d476c04f9aee311cff92dbb1021fbac5`에 보존했다. 분기/측정 당시 HEAD `14d47e83770958eb78a91c564bf39e47c4a25dba`와 릴리스 태그 `7842b57cf400834ce65ecad703bd4babb6c9249c`는 원자료대로 유지한다. 최종 인계 tip/원격 반영은 `git log -1`과 `origin/perf/dc25-keyed-fast-path`로 확인한다. 버전 변경·배포는 없다.
+현재 인계 정본은 [IMPLEMENT 상태 / 핸드오프](./IMPLEMENT.md#상태--핸드오프)다. DC-26 분석 완료와 후속 구현 미착수를 구분한다.

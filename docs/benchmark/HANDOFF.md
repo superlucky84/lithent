@@ -1,6 +1,65 @@
 # summary
 
-## 최신 — 컴포넌트 비용·`h` 경량화 실험 기록 (2026-10-28)
+## 최신 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
+
+- done: 2026-10-29~30의 새 archive 5개(c4-list-boundary·c4-owner·c4-key-snapshot·static-dynamic·bulk-removal-v2, 합계 224,675,015B)를 GitHub Release [`benchmark-evidence`](https://github.com/superlucky84/lithent/releases/tag/benchmark-evidence)로 옮겼다. 업로드한 asset의 크기·SHA-256이 각 manifest와 같다. 결과 문서와 `report.mjs`의 archive 링크를 release 주소로 바꿨고 `docs/benchmark/*.tar.gz`를 `.gitignore`에 넣었다. 그 전 archive는 git에 그대로 둔다.
+- history: archive를 이력에서 빼려고 `perf/c4-key-snapshot`의 4커밋을 main 위의 `perf/c4-bulk-removal`로 다시 쌓았다. archive 외 tree는 같다. SHA 대응은 `7f4df5c`→`b3cd570`, `4109bd3`→`b4f6b57`, `a56bae1`→`c578a2f`, `c53569e`→`b1ca5e3`이며, 아래 기록의 옛 SHA는 이 대응으로 읽는다.
+- workflow: main 하나만 오래 두고, 실험마다 짧은 브랜치를 만들어 채택 여부와 상관없이 main에 병합한다(merge commit). 병합과 release는 분리한다. 증거 archive는 release에 둔다. [CONTRIBUTING](../../CONTRIBUTING.md).
+- validation: 리뷰에서 base 457·concurrent 360·부속 169(skip 3)·e2e 78·`verify:concurrent`·tsc 통과, base 4,817/4,824B·concurrent 6,953/9,000B를 확인했다. `verify:release`는 로컬 pnpm 12.15.0 실행 파일 오류(ENOEXEC)로 실행하지 못했다.
+
+## 이전 — DC-28 select 프레임 대기 진단과 bulk removal v2 (2026-10-30)
+
+- done: 보존 trace 7세션으로 select 공식 전체가 runner 강제 GC 시간 mod 16.67ms가 정하는 BeginFrame 대기를 포함함을 확인했다. Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. 2026-10-19 bulk removal의 select 기각 근거가 이 대기였으므로, base·concurrent `findChildWithRemoveElement`에 정체성 비교 방식으로 다시 옮겨 측정했다. [select 대기](./SELECT_VSYNC_PHASE.md), [bulk removal v2](./BULK_REMOVAL_V2_RESULTS.md), [집계](./bulk-removal-v2-results.json), [도구](../../experiments/bulk-removal-v2/README.md).
+- decision: **채택 권장(기본 경로, 새 API 없음).** 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS −10.40%이고 교차 진단 −4.98%(29/40)다. C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base 4,817B·concurrent 6,953B다. 외부 노드 삭제 버그를 고친다.
+- validation: 공유 6검사(HEAD 2 실패)·`test:dual` 1,166/skip 3·e2e 78·`verify:concurrent`를 통과했다. Chrome 삭제 기록은 행 앱 1,000→1이다. CPU 1,160·메모리 120 양순서에서 실패/warnings 0이고, trace 재계산이 공식 값과 일치했다. 교차 진단의 페이지 재사용 두 번은 서로 어긋나 보고에서 뺐다.
+- preservation: 새 archive/manifest(1,443 entries/54,681,015B, SHA-256 `bc3c52cf00d10cb2a394a78bae874cd4b2fc31282a5ca93692a6424e6d795a9c`)에 staging·도구·patch·테스트를 보존했다. select 분석은 [JSON](./select-vsync-phase.json)이다.
+- next/limits: 일반 element 행 전체 삭제의 약 +1% 가능 비용은 확정하지 않았다. 공식 A 앱의 R3 결과는 바뀌지 않는다. DC-25는 select 손해가 약해졌지만 재진행하지 않았다. portal BUG-3·concurrent 앱 timing은 별도다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- commit: 측정 기준 HEAD `a56bae1`. 사용자 요청으로 DC-28 코드·도구·문서·증거를 이 변경을 포함하는 커밋에 보존한다. 최종 SHA는 `git log -1 --format=%H`로 확인하며 push하지 않는다. main 병합/release는 별도다.
+
+## 이전 — DC-27 수동 정적/동적 정보 검증·미채택 (2026-10-30)
+
+- done: `4109bd3`에서 별도 blueprint/base overlay를 구현했다. 일반 h/목록 map/cache를 유지하며 계약/작업량27·기존 core26파일/186검사·분리 strict types·Chrome14·3앱 keyed/9동작/font·앱별3context retention과 새 CPU870·메모리90 양순서를 통과했다. [결과](./STATIC_DYNAMIC_RESULTS.md), [집계](./static-dynamic-results.json), [도구](../../experiments/static-dynamic/README.md).
+- decision: **이번 수동 blueprint 구현 미채택, 자동 compiler 제품 구현 보류**. candidate/stock 가중 전체−0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. 같은 overlay의 정보 활용 전체−1.64%, control/stock JS+3.87%와 구분했다. 과거 C4/peer/Vue와 합산하지 않는다.
+- validation: 독립288분포/288비율/27가중·양순서/표본·root23+추가9/stage121·browser/실제 번들/runner185/설치343 해시 통과. 최종 공식 실패/재시도/warnings0이다. V1은 동일 객체의 추가 metadata 조회 때문에 부분 수집 후 보완했고, V2는 기존 core를 유지하며 같은 객체의 block hook만 생략한다. WeakMap.get 계수1k/10k행2013/20013→13/13. V1 표본은 분리 보존하고 최종 점수에 섞지 않는다.
+- preservation: 최종 staging `/private/tmp/lithent-static-dynamic-20261030-v2`의 source/overlay/patch·raw/trace·V1 시도·준비 실패·도구를 새 archive/manifest 2,241entries/56,706,937B에 보존했다. 압축/member 전체 해시·실측 입력/도구·집계 JSON 대조·상대 링크/앵커332개·포맷/공백 검사 통과, G0~G4 완료다.
+- next/limits: 후속은 전용 생성/patch 코드의 별도 작은 설계/검증일 수 있으나 미검증이다. 현재 결과가 모든 compiler 최적화 불가능성을 뜻하지 않는다. 자동 compiler·제품 API·SSR/HMR/concurrent·기존 portal BUG-3 해결은 별도다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- commit: 측정 기준 HEAD `4109bd3`. 사용자 요청으로 DC-27 코드/문서/증거를 이 변경을 포함하는 커밋에 보존하고 `origin/perf/c4-key-snapshot`에 push한다. 최종 SHA/원격 동기화는 `git log -1 --format=%H`와 `git status -sb`로 확인한다. default source/guard·기존 C4 archive는 유지한다.
+
+## 이전 — P1/P2 커밋과 C4 P3 검증·미채택 (2026-10-30)
+
+- commit: 사용자 요청으로 `perf/c4-key-snapshot` 생성, 기존 진단/P1/P2와 증거43파일을 `7f4df5c`에 커밋했다. 이어 진행한 P3 소스/문서/증거도 사용자 요청으로 이 변경을 포함하는 커밋에 보존한다. 최종 SHA는 `git log -1 --format=%H`로 확인하며 push하지 않는다. 아래 미커밋 표기는 각 이력 시점이다.
+- done: 같은 P2 계약·앱/코어에서 구조 keyOf/Map.get 중복을 scalar keys 배열로 대체했다. strict types·owner19/추가5회귀·작업량8조건·Chrome owner12/앱9·retention·3앱 공식 keyed/9동작/font와 새 P2/P3/Preact class CPU870·메모리90 양순서를 완료했다. [보고서](./C4_KEY_SNAPSHOT_RESULTS.md), [집계](./c4-key-snapshot-results.json), [도구](../../experiments/c4-key-snapshot/README.md).
+- decision: **P3 미채택, 후속 실험 기준은 P2 유지**. P3/P2 가중 전체+1.78%(main+1.62/reverse+1.24), JS+2.47%, 전체 삭제+15.01%다. 10k 메모리+0.03197MB(+0.112%), 앱 Brotli+3B이며 단일 peer1.10 범위도 양쪽7/9다. 원래 A 앱 개선율·과거 세션과 합산하지 않았다.
+- validation: 독립288분포/9가중/180peer 비율·가중·입력23/runner185/설치343+258 해시 통과. keyOf/Map.get은 실측이고 n key 쓰기는 소스에서 산정했다. Chrome 업데이트 전 검증/표본 전 guard 실패와 framework pin 수정 전 준비도 분리 보존한다. 최종 staging은 `/private/tmp/lithent-c4-key-snapshot-20261030-v2`, 현재 Chrome156.0.8078.74의 새 수집만 포함하며 공식 실패/재시도/warnings0이다.
+- preservation: 새 archive/manifest 1,667entries/41,321,528B를 보존했고 압축/member 전체 해시·집계 JSON 대조·상대 링크/앵커325개·포맷/공백 검사를 통과했다. P1/P2 자료는 유지했다.
+- next/limits: F0~F4 완료. 같은 조회 미세 조정은 반복하지 않으며 더 큰 가설은 구조 변경 정보/전체 순회 축소 또는 compiler 동적 필드 경로다. 예상 개선율은 미확정이며 기존 targeted/retained 재실험으로 대신하지 않는다. 기본 runtime/guard·기존 자료와 portal BUG-3·owner 교대·concurrent/SSR/HMR·최종 API·네 peer/Vue 검증은 남는다. [현재 정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+
+## 이전 — C4 P2 owner 확장·Preact class 재비교 (2026-10-29)
+
+- done: 목록당 하나의 View가 content/세션을 소유하도록 확장하고 parent renew·nested/root component·자체 renew·다중 DOM 출력·콜백 중 알림·edit·fault/remount·멱등 dispose를 검증했다. 기본 runtime/public exports는 바꾸지 않았다. [보고서](./C4_OWNER_RESULTS.md), [집계](./c4-owner-results.json), [도구](../../experiments/c4-owner/README.md).
+- result: 새 B/C/Preact class CPU870·메모리90 양순서에서 C4/B 가중 전체 −3.44%, C4/P +1.29%. 한 peer1.10 이내7/9이며 선택1.233·교환1.142는 미달. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B다. P1 세션과 합산하지 않았다.
+- diagnostics: 기존 선택150trace에서 C4 JS0.8505/P1.291ms와 선정 이벤트 미포함 구간2.259/0.677ms를 관찰했다. 원인을 scheduler/GC/VDOM으로 귀속하지 않는다. class="undefined"→빈 문자열 단독 pilot100표본은 전체 변화 방향이 갈려 미채택이다. [별도 진단](./c4-owner-selection-diagnostics.json).
+- validation/limits: strict types, JSDOM19(기존 portal 한계 관찰1 포함), Chrome owner12+앱9, 3앱 공식 keyed/9동작/font, B/C각3context retention 통과. 독립288분포/9 C/B가중/180 peer비율·가중 + pilot18분포 감사. 기존 중첩 portal 삭제 BUG-3·owner handover/clone·concurrent/SSR/HMR·최종 공개 API는 남는다. 다중 root 교체 오류의 owner remount도 별도 확인했다.
+- next: key snapshot으로 구조 검증 중복 작업을 줄이는 한정 가설을 검토할 수 있다. 증명/쓰기/메모리 비용은 미검증이다. 기본 채택·네 peer/Vue 목표 달성은 아니다. 현재 인계 정본은 [IMPLEMENT](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- commit: 기준 HEAD `4de76ef`, 이번 작업은 미커밋. 입력/번들/원자료/trace·준비 실패·도구는 별도 영구 archive/manifest(1,553entries/44,227,718B)로 보존하고 decoded hash를 모두 확인했다. sibling과 첫 C4 자료는 유지한다.
+
+## 이전 — C4 첫 목록 경계 실험 완료 (2026-10-29)
+
+- done: 사용자 후속 요청으로 plain keyed VDOM을 소유하는 격리 base C4를 구현했다. set은 전체 keyed 구조 갱신, invalidate(keys)는 알려진 slot만 갱신하며 행별 mount를 추가하지 않는다. [보고서](./C4_LIST_BOUNDARY_RESULTS.md), [결과 JSON](./c4-list-boundary-results.json), [도구](../../experiments/c4-list-boundary/README.md).
+- result: 새 B/C CPU580·메모리60 양순서에서 가중 전체 −4.72%(main −4.97/reverse −4.21), 선택 −40.90%, partial −9.86%. 교체 전체 +1.08%, 한 행 삭제 JS +12.56%도 공개한다. 10k 메모리 +0.261MB(+0.93%), 앱 전체 Brotli +727B다. 기존 peer/Vue와 같은 실행의 비교는 하지 않았다.
+- validation: strict source/core/B/C types, JSDOM22·실제 Chrome9·공식 B/C keyed/9동작/font·조건별3contexts의100회 churn/partial을 확인했다. 독립192분포/9가중·양순서/표본/앱hash 감사 통과. 최종 포맷 재빌드 JS/HTML도 측정 해시와 같다. 공식 실패/재시도/warnings0이며 준비 실패는 분리 보존했다.
+- next: 한정 원리 검증은 후속 설계에 투자할 근거가 있다. 알림 누락/소유권·owner clone/부모 재렌더·nested component·예외 복구·concurrent/SSR/HMR을 설계하고 제품 API와 네 peer 재비교로 이어갈 수 있다. 현재 기본 채택은 하지 않았다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- evidence/commit: 영구 archive/manifest에 입력·번들·raw/trace·실패·도구를 보존했다. 기준 HEAD `4de76ef`, 이번 작업은 미커밋. default runtime/guard·sibling·기존 증거는 유지했다.
+
+## 이전 — 남은 격차 원인 분석 (2026-10-29)
+
+- done: [진단 보고서](./RENDER_GAP_DIAGNOSIS.md), [원자료 재계산/소스/반례](./render-gap-diagnosis.json), [도구](../../experiments/render-gap-diagnosis/analyze.mjs)를 보존했다. DC-25 baseline/Preact class 가중 전체 1.02172배, 선택 1.371배/JS 2.23배다. Vue의 최신 동시 측정은 없다.
+- found: h 생성 시 부모 대입만 빼면 최종 DOM은 같아도 render 전/부모 mountReady의 getParent 관찰이 달라진다. 무조건 제거는 후보로 진행하지 않는다. 일반 context가 실패한다는 결론은 아니다.
+- next: 기시도 후보를 재실행하기보다 기존 C4의 변경 정보 계약 설계를 우선 제안한다. compiler가 동적 필드를 전달하는 경로는 별도 후보다. 공개 API/구현 선택은 TBD이며 코어 최적화는 미착수다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- limits: 새 CPU/메모리/production profile 없음. 기존 runtime·guard·앱·archive를 유지한다. 원인별 시간 기여율과 Vue의 현재 배수는 미확정이다.
+- commit: 분석 기준 `4de76ef`, 이번 진단/문서는 미커밋이다.
+
+## 이전 — 컴포넌트 비용·`h` 경량화 실험 기록 (2026-10-28)
 
 - done: 행 컴포넌트 앱(B/C)의 비용, 래퍼 재사용, 가벼운 컴포넌트, `h` 후보 V1~V4를 공식 러너로 측정하고 [결과](./COMPONENT_COST_RESULTS.md)와 [원자료·패치](./component-cost-evidence.tar.gz)를 남겼다.
 - decision: **모두 미채택**. 가중 전체 변화는 모두 세션 흔들림(약 ±2%) 안이었다. 이득이 가장 큰 V1은 4세션 pooled −0.6%이며 guard를 4B 넘는다. 한도 안의 V2~V4는 이득이 없었다. runtime·concurrent·guard 4,824B·실제 4,819B와 PR #2136의 A 앱을 유지한다.
