@@ -21,13 +21,12 @@ How branches, releases and benchmark evidence are handled in this repository.
 Merging and releasing are separate steps. `main` holds only adopted runtime
 changes, so a release can be cut from `main` at any time.
 
-1. Check: `pnpm test:dual`, `pnpm test:e2e`, `pnpm verify:concurrent`,
-   `pnpm verify:release` and `pnpm size`.
-2. Bump the version in `package.json` (and `lithentConcurrent/package.json` when
-   the concurrent core changed), and add an entry to `CHANGELOG.md`. Commit it as
-   `chore: version up x.y.z`.
-3. Publish, then tag `lithent@x.y.z` (and `lithent-concurrent@x.y.z`) and create
-   the GitHub releases. Pushing a `lithent@*` tag redeploys the docs site.
+Follow [RELEASING.md](./RELEASING.md), updated for each release: bump
+`package.json` (and `lithentConcurrent/package.json` when the concurrent core
+changed), add a `CHANGELOG.md` entry, build and verify, commit and push to
+`main`, publish to npm, then tag `lithent@x.y.z` (and `lithent-concurrent@x.y.z`)
+and create the GitHub releases. Pushing a `lithent@*` tag redeploys the docs
+site.
 
 ## Benchmark evidence
 

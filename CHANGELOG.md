@@ -1,5 +1,25 @@
 # Release notes
 
+## 2026-10-31
+
+### lithent 1.25.4
+
+- Clear a list of component or Fragment rows in one DOM operation when the
+  list is all of its parent element's content. Removing 1,000 component rows
+  now takes one DOM removal instead of 1,000; on a benchmark app with a
+  component per row, clearing 1,000 rows was 7.8% faster (script time 10.4%).
+  Lists of plain elements were already cleared this way and are unchanged.
+- Stop deleting a node that other code put in place of one of a list's
+  elements. When a whole list was removed, the renderer cleared its parent if
+  it had the same number of children as the list, without checking that they
+  were the same nodes. It now clears the parent only when its children are
+  exactly the list's nodes, and otherwise removes them one by one.
+- The base bundle is 4,817B Brotli (budget 4,824B).
+
+### lithent-concurrent 0.2.4
+
+- Include the list removal changes above.
+
 ## 2026-10-27
 
 ### lithent 1.25.3

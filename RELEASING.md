@@ -1,4 +1,4 @@
-# PR #99 릴리스 — lithent 1.25.2 / lithent-concurrent 0.2.2
+# PR #102 릴리스 — lithent 1.25.4 / lithent-concurrent 0.2.4
 
 저장소 루트의 `main`에서 실행한다. Node 버전은 root `package.json`의 Volta
 설정(24.22.1), pnpm 버전은 `packageManager`(12.15.0)를 따른다.
@@ -8,19 +8,28 @@ Volta의 pnpm을 쓴다면 기본 pnpm을 10.34.9 이상으로 두면 이 저장
 `packageManager`의 버전으로 자동 전환된다(`volta install pnpm@10.34.9`).
 `pnpm -v`가 12.15.0을 출력하는지 먼저 확인한다.
 
+기본 pnpm 10.22.0에서 자동 전환하면 12.15.0의 native binary 설치 script가 실행되지
+않아, `~/Library/pnpm/.tools/pnpm/12.15.0/bin/pnpm`이 자리표시 파일로 남고
+`ENOEXEC`로 실패한다. 이때는 그 설치의 script를 직접 실행한다.
+
+```sh
+node ~/Library/pnpm/.tools/pnpm/12.15.0/node_modules/pnpm/install.js
+pnpm -v
+```
+
 이번 npm 발행 대상은 아래 두 패키지다.
 
-| 순서 | 패키지               | 이전 → 배포 버전 | 내용                                                         |
-| ---- | -------------------- | ---------------- | ------------------------------------------------------------ |
-| 1    | `lithent`            | 1.25.1 → 1.25.2  | 재사용 노드·keyed 갱신·렌더 오류 복구 수정, 렌더링 비용 감소 |
-| 2    | `lithent-concurrent` | 0.2.1 → 0.2.2    | 공통 렌더링 수정, sync/low 큐 오류 복구와 idle 완료          |
+| 순서 | 패키지               | 이전 → 배포 버전 | 내용                                                       |
+| ---- | -------------------- | ---------------- | ---------------------------------------------------------- |
+| 1    | `lithent`            | 1.25.3 → 1.25.4  | component/Fragment 행 목록 한 번 삭제, 외부 노드 삭제 수정 |
+| 2    | `lithent-concurrent` | 0.2.3 → 0.2.4    | 같은 목록 삭제 변경                                        |
 
 `lithent/helper`, `lithent/devHelper`, JSX runtime, SSR, tag, ftags, element는
 root `lithent` tarball에 포함된다. `lithent-concurrent/helper`는 Concurrent
 tarball에 포함된다. private workspace 패키지는 별도로 발행하지 않는다.
 HMR/parser/template/Vite/MDX 플러그인과 `create-lithent`도 이번 발행 대상에 포함되지 않는다.
 
-Concurrent의 `lithent` peer 범위는 기존 `^1.25.0`이며, 이번 `1.25.2`를 허용한다.
+Concurrent의 `lithent` peer 범위는 기존 `^1.25.0`이며, 이번 `1.25.4`를 허용한다.
 
 ## 1. main·버전·릴리스 기록 확인
 
@@ -32,8 +41,8 @@ node -p "require('./package.json').version"
 node -p "require('./lithentConcurrent/package.json').version"
 ```
 
-manifest 버전은 이미 `1.25.2`와 `0.2.2`로 올라 있다. 위 출력이 두 버전과 일치하면
-다음 단계로 진행한다. `CHANGELOG.md`의 2026-10-16 절이 이번 릴리스 기록이다.
+manifest 버전은 이미 `1.25.4`와 `0.2.4`로 올라 있다. 위 출력이 두 버전과 일치하면
+다음 단계로 진행한다. `CHANGELOG.md`의 2026-10-31 절이 이번 릴리스 기록이다.
 
 ## 2. 설치·빌드·검증
 
@@ -66,7 +75,7 @@ examples와 문서 사이트도 준비한다. `test:dual`은 두 코어와 양�
 git diff --check
 git diff --stat
 git add package.json lithentConcurrent/package.json pnpm-lock.yaml CHANGELOG.md RELEASING.md
-git commit -m "chore(release): prepare lithent 1.25.2 and lithent-concurrent 0.2.2"
+git commit -m "chore(release): prepare lithent 1.25.4 and lithent-concurrent 0.2.4"
 git push origin main
 git status --short --branch
 ```
@@ -102,28 +111,35 @@ pnpm 11부터 `pnpm publish`는 npm CLI를 거치지 않는다. registry가 OTP�
 
 ```sh
 pnpm publish --access public --publish-branch main
-npm view lithent@1.25.2 version
+npm view lithent@1.25.4 version
 ```
 
-`1.25.2`가 확인되면 Concurrent를 발행한다.
+`1.25.4`가 확인되면 Concurrent를 발행한다.
 
 ```sh
 (cd lithentConcurrent && pnpm publish --access public --publish-branch main)
-npm view lithent-concurrent@0.2.2 version
+npm view lithent-concurrent@0.2.4 version
 ```
 
 한 패키지만 성공한 경우 성공한 버전을 다시 발행하지 않고, 남은 패키지부터 재개한다.
 두 버전의 발행을 확인한 뒤 다음 단계로 진행한다.
 
-## 6. 태그·문서 사이트
+## 6. 태그·GitHub 릴리스·문서 사이트
 
 두 npm 발행에 사용한 동일 커밋에 태그를 만들고 명시적으로 push한다.
 
 ```sh
-git tag lithent@1.25.2
-git tag lithent-concurrent@0.2.2
-git push origin lithent@1.25.2 lithent-concurrent@0.2.2
+git tag lithent@1.25.4
+git tag lithent-concurrent@0.2.4
+git push origin lithent@1.25.4 lithent-concurrent@0.2.4
 gh run list --workflow docs.yml --limit 5
+```
+
+태그마다 GitHub 릴리스를 만든다. `lithent@1.25.4`가 Latest가 된다.
+
+```sh
+gh release create lithent@1.25.4 --title lithent@1.25.4 --notes-file <노트 파일>
+gh release create lithent-concurrent@0.2.4 --title lithent-concurrent@0.2.4 --latest=false --notes-file <노트 파일>
 ```
 
 `.github/workflows/docs.yml`이 `lithent@*` 태그를 받아 전체 workspace를
@@ -139,14 +155,13 @@ gh workflow run docs.yml --ref main
 
 ## 기존 검증 근거와 현재 단계
 
-PR #99는 main의 `96aae56`으로 병합됐다. 런타임 수정 커밋 `0ccd126`에서는 전체 빌드,
-unit/satellite·SSR 테스트, `verify:concurrent`, `verify:release`, Chromium E2E 64개가 통과했다.
-자세한 기록은 [EDGE_FIX_PERFORMANCE](./docs/benchmark/EDGE_FIX_PERFORMANCE.md)에 있다.
+PR #102는 main의 `6d27832`로 병합됐다. 런타임 변경은 `findChildWithRemoveElement`
+(base·Concurrent) 하나이며, 병합 전 리뷰에서 unit/satellite 테스트, `verify:concurrent`,
+Chromium E2E 78개, 크기 guard와 추가 경계 사례 12개가 양쪽 코어에서 통과했다.
 
-이번 로컬 공식 벤치마크는 `592d320`과 `0ccd126`을 같은 앱으로 비교한 총 320개 표본이다.
-1차 9개 항목의 가중 전체 시간은 −3.4%, JavaScript는 −10.2%였다.
-10,000행 생성 재확인 합산은 전체 +0.6%, JS +1.5%로, 작은 JS 증가가 남았다.
-조건·원본·재현 방법은 [EDGE_OFFICIAL_RESULTS](./docs/benchmark/EDGE_OFFICIAL_RESULTS.md)에 있다.
+공식 벤치마크는 [BULK_REMOVAL_V2_RESULTS](./docs/benchmark/BULK_REMOVAL_V2_RESULTS.md)에 있다.
+js-framework-benchmark 앱(일반 element 행) 가중 전체는 −0.09%로 중립이고, 행마다
+component가 있는 앱의 1,000행 삭제는 −7.84%(JS −10.40%)였다.
 
-이 기록은 런타임 수정과 성능 측정의 근거다. 위 2번은 `1.25.2`/`0.2.2` manifest로
+이 기록은 런타임 변경과 성능 측정의 근거다. 위 2번은 `1.25.4`/`0.2.4` manifest로
 발행할 결과를 다시 빌드·검증하는 단계이며, npm 발행 완료 기록과 구분한다.
