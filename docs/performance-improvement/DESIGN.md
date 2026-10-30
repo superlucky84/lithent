@@ -1,8 +1,21 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-30. 상태: **새 브랜치 `perf/c4-key-snapshot`에 P1/P2를 `7f4df5c`로 커밋했다. 이어 P3 key snapshot을 검증·측정했으나 미채택이다. 새 P2/P3/Preact class CPU870·메모리90 양순서에서 P3/P2 가중 전체 +1.78%(main +1.62/reverse +1.24), JS +2.47%, 전체 삭제 +15.01%다. 10k 메모리+0.03197MB, 앱 Brotli+3B이며 단일 peer1.10 범위도 두 후보 모두7/9다. 기본 runtime/guard·공개 API와 portal BUG-3·concurrent/SSR/HMR 한계는 유지한다.**
+- 기준일: 2026-10-30. 상태: **DC-27 수동 정적/동적 blueprint 검증을 완료하고 미채택으로 판단했다. stock/control/candidate CPU870·메모리90 양순서에서 candidate/stock 가중 전체 −0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신은 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. V1은 보완 전 부분 수집으로 분리 보존하며 최종 V2에 합산하지 않는다. 기본 runtime/guard·공개 API와 이전 C4 증거는 유지한다. 자동 compiler/제품 지원은 별도다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
+
+## DC-27 — 수동 blueprint와 동적 slot
+
+R101~R106 / G0~G4 / M-24. 기존 template parser는 일반 h 호출을 생성하고 공백/텍스트를 정리한다. 이번에는 자동 AST 변환을 추가하기 전에, 명시적 정보가 실제 작업을 줄이는지 별도로 평가한다.
+
+- [x] DC-27-1 정보/소유권: readonly HTML schema의 static attrs/children와 `{slot:index}`를 한 번 검증·복사한다. 호출은 `(values,key)`이며 값 tuple을 snapshot한다. 최초 materialize는 기존 `createWDom` layout으로 독립 tree를 만들고 정적 props/계획만 공유한다. 이 생성 방식도 새 opt-in 경로의 일부이며 비교 생략만의 단독 효과로 표시하지 않는다.
+- [x] DC-27-2 경로: core 사본의 diff 진입·DOM 생성·typeUpdate·clone에 한정 hook을 둔다. 같은 blueprint/key의 fresh description은 기존 자식 tree/bindings를 소유권 이전하고 직접 자식의 parent를 현재 root로 연결한다. 바뀐 slot을 콘텐츠 순서로 기존 updateProps/updateText에 commit한다. class/text/events의 WDom 상태도 반영하며 일반 keyed reconciliation/목록 map/cache는 유지한다. default source는 변경하지 않는다.
+- [x] DC-27-3 fallback: 첫 배치/다른 blueprint/key/plain 전환은 full materialize 뒤 기존 diff를 쓴다. clone은 현재 description의 snapshot에서 독립 tree를 새로 만들어 pending/retired 자식 공유를 피한다. 동일 description의 같은 위치 캐시는 기존 N 경로를 유지한다. 변하지 않은 slot도 비교 비용은 계산에 포함한다.
+- [x] DC-27-4 제한/오류: schema는 builtin HTML 고정 구조와 scalar text/attrs/direct event만 허용한다. 내부 component/hook/ref/portal/input/SVG/custom element·동적 arity·getters는 이 경로로 선언하지 않는다. 순수 tuple·불투명 description 계약은 일반 h 관찰의 변경 허가가 아니다. commit 실패는 fault로 표시해 unmount/remount를 요구하며 transactional DOM rollback은 미보장이다. 외부 부모/형제는 일반 core 동작을 따른다.
+- [x] DC-27-5 대조: stock=A 앱+원래 core, control=A 앱+overlay, candidate=동일 캐시/목록 앱+수동 blueprint+overlay다. 값 배열/metadata/slot 검사와 static plan/생성 할당도 candidate 비용에 포함한다. 세 앱 모두 공식9동작과 key identity를 확인한다. control/stock은 기본 경로 hook 비용, candidate/control은 같은 overlay의 정보 사용 효과, candidate/stock은 이번 opt-in 앱의 총 차이다.
+      첫 V1 수집 중, 변경 없는 cached row에도 추가 WeakMap 조회가 반복됨을 확인했다. 일반 core의 조기 반환 계약을 바꾸지 않고 block hook만 `new !== original`일 때 호출하는 V2로 보완한다. 동일 객체는 기존 diff/generalize/metadata 경로를 그대로 실행하며 block 검사만 생략한다. V1 staging/부분 표본을 보존하고 최종 V2의 계약/타입/core/Chrome/공식 입력을 새로 검증한다. V1 timing은 V2 점수에 섞지 않는다.
+
+- [x] DC-27-6 미채택: 최종 V2 CPU870/메모리90의 net 전체−0.04%(main+2.38/reverse−2.07), JS+2.98%, 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. 부분 갱신 전체−12.33%/JS−20.09%와 같은 overlay 정보 경로−1.64%는 관찰했으나 global hook·생성/metadata 비용을 포함한 안정적인 전체 이득이 없다. 수동 경로와 자동 compiler 전체 구현은 보류하며 이후에는 전용 생성/patch 코드의 가능성을 별도로 설계할 수 있다. 이 결과를 모든 compiler의 불가능성·Vue 우위·일반 JSX 무수정 이득으로 해석하지 않는다. [결과](../benchmark/STATIC_DYNAMIC_RESULTS.md).
 
 ## DC-26 — 남은 격차 진단과 후속 분기
 

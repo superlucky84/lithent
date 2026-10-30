@@ -2,10 +2,23 @@
 
 > **DC-25 첫 후보는 검증 후 미채택으로 종료했다.** 기본 이벤트 계약은 DC-23/R62~R66을 유지한다. DC-22의 proxy 적용/검증/측정은 당시 이력이다.
 
-- 기준일: 2026-10-30. 상태: **새 브랜치 `perf/c4-key-snapshot`에 P1/P2를 `7f4df5c`로 커밋했다. 이어 P3 key snapshot을 검증·측정했으나 미채택이다. 새 P2/P3/Preact class CPU870·메모리90 양순서에서 P3/P2 가중 전체 +1.78%(main +1.62/reverse +1.24), JS +2.47%, 전체 삭제 +15.01%다. 10k 메모리+0.03197MB, 앱 Brotli+3B이며 단일 peer1.10 범위도 두 후보 모두7/9다. 기본 runtime/guard·공개 API와 portal BUG-3·concurrent/SSR/HMR 한계는 유지한다.**
+- 기준일: 2026-10-30. 상태: **DC-27 수동 정적/동적 blueprint 검증을 완료하고 미채택으로 판단했다. stock/control/candidate CPU870·메모리90 양순서에서 candidate/stock 가중 전체 −0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신은 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. V1은 보완 전 부분 수집으로 분리 보존하며 최종 V2에 합산하지 않는다. 기본 runtime/guard·공개 API와 이전 C4 증거는 유지한다. 자동 compiler/제품 지원은 별도다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
+
+## DC-27 — 정적 구조와 동적 필드 정보의 원리 검증
+
+2026-10-30 사용자 “1을 진행” 요청. 위치는 기존 네 정본이며 구현은 `experiments/static-dynamic/`, 결과는 `docs/benchmark/`다. 기준 HEAD `4109bd3`의 base와 원래 A 앱을 사용한다. C4의 알려진 변경 행 알림·행별 component·Map 미세 조정과 결합하지 않는다. 데이터 마이그레이션/배포는 없다.
+
+- R101. 수동 `defineBlock(schema)`가 고정 HTML 구조·정적 attrs와 동적 scalar text/attr/event slot을 선언한다. 같은 blueprint의 갱신에서는 정적 WDom 생성/비교를 생략한다. 최초 생성은 인스턴스별 WDom/DOM을 소유하며 static props/계획만 공유한다. VDOM/DOM 인스턴스를 행 사이에 공유하지 않는다.
+- R102. 기본 h/getter/관찰 계약을 변경하지 않는다. block은 순수 값 배열을 받는 opt-in 불투명 description이며 materialize 전 내부 WDom 관찰·외부 subtree mutation을 지원하지 않는다. 첫 범위는 일반 HTML의 고정 arity/text·class/title/aria/data 등 scalar attrs와 직접 event다. per-node hook/VDOM callback·component/portal/Fragment·spread/getter/ref/style/input/custom element/SVG/동적 구조는 blueprint에서 제외하고 기존 일반 h 경로를 사용한다. 자동 컴파일/SSR/HMR/concurrent/public export는 비범위다.
+- R103. blueprint/key 불일치·plain과의 전환은 완전한 일반 WDom을 materialize해 정상 diff/render로 처리한다. 동일 위치 캐시 재사용·keyed 이동/삽입/삭제·같은 description의 중복 배치/clone·부모 renew·제거/재마운트에서 인스턴스와 최신 값이 어긋나지 않아야 한다. dynamic 값의 평가/복사·비교와 binding/metadata/생성 비용을 측정에 포함한다.
+- R104. DOM 쓰기는 기존 base updater를 재사용한다. class undefined/빈 문자열 등 기존 관찰을 임의 정규화하지 않는다. static children의 parent 연결과 patch 후 WDom 상태를 유지한다. 오류는 일반 rollback을 약속하지 않으며 부분 commit 오류 후 unmount/remount 계약을 검증한다. metadata는 WeakMap으로 소유하고 별도 전역 행 registry를 두지 않는다.
+- R105. 일반 목록 fixture에서 초기 생성·text/attr/event 교체·불변 갱신·fallback·수명/오류를 검증하고 정적 노드 생성/방문과 slot 비교/실제 DOM 쓰기를 별도 계수한다. 진단 build와 공식 build를 분리한다. strict types·일반 core 회귀·실제 Chrome keyed/9동작/font·조건별 retention을 통과한 입력만 측정한다.
+- R106. stock 원래 A / 같은 앱의 overlay control / blueprint 행을 쓰는 overlay candidate를 같은 source/toolchain에서 새로 빌드한다. 세 앱 CPU870·공식 메모리90을 양순서 직렬 수집해 global hook 비용과 opt-in 정보의 이득을 구분한다. source/browser/runner/dependency/실제 bundle과 raw/trace를 고정·보존한다. peer/Vue는 이번 비교에 없으며 과거 개선율을 합산하지 않는다. 실제 전체/JS·메모리/크기와 회귀를 본 뒤 다음 compiler 설계로 진행할 근거가 있는지 판단한다.
+
+DC-27 결과: [정적/동적 정보 실험](../benchmark/STATIC_DYNAMIC_RESULTS.md). 일반 fixture와 실제 앱의 부분 갱신에서 생성/비교 감소를 확인했지만 전체 이득이 불안정하고 JS·메모리/크기가 늘어 이번 수동 blueprint 경로를 미채택했다. compiler 전반의 불가능성이나 C4와의 누적 개선으로 일반화하지 않는다.
 
 ## DC-26 — 남은 성능 격차의 원인 분석
 

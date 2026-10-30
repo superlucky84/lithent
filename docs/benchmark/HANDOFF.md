@@ -1,6 +1,15 @@
 # summary
 
-## 최신 — P1/P2 커밋과 C4 P3 검증·미채택 (2026-10-30)
+## 최신 — DC-27 수동 정적/동적 정보 검증·미채택 (2026-10-30)
+
+- done: `4109bd3`에서 별도 blueprint/base overlay를 구현했다. 일반 h/목록 map/cache를 유지하며 계약/작업량27·기존 core26파일/186검사·분리 strict types·Chrome14·3앱 keyed/9동작/font·앱별3context retention과 새 CPU870·메모리90 양순서를 통과했다. [결과](./STATIC_DYNAMIC_RESULTS.md), [집계](./static-dynamic-results.json), [도구](../../experiments/static-dynamic/README.md).
+- decision: **이번 수동 blueprint 구현 미채택, 자동 compiler 제품 구현 보류**. candidate/stock 가중 전체−0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. 같은 overlay의 정보 활용 전체−1.64%, control/stock JS+3.87%와 구분했다. 과거 C4/peer/Vue와 합산하지 않는다.
+- validation: 독립288분포/288비율/27가중·양순서/표본·root23+추가9/stage121·browser/실제 번들/runner185/설치343 해시 통과. 최종 공식 실패/재시도/warnings0이다. V1은 동일 객체의 추가 metadata 조회 때문에 부분 수집 후 보완했고, V2는 기존 core를 유지하며 같은 객체의 block hook만 생략한다. WeakMap.get 계수1k/10k행2013/20013→13/13. V1 표본은 분리 보존하고 최종 점수에 섞지 않는다.
+- preservation: 최종 staging `/private/tmp/lithent-static-dynamic-20261030-v2`의 source/overlay/patch·raw/trace·V1 시도·준비 실패·도구를 새 archive/manifest 2,241entries/56,706,937B에 보존했다. 압축/member 전체 해시·실측 입력/도구·집계 JSON 대조·상대 링크/앵커332개·포맷/공백 검사 통과, G0~G4 완료다.
+- next/limits: 후속은 전용 생성/patch 코드의 별도 작은 설계/검증일 수 있으나 미검증이다. 현재 결과가 모든 compiler 최적화 불가능성을 뜻하지 않는다. 자동 compiler·제품 API·SSR/HMR/concurrent·기존 portal BUG-3 해결은 별도다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- commit: 측정 기준 HEAD `4109bd3`. 사용자 요청으로 DC-27 코드/문서/증거를 이 변경을 포함하는 커밋에 보존하고 `origin/perf/c4-key-snapshot`에 push한다. 최종 SHA/원격 동기화는 `git log -1 --format=%H`와 `git status -sb`로 확인한다. default source/guard·기존 C4 archive는 유지한다.
+
+## 이전 — P1/P2 커밋과 C4 P3 검증·미채택 (2026-10-30)
 
 - commit: 사용자 요청으로 `perf/c4-key-snapshot` 생성, 기존 진단/P1/P2와 증거43파일을 `7f4df5c`에 커밋했다. 이어 진행한 P3 소스/문서/증거도 사용자 요청으로 이 변경을 포함하는 커밋에 보존한다. 최종 SHA는 `git log -1 --format=%H`로 확인하며 push하지 않는다. 아래 미커밋 표기는 각 이력 시점이다.
 - done: 같은 P2 계약·앱/코어에서 구조 keyOf/Map.get 중복을 scalar keys 배열로 대체했다. strict types·owner19/추가5회귀·작업량8조건·Chrome owner12/앱9·retention·3앱 공식 keyed/9동작/font와 새 P2/P3/Preact class CPU870·메모리90 양순서를 완료했다. [보고서](./C4_KEY_SNAPSHOT_RESULTS.md), [집계](./c4-key-snapshot-results.json), [도구](../../experiments/c4-key-snapshot/README.md).

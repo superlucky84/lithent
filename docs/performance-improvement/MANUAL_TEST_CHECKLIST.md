@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-30. 상태: **새 브랜치 `perf/c4-key-snapshot`에 P1/P2를 `7f4df5c`로 커밋했다. 이어 P3 key snapshot을 검증·측정했으나 미채택이다. 새 P2/P3/Preact class CPU870·메모리90 양순서에서 P3/P2 가중 전체 +1.78%(main +1.62/reverse +1.24), JS +2.47%, 전체 삭제 +15.01%다. 10k 메모리+0.03197MB, 앱 Brotli+3B이며 단일 peer1.10 범위도 두 후보 모두7/9다. 기본 runtime/guard·공개 API와 portal BUG-3·concurrent/SSR/HMR 한계는 유지한다.**
+- 기준일: 2026-10-30. 상태: **DC-27 수동 정적/동적 blueprint 검증을 완료하고 미채택으로 판단했다. stock/control/candidate CPU870·메모리90 양순서에서 candidate/stock 가중 전체 −0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신은 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. V1은 보완 전 부분 수집으로 분리 보존하며 최종 V2에 합산하지 않는다. 기본 runtime/guard·공개 API와 이전 C4 증거는 유지한다. 자동 compiler/제품 지원은 별도다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
@@ -25,6 +25,16 @@
 - [x] M-22-4: strict types/관련 회귀·Chrome·retention과 새 B/C/P CPU870·메모리90 양순서/해시/분포/비율을 검산한다. 한 peer만 비교했음을 밝히며 concurrent/SSR/HMR은 미완료로 남긴다.
 
 - [x] M-22-5(R95): class 값 한 축의 실제 DOM 차이와 양쪽 keyed/9동작/font를 확인하고 선택100표본/18분포를 별도로 검산했다. 양차수 +14.20%/−13.99%로 방향이 갈려 미채택이며 전체870/90에 합산하지 않는다.
+
+## M-24. 정적/동적 blueprint — R101~R106
+
+- [x] M-24-1: stock/control/candidate 앱의 목록/cache·event/class/text 출력과 9동작/keyed/font가 같아야 한다. initial h/일반 getter 계약과 block의 불투명·순수 opt-in 제한을 구분한다.
+- [x] M-24-2: 생성/정적 노드 재생성·diff 방문·slot 비교/실제 DOM writes를 계수한다. 생성/metadata/복사 비용도 포함하며 global hook 비용을 control/stock으로 비교한다.
+- [x] M-24-3: text/attrs/events/undefined/빈 값·keyed swap/삽입/삭제·clone/같은 description 중복·retired/pending·plain/blueprint 전환·부모/형제·제거/재마운트·오류/retention을 검사한다. 지원하지 않는 schema는 조용히 잘못 그리지 않아야 한다.
+- [x] M-24-4: strict types·일반 core 회귀·실제 Chrome 계약 뒤 3앱 CPU870/공식 메모리90 양순서를 수집하고 수치/해시를 독립 검산한다. 과거 C4/peer/Vue와 합산하지 않는다.
+- [x] M-24-5: 기존 runtime/guard/exports·기존 archive가 유지되고 실제 후보/도구/raw/실패 보존과 compiler 투자 판단이 정본과 일치하는지 확인한다.
+
+DC-27 판단: [결과](../benchmark/STATIC_DYNAMIC_RESULTS.md). 부분 갱신의 실제 작업/JS는 줄었지만 전체−0.04%의 방향이 갈리고 JS+2.98%·10k 메모리+5.11%·앱 Brotli+1,472B여서 수동 경로 미채택이다. V1 부분 표본과 최종 V2를 분리하며 기본 runtime/guard·기존 제한은 유지한다.
 
 ## M-23. C4 P3 snapshot — R96~R100
 
