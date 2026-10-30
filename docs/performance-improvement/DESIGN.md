@@ -1,6 +1,6 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-29. 상태: **C4 P2 owner/중첩 확장과 새 3앱 비교 완료. CPU870/메모리90 양순서에서 C4는 기존 앱 대비 가중 전체 −3.44%, Preact class 대비 +1.29%다. 해당 한 peer의1.10 범위7/9이며 선택/교환은 미달이다. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B. 추가 class pilot100표본은 방향이 갈려 미채택이다. 기본 runtime/guard·공개 API는 유지하며 portal BUG-3·concurrent/SSR/HMR은 남아 있다.**
+- 기준일: 2026-10-30. 상태: **새 브랜치 `perf/c4-key-snapshot`에 P1/P2를 `7f4df5c`로 커밋했다. 이어 P3 key snapshot을 검증·측정했으나 미채택이다. 새 P2/P3/Preact class CPU870·메모리90 양순서에서 P3/P2 가중 전체 +1.78%(main +1.62/reverse +1.24), JS +2.47%, 전체 삭제 +15.01%다. 10k 메모리+0.03197MB, 앱 Brotli+3B이며 단일 peer1.10 범위도 두 후보 모두7/9다. 기본 runtime/guard·공개 API와 portal BUG-3·concurrent/SSR/HMR 한계는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
 
@@ -44,9 +44,19 @@ P2 진단에서 기존 base의 중첩 portal 삭제 한계를 확인했다. 일�
 
 P2 공식 수집 후 class 표현의 한 변수 진단(R95)을 추가한다. 같은 P2 소스에서 tr class의 비선택 값을 undefined에서 빈 문자열로만 바꾸며 current/empty를 새 production 빌드와 별도 staging으로 비교한다. DOM에서 class 문자열을 먼저 확인하고 공식9동작/keyed/font 뒤 선택25×2앱×2차수=100표본을 수집한다. 기본 앱과 P2의870/90표본을 덮어쓰거나 합산하지 않는다. 초기1k행 class 속성 수/생성 비용이 달라질 수 있어 선택 pilot만으로 채택하지 않는다.
 
-P2 최종 판단: [보고서](../benchmark/C4_OWNER_RESULTS.md). 기존 앱 대비 전체 가중은 main−1.17%/reverse−4.82%/pooled−3.44%이며 차수별 크기가 다르다. Preact class 단독 대비7/9이고 선택1.233배·교환1.142배는 남는다. 기능 확장한 후보는 보존하되 기본 채택하지 않는다. 다음 C4 후보는 구조 검증의 추가 n회 Map.get/중복 keyOf를 key snapshot 증명으로 대체하는 한정 가설이다. 이득과 snapshot 쓰기/메모리 비용은 미검증이며 기존 Map/LIS 실험을 자동 반복하지 않는다. 선택의 PrePaint 사이 미포함 구간은 원인 미귀속으로 남긴다.
+P2 최종 판단: [보고서](../benchmark/C4_OWNER_RESULTS.md). 기존 앱 대비 전체 가중은 main−1.17%/reverse−4.82%/pooled−3.44%이며 차수별 크기가 다르다. Preact class 단독 대비7/9이고 선택1.233배·교환1.142배는 남는다. 기능 확장한 후보는 보존하되 기본 채택하지 않는다. 다음 C4 후보는 구조 검증의 추가 n회 Map.get/중복 keyOf를 key snapshot 증명으로 대체하는 한정 가설이다. P2 완료 당시 이득과 snapshot 쓰기/메모리 비용은 미검증이었다. 후속 P3의 실제 검증/미채택 판단은 아래 절을 따른다. 기존 Map/LIS 실험을 자동 반복하지 않으며 선택의 PrePaint 사이 미포함 구간은 원인 미귀속으로 남긴다.
 
 추가 class pilot은 +14.20%/−13.99%로 전체 방향이 갈려 미채택이다. 다중 DOM root 교체 실패 진단은 owner 재마운트로 복구됐으나 일반 rollback 보장은 아니다. 제품 공개 전 BUG-3, owner handover/clone·동기 edit/외부 알림·concurrent/SSR/HMR 계약을 확장해야 한다.
+
+### DC-26-C4-P3 — key snapshot
+
+R96~R100 / F0~F4 / M-23. 기준 브랜치 `perf/c4-key-snapshot`, snapshot commit `7f4df5c`다.
+
+- [x] P3-1: set의 기존 key 읽기/중복 검사에서 keys[index]를 저장한다. items/keys/indexes를 검증 완료 뒤 함께 게시하고 version을 올린다. 구조 flush와 최초 owner view는 그 keys를 describe의 예상 key로 사용한다. describe의 현재 keyOf/출력 key 검사는 유지한다.
+- [x] P3-2: P2의 구조 map 콜백 안 중복 keyOf와 Map.get(index 일치)만 제거한다. 부분 갱신 Map.get, core의 전체 keyed reconciliation과 순서/콜백·fault·disposed 정책은 유지한다. 정렬/구조 방문은 그대로이며 O(n)을 O(1)로 만들었다고 설명하지 않는다.
+- [x] P3-3: flush는 items/keys/indexes를 같은 세대에서 캡처한다. set 실패는 기존 데이터를 게시하지 않고, lifecycle set은 다음 배치용 새 snapshot을 만든다. dispose에서 keys를 해제한다. key mutation/중복/교차 배치·throw/retry·remount 회귀를 확인한다.
+- [x] P3-4: 같은 P2 앱을 baseline/P3 두 번 빌드하고 API·선택 class 표현은 바꾸지 않는다. source core/runner/browser와 새 peer build를 고정해 공식870/90을 양순서 수집한다. 순수 keyOf 계약 하의 읽기 축소이며 기본 h/diff/render에는 적용하지 않는다.
+- [x] P3-5 미채택: 새870/90의 가중 전체 +1.78%, JS +2.47%, 전체 삭제 +15.01%이며 10k 메모리+0.03197MB·Brotli+3B다. keyOf/Map.get 실측 감소와 소스상 n snapshot 쓰기를 구분하며, 조회 감소가 추가 저장을 포함한 실제 이득으로 이어지지 않아 P2 실험 기준을 유지한다. 단일 peer1.10 범위도 양쪽7/9다. 원래 A 앱의 누적 개선이나 네 peer/Vue 검증은 아니다. [결과](../benchmark/C4_KEY_SNAPSHOT_RESULTS.md).
 
 ## DC-25 — 같은 순서 keyed 빠른 경로
 

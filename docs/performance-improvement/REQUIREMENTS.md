@@ -2,7 +2,7 @@
 
 > **DC-25 첫 후보는 검증 후 미채택으로 종료했다.** 기본 이벤트 계약은 DC-23/R62~R66을 유지한다. DC-22의 proxy 적용/검증/측정은 당시 이력이다.
 
-- 기준일: 2026-10-29. 상태: **C4 P2 owner/중첩 확장과 새 3앱 비교 완료. CPU870/메모리90 양순서에서 C4는 기존 앱 대비 가중 전체 −3.44%, Preact class 대비 +1.29%다. 해당 한 peer의1.10 범위7/9이며 선택/교환은 미달이다. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B. 추가 class pilot100표본은 방향이 갈려 미채택이다. 기본 runtime/guard·공개 API는 유지하며 portal BUG-3·concurrent/SSR/HMR은 남아 있다.**
+- 기준일: 2026-10-30. 상태: **새 브랜치 `perf/c4-key-snapshot`에 P1/P2를 `7f4df5c`로 커밋했다. 이어 P3 key snapshot을 검증·측정했으나 미채택이다. 새 P2/P3/Preact class CPU870·메모리90 양순서에서 P3/P2 가중 전체 +1.78%(main +1.62/reverse +1.24), JS +2.47%, 전체 삭제 +15.01%다. 10k 메모리+0.03197MB, 앱 Brotli+3B이며 단일 peer1.10 범위도 두 후보 모두7/9다. 기본 runtime/guard·공개 API와 portal BUG-3·concurrent/SSR/HMR 한계는 유지한다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
@@ -39,6 +39,18 @@
 - R95. P2 공식 수집 이후, 앱의 선택 해제 class 값 undefined→빈 문자열 한 축을 별도 selection pilot으로 확인한다. 기존 C4 자료/기본 앱을 덮어쓰지 않으며 양순서100표본·실제 DOM 값과 9동작 정합성을 확인한다. 전체 성능·메모리 개선 또는 제품 채택으로 일반화하지 않는다.
 
 P2 결과는 [owner 확장 보고서](../benchmark/C4_OWNER_RESULTS.md)와 [선택/class 진단](../benchmark/c4-owner-selection-diagnostics.json)에 연결한다. 기능 확장과 한 peer 재비교를 완료했으며 기존 네 peer/Vue 목표 달성이나 기본 채택으로 표시하지 않는다.
+
+### C4 P3 — key snapshot 검증 비용 축소
+
+2026-10-29 사용자 요청으로 `perf/c4-key-snapshot`을 만들고 P1/P2와 진단·증거를 `7f4df5c`에 커밋했다. 이어 같은 P2 계약의 한 변수 후보를 평가한다.
+
+- R96. 기준선은 해당 커밋의 P2 controller와 같은 앱/코어다. set에서 key snapshot 배열을 함께 소유해 구조 view의 추가 Map.get·중복 keyOf를 대체한다. key 변경 검사는 유지하며 일반 keyed core 매칭은 바꾸지 않는다.
+- R97. items/keys/indexes를 한 세대로 게시하고 flush가 같은 batch의 세 배열/Map을 캡처한다. lifecycle의 다음 set, view throw/retry, 제거/재마운트, dispose에서 snapshot이 어긋나거나 낡은 key를 재사용하지 않아야 한다.
+- R98. P2의 순수 keyOf/view, 고유 불변 string/number key, 단일 owner·중첩 component·오류/지원 범위를 유지한다. keyOf/getter의 기존 호출 횟수를 보장하는 일반 core 최적화로 표시하지 않는다.
+- R99. P2/P3의 n=1k/10k 구조 갱신에서 실제 keyOf/Map.get 호출과 남는 작업을 계수한다. 상쇄되는 snapshot 배열 쓰기/저장 비용을 기록하고 시간 이득으로 대신하지 않는다.
+- R100. 새 P2/P3/Preact class11 CPU870·공식 메모리90을 양순서 수집한다. 과거 원래 A 앱·P2 세션의 수치와 합산하거나 개선율을 곱하지 않는다. 최종 후보 채택/보류와 public runtime·guard 유지 여부를 문서/증거로 남긴다.
+
+P3 최종 판단: [key snapshot 결과](../benchmark/C4_KEY_SNAPSHOT_RESULTS.md). keyOf/Map.get 호출은 줄었지만 snapshot 저장을 포함한 실제 전체/JS는 악화했고 목표 항목 수도 늘지 않아 미채택이다. P2 실험 기준과 기본 runtime/guard를 유지한다. 이번 결과를 원래 A 앱의 누적 개선이나 Vue 비교로 사용하지 않는다.
 
 ## DC-25 — 같은 순서 keyed 빠른 경로
 

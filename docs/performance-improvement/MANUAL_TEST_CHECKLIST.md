@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-29. 상태: **C4 P2 owner/중첩 확장과 새 3앱 비교 완료. CPU870/메모리90 양순서에서 C4는 기존 앱 대비 가중 전체 −3.44%, Preact class 대비 +1.29%다. 해당 한 peer의1.10 범위7/9이며 선택/교환은 미달이다. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B. 추가 class pilot100표본은 방향이 갈려 미채택이다. 기본 runtime/guard·공개 API는 유지하며 portal BUG-3·concurrent/SSR/HMR은 남아 있다.**
+- 기준일: 2026-10-30. 상태: **새 브랜치 `perf/c4-key-snapshot`에 P1/P2를 `7f4df5c`로 커밋했다. 이어 P3 key snapshot을 검증·측정했으나 미채택이다. 새 P2/P3/Preact class CPU870·메모리90 양순서에서 P3/P2 가중 전체 +1.78%(main +1.62/reverse +1.24), JS +2.47%, 전체 삭제 +15.01%다. 10k 메모리+0.03197MB, 앱 Brotli+3B이며 단일 peer1.10 범위도 두 후보 모두7/9다. 기본 runtime/guard·공개 API와 portal BUG-3·concurrent/SSR/HMR 한계는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
@@ -25,6 +25,14 @@
 - [x] M-22-4: strict types/관련 회귀·Chrome·retention과 새 B/C/P CPU870·메모리90 양순서/해시/분포/비율을 검산한다. 한 peer만 비교했음을 밝히며 concurrent/SSR/HMR은 미완료로 남긴다.
 
 - [x] M-22-5(R95): class 값 한 축의 실제 DOM 차이와 양쪽 keyed/9동작/font를 확인하고 선택100표본/18분포를 별도로 검산했다. 양차수 +14.20%/−13.99%로 방향이 갈려 미채택이며 전체870/90에 합산하지 않는다.
+
+## M-23. C4 P3 snapshot — R96~R100
+
+- [x] M-23-1: P2 커밋 소스와 같은 앱/코어를 고정하고 key snapshot 한 축만 변경한다. keyOf/Map.get의 실측 감소와 소스상 n snapshot 쓰기/저장 비용을 분리했다.
+- [x] M-23-2: set 후 key 변경·중복/±0·다음 lifecycle set·throw/retry·제거/재마운트·dispose에서 세대가 섞이지 않아야 한다. owner/중첩/focus/오류의 기존 범위도 유지한다.
+- [x] M-23-3: strict types·Chrome/retention·3앱 공식 keyed/9동작/font·CPU870/메모리90 양순서·독립 수치/해시 감사·영구 보존을 확인한다. 과거 A 앱 수치와 합산하지 않는다.
+
+P3 결과: 가중 전체+1.78%·JS+2.47%·전체 삭제+15.01%, 10k 메모리+0.03197MB·Brotli+3B여서 미채택이다. 두 후보의 단일 peer1.10 범위도7/9로 같다. [결과/검증](../benchmark/C4_KEY_SNAPSHOT_RESULTS.md)을 따르며 P2/기본 runtime과 미지원 경계를 유지한다.
 
 ## M-20. DC-25 같은 순서 keyed 빠른 경로 — R72~R79
 

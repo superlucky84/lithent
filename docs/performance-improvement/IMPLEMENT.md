@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 기준일: 2026-10-29. 상태: **C4 P2 owner/중첩 확장과 새 3앱 비교 완료. CPU870/메모리90 양순서에서 C4는 기존 앱 대비 가중 전체 −3.44%, Preact class 대비 +1.29%다. 해당 한 peer의1.10 범위7/9이며 선택/교환은 미달이다. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B. 추가 class pilot100표본은 방향이 갈려 미채택이다. 기본 runtime/guard·공개 API는 유지하며 portal BUG-3·concurrent/SSR/HMR은 남아 있다.**
+- 기준일: 2026-10-30. 상태: **새 브랜치 `perf/c4-key-snapshot`에 P1/P2를 `7f4df5c`로 커밋했다. 이어 P3 key snapshot을 검증·측정했으나 미채택이다. 새 P2/P3/Preact class CPU870·메모리90 양순서에서 P3/P2 가중 전체 +1.78%(main +1.62/reverse +1.24), JS +2.47%, 전체 삭제 +15.01%다. 10k 메모리+0.03197MB, 앱 Brotli+3B이며 단일 peer1.10 범위도 두 후보 모두7/9다. 기본 runtime/guard·공개 API와 portal BUG-3·concurrent/SSR/HMR 한계는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
 - 완료한 DC-22 실행 순서: [Phase4A~4E](#dc-22--종합-반영-실행-phase4a4e) → [Phase5](#phase-5--test-hardening) → [Phase6](#phase-6--integration-test와-채택인계). 앞선 Phase0~4의 완료 기록은 보존하며, 과거 size 중단·미채택을 현재 후속의 자동 종료 조건으로 쓰지 않는다.
@@ -59,6 +59,14 @@ R80~R84 / DC-26-1~6 / M-21. **D0 완료 후 사용자 요청으로 D1/D2 및 한
 - [x] **E4 보존/판단:** 실제 후보 source/bundle과 원자료/trace/실패를 새 archive에 보존하고 네 문서/HANDOFF를 맞춘다. 진입은 E3, 종료는 검증된 범위와 미지원 경계·다음 단계·최신 commit을 재현 가능하게 남기는 것이다.
 
 - [x] **E3 추가 진단(R95):** 기존 선택150trace의 선정 이벤트 coverage/구간을 확인했고 GC 주원인이나 scheduler 원인으로 단정하지 않았다. 별도 class 표현 앱은 DOM/keyed/9동작/font 뒤 선택100표본을 양순서 수집했으나 전체 방향이 갈려 미채택이다. 다중 root 교체 오류 후 owner remount도 별도 확인했다.
+
+## C4 P3 — 실행 F0~F4
+
+- [x] **F0 커밋/계약:** 브랜치 생성과 기존43파일/증거 커밋 `7f4df5c` 완료. R96~R100·P3-1~5·M-23을 작성했다. 종료는 P2 기준 소스와 한 변수 범위 확정이다.
+- [x] **F1 구현/작업량:** 별도 P3 snapshot을 구현하고 P2 대비 keyOf/Map.get과 snapshot 쓰기를 계수한다. 진입은 F0, 기준은 커밋의 P2, 종료는 keyOf/Map.get 실제 계수와 코드상 n snapshot 쓰기/저장 비용 확인이다.
+- [x] **F2 Test Hardening(한정):** 기존 owner19/Chrome12·앱9와 key mutation·세대 분리·retry/remount/dispose를 검증한다. 진입은 F1, 종료는 strict types와 같은 계약 통과다. portal BUG-3은 기존 한계로 남긴다.
+- [x] **F3 Integration Test/측정:** 새 P2/P3/Preact class3앱 keyed/9동작/font 뒤 CPU870·메모리90을 양순서 직렬 수집한다. 진입은 F2와 입력 해시 고정, 종료는 분포·가중·peer·메모리/크기의 독립 감사다.
+- [x] **F4 판단/보존:** 후보 채택/보류 이유, 실제 소스/번들·원자료/trace·실패와 감사를 새 archive에 보존한다. 진입은 F3, 종료는 네 문서/HANDOFF·명령·최신 commit·다음 단계가 일치하는 것이다. 제품 기본 반영/공개 API는 별도다.
 
 ## DC-25 — 실행 계획
 
@@ -451,7 +459,9 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 ## 상태 / 핸드오프
 
-- done: C4 P2 owner/View·edit·배치/수명/오류 정책을 격리 구현했다. strict types·JSDOM19(기존 portal 관찰1 포함)·Chrome owner12+앱9·3앱 공식 keyed/9동작/font·B/C 각각3context100회 churn/partial을 확인했다. CPU870/메모리90 양순서·독립288분포/9 C/B가중/180 peer비율·가중 감사 통과. 추가 선택100표본/18분포와 기존150trace·다중 root fault 진단을 분리했다. [최종 보고서](../benchmark/C4_OWNER_RESULTS.md).
-- next: 영구 보존과 최종 검증을 완료했다. 후속 C4 가설은 구조 검증 key snapshot이며 비용 미검증이다. 선택은 native PrePaint 사이 구간을 원인 귀속하기 전 단순 scheduler/GC 탓으로 돌리지 않는다. 제품화에는 BUG-3·owner handover/clone·변경 정보 계약·concurrent/SSR/HMR이 남아 있다.
-- result/limits: C4/B 전체 −3.44%, C4/Preact class +1.29%, 단일 peer1.10 목표7/9. 10k 메모리+0.262MB(+0.93%), 앱 br+1,110B. class pilot은 양차수 방향이 갈려 미채택이다. 네 peer/Vue 우위·일반 rollback·공개 채택은 입증하지 않았다.
-- commit: HEAD `4de76ef`, 이번 분석/실험/문서는 미커밋이다. default runtime/guard·sibling·P1 archive를 유지했다. 실행 입력은 `/private/tmp/lithent-c4-owner-20261029-v2`, 초기 준비 실패는 suffix 없는 경로에 보존한다. 성공한 수집은 반복하지 않는다. archive1,553entries/44,227,718B와 모든 decoded hash를 확인했다. frozen21·runner343/peer258package 해시, JSON/감사 집계 일치·포맷·로컬 링크/앵커를 검증했다.
+- done: 사용자 요청으로 `perf/c4-key-snapshot` 생성, 기존43파일/진단/P1/P2/증거를 `7f4df5c`에 커밋했다. 이어 P3 scalar key snapshot의 strict types·공유 owner19/추가5회귀·작업량8조건·Chrome owner12/앱9·retention·3앱 공식 keyed/9동작/font와 새 CPU870·메모리90 양순서를 완료했다. baseline JS는 기존 P2와 같은 `0a2b31a4…`다.
+- result: P3/P2 가중 전체+1.78%(main+1.62/reverse+1.24), JS+2.47%, 전체 삭제+15.01%, 10k 메모리+0.03197MB(+0.112%), 앱 Brotli+3B다. 단일 Preact class1.10 범위는 양쪽7/9이며 선택/교환은 남는다. **P3 미채택, P2 실험 기준 유지**다. [보고서](../benchmark/C4_KEY_SNAPSHOT_RESULTS.md). 원래 A 앱 대비 개선율이나 과거 세션과 합산하지 않았다.
+- validation: 독립288분포/9가중/180peer 비율·가중과 frozen23/source·browser/runner185·설치 runner343/peer258 package 해시를 통과했다. keyOf/Map.get은 실측 계수, n snapshot 쓰기는 코드/입력으로 산정한 값이다. 중단 사이 Chrome 업데이트로 최초 collection은 표본 전 guard에서 종료됐고, 현재 framework pin 수정 후 별도 staging에서 native 검증과 수집을 새로 했다. 이번 공식 실패/재시도/warnings0이다.
+- preservation: 실제 소스/번들·raw/trace·준비 이력·공유/새 도구를 새 archive/manifest(1,667entries/41,321,528B, SHA-256 `6602980d72413143163b8c60d9b407f317ae3d6646f69d652ac94d1abb74eecf`)에 보존했다. 압축/member 전체 재검산, 결과 JSON 대조, 상대 링크/앵커325개·포맷·공백 검사를 통과했다. 최종 staging은 `/private/tmp/lithent-c4-key-snapshot-20261030-v2`다. F0~F4를 완료했으며 같은 조회 미세 조정을 반복하지 않는다. 다음 가설은 구조 변경 정보로 전체 keyed 순회를 줄이거나 compiler 동적 필드 정보 경로를 설계하는 것이다. 예상 이득은 미확정이다.
+- blockers/limits: 수집/검산 블로커 없음. 삭제 회귀를 특정 함수/GC/배열 할당으로 귀속하지 않는다. portal BUG-3·owner handover/clone·concurrent/SSR/HMR·최종 공개 API 및 네 peer/Vue 비교는 별도다.
+- commit: 측정 기준 HEAD는 `7f4df5c`(P2까지 snapshot)다. 사용자 요청으로 P3 소스/문서/증거를 이 변경을 포함하는 커밋에 보존한다. 최종 커밋 SHA는 `git log -1 --format=%H`로 확인한다. push하지 않으며 기본 runtime/guard·sibling과 P1/P2 archive를 유지한다. 성공한 수집은 반복하지 않는다.

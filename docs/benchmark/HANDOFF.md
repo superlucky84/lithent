@@ -1,6 +1,15 @@
 # summary
 
-## 최신 — C4 P2 owner 확장·Preact class 재비교 (2026-10-29)
+## 최신 — P1/P2 커밋과 C4 P3 검증·미채택 (2026-10-30)
+
+- commit: 사용자 요청으로 `perf/c4-key-snapshot` 생성, 기존 진단/P1/P2와 증거43파일을 `7f4df5c`에 커밋했다. 이어 진행한 P3 소스/문서/증거도 사용자 요청으로 이 변경을 포함하는 커밋에 보존한다. 최종 SHA는 `git log -1 --format=%H`로 확인하며 push하지 않는다. 아래 미커밋 표기는 각 이력 시점이다.
+- done: 같은 P2 계약·앱/코어에서 구조 keyOf/Map.get 중복을 scalar keys 배열로 대체했다. strict types·owner19/추가5회귀·작업량8조건·Chrome owner12/앱9·retention·3앱 공식 keyed/9동작/font와 새 P2/P3/Preact class CPU870·메모리90 양순서를 완료했다. [보고서](./C4_KEY_SNAPSHOT_RESULTS.md), [집계](./c4-key-snapshot-results.json), [도구](../../experiments/c4-key-snapshot/README.md).
+- decision: **P3 미채택, 후속 실험 기준은 P2 유지**. P3/P2 가중 전체+1.78%(main+1.62/reverse+1.24), JS+2.47%, 전체 삭제+15.01%다. 10k 메모리+0.03197MB(+0.112%), 앱 Brotli+3B이며 단일 peer1.10 범위도 양쪽7/9다. 원래 A 앱 개선율·과거 세션과 합산하지 않았다.
+- validation: 독립288분포/9가중/180peer 비율·가중·입력23/runner185/설치343+258 해시 통과. keyOf/Map.get은 실측이고 n key 쓰기는 소스에서 산정했다. Chrome 업데이트 전 검증/표본 전 guard 실패와 framework pin 수정 전 준비도 분리 보존한다. 최종 staging은 `/private/tmp/lithent-c4-key-snapshot-20261030-v2`, 현재 Chrome156.0.8078.74의 새 수집만 포함하며 공식 실패/재시도/warnings0이다.
+- preservation: 새 archive/manifest 1,667entries/41,321,528B를 보존했고 압축/member 전체 해시·집계 JSON 대조·상대 링크/앵커325개·포맷/공백 검사를 통과했다. P1/P2 자료는 유지했다.
+- next/limits: F0~F4 완료. 같은 조회 미세 조정은 반복하지 않으며 더 큰 가설은 구조 변경 정보/전체 순회 축소 또는 compiler 동적 필드 경로다. 예상 개선율은 미확정이며 기존 targeted/retained 재실험으로 대신하지 않는다. 기본 runtime/guard·기존 자료와 portal BUG-3·owner 교대·concurrent/SSR/HMR·최종 API·네 peer/Vue 검증은 남는다. [현재 정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+
+## 이전 — C4 P2 owner 확장·Preact class 재비교 (2026-10-29)
 
 - done: 목록당 하나의 View가 content/세션을 소유하도록 확장하고 parent renew·nested/root component·자체 renew·다중 DOM 출력·콜백 중 알림·edit·fault/remount·멱등 dispose를 검증했다. 기본 runtime/public exports는 바꾸지 않았다. [보고서](./C4_OWNER_RESULTS.md), [집계](./c4-owner-results.json), [도구](../../experiments/c4-owner/README.md).
 - result: 새 B/C/Preact class CPU870·메모리90 양순서에서 C4/B 가중 전체 −3.44%, C4/P +1.29%. 한 peer1.10 이내7/9이며 선택1.233·교환1.142는 미달. 10k 메모리+0.262MB(+0.93%), 앱 Brotli+1,110B다. P1 세션과 합산하지 않았다.
