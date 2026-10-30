@@ -1,8 +1,19 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
-- 기준일: 2026-10-30. 상태: **DC-27 수동 정적/동적 blueprint 검증을 완료하고 미채택으로 판단했다. stock/control/candidate CPU870·메모리90 양순서에서 candidate/stock 가중 전체 −0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신은 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. V1은 보완 전 부분 수집으로 분리 보존하며 최종 V2에 합산하지 않는다. 기본 runtime/guard·공개 API와 이전 C4 증거는 유지한다. 자동 compiler/제품 지원은 별도다.**
+- 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
+
+## DC-28 — select 대기 해석과 대량 삭제의 정체성 비교
+
+R107~R110 / H0~H4 / M-25. 근거는 [select 프레임 대기](../benchmark/SELECT_VSYNC_PHASE.md)와 [bulk removal v2](../benchmark/BULK_REMOVAL_V2_RESULTS.md)다.
+
+- [x] DC-28-1 진단: 공식 구간(click 시작~마지막 logic event 뒤 첫 Commit 끝)을 trace에서 다시 계산한다. bulk-v2 1,160개에서 공식 값과 1e-6ms 이내로 일치했다. active는 구간 안 main thread X 이벤트의 합집합, 대기는 전체 − active다. GC 시작 위상과 클릭 위상은 측정 프레임 뒤 Viz tick 사슬로 추정하며 점수에 쓰지 않는다.
+- [x] DC-28-2 재판단: 2026-10-19 bulk removal의 select 증가는 프레임 대기였다(간격 증가 ≈ 전체 증가, 동일 번들 대조 JS 같음). DC-25는 가중 active −0.70%(양순서 개선)로 select 손해가 약해지지만 1.10 이내 항목은 8/9 그대로다. C4 P2/P3, DC-27, DC-22 판단은 유지한다.
+- [x] DC-28-3 삭제 경로: `findChildWithRemoveElement`는 `oc`/`children`을 걷는다. nodeType 11은 그 자식으로 재귀하고, 나머지는 부모의 다음 자식과 같은 노드인지 비교하며 첫 불일치에서 멈춘다. el이 없는 항목은 통과하고 portal과 `<html>`은 불일치다. 모두 같고 남는 자식이 없을 때만 `textContent = ''` 뒤 item.el을 비운다. 아니면 기존 항목별 경로로 간다.
+- [x] DC-28-4 범위/비용: 목록 전체 삭제만 바뀐다. remove-one·keyed 불일치 삭제는 component당 root 1개라 기존 경로다. 걷는 길이는 삭제 대상 root 수를 넘지 않는다. 개수 비교가 외부 노드를 함께 지우던 문제를 정체성 비교로 고친다. unmount callback은 기존대로 DOM 제거 전에 실행한다.
+- [x] DC-28-5 대조: baseline/candidate는 공식 A 앱(일반 element 행, 이미 한 번 삭제)으로 중립을 확인한다. rows-baseline/rows-candidate는 앱 C(행 `mount` component + cache)로 이득을 확인한다. 네 앱 모두 같은 source/toolchain에서 새로 빌드한다.
+- [x] DC-28-6 판단: **채택 권장.** A 가중 전체 −0.09%·active +0.32%로 중립이다. C 전체 삭제는 −7.84%·JS −10.40%이고 교차 진단 −4.98%(29/40)다. 메모리 ±0.6% 이내, base 4,817B·concurrent 6,953B다. 일반 element 행 삭제의 약 +1% 가능 비용(교차 script만 p=0.024)은 한계로 남긴다. 사용자 요청으로 이 브랜치에 커밋했다. main 병합/release는 별도다.
 
 ## DC-27 — 수동 blueprint와 동적 slot
 

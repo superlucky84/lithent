@@ -100,32 +100,23 @@ const deleteRealDom = (newWDom: WDom, parent: HTMLElement) => {
 const findChildWithRemoveElement = (newWDom: WDom, parent: HTMLElement) => {
   const items = newWDom.oc || newWDom.children || [];
 
-  // Bulk fast path: the parent element contains exactly these children,
-  // so they can all be dropped in a single operation.
-  if (
-    items.length > 1 &&
-    items.every(item => {
-      const nt = item.el && item.el.nodeType;
-      return (
-        (nt === 1 || nt === 3) &&
-        (item.el as HTMLElement).tagName !== 'HTML' &&
-        !checkPortalElement(item)
-      );
-    })
-  ) {
-    // Stop one past the candidates: a component in a long list calls this
-    // once per component, so counting every sibling there is quadratic.
-    // (counted via sibling pointers -- childNodes would materialize a live list)
-    let count = 0;
-    for (
-      let node = parent.firstChild;
-      node && count <= items.length;
-      node = node.nextSibling
-    ) {
-      count++;
-    }
+  // Clear only when these roots, through any Fragment/component wrappers,
+  // are exactly the parent's children. Stop at the first mismatch so removing
+  // one part of a larger list never walks its remaining siblings.
+  if (items.length > 1) {
+    let next = parent.firstChild;
+    const matches = (item: WDom): boolean => {
+      const el = item.el;
+      if (!el || checkPortalElement(item)) return !el;
+      if (el.nodeType === 11) {
+        return (item.oc || item.children || []).every(matches);
+      }
+      const same = el === next && (el as HTMLElement).tagName !== 'HTML';
+      next = el.nextSibling;
+      return same;
+    };
 
-    if (count === items.length) {
+    if (items.every(matches) && !next) {
       parent.textContent = '';
       items.forEach(item => (item.el = undefined));
       return;

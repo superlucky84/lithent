@@ -1,6 +1,15 @@
 # summary
 
-## 최신 — DC-27 수동 정적/동적 정보 검증·미채택 (2026-10-30)
+## 최신 — DC-28 select 프레임 대기 진단과 bulk removal v2 (2026-10-30)
+
+- done: 보존 trace 7세션으로 select 공식 전체가 runner 강제 GC 시간 mod 16.67ms가 정하는 BeginFrame 대기를 포함함을 확인했다. Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. 2026-10-19 bulk removal의 select 기각 근거가 이 대기였으므로, base·concurrent `findChildWithRemoveElement`에 정체성 비교 방식으로 다시 옮겨 측정했다. [select 대기](./SELECT_VSYNC_PHASE.md), [bulk removal v2](./BULK_REMOVAL_V2_RESULTS.md), [집계](./bulk-removal-v2-results.json), [도구](../../experiments/bulk-removal-v2/README.md).
+- decision: **채택 권장(기본 경로, 새 API 없음).** 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS −10.40%이고 교차 진단 −4.98%(29/40)다. C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base 4,817B·concurrent 6,953B다. 외부 노드 삭제 버그를 고친다.
+- validation: 공유 6검사(HEAD 2 실패)·`test:dual` 1,166/skip 3·e2e 78·`verify:concurrent`를 통과했다. Chrome 삭제 기록은 행 앱 1,000→1이다. CPU 1,160·메모리 120 양순서에서 실패/warnings 0이고, trace 재계산이 공식 값과 일치했다. 교차 진단의 페이지 재사용 두 번은 서로 어긋나 보고에서 뺐다.
+- preservation: 새 archive/manifest(1,443 entries/54,681,015B, SHA-256 `bc3c52cf00d10cb2a394a78bae874cd4b2fc31282a5ca93692a6424e6d795a9c`)에 staging·도구·patch·테스트를 보존했다. select 분석은 [JSON](./select-vsync-phase.json)이다.
+- next/limits: 일반 element 행 전체 삭제의 약 +1% 가능 비용은 확정하지 않았다. 공식 A 앱의 R3 결과는 바뀌지 않는다. DC-25는 select 손해가 약해졌지만 재진행하지 않았다. portal BUG-3·concurrent 앱 timing은 별도다. [정본 인계](../performance-improvement/IMPLEMENT.md#상태--핸드오프).
+- commit: 측정 기준 HEAD `a56bae1`. 사용자 요청으로 DC-28 코드·도구·문서·증거를 이 변경을 포함하는 커밋에 보존한다. 최종 SHA는 `git log -1 --format=%H`로 확인하며 push하지 않는다. main 병합/release는 별도다.
+
+## 이전 — DC-27 수동 정적/동적 정보 검증·미채택 (2026-10-30)
 
 - done: `4109bd3`에서 별도 blueprint/base overlay를 구현했다. 일반 h/목록 map/cache를 유지하며 계약/작업량27·기존 core26파일/186검사·분리 strict types·Chrome14·3앱 keyed/9동작/font·앱별3context retention과 새 CPU870·메모리90 양순서를 통과했다. [결과](./STATIC_DYNAMIC_RESULTS.md), [집계](./static-dynamic-results.json), [도구](../../experiments/static-dynamic/README.md).
 - decision: **이번 수동 blueprint 구현 미채택, 자동 compiler 제품 구현 보류**. candidate/stock 가중 전체−0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. 같은 overlay의 정보 활용 전체−1.64%, control/stock JS+3.87%와 구분했다. 과거 C4/peer/Vue와 합산하지 않는다.

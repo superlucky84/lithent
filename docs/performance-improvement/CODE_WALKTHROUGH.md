@@ -414,6 +414,10 @@ if (items.length > 1 && count === items.length &&
 리스트 옆에 다른 형제가 있으면(count 불일치) 기존 경로로 떨어진다.
 unmount 콜백/이벤트 해제는 이 함수에 오기 전에 기존 순서대로 이미 끝나 있다.
 
+> 2026-10-30 DC-28(`perf/c4-key-snapshot` 커밋): 개수 대신 부모 자식과의 순서·정체성을 비교하고
+> Fragment/component 래퍼를 통과한다. 행이 component여도 한 번에 지우며, 외부 노드가
+> 자식을 대체한 경우는 지우지 않는다. [결과](../benchmark/BULK_REMOVAL_V2_RESULTS.md).
+
 ### 4.5 `wDomChildrenToDom` — 중간 DocumentFragment 제거
 
 **변경 전**: 부모 노드마다 `DF()`를 만들어 자식들을 모았다가 부모에 붙였다.

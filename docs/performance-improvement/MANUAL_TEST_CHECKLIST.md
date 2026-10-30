@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
-- 기준일: 2026-10-30. 상태: **DC-27 수동 정적/동적 blueprint 검증을 완료하고 미채택으로 판단했다. stock/control/candidate CPU870·메모리90 양순서에서 candidate/stock 가중 전체 −0.04%(main+2.38/reverse−2.07), JS+2.98%다. 부분 갱신은 전체−12.33%/JS−20.09%지만 10k 메모리+1.44025MB(+5.11%)·앱 Brotli+1,472B다. V1은 보완 전 부분 수집으로 분리 보존하며 최종 V2에 합산하지 않는다. 기본 runtime/guard·공개 API와 이전 C4 증거는 유지한다. 자동 compiler/제품 지원은 별도다.**
+- 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
 - 각 항목은 표시된 Phase에서 해당 증거를 확보하며 M-1·M-2는 후보 구현 전에도 수행한다. 최종 채택에는 정합성/빌드·B1~B4 검증과 성능 산출물이 필요하다. B2 크기 수치/기존 script 결과는 공개하되 현재 R11/R34에 따라 소폭 초과만으로 CPU/메모리 평가를 중단하지 않는다. 정합성 실패를 시간·메모리 교환으로 허용하지 않으며 개별 성능 손해나 소폭 크기만으로 자동 판정하지 않는다.
@@ -25,6 +25,17 @@
 - [x] M-22-4: strict types/관련 회귀·Chrome·retention과 새 B/C/P CPU870·메모리90 양순서/해시/분포/비율을 검산한다. 한 peer만 비교했음을 밝히며 concurrent/SSR/HMR은 미완료로 남긴다.
 
 - [x] M-22-5(R95): class 값 한 축의 실제 DOM 차이와 양쪽 keyed/9동작/font를 확인하고 선택100표본/18분포를 별도로 검산했다. 양차수 +14.20%/−13.99%로 방향이 갈려 미채택이며 전체870/90에 합산하지 않는다.
+
+## M-25. select 프레임 대기와 bulk removal v2 — R107~R110
+
+- [x] M-25-1: trace로 다시 계산한 공식 구간이 공식 값과 일치한다(bulk-v2 1,160개, 1e-6ms 이내). 7세션의 active/대기·강제 GC·위상 분해가 [JSON](../benchmark/select-vsync-phase.json)에 있다. 공식 점수 정의는 바꾸지 않았다.
+- [x] M-25-2: 공유 6검사를 base·concurrent에서 통과하고 HEAD에서 2개(component 행 한 번 삭제, 외부 노드 보존) 실패를 확인했다. `test:dual` 1,166 통과/skip 3, Playwright e2e 78, `verify:concurrent`, 크기 base 4,817/4,824B·concurrent 6,953/9,000B다.
+- [x] M-25-3: 실제 Chrome에서 Clear의 `#tbody` 삭제 기록이 행 앱 1,000→1, A 앱 1→1이다. 네 앱 모두 1,000노드를 지우고 다시 만들었다.
+- [x] M-25-4: 4앱 gate(keyed/9동작/font) 뒤 CPU 1,160·메모리 120을 양순서 직렬 수집했다. 실패/warnings 0이고 source/browser/runner/bundle guard를 통과했다. 수집 중 다른 작업은 없었다.
+- [x] M-25-5: 수집 뒤 교차 진단(새 페이지, 40라운드)의 방향을 공식 결과와 비교했다. 행 앱은 같은 방향, A 앱은 script만 약 +1%였다. 페이지 재사용 두 번은 서로 어긋나 분리 보존했다.
+- [x] M-25-6: 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). 기본 runtime의 삭제 경로가 바뀐다. main 병합/release는 별도다.
+
+DC-28 판단: [select 대기](../benchmark/SELECT_VSYNC_PHASE.md), [bulk removal v2](../benchmark/BULK_REMOVAL_V2_RESULTS.md). 채택 권장이며 사용자 요청으로 이 브랜치에 커밋했다.
 
 ## M-24. 정적/동적 blueprint — R101~R106
 
