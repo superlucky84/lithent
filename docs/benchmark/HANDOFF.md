@@ -1,6 +1,15 @@
 # summary
 
-## 최신 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
+## 최신 — 위치 기반 keyed 매칭과 캐시 적중 경로 (2026-10-31)
+
+- done: base 기본 경로 네 곳을 바꿨다(새 API 없음). 키가 유일하다고 증명된 목록의 위치 매칭(`9bb0fb3`), 순서 그대로인 목록 자식의 제자리 갱신(`e0c0549`), 같은 노드 반환(`b1fc8af`), 태그 문자열로 커스텀 엘리먼트 확인(`197dcea`). [결과](./POSITIONAL_KEYS_RESULTS.md), [도구](../../experiments/positional-keys/README.md).
+- result: 샌드박스(Chromium 153, 스크립트 시간만)에서 새 페이지 조건 select −45%, 1행 삭제 −24%, 1k 생성 −14%, 교환 −13%, 부분 갱신 −7%. 웜업 상태 select −51%, 부분 갱신 −29%, 삭제 −21%. 공식 러너 값이 아니다.
+- size: base Brotli 4,817 → 4,925B. 소유자가 +150B까지 허용했고, 측정 증가분 101B를 `BASE_RENDER_ALLOWANCE`로 반영했다.
+- validation: `test:dual`, e2e 78, `verify:concurrent`, tsc/ESLint/Prettier 통과. `core-keyedFastPath`의 children getter 읽기 계약을 base는 읽지 않는 것으로 바꿨다.
+- next: Mac 공식 러너 9항목 양순서. 부분 갱신 전체 시간이 늘면 `b1fc8af`만 되돌린다. concurrent 이식과 메모리 측정은 하지 않았다.
+- branch: `ccr-13e38382-ayms8k`(main `7796eb1` 기준). main 병합은 별도다.
+
+## 이전 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
 
 - done: 2026-10-29~30의 새 archive 5개(c4-list-boundary·c4-owner·c4-key-snapshot·static-dynamic·bulk-removal-v2, 합계 224,675,015B)를 GitHub Release [`benchmark-evidence`](https://github.com/superlucky84/lithent/releases/tag/benchmark-evidence)로 옮겼다. 업로드한 asset의 크기·SHA-256이 각 manifest와 같다. 결과 문서와 `report.mjs`의 archive 링크를 release 주소로 바꿨고 `docs/benchmark/*.tar.gz`를 `.gitignore`에 넣었다. 그 전 archive는 git에 그대로 둔다.
 - history: archive를 이력에서 빼려고 `perf/c4-key-snapshot`의 4커밋을 main 위의 `perf/c4-bulk-removal`로 다시 쌓았다. archive 외 tree는 같다. SHA 대응은 `7f4df5c`→`b3cd570`, `4109bd3`→`b4f6b57`, `a56bae1`→`c578a2f`, `c53569e`→`b1ca5e3`이며, 아래 기록의 옛 SHA는 이 대응으로 읽는다.
