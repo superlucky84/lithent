@@ -244,41 +244,64 @@ const remakeChildrenForUpdate = (newWDom: WDom, originalWDom: WDom) => {
 
 /**
  * Recursive handling of loop-type virtual DOM elements.
- * Matches children against the originals by key via a Map in O(n) and
- * records each match's original index (oi) for the render phase to
- * minimize moves via LIS. The originals left unmatched are deleted.
+ * Matches children against the originals by key and records each match's
+ * original index (oi) for the render phase to minimize moves via LIS. The
+ * originals left unmatched are deleted.
+ *
+ * A list whose keys were proved unique (all its children matched ones of a
+ * unique list) pairs children by position while their keys agree, as in a
+ * redraw that moves nothing: only the first mismatch builds the key map, of
+ * the originals not taken yet. With unique keys that is the same pairing as
+ * the map's (the first original with the key wins).
  */
+const uniqueKeys = new WeakSet<WDom>();
+
 const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
   const origChildren = originalWDom.children || [];
-  const keyMap = new Map<unknown, number>();
-  origChildren.forEach((item, index) => {
-    const key = getKey(item);
-    if (checkExisty(key) && !keyMap.has(key)) {
-      keyMap.set(key, index);
-    }
-  });
-
   const used: boolean[] = [];
+  let unique = uniqueKeys.has(originalWDom);
+  let keyMap: Map<unknown, number> | undefined;
+  let matched = 0;
+  const makeKeyMap = () => {
+    keyMap = new Map<unknown, number>();
+    origChildren.forEach((item, index) => {
+      const key = getKey(item);
+      if (!used[index] && checkExisty(key)) {
+        keyMap!.has(key) ? (unique = false) : keyMap!.set(key, index);
+      }
+    });
+  };
+
+  if (!unique) {
+    unique = true;
+    makeKeyMap();
+  }
+
   const getParent = makeParentGetter(newWDom);
   const remaked = (newWDom.children || []).map((item, index) => {
     const key = getKey(item);
-    // Unkeyed items among keyed ones (a hidden row's null, a nested array)
-    // pair with the unkeyed original at the same index, as in React.
-    const origIndex = checkExisty(key)
-      ? keyMap.get(key)
-      : index < origChildren.length && !checkExistyKey(origChildren[index])
-        ? index
-        : undefined;
-    let original: WDom | undefined;
+    const atIndex = origChildren[index];
+    let origIndex: number | undefined;
 
-    if (origIndex !== undefined) {
-      keyMap.delete(key);
-      used[origIndex] = true;
-      original = origChildren[origIndex];
+    if (!checkExisty(key)) {
+      // Unkeyed items among keyed ones (a hidden row's null, a nested array)
+      // pair with the unkeyed original at the same index, as in React.
+      if (!checkExistyKey(atIndex)) {
+        origIndex = index;
+      }
+    } else if (!keyMap && atIndex && getKey(atIndex) === key) {
+      origIndex = index;
+    } else {
+      keyMap || makeKeyMap();
+      origIndex = keyMap!.get(key);
+      keyMap!.delete(key);
     }
 
+    const original = origChildren[origIndex!];
     const child = makeNewWDomTree(item, original);
     if (original) {
+      used[origIndex!] = true;
+      matched++;
       child.oi = origIndex;
     }
     child.getParent = getParent;
@@ -286,12 +309,18 @@ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
     return child;
   });
 
+  if (unique && matched === remaked.length) {
+    uniqueKeys.add(newWDom);
+  }
+
   // Originals left unmatched, including ones whose key was already taken
   // (no key, or a duplicate) and so never made it into keyMap.
-  typeDeleteUnused(
-    origChildren.filter((_item, index) => !used[index]),
-    originalWDom
-  );
+  if (matched < origChildren.length) {
+    typeDeleteUnused(
+      origChildren.filter((_item, index) => !used[index]),
+      originalWDom
+    );
+  }
 
   return remaked;
 };
