@@ -303,14 +303,22 @@ const typeUpdate = (newWDom: WDom) => {
  */
 const updateChildren = (newWDom: WDom) => {
   const children = newWDom.children || [];
+  let last = -1;
 
+  // Nothing added or replaced, and the matched children still in their
+  // original order (oi rising): each is updated where it is, with no
+  // placement pass. `last < (last = oi)` compares with the previous oi.
   if (
     newWDom.type !== 'l' ||
-    !children.some(
-      item => 'ATS'.includes(item.nr as string) || item.oi !== undefined
+    children.every(
+      ({ nr, oi }) =>
+        nr !== 'A' && nr !== 'S' && (oi === undefined || last < (last = oi))
     )
   ) {
-    children.forEach(wDomUpdate);
+    children.forEach(item => {
+      wDomUpdate(item);
+      item.oi = undefined;
+    });
     return;
   }
 
