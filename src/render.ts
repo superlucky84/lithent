@@ -281,7 +281,7 @@ const typeUpdate = (newWDom: WDom) => {
 
   if (newWDom.el) {
     const { op: oldProps, props } = newWDom;
-    updateProps(props, newWDom.el, oldProps);
+    updateProps(props, newWDom.el, oldProps, newWDom.tag);
 
     if (newWDom.tag === 'input') {
       (newWDom.el as HTMLInputElement).value = String(
@@ -519,9 +519,13 @@ const updateText = (newWDom: WDom) => {
 const updateProps = (
   props?: Props,
   element?: HTMLElement | Element | DocumentFragment | Text,
-  oldProps?: Props | null
+  oldProps?: Props | null,
+  tag?: string
 ) => {
   const originalProps = oldProps || {};
+  // Only a tag with a dash names a custom element (a portal's element is
+  // its target): the others skip reading the element for each prop set.
+  const custom = !tag || tag === 'portal' || tag.includes('-');
 
   for (const dataKey in props) {
     const dataValue: unknown = props[dataKey];
@@ -571,6 +575,7 @@ const updateProps = (
           // Only keys HTMLElement lacks: `textContent` or `offsetWidth` would
           // run a DOM setter or throw.
           if (
+            custom &&
             isPendingCustomElement(element) &&
             !(dataKey in HTMLElement.prototype)
           ) {
@@ -658,7 +663,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
 
   wDomChildrenToDom(wDom, children, element, isHydration);
 
-  updateProps(props, element, null);
+  updateProps(props, element, null, tag);
 
   addMountedQueue(wDom);
 
