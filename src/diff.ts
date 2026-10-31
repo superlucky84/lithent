@@ -22,6 +22,13 @@ export const makeNewWDomTree = (
   newWDom: WDom | TagFunctionResolver,
   originalWDom?: WDom
 ) => {
+  // The same drawn node in the same place (a row a cache handed back):
+  // nothing to compare or update. An empty one still goes to deletion.
+  if (newWDom === originalWDom && originalWDom!.type) {
+    originalWDom!.nr = 'N';
+    return originalWDom!;
+  }
+
   // Already drawn or taken by a diff (it has nr, 'N' once drawn): the node
   // belongs to another place, so this place draws a copy. The same node in the same place is still left
   // alone as unchanged. A component made without a diff and not drawn yet
