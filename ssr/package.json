@@ -30,8 +30,5 @@
   "devDependencies": {
     "express": "^4.21.1",
     "lithent": "workspace:*"
-  },
-  "volta": {
-    "node": "24.22.1"
   }
 }

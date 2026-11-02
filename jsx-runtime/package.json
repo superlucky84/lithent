@@ -30,8 +30,5 @@
   },
   "peerDependencies": {
     "lithent": "^1.21.0"
-  },
-  "volta": {
-    "node": "24.22.1"
   }
 }

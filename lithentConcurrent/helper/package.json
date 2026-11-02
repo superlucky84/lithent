@@ -31,8 +31,5 @@
   },
   "peerDependencies": {
     "lithent-concurrent": "workspace:*"
-  },
-  "volta": {
-    "node": "24.22.1"
   }
 }

@@ -48,8 +48,5 @@
     "vite-plugin-checker": "^0.8.0",
     "vite-plugin-dts": "^4.2.1",
     "vitest": "^2.1.5"
-  },
-  "volta": {
-    "node": "24.22.1"
   }
 }

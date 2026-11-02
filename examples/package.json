@@ -28,8 +28,5 @@
     "lithent": "workspace:*",
     "lithent-helper": "workspace:*",
     "lithent-tag": "workspace:*"
-  },
-  "volta": {
-    "node": "24.22.1"
   }
 }

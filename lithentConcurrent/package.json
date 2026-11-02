@@ -60,8 +60,5 @@
   "keywords": [
     "lithent",
     "concurrent"
-  ],
-  "volta": {
-    "node": "24.22.1"
-  }
+  ]
 }

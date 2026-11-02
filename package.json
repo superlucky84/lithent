@@ -4,6 +4,13 @@
   "version": "1.25.5",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@12.15.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.22.1",
+      "onFail": "error"
+    }
+  },
   "main": "./dist/lithent.cjs",
   "module": "./dist/lithent.mjs",
   "scripts": {
@@ -222,8 +229,5 @@
     "vite-plugin-checker": "^0.8.0",
     "vite-plugin-dts": "^2.3.0",
     "vitest": "^2.1.2"
-  },
-  "volta": {
-    "node": "24.22.1"
   }
 }

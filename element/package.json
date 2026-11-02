@@ -30,8 +30,5 @@
   ],
   "peerDependencies": {
     "lithent": "workspace:*"
-  },
-  "volta": {
-    "node": "24.22.1"
   }
 }

@@ -27,20 +27,17 @@ root는 `1.25.5`, Concurrent는 `0.2.4`여야 한다. `CHANGELOG.md`의 2026-11-
 기존 VDOM을 그대로 반환할 때 getter를 다시 읽지 않는 변경과, reconciliation 도중
 기존 키를 직접 수정하는 사용법을 지원하지 않는다는 점을 확인한다.
 
-Node는 root Volta 설정의 24.22.1, pnpm은 `packageManager`의 12.15.0을 사용한다.
+Node는 `mise.toml`과 root `devEngines.runtime`의 24.22.1,
+pnpm은 `packageManager`의 12.15.0을 사용한다. CI는 같은 버전을 담은 `.nvmrc`를 읽는다.
 
 ```sh
-node --version
+mise install
+mise exec -- node --version
 pnpm --version
 ```
 
-Volta 2.0.2는 pnpm 11 이상을 실행하지 못하므로 pnpm을 Volta로 고정하지 않는다.
-기존에 설치된 pnpm 12.15.0 실행 파일이 있으면 그 디렉터리를 PATH 앞에 둔다.
-이 작업 환경에서는 다음 경로로 고정 버전을 직접 실행할 수 있다.
-
-```sh
-~/Library/pnpm/.tools/pnpm/12.15.0/bin/pnpm --version
-```
+Node 버전이 다르면 `devEngines.runtime.onFail: error` 정책에 따라 개발 도구의
+실행이 실패한다. 프로젝트 디렉터리에서 mise가 선택한 Node를 사용한다.
 
 ## 2. 설치·빌드·검증
 
