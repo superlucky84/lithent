@@ -30,3 +30,39 @@ node coldprof.mjs head-debug:flat create 12
 
 `updr` is the partial update with the rows rebuilt every 8 operations, so the
 labels do not keep growing.
+
+## Official runner on macOS
+
+The following freezes `main` and `HEAD`, builds the same production adapter
+from the supplied benchmark checkout against both ESM cores, and copies that
+checkout's compiled official runner and CSS into a fresh staging directory.
+The helper source must be identical in both revisions. The benchmark checkout
+and installed dependencies are kept in place; Vite may create a temporary
+configuration module beside its config when preparing the builds.
+
+```sh
+node experiments/positional-keys/official-prepare.mjs \
+  /private/tmp/lithent-positional-official-FRESH \
+  /path/to/js-framework-benchmark-upstream
+node experiments/positional-keys/official-run.mjs \
+  /private/tmp/lithent-positional-official-FRESH suite
+python3 experiments/positional-keys/official-analyze.py \
+  /private/tmp/lithent-positional-official-FRESH
+```
+
+Preparation accepts optional baseline/candidate revision arguments after the
+benchmark path. `suite` runs official keyed checks and nine DOM/font scenarios,
+then CPU collection in both application orders, alternating the order between
+items: 15 samples per item, 25 for select, 580 samples total. Chrome runs
+headless with the official runner's throttling, warm-ups and forced GC.
+Browser/local server operations require permission outside a restricted sandbox.
+Do not run builds, tests, profiles or other benchmarks during collection.
+
+Each phase refuses to replace an existing result, including incomplete runs.
+`gate`, `main` and `reverse` can be invoked individually for a missing phase.
+The runner, builds, tools and browser binary/engine hashes are checked before
+and after each phase. Analysis independently recomputes all 580 official trace
+durations, reports total/script/paint and diagnostic active/wait times, and
+writes `official-results.json` with every sample and bootstrap intervals.
+Intervals describe within-session sample uncertainty; they do not account for
+systematic machine or session effects. Source and raw traces remain in staging.

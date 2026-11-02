@@ -1,5 +1,29 @@
 # Release notes
 
+## 2026-11-02
+
+### lithent 1.25.5
+
+- Reduce keyed-list matching and DOM placement work when rows retain their
+  keys and order, and return a reused identical virtual node without diffing
+  it again. Ordinary element props also skip the pending custom-element check.
+- In a local Mac run of the official js-framework-benchmark runner, weighted
+  total time fell 2.59% and script time 6.84% against 1.25.4, using the same
+  cached-row app and 580 samples across two execution orders. Partial updates
+  were 9.21% faster and selection 12.91% faster. These are local comparison
+  results, not published upstream rankings; see the
+  [measurement report](./docs/benchmark/POSITIONAL_KEYS_OFFICIAL_RESULTS.md).
+- Compatibility note: the base core returns a reused identical nonempty
+  virtual node before its usual comparison, so that comparison no longer
+  re-reads its children getter. Do not depend on getter side effects when
+  returning a cached virtual node. Keep keys stable during a
+  reconciliation; changing an existing node's `props.key` or key getter result
+  from an update callback is not a supported way to change row identity. To
+  change identity, render a new node with the new key.
+- The base bundle is 4,925B Brotli, up 108B from 1.25.4. The size budget is
+  4,925B. This release changes only the base core; lithent-concurrent remains
+  at 0.2.4.
+
 ## 2026-10-31
 
 ### lithent 1.25.4
@@ -276,7 +300,7 @@ and `renderToString` fixes are not separate npm releases.
   DOM). `styles` are shared by every instance through one adopted style sheet,
   with a `<style>` fallback. Slots project the element's children.
 - The component receives the element as `props.host`; `emit(host, name,
-  detail, init?)` dispatches a `CustomEvent` that bubbles, is composed and is
+detail, init?)` dispatches a `CustomEvent` that bubbles, is composed and is
   cancelable unless `init` says otherwise.
 - Moving an element keeps its state; removing it unmounts after a microtask.
   `defineElement` returns `undefined` without `customElements` (SSR).
