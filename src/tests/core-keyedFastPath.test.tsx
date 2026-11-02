@@ -12,7 +12,9 @@ import {
 const concurrent = 'deferRender' in core;
 
 describe('same-order keyed matching baseline', () => {
-  it('preserves children getter observations on a reused identical VDOM object', async () => {
+  // The base core returns a reused identical node as it is, without reading
+  // it again; the concurrent core still compares it.
+  it('keeps a reused identical VDOM object and its element', async () => {
     let refresh = () => {};
     let armed = false;
     let reads = 0;
@@ -39,7 +41,7 @@ describe('same-order keyed matching baseline', () => {
       armed = true;
       refresh();
       await nextTick();
-      expect(reads).toBeGreaterThan(0);
+      expect(reads > 0).toBe(concurrent);
       expect(host.querySelector('b')).toBe(element);
       expect(host.textContent).toBe('held');
     } finally {

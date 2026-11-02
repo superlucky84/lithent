@@ -1,6 +1,32 @@
 # summary
 
-## 최신 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
+## 최신 — lithent 1.25.5 릴리스 준비와 최종 검토 (2026-11-02)
+
+- scope: 사용자 요청으로 root `lithent`를 1.25.4 → 1.25.5로 올리고 CHANGELOG·RELEASING을 현재 최적화와 호환성 변경에 맞췄다. Concurrent는 런타임 변경이 없어 0.2.4를 유지한다. npm 최신 1.25.4와 origin/main `7796eb1`을 확인했다. PR 생성이 이번 범위이며 병합·npm 발행은 후속이다.
+- review: 전체 빌드·`test:dual` 1,176통과/3제외·E2E 78·타입/린트·실제 tarball import/require/strict types·Concurrent 산출물·크기 검사를 통과했다. 1.25.5 manifest로 재빌드한 base ESM은 실측 후보와 SHA-256이 같다. base Brotli 4,925/4,925B다.
+- compatibility decision: 갱신 콜백이 뒤 행의 기존 `props.key`를 직접 수정하거나 key getter 결과를 바꾸면 main과 매칭 결과가 달라진다. 일반적인 동일 키 재사용 회귀라는 초기 판단을 철회했다. 사용자와 키를 reconciliation 중 안정적으로 유지하는 지원 범위를 확인했고, 해당 강제 변경 사례는 배포 차단에서 제외했다. 동일 VDOM getter 관찰 변경과 함께 공개 CHANGELOG에 기록했다.
+- preservation: [Mac 공식 러너 증거 archive](https://github.com/superlucky84/lithent/releases/download/benchmark-evidence/positional-keys-official-20261102-evidence.tar.gz)를 기존 자료 보관용 `benchmark-evidence`에 첨부했다. 원격 27,400,269B·SHA-256 `7c7fba3f3f72556ea81f474ac65003c1e22eca623fb66dac3077c86221d9b326`이 로컬 manifest와 같다. npm 패키지 릴리스와 구분한다.
+- next: 현재 브랜치의 최적화·벤치마크 검증·릴리스 준비를 함께 PR로 보낸다. main 병합은 merge commit을 사용하고, 발행은 RELEASING.md의 base 1.25.5 단독 절차를 따른다.
+
+## 이전 — 위치 기반 keyed 최적화 Mac 공식 러너 검증 (2026-11-02)
+
+- done: 지정된 `../js-framework-benchmark-upstream`의 실제 A 앱과 compiled official runner를 고정하고 main `7796eb1` / 브랜치 `ff2206b`를 같은 앱·helper로 비교했다. Apple M4 Pro·Node 24.22.1·Chrome 156.0.8078.74에서 CPU 9항목 580표본 양순서를 완료했다. [결과](./POSITIONAL_KEYS_OFFICIAL_RESULTS.md), [표본/집계](./positional-keys-official-results.json), [재현 도구](../../experiments/positional-keys/README.md#official-runner-on-macos).
+- result: 중앙값 기준 가중 전체 −2.59%(1회차 −1.97% / 역순 −3.76%), JS −6.84%. 평균 기준 가중 전체도 −1.88%다. 부분 갱신 전체 −9.21%·선택 −12.91%·1k 생성 −1.35%이며 이 셋은 양순서에서 개선됐다. 교환·추가는 회차별 방향이 바뀌어 단정하지 않는다.
+- decision: 부분 갱신의 과거 회귀가 재현되지 않았다(−8.37% / −9.17%). `b1fc8af`를 유지한다. 기본 코어는 수정하지 않았다.
+- validation: 두 앱 official keyed·9개 DOM·폰트 검사 통과. 실패/배치 재시도/러너 경고 0, 580 trace 전체 시간을 독립 재계산해 모두 일치했다. 브라우저·runner·번들 해시 검사를 통과했다. 벤치마크 저장소 작업 트리는 깨끗하다.
+- preservation: staging `/private/tmp/lithent-positional-official-20261102-v2`, 로컬 `docs/benchmark/positional-keys-official-20261102-evidence.tar.gz`와 manifest에 보존했다(27,400,269B·1,085 entries, 압축 해제 후 member 해시 대조 통과). 이후 공개 업로드는 위 최신 기록을 따른다.
+- next: PR·main 병합(merge commit)·릴리스는 후속 작업이다. concurrent 이식과 메모리 측정은 하지 않았다. 시스템 부하와 항목별 회차 차이 때문에 작은 변화는 보수적으로 해석한다.
+
+## 이전 — 위치 기반 keyed 매칭과 캐시 적중 경로 (2026-10-31)
+
+- done: base 기본 경로 네 곳을 바꿨다(새 API 없음). 키가 유일하다고 증명된 목록의 위치 매칭(`9bb0fb3`), 순서 그대로인 목록 자식의 제자리 갱신(`e0c0549`), 같은 노드 반환(`b1fc8af`), 태그 문자열로 커스텀 엘리먼트 확인(`197dcea`). [결과](./POSITIONAL_KEYS_RESULTS.md), [도구](../../experiments/positional-keys/README.md).
+- result: 샌드박스(Chromium 153, 스크립트 시간만)에서 새 페이지 조건 select −45%, 1행 삭제 −24%, 1k 생성 −14%, 교환 −13%, 부분 갱신 −7%. 웜업 상태 select −51%, 부분 갱신 −29%, 삭제 −21%. 공식 러너 값이 아니다.
+- size: base Brotli 4,817 → 4,925B. 소유자가 +150B까지 허용했고, 측정 증가분 101B를 `BASE_RENDER_ALLOWANCE`로 반영했다.
+- validation: `test:dual`, e2e 78, `verify:concurrent`, tsc/ESLint/Prettier 통과. `core-keyedFastPath`의 children getter 읽기 계약을 base는 읽지 않는 것으로 바꿨다.
+- next: Mac 공식 러너 9항목 양순서. 부분 갱신 전체 시간이 늘면 `b1fc8af`만 되돌린다. concurrent 이식과 메모리 측정은 하지 않았다.
+- branch: `ccr-13e38382-ayms8k`(main `7796eb1` 기준). main 병합은 별도다.
+
+## 이전 — 증거 archive 위치 변경과 브랜치 규칙 (2026-10-31)
 
 - done: 2026-10-29~30의 새 archive 5개(c4-list-boundary·c4-owner·c4-key-snapshot·static-dynamic·bulk-removal-v2, 합계 224,675,015B)를 GitHub Release [`benchmark-evidence`](https://github.com/superlucky84/lithent/releases/tag/benchmark-evidence)로 옮겼다. 업로드한 asset의 크기·SHA-256이 각 manifest와 같다. 결과 문서와 `report.mjs`의 archive 링크를 release 주소로 바꿨고 `docs/benchmark/*.tar.gz`를 `.gitignore`에 넣었다. 그 전 archive는 git에 그대로 둔다.
 - history: archive를 이력에서 빼려고 `perf/c4-key-snapshot`의 4커밋을 main 위의 `perf/c4-bulk-removal`로 다시 쌓았다. archive 외 tree는 같다. SHA 대응은 `7f4df5c`→`b3cd570`, `4109bd3`→`b4f6b57`, `a56bae1`→`c578a2f`, `c53569e`→`b1ca5e3`이며, 아래 기록의 옛 SHA는 이 대응으로 읽는다.

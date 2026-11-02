@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <body>
+    <script type="module">
+      const q = new URLSearchParams(location.search);
+      const vs = q.get('vs').split(','),
+        sc = q.get('sc'),
+        n = Number(q.get('n'));
+      const flush = () => new Promise(queueMicrotask);
+      const benches = [];
+      for (const v of vs) {
+        const t = document.createElement('table');
+        const tb = document.createElement('tbody');
+        t.appendChild(tb);
+        document.body.appendChild(t);
+        const [vn, md] = v.split(':');
+        const { makeBench } = await import(`./out/${vn}/app.mjs`);
+        benches.push(makeBench(tb, md || 'flat'));
+      }
+      const actOf = b =>
+        ({
+          select: i => b.select(i),
+          swap: () => b.swap(),
+          update: () => b.update(),
+          replace: () => b.run(),
+          add: () => b.add(),
+          create: { pre: () => b.clear(), act: () => b.run() },
+          clear: { pre: () => b.run(), act: () => b.clear() },
+          remove: {
+            pre: () => b.rows() < 500 && b.run(),
+            act: () => b.remove(),
+          },
+          updr: (() => {
+            let c = 0;
+            return {
+              pre: () => {
+                if (++c % 8 === 0) b.run();
+              },
+              act: () => b.update(),
+            };
+          })(),
+          runlots: { pre: () => b.clear(), act: () => b.runLots() },
+        })[sc];
+      const acts = benches.map(actOf);
+      for (const b of benches) {
+        b.run();
+        await flush();
+      }
+      const times = vs.map(() => []);
+      const B = 10,
+        rounds = Math.ceil(n / B) + 3;
+      let i = 0;
+      for (let r = 0; r < rounds; r++) {
+        const order = vs.map((_, k) => k);
+        for (let k = order.length - 1; k > 0; k--) {
+          const j = Math.floor(Math.random() * (k + 1));
+          [order[k], order[j]] = [order[j], order[k]];
+        }
+        for (const k of order) {
+          const a = acts[k];
+          let sum = 0;
+          for (let b = 0; b < B; b++) {
+            if (typeof a === 'object') {
+              a.pre();
+              await flush();
+            }
+            const t = performance.now();
+            typeof a === 'object' ? a.act() : a(i + b);
+            await flush();
+            sum += performance.now() - t;
+          }
+          if (r >= 3) times[k].push(sum / B);
+        }
+        i += B;
+      }
+      window.result = times;
+    </script>
+  </body>
+</html>

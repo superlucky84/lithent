@@ -281,7 +281,7 @@ const typeUpdate = (newWDom: WDom) => {
 
   if (newWDom.el) {
     const { op: oldProps, props } = newWDom;
-    updateProps(props, newWDom.el, oldProps);
+    updateProps(props, newWDom.el, oldProps, newWDom.tag);
 
     if (newWDom.tag === 'input') {
       (newWDom.el as HTMLInputElement).value = String(
@@ -303,14 +303,22 @@ const typeUpdate = (newWDom: WDom) => {
  */
 const updateChildren = (newWDom: WDom) => {
   const children = newWDom.children || [];
+  let last = -1;
 
+  // Nothing added or replaced, and the matched children still in their
+  // original order (oi rising): each is updated where it is, with no
+  // placement pass. `last < (last = oi)` compares with the previous oi.
   if (
     newWDom.type !== 'l' ||
-    !children.some(
-      item => 'ATS'.includes(item.nr as string) || item.oi !== undefined
+    children.every(
+      ({ nr, oi }) =>
+        nr !== 'A' && nr !== 'S' && (oi === undefined || last < (last = oi))
     )
   ) {
-    children.forEach(wDomUpdate);
+    children.forEach(item => {
+      wDomUpdate(item);
+      item.oi = undefined;
+    });
     return;
   }
 
@@ -511,9 +519,13 @@ const updateText = (newWDom: WDom) => {
 const updateProps = (
   props?: Props,
   element?: HTMLElement | Element | DocumentFragment | Text,
-  oldProps?: Props | null
+  oldProps?: Props | null,
+  tag?: string
 ) => {
   const originalProps = oldProps || {};
+  // Only a tag with a dash names a custom element (a portal's element is
+  // its target): the others skip reading the element for each prop set.
+  const custom = !tag || tag === 'portal' || tag.includes('-');
 
   for (const dataKey in props) {
     const dataValue: unknown = props[dataKey];
@@ -563,6 +575,7 @@ const updateProps = (
           // Only keys HTMLElement lacks: `textContent` or `offsetWidth` would
           // run a DOM setter or throw.
           if (
+            custom &&
             isPendingCustomElement(element) &&
             !(dataKey in HTMLElement.prototype)
           ) {
@@ -650,7 +663,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
 
   wDomChildrenToDom(wDom, children, element, isHydration);
 
-  updateProps(props, element, null);
+  updateProps(props, element, null, tag);
 
   addMountedQueue(wDom);
 
