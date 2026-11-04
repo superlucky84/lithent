@@ -1,5 +1,35 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
+## 현재 작업 — 블로그 편집 결정 (2026-11-05)
+
+BLOG-R1~BLOG-R6 / BLOG-M1~BLOG-M6. 이번 대화에서 사용자가 확인한 편집 방향이다. 원고는 계속 다듬는 중이며, 아래의 과거 코어 설계·검증을 새 구현 계획으로 재개하지 않는다.
+
+- [x] BLOG-DC1 — 문서의 역할: [공부용 원본](./BLOG_POST_LIS_OPTIMIZATIONS.ko.md)은 자세한 기술 근거, [블로그 원고](./BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md)는 개발자의 경험을 담는 글이다. LIS는 [전편](https://subtleflo.com/2026/8/10/refactoring-key-diff-in-my-own-virtual-dom)에서 다뤘으므로 링크와 한 문장만 남긴다. → BLOG-M1.
+- [x] BLOG-DC2 — 저자의 목소리: AI 이전부터 몇 년간 작은 클로저 기반 가상 DOM 라이브러리를 만들었고, 원하는 동작을 거의 구현한 뒤 속도에 관심을 갖게 됐다. 이번에는 처음부터 AI 에이전트로 병목 후보를 찾고 함께 우선순위를 정해 시험했다. "먼저 밝혀 둘 게 있다, AI의 도움을 많이 받았다" 같은 상투적인 고백은 삭제했다. "영리하게 일한다"보다 "더 영리하게 할 방법을 찾으려고 노력한다"로 낮추고, 작은 후보를 AI가 찾았다는 고백에는 😅를 사용한다. → BLOG-M2.
+- [x] BLOG-DC3 — 강조할 경험: 정확하게 삭제하려고 DOM마다 `remove()`를 호출하고 `on*` 이벤트를 빠짐없이 해제한 정직함이 병목이 됐다는 아이러니가 중심이다. 계산과 정확성에 몰두해 숲을 놓쳤다는 자각을 살린다. 함수 재사용으로 개발할 때의 생각할 부담을 줄였어도, 실행 시 같은 계산이 반복될 수 있었다는 깨달음과 "영리한 성실함"을 연결한다. 목록 최적화는 탐색·재배치 준비·같은 객체의 재비교 생략 정도로 설명하며 내부 분기와 배열 이름을 길게 나열하지 않는다. → BLOG-M2, BLOG-M3.
+- [x] BLOG-DC4 — 캐시와 회수: `cacheUpdate`를 `memo` 같은 효과로 생각했지만 캐시 바깥의 props 동기화·갱신 준비·출력 래퍼 비용은 남았다. 같은 컴포넌트의 일반 갱신에서 마운터를 다시 실행한 것은 아니다. 저자는 캐시를 좋아하지 않고 구조만 잘 설계해도 충분한 속도를 얻는다고 믿지만, 벤치마크에서는 수치를 위해 행 출력을 적극 캐시하는 기교를 썼다고 인정한다. 회수 절 제목은 "한 줄짜리 함수가 메모리 회수를 늦추고 있었다"다. 평소 메모리를 테스트했고 회수의 유예도 받아들였지만, 이번 반복 검증에서 필요 이상으로 오래 남는 참조를 발견했다는 흐름이다. 사용자는 원래 코드를 단순히 "누수"로 규정하는 표현을 원하지 않는다. 다만 기록은 강제 GC 뒤에도 이전 노드가 남았으므로 일정 시간 후 저절로 회수됐다고 새로 단정하지 않는다. 중첩 함수를 피하는 것이 항상 정답이라는 결론도 내리지 않는다. → BLOG-M3, BLOG-M4.
+- [x] BLOG-DC5 — 이미 알던 것과 새로 체감한 것: `undefined` 대입 자체는 이미 알고 있었고, AI와 최적화하면서 성능 차이를 체감했다. 노드 팩토리는 여러 종류의 WDom에 공통 속성 13개를 같은 순서로 미리 넣어 읽고 쓰는 비용을 줄인 변경이다. 이미 존재하는 속성의 값을 업데이트하는 순서를 맞춘 기능이나, 생성 함수 호출 자체가 빠르다는 뜻이 아니다. dictionary mode/fast properties를 해설하던 문단은 사용자 요청으로 삭제했다. → BLOG-M3, BLOG-M4.
+- [x] BLOG-DC6 — 가치와 손익: 번들 크기 대비 이득이 작은 후보는 제외했다. 크기는 minified UMD/Brotli 기준 "4KB대"로 쓰며 4KB 이하라고 바꾸지 않는다. compact13에서는 전체 시간 약 5.9% 감소를 위해 1만 행 메모리 약 2.5% 증가를 받아들였다. 모든 필드를 넣는 안은 제외했다. 일괄 삭제의 정체성 검사는 컴포넌트 행 삭제 약 7.84% 개선과 일반 행의 약 1% 추가 비용 가능성을 함께 적는다. 이벤트 proxy는 일반 inline UI 이득이 있었으나 기존 캐시 앱의 추가 이득·번들·메모리·native 연동을 고려해 잠시 채택한 뒤 복원했다. 단순히 모든 경우에 효과가 없었다고 쓰지 않는다. 미세한 속도 경쟁에는 여전히 회의적이고, 예측 가능성과 동작의 투명성을 더 중요하게 여기면서도 개선하는 재미를 발견했다는 마무리를 유지한다. → BLOG-M3, BLOG-M4.
+
+### 다음 편집에서 찾아볼 기록
+
+| 주제                                          | 근거                                                                                                                                                                                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 전체 이력과 최종 결정                         | [benchmark/HANDOFF](../benchmark/HANDOFF.md), 이 문서와 [IMPLEMENT](./IMPLEMENT.md)의 기존 성능 작업 기록                                                                             |
+| 초기 삭제 병목·리스너 해제 생략               | [STATUS](../benchmark/STATUS.md)                                                                                                                                                      |
+| 캐시 바깥의 갱신 비용·반복 delete             | [CORE_ANALYSIS](../benchmark/CORE_ANALYSIS.md)                                                                                                                                        |
+| 행 경계 제거·부모 getter·강제 GC/WeakRef 결과 | [PRODUCTION_RESULTS](../benchmark/PRODUCTION_RESULTS.md)                                                                                                                              |
+| 일괄 삭제의 이득·외부 노드 버그·비용          | [BULK_REMOVAL_V2_RESULTS](../benchmark/BULK_REMOVAL_V2_RESULTS.md)                                                                                                                    |
+| compact13과 full22의 채택·메모리·번들         | [NODE_SHAPE_RESULTS](../benchmark/NODE_SHAPE_RESULTS.md)                                                                                                                              |
+| 이전 노드 없는 경우의 타입 비교 생략          | [CREATION_PROFILE](../benchmark/CREATION_PROFILE.md)                                                                                                                                  |
+| 최신 목록 최적화 묶음                         | [POSITIONAL_KEYS_OFFICIAL_RESULTS](../benchmark/POSITIONAL_KEYS_OFFICIAL_RESULTS.md)                                                                                                  |
+| 이벤트 핸들러 테이블·공유 proxy와 최종 복원   | [NATIVE_EVENTS_RESULTS](../benchmark/NATIVE_EVENTS_RESULTS.md), [COMPREHENSIVE_RESULTS](../benchmark/COMPREHENSIVE_RESULTS.md), [보존 구현](../../experiments/comprehensive/event.ts) |
+| 프레임 대기·React/Preact 비교                 | [SELECT_VSYNC_PHASE](../benchmark/SELECT_VSYNC_PHASE.md), [PEER_BASELINE_RESULTS](../benchmark/PEER_BASELINE_RESULTS.md)                                                              |
+
+### 최신 편집 지점
+
+"이미 아는 사실을 매번 다시 계산하고 있었다" 절에서 내부 구현 설명을 줄였다. 가장 최근에는 "항목의 위치를 굳이 다시 찾을 필요가 없을 때는 탐색을 건너뛰었다"로 고치고, 함수를 재사용해 인지 부담을 줄이는 습관과 실행 비용의 차이를 소감으로 넣었다. 다음에는 사용자가 새로 지정하는 부분부터 이어서 다듬는다. 남은 문단 전체를 자동으로 다시 쓰거나 새 성능 실험을 시작하지 않는다.
+
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.

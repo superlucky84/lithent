@@ -1,5 +1,16 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
+## 현재 작업 — 블로그 편집 체크포인트 (2026-11-05)
+
+BLOG-R1~BLOG-R6 / BLOG-DC1~BLOG-DC6 / BLOG-P1~BLOG-P3. 이번에는 아래 문서 확인만 수행한다. 기존 코어 테스트·측정 기록의 체크를 이번 실행 결과로 재사용하지 않는다.
+
+- [x] BLOG-M1 — [공부용 원본](./BLOG_POST_LIS_OPTIMIZATIONS.ko.md)과 [블로그 편집 대상](./BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md), LIS 전편 링크, benchmark 근거의 역할이 구분된다.
+- [x] BLOG-M2 — 사용자 목소리: 직접 반복 구현한 정확성의 역설, AI의 실질적인 도움, 캐시에 대한 고백, 예측 가능성·투명성 우선, "노력하는 편"의 낮춘 말투와 최신 함수 재사용 소감이 유지된다. 독자가 내부 구현을 알아야 하는 설명을 되살리지 않는다.
+- [x] BLOG-M3 — 수치·이력: 앱 전후/코어 변경과 진단/공식 러너를 구분한다. compact13의 메모리 증가, bulk removal의 손익, proxy의 잠시 채택 후 복원, 개별 실험 간 합산 불가를 근거 문서에 대조한다. 측정을 모두 사용자가 직접 했다고 쓰지 않는다.
+- [x] BLOG-M4 — 사실 경계: 마운터 재실행으로 설명하지 않는다. `undefined` 방법은 이미 알던 것이고 성능 효과를 체감한 것으로 쓴다. 속성 값 갱신 순서를 맞춘 기능으로 설명하지 않는다. 회수는 필요 이상으로 오래 유지된 참조이며, 기록에 없는 자동 회수 기한이나 중첩 함수의 보편적 해법을 만들지 않는다. 번들 "4KB대"의 압축 형식을 유지한다.
+- [x] BLOG-M5 — 두 글, 네 정본, benchmark/HANDOFF의 새 로컬 링크·인계 경로와 원고의 고정 커밋 링크 대상을 확인했다. 로컬 링크 31개·고정 커밋 대상 11개가 존재한다. 역사 기록의 링크와 원자료는 재작성하지 않았다.
+- [x] BLOG-M6 — 원고와 인계 Markdown 6개의 Prettier 및 `git diff --check`를 통과했다. git 변경 범위는 원고와 인계 문서뿐이고, 공부용 원본·런타임·벤치마크 자료는 변경하지 않았다.
+
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.

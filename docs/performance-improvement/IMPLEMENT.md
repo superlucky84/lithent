@@ -1,5 +1,56 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
+## 현재 작업 — 블로그 편집 체크포인트 (2026-11-05)
+
+현재 작업은 한국어 블로그 원고 편집이다. 아래 기존 코어 구현 단계는 역사 기록이며 새로 진행하지 않는다. 재개 정보는 [상태 / 핸드오프](#상태--핸드오프), 편집 요구·결정은 [REQUIREMENTS](./REQUIREMENTS.md)의 BLOG-R1~BLOG-R6과 [DESIGN](./DESIGN.md)의 BLOG-DC1~BLOG-DC6에 있다.
+
+### BLOG-P1 — 원고 편집과 재개 문서 동기화 (체크포인트 완료)
+
+Refs: BLOG-R1, BLOG-R2, BLOG-R3, BLOG-R4, BLOG-R5, BLOG-R6, BLOG-DC1, BLOG-DC2, BLOG-DC3, BLOG-DC4, BLOG-DC5, BLOG-DC6
+
+진입: `bfd5f99`의 두 초안과 기존 benchmark 기록. 종료: 이번 대화에서 확인한 표현·소감과 사실 경계를 원고와 인계 문서에 보존한다. 원고 전체의 최종 완료를 뜻하지 않는다.
+
+- [x] 공부용 원본과 편집용 블로그의 역할·경로를 구분했다.
+- [x] 사용자의 문장별 요구를 블로그에 반영하고 편집 결정을 DESIGN에 남겼다.
+- [x] benchmark 인계에서 현재 원고 편집과 과거 구현·측정을 구분한다.
+
+Files:
+
+- `docs/performance-improvement/BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md` (modified)
+- `docs/performance-improvement/REQUIREMENTS.md` (modified)
+- `docs/performance-improvement/DESIGN.md` (modified)
+- `docs/performance-improvement/IMPLEMENT.md` (modified)
+- `docs/performance-improvement/MANUAL_TEST_CHECKLIST.md` (modified)
+- `docs/benchmark/HANDOFF.md` (modified)
+
+### BLOG-P2 — Test Hardening: 사실·서술 대조 (완료)
+
+Refs: BLOG-R2, BLOG-R3, BLOG-R4, BLOG-R5, BLOG-M2, BLOG-M3, BLOG-M4
+
+진입: BLOG-P1의 원고와 편집 결정. 종료: 과거 측정의 범위, 마운터/캐시, 회수, 노드 팩토리, 이벤트 proxy의 설명을 원본과 근거 기록에 대조한다.
+
+- [x] 원고 전체와 이번 대화에서 확인한 소스 기록을 대조해 BLOG-M2~BLOG-M4를 확인했다.
+- 런타임·테스트 코드 변경과 새 벤치마크가 없으므로 런타임 suite와 성능 재수집은 N/A다.
+
+Files:
+
+- `docs/performance-improvement/IMPLEMENT.md` (modified)
+- `docs/performance-improvement/MANUAL_TEST_CHECKLIST.md` (modified)
+
+### BLOG-P3 — Integration Test: 문서 연결·형식·인계 (완료)
+
+Refs: BLOG-R1, BLOG-R6, BLOG-M1, BLOG-M5, BLOG-M6
+
+진입: BLOG-P2 완료. 종료: 두 글과 네 정본·benchmark 인계의 로컬 연결, 편집 범위, Prettier/공백 검사를 통과한다.
+
+- [x] BLOG-M1/BLOG-M5/BLOG-M6을 확인했다. 로컬 링크 31개와 원고의 고정 커밋 근거 대상 11개가 존재한다. 대상 Markdown 6개의 Prettier와 `git diff --check`를 통과했다.
+- 문서 검증 뒤 `docs/perf-blog` 브랜치에 커밋·푸시한다. ctxbin `lithent/docs/perf-blog` 저장은 하지 못했으며(2026-11-05 사용자 확인), 재개 정보는 이 문서와 `docs/benchmark/HANDOFF.md`에만 있다. 병합·게시·릴리스는 이번 범위가 아니다.
+
+Files:
+
+- `docs/performance-improvement/IMPLEMENT.md` (modified)
+- `docs/performance-improvement/MANUAL_TEST_CHECKLIST.md` (modified)
+
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
@@ -474,6 +525,20 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 - [x] 현재 compact13 archive의 SHA-256·gzip33,532,074B·1,367entry를 확인하고 오래된 최종 증거/커밋 표기를 정정했다. Prettier와 `git diff --check`를 통과했다. 이번 변경은 문서5개이며 runtime 테스트/성능 수집은 미실행이다.
 
 ## 상태 / 핸드오프
+
+### 현재 — 블로그 원고를 사용자와 다듬는 중 (2026-11-05)
+
+- objective: 기존 성능 구현을 진행하는 것이 아니라, 실제 경험과 고백이 드러나는 블로그 글을 문장별로 다듬는 중이다. 사용자 후속 요청부터 이어서 반영한다.
+- files: 공부용 원본은 `docs/performance-improvement/BLOG_POST_LIS_OPTIMIZATIONS.ko.md`, 수정 대상은 `docs/performance-improvement/BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md`다. 원본은 이번에 수정하지 않았다.
+- sources: `docs/benchmark/HANDOFF.md`와 주제별 결과·최종 채택 기록을 읽는다. 구체적인 파일 대응표와 저자의 표현·의도는 DESIGN의 블로그 편집 결정에 있다. 원고의 링크는 당시 측정 근거이며 새 실험을 의미하지 않는다.
+- done: 서론, 캐시의 의도와 실제 비용, 정직한 삭제·이벤트 정리의 역설, 회수 표현, `undefined`와 compact13의 이해, 작은 반복과 함수 재사용의 차이를 반영했다. LIS는 전편 링크 한 문장으로 줄였다. 최신 편집은 "이미 아는 사실을 매번 다시 계산하고 있었다" 절이다.
+- voice: AI가 실제 후보 발견·구현·측정을 도왔음을 자연스럽게 인정한다. 독자가 Lithent 내부를 다 알아야 하는 설명과 상투적인 AI 고지를 피한다. 저자의 예측 가능성·투명성 우선, 캐시를 선호하지 않는 생각과 벤치마크에서 캐시를 적극 쓴 고백을 유지한다.
+- validation: 이번 체크포인트의 결과는 위 BLOG-P2/BLOG-P3과 MANUAL_TEST_CHECKLIST의 BLOG-M1~BLOG-M6에서 확인한다. 이번에 런타임 테스트나 성능을 새로 실행한 것으로 쓰지 않는다.
+- next: 다음 대화에서 사용자가 지정하는 문장부터 계속 수정한다. 전체 원고의 최종 승인·게시는 아직 아니다. 이번 저장 요청 때문에 추가 개선안이나 새 코어 구현을 시작하지 않는다.
+- commit/sync: 브랜치 `docs/perf-blog`, 작성 기준 SHA `bfd5f99fe1bc116ae999c3c7d250d9d005f178dc`. 이 인계를 포함한 최종 커밋은 `git log -1 --format=%H`와 원격 브랜치로 확인한다. ctxbin `lithent/docs/perf-blog`에는 저장하지 않았다(2026-11-05 사용자 확인). 재개는 이 절과 DESIGN의 블로그 편집 결정만으로 한다.
+- blockers: 원고 편집의 알려진 블로커 없음. 사용자의 후속 문장 수정 요구를 기다리는 체크포인트다.
+
+### 기존 성능 구현 기록 — 2026-10-30
 
 - done: HEAD `a56bae1`에서 DC-28을 진행했다. 보존 trace로 select 공식 전체가 runner 강제 GC 시간 mod 16.67ms가 정하는 BeginFrame 대기를 포함함을 확인했다. Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. 이 근거로 2026-10-19 bulk removal을 base·concurrent `findChildWithRemoveElement`에 정체성 비교 방식으로 다시 옮겼다. 공유 6검사·`test:dual` 1,166/skip 3·e2e 78·`verify:concurrent`를 통과했다.
 - result: 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36), active +0.32%(main−0.32/reverse−0.37)로 중립이다. 행 component 앱 C는 전체 삭제 −7.84%(main−8.80/reverse−5.95), JS −10.40%, active −8.41%, 가중 −0.68%(main−1.55/reverse+0.41)다. 교차 진단에서는 C −4.98%(29/40), A +0.97%(27/40 느림·동률 1, script만 p=0.024)였다. 메모리 ±0.6% 이내, base Brotli 4,819→4,817B, concurrent 6,935→6,953B다. A 앱 select는 전체 −8.91%·active −0.28%로 지난번과 반대 방향이었다. [select 대기](../benchmark/SELECT_VSYNC_PHASE.md), [bulk removal v2](../benchmark/BULK_REMOVAL_V2_RESULTS.md).

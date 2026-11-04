@@ -1,5 +1,18 @@
 # REQUIREMENTS — 코어 갱신 범위와 전체 렌더링 성능 개선
 
+## 현재 작업 — 성능 개선 블로그 편집 (2026-11-05)
+
+현재는 `doc-driven-designer-v1`로 남긴 성능 개선 기록을 바탕으로 블로그 원고를 사용자와 다듬고 있다. 아래 코어 최적화 요구사항은 당시 구현 기록이며, 이번 작업은 런타임 변경이나 새 성능 측정이 아니다.
+
+- BLOG-R1. 공부용 원본은 [BLOG_POST_LIS_OPTIMIZATIONS.ko.md](./BLOG_POST_LIS_OPTIMIZATIONS.ko.md), 편집 대상은 [BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md](./BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md)다. 원본을 근거로 삼고 블로그용 글에 후속 요구를 반영한다.
+- BLOG-R2. [benchmark/HANDOFF](../benchmark/HANDOFF.md)와 해당 주제의 측정 보고서, 기존 DESIGN/IMPLEMENT의 최종 채택 결정을 확인한다. 과거 후보와 현재 구현, 진단과 공식 러너 수치를 구분하며 서로 다른 실험의 개선율을 합산하지 않는다.
+- BLOG-R3. 독자는 Lithent 내부를 모르는 일반 개발자다. 구현 설명은 필요한 만큼만 남기고, 실제 만든 사람의 경험·고백·발견을 자연스러운 한국어로 쓴다. AI가 쓴 듯한 방어적 해설이나 뻔한 AI 도움 고지는 되살리지 않는다.
+- BLOG-R4. 작은 번들과 정확한 동작을 우선했던 출발점, AI와 병목 후보의 우선순위를 정해 개선한 과정, 정직하게 반복하던 코드가 병목이었다는 아이러니를 보존한다. 측정·후보 발견은 AI의 도움을 받은 것으로 쓰며 사용자가 모두 직접 수행한 것처럼 서술하지 않는다.
+- BLOG-R5. 사용자의 감상과 확인된 사실을 구분한다. 특히 마운터 재실행, 객체 속성 생성 순서, 메모리 회수 유예, 이벤트 프록시의 채택 이력을 근거 없이 단정하지 않는다. 구체적인 표현과 사실 경계는 DESIGN의 BLOG-DC1~BLOG-DC6을 따른다.
+- BLOG-R6. 원고는 아직 편집 중이다. 이번은 git 문서 인계를 남기는 체크포인트이며 최종 원고 승인이나 게시가 아니다. ctxbin에는 저장하지 않았으므로, 다음 작업자는 아래 설명을 다시 요구하지 않고 이 문서들만으로 재개할 수 있어야 한다.
+
+검증 기준은 [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md)의 BLOG-M1~BLOG-M6, 진행·재개 정보는 [IMPLEMENT](./IMPLEMENT.md)의 블로그 편집 단계와 상태 / 핸드오프에 있다.
+
 > **DC-25 첫 후보는 검증 후 미채택으로 종료했다.** 기본 이벤트 계약은 DC-23/R62~R66을 유지한다. DC-22의 proxy 적용/검증/측정은 당시 이력이다.
 
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**

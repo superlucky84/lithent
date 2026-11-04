@@ -1,6 +1,17 @@
 # summary
 
-## 최신 — lithent 1.25.5 릴리스 준비와 최종 검토 (2026-11-02)
+## 최신 — 성능 개선 블로그를 사용자와 편집 중 (2026-11-05)
+
+- scope: `doc-driven-designer-v1`로 남긴 기존 구현·측정 기록을 참고해 블로그 문장을 다듬는 중이다. 새 성능 개선·런타임 변경·측정 작업이 아니다. 이번은 git 문서 인계를 남기는 체크포인트이며 원고의 최종 승인이나 게시가 아니다.
+- files: 공부용 원본은 [BLOG_POST_LIS_OPTIMIZATIONS.ko.md](../performance-improvement/BLOG_POST_LIS_OPTIMIZATIONS.ko.md), 실제 수정 대상은 [BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md](../performance-improvement/BLOG_POST_JS_FRAMEWORK_BENCHMARK.ko.md)다. 원본은 수정하지 않는다.
+- decisions: 구체적인 사용자 말투·의도·소감과 기술적 사실 경계는 [DESIGN의 현재 블로그 편집 결정](../performance-improvement/DESIGN.md)에 있다. AI와 병목 후보를 정해 시험한 과정, 정확하게 하나씩 지우고 이벤트를 해제한 정직함이 병목이었다는 역설, 캐시 사용에 대한 고백, 메모리 회수 표현과 `undefined`/compact13의 이해를 반영했다.
+- latest edit: "이미 아는 사실을 매번 다시 계산하고 있었다" 절에서 세부 분기를 줄였다. "항목의 위치를 굳이 다시 찾을 필요가 없을 때는 탐색을 건너뛰었다"와 함수 재사용이 개발자의 인지 부담은 줄여도 반복 계산까지 줄여 주지는 않았다는 소감을 넣었다.
+- sources: 이 폴더의 보고서와 최종 채택 기록을 계속 참고한다. STATUS/CORE_ANALYSIS/PRODUCTION_RESULTS/BULK_REMOVAL_V2_RESULTS/NODE_SHAPE_RESULTS/CREATION_PROFILE/POSITIONAL_KEYS_OFFICIAL_RESULTS/NATIVE_EVENTS_RESULTS가 주요 근거이며, [DESIGN](../performance-improvement/DESIGN.md)에 주제별 연결표가 있다.
+- validation: [원고 확인 기준](../performance-improvement/MANUAL_TEST_CHECKLIST.md)의 BLOG-M1~BLOG-M6과 [실행·현재 인계](../performance-improvement/IMPLEMENT.md)의 BLOG-P1~BLOG-P3을 따른다. 과거 런타임 테스트·측정을 이번에 다시 실행했다고 쓰지 않는다.
+- next: 사용자가 다음으로 지정하는 문장을 이어서 다듬는다. 전체 글을 임의로 다시 쓰거나 새 코어 실험을 재개하지 않는다. 다음 작업자는 위 DESIGN과 두 글을 읽고 바로 재개한다.
+- commit/sync: `docs/perf-blog`, 작성 기준 `bfd5f99fe1bc116ae999c3c7d250d9d005f178dc`. 체크포인트의 실제 SHA·원격 반영 결과는 `git log -1`과 원격 브랜치에서 확인한다. ctxbin `lithent/docs/perf-blog`에는 저장하지 않았으므로(2026-11-05 사용자 확인) 이 절과 정본 문서만으로 재개한다. 현재 작업 트리의 성능 구현 상태는 아래 역사 기록과 구분한다.
+
+## 이전 — lithent 1.25.5 릴리스 준비와 최종 검토 (2026-11-02)
 
 - scope: 사용자 요청으로 root `lithent`를 1.25.4 → 1.25.5로 올리고 CHANGELOG·RELEASING을 현재 최적화와 호환성 변경에 맞췄다. Concurrent는 런타임 변경이 없어 0.2.4를 유지한다. npm 최신 1.25.4와 origin/main `7796eb1`을 확인했다. PR 생성이 이번 범위이며 병합·npm 발행은 후속이다.
 - review: 전체 빌드·`test:dual` 1,176통과/3제외·E2E 78·타입/린트·실제 tarball import/require/strict types·Concurrent 산출물·크기 검사를 통과했다. 1.25.5 manifest로 재빌드한 base ESM은 실측 후보와 SHA-256이 같다. base Brotli 4,925/4,925B다.
