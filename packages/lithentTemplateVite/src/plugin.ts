@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Plugin, PluginOption, ResolvedConfig, UserConfig } from 'vite';
-import { normalizePath, transformWithEsbuild } from 'vite';
+import { normalizePath, transformWithEsbuild, transformWithOxc } from 'vite';
 import { transformDocument } from '@lithent/lithent-template-parser';
 
 type LoaderValue = 'js' | 'jsx' | 'ts' | 'tsx' | 'json' | 'css';
@@ -90,16 +90,6 @@ const mergeExtensions = (
   return Array.from(set);
 };
 
-const mergeLoaderMap = (
-  original: LoaderMap | undefined,
-  additions: LoaderMap
-): LoaderMap => {
-  return {
-    ...(original ?? {}),
-    ...additions,
-  };
-};
-
 const VIRTUAL_QUERY = 'lithent:original';
 
 export function lithentTemplateVite(
@@ -111,6 +101,14 @@ export function lithentTemplateVite(
     acc[ext] = loader;
     return acc;
   }, {} as LoaderMap);
+  // The optimizer scans raw templates before our load hook compiles markup.
+  // Its parser must accept JSX even when the compiled document uses plain TS.
+  const scanLoaders: LoaderMap = Object.fromEntries(
+    Object.entries(extensionLoaders).map(([ext, loader]) => [
+      ext,
+      loader === 'ts' ? 'tsx' : loader === 'js' ? 'jsx' : loader,
+    ])
+  );
   const defaultInclude = extensions.map(
     ext => new RegExp(`${escapeRegExp(ext)}$`)
   );
@@ -140,15 +138,12 @@ export function lithentTemplateVite(
             userConfig.optimizeDeps?.extensions,
             extensions
           ),
-          esbuildOptions: {
-            ...(userConfig.optimizeDeps?.esbuildOptions ?? {}),
-            loader: mergeLoaderMap(
-              typeof userConfig.optimizeDeps?.esbuildOptions?.loader ===
-                'object'
-                ? (userConfig.optimizeDeps?.esbuildOptions?.loader as LoaderMap)
-                : undefined,
-              extensionLoaders
-            ),
+          rolldownOptions: {
+            ...userConfig.optimizeDeps?.rolldownOptions,
+            moduleTypes: {
+              ...userConfig.optimizeDeps?.rolldownOptions?.moduleTypes,
+              ...scanLoaders,
+            },
           },
         },
       };
@@ -232,19 +227,22 @@ export function lithentTemplateVite(
 
       const loader = extensionLoaders[ext] ?? inferLoader(ext);
       const transformedCode = result.transformed ? result.code : raw;
-      const esbuildResult = await transformWithEsbuild(
-        transformedCode,
-        originalPath,
-        {
-          loader,
-          sourcemap: config?.command === 'build',
-          sourcefile: originalPath,
-        }
-      );
+      // Oxc handles the script loaders. Preserve the existing opt-in JSON/CSS
+      // loaders through esbuild, which is an explicit plugin dependency.
+      const resultCode =
+        loader === 'json' || loader === 'css'
+          ? await transformWithEsbuild(transformedCode, originalPath, {
+              loader,
+              sourcemap: config?.command === 'build',
+            })
+          : await transformWithOxc(transformedCode, originalPath, {
+              lang: loader,
+              sourcemap: config?.command === 'build',
+            });
 
       return {
-        code: esbuildResult.code,
-        map: esbuildResult.map ?? null,
+        code: resultCode.code,
+        map: resultCode.map ?? null,
       };
     },
   };

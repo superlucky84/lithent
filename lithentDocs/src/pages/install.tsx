@@ -172,9 +172,13 @@ const code11 = `...
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
   },
 });
 `;

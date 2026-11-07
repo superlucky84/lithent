@@ -13,13 +13,21 @@ import { concurrentAlias } from './alias.js';
  * `../src` — outside this package's root.
  */
 export default defineConfig({
-  root: __dirname,
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
+  },
+  root: import.meta.dirname,
   resolve: {
     alias: [
-      ...concurrentAlias(__dirname),
+      ...concurrentAlias(import.meta.dirname),
       {
         find: /^lithent-concurrent$/,
-        replacement: resolve(__dirname, 'src/index.ts'),
+        replacement: resolve(import.meta.dirname, 'src/index.ts'),
       },
       {
         // The built bundle, not the source: the helper package aliases its own
@@ -27,7 +35,7 @@ export default defineConfig({
         // Run `pnpm build:concurrentHelper` first (`pnpm dev:concurrent` does).
         find: /^lithent-concurrent-helper$/,
         replacement: resolve(
-          __dirname,
+          import.meta.dirname,
           'helper/dist/lithentConcurrentHelper.mjs'
         ),
       },
@@ -37,6 +45,6 @@ export default defineConfig({
     // LITHENT_NO_OPEN lets a headless check start the server without
     // launching a browser.
     open: process.env.LITHENT_NO_OPEN ? false : '/html/transition.html',
-    fs: { allow: [resolve(__dirname, '..')] },
+    fs: { allow: [resolve(import.meta.dirname, '..')] },
   },
 });

@@ -7,6 +7,7 @@
  *
  *   pnpm check:scaffold              # 기본 코어
  *   pnpm check:scaffold:concurrent   # lithent -> lithent-concurrent
+ *   node scripts/check-scaffold.mjs --check  # build/SSR/CSS gates, then exit
  *
  * 스크래치 디렉터리에서만 작업하므로 `createLithent/express` 원본은 건드리지 않는다.
  */
@@ -73,7 +74,7 @@ const configPath = join(work, 'vite.config.js');
 const config = readFileSync(configPath, 'utf8');
 const target = `  resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(import.meta.dirname, './src'),
     },
   },`;
 
@@ -86,7 +87,14 @@ const swap = concurrent
   ? `      // anchored여야 한다. 접두사 매칭은 lithent/jsx-runtime 같은 서브패스까지 끌어간다.
       // 그리고 파일 경로가 아니라 패키지 이름으로 건다 — 이 템플릿은 lithent를
       // external로 두므로, 파일 경로를 넣으면 브라우저가 받을 수 없는 것이 나온다.
-      { find: /^lithent$/, replacement: 'lithent-concurrent' },
+      {
+        find: /^lithent$/,
+        replacement: 'lithent-concurrent',
+        // Resolve the bare replacement as a package, not a filesystem path.
+        customResolver(source, importer, options) {
+          return this.resolve(source, importer, { ...options, skipSelf: true });
+        },
+      },
 `
   : '';
 
@@ -96,7 +104,7 @@ writeFileSync(
     target,
     `  resolve: {
     alias: [
-${swap}      { find: '@', replacement: resolve(__dirname, './src') },
+${swap}      { find: '@', replacement: resolve(import.meta.dirname, './src') },
     ],
   },`
   )
@@ -224,6 +232,29 @@ if (hasMarkup) {
   ok('SSR 마크업이 채워져 있다');
 } else {
   bad('HTML이 사실상 비어 있다 — SSR이 안 됐다');
+}
+
+const stylesheet = html.match(
+  /<link\b[^>]*rel=["']stylesheet["'][^>]*href=["']([^"']+)["']/i
+);
+if (stylesheet) {
+  const response = await fetch(new URL(stylesheet[1], url));
+  if (
+    response.ok &&
+    response.headers.get('content-type')?.includes('text/css')
+  ) {
+    ok('SSR 스타일시트가 CSS로 제공된다');
+  } else {
+    bad(`SSR 스타일시트 응답이 올바르지 않다: ${stylesheet[1]}`);
+  }
+} else {
+  bad('SSR 스타일시트 링크가 없다');
+}
+
+if (process.argv.includes('--check')) {
+  server.kill();
+  await new Promise(done => server.once('close', done));
+  process.exit(process.exitCode || 0);
 }
 
 // --- 7. 사람 몫 --------------------------------------------------------------

@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/lithent-mdx",
-  "version": "0.2.7",
+  "version": "0.3.0",
   "description": "Vite plugin for MDX support in Lithent applications",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@lithent/hmr-parser": "workspace:*",
     "lithent": "workspace:*",
-    "vite": "^5.4.8"
+    "vite": "^8.3.6"
   },
   "keywords": [
     "lithent",
@@ -47,7 +47,7 @@
   },
   "peerDependencies": {
     "lithent": "^1.21.3",
-    "vite": "^5.0.0"
+    "vite": "^8.0.0"
   },
   "files": [
     "dist",

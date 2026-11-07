@@ -20,7 +20,7 @@ const coreAlias =
         {
           find: /^lithent$/,
           replacement: resolve(
-            __dirname,
+            import.meta.dirname,
             '../lithentConcurrent/dist/lithentConcurrent.mjs'
           ),
         },
@@ -29,37 +29,41 @@ const coreAlias =
 
 export default defineConfig(({ mode }) => ({
   plugins: [
-    checker({
-      typescript: true,
-      eslint: {
-        useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
-    }),
+    !process.env.VITEST &&
+      checker({
+        typescript: true,
+        eslint: {
+          useFlatConfig: true,
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
+      }),
     dts({
-      outputDir: ['dist'],
-      afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
+      outDir: ['dist'],
+      afterBuild: () =>
+        emitDeclarationFormats(resolve(import.meta.dirname, 'dist')),
     }),
   ],
   resolve: {
     alias: [
       ...coreAlias,
-      { find: '@', replacement: resolve(__dirname, './src') },
+      { find: '@', replacement: resolve(import.meta.dirname, './src') },
     ],
   },
   build: {
+    // Preserve the browser target used before the Vite 8 migration.
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     emptyOutDir: false,
     sourcemap: true,
     lib: {
       formats: ['es', 'umd', 'cjs'],
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'lithentSsr',
       fileName: format => {
         if (format === 'cjs') return 'lithentSsr.cjs';
         return format === 'umd' ? 'lithentSsr.umd.js' : 'lithentSsr.mjs';
       },
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: mode === 'production' ? ['lithent'] : [],
       output: {
         globals: {

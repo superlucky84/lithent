@@ -5,6 +5,14 @@ import dts from 'vite-plugin-dts';
 import { emitDeclarationFormats } from './scripts/emit-declaration-formats.mjs';
 import { minify } from 'terser';
 export default defineConfig({
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
+  },
   plugins: [
     // Builds still type-check and lint. Tests skip the checker: on Node
     // 24.19+, vitest aborts when it exits while the checker is still running.
@@ -17,8 +25,9 @@ export default defineConfig({
         },
       }),
     dts({
-      outputDir: ['dist'],
-      afterBuild: () => emitDeclarationFormats(resolve(__dirname, 'dist')),
+      outDir: ['dist'],
+      afterBuild: () =>
+        emitDeclarationFormats(resolve(import.meta.dirname, 'dist')),
     }),
     {
       name: 'compact-umd-identifiers',
@@ -47,27 +56,28 @@ export default defineConfig({
     },
   ],
   resolve: {
-    alias: [{ find: '@', replacement: resolve(__dirname, './src') }],
+    alias: [{ find: '@', replacement: resolve(import.meta.dirname, './src') }],
   },
   build: {
+    // Preserve the browser target used before the Vite 8 migration.
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     emptyOutDir: false,
     sourcemap: true,
     lib: {
       formats: ['es', 'umd', 'cjs'],
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'lithent',
       fileName: format => {
         if (format === 'cjs') return 'lithent.cjs';
         return format === 'umd' ? 'lithent.umd.js' : 'lithent.mjs';
       },
     },
-    rollupOptions: {
+    rolldownOptions: {
       // No Symbol.toStringTag "Module" marker on the UMD/CJS exports object.
       output: { generatedCode: { symbols: false } },
       treeshake: {
         moduleSideEffects: false,
         propertyReadSideEffects: false,
-        tryCatchDeoptimization: false,
       },
     },
   },

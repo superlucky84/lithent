@@ -1,0 +1,1096 @@
+{
+  "date": "2026-11-07T07:58:25.834Z",
+  "branch": "chore/vite8-migration",
+  "baselineHead": "d594983",
+  "node": "v24.22.1",
+  "pnpm": "12.15.0",
+  "versions": {
+    "vite": "8.3.6",
+    "rolldown": "1.2.16",
+    "vitest": "4.1.12",
+    "typescript": "5.6.3",
+    "terser": "5.18.1",
+    "dts": "4.5.4",
+    "tailwindTemplate": "4.3.4"
+  },
+  "target": ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
+  "artifacts": {
+    "base.mjs": {
+      "before": {
+        "raw": 19424,
+        "gzip9": 6573,
+        "brotli": 6007,
+        "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f"
+      },
+      "after": {
+        "raw": 16967,
+        "gzip9": 5792,
+        "brotli": 5273,
+        "sha256": "1fdd8cb1522e85df8290affd3f7c4cbe7042a1b6465078b78e28fcf96aa01795"
+      }
+    },
+    "base.cjs": {
+      "before": {
+        "raw": 12870,
+        "gzip9": 5397,
+        "brotli": 4995,
+        "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+      },
+      "after": {
+        "raw": 12447,
+        "gzip9": 5132,
+        "brotli": 4775,
+        "sha256": "509f1dea9e3ceb294cd73ad15d05798d6a518d3d015adae50ac216ea50611895"
+      }
+    },
+    "base.umd.js": {
+      "before": {
+        "raw": 13015,
+        "gzip9": 5325,
+        "brotli": 4925,
+        "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+      },
+      "after": {
+        "raw": 12589,
+        "gzip9": 5211,
+        "brotli": 4835,
+        "sha256": "1f567eb00773577c8c3914031fab8a0276c8f651d1d8cdae55a8dfde40f1d572"
+      }
+    },
+    "concurrent.mjs": {
+      "before": {
+        "raw": 27782,
+        "gzip9": 9080,
+        "brotli": 8280,
+        "sha256": "c5cf6a38e632043662d6d629759e383a3615a64abfb46ad031b6572883cc3703"
+      },
+      "after": {
+        "raw": 24208,
+        "gzip9": 8051,
+        "brotli": 7336,
+        "sha256": "895cb7aeba8e511d0deae3f584b698cb0c8f0e67dfb319c371af14267e48a226"
+      }
+    },
+    "concurrent.cjs": {
+      "before": {
+        "raw": 18426,
+        "gzip9": 7455,
+        "brotli": 6882,
+        "sha256": "24d9c6d9e7b7af9046443477a64c434df10f41e500f990888106fc417e140bd9"
+      },
+      "after": {
+        "raw": 17875,
+        "gzip9": 7182,
+        "brotli": 6638,
+        "sha256": "0627f6478de01ca7347f061736252fcf5f604314bc3c4c55d629fd0e251a0b6e"
+      }
+    },
+    "concurrent.umd.js": {
+      "before": {
+        "raw": 18487,
+        "gzip9": 7539,
+        "brotli": 6953,
+        "sha256": "099fbb826eb88ee9fda7776c394faf25a49a6b790cd361bcd4da06277e5269ad"
+      },
+      "after": {
+        "raw": 17921,
+        "gzip9": 7233,
+        "brotli": 6684,
+        "sha256": "2172b78dd61c8eb71406c7d123c4afbe2ee7cd7aa7d4e3d59f833b873a3f0d72"
+      }
+    }
+  },
+  "element": {
+    "raw": 2061,
+    "gzip9": 1119,
+    "brotli": 968,
+    "sha256": "cc3d95378bd8270fc5f16ee4960d78bd069f473637d58aa96fad53f1c778dc31"
+  },
+  "freshBuild": {
+    "identical": true,
+    "checked": 39,
+    "hashes": {
+      "dist/lithent.cjs": "509f1dea9e3ceb294cd73ad15d05798d6a518d3d015adae50ac216ea50611895",
+      "dist/lithent.mjs": "1fdd8cb1522e85df8290affd3f7c4cbe7042a1b6465078b78e28fcf96aa01795",
+      "dist/lithent.umd.js": "1f567eb00773577c8c3914031fab8a0276c8f651d1d8cdae55a8dfde40f1d572",
+      "lithentConcurrent/dist/lithentConcurrent.cjs": "0627f6478de01ca7347f061736252fcf5f604314bc3c4c55d629fd0e251a0b6e",
+      "lithentConcurrent/dist/lithentConcurrent.mjs": "895cb7aeba8e511d0deae3f584b698cb0c8f0e67dfb319c371af14267e48a226",
+      "lithentConcurrent/dist/lithentConcurrent.umd.js": "2172b78dd61c8eb71406c7d123c4afbe2ee7cd7aa7d4e3d59f833b873a3f0d72",
+      "helper/dist/lithentHelper.cjs": "ce434f477179bc23f758181cb6faf1f1c0d7d8830e0cec09b4f39bebe9b92902",
+      "helper/dist/lithentHelper.mjs": "53f89603c2b86844525fe021dbdb42d0b5a2e9e18226afb58dcf1cec20bb3a19",
+      "helper/dist/lithentHelper.umd.js": "87c3cb386ce18645b5d13de7fdd82d21c229357ad0b279a89be2172399594d01",
+      "devHelper/dist/lithentDevHelper.cjs": "456bb904a0d1710202312315c3ab154b272baefe2394e1337910791c2752b877",
+      "devHelper/dist/lithentDevHelper.mjs": "27797f4b98b5741d812a4095ec76b4e5679d248a767838eb37e798f07c11db0e",
+      "devHelper/dist/lithentDevHelper.umd.js": "39512ddf2ccb9e6ffb3548d38689da4c837cc031edad1108cbcde479aa58bfdc",
+      "ssr/dist/lithentSsr.cjs": "85865f61ff859846b5765d9e4d0810ce3773fde8ea00c38cc331a05c32d1464b",
+      "ssr/dist/lithentSsr.mjs": "cc90a6099b608e5959c46bfbebc6c1cf3af6554cf158430af798ca8c25962350",
+      "ssr/dist/lithentSsr.umd.js": "f90d5cb99a6e3221217526ba3729ca89be30084c429c74252eebb47ed167ef23",
+      "tag/dist/lithentTag.cjs": "2ba45b8e613d07d2a93a23e5159846cba5da2bcae3a1663e9582f334fdbdf7cb",
+      "tag/dist/lithentTag.mjs": "2e025cec10cbdd55f0c0af75d41c952af5843e914863528f58aca8262c9f1dc8",
+      "tag/dist/lithentTag.umd.js": "24d2edee0d9773737047ad996680213d5083db81a40a34027d0bd33318480d3a",
+      "ftags/dist/lithentFTags.cjs": "624a2ed51afbf6405d3d6f59576dcf4be35498ab83374b406570691bd2b1ee03",
+      "ftags/dist/lithentFTags.mjs": "6580c5d49b119c238fb4be31bf5a1b02d88f8937207849a99340704147407ae3",
+      "ftags/dist/lithentFTags.umd.js": "608fe4f0b9ae4b9321b1189d19f9129764e8666135befd3e7b7cf186e18e4d69",
+      "element/dist/lithentElement.cjs": "bda8d44a396223c246545d2ec3078ccd1e8e6b9488e2e711f01f317f6b6059f4",
+      "element/dist/lithentElement.mjs": "9f8b9087c67f2c9a1f40903025103a63689ef5d2f58dc9748e4b41cf25154e11",
+      "element/dist/lithentElement.umd.js": "cc3d95378bd8270fc5f16ee4960d78bd069f473637d58aa96fad53f1c778dc31",
+      "jsx-runtime/dist/jsxRuntime.cjs": "c1d8e285fb03edd902ecb61eef1984bf830a8692c91aa31c4bf18f80287840c9",
+      "jsx-runtime/dist/jsxRuntime.mjs": "32fbceed8345c32519d4ac6c444cf12f9b09d0ca583a256128504ae3d1ad2a78",
+      "jsx-runtime/dist/jsxRuntime.umd.js": "e132c672e9848f4bb7b4ec7d395f96b0629db6adfaeaec7a861e24e46e98842c",
+      "lithentConcurrent/helper/dist/lithentConcurrentHelper.cjs": "7bbbf530f4d73e204f4f0a4406c7230ea79214d4273424dfa8a575eae01d4f0a",
+      "lithentConcurrent/helper/dist/lithentConcurrentHelper.mjs": "2c98b3608da9d40ce70daa198d480bb0b8aefe936421852c1175672c78d1a0cd",
+      "lithentConcurrent/helper/dist/lithentConcurrentHelper.umd.js": "c28b6e7bf63ebf683c86502743af66e3ac2b4d8f9bf2e4698a1ca86d32d06a25",
+      "packages/hmrParser/dist/lithentHmrParser.mjs": "d4004dcc10d49d74527877222564f1652b2bd55b4710e260bbc8e2571c91316a",
+      "packages/hmrParser/dist/lithentHmrParser.umd.js": "7745a1c6c564f94632be04a41438f96a43f3414e31c1c66aa883cc7c523b72d0",
+      "packages/lithentTemplateParser/dist/index.mjs": "a783a216aa4d39c82a4fb1b1d66aa70015d32ef990095b018a3ad905c86bca1a",
+      "packages/lithentTemplateParser/dist/index.umd.cjs": "43aa978a2d45e1ddd183133c8a0ec63be3686fa2e19b2da860b6d0f61d4f10dd",
+      "packages/lithentTemplateVite/dist/index.mjs": "3941d7e4125c00494b98f9f29903d016423dcbb728f8a5d559b57912d347cd6b",
+      "packages/lithentMdx/dist/index.mjs": "e755185c2786a7e6d0177586b44fe71f501b5b6f846622f8bd24cc0d261c04dd",
+      "packages/lithentMdx/dist/index.umd.js": "0b15fe3b1d29334f896e26c4fb06f7954ba36eed65b39d04eaec7e698908f98f",
+      "packages/lithentVite/dist/index.mjs": "d856648047685fc71109b368da1972cfe5e542f7e0ee457f8c20408d6287f966",
+      "packages/lithentVite/dist/index.umd.js": "e45250bc85957f2ac077d83b6a421e7011c4c195feda9feee28d6b26037547e5"
+    }
+  },
+  "validation": {
+    "frozenInstall": "passed, strict minimum release age, no workspace policy exceptions",
+    "cleanBuild": "passed",
+    "dualTests": {
+      "passed": 1176,
+      "skipped": 3,
+      "note": "existing concurrent-only exclusions in the base suite"
+    },
+    "templateTests": {
+      "passed": 5
+    },
+    "e2e": {
+      "passed": 78,
+      "chromium": "151.0.7922.173"
+    },
+    "mutations": {
+      "passed": 5,
+      "expectedFailures": 6
+    },
+    "concurrentArtifacts": "passed after clean build",
+    "installedTarballs": "passed after clean build; ESM/CJS, 11 public paths, strict Node16/NodeNext declarations",
+    "scaffolds": {
+      "base": "build + correct core + SSR + CSS HTTP response passed",
+      "concurrent": "build + correct core + declarations + SSR + CSS HTTP response passed"
+    },
+    "templateIntegration": "dev and production passed; real dependency optimization metadata and production source maps"
+  },
+  "runtime": {
+    "warmed": {
+      "complete": true,
+      "date": "2026-11-07T07:15:44.343Z",
+      "note": "Local production ESM diagnostic; no browser rendering timing, CPU throttling or official benchmark equivalence. Same app, alternating order, fresh contexts, forced GC.",
+      "node": "v24.22.1",
+      "inputs": {
+        "base-before": {
+          "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f",
+          "raw": 19424,
+          "gzip": 6573,
+          "brotli": 6007
+        },
+        "base-after": {
+          "sha256": "1fdd8cb1522e85df8290affd3f7c4cbe7042a1b6465078b78e28fcf96aa01795",
+          "raw": 16967,
+          "gzip": 5792,
+          "brotli": 5273
+        },
+        "concurrent-before": {
+          "sha256": "c5cf6a38e632043662d6d629759e383a3615a64abfb46ad031b6572883cc3703",
+          "raw": 27782,
+          "gzip": 9080,
+          "brotli": 8280
+        },
+        "concurrent-after": {
+          "sha256": "895cb7aeba8e511d0deae3f584b698cb0c8f0e67dfb319c371af14267e48a226",
+          "raw": 24208,
+          "gzip": 8051,
+          "brotli": 7336
+        }
+      },
+      "samples": [
+        {
+          "round": 0,
+          "name": "base-before",
+          "updateMs": 74.70000000018626,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2948960,
+          "disposedHeap": 1629340,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 0,
+          "name": "base-after",
+          "updateMs": 68.59999999962747,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2950124,
+          "disposedHeap": 1649632,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 0,
+          "name": "concurrent-before",
+          "updateMs": 292.79999999981374,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 3097932,
+          "disposedHeap": 1727484,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 0,
+          "name": "concurrent-after",
+          "updateMs": 592.1999999992549,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 3090296,
+          "disposedHeap": 1717184,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "concurrent-after",
+          "updateMs": 196.40000000037253,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2851708,
+          "disposedHeap": 1723868,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "concurrent-before",
+          "updateMs": 100.6000000005588,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 3089568,
+          "disposedHeap": 1722784,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "base-after",
+          "updateMs": 68.09999999962747,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2945672,
+          "disposedHeap": 1625928,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "base-before",
+          "updateMs": 41.5,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2959736,
+          "disposedHeap": 1634148,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "base-before",
+          "updateMs": 79,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2953488,
+          "disposedHeap": 1630096,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "base-after",
+          "updateMs": 100.6000000005588,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2953888,
+          "disposedHeap": 1628292,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "concurrent-before",
+          "updateMs": 127.29999999981374,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2852892,
+          "disposedHeap": 1728988,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "concurrent-after",
+          "updateMs": 118.6000000005588,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 3087952,
+          "disposedHeap": 1718188,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "concurrent-after",
+          "updateMs": 122.40000000037253,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 3089660,
+          "disposedHeap": 1717388,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "concurrent-before",
+          "updateMs": 303.59999999962747,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 3091660,
+          "disposedHeap": 1723012,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "base-after",
+          "updateMs": 74.6000000005588,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2947264,
+          "disposedHeap": 1629464,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "base-before",
+          "updateMs": 67,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2949064,
+          "disposedHeap": 1626000,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        }
+      ],
+      "chromium": "151.0.7922.173",
+      "warmupUpdates": 100,
+      "measuredUpdates": 30,
+      "rows": 1000
+    },
+    "shortWarmup": {
+      "complete": true,
+      "date": "2026-11-07T07:11:36.990Z",
+      "note": "Local production ESM diagnostic; no browser rendering timing, CPU throttling or official benchmark equivalence. Same app, alternating order, fresh contexts, forced GC.",
+      "node": "v24.22.1",
+      "inputs": {
+        "base-before": {
+          "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f",
+          "raw": 19424,
+          "gzip": 6573,
+          "brotli": 6007
+        },
+        "base-after": {
+          "sha256": "1fdd8cb1522e85df8290affd3f7c4cbe7042a1b6465078b78e28fcf96aa01795",
+          "raw": 16967,
+          "gzip": 5792,
+          "brotli": 5273
+        },
+        "concurrent-before": {
+          "sha256": "c5cf6a38e632043662d6d629759e383a3615a64abfb46ad031b6572883cc3703",
+          "raw": 27782,
+          "gzip": 9080,
+          "brotli": 8280
+        },
+        "concurrent-after": {
+          "sha256": "895cb7aeba8e511d0deae3f584b698cb0c8f0e67dfb319c371af14267e48a226",
+          "raw": 24208,
+          "gzip": 8051,
+          "brotli": 7336
+        }
+      },
+      "samples": [
+        {
+          "round": 0,
+          "name": "base-before",
+          "updateMs": 321,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2754832,
+          "disposedHeap": 1630168,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 0,
+          "name": "base-after",
+          "updateMs": 338.6000000005588,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2762740,
+          "disposedHeap": 1625472,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 0,
+          "name": "concurrent-before",
+          "updateMs": 368.5,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2902684,
+          "disposedHeap": 1723904,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 0,
+          "name": "concurrent-after",
+          "updateMs": 320.79999999981374,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2884972,
+          "disposedHeap": 1718492,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "concurrent-after",
+          "updateMs": 380.79999999981374,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2893316,
+          "disposedHeap": 1715360,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "concurrent-before",
+          "updateMs": 392.79999999981374,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2901136,
+          "disposedHeap": 1724884,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "base-after",
+          "updateMs": 409.40000000037253,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2755004,
+          "disposedHeap": 1627244,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 1,
+          "name": "base-before",
+          "updateMs": 296.29999999981374,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2751332,
+          "disposedHeap": 1632084,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "base-before",
+          "updateMs": 367.40000000037253,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2752476,
+          "disposedHeap": 1627624,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "base-after",
+          "updateMs": 407.59999999962747,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2752016,
+          "disposedHeap": 1624564,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "concurrent-before",
+          "updateMs": 586.2000000001863,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2901284,
+          "disposedHeap": 1719952,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 2,
+          "name": "concurrent-after",
+          "updateMs": 1041.6000000005588,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2898848,
+          "disposedHeap": 1716556,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "concurrent-after",
+          "updateMs": 1385.5,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2893344,
+          "disposedHeap": 1717632,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "concurrent-before",
+          "updateMs": 320.90000000037253,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2905436,
+          "disposedHeap": 1722164,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 6,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "base-after",
+          "updateMs": 369,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2756188,
+          "disposedHeap": 1629096,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        },
+        {
+          "round": 3,
+          "name": "base-before",
+          "updateMs": 267.1000000005588,
+          "live": {
+            "keys": 1000,
+            "retired": 0
+          },
+          "disposed": {
+            "keys": 0,
+            "retired": 0,
+            "nodes": 0
+          },
+          "liveHeap": 2754952,
+          "disposedHeap": 1630172,
+          "liveDom": {
+            "documents": 1,
+            "nodes": 4007,
+            "jsEventListeners": 13
+          },
+          "disposedDom": {
+            "documents": 1,
+            "nodes": 4,
+            "jsEventListeners": 13
+          }
+        }
+      ],
+      "chromium": "151.0.7922.173",
+      "warmupUpdates": 5,
+      "measuredUpdates": 30,
+      "rows": 1000
+    }
+  },
+  "limitations": [
+    "Local runtime timing only: four samples per variant, no official benchmark or paint timing.",
+    "Short warmup produced slower observations; all samples are retained.",
+    "Plugin versions and template references must be coordinated at a separate release step."
+  ]
+}

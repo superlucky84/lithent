@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/hmr-parser",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Lithent HMR parser utilities for build tools",
   "packageManager": "pnpm@12.15.0",
   "main": "./dist/lithentHmrParser.cjs",
@@ -49,9 +49,9 @@
   "devDependencies": {
     "lithent": "workspace:*",
     "@types/babel__traverse": "^7.20.6",
-    "vite": "^5.4.8",
+    "vite": "^8.3.6",
     "vite-plugin-checker": "^0.8.0",
-    "vite-plugin-dts": "^4.2.1",
-    "vitest": "^2.1.5"
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.12"
   }
 }

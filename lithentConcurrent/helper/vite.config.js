@@ -14,29 +14,40 @@ import { emitDeclarationFormats } from '../../scripts/emit-declaration-formats.m
  * that would only work inside this repo.
  */
 export default defineConfig({
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
+  },
   plugins: [
-    checker({
-      typescript: true,
-      eslint: {
-        useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
-    }),
+    !process.env.VITEST &&
+      checker({
+        typescript: true,
+        eslint: {
+          useFlatConfig: true,
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
+      }),
     dts({
-      outputDir: ['dist/types'],
+      outDir: ['dist/types'],
       afterBuild: () =>
-        emitDeclarationFormats(resolve(__dirname, 'dist/types')),
+        emitDeclarationFormats(resolve(import.meta.dirname, 'dist/types')),
     }),
   ],
   resolve: {
-    alias: [{ find: '@', replacement: resolve(__dirname, './src') }],
+    alias: [{ find: '@', replacement: resolve(import.meta.dirname, './src') }],
   },
   build: {
+    // Preserve the browser target used before the Vite 8 migration.
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     emptyOutDir: false,
     sourcemap: true,
     lib: {
       formats: ['es', 'umd', 'cjs'],
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'lithentConcurrentHelper',
       fileName: format => {
         if (format === 'cjs') return 'lithentConcurrentHelper.cjs';
@@ -45,7 +56,7 @@ export default defineConfig({
           : 'lithentConcurrentHelper.mjs';
       },
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['lithent-concurrent'],
       output: {
         globals: {

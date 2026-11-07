@@ -4,12 +4,12 @@ import lithentMdxPlugin from './src/plugin';
 import { lithentVitePlugin } from '../lithentVite/src/plugin';
 
 export default defineConfig({
-  root: __dirname,
+  root: import.meta.dirname,
   publicDir: false,
   plugins: [lithentMdxPlugin(), lithentVitePlugin()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(import.meta.dirname, './src'),
     },
   },
   server: {

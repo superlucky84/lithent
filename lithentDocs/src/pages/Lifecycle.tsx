@@ -281,7 +281,13 @@ export const Tabs = mount(renew => {
 
 export default defineConfig({
   resolve: {
-    alias: [{ find: /^lithent$/, replacement: 'lithent-concurrent' }],
+    alias: [{
+      find: /^lithent$/,
+      replacement: 'lithent-concurrent',
+      customResolver(source, importer, options) {
+        return this.resolve(source, importer, { ...options, skipSelf: true });
+      },
+    }],
   },
 });`}
       />

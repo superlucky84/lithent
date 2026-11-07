@@ -1,0 +1,566 @@
+{
+  "date": "2026-11-07T06:07:17.320Z",
+  "differential": "reference /tmp/lithent-core-analysis/results/current/lithent.umd.js: 9 snapshots, 23 log entries, 0 uncaught errors, [object Object]\n/tmp/lithent-core-analysis/results/vite8/lithent.umd.js: IDENTICAL dom/log/errors/exports, [object Object]\n/tmp/lithent-core-analysis/results/vite8-legacy-target/lithent.umd.js: IDENTICAL dom/log/errors/exports, [object Object]\n/tmp/lithent-core-analysis/results/current-latest-terser/lithent.umd.js: IDENTICAL dom/log/errors/exports, [object Object]\n/tmp/lithent-core-analysis/results/source-ownSymbol/lithent.umd.js: IDENTICAL dom/log/errors/exports, [object Object]\n/tmp/lithent-core-analysis/results/source-iterativeAncestor/lithent.umd.js: IDENTICAL dom/log/errors/exports, [object Object]\n",
+  "compatibility": {
+    "current": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": ["label"]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": ["child", "unmount", "parent"],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [0, 0, 0],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "vite8": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": ["label"]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": ["child", "unmount", "parent"],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [0, 0, 0],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "vite8-legacy-target": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": ["label"]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": ["child", "unmount", "parent"],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [0, 0, 0],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "current-latest-terser": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": ["label"]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": ["child", "unmount", "parent"],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [0, 0, 0],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "source-ownSymbol": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": ["label"]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": ["child", "unmount", "parent"],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [0, 0, 0],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    },
+    "source-iterativeAncestor": {
+      "prototypeNameComponentProp": {
+        "text": "b",
+        "ownKeys": ["label"]
+      },
+      "inheritedComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "nonEnumerableComponentProp": {
+        "text": "undefined",
+        "ownKeys": []
+      },
+      "inheritedHiddenDomProp": {
+        "title": null
+      },
+      "removedNodeEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "destroyedRootEvent": {
+        "clicks": 1,
+        "remaining": 0
+      },
+      "removalDuringBubbling": {
+        "calls": ["child", "unmount", "parent"],
+        "remaining": 0
+      },
+      "persistentPortalHostListener": {
+        "countsAfterRemoval": [0, 0, 0],
+        "callsAfterDestroy": 0,
+        "remaining": 1
+      },
+      "renewedAfterParentUpdate": {
+        "text": "b:1"
+      }
+    }
+  },
+  "exports": {
+    "current": {
+      "esm": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "cjs": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ]
+    },
+    "vite8": {
+      "esm": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "cjs": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ]
+    },
+    "vite8-legacy-target": {
+      "esm": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "cjs": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ]
+    },
+    "current-latest-terser": {
+      "esm": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "cjs": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ]
+    },
+    "source-ownSymbol": {
+      "esm": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "cjs": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ]
+    },
+    "source-iterativeAncestor": {
+      "esm": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "cjs": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ]
+    }
+  },
+  "functions": {
+    "current/lithent.umd.js": {
+      "all": 171,
+      "bound": 121,
+      "nestedArrowParentGetter": 2
+    },
+    "vite8/lithent.umd.js": {
+      "all": 171,
+      "bound": 118,
+      "nestedArrowParentGetter": 2
+    },
+    "vite8-legacy-target/lithent.umd.js": {
+      "all": 171,
+      "bound": 118,
+      "nestedArrowParentGetter": 2
+    },
+    "current-latest-terser/lithent.umd.js": {
+      "all": 171,
+      "bound": 121,
+      "nestedArrowParentGetter": 2
+    },
+    "source-ownSymbol/lithent.umd.js": {
+      "all": 171,
+      "bound": 121,
+      "nestedArrowParentGetter": 2
+    },
+    "source-iterativeAncestor/lithent.umd.js": {
+      "all": 170,
+      "bound": 120,
+      "nestedArrowParentGetter": 2
+    },
+    "terser-default.js": {
+      "all": 170,
+      "bound": 90,
+      "nestedArrowParentGetter": 2
+    },
+    "terser-no-inline.js": {
+      "all": 171,
+      "bound": 121,
+      "nestedArrowParentGetter": 2
+    }
+  },
+  "chromium": "151.0.7922.173",
+  "counter": {
+    "current": "1",
+    "vite8": "1",
+    "current-build-vite8-esm": "1"
+  }
+}

@@ -13,16 +13,24 @@ import { defineConfig } from 'vite';
  * Requires `pnpm build` (or at least `build:core` + `build:concurrent`).
  */
 export default defineConfig({
-  root: __dirname,
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
+  },
+  root: import.meta.dirname,
   resolve: {
     alias: [
       {
         find: /^bench-core-base$/,
-        replacement: resolve(__dirname, '..', 'dist/lithent.mjs'),
+        replacement: resolve(import.meta.dirname, '..', 'dist/lithent.mjs'),
       },
       {
         find: /^bench-core-concurrent$/,
-        replacement: resolve(__dirname, 'dist/lithentConcurrent.mjs'),
+        replacement: resolve(import.meta.dirname, 'dist/lithentConcurrent.mjs'),
       },
     ],
   },
@@ -36,6 +44,6 @@ export default defineConfig({
     open: process.env.LITHENT_NO_OPEN
       ? false
       : process.env.LITHENT_PAGE || '/html/units.html',
-    fs: { allow: [resolve(__dirname, '..')] },
+    fs: { allow: [resolve(import.meta.dirname, '..')] },
   },
 });

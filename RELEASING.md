@@ -1,5 +1,42 @@
 # 릴리스 절차
 
+## Vite 8 릴리스 준비
+
+`chore/vite8-migration`은 최신 main `933400d`의 cleanup 수정과 공개 패키지
+ESM/CJS 경로를 유지하면서 다음 **8개 패키지**를 다음 릴리스 후보로 올린다.
+이 절은 배포 준비 기록이며 npm 발행 완료 기록이 아니다.
+
+| 패키지                             | 현재 배포 버전 → 후보 | 변경                                   |
+| ---------------------------------- | --------------------- | -------------------------------------- |
+| `lithent`                          | 1.25.6 → 1.25.7       | Vite 8로 코어와 포함된 서브패스 재빌드 |
+| `lithent-concurrent`               | 0.2.5 → 0.2.6         | Vite 8로 Concurrent 재빌드             |
+| `@lithent/hmr-parser`              | 0.2.4 → 0.2.5         | 새 도구로 파서 재빌드                  |
+| `@lithent/lithent-template-parser` | 0.1.2 → 0.1.3         | 새 도구로 파서 재빌드                  |
+| `@lithent/lithent-template-vite`   | 0.1.2 → 0.2.0         | Vite 8 peer, Oxc 변환과 의존성 스캔    |
+| `@lithent/lithent-vite`            | 0.3.5 → 0.4.0         | Vite 8 peer, 혼합 JSX/템플릿 지원      |
+| `@lithent/lithent-mdx`             | 0.2.7 → 0.3.0         | Vite 8 peer와 빌드 전환                |
+| `create-lithent`                   | 0.3.4 → 0.4.0         | Vite 8 템플릿과 Node 요건 갱신         |
+
+코어 API는 그대로라 패치 버전을 사용한다. Vite 플러그인 3종은 Vite 5 지원을
+중단하므로 현재 0.x 정책에서 minor를 올린다. 생성기도 기본 템플릿의 Vite/Node
+요건이 바뀌므로 minor를 올린다. private workspace와 root에 포함되는 서브패스는
+독립 발행하지 않는다. 기존 런타임 peer 범위는 그대로 호환된다.
+
+두 생성 템플릿은 `lithent ^1.25.7`과 `@lithent/lithent-vite ^0.4.0`을 참조하며,
+SSR은 `@lithent/lithent-mdx ^0.3.0`도 사용한다. 내부 `workspace:*` 참조는 pack에서
+후보 버전으로 변환된다. release plan의 의존 순서를 따라 파서를 템플릿 플러그인보다,
+템플릿 플러그인을 HMR 플러그인보다 먼저 발행한다.
+
+생성기는 main의 템플릿을 내려받는다. 아래 CI 절차의 모든 후보가 registry에 보이는지
+확인한 뒤 새 템플릿을 사용할 수 있다. `create-lithent`도 처음 자동 발행하는 후보에
+포함되므로 이 패키지의 Trusted Publisher 구성을 배포 전에 확인한다. 이 준비 작업은
+PR 생성까지이며, 병합·npm 발행·태그 생성은 수행하지 않는다.
+
+검증과 크기 비교는 [Vite 8 보고서](./docs/benchmark/VITE8_MIGRATION_RESULTS.md),
+공개 변경 사항은 [CHANGELOG](./CHANGELOG.md#unreleased--vite-8)에 기록한다.
+
+## CI 발행 절차
+
 사용자 U-10(2026-11-07)에 따라 **main의 모든 필수 검사 성공 후** 버전업된 패키지만 자동 발행한다.
 후보 계산·실제 tarball/소비자 검증·OIDC 발행 job·성공 태그·root 문서 dispatch를 구현했다.
 아래 외부 초기 설정은 아직 적용하지 않았고 이 작업에서 실제 npm 발행도 수행하지 않았다.

@@ -61,7 +61,7 @@ export const lithentVitePlugin = (
     config() {
       const shared = {
         build: {
-          rollupOptions: {
+          rolldownOptions: {
             onwarn(
               warning: {
                 code?: string;
@@ -102,15 +102,13 @@ export const lithentVitePlugin = (
         },
       };
 
-      if (templateEnabled) {
-        return shared;
-      }
-
       return {
         ...shared,
-        esbuild: {
-          jsx: 'automatic',
-          jsxImportSource,
+        oxc: {
+          jsx: {
+            runtime: 'automatic',
+            importSource: jsxImportSource,
+          },
         },
       };
     },
@@ -152,7 +150,7 @@ export const lithentVitePlugin = (
         return null;
       }
 
-      // Since we're enforce: 'post', esbuild has already transformed the code.
+      // Since we're enforce: 'post', Oxc has already transformed the code.
       // We just inject HMR code and return.
       return {
         code: result.code,
