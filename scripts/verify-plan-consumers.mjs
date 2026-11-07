@@ -139,9 +139,31 @@ export async function verifyPlanConsumers({
       join(consumer, 'package.json'),
       JSON.stringify({ private: true, type: 'module', dependencies }, null, 2)
     );
+    // Internal registry dependencies are pinned to the exact version npm
+    // serves, which this pipeline may have published minutes ago. pnpm's
+    // release age gate is meant for third-party packages and would refuse
+    // them, so only these first-party names are exempt.
+    const releaseAgeExclude = [
+      ...new Set(
+        plan.dependencies
+          .filter(
+            edge => closure.has(edge.consumer) && edge.source === 'registry'
+          )
+          .map(edge => edge.name)
+      ),
+    ].sort();
     await writeFile(
       join(consumer, 'pnpm-workspace.yaml'),
-      JSON.stringify({ overrides }, null, 2)
+      JSON.stringify(
+        {
+          overrides,
+          ...(releaseAgeExclude.length && {
+            minimumReleaseAgeExclude: releaseAgeExclude,
+          }),
+        },
+        null,
+        2
+      )
     );
     await run(
       'pnpm',

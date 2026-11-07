@@ -190,6 +190,42 @@ test('an accepted upload with a confirmation failure remains unconfirmed for sou
   }
 });
 
+test('the default window confirms a version npm serves over a minute after upload and still gives up after five minutes', async () => {
+  for (const delayMs of [75_000, Infinity]) {
+    const f = await fixture();
+    delete f.options.confirmationAttempts;
+    let now = 0;
+    const visibleAt = new Map();
+    f.options.wait = async ms => {
+      now += ms;
+    };
+    const read = f.options.registry.getVersion;
+    f.options.registry.getVersion = async (name, version) => {
+      const value = await read(name, version);
+      if (!value) return null;
+      if (!visibleAt.has(name)) visibleAt.set(name, now + delayMs);
+      return now >= visibleAt.get(name) ? value : null;
+    };
+    if (delayMs === Infinity) {
+      await assert.rejects(
+        () => executeRelease(f.options),
+        /Publication not confirmed: alpha/
+      );
+      assert.equal(f.snapshots.at(-1).packages[0].status, 'unconfirmed');
+      assert.equal(now, 300_000);
+    } else {
+      let result;
+      await assert.doesNotReject(async () => {
+        result = await executeRelease(f.options);
+      });
+      assert.deepEqual(
+        result.packages.map(row => row.status),
+        ['published', 'published']
+      );
+    }
+  }
+});
+
 test('a confirmed conflicting upload is failed rather than an unconfirmed recovery candidate', async () => {
   const f = await fixture();
   f.options.publish = async artifact => {

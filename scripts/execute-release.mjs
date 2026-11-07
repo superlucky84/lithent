@@ -1,6 +1,7 @@
 import { setTimeout as delay } from 'node:timers/promises';
 import semver from 'semver';
 import { fileIdentity } from './artifact-utils.mjs';
+import { visibilityWindow, waitForVersion } from './npm-registry.mjs';
 
 export function verifyConsumerProof(
   { plan, planSha256, proof },
@@ -39,8 +40,8 @@ export async function executeRelease({
   publish,
   persist,
   wait = delay,
-  confirmationAttempts = 6,
-  confirmationDelayMs = 5000,
+  confirmationAttempts = visibilityWindow.attempts,
+  confirmationDelayMs = visibilityWindow.delayMs,
 }) {
   verifyConsumerProof({ plan, planSha256, proof });
   if (typeof publish !== 'function' || typeof persist !== 'function')
@@ -136,12 +137,11 @@ export async function executeRelease({
       } catch (error) {
         commandError = error;
       }
-      let confirmed;
-      for (let attempt = 0; attempt < confirmationAttempts; attempt++) {
-        confirmed = await registry.getVersion(row.name, row.version);
-        if (confirmed) break;
-        if (attempt + 1 < confirmationAttempts) await wait(confirmationDelayMs);
-      }
+      const confirmed = await waitForVersion(registry, row.name, row.version, {
+        attempts: confirmationAttempts,
+        delayMs: confirmationDelayMs,
+        wait,
+      });
       if (!confirmed)
         throw new Error(
           `Publication not confirmed: ${row.name}${commandError ? ': ' + commandError.message : ''}`

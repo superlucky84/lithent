@@ -58,6 +58,7 @@ export async function publishValidatedRelease({
   readProof = readJson,
   persist,
   nodeVersion = process.versions.node,
+  wait,
 }) {
   const context = assertReleaseContext({
     env,
@@ -98,6 +99,7 @@ export async function publishValidatedRelease({
     ...inputs,
     proof,
     registry,
+    wait,
     publish: artifact =>
       run(
         'npm',
