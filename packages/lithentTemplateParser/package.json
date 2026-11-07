@@ -1,16 +1,21 @@
 {
   "type": "module",
   "name": "@lithent/lithent-template-parser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Lithent Template Parser",
   "main": "./dist/index.umd.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.umd.cjs",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.umd.cjs"
+      },
       "default": "./dist/index.mjs"
     },
     "./package.json": "./package.json"

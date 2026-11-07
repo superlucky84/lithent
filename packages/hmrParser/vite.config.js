@@ -39,7 +39,9 @@ export default defineConfig({
     lib: {
       entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'lithentHmrParser',
+      formats: ['es', 'umd', 'cjs'],
       fileName: format => {
+        if (format === 'cjs') return 'lithentHmrParser.cjs';
         return format === 'umd'
           ? 'lithentHmrParser.umd.js'
           : 'lithentHmrParser.mjs';

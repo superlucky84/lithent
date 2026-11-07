@@ -8,7 +8,10 @@ import ts from 'typescript';
  * relative paths also let Node16/NodeNext check the ESM graph without relying
  * on a bundler's extension and directory resolution.
  */
-export function emitDeclarationFormats(directory) {
+export function emitDeclarationFormats(
+  directory,
+  { esmTypeImports = [] } = {}
+) {
   const walk = dir =>
     readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
       const file = join(dir, entry.name);
@@ -74,13 +77,36 @@ export function emitDeclarationFormats(directory) {
     visit(source);
     const rewrite = extension => {
       let result = content;
+      const edits = [];
+      if (extension === '.cjs') {
+        for (const statement of source.statements) {
+          if (
+            ts.isImportDeclaration(statement) &&
+            statement.importClause?.isTypeOnly &&
+            esmTypeImports.includes(statement.moduleSpecifier.text) &&
+            !statement.attributes
+          ) {
+            // Vite exposes its types through the ESM condition, even to CJS
+            // plugins. This is a type-only resolution choice, not a runtime import.
+            edits.push({
+              start: statement.moduleSpecifier.end,
+              end: statement.moduleSpecifier.end,
+              text: ' with { "resolution-mode": "import" }',
+            });
+          }
+        }
+      }
       // Work backwards so replacements preserve the remaining source offsets.
-      for (const node of specifiers.sort((a, b) => b.pos - a.pos)) {
-        const path = modulePath(file, node.text, extension);
+      for (const node of specifiers) {
+        edits.push({
+          start: node.getStart(source) + 1,
+          end: node.end - 1,
+          text: modulePath(file, node.text, extension),
+        });
+      }
+      for (const edit of edits.sort((a, b) => b.start - a.start)) {
         result =
-          result.slice(0, node.getStart(source) + 1) +
-          path +
-          result.slice(node.end - 1);
+          result.slice(0, edit.start) + edit.text + result.slice(edit.end);
       }
       return result;
     };

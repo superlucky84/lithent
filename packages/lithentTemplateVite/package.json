@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@lithent/lithent-template-vite",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Vite plugin that compiles Lithent’s JSX-like template syntax into h() calls.",
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
@@ -9,7 +9,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs"
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
     }
   },
   "scripts": {

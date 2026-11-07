@@ -1,7 +1,6 @@
 import type { Plugin, PluginOption, ResolvedConfig } from 'vite';
-import lithentTemplateVite, {
-  type LithentTemplateViteOptions,
-} from '@lithent/lithent-template-vite';
+import lithentTemplateVite from '@lithent/lithent-template-vite';
+import type { LithentTemplateViteOptions } from '@lithent/lithent-template-vite';
 import {
   transformWithHmr,
   shouldSkipTransform,

@@ -67,8 +67,23 @@ export const isComponentMapManualMode = (): boolean => componentMapManualMode;
 export const runUnmountEffects = (compKey: CompKey): void => {
   const subInfo = componentMap.get(compKey);
   if (subInfo) {
-    subInfo.umts.forEach(effect => effect());
+    // Clear first so reentrant disposal cannot run these registrations again.
+    const effects = subInfo.umts;
     subInfo.umts = [];
+    effects.forEach(effect => {
+      try {
+        effect();
+      } catch (error) {
+        // Finish teardown before the host error handler can reenter it.
+        queueMicrotask(() => {
+          try {
+            reportError(error);
+          } catch {
+            throw error;
+          }
+        });
+      }
+    });
   }
 };
 

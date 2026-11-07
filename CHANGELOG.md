@@ -1,5 +1,52 @@
 # Release notes
 
+## 2026-11-07
+
+### lithent 1.25.6 / lithent-concurrent 0.2.5
+
+- Continue unmounting after a cleanup throws: run the remaining component,
+  child and sibling cleanups, remove retired DOM and release automatically
+  managed component entries. Failed cleanups are not run again on disposal
+  retries or reentry. Custom elements can reconnect with a fresh instance.
+- Compatibility note: cleanup failures are reported after teardown through
+  `reportError`, with an asynchronous throw fallback when it is unavailable
+  or fails. A `try/catch` around destroy no longer receives cleanup failures
+  synchronously. The original thrown value is preserved.
+- The base cleanup recovery allowance is 28B Brotli, bringing its budget to
+  4,953B. The concurrent and element budgets are unchanged.
+- Preserve the JSX intrinsic key/value types while allowing ESM and CommonJS
+  declaration graphs, including both cores, in one strict TypeScript program.
+  Merged declarations previously reported duplicate index signatures.
+
+### Toolchain packages
+
+- `@lithent/hmr-parser` 0.2.4, `@lithent/lithent-mdx` 0.2.7 and
+  `@lithent/lithent-vite` 0.3.5 provide real `.cjs` entry points alongside
+  ESM and the existing browser UMD files. CommonJS consumers previously
+  received an empty namespace from the declared `.umd.js` entry points.
+- These packages and `@lithent/lithent-template-parser` 0.1.2 expose separate
+  ESM/CommonJS declaration graphs. `@lithent/lithent-template-vite` 0.1.2
+  adopts the updated parser dependency and remains ESM only.
+
+### Release automation
+
+- These are the first versions published from CI. After every check passes
+  on `main`, CI publishes only packages whose version was bumped. It uploads
+  the exact archives it tested, using npm Trusted Publishing (OIDC) with
+  provenance, and tags each package at the commit it was built from.
+- `lithent` 1.25.6 was published from the #104 merge commit. The other six
+  packages were published from the #105 merge commit, which changed only
+  release scripts. `create-lithent` stays at 0.3.4.
+- npm can take over a minute to serve a new version after accepting it.
+  Publishing and tag recording now wait up to five minutes for it instead of
+  25 seconds (#105).
+- Release candidate checks exempt only first-party packages from pnpm's
+  minimum release age, so a sibling published minutes earlier can be
+  installed. Third-party packages keep the age gate (#105).
+
+See the [GitHub release](https://github.com/superlucky84/lithent/releases/tag/lithent%401.25.6)
+and [RELEASING.md](./RELEASING.md).
+
 ## 2026-11-02
 
 ### lithent 1.25.5

@@ -1,4 +1,66 @@
-# 릴리스 준비 — lithent 1.25.5
+# 릴리스 절차
+
+사용자 U-10(2026-11-07)에 따라 **main의 모든 필수 검사 성공 후** 버전업된 패키지만 자동 발행한다.
+후보 계산·실제 tarball/소비자 검증·OIDC 발행 job·성공 태그·root 문서 dispatch를 구현했다.
+아래 외부 초기 설정은 아직 적용하지 않았고 이 작업에서 실제 npm 발행도 수행하지 않았다.
+정본은 [설계](./docs/reliability/DESIGN.md), 진행/근거는 [IMPLEMENT](./docs/reliability/IMPLEMENT.md)다.
+
+배포할 독립 공개 패키지의 `package.json.version`만 작업자가 올린다.
+helper·JSX·SSR·element 등 root 서브패스 변경은 `lithent`, 공유 코어 변경은 root와 Concurrent의 버전을 각각 검토한다.
+private workspace와 새로 추가된 공개 패키지는 자동 발행 목록에 들어가지 않는다.
+허용 목록과 도입 기준은 [.github/release-policy.json](./.github/release-policy.json)에 있다.
+기준과 같은 버전은 도입만으로 발행하지 않고, 더 높은 stable 버전 중 npm에 없는 정확한 버전만 선택한다.
+이미 발행된 버전은 제외하며 부분 실패 뒤에도 남은 버전을 찾는다. prerelease는 보류한다.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm verify:release --output-dir artifacts/release
+pnpm release:plan
+node scripts/verify-plan-consumers.mjs
+```
+
+모든 CI 검사도 통과해야 한다. 전체 명령은 [CONTRIBUTING](./CONTRIBUTING.md#pull-request-checks)에 있다.
+pack 출력 디렉터리는 비어 있어야 한다. 기존 결과를 확인한 뒤 별도 위치로 옮기고 새로 실행한다.
+plan의 선택/제외 사유·의존 순서·소스 소유 경고를 확인한다. 후보 소비자는 선택 archive와 실제 npm 의존성을 설치한다.
+`--allow-dirty`는 로컬 후보 계산/소비자 검사에만 쓰며 dirty 결과로 발행할 수 없다.
+CI는 같은 run/SHA의 archive·plan·proof를 hash로 묶어 브라우저 job에서 다시 확인한다.
+
+npm Trusted Publishing 운영 준비(미완료):
+
+- 저장소 관리자가 main의 필수 검사 **CI**를 ruleset/branch protection에 등록한다. 발행 CLI는 보호된 main ref를 요구한다.
+- GitHub environment **npm**을 만들고 deployment branches를 **main만** 허용한다. 자동 발행을 위해 릴리스별 승인 대기는 추가하지 않는다.
+- 발행할 패키지의 소유자가 npm Trusted Publisher를 설정한다: GitHub owner **superlucky84**, repository **lithent**, workflow filename **ci.yml**, environment **npm**. 값은 대소문자까지 일치시킨다.
+- Node >=22.14.0, npm CLI >=11.5.1, GitHub-hosted runner를 사용한다. 현재 고정 Node 24.22.1의 npm 11.9.0은 버전 요건을 만족한다.
+- 새 publisher에는 직접 `npm publish` action을 허용한다. repository 메타데이터와 provenance의 공개 저장소 주소도 대조한다.
+- 신규 Trusted Publisher는 생성 후 2일 이내 첫 발행이 필요하다. 현재 후보 7개부터 설정하며 baseline으로 제외된 `create-lithent`는 실제 버전업/발행 직전에 설정한다. 만료된 연결은 npm에서 다시 등록한다.
+- `id-token: write`는 실제 발행 job, 태그/문서에 필요한 쓰기 권한은 별도 후속 job으로 제한한다. 장기 npm 토큰은 추가하지 않는다.
+- 발행·기록 job은 의존성 설치 script를 실행하지 않는다. GitHub 쓰기 토큰은 태그/dispatch step에서만 전달한다.
+- read-only CI와 위 설정을 확인한 뒤 저장소 Actions variable **NPM_PUBLISH_ENABLED=true**로 최초 활성화한다. 변수가 없거나 false이면 발행/태그 job은 생략하고 검증은 그대로 수행한다. 비활성화하려면 이 값을 false로 바꾼다.
+- 변수 활성화 자체는 workflow를 시작하지 않는다. 이후 main push 또는 main 대상으로 Validate 수동 실행을 하면 모든 검증 뒤 발행한다. PR/fork/다른 ref는 발행할 수 없다.
+- 검증한 tarball을 그대로 발행하고 registry integrity로 성공을 확인한다. 실패했다고 이미 발행한 버전을 삭제하거나 덮어쓰지 않는다.
+- 성공한 패키지만 해당 발행 SHA에 `<package-name>@<version>` 태그를 만든다. root의 기존 `lithent@<version>` 표기를 유지하며 scoped 이름도 포함한다. 기존 다른 SHA 태그는 덮어쓰지 않는다. GitHub Release는 자동 생성하지 않는다.
+- root 성공 뒤 docs.yml을 해당 태그와 release_sha로 명시 dispatch한다. `GITHUB_TOKEN`의 tag push만으로 연쇄 실행되지 않는 제한을 처리한다. dispatch 접수와 실제 사이트 배포 성공은 별도로 확인한다. 기존 docs의 main/tag/수동 trigger는 유지한다.
+
+실행·실패 복구:
+
+- Quality·Chromium/Firefox/WebKit·CI가 모두 성공해야 publish를 시작한다. PR의 진행 중 검증은 새 커밋으로 취소할 수 있지만 main 발행은 자동 취소하지 않는다.
+- 후보가 0개면 정상 종료한다. A 발행 확인 후 B가 실패하면 실패 상태와 A의 성공을 receipt에 저장하고, 후속 job은 A의 태그를 기록한다. 다음 실행은 registry에 있는 A를 다시 발행하지 않는다.
+- GitHub Actions에서 **원래 main run의 실패 job을 재실행**하면 원래 Quality artifact output을 사용한다. run_attempt가 달라져도 올바른 build를 찾고, 같은 run/SHA의 이전 attempt receipt도 합쳐 성공 태그를 복구한다.
+- npm은 업로드를 받은 뒤 1분 넘게 지나서야 새 버전을 보여줄 수 있다(lithent 1.25.6은 약 75초). 발행·기록 job은 버전이 보이지 않으면 10초 간격으로 최대 5분 기다린다. registry 오류는 기다리지 않고 바로 실패로 처리한다.
+- 업로드 시도 뒤 registry 확인이 오류/timeout/가시성 기한 소진으로 끝나면 패키지는 **unconfirmed**, 발행 job은 실패다. 후속 기록 job은 원래 run/clean SHA와 archive 이름·size·SHA-256·SRI가 같은 receipt를 registry에서 재확인한다. 일치하면 태그와 root 문서 요청을 복구하며 `recoveredUnconfirmed: true`를 기록한다. 계속 404/오류/다른 SRI이면 기록 job도 실패하므로 빈 성공으로 취급하지 않는다.
+- 위 미확정 receipt가 남아 있으면 발행 job이 같은 버전을 skipped로 처리하거나, 같은 commit의 Quality 재실행에서 후보가 0개가 되어도 원래 run의 기록 job이 복구한다. 업로드 전 실패·pending·skipped·중단된 publishing 상태만으로는 과거 발행을 인수하지 않는다. 다른 run/SHA에 있는 발행도 자동 복구하지 않는다.
+- 태그/문서 기록만 실패했으면 원래 run의 **Record release tags and dispatch docs** job을 재실행한다. 기존 동일 SHA 태그는 유지하며 docs dispatch를 재시도한다.
+- build·발행 receipt·발행/태그 기록은 30일 보관한다. 일반 Quality/브라우저 로그와 preview는 7일이다. 다른 main run에서 과거 버전을 찾았다는 이유로 새 SHA에 태그하지 않는다.
+- receipt/원래 build가 만료·유실되거나 발행 직후 runner가 강제 종료되었다면 npm provenance·실제 버전/integrity·원래 발행 SHA를 확인해 수동 복구한다. 버전을 삭제/덮어쓰기하거나 새 main SHA로 과거 발행을 대신 기록하지 않는다.
+
+GitHub required check `CI`의 ruleset 설정과 실제 PR/main 실행도 별도 미완료다.
+자동화가 활성화되기 전 수동 발행은 아래 과거 절차의 **실제 발행할 버전/SHA**로 바꿔 수행한다.
+이 작업에서는 push·npm 발행·태그·GitHub Release 생성·저장소 설정 변경을 수행하지 않았다.
+
+## 1.25.5 릴리스 준비 이력
+
+아래 수치와 명령은 1.25.5 준비 당시의 이력이다. 현재 자동화 상태는 위 절차를 따른다.
 
 이번 PR은 base 코어의 keyed 목록·캐시 경로 최적화와 릴리스 준비를 포함한다.
 main에 merge commit으로 병합한 뒤 이 문서의 발행 절차를 실행한다.

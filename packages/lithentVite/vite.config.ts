@@ -27,7 +27,9 @@ export default defineConfig({
       entryRoot: resolve(import.meta.dirname, 'src'),
       aliasesExclude: ['@lithent/lithent-template-vite'],
       afterBuild: () =>
-        emitDeclarationFormats(resolve(import.meta.dirname, 'dist')),
+        emitDeclarationFormats(resolve(import.meta.dirname, 'dist'), {
+          esmTypeImports: ['vite', '@lithent/lithent-template-vite'],
+        }),
     }),
   ],
   resolve: {
@@ -51,7 +53,13 @@ export default defineConfig({
     lib: {
       entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'lithentVite',
-      fileName: format => (format === 'umd' ? 'index.umd.js' : 'index.mjs'),
+      formats: ['es', 'umd', 'cjs'],
+      fileName: format =>
+        format === 'cjs'
+          ? 'index.cjs'
+          : format === 'umd'
+            ? 'index.umd.js'
+            : 'index.mjs',
     },
     rolldownOptions: {
       external: [
@@ -61,6 +69,7 @@ export default defineConfig({
         '@lithent/lithent-template-vite',
       ],
       output: {
+        interop: 'auto',
         globals: {
           vite: 'vite',
           lithent: 'lithent',
