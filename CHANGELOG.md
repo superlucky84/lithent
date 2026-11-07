@@ -26,6 +26,7 @@
 
 ### create-lithent 0.4.0
 
+- Correct the repository URL used to validate release provenance.
 - Generate SPA and Express SSR projects using Vite 8 and matching plugin/core
   versions. Both templates declare Node `^20.19.0 || >=22.12.0`.
 - Bound Tailwind scanning to the declared template content paths and keep the
