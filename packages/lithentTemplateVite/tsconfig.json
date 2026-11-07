@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "lib": ["ESNext"],
     "strict": true,
     "declaration": true,
@@ -14,7 +14,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "baseUrl": "./",
-    "types": ["vitest/importMeta"],
+    "types": ["vitest/importMeta", "node"],
     "jsx": "preserve",
     "jsxImportSource": "lithent",
     "paths": {

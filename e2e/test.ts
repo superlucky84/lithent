@@ -3,7 +3,11 @@ import type { Page } from '@playwright/test';
 
 export const test = base.extend<{ browserErrors: string[] }>({
   browserErrors: [
-    async ({ page }, use, testInfo) => {
+    async ({ page, browser }, use, testInfo) => {
+      testInfo.annotations.push({
+        type: 'browser',
+        description: `${browser.browserType().name()} ${browser.version()}`,
+      });
       const errors: string[] = [];
       page.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
       page.on('console', message => {

@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-25T23:33:17.759531+00:00",
+  "pass": true,
+  "head": "fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4",
+  "runtimeSourceFiles": 24,
+  "productionFormats": 6,
+  "currentRepoFilesMatchArchive": 221,
+  "siblingInputFilesUnchanged": 12,
+  "docs": {
+    "localLinksAndAnchors": 351,
+    "preservedGitObjects": 8,
+    "pass": true
+  },
+  "archiveAudit": {
+    "archives": 56,
+    "entries": 9245,
+    "traces": 7844,
+    "pass": true
+  },
+  "e2e": {
+    "startTime": "2026-10-25T23:24:54.423Z",
+    "duration": 37776.833,
+    "expected": 76,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "goalPasses": 6,
+  "compressedEvidenceBytes": 352098151
+}

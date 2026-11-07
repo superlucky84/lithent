@@ -4,8 +4,8 @@
   "version": "0.21.1",
   "description": "Lithent JSX runtime",
   "private": true,
-  "packageManager": "pnpm@7.6.0",
-  "main": "./dist/jsxRuntime.umd.js",
+  "packageManager": "pnpm@12.15.0",
+  "main": "./dist/jsxRuntime.cjs",
   "module": "./dist/jsxRuntime.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
@@ -30,8 +30,5 @@
   },
   "peerDependencies": {
     "lithent": "^1.21.0"
-  },
-  "volta": {
-    "node": "20.3.0"
   }
 }

@@ -1,7 +1,7 @@
 name: Deploy docs
 
 # Publishes lithentDocs to the gh-pages branch, which GitHub Pages serves at
-# https://superlucky84.github.io/lithent/. Runs when the docs change on main,
+# https://superlucky84.github.io/lithent/. Runs when docs or root build manifests change on main,
 # for every `lithent@x.y.z` tag (the site bundles the released core), and on
 # demand from the Actions tab.
 on:
@@ -10,10 +10,19 @@ on:
       - main
     paths:
       - 'lithentDocs/**'
+      - 'package.json'
+      - 'mise.toml'
+      - '.nvmrc'
+      - 'pnpm-lock.yaml'
       - '.github/workflows/docs.yml'
     tags:
       - 'lithent@*'
   workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Expected source SHA when dispatched after a confirmed npm release
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -28,17 +37,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: Confirm the source requested by the release workflow
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          if [[ -n "$RELEASE_SHA" && "$RELEASE_SHA" != "$GITHUB_SHA" ]]; then
+            echo "Release documentation source SHA does not match the requested ref."
+            exit 1
+          fi
+
+      # Installs the pnpm version in package.json `packageManager`.
+      # pnpm 12 needs v6.1.0 or later; the v6 tag predates it.
+      - uses: pnpm/action-setup@v6.1.0
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: package.json
+          node-version-file: .nvmrc
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
 
       # The docs import the workspace packages through their built output, so
-      # the whole workspace is built, not only lithentDocs.
+      # the whole workspace is built, not only lithentDocs. Runtime declarations
+      # must finish before toolchain tests and documentation are type-checked.
       - run: pnpm build
 
       - uses: actions/checkout@v4

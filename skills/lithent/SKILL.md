@@ -1,7 +1,7 @@
 ---
 name: lithent
 title: Lithent Agent Skills
-version: {{VERSION}}
+version: { { VERSION } }
 description: AI agent skills for working with the Lithent library.
 additional_materials:
   - constraints/
@@ -17,7 +17,8 @@ This file provides AI agent skills for working with the Lithent library.
 
 ## Overview
 
-Lithent is a lightweight (~4KB) JSX-based virtual DOM library with closure-based state management. It offers two component modes:
+Lithent is a lightweight (~4.8KB Brotli, minified UMD) JSX-based virtual DOM library with closure-based state management. It offers two component modes:
+
 - **Manual Mode** (`mount`): Explicit control with `renew()` function
 - **Light API Mode** (`lmount`): Auto-reactive with `lstate`/`lstore`
 
@@ -49,7 +50,7 @@ render(<Counter initial={10} />, document.getElementById('app')!);
 import { lmount, render } from 'lithent';
 import { lstate } from 'lithent/helper';
 
-const Counter = lmount<{ initial?: number }>((props) => {
+const Counter = lmount<{ initial?: number }>(props => {
   const count = lstate(props.initial ?? 0);
 
   return () => (
@@ -71,7 +72,7 @@ render(<Counter initial={10} />, document.getElementById('app')!);
 import { mount } from 'lithent';
 import { state, computed, effect } from 'lithent/helper';
 
-const Component = mount((renew) => {
+const Component = mount(renew => {
   const firstName = state('John', renew);
   const lastName = state('Doe', renew);
 
@@ -115,7 +116,7 @@ const Component = lmount(() => {
 import { store } from 'lithent/helper';
 const userStore = store({ name: '', loggedIn: false });
 
-const Component = mount((renew) => {
+const Component = mount(renew => {
   const user = userStore(renew);
   return () => <p>{user.name}</p>;
 });
@@ -133,9 +134,14 @@ const Component = lmount(() => {
 ## Lifecycle Hooks
 
 ```tsx
-import { mount, mountCallback, updateCallback, mountReadyCallback } from 'lithent';
+import {
+  mount,
+  mountCallback,
+  updateCallback,
+  mountReadyCallback,
+} from 'lithent';
 
-const Component = mount((renew) => {
+const Component = mount(renew => {
   // After mount (return cleanup function for unmount)
   mountCallback(() => {
     console.log('Mounted');
@@ -161,8 +167,8 @@ const Component = mount((renew) => {
 ```tsx
 import { mount, ref } from 'lithent';
 
-const Component = mount((renew) => {
-  const inputRef = ref<HTMLInputElement>(null);
+const Component = mount(renew => {
+  const inputRef = ref<HTMLInputElement | null>(null);
 
   const focusInput = () => inputRef.value?.focus();
 
@@ -174,6 +180,14 @@ const Component = mount((renew) => {
   );
 });
 ```
+
+## DOM Events
+
+Event props register the original native callback. Changing its identity removes
+the old callback and registers the new one, following native identity, dedup and
+ordering rules. Keep stable handlers in the mounter when possible. For listener
+options or independent registration, use `ref` and `mountCallback` with cleanup.
+See [DOM events](reference/events.md) for dispatch timing and retained DOM.
 
 ## Context API
 
@@ -192,7 +206,7 @@ const Provider = mount((renew, _props, children) => {
   );
 });
 
-const Consumer = mount((renew) => {
+const Consumer = mount(renew => {
   const { theme } = ThemeContext.useContext(renew);
   return () => <p>{theme}</p>;
 });
@@ -215,15 +229,16 @@ const Consumer = lmount(() => {
 import { mount, portal } from 'lithent';
 
 const Modal = mount((renew, props: { onClose: () => void }) => {
-  return () => portal(
-    <div class="modal-overlay" onClick={props.onClose}>
-      <div class="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Modal</h2>
-        <button onClick={props.onClose}>Close</button>
-      </div>
-    </div>,
-    document.body
-  );
+  return () =>
+    portal(
+      <div class="modal-overlay" onClick={props.onClose}>
+        <div class="modal-content" onClick={e => e.stopPropagation()}>
+          <h2>Modal</h2>
+          <button onClick={props.onClose}>Close</button>
+        </div>
+      </div>,
+      document.body
+    );
 });
 ```
 
@@ -235,11 +250,14 @@ Always use `key` prop for lists:
 import { mount } from 'lithent';
 import { state } from 'lithent/helper';
 
-const TodoList = mount((renew) => {
-  const todos = state([
-    { id: 1, text: 'Learn Lithent', done: false },
-    { id: 2, text: 'Build app', done: false },
-  ], renew);
+const TodoList = mount(renew => {
+  const todos = state(
+    [
+      { id: 1, text: 'Learn Lithent', done: false },
+      { id: 2, text: 'Build app', done: false },
+    ],
+    renew
+  );
 
   const toggle = (id: number) => {
     todos.value = todos.value.map(t =>
@@ -280,12 +298,14 @@ import { state } from 'lithent/helper';
 
 const { div, button, p } = fTags;
 
-const Counter = fMount((renew) => {
+const Counter = fMount(renew => {
   const count = state(0, renew);
-  return () => div({},
-    p({}, `Count: ${count.value}`),
-    button({ onClick: () => count.value++ }, '+1')
-  );
+  return () =>
+    div(
+      {},
+      p({}, `Count: ${count.value}`),
+      button({ onClick: () => count.value++ }, '+1')
+    );
 });
 ```
 
@@ -298,7 +318,7 @@ import { state } from 'lithent/helper';
 
 const html = lTag;
 
-const Counter = mount((renew) => {
+const Counter = mount(renew => {
   const count = state(0, renew);
   return () => html`
     <div>
@@ -343,7 +363,9 @@ const Card = mount((renew, props: { title: string }, children) => {
 });
 
 // Usage
-<Card title="Title"><p>Content</p></Card>
+<Card title="Title">
+  <p>Content</p>
+</Card>;
 ```
 
 ## Concurrent Rendering (optional)
@@ -357,11 +379,22 @@ import { mount, deferRender, whenIdle } from 'lithent-concurrent';
 // Urgent input and heavy list must be different components.
 let setQuery: (next: string) => void = () => {};
 
-const HeavyList = mount((renew) => {
+const HeavyList = mount(renew => {
   let query = '';
-  setQuery = (next) => deferRender(() => { query = next; renew(); });
+  setQuery = next =>
+    deferRender(() => {
+      query = next;
+      renew();
+    });
   return () => (
-    <ul>{rows.map((row) => <li key={row.id}>{row.text}{query}</li>)}</ul>
+    <ul>
+      {rows.map(row => (
+        <li key={row.id}>
+          {row.text}
+          {query}
+        </li>
+      ))}
+    </ul>
   );
 });
 
@@ -395,23 +428,41 @@ See `reference/element.md` for prop conversion, events, styles and lifecycle.
 ```tsx
 // Core
 import {
-  mount, lmount, render, h, Fragment, portal,
-  ref, nextTick, mountCallback, updateCallback, mountReadyCallback
+  mount,
+  lmount,
+  render,
+  h,
+  Fragment,
+  portal,
+  ref,
+  nextTick,
+  mountCallback,
+  updateCallback,
+  mountReadyCallback,
 } from 'lithent';
 
 // Helper
 import {
-  state, lstate,                    // Reactive state
-  computed, effect,                 // Derived values & side effects
-  store, lstore,                    // Global state
-  createContext, createLContext,   // Context API
-  cacheUpdate, nextTickRender,     // Performance
-  unwrapChildren                    // Utility
+  state,
+  lstate, // Reactive state
+  computed,
+  effect, // Derived values & side effects
+  store,
+  lstore, // Global state
+  createContext,
+  createLContext, // Context API
+  cacheUpdate,
+  nextTickRender, // Performance
+  unwrapChildren, // Utility
 } from 'lithent/helper';
 
 // Concurrent (optional package)
 import { deferRender, whenIdle, hasPending } from 'lithent-concurrent';
-import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper';
+import {
+  deferred,
+  ldeferred,
+  hasPendingRender,
+} from 'lithent-concurrent/helper';
 
 // SSR
 import { renderToString, hydration } from 'lithent/ssr';
@@ -429,5 +480,5 @@ import { lTag } from 'lithent/tag';
 ## Additional materials (optional)
 
 - `constraints/` (rules, mistakes, troubleshooting)
-- `reference/` (props types, children types, lstore inference, concurrent, element)
+- `reference/` (props types, children types, lstore inference, events, concurrent, element)
 - `examples/` (quick examples)

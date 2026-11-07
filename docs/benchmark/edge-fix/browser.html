@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <body>
+    <table>
+      <tbody id="tb"></tbody>
+    </table>
+    <script type="module">
+      const q = new URLSearchParams(location.search);
+      const { makeBench } = await import(`./out/${q.get('v')}/app.mjs`);
+      const b = makeBench(document.getElementById('tb'), q.get('app'));
+      const flush = () => new Promise(queueMicrotask);
+      const sc = q.get('sc'),
+        n = Number(q.get('n'));
+      const act = {
+        select: i => b.select(i),
+        swap: () => b.swap(),
+        update: () => b.update(),
+        replace: () => b.run(),
+        // Clearing too: the timed operation is clear + create 1,000 rows.
+        create: async () => {
+          b.clear();
+          await flush();
+          b.run();
+        },
+      }[sc];
+      b.run();
+      await flush();
+      for (let i = 0; i < 30; i++) {
+        await act(i);
+        await flush();
+      }
+      const times = [];
+      const t0 = performance.now();
+      for (let i = 0; i < n; i++) {
+        const t = performance.now();
+        await act(i);
+        await flush();
+        times.push(performance.now() - t);
+      }
+      const total = performance.now() - t0;
+      times.sort((a, c) => a - c);
+      window.result = {
+        total,
+        perOp: total / n,
+        median: times[n >> 1],
+        p90: times[Math.floor(n * 0.9)],
+      };
+    </script>
+  </body>
+</html>

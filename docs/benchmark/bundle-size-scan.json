@@ -1,0 +1,755 @@
+{
+  "node": "v24.11.1",
+  "zlib": "1.3.1-470d3a2",
+  "baseline": {
+    "raw": 12759,
+    "gzip": 5187,
+    "br": 4824,
+    "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+  },
+  "variants": [
+    {
+      "name": "syntax-return-hidden",
+      "raw": 12688,
+      "gzip": 5147,
+      "br": 4779,
+      "sha256": "a7c20b8bb058b801cd6016193bf93c235f3aa76702fa7452b43599f50ee4d951",
+      "options": {
+        "compress": {
+          "defaults": false,
+          "booleans": true,
+          "comparisons": true,
+          "conditionals": true,
+          "evaluate": true,
+          "properties": true,
+          "typeofs": true,
+          "if_return": true
+        },
+        "mangle": true
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "syntax-hidden",
+      "raw": 12700,
+      "gzip": 5145,
+      "br": 4788,
+      "sha256": "0ce1b8a5535022a77464b9c92f7edb0498eb35efebf2725c2410912cd5f44417",
+      "options": {
+        "compress": {
+          "defaults": false,
+          "booleans": true,
+          "comparisons": true,
+          "conditionals": true,
+          "evaluate": true,
+          "properties": true,
+          "typeofs": true
+        },
+        "mangle": true
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "hidden-map",
+      "raw": 12719,
+      "gzip": 5155,
+      "br": 4798,
+      "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c",
+      "options": {},
+      "risk": "Automatic source-map linking is removed; JS tokens stay identical."
+    },
+    {
+      "name": "rename-standard-hidden",
+      "raw": 12719,
+      "gzip": 5155,
+      "br": 4798,
+      "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c",
+      "options": {
+        "compress": false,
+        "mangle": true
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-3-hidden",
+      "raw": 12719,
+      "gzip": 5200,
+      "br": 4798,
+      "sha256": "ee080da01f4e1e407711f1805be526f4dd6bbd985b7cdbae1f3405a90b83c69d",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-1-hidden",
+      "raw": 12719,
+      "gzip": 5207,
+      "br": 4803,
+      "sha256": "e9baf8aed391bce26cd1de3f66152bb25d32fb385698a5a10d6f9d63932b35d0",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-14-hidden",
+      "raw": 12719,
+      "gzip": 5206,
+      "br": 4804,
+      "sha256": "ed9fcc9b8e861a5d9647bfd1326ed686b60210e122496353ba30e4924e941d28",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-11-hidden",
+      "raw": 12719,
+      "gzip": 5197,
+      "br": 4805,
+      "sha256": "20bfd070a5fd4c98b7473e09c77e261ce1ce1ac7f288864c94ac56f96052e491",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-2-hidden",
+      "raw": 12719,
+      "gzip": 5203,
+      "br": 4806,
+      "sha256": "b64f9450572650dd5bd885d86bd6543de8f06bea0e959e31ea39cccb415219d6",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-6-hidden",
+      "raw": 12719,
+      "gzip": 5219,
+      "br": 4806,
+      "sha256": "abb6f1f97488b7f328913110ec36304c1f187f07e601f3678adfd091cef51c57",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-4-hidden",
+      "raw": 12719,
+      "gzip": 5192,
+      "br": 4807,
+      "sha256": "ab4f5de6d8f4ddbb467a259b8d7b24cbc92fd007b4bc67c7a79afeaece4200cf",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "syntax-return",
+      "raw": 12728,
+      "gzip": 5179,
+      "br": 4808,
+      "sha256": "0e1675c520481d3b7da760bc0f2fbeb81ad05bdb0e5a70bbb9e6510f139ac5c9",
+      "options": {
+        "compress": {
+          "defaults": false,
+          "booleans": true,
+          "comparisons": true,
+          "conditionals": true,
+          "evaluate": true,
+          "properties": true,
+          "typeofs": true,
+          "if_return": true
+        },
+        "mangle": true
+      },
+      "risk": "Expression transforms: additional runtime/scope/performance checks required."
+    },
+    {
+      "name": "alphabet-5-hidden",
+      "raw": 12719,
+      "gzip": 5222,
+      "br": 4808,
+      "sha256": "38e92d8d371d4d99ea7dc21e810485032a1d9c281e15fa6e328828d693b02af8",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "rename-lines-hidden",
+      "raw": 12719,
+      "gzip": 5160,
+      "br": 4810,
+      "sha256": "36b27a067abcf89be19ac1ebbf9dec93f0bb6e40f3c79d8b00b2604741ecdcd0",
+      "options": {
+        "compress": false,
+        "mangle": true,
+        "format": {
+          "semicolons": false
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-0-hidden",
+      "raw": 12719,
+      "gzip": 5200,
+      "br": 4810,
+      "sha256": "2b1c45350530822ea1a23f918d9c43fa3c883037943b7dd9249ca6de4114f56a",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-13-hidden",
+      "raw": 12719,
+      "gzip": 5200,
+      "br": 4812,
+      "sha256": "a550998695985ef7afbf8eb45e5a6c22ae02e0734214fbea5eebfdcbe7e54a2a",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-15-hidden",
+      "raw": 12719,
+      "gzip": 5214,
+      "br": 4813,
+      "sha256": "2bed5031639910d42469bf2eaae779108006531b9a506ef83a3bd0e43d74e5a5",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "syntax",
+      "raw": 12740,
+      "gzip": 5177,
+      "br": 4815,
+      "sha256": "f342ba8f0ccca2f95a9a69bc159999fe434dd9b4e3e595ad1db2cda66fba8289",
+      "options": {
+        "compress": {
+          "defaults": false,
+          "booleans": true,
+          "comparisons": true,
+          "conditionals": true,
+          "evaluate": true,
+          "properties": true,
+          "typeofs": true
+        },
+        "mangle": true
+      },
+      "risk": "Expression transforms: additional runtime/scope/performance checks required."
+    },
+    {
+      "name": "alphabet-9-hidden",
+      "raw": 12719,
+      "gzip": 5220,
+      "br": 4816,
+      "sha256": "8b457a334d7ac3515e674d96ef628ad0b84122baa439c0f9af32b715198d53aa",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-10-hidden",
+      "raw": 12719,
+      "gzip": 5207,
+      "br": 4819,
+      "sha256": "b88095d738a8dba64459bf991118df3c7ce3060bd5f7f0ad9203558cce0aee7a",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-12-hidden",
+      "raw": 12719,
+      "gzip": 5204,
+      "br": 4821,
+      "sha256": "5b750c13448e1e4e09b199931f57a053b5403d7094a8472ec85cbf47a54dd220",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-7-hidden",
+      "raw": 12719,
+      "gzip": 5218,
+      "br": 4821,
+      "sha256": "128ce5b1b8d5a01999070352d161adcd6b6648d6d4a9311a64f9195402c6b5c2",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "alphabet-8-hidden",
+      "raw": 12719,
+      "gzip": 5211,
+      "br": 4822,
+      "sha256": "81e9ad70182432abb711b96c2454168f32cec7ec0dbeeb575da7cbc6e73cf817",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Combined with hidden-map debugging tradeoff."
+    },
+    {
+      "name": "rename-standard",
+      "raw": 12759,
+      "gzip": 5187,
+      "br": 4824,
+      "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d",
+      "options": {
+        "compress": false,
+        "mangle": true
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-3",
+      "raw": 12759,
+      "gzip": 5233,
+      "br": 4828,
+      "sha256": "f6fd35368d7c66027ae4c969c672a2b318eefe93c27d3d862f288b599779ba48",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-11",
+      "raw": 12759,
+      "gzip": 5230,
+      "br": 4831,
+      "sha256": "fb8c11bcf015c174fce666008db01a3d85a28573ba93eb639e8c34aaccbdad37",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-2",
+      "raw": 12759,
+      "gzip": 5235,
+      "br": 4831,
+      "sha256": "983bb63e782410e70257de0656b22455f3f5b9b147c29e10a0f3ae6eed395c70",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-4",
+      "raw": 12759,
+      "gzip": 5225,
+      "br": 4833,
+      "sha256": "c1ff60cf1052a4e55575fec0cc5ad9215b8fd1c2901b110cbfbf20e2f7f74317",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-6",
+      "raw": 12759,
+      "gzip": 5253,
+      "br": 4834,
+      "sha256": "18a27616443523a72e99fca7a02ac2a0204002f4beba70f63603e8b28de56614",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-14",
+      "raw": 12759,
+      "gzip": 5239,
+      "br": 4835,
+      "sha256": "e00cc889324f67890e676abbe2ec5950c0d49834df5b3b6f9369176844ecd54e",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-1",
+      "raw": 12759,
+      "gzip": 5240,
+      "br": 4835,
+      "sha256": "161c3f622067ed4d73bc37d4c90cba1dc1484faf2deaeb4c12780ef69f0ff40d",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "rename-lines",
+      "raw": 12759,
+      "gzip": 5192,
+      "br": 4836,
+      "sha256": "d93ea9219f5428c258172fca4db384ad9a86ebc052303f6c5d27b6e7a33ba482",
+      "options": {
+        "compress": false,
+        "mangle": true,
+        "format": {
+          "semicolons": false
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-0",
+      "raw": 12759,
+      "gzip": 5232,
+      "br": 4836,
+      "sha256": "ddd2ca1abed72f4676a5ce1f3c9f30038be8af847777785ed45cd0880533de9c",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-9",
+      "raw": 12759,
+      "gzip": 5252,
+      "br": 4839,
+      "sha256": "b8d98dea39c5d3a7f8ff4b838f17d437a08619ae2851adbe306d0c6dc8e8be6b",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-15",
+      "raw": 12759,
+      "gzip": 5246,
+      "br": 4841,
+      "sha256": "f362fea058d3e3de0c60afca7747a1fa300a9a61c091832bc12d1b3834f750ee",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-12",
+      "raw": 12759,
+      "gzip": 5237,
+      "br": 4842,
+      "sha256": "10c16a6909a8031da6abbc83a25fc94e4375cece6cdd76cd63a974c3697710b6",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-5",
+      "raw": 12759,
+      "gzip": 5256,
+      "br": 4846,
+      "sha256": "5db3697fa2f043a701ea656c7c0893a74d8213e215e956c60f2c458007515610",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-13",
+      "raw": 12759,
+      "gzip": 5232,
+      "br": 4847,
+      "sha256": "9418e2a9e2445b63b21b483f7bbcc750dc6369ad1999715a15c9ff36224fb354",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-10",
+      "raw": 12759,
+      "gzip": 5240,
+      "br": 4847,
+      "sha256": "b7795ec0f4346e8318f4814b24b17f76a654d48ba9006c1e07618921abf60c03",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-7",
+      "raw": 12759,
+      "gzip": 5251,
+      "br": 4850,
+      "sha256": "6199a19fc04b426787b386fc9507061c12228b19499cd93a0b86b38953008f85",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    },
+    {
+      "name": "alphabet-8",
+      "raw": 12759,
+      "gzip": 5243,
+      "br": 4853,
+      "sha256": "8dd2fba747dbaf4648852b8865832f640289fdd0624b1109c6d05607cc0fb401",
+      "options": {
+        "compress": false,
+        "mangle": {
+          "nth_identifier": {
+            "get": "[function]"
+          }
+        }
+      },
+      "risk": "Rename/reprint only: requires actual-build reproduction and scope checks."
+    }
+  ],
+  "formats": {
+    "dist/lithent.mjs": {
+      "baseline": {
+        "raw": 18868,
+        "gzip": 6343,
+        "br": 5802,
+        "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e"
+      },
+      "hiddenMap": {
+        "raw": 18831,
+        "gzip": 6314,
+        "br": 5776,
+        "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d"
+      }
+    },
+    "dist/lithent.umd.js": {
+      "baseline": {
+        "raw": 12759,
+        "gzip": 5187,
+        "br": 4824,
+        "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+      },
+      "hiddenMap": {
+        "raw": 12719,
+        "gzip": 5155,
+        "br": 4798,
+        "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c"
+      }
+    },
+    "dist/lithent.cjs": {
+      "baseline": {
+        "raw": 12606,
+        "gzip": 5234,
+        "br": 4857,
+        "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820"
+      },
+      "hiddenMap": {
+        "raw": 12569,
+        "gzip": 5203,
+        "br": 4833,
+        "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408"
+      }
+    },
+    "lithentConcurrent/dist/lithentConcurrent.mjs": {
+      "baseline": {
+        "raw": 27645,
+        "gzip": 9015,
+        "br": 8206,
+        "sha256": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c"
+      },
+      "hiddenMap": {
+        "raw": 27598,
+        "gzip": 8982,
+        "br": 8175,
+        "sha256": "2ef8a692e030526f76ad14bb6dcd71869ee6a7f1e594c8b0313a62d976f37be6"
+      }
+    },
+    "lithentConcurrent/dist/lithentConcurrent.umd.js": {
+      "baseline": {
+        "raw": 18419,
+        "gzip": 7484,
+        "br": 6903,
+        "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0"
+      },
+      "hiddenMap": {
+        "raw": 18369,
+        "gzip": 7451,
+        "br": 6868,
+        "sha256": "e95e6dcacd7cc978d2cdebd501a54837330859b1d226e7ce8b5cabebfeb52923"
+      }
+    },
+    "lithentConcurrent/dist/lithentConcurrent.cjs": {
+      "baseline": {
+        "raw": 18358,
+        "gzip": 7413,
+        "br": 6836,
+        "sha256": "218f069c7acaca3d490f7ab04395977dde6c14c07614d91abc96d0a6d7f3c4cb"
+      },
+      "hiddenMap": {
+        "raw": 18311,
+        "gzip": 7376,
+        "br": 6802,
+        "sha256": "264c59d5cdf3808995f5ec6a1b879bfe267517934bc17f75949b71e8c038d0e0"
+      }
+    }
+  }
+}

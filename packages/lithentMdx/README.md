@@ -3,6 +3,7 @@
 Official Vite plugin that tailors the MDX toolchain for Lithent.
 
 ## Features
+
 - **Lithent-focused JSX config**: Sets `jsxImportSource` so MDX JSX renders through the Lithent runtime.
 - **Automatic `mount()` wrapping**: Wraps the MDX default export with Lithent `mount()` to preserve state during HMR.
 - **Configurable pipeline**: Pass any `@mdx-js/rollup` options via `mdxOptions`.
@@ -15,9 +16,10 @@ pnpm add -D @lithent/lithent-mdx @mdx-js/rollup
 ```
 
 Required peer dependencies:
-- `lithent` `^1.21.0`
-- `vite` `^5.0.0`
-- `@lithent/lithent-vite` `^0.2.3` for end-to-end HMR support
+
+- `lithent` `^1.21.3`
+- `vite` `^8.0.0`
+- `@lithent/lithent-vite` `^0.4.0` for end-to-end HMR support
 
 ## Usage
 

@@ -77,6 +77,10 @@ const menuData: MenuSection[] = [
         link: '/guide/cache-update',
       },
       { text: { en: 'stateRef', ko: 'stateRef' }, link: '/guide/state-ref' },
+      {
+        text: { en: 'Lifecycle Helpers', ko: '수명 관리 헬퍼' },
+        link: '/guide/lifecycle',
+      },
     ],
   },
   {
@@ -263,6 +267,10 @@ const menuData: MenuSection[] = [
           ko: 'HTM Tags CDN (빠른 메모)',
         },
         link: '/examples/21',
+      },
+      {
+        text: { en: 'Retained Editor & Tasks', ko: '보존 편집기와 작업 수명' },
+        link: '/examples/22',
       },
     ],
   },

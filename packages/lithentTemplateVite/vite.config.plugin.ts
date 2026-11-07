@@ -3,12 +3,12 @@ import { defineConfig } from 'vite';
 import lithentTemplateVite from './src/plugin';
 
 export default defineConfig({
-  root: __dirname,
+  root: import.meta.dirname,
   publicDir: false,
   plugins: [lithentTemplateVite()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(import.meta.dirname, './src'),
     },
   },
   server: {

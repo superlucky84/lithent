@@ -1,0 +1,96 @@
+--- /dev/null
++++ b/src/utils/createWDom.ts
+@@ -0,0 +1,35 @@
++import type { WDom } from '@/types';
++import { wdomSymbol } from '@/utils/universalRef';
++
++// Experimental full layout. Own optional-field presence differs from baseline.
++export const createWDom = (
++  type: WDom['type'],
++  tag?: WDom['tag'],
++  props?: WDom['props'],
++  text?: WDom['text'],
++  children?: WDom['children'],
++  getParent?: WDom['getParent']
++): WDom => ({
++  type,
++  nr: undefined,
++  tag,
++  props,
++  text,
++  children,
++  getParent,
++  el: undefined,
++  oi: undefined,
++  oc: undefined,
++  op: undefined,
++  il: undefined,
++  isRoot: undefined,
++  we: undefined,
++  ae: undefined,
++  ctor: undefined,
++  compKey: undefined,
++  compProps: undefined,
++  compChild: undefined,
++  reRender: undefined,
++  rs: undefined,
++  [wdomSymbol]: true,
++});
+--- a/src/wDom.ts
++++ b/src/wDom.ts
+@@ -22 +21,0 @@
+-  wdomSymbol,
+@@ -25,0 +25 @@
++import { createWDom } from '@/utils/createWDom';
+@@ -40,6 +40 @@
+-  ({
+-    type: 'f', // fragment
+-    nr: undefined,
+-    [wdomSymbol]: true,
+-    children,
+-  }) as WDom;
++  createWDom('f', undefined, undefined, undefined, children);
+@@ -204,10 +199 @@
+-  return {
+-    type: 'e', // element
+-    // Declared on every new node: a diff sets it, and a drawn node keeps it
+-    // ('N'), so the node keeps its shape and reading it is a plain lookup.
+-    nr: undefined,
+-    [wdomSymbol]: true,
+-    tag,
+-    props,
+-    children,
+-  } as WDom;
++  return createWDom('e', tag, props, undefined, children);
+@@ -238 +224 @@
+-    return { type: null, nr: undefined, [wdomSymbol]: true } as WDom;
++    return createWDom(null);
+@@ -242,6 +228 @@
+-    const node = {
+-      type: 'l', // loop (array mapping)
+-      nr: undefined,
+-      [wdomSymbol]: true,
+-      children,
+-    } as WDom;
++    const node = createWDom('l', undefined, undefined, undefined, children);
+@@ -252 +233 @@
+-    return { type: 't', nr: undefined, [wdomSymbol]: true, text: item } as WDom; // text node
++    return createWDom('t', undefined, undefined, item);
+@@ -340,9 +321,8 @@
+-    : ({
+-        type: wDom.type,
+-        tag: wDom.tag,
+-        props: wDom.props,
+-        text: wDom.text,
+-        children: wDom.children && [...wDom.children],
+-        getParent: wDom.getParent,
+-        [wdomSymbol]: true,
+-      } as WDom);
++    : createWDom(
++        wDom.type,
++        wDom.tag,
++        wDom.props,
++        wDom.text,
++        wDom.children && [...wDom.children],
++        wDom.getParent
++      );

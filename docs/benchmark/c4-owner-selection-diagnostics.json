@@ -1,0 +1,388 @@
+{
+  "at": "2026-10-29T10:11:23.098Z",
+  "scope": "separate offline trace diagnostic and single-axis selection-only app pilot; not pooled with primary 870 CPU/90 memory",
+  "trace": {
+    "count": 150,
+    "groups": {
+      "main/baseline": {
+        "count": 25,
+        "total": 6.849,
+        "script": 3.17,
+        "paint": 2.382,
+        "coveredSelectedEvents": 5.517,
+        "notCoveredBySelectedEvents": 1.2140000000000004,
+        "afterMicrotasksBeforeRender": 0.002,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 3.17,
+        "clickEndToFirstMicrotask": null
+      },
+      "main/candidate": {
+        "count": 25,
+        "total": 6.377,
+        "script": 0.81,
+        "paint": 2.319,
+        "coveredSelectedEvents": 3.035,
+        "notCoveredBySelectedEvents": 3.1249999999999996,
+        "afterMicrotasksBeforeRender": 0.001,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 0.81,
+        "clickEndToFirstMicrotask": null
+      },
+      "main/preact-classes": {
+        "count": 25,
+        "total": 4.2,
+        "script": 1.316,
+        "paint": 2.191,
+        "coveredSelectedEvents": 3.507,
+        "notCoveredBySelectedEvents": 0.6700000000000004,
+        "afterMicrotasksBeforeRender": 0.001,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 1.316,
+        "clickEndToFirstMicrotask": null
+      },
+      "reverse/baseline": {
+        "count": 25,
+        "total": 7.799,
+        "script": 3.142,
+        "paint": 2.164,
+        "coveredSelectedEvents": 5.385,
+        "notCoveredBySelectedEvents": 2.0470000000000006,
+        "afterMicrotasksBeforeRender": 0.002,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 3.142,
+        "clickEndToFirstMicrotask": null
+      },
+      "reverse/candidate": {
+        "count": 25,
+        "total": 4.222,
+        "script": 0.904,
+        "paint": 1.929,
+        "coveredSelectedEvents": 2.888,
+        "notCoveredBySelectedEvents": 1.291,
+        "afterMicrotasksBeforeRender": 0.001,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 0.904,
+        "clickEndToFirstMicrotask": null
+      },
+      "reverse/preact-classes": {
+        "count": 25,
+        "total": 4.043,
+        "script": 1.281,
+        "paint": 2.142,
+        "coveredSelectedEvents": 3.463,
+        "notCoveredBySelectedEvents": 0.6839999999999997,
+        "afterMicrotasksBeforeRender": 0.002,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 1.281,
+        "clickEndToFirstMicrotask": null
+      },
+      "pooled/baseline": {
+        "count": 50,
+        "total": 6.9155,
+        "script": 3.1624999999999996,
+        "paint": 2.1795,
+        "coveredSelectedEvents": 5.459,
+        "notCoveredBySelectedEvents": 1.419,
+        "afterMicrotasksBeforeRender": 0.002,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 3.1624999999999996,
+        "clickEndToFirstMicrotask": null
+      },
+      "pooled/candidate": {
+        "count": 50,
+        "total": 5.068,
+        "script": 0.8505,
+        "paint": 2.1245,
+        "coveredSelectedEvents": 3.0185,
+        "notCoveredBySelectedEvents": 2.259,
+        "afterMicrotasksBeforeRender": 0.001,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 0.8505,
+        "clickEndToFirstMicrotask": null
+      },
+      "pooled/preact-classes": {
+        "count": 50,
+        "total": 4.109999999999999,
+        "script": 1.291,
+        "paint": 2.1635,
+        "coveredSelectedEvents": 3.4939999999999998,
+        "notCoveredBySelectedEvents": 0.677,
+        "afterMicrotasksBeforeRender": 0.002,
+        "numberCommits": 1,
+        "gcEventCoverage": 0,
+        "clickDuration": 1.291,
+        "clickEndToFirstMicrotask": null
+      }
+    },
+    "gaps": {
+      "baseline": {
+        "largestGapMedian": 0.909,
+        "locations": {
+          "PrePaint -> PrePaint": 25,
+          "PrePaint -> Paint": 22,
+          "Paint -> Layerize": 1,
+          "UpdateLayoutTree -> PrePaint": 2
+        }
+      },
+      "candidate": {
+        "largestGapMedian": 1.903,
+        "locations": {
+          "PrePaint -> PrePaint": 38,
+          "PrePaint -> Paint": 11,
+          "EventDispatch -> UpdateLayoutTree": 1
+        }
+      },
+      "preact-classes": {
+        "largestGapMedian": 0.5725,
+        "locations": {
+          "PrePaint -> Paint": 35,
+          "PrePaint -> PrePaint": 13,
+          "Paint -> Layerize": 2
+        }
+      }
+    },
+    "limitation": "Coverage of selected events is not proof of idle, scheduling cause, or exact cost attribution."
+  },
+  "classPilot": {
+    "count": 100,
+    "inputs": {
+      "at": "2026-10-29T10:08:03.491Z",
+      "sourceOriginal": "de3c63ad1945e89ea9be0ae82b80c0d929150073e3ec8f3143d630b2b364c3c0",
+      "sourceCandidate": "38df563dbe17aa32844115e740cdc5375bbcb0aa25c04136f7bc127e9678e14a",
+      "manifest": {
+        "current": {
+          "bundle": "0a2b31a49a20f5a9befd60956742da37c12faa36c0ee0cd452b760b142d22d57",
+          "html": "2a8318c2a123addf7e705b04a3c588b4e0e04515aaf3f90b4be1333053a48776",
+          "entryJS": "main.js"
+        },
+        "empty": {
+          "bundle": "892f9207e9d683c762a890cc2eb7945ed041ab452f2ece62d10581e4b365a608",
+          "html": "2a8318c2a123addf7e705b04a3c588b4e0e04515aaf3f90b4be1333053a48776",
+          "entryJS": "main.js"
+        }
+      },
+      "plan": "2 apps x 2 orders x 25 official selection = 100 samples; no full CPU/memory adoption claim"
+    },
+    "dom": [
+      {
+        "name": "current",
+        "initialClass": null,
+        "deselectedClass": "undefined",
+        "selectedClass": "danger"
+      },
+      {
+        "name": "empty",
+        "initialClass": "",
+        "deselectedClass": "",
+        "selectedClass": "danger"
+      }
+    ],
+    "rows": {
+      "main": {
+        "conditions": {
+          "current": {
+            "total": {
+              "n": 25,
+              "median": 4.212,
+              "p25": 3.6574999999999998,
+              "p75": 7.1335,
+              "min": 3.021,
+              "max": 10.416
+            },
+            "script": {
+              "n": 25,
+              "median": 0.851,
+              "p25": 0.6545000000000001,
+              "p75": 1.0145,
+              "min": 0.17,
+              "max": 1.64
+            },
+            "paint": {
+              "n": 25,
+              "median": 2.258,
+              "p25": 1.9035,
+              "p75": 2.7285,
+              "min": 1.488,
+              "max": 3.653
+            }
+          },
+          "empty": {
+            "total": {
+              "n": 25,
+              "median": 4.81,
+              "p25": 3.6574999999999998,
+              "p75": 6.8100000000000005,
+              "min": 3.181,
+              "max": 9.538
+            },
+            "script": {
+              "n": 25,
+              "median": 0.695,
+              "p25": 0.34099999999999997,
+              "p75": 0.9695,
+              "min": 0.145,
+              "max": 1.507
+            },
+            "paint": {
+              "n": 25,
+              "median": 2.21,
+              "p25": 2.0875,
+              "p75": 2.6215,
+              "min": 1.727,
+              "max": 3.039
+            }
+          }
+        },
+        "change": {
+          "total": 0.14197530864197527,
+          "script": -0.1833137485311399,
+          "paint": -0.021257750221434946
+        }
+      },
+      "reverse": {
+        "conditions": {
+          "current": {
+            "total": {
+              "n": 25,
+              "median": 5.468,
+              "p25": 4.4165,
+              "p75": 7.459,
+              "min": 3.189,
+              "max": 10.629
+            },
+            "script": {
+              "n": 25,
+              "median": 0.828,
+              "p25": 0.457,
+              "p75": 1.0750000000000002,
+              "min": 0.15,
+              "max": 1.987
+            },
+            "paint": {
+              "n": 25,
+              "median": 2.119,
+              "p25": 1.888,
+              "p75": 2.4595000000000002,
+              "min": 1.399,
+              "max": 4.638
+            }
+          },
+          "empty": {
+            "total": {
+              "n": 25,
+              "median": 4.703,
+              "p25": 3.9219999999999997,
+              "p75": 7.6965,
+              "min": 3.321,
+              "max": 11.693
+            },
+            "script": {
+              "n": 25,
+              "median": 0.79,
+              "p25": 0.6619999999999999,
+              "p75": 0.9735,
+              "min": 0.156,
+              "max": 1.345
+            },
+            "paint": {
+              "n": 25,
+              "median": 2.357,
+              "p25": 2.0955000000000004,
+              "p75": 2.6585,
+              "min": 1.506,
+              "max": 3.527
+            }
+          }
+        },
+        "change": {
+          "total": -0.1399049012435991,
+          "script": -0.045893719806763156,
+          "paint": 0.11231713072203875
+        }
+      },
+      "pooled": {
+        "conditions": {
+          "current": {
+            "total": {
+              "n": 50,
+              "median": 4.984,
+              "p25": 3.909,
+              "p75": 7.157,
+              "min": 3.021,
+              "max": 10.629
+            },
+            "script": {
+              "n": 50,
+              "median": 0.847,
+              "p25": 0.552,
+              "p75": 1.023,
+              "min": 0.15,
+              "max": 1.987
+            },
+            "paint": {
+              "n": 50,
+              "median": 2.2445,
+              "p25": 1.903,
+              "p75": 2.475,
+              "min": 1.399,
+              "max": 4.638
+            }
+          },
+          "empty": {
+            "total": {
+              "n": 50,
+              "median": 4.803,
+              "p25": 3.762,
+              "p75": 6.908,
+              "min": 3.181,
+              "max": 11.693
+            },
+            "script": {
+              "n": 50,
+              "median": 0.7585,
+              "p25": 0.455,
+              "p75": 0.97,
+              "min": 0.145,
+              "max": 1.507
+            },
+            "paint": {
+              "n": 50,
+              "median": 2.303,
+              "p25": 2.103,
+              "p75": 2.63,
+              "min": 1.506,
+              "max": 3.527
+            }
+          }
+        },
+        "change": {
+          "total": -0.0363162118780096,
+          "script": -0.10448642266824093,
+          "paint": 0.026063711294274983
+        }
+      }
+    },
+    "stableTotalReduction": false,
+    "gateComplete": true,
+    "failedBatches": [],
+    "decision": "No consistent total-time benefit; no adoption and no full-CPU/memory claim."
+  },
+  "faultProbe": {
+    "at": "2026-10-29T08:51:33.608Z",
+    "scope": "untimed component multi-root replacement failure; no universal rollback promise",
+    "afterOwnerUnmount": "<ul></ul>",
+    "afterOwnerRemount": "<ul><strong>row</strong><b>tail</b></ul>",
+    "afterHostUnmount": "",
+    "afterHostRemount": "<ul><strong>row</strong><b>tail</b></ul>",
+    "ownerOnlyLeavesOldElement": false,
+    "hostReplacementRecovers": true
+  }
+}

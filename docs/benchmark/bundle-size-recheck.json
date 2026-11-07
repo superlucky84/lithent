@@ -1,0 +1,203 @@
+{
+  "date": "2026-10-26",
+  "scope": "DC-24 recheck: base minified UMD only unless noted. Output/source candidates; nothing adopted.",
+  "toolchain": {
+    "node": "v22.22.0",
+    "zlib": "1.3.1-470d3a2",
+    "vite": "5.4.8",
+    "terser": "5.18.1",
+    "gzipLevel": 9,
+    "brotli": "default"
+  },
+  "workspaceHead": "48cb5837bc75345ddb5c8ab8c81f8f4b2fb6e4aa",
+  "baseline": {
+    "raw": 12759,
+    "gzip": 5187,
+    "br": 4824,
+    "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+  },
+  "baselineMatchesDc24": true,
+  "candidates": [
+    {
+      "name": "syntax4",
+      "terserCompress": {
+        "defaults": false,
+        "booleans": true,
+        "lhs_constants": true,
+        "if_return": true,
+        "join_vars": true
+      },
+      "umd": {
+        "raw": 12748,
+        "gzip": 5188,
+        "br": 4800,
+        "sha256": "aae15a43a0db6da1d2c62c7e13a310f739361edc53cbf3d32c4a98b34e7a5451"
+      },
+      "note": "UMD only; ESM/CJS bytes unchanged. 168 functions / 118 named bindings, same as baseline."
+    },
+    {
+      "name": "noModuleToStringTag",
+      "rollupOutput": {
+        "generatedCode": {
+          "symbols": false
+        }
+      },
+      "umd": {
+        "raw": 12698,
+        "gzip": 5159,
+        "br": 4802,
+        "sha256": "38002d917bcf6d24415ad2a88c005d4fae1ad78a28ec00e1597cae8ae353d6ae"
+      },
+      "cjs": {
+        "raw": 12539,
+        "gzip": 5201,
+        "br": 4832,
+        "sha256": "ee1f0e7a8d4ee448604e646c1bb40e0724593d19324432549e90b4c1b5c1c6eb"
+      },
+      "note": "Removes Object.defineProperty(exports, Symbol.toStringTag, {value:\"Module\"}) from UMD and CJS. ESM unchanged."
+    },
+    {
+      "name": "syntax4+noModuleToStringTag",
+      "umd": {
+        "raw": 12687,
+        "gzip": 5159,
+        "br": 4778,
+        "sha256": "805023c21bc0088cd2a5a97a54084649145f0860d697e664d0c7838ffe79725c"
+      },
+      "cjs": {
+        "raw": 12539,
+        "gzip": 5201,
+        "br": 4832,
+        "sha256": "ee1f0e7a8d4ee448604e646c1bb40e0724593d19324432549e90b4c1b5c1c6eb"
+      }
+    },
+    {
+      "name": "hiddenMap (DC-24, real hidden build)",
+      "umd": {
+        "raw": 12719,
+        "gzip": 5155,
+        "br": 4798,
+        "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c"
+      }
+    },
+    {
+      "name": "syntax4+noModuleToStringTag+hiddenMap (real hidden build)",
+      "umd": {
+        "raw": 12647,
+        "gzip": 5126,
+        "br": 4748,
+        "sha256": "915418b2bf4c2703a2715ddaa565343c6baeb816041b418ad00fbccf2e145d0d"
+      },
+      "cjs": {
+        "raw": 12502,
+        "gzip": 5172,
+        "br": 4805,
+        "sha256": "e269dff627a5ac0ab1cfd3f28bd05d4a94c817abf857a35e0a2ec6f07be74d3e"
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "name": "terser default compress",
+      "deltaBr": -102,
+      "reason": "moves 33 single-use functions into their callers (118 -> 85 named bindings) and removes one function (168 -> 167): changes closure scopes the build deliberately keeps"
+    },
+    {
+      "name": "source E1 shared hook push",
+      "umd": {
+        "raw": 12724,
+        "gzip": 5207,
+        "br": 4836,
+        "sha256": "3163561ad14d839cab6664f6e6697b4177da31c82d2d37a27e1ecdec2c65643e"
+      }
+    },
+    {
+      "name": "source E2 Object.prototype alias",
+      "umd": {
+        "raw": 12750,
+        "gzip": 5190,
+        "br": 4834,
+        "sha256": "000e0c87f9aa6097a3b77c76355fd3cca8cca4764235472ae4ac8741def7a276"
+      }
+    },
+    {
+      "name": "source E3 shared child-count check",
+      "umd": {
+        "raw": 12659,
+        "gzip": 5191,
+        "br": 4830,
+        "sha256": "e98499c0ae726a8706434146e5bc734f681f41e93c041204b35079eb380ec138"
+      }
+    },
+    {
+      "name": "source E1+E2+E3",
+      "umd": {
+        "raw": 12619,
+        "gzip": 5210,
+        "br": 4836,
+        "sha256": "b67f86e8b415097ba9280230e4b745838ba6579d8d1e0508151e1b9f4f533cfb"
+      }
+    }
+  ],
+  "terserFlagScan": [
+    "rename-only 12758/5186/4821 functions/named 168/118",
+    "arrows           Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "booleans         Δraw -5 Δgzip -3 Δbr -17 functions 168/118",
+    "collapse_vars    Δraw 5 Δgzip 6 Δbr -7 functions 168/117",
+    "comparisons      Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "computed_props   Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "conditionals     Δraw -14 Δgzip -8 Δbr 3 functions 168/118",
+    "dead_code        Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "directives       Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "drop_debugger    Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "evaluate         Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "hoist_funs       Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "hoist_props      Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "hoist_vars       Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "if_return        Δraw -2 Δgzip 1 Δbr -12 functions 168/118",
+    "inline           Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "join_vars        Δraw -4 Δgzip -1 Δbr -3 functions 168/118",
+    "keep_fargs       Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "lhs_constants    Δraw 0 Δgzip 6 Δbr -16 functions 168/118",
+    "loops            Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "negate_iife      Δraw -1 Δgzip -1 Δbr 0 functions 168/118",
+    "properties       Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "reduce_funcs     Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "reduce_vars      Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "sequences        Δraw 23 Δgzip 8 Δbr 10 functions 168/118",
+    "side_effects     Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "switches         Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "toplevel         Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "typeofs          Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "unused           Δraw 0 Δgzip 0 Δbr 0 functions 168/118",
+    "syntax4                      12747/5187/4796 Δbr -25 functions 168/118",
+    "dc24                         12727/5178/4804 Δbr -17 functions 168/118",
+    "defaultsWithoutScopeChanges  12733/5191/4801 Δbr -20 functions 168/118",
+    "fullDefaults                 12533/5095/4719 Δbr -102 functions 167/85"
+  ],
+  "equivalence": "umd-diff.cjs: syntax4, noModuleToStringTag, both, and both+hidden produce identical DOM snapshots (9), lifecycle logs (23), uncaught errors (2, same as baseline: BUG-1) and export names in jsdom. Object.prototype.toString(lithent) changes from [object Module] to [object Object] without the tag.",
+  "bug1": {
+    "title": "portal sibling used as insert anchor",
+    "reproducedIn": ["jsdom 25.0.1", "Playwright Chromium"],
+    "alsoIn": "published lithent@1.25.2 UMD",
+    "cause": "src/render.ts findChildFragmentNextElement returns a portal node el (the portal target) as the next sibling element",
+    "repro": "experiments/bundle-size-recheck/portal-anchor-repro.cjs"
+  },
+  "adoption": {
+    "date": "2026-10-26",
+    "decision": "User chose option 1: syntax4 + noModuleToStringTag on top of the BUG-1 fix. Hidden map not adopted.",
+    "config": "vite.config.js: UMD terser compress {defaults:false, booleans, lhs_constants, if_return, join_vars}; rollupOptions.output.generatedCode.symbols=false",
+    "baseUmd": {
+      "raw": 12746,
+      "gzip": 5207,
+      "br": 4819,
+      "guard": 4824,
+      "sha256": "1501e239c466353d106e0f2b59102734b757ad85cce44173e661248e965271ad"
+    },
+    "baseCjsSha256": "8a22f1e48116a4db0241c9ce8be27281918e3adee12d4e95c1c5fb6685a429ef",
+    "baseEsmSha256": "6665eac483edf71244af648bcd5793cfec5e3eec9aeec6618294b4d5cdb4eb47",
+    "fixOnlyBaseUmdBr": 4860,
+    "concurrentUmdBr": 6935,
+    "note": "ESM bytes identical to the fix-only build. Earlier candidate rows above were measured before the BUG-1 fix."
+  }
+}

@@ -1,3 +1,4 @@
+import { skipJsExpression } from '../docPipe/scan';
 import {
   Token,
   TokenType,
@@ -139,16 +140,23 @@ export class Lexer {
     // Consume <!--
     value += this.advance() + this.advance() + this.advance() + this.advance();
 
+    let closed = false;
     // Read until -->
     while (!this.isEOF()) {
       if (this.peek() === '-' && this.peek(1) === '-' && this.peek(2) === '>') {
         value += this.advance() + this.advance() + this.advance();
+        closed = true;
         break;
       }
       value += this.advance();
     }
 
     const end = this.getCurrentPosition();
+    if (!closed)
+      throw Object.assign(new Error('Unclosed comment'), {
+        line: start.line,
+        column: start.column,
+      });
     this.tokens.push(createToken(TokenType.COMMENT, value, start, end));
   }
 
@@ -324,6 +332,7 @@ export class Lexer {
     const quote = this.advance(); // " or '
     let value = quote;
     let escaped = false;
+    let closed = false;
 
     while (!this.isEOF()) {
       const char = this.peek();
@@ -342,6 +351,7 @@ export class Lexer {
 
       if (char === quote) {
         value += this.advance();
+        closed = true;
         break;
       }
 
@@ -349,6 +359,11 @@ export class Lexer {
     }
 
     const end = this.getCurrentPosition();
+    if (!closed)
+      throw Object.assign(new Error('Unclosed attribute string'), {
+        line: start.line,
+        column: start.column,
+      });
     this.tokens.push(createToken(TokenType.STRING_LITERAL, value, start, end));
   }
 
@@ -386,100 +401,35 @@ export class Lexer {
       createToken(TokenType.EXPRESSION_START, '{', startPos, openEnd)
     );
 
-    let value = '';
-    let depth = 1;
-    let inString: string | null = null;
-    let escaped = false;
-    let contentStart: Position | null = null;
-    let contentEnd: Position = openEnd;
-
-    const consumeChar = (): string => {
-      const charStart = this.getCurrentPosition();
-      const char = this.advance();
-      const charEnd = this.getCurrentPosition();
-
-      value += char;
-      if (!contentStart) {
-        contentStart = charStart;
-      }
-      contentEnd = charEnd;
-
-      return char;
-    };
-
-    while (!this.isEOF() && depth > 0) {
-      const char = this.peek();
-
-      // Handle string literals inside expressions
-      if (inString) {
-        if (escaped) {
-          consumeChar();
-          escaped = false;
-          continue;
-        }
-        if (char === '\\') {
-          escaped = true;
-          consumeChar();
-          continue;
-        }
-        if (char === inString) {
-          consumeChar();
-          inString = null;
-          continue;
-        }
-        consumeChar();
-        continue;
-      }
-
-      // Not in string
-      if (char === '"' || char === "'" || char === '`') {
-        inString = char;
-        consumeChar();
-        continue;
-      }
-
-      if (char === '{') {
-        depth++;
-        consumeChar();
-        continue;
-      }
-
-      if (char === '}') {
-        depth--;
-        if (depth === 0) {
-          // End of expression
-          if (value.trim()) {
-            const start = contentStart ?? openEnd;
-            const end = contentEnd;
-            this.tokens.push(
-              createToken(TokenType.EXPRESSION_CONTENT, value, start, end)
-            );
-          }
-
-          const closeStart = this.getCurrentPosition();
-          this.advance(); // consume }
-          const closeEnd = this.getCurrentPosition();
-          this.tokens.push(
-            createToken(TokenType.EXPRESSION_END, '}', closeStart, closeEnd)
-          );
-          return;
-        }
-        consumeChar();
-        continue;
-      }
-
-      consumeChar();
+    const contentStart = this.getCurrentPosition();
+    const end = skipJsExpression(this.input, this.position);
+    if (end === null) {
+      throw Object.assign(new Error('Unclosed expression'), {
+        line: startPos.line,
+        column: startPos.column,
+      });
     }
-
-    // If we get here, expression wasn't closed properly
-    // Still add the content we have
-    if (value.trim()) {
-      const start = contentStart ?? openEnd;
-      const end = contentStart ? contentEnd : this.getCurrentPosition();
+    const value = this.input.slice(this.position, end - 1);
+    while (this.position < end - 1) this.advance();
+    const contentEnd = this.getCurrentPosition();
+    if (value.trim())
       this.tokens.push(
-        createToken(TokenType.EXPRESSION_CONTENT, value, start, end)
+        createToken(
+          TokenType.EXPRESSION_CONTENT,
+          value,
+          contentStart,
+          contentEnd
+        )
       );
-    }
+    this.advance();
+    this.tokens.push(
+      createToken(
+        TokenType.EXPRESSION_END,
+        '}',
+        contentEnd,
+        this.getCurrentPosition()
+      )
+    );
   }
 
   /**

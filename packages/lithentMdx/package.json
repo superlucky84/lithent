@@ -1,16 +1,21 @@
 {
   "type": "module",
   "name": "@lithent/lithent-mdx",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "description": "Vite plugin for MDX support in Lithent applications",
-  "main": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.umd.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "scripts": {
@@ -26,7 +31,7 @@
   "devDependencies": {
     "@lithent/hmr-parser": "workspace:*",
     "lithent": "workspace:*",
-    "vite": "^5.4.8"
+    "vite": "^8.3.6"
   },
   "keywords": [
     "lithent",
@@ -42,14 +47,11 @@
   },
   "peerDependencies": {
     "lithent": "^1.21.3",
-    "vite": "^5.0.0"
+    "vite": "^8.0.0"
   },
   "files": [
     "dist",
     "src"
   ],
-  "packageManager": "pnpm@9.12.3",
-  "volta": {
-    "node": "20.3.0"
-  }
+  "packageManager": "pnpm@12.15.0"
 }

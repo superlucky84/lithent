@@ -106,6 +106,7 @@ const categories: CategoryWithTheme[] = [
       { text: 'lcontext', link: '/guide/lcontext' },
       { text: 'cacheUpdate', link: '/guide/cache-update' },
       { text: 'stateRef', link: '/guide/state-ref' },
+      { text: '수명 관리 헬퍼', link: '/guide/lifecycle' },
     ],
   },
   {
@@ -252,6 +253,11 @@ const examples: ExampleItem[] = [
     link: '/examples/21',
     description:
       'HTM Tags와 Import Maps, Lithent Light API를 사용해 CDN만으로 완전한 메모 앱 구현',
+  },
+  {
+    text: '보존 편집기와 작업 수명',
+    link: '/examples/22',
+    description: '초안·되돌리기를 보존하고 검색·폴링·저장의 수명을 구분',
   },
 ];
 

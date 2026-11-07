@@ -1,0 +1,202 @@
+{
+  "baselineCommit": "925b4aa98c40ca20b309ea2613cc625d260fa5b1",
+  "node": "v24.19.0",
+  "compression": "gzip level 9; Node default Brotli; source maps excluded",
+  "production": [
+    {
+      "path": "dist/lithent.mjs",
+      "raw": 18779,
+      "gzip": 6071,
+      "brotli": 5509,
+      "sha256": "e7f992f5614b232e8836e1308b1c537be5444e35e917bd686b0a5d3ebd8065be",
+      "baseline": {
+        "path": "dist/lithent.mjs",
+        "raw": 18487,
+        "gzip": 5951,
+        "brotli": 5420,
+        "sha256": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f"
+      },
+      "delta": {
+        "raw": 292,
+        "gzip": 120,
+        "brotli": 89
+      }
+    },
+    {
+      "path": "dist/lithent.cjs",
+      "raw": 13041,
+      "gzip": 5286,
+      "brotli": 4875,
+      "sha256": "b1b3e279b8848bac394a9b5191844ccb7af65f21ebde1faf5268b452936b8aa6",
+      "baseline": {
+        "path": "dist/lithent.cjs",
+        "raw": 12819,
+        "gzip": 5171,
+        "brotli": 4785,
+        "sha256": "c1715fad8c0ea4b15bf603ed8fff8278109e16b6d5c85dd9a19a4e7cc5c63394"
+      },
+      "delta": {
+        "raw": 222,
+        "gzip": 115,
+        "brotli": 90
+      }
+    },
+    {
+      "path": "dist/lithent.umd.js",
+      "raw": 13188,
+      "gzip": 5257,
+      "brotli": 4859,
+      "sha256": "a12863c87f9a8152ae68a782793357b6bd45d7f16f93da96d716374dd796133f",
+      "baseline": {
+        "path": "dist/lithent.umd.js",
+        "raw": 12966,
+        "gzip": 5142,
+        "brotli": 4758,
+        "sha256": "ef1f48dc17504ac6c60c82617c9e1a8fd1b01adbd55b7a6e061738e419cf4414"
+      },
+      "delta": {
+        "raw": 222,
+        "gzip": 115,
+        "brotli": 101
+      }
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.mjs",
+      "raw": 25244,
+      "gzip": 8059,
+      "brotli": 7350,
+      "sha256": "0cc166d419c8360e7440a0f8931dcbbc787234b07c78c2b335dee1e47d27e7ff",
+      "baseline": {
+        "path": "lithentConcurrent/dist/lithentConcurrent.mjs",
+        "raw": 24795,
+        "gzip": 7902,
+        "brotli": 7219,
+        "sha256": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92"
+      },
+      "delta": {
+        "raw": 449,
+        "gzip": 157,
+        "brotli": 131
+      }
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.cjs",
+      "raw": 17315,
+      "gzip": 6957,
+      "brotli": 6430,
+      "sha256": "9b1763468f7657484b737cd48fe327ad975d2f071499da4c360d4f72a0adda3f",
+      "baseline": {
+        "path": "lithentConcurrent/dist/lithentConcurrent.cjs",
+        "raw": 16984,
+        "gzip": 6819,
+        "brotli": 6298,
+        "sha256": "bc47852ebd1d4d0997f41bd2eaf5e06bb700fbba2e2b450c2b9265085ce79bd1"
+      },
+      "delta": {
+        "raw": 331,
+        "gzip": 138,
+        "brotli": 132
+      }
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+      "raw": 17376,
+      "gzip": 7041,
+      "brotli": 6502,
+      "sha256": "79cee79bd2e1f62dfc56d60431a12d8b5d187d9c162eb58aa8aa11989801b623",
+      "baseline": {
+        "path": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+        "raw": 17045,
+        "gzip": 6906,
+        "brotli": 6385,
+        "sha256": "25568c92870172eae7d2ce0bd51d6fcbb176ca2947e4e7a2e25f7d7fed4add62"
+      },
+      "delta": {
+        "raw": 331,
+        "gzip": 135,
+        "brotli": 117
+      }
+    },
+    {
+      "path": "helper/dist/lithentHelper.mjs",
+      "raw": 9130,
+      "gzip": 2457,
+      "brotli": 2115,
+      "sha256": "919ba0763da8edd34ac5c5691d3918a201ad218f53dba20c6b4e7b1d88902c2e",
+      "baseline": {
+        "path": "helper/dist/lithentHelper.mjs",
+        "raw": 9130,
+        "gzip": 2457,
+        "brotli": 2115,
+        "sha256": "919ba0763da8edd34ac5c5691d3918a201ad218f53dba20c6b4e7b1d88902c2e"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    },
+    {
+      "path": "helper/dist/lithentHelper.cjs",
+      "raw": 5982,
+      "gzip": 2040,
+      "brotli": 1807,
+      "sha256": "8ea45730216c45fcfd46518a3835dd79ee3470335a4fb19a22bb577c83a47f32",
+      "baseline": {
+        "path": "helper/dist/lithentHelper.cjs",
+        "raw": 5982,
+        "gzip": 2040,
+        "brotli": 1807,
+        "sha256": "8ea45730216c45fcfd46518a3835dd79ee3470335a4fb19a22bb577c83a47f32"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    },
+    {
+      "path": "helper/dist/lithentHelper.umd.js",
+      "raw": 6145,
+      "gzip": 2134,
+      "brotli": 1879,
+      "sha256": "c3298d1cf1ab4e7d3b769d7a18f5a81ac12b30f139ae5fac598f28b0d994b0ea",
+      "baseline": {
+        "path": "helper/dist/lithentHelper.umd.js",
+        "raw": 6145,
+        "gzip": 2134,
+        "brotli": 1879,
+        "sha256": "c3298d1cf1ab4e7d3b769d7a18f5a81ac12b30f139ae5fac598f28b0d994b0ea"
+      },
+      "delta": {
+        "raw": 0,
+        "gzip": 0,
+        "brotli": 0
+      }
+    }
+  ],
+  "experiment": [
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.mjs",
+      "raw": 8302,
+      "gzip": 2563,
+      "brotli": 2295,
+      "sha256": "b066b07eccf386e8f569dac614914f11c6a869cc98bc675d4dd2729f90790bab"
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.cjs",
+      "raw": 5248,
+      "gzip": 2156,
+      "brotli": 1950,
+      "sha256": "71e9761630c1b31717552c2f5c7f666dc1054528bba50100612392e253480681"
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.umd.js",
+      "raw": 5445,
+      "gzip": 2285,
+      "brotli": 2045,
+      "sha256": "eb3d4b60a3c44fc7f9d17adb6e6cfa1f435f35dd381a3490b8478e849831c72b"
+    }
+  ],
+  "productionSourceDiffStat": "lithentConcurrent/src/diff.ts      |  3 +++\n lithentConcurrent/src/scheduler.ts | 14 ++++++++++++++\n lithentConcurrent/src/wDom.ts      |  2 +-\n src/diff.ts                        |  3 +++\n src/types/index.ts                 |  8 +++++++-\n src/utils/universalRef.ts          |  9 ++++++++-\n src/wDom.ts                        |  2 +-\n 7 files changed, 37 insertions(+), 4 deletions(-)"
+}

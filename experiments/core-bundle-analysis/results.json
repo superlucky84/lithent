@@ -1,0 +1,1026 @@
+{
+  "date": "2026-11-07T06:04:52.523Z",
+  "head": "d594983897bab460b469cea8c6e73dfd354f1fd2",
+  "node": "v24.22.1",
+  "zlib": "1.3.2.1-motley-285e94b",
+  "compression": "gzip level 9; Brotli Node defaults",
+  "sourceHashes": {
+    "utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+    "utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+    "utils/predicator.ts": "58f5c24f1c371c196105a73c2898bf1a1bda198606366756caf6e67befb2fe12",
+    "hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+    "hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+    "hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+    "hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+    "render.ts": "9c106005c2a1a468a390dadbd5893f40c98c6d516d9fd38ab46af7ee9b1d4cf5",
+    "diff.ts": "bb46628542778a55f0a80636c2e448bdf60fd473c578482851df0244d734e6f2",
+    "utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+    "utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+    "hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+    "wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f",
+    "hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+    "hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+    "index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e"
+  },
+  "libraries": [
+    {
+      "name": "current",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 2167,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19424,
+          "gzip": 6573,
+          "brotli": 6007,
+          "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f"
+        },
+        "lithent.umd.js": {
+          "raw": 13015,
+          "gzip": 5325,
+          "brotli": 4925,
+          "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+        },
+        "lithent.cjs": {
+          "raw": 12870,
+          "gzip": 5397,
+          "brotli": 4995,
+          "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+        }
+      },
+      "modules": {
+        "utils/universalRef.ts": {
+          "renderedLength": 1502,
+          "originalLength": 2092,
+          "renderedExports": [
+            "wdomSymbol",
+            "xmlnsRef",
+            "compKeyRef",
+            "needDiffRef",
+            "componentMap",
+            "lmountComponentSet",
+            "getComponentKey",
+            "getCurrentComponent",
+            "getComponentSubInfo",
+            "initUpdateHookState",
+            "initMountHookState",
+            "setComponentMapManualMode",
+            "isComponentMapManualMode",
+            "runUnmountEffects",
+            "disposeComponentEntry"
+          ],
+          "removedExports": []
+        },
+        "utils/index.ts": {
+          "renderedLength": 710,
+          "originalLength": 1335,
+          "renderedExports": [
+            "getParent",
+            "makeParentGetter",
+            "keys",
+            "isEnumerableProp",
+            "hasEnumerableProp",
+            "isObject",
+            "isPropType"
+          ],
+          "removedExports": ["entries", "assign"]
+        },
+        "utils/predicator.ts": {
+          "renderedLength": 3246,
+          "originalLength": 5733,
+          "renderedExports": [
+            "getKey",
+            "checkVirtualType",
+            "checkCustemComponentFunction",
+            "checkFragmentFunction",
+            "checkEmptyElement",
+            "checkPortalElement",
+            "checkEventKey",
+            "checkExistyKey",
+            "checkKeyedChildren",
+            "checkExisty",
+            "checkStyleData",
+            "checkRefData",
+            "hasAccessorMethods",
+            "isPendingCustomElement",
+            "getWDomType",
+            "checkSameWDomWithOriginal"
+          ],
+          "removedExports": []
+        },
+        "hook/internal/unmount.ts": {
+          "renderedLength": 923,
+          "originalLength": 1517,
+          "renderedExports": ["unmount", "runUnmountQueueFromWDom"],
+          "removedExports": []
+        },
+        "hook/mountCallback.ts": {
+          "renderedLength": 764,
+          "originalLength": 1195,
+          "renderedExports": [
+            "addMountedQueue",
+            "execMountedQueue",
+            "mountCallback"
+          ],
+          "removedExports": []
+        },
+        "hook/mountReadyCallback.ts": {
+          "renderedLength": 605,
+          "originalLength": 968,
+          "renderedExports": ["mountReadyCallback", "runWDomCallbacksFromWDom"],
+          "removedExports": []
+        },
+        "hook/internal/useUpdate.ts": {
+          "renderedLength": 959,
+          "originalLength": 1306,
+          "renderedExports": ["useUpdated", "runUpdatedQueueFromWDom"],
+          "removedExports": []
+        },
+        "render.ts": {
+          "renderedLength": 14270,
+          "originalLength": 22923,
+          "renderedExports": [
+            "render",
+            "typeDelete",
+            "typeDeleteUnused",
+            "wDomUpdate"
+          ],
+          "removedExports": []
+        },
+        "diff.ts": {
+          "renderedLength": 5663,
+          "originalLength": 10907,
+          "renderedExports": ["makeNewWDomTree"],
+          "removedExports": []
+        },
+        "utils/redraw.ts": {
+          "renderedLength": 911,
+          "originalLength": 1771,
+          "renderedExports": ["bindRedraw", "componentUpdate"],
+          "removedExports": ["setRedrawAction"]
+        },
+        "utils/createWDom.ts": {
+          "renderedLength": 236,
+          "originalLength": 547,
+          "renderedExports": ["createWDom"],
+          "removedExports": []
+        },
+        "hook/updateCallback.ts": {
+          "renderedLength": 458,
+          "originalLength": 687,
+          "renderedExports": ["updateCallback", "runUpdateCallback"],
+          "removedExports": []
+        },
+        "wDom.ts": {
+          "renderedLength": 6510,
+          "originalLength": 13218,
+          "renderedExports": [
+            "Fragment",
+            "h",
+            "portal",
+            "mount",
+            "lmount",
+            "replaceWDom",
+            "cloneWDom",
+            "copyResolver"
+          ],
+          "removedExports": []
+        },
+        "hook/ref.ts": {
+          "renderedLength": 92,
+          "originalLength": 113,
+          "renderedExports": ["ref", "nextTick"],
+          "removedExports": []
+        },
+        "hook/useRenew.ts": {
+          "renderedLength": 145,
+          "originalLength": 426,
+          "renderedExports": ["useRenew"],
+          "removedExports": []
+        },
+        "index.ts": {
+          "renderedLength": 0,
+          "originalLength": 1060,
+          "renderedExports": [],
+          "removedExports": []
+        }
+      }
+    },
+    {
+      "name": "vite5",
+      "vite": "5.4.21",
+      "target": "version default",
+      "elapsedMs": 1515,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19424,
+          "gzip": 6573,
+          "brotli": 6007,
+          "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f"
+        },
+        "lithent.umd.js": {
+          "raw": 13015,
+          "gzip": 5325,
+          "brotli": 4925,
+          "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+        },
+        "lithent.cjs": {
+          "raw": 12870,
+          "gzip": 5397,
+          "brotli": 4995,
+          "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+        }
+      }
+    },
+    {
+      "name": "vite6",
+      "vite": "6.4.5",
+      "target": "version default",
+      "elapsedMs": 859,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19424,
+          "gzip": 6573,
+          "brotli": 6007,
+          "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f"
+        },
+        "lithent.umd.js": {
+          "raw": 13015,
+          "gzip": 5325,
+          "brotli": 4925,
+          "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+        },
+        "lithent.cjs": {
+          "raw": 12870,
+          "gzip": 5397,
+          "brotli": 4995,
+          "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+        }
+      }
+    },
+    {
+      "name": "vite7",
+      "vite": "7.3.7",
+      "target": "version default",
+      "elapsedMs": 956,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19440,
+          "gzip": 6573,
+          "brotli": 6011,
+          "sha256": "b31275a89b1c476d7a9bfa3de29ea4bd5f15dc7993c38c132e8222cf46a02b71"
+        },
+        "lithent.umd.js": {
+          "raw": 13015,
+          "gzip": 5325,
+          "brotli": 4925,
+          "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+        },
+        "lithent.cjs": {
+          "raw": 12870,
+          "gzip": 5397,
+          "brotli": 4995,
+          "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+        }
+      }
+    },
+    {
+      "name": "vite8",
+      "vite": "8.3.6",
+      "target": "version default",
+      "elapsedMs": 531,
+      "files": {
+        "lithent.mjs": {
+          "raw": 17012,
+          "gzip": 5830,
+          "brotli": 5298,
+          "sha256": "a4dfdc0acabaf1118fa6f617b50a8106f2b0cd069a553ed7050fe35b4f8f3e52"
+        },
+        "lithent.umd.js": {
+          "raw": 12586,
+          "gzip": 5211,
+          "brotli": 4828,
+          "sha256": "6f219cd0980c5236e2607bd1b3b846271806328d84ff0ba4009f455a691b0761"
+        },
+        "lithent.cjs": {
+          "raw": 12444,
+          "gzip": 5134,
+          "brotli": 4767,
+          "sha256": "61acc52cf4885af8ac1a481ed3ca16d9e1e06b48c72d50c49b869a957f5dbb32"
+        }
+      }
+    },
+    {
+      "name": "vite7-legacy-target",
+      "vite": "7.3.7",
+      "target": ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
+      "elapsedMs": 461,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19440,
+          "gzip": 6573,
+          "brotli": 6011,
+          "sha256": "b31275a89b1c476d7a9bfa3de29ea4bd5f15dc7993c38c132e8222cf46a02b71"
+        },
+        "lithent.umd.js": {
+          "raw": 13015,
+          "gzip": 5325,
+          "brotli": 4925,
+          "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+        },
+        "lithent.cjs": {
+          "raw": 12870,
+          "gzip": 5397,
+          "brotli": 4995,
+          "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+        }
+      }
+    },
+    {
+      "name": "vite8-legacy-target",
+      "vite": "8.3.6",
+      "target": ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
+      "elapsedMs": 394,
+      "files": {
+        "lithent.mjs": {
+          "raw": 17021,
+          "gzip": 5830,
+          "brotli": 5299,
+          "sha256": "f66467e179acd4920dd17d7b153599662bd8a7b038bfdf54b58d5ebfad4820a3"
+        },
+        "lithent.umd.js": {
+          "raw": 12589,
+          "gzip": 5211,
+          "brotli": 4835,
+          "sha256": "1f567eb00773577c8c3914031fab8a0276c8f651d1d8cdae55a8dfde40f1d572"
+        },
+        "lithent.cjs": {
+          "raw": 12447,
+          "gzip": 5132,
+          "brotli": 4775,
+          "sha256": "509f1dea9e3ceb294cd73ad15d05798d6a518d3d015adae50ac216ea50611895"
+        }
+      }
+    },
+    {
+      "name": "current-esnext",
+      "vite": "5.4.8",
+      "target": "esnext",
+      "elapsedMs": 544,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19424,
+          "gzip": 6573,
+          "brotli": 6007,
+          "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f"
+        },
+        "lithent.umd.js": {
+          "raw": 13015,
+          "gzip": 5325,
+          "brotli": 4925,
+          "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+        },
+        "lithent.cjs": {
+          "raw": 12870,
+          "gzip": 5397,
+          "brotli": 4995,
+          "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+        }
+      }
+    },
+    {
+      "name": "current-hidden-map",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 1225,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19387,
+          "gzip": 6544,
+          "brotli": 5988,
+          "sha256": "cf9e398c4b6345a61fa776c26f1cbd89e711c3701d3258782c718cdb8b2b8502"
+        },
+        "lithent.umd.js": {
+          "raw": 12975,
+          "gzip": 5290,
+          "brotli": 4896,
+          "sha256": "ef9268bb2a75164b163d2422752384c862e1e273c6d182cfc1df7d9f3a9d5e66"
+        },
+        "lithent.cjs": {
+          "raw": 12833,
+          "gzip": 5366,
+          "brotli": 4974,
+          "sha256": "8cd6934f8f296176e112cda6e1828a50b01292ed739b16efb7d0e9818dd91250"
+        }
+      }
+    },
+    {
+      "name": "current-latest-terser",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 1009,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19424,
+          "gzip": 6573,
+          "brotli": 6007,
+          "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f"
+        },
+        "lithent.umd.js": {
+          "raw": 12941,
+          "gzip": 5308,
+          "brotli": 4912,
+          "sha256": "1c1171bb922e6b3e05cceb3385ee542009bc5b5568ab59563d406904982c5013"
+        },
+        "lithent.cjs": {
+          "raw": 12870,
+          "gzip": 5397,
+          "brotli": 4995,
+          "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+        }
+      }
+    },
+    {
+      "name": "current-unminified",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 349,
+      "files": {
+        "lithent.mjs": {
+          "raw": 37425,
+          "gzip": 9109,
+          "brotli": 8190,
+          "sha256": "b9af95329d61e96da669bff6261289e21674ae126b598594eeb6c9dedc0318a7"
+        },
+        "lithent.umd.js": {
+          "raw": 40532,
+          "gzip": 9397,
+          "brotli": 8396,
+          "sha256": "98e13fefb407365d7fac763f333f2cdef638f5700f6ef5f81fac160909e7c7f2"
+        },
+        "lithent.cjs": {
+          "raw": 37859,
+          "gzip": 9169,
+          "brotli": 8238,
+          "sha256": "03b9d6af0c553b86b52cf2fcfb994561a6eff4096b9dc051cc8c3d7f6c1014ed"
+        }
+      }
+    }
+  ],
+  "consumers": [
+    {
+      "name": "current",
+      "vite": "5.4.8",
+      "fixture": "ref",
+      "imported": "/tmp/lithent-core-analysis/results/current/lithent.mjs",
+      "raw": 48,
+      "gzip": 68,
+      "brotli": 52,
+      "sha256": "8400cfd2dbfcb28945c858121334dfa28675f5f2f98016b7fcbdff6028ed3131"
+    },
+    {
+      "name": "current",
+      "vite": "5.4.8",
+      "fixture": "h",
+      "imported": "/tmp/lithent-core-analysis/results/current/lithent.mjs",
+      "raw": 11455,
+      "gzip": 4856,
+      "brotli": 4501,
+      "sha256": "afb7d85462f82d2a3e11d410815a9e49bba2adc52c6c9fb1c88db46c31372322"
+    },
+    {
+      "name": "current",
+      "vite": "5.4.8",
+      "fixture": "static",
+      "imported": "/tmp/lithent-core-analysis/results/current/lithent.mjs",
+      "raw": 11630,
+      "gzip": 4914,
+      "brotli": 4550,
+      "sha256": "06882a48f01b90c079d00cdc63466608cb1a44113023959caf263652d7fdef5c"
+    },
+    {
+      "name": "current",
+      "vite": "5.4.8",
+      "fixture": "counter",
+      "imported": "/tmp/lithent-core-analysis/results/current/lithent.mjs",
+      "raw": 11705,
+      "gzip": 4961,
+      "brotli": 4599,
+      "sha256": "9859ddc937dd68b2d41f4c17adad59c7387ec7c7cc53fa0a77a6937acf987c0b"
+    },
+    {
+      "name": "current",
+      "vite": "5.4.8",
+      "fixture": "all",
+      "imported": "/tmp/lithent-core-analysis/results/current/lithent.mjs",
+      "raw": 12768,
+      "gzip": 5405,
+      "brotli": 5016,
+      "sha256": "9badbd6022cb1d4c24643cc1514cc65c2bedba621b28d08bdae62b0e02d68566"
+    },
+    {
+      "name": "vite5",
+      "vite": "5.4.21",
+      "fixture": "ref",
+      "imported": "/tmp/lithent-core-analysis/results/vite5/lithent.mjs",
+      "raw": 48,
+      "gzip": 68,
+      "brotli": 52,
+      "sha256": "8400cfd2dbfcb28945c858121334dfa28675f5f2f98016b7fcbdff6028ed3131"
+    },
+    {
+      "name": "vite5",
+      "vite": "5.4.21",
+      "fixture": "h",
+      "imported": "/tmp/lithent-core-analysis/results/vite5/lithent.mjs",
+      "raw": 11487,
+      "gzip": 4875,
+      "brotli": 4523,
+      "sha256": "8e17ac2f76ac0f3312603f4ae6217d71c413e334c0e0731d8791bfcbb1537144"
+    },
+    {
+      "name": "vite5",
+      "vite": "5.4.21",
+      "fixture": "static",
+      "imported": "/tmp/lithent-core-analysis/results/vite5/lithent.mjs",
+      "raw": 11662,
+      "gzip": 4930,
+      "brotli": 4572,
+      "sha256": "67bf2e506642d36f67a6000d92cdfe3a75c9f5c31e9fb065470fc53f5936e844"
+    },
+    {
+      "name": "vite5",
+      "vite": "5.4.21",
+      "fixture": "counter",
+      "imported": "/tmp/lithent-core-analysis/results/vite5/lithent.mjs",
+      "raw": 11737,
+      "gzip": 4976,
+      "brotli": 4608,
+      "sha256": "21112a5f4c0a7087c231cc45888b8ba512ccbeb76b1d6fb61a34a0ef32ec8dc3"
+    },
+    {
+      "name": "vite5",
+      "vite": "5.4.21",
+      "fixture": "all",
+      "imported": "/tmp/lithent-core-analysis/results/vite5/lithent.mjs",
+      "raw": 12768,
+      "gzip": 5401,
+      "brotli": 5012,
+      "sha256": "239902046ebfab6e025d2555a2d498113f7532ee0d7a416604cc0c057125229f"
+    },
+    {
+      "name": "vite6",
+      "vite": "6.4.5",
+      "fixture": "ref",
+      "imported": "/tmp/lithent-core-analysis/results/vite6/lithent.mjs",
+      "raw": 48,
+      "gzip": 68,
+      "brotli": 52,
+      "sha256": "8400cfd2dbfcb28945c858121334dfa28675f5f2f98016b7fcbdff6028ed3131"
+    },
+    {
+      "name": "vite6",
+      "vite": "6.4.5",
+      "fixture": "h",
+      "imported": "/tmp/lithent-core-analysis/results/vite6/lithent.mjs",
+      "raw": 11487,
+      "gzip": 4875,
+      "brotli": 4523,
+      "sha256": "8e17ac2f76ac0f3312603f4ae6217d71c413e334c0e0731d8791bfcbb1537144"
+    },
+    {
+      "name": "vite6",
+      "vite": "6.4.5",
+      "fixture": "static",
+      "imported": "/tmp/lithent-core-analysis/results/vite6/lithent.mjs",
+      "raw": 11662,
+      "gzip": 4930,
+      "brotli": 4572,
+      "sha256": "67bf2e506642d36f67a6000d92cdfe3a75c9f5c31e9fb065470fc53f5936e844"
+    },
+    {
+      "name": "vite6",
+      "vite": "6.4.5",
+      "fixture": "counter",
+      "imported": "/tmp/lithent-core-analysis/results/vite6/lithent.mjs",
+      "raw": 11737,
+      "gzip": 4976,
+      "brotli": 4608,
+      "sha256": "21112a5f4c0a7087c231cc45888b8ba512ccbeb76b1d6fb61a34a0ef32ec8dc3"
+    },
+    {
+      "name": "vite6",
+      "vite": "6.4.5",
+      "fixture": "all",
+      "imported": "/tmp/lithent-core-analysis/results/vite6/lithent.mjs",
+      "raw": 12768,
+      "gzip": 5401,
+      "brotli": 5012,
+      "sha256": "239902046ebfab6e025d2555a2d498113f7532ee0d7a416604cc0c057125229f"
+    },
+    {
+      "name": "vite7",
+      "vite": "7.3.7",
+      "fixture": "ref",
+      "imported": "/tmp/lithent-core-analysis/results/vite7/lithent.mjs",
+      "raw": 48,
+      "gzip": 68,
+      "brotli": 52,
+      "sha256": "8400cfd2dbfcb28945c858121334dfa28675f5f2f98016b7fcbdff6028ed3131"
+    },
+    {
+      "name": "vite7",
+      "vite": "7.3.7",
+      "fixture": "h",
+      "imported": "/tmp/lithent-core-analysis/results/vite7/lithent.mjs",
+      "raw": 11487,
+      "gzip": 4875,
+      "brotli": 4523,
+      "sha256": "8e17ac2f76ac0f3312603f4ae6217d71c413e334c0e0731d8791bfcbb1537144"
+    },
+    {
+      "name": "vite7",
+      "vite": "7.3.7",
+      "fixture": "static",
+      "imported": "/tmp/lithent-core-analysis/results/vite7/lithent.mjs",
+      "raw": 11662,
+      "gzip": 4930,
+      "brotli": 4572,
+      "sha256": "67bf2e506642d36f67a6000d92cdfe3a75c9f5c31e9fb065470fc53f5936e844"
+    },
+    {
+      "name": "vite7",
+      "vite": "7.3.7",
+      "fixture": "counter",
+      "imported": "/tmp/lithent-core-analysis/results/vite7/lithent.mjs",
+      "raw": 11737,
+      "gzip": 4976,
+      "brotli": 4608,
+      "sha256": "21112a5f4c0a7087c231cc45888b8ba512ccbeb76b1d6fb61a34a0ef32ec8dc3"
+    },
+    {
+      "name": "vite7",
+      "vite": "7.3.7",
+      "fixture": "all",
+      "imported": "/tmp/lithent-core-analysis/results/vite7/lithent.mjs",
+      "raw": 12768,
+      "gzip": 5401,
+      "brotli": 5012,
+      "sha256": "239902046ebfab6e025d2555a2d498113f7532ee0d7a416604cc0c057125229f"
+    },
+    {
+      "name": "vite8",
+      "vite": "8.3.6",
+      "fixture": "ref",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 39,
+      "gzip": 59,
+      "brotli": 43,
+      "sha256": "0802fb7633649605c8ce5e0577f73097fdd9b58d0e18e0ea2169729f6a7e698b"
+    },
+    {
+      "name": "vite8",
+      "vite": "8.3.6",
+      "fixture": "h",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 11116,
+      "gzip": 4638,
+      "brotli": 4309,
+      "sha256": "218a3a63713e2d7b6623da163d4983840000c9490bcb5ae6291bb5d0fb5e1fba"
+    },
+    {
+      "name": "vite8",
+      "vite": "8.3.6",
+      "fixture": "static",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 11298,
+      "gzip": 4698,
+      "brotli": 4369,
+      "sha256": "f01d4907dd1f2eb4f13eed75ee1e76251cea0351e1b94c0e18a05f512aebcef0"
+    },
+    {
+      "name": "vite8",
+      "vite": "8.3.6",
+      "fixture": "counter",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 11367,
+      "gzip": 4731,
+      "brotli": 4400,
+      "sha256": "6aa197d348f919765e699fee5fab658ce03b3cfe60ae9622d1770c64036d27c4"
+    },
+    {
+      "name": "vite8",
+      "vite": "8.3.6",
+      "fixture": "all",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 12506,
+      "gzip": 5161,
+      "brotli": 4789,
+      "sha256": "1a039d5b2f827c5224cb76c70460d1e45f8f95f2276e3a7b1eb21147a8ae658c"
+    },
+    {
+      "name": "current-direct-source",
+      "vite": "5.4.8",
+      "fixture": "h",
+      "imported": "/tmp/lithent-core-analysis/results/variants/base/src/index.ts",
+      "raw": 11449,
+      "gzip": 4861,
+      "brotli": 4502,
+      "sha256": "e85ca674e1198e68d044a91588748724343296fd67520e84b3837203b2ba5a10"
+    },
+    {
+      "name": "current-build-vite8-esm",
+      "vite": "5.4.8",
+      "fixture": "h",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 11133,
+      "gzip": 4771,
+      "brotli": 4438,
+      "sha256": "5f0b7d7cf3e518be20f9381d1ebcceb472fa33aeff1e218de97a80d0967f8a68"
+    },
+    {
+      "name": "current-direct-source",
+      "vite": "5.4.8",
+      "fixture": "static",
+      "imported": "/tmp/lithent-core-analysis/results/variants/base/src/index.ts",
+      "raw": 11624,
+      "gzip": 4916,
+      "brotli": 4550,
+      "sha256": "997512c73e6407db19d9e3bc9583a832bc41108af2147587e9da434006965adf"
+    },
+    {
+      "name": "current-build-vite8-esm",
+      "vite": "5.4.8",
+      "fixture": "static",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 11306,
+      "gzip": 4824,
+      "brotli": 4510,
+      "sha256": "980d4346df9cfbcf0ddfc33f1a78d87067b9fb642234da6889ff796600062041"
+    },
+    {
+      "name": "current-direct-source",
+      "vite": "5.4.8",
+      "fixture": "counter",
+      "imported": "/tmp/lithent-core-analysis/results/variants/base/src/index.ts",
+      "raw": 11699,
+      "gzip": 4960,
+      "brotli": 4607,
+      "sha256": "ef43cf4e92478d9809b4945612e7cc440c5dd0df99156a4357df654957d28f09"
+    },
+    {
+      "name": "current-build-vite8-esm",
+      "vite": "5.4.8",
+      "fixture": "counter",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 11387,
+      "gzip": 4872,
+      "brotli": 4550,
+      "sha256": "a86ddf745996787c4a2f480b35928bf9cd67788440f099a7c8f9491982f8b509"
+    },
+    {
+      "name": "current-direct-source",
+      "vite": "5.4.8",
+      "fixture": "all",
+      "imported": "/tmp/lithent-core-analysis/results/variants/base/src/index.ts",
+      "raw": 12768,
+      "gzip": 5407,
+      "brotli": 5004,
+      "sha256": "d99837db81cc79c6b9d557c819bbaa21617e7bb7627890800bb11f9d4dc911b1"
+    },
+    {
+      "name": "current-build-vite8-esm",
+      "vite": "5.4.8",
+      "fixture": "all",
+      "imported": "/tmp/lithent-core-analysis/results/vite8/lithent.mjs",
+      "raw": 12423,
+      "gzip": 5312,
+      "brotli": 4947,
+      "sha256": "2e4f370316303f7ef4980852eff5f406b4e670b2a9658337474a0dd16e3bac6f"
+    }
+  ],
+  "sourceExperiments": [
+    {
+      "name": "source-ownSymbol",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 600,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19423,
+          "gzip": 6564,
+          "brotli": 6000,
+          "sha256": "bd03beec55cc9a4cde4709e3eb4644c90692e044f49e2a16f392b760b46e7aff"
+        },
+        "lithent.umd.js": {
+          "raw": 13013,
+          "gzip": 5317,
+          "brotli": 4921,
+          "sha256": "9fa07d9d7972b1ed89a095751e2dd83721f67706ec376cc6cbb8d07477c5cd5b"
+        },
+        "lithent.cjs": {
+          "raw": 12868,
+          "gzip": 5389,
+          "brotli": 4996,
+          "sha256": "ec8ce44da7b63129dab84e63c52463057a37e1966eb62bf42f6a0adb8effc795"
+        }
+      }
+    },
+    {
+      "name": "source-iterativeAncestor",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 452,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19385,
+          "gzip": 6560,
+          "brotli": 5995,
+          "sha256": "402fa399807e650153b4bf8ee3e6501e237c0e606c9d87d21d3c591fd11ee8ca"
+        },
+        "lithent.umd.js": {
+          "raw": 13001,
+          "gzip": 5314,
+          "brotli": 4918,
+          "sha256": "16d0392db05a2c50d566a9369e236411d03ed8ed52d186c5b24f4956d16e311f"
+        },
+        "lithent.cjs": {
+          "raw": 12853,
+          "gzip": 5384,
+          "brotli": 4976,
+          "sha256": "a22593d5f47820a4cfe484d49149720bf45e71aade9e16ab432cd25b4422010c"
+        }
+      }
+    },
+    {
+      "name": "source-optionalKey",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 380,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19475,
+          "gzip": 6592,
+          "brotli": 6020,
+          "sha256": "ec7ce93ce8bb6930fd76c2e3e09b75f26264f7a16bfa4e5489a14acb11ced7d4"
+        },
+        "lithent.umd.js": {
+          "raw": 13047,
+          "gzip": 5342,
+          "brotli": 4936,
+          "sha256": "00423942e9558666d5695d620545b9afa9ee2c53b07c2d33b0e6a6678302e11b"
+        },
+        "lithent.cjs": {
+          "raw": 12902,
+          "gzip": 5412,
+          "brotli": 5016,
+          "sha256": "0bc45a14bc8b39ba9accabaf54fedff95b6f591f6470954d00c84fb63559bf82"
+        }
+      }
+    },
+    {
+      "name": "source-ownSymbol-iterativeAncestor-optionalKey",
+      "vite": "5.4.8",
+      "target": "version default",
+      "elapsedMs": 411,
+      "files": {
+        "lithent.mjs": {
+          "raw": 19435,
+          "gzip": 6571,
+          "brotli": 6019,
+          "sha256": "48c62bcc77a82b00a6190b6ceb52c8208863a28f896d55585d8bb747f1ea5e25"
+        },
+        "lithent.umd.js": {
+          "raw": 13031,
+          "gzip": 5322,
+          "brotli": 4921,
+          "sha256": "be697c7f4c7aa2580de8bcef3edcf543a9d7947f1e3b3640aa2ac1a0371242ab"
+        },
+        "lithent.cjs": {
+          "raw": 12883,
+          "gzip": 5393,
+          "brotli": 4984,
+          "sha256": "958ffbda7538ee74c54c5d48da9cc68c9ce2c656ff96c781373b0695cad2c279"
+        }
+      }
+    }
+  ],
+  "postprocess": [
+    {
+      "name": "terser-default",
+      "raw": 12818,
+      "gzip": 5248,
+      "brotli": 4857,
+      "sha256": "870b6241f960f1bf9a1925a423d3a419bedd083f28e00678a4c02cc621e20c8a"
+    },
+    {
+      "name": "terser-no-inline",
+      "raw": 13002,
+      "gzip": 5333,
+      "brotli": 4936,
+      "sha256": "962aa46ae2f9edf1c05ad31e80c9e63c735d5572a52751a4df5f637fefc9fa64"
+    }
+  ],
+  "productionConfigProof": {
+    "lithent.mjs": {
+      "identical": true,
+      "sha256": "76aba3f485f994a381509b0d92efbe7f4f574e9dd5f62d94334aa800f0c0aa6f"
+    },
+    "lithent.umd.js": {
+      "identical": true,
+      "sha256": "dff0ab8b5c652a880346cb1aaf160088be2d50022750767f8c7b596cac379c4b"
+    },
+    "lithent.cjs": {
+      "identical": true,
+      "sha256": "2e0e56f50ff7d54b8097a7b307326cef680b53ac66cbdb0751fc4297427d441f"
+    }
+  },
+  "vite8NativeConfigProof": {
+    "umdIdentical": true,
+    "cjsIdentical": true,
+    "esmDifference": "Only the first source-path comment differs between source copy and src/. Native ESM: raw 16967, gzip9 5792, Brotli 5273."
+  },
+  "tools": {
+    "current": {
+      "vite": "5.4.8",
+      "dependencies": [
+        {
+          "name": "rollup",
+          "version": "4.24.0"
+        },
+        {
+          "name": "esbuild",
+          "version": "0.21.5"
+        }
+      ]
+    },
+    "vite5": {
+      "vite": "5.4.21",
+      "dependencies": [
+        {
+          "name": "rollup",
+          "version": "4.68.0"
+        },
+        {
+          "name": "esbuild",
+          "version": "0.21.5"
+        }
+      ]
+    },
+    "vite6": {
+      "vite": "6.4.5",
+      "dependencies": [
+        {
+          "name": "rollup",
+          "version": "4.68.0"
+        },
+        {
+          "name": "esbuild",
+          "version": "0.25.12"
+        }
+      ]
+    },
+    "vite7": {
+      "vite": "7.3.7",
+      "dependencies": [
+        {
+          "name": "rollup",
+          "version": "4.68.0"
+        },
+        {
+          "name": "esbuild",
+          "version": "0.28.2"
+        }
+      ]
+    },
+    "vite8": {
+      "vite": "8.3.6",
+      "dependencies": [
+        {
+          "name": "rolldown",
+          "version": "1.2.16"
+        }
+      ]
+    },
+    "terser": {
+      "name": "terser",
+      "version": "5.18.1"
+    },
+    "latestTerser": "5.51.2"
+  },
+  "existingDist": {
+    "umd": {
+      "raw": 12741,
+      "gzip": 5167,
+      "brotli": 4798
+    },
+    "note": "Pre-existing output is stale; current source rebuild is 4925 Brotli bytes."
+  },
+  "tests": {
+    "runner": "Vitest 2.1.2 under Node 24.22.1; existing root config",
+    "filesPassed": 73,
+    "testsPassed": 462,
+    "durationSeconds": 104.59,
+    "note": "Unchanged source only; not the upgraded Vite test matrix."
+  }
+}

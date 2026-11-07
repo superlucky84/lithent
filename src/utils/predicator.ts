@@ -19,12 +19,6 @@ type WDomParam =
  * Predicator
  */
 
-const checkPlainWDomType = (wDom: WDomParam): wDom is WDom =>
-  isObject(wDom) && !('resolve' in wDom);
-
-const checkPlainType = (wDom: WDomParam, typeName: string) =>
-  checkPlainWDomType(wDom) && wDom.type === typeName;
-
 const checkSameCustomComponent = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
@@ -33,57 +27,36 @@ const checkSameCustomComponent = (
     ? newWDom.ctor === (originalWDom && originalWDom.ctor)
     : newWDom === (originalWDom && originalWDom.ctor);
 
-const checkSameFragment = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === 'f' &&
-    originalWDom.children &&
-    originalWDom.children.length ===
-      (newWDom.children && newWDom.children.length)
-  );
+// The checks below are reached through checkSameWDomWithOriginal only: with
+// a plain node of that type (getWDomType) and an original.
+const checkSameFragment = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === 'f' &&
+  // A component's node is a one-child fragment too: never update it in
+  // place as a plain fragment, or the component is never unmounted, nor
+  // update a plain fragment with one (a hoisted <Comp /> first drawn by a
+  // redraw), or it is never mounted.
+  !originalWDom.ctor &&
+  !newWDom.ctor &&
+  !!originalWDom.children &&
+  originalWDom.children.length ===
+    (newWDom.children && newWDom.children.length);
 
-const checkSameTagElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === 'e' &&
-    originalWDom.tag === newWDom.tag &&
-    originalWDom.children &&
-    originalWDom.children.length ===
-      (newWDom.children && newWDom.children.length)
-  );
+const checkSameTagElement = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === 'e' &&
+  originalWDom.tag === newWDom.tag &&
+  !!originalWDom.children &&
+  originalWDom.children.length ===
+    (newWDom.children && newWDom.children.length);
 
-const checkNormalTypeElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === newWDom.type
-  );
+const checkNormalTypeElement = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === newWDom.type;
 
-const checkLoopTypeElement = (
-  newWDom: WDom | TagFunction | TagFunctionResolver,
-  originalWDom?: WDom
-): boolean =>
-  !!(
-    checkPlainWDomType(newWDom) &&
-    originalWDom &&
-    originalWDom.type === newWDom.type &&
-    ((checkExistyKey((newWDom.children || [])[0]) &&
-      checkExistyKey((originalWDom.children || [])[0])) ||
-      (originalWDom.children &&
-        newWDom.children &&
-        originalWDom.children.length === newWDom.children.length))
-  );
+const checkLoopTypeElement = (newWDom: WDom, originalWDom: WDom): boolean =>
+  originalWDom.type === newWDom.type &&
+  ((checkKeyedChildren(newWDom) && checkKeyedChildren(originalWDom)) ||
+    (!!originalWDom.children &&
+      originalWDom.children.length ===
+        (newWDom.children && newWDom.children.length)));
 
 export const getKey = (target: WDom) =>
   (target && target.compProps && target.compProps.key) ??
@@ -105,13 +78,26 @@ export const checkCustemComponentFunction = (
 
 export const checkFragmentFunction = (
   target: unknown
-): target is FragmentFunction =>
-  typeof target === 'function' && target === Fragment;
+): target is FragmentFunction => target === Fragment;
 
-export const checkEmptyElement = (wDom: WDomParam) =>
-  checkPlainWDomType(wDom) && !wDom.type;
+// A diffed node (resolved already): empty when it has no type.
+export const checkEmptyElement = (wDom: WDom) => !wDom.type;
+
+// Whether the node's element is a portal target, which lies outside the
+// parent the portal sits in: a portal's own element, or the one a node
+// replacing or deleting a portal still holds, with that portal's props (op),
+// until it is drawn.
+export const checkPortalElement = ({ el, op, props }: WDom) =>
+  !!el && (el === (op && op.portal) || el === (props && props.portal));
+
+export const checkEventKey = (key: string) => key[0] === 'o' && key[1] === 'n';
 
 export const checkExistyKey = (target: WDom) => checkExisty(getKey(target));
+
+// A list is keyed when any child has a key: a leading null or false (a hidden
+// row) must not turn key matching off for the rest.
+export const checkKeyedChildren = (target?: WDom) =>
+  !!target && !!target.children && target.children.some(checkExistyKey);
 
 export const checkExisty = (value: unknown) =>
   value !== null && value !== undefined;
@@ -165,15 +151,7 @@ export const getWDomType = (
 ): WDomType =>
   checkCustemComponentFunction(wDom)
     ? 'c'
-    : checkPlainType(wDom, 'f')
-      ? 'f'
-      : checkPlainType(wDom, 'e')
-        ? 'e'
-        : checkPlainType(wDom, 'l')
-          ? 'l'
-          : checkPlainType(wDom, 't')
-            ? 't'
-            : 'et';
+    : ((wDom as WDom).type as WDomType) || 'et';
 
 export const checkSameWDomWithOriginal = {
   c: checkSameCustomComponent,

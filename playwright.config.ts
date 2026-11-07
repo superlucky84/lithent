@@ -1,6 +1,19 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const browsers = {
+  chromium: { name: 'chromium', device: 'Desktop Chrome' },
+  firefox: { name: 'firefox', device: 'Desktop Firefox' },
+  webkit: { name: 'webkit', device: 'Desktop Safari' },
+} as const;
+const selected = process.env.LITHENT_E2E_BROWSER ?? 'chromium';
+if (!Object.hasOwn(browsers, selected))
+  throw new Error(
+    `Invalid LITHENT_E2E_BROWSER: ${JSON.stringify(selected)}; expected chromium, firefox or webkit`
+  );
+const browser = browsers[selected as keyof typeof browsers];
+
 export default defineConfig({
+  metadata: { browser: browser.name },
   testDir: './e2e',
   testMatch: '**/*.spec.ts',
   timeout: 30_000,
@@ -11,7 +24,14 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    ...devices['Desktop Chrome'],
+    ...devices[browser.device],
+    browserName: browser.name,
+    launchOptions:
+      browser.name === 'firefox'
+        ? { firefoxUserPrefs: { 'browser.chrome.site_icons': false } }
+        : browser.name === 'chromium' && process.env.LITHENT_CHROME
+          ? { executablePath: process.env.LITHENT_CHROME }
+          : {},
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

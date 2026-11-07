@@ -1,0 +1,4909 @@
+<!doctype html>
+<html lang="ko">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>DC-16 · Lithent / React / Preact</title>
+  <style>
+    :root {
+      font-family: system-ui, sans-serif;
+      color: #18202b;
+      background: #f7f8fa;
+    }
+    body {
+      max-width: 1300px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    h1 {
+      font-size: 28px;
+      margin: 0 0 12px;
+    }
+    p {
+      line-height: 1.6;
+    }
+    .summary {
+      font-size: 20px;
+      font-weight: 650;
+    }
+    label {
+      display: inline-block;
+      margin: 12px 24px 16px 0;
+    }
+    select {
+      font: inherit;
+      padding: 8px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+    }
+    .scroll {
+      overflow: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+    }
+    th,
+    td {
+      border: 1px solid #d6dae1;
+      padding: 12px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+    th {
+      background: #edf0f5;
+    }
+    td small {
+      display: block;
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+    .goal {
+      font-weight: 700;
+    }
+    .fail {
+      color: #a12e21;
+    }
+    .pass {
+      color: #155f35;
+    }
+    .note {
+      color: #455166;
+      font-size: 14px;
+    }
+    a {
+      color: #2456b8;
+    }
+    footer {
+      margin: 24px 0;
+    }
+    caption {
+      text-align: left;
+      margin: 8px 0;
+    }
+  </style>
+  <h1>고정 peer 전체 비교</h1>
+  <p class="summary" id="summary"></p>
+  <p>
+    CPU 목표: 9항목 모두에서 Lithent 전체 시간 중앙값 ≤ 고정 네 peer 최저값 ×
+    1.10.
+  </p>
+  <label
+    >지표
+    <select id="metric">
+      <option value="total">CPU 전체 시간 · ms</option>
+      <option value="script">CPU JS · ms</option>
+      <option value="paint">CPU paint · ms</option>
+      <option value="memory">공식 메모리 · MB</option>
+    </select></label
+  >
+  <label
+    >표본
+    <select id="round">
+      <option value="pooled">두 차수 합산</option>
+      <option value="main">첫 차수</option>
+      <option value="reverse">반대 차수</option>
+    </select></label
+  >
+  <div class="scroll">
+    <table>
+      <caption id="caption"></caption>
+      <thead id="head"></thead>
+      <tbody id="body"></tbody>
+    </table>
+  </div>
+  <p class="note">
+    셀 색상과 셀 아래 비율: 다섯 앱의 항목별 최저 중앙값 기준, 고정 upstream
+    연속 색상 함수. 목표 판정: 네 peer 최저값 기준. JS·paint·메모리에는 CPU1.10
+    목표를 적용하지 않습니다.
+  </p>
+  <p class="note">
+    각 CPU 항목은 차수별 15표본(선택25), 메모리는3표본입니다. 표시는 소수3자리로
+    반올림하지만 판정은 원시 비율을 사용합니다. 합산만 경계를 통과하거나 작은
+    차이가 있으면 두 차수를 함께 확인하세요. 색상·평균은 전 항목 목표 달성의
+    대체 지표가 아닙니다.
+  </p>
+  <p class="note">
+    React hooks19.2.0 / classes19.0.0, Preact hooks/classes11.0.0의 고정 구현
+    비교입니다. 버전·hooks 효과를 분리한 실험이 아닙니다.
+  </p>
+  <footer>
+    <a href="PEER_BASELINE_RESULTS.md">해석·병목 진단·제한</a> ·
+    <a href="peer-baseline-results.json">원본 수치</a>
+  </footer>
+  <script>
+    const data = {
+      rows: {
+        main: [
+          {
+            id: '01_run1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 27.453,
+                  p25: 27.098,
+                  p75: 28.027,
+                  min: 26.978,
+                  max: 30.217,
+                },
+                script: {
+                  count: 15,
+                  median: 8.128,
+                  p25: 8.011,
+                  p75: 8.317,
+                  min: 7.935,
+                  max: 9.2,
+                },
+                paint: {
+                  count: 15,
+                  median: 18.773,
+                  p25: 18.568,
+                  p75: 19.113,
+                  min: 18.401,
+                  max: 21.024,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 24.527,
+                  p25: 24.356,
+                  p75: 25.355,
+                  min: 23.836,
+                  max: 25.725,
+                },
+                script: {
+                  count: 15,
+                  median: 5.514,
+                  p25: 5.347,
+                  p75: 5.576,
+                  min: 5.174,
+                  max: 6.147,
+                },
+                paint: {
+                  count: 15,
+                  median: 18.426,
+                  p25: 18.251,
+                  p75: 19.149,
+                  min: 18.005,
+                  max: 19.826,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 27.293,
+                  p25: 25.869,
+                  p75: 28.808,
+                  min: 25.648,
+                  max: 29.613,
+                },
+                script: {
+                  count: 15,
+                  median: 7.483,
+                  p25: 6.971,
+                  p75: 7.742,
+                  min: 6.84,
+                  max: 8.303,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.529,
+                  p25: 18.401,
+                  p75: 20.332,
+                  min: 18.096,
+                  max: 20.94,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 26.171,
+                  p25: 25.97,
+                  p75: 26.555,
+                  min: 25.346,
+                  max: 27.761,
+                },
+                script: {
+                  count: 15,
+                  median: 6.755,
+                  p25: 6.573,
+                  p75: 7.117,
+                  min: 6.545,
+                  max: 7.334,
+                },
+                paint: {
+                  count: 15,
+                  median: 18.853,
+                  p25: 18.62,
+                  p75: 18.926,
+                  min: 18.212,
+                  max: 20.188,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 26.309,
+                  p25: 25.86,
+                  p75: 26.774,
+                  min: 25.54,
+                  max: 27.644,
+                },
+                script: {
+                  count: 15,
+                  median: 6.675,
+                  p25: 6.609,
+                  p75: 6.722,
+                  min: 6.411,
+                  max: 6.98,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.093,
+                  p25: 18.605,
+                  p75: 19.682,
+                  min: 18.441,
+                  max: 20.243,
+                },
+              },
+            },
+          },
+          {
+            id: '02_replace1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 31.962,
+                  p25: 31.1,
+                  p75: 32.493,
+                  min: 30.89,
+                  max: 33.295,
+                },
+                script: {
+                  count: 15,
+                  median: 11.664,
+                  p25: 11.467,
+                  p75: 11.864,
+                  min: 11.265,
+                  max: 12.093,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.354,
+                  p25: 19.029,
+                  p75: 20.038,
+                  min: 18.944,
+                  max: 20.823,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 31.451,
+                  p25: 30.489,
+                  p75: 32.991,
+                  min: 30.021,
+                  max: 33.428,
+                },
+                script: {
+                  count: 15,
+                  median: 10.857,
+                  p25: 10.676,
+                  p75: 11.68,
+                  min: 10.631,
+                  max: 12.23,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.777,
+                  p25: 19.189,
+                  p75: 20.933,
+                  min: 18.591,
+                  max: 21.539,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 31.196,
+                  p25: 30.748,
+                  p75: 31.818,
+                  min: 30.298,
+                  max: 33.478,
+                },
+                script: {
+                  count: 15,
+                  median: 11.172,
+                  p25: 10.671,
+                  p75: 11.617,
+                  min: 10.296,
+                  max: 11.973,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.52,
+                  p25: 19.182,
+                  p75: 20.667,
+                  min: 18.85,
+                  max: 21.052,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 30.648,
+                  p25: 30.18,
+                  p75: 31.231,
+                  min: 29.389,
+                  max: 33.224,
+                },
+                script: {
+                  count: 15,
+                  median: 10.731,
+                  p25: 10.414,
+                  p75: 10.964,
+                  min: 10.211,
+                  max: 11.527,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.317,
+                  p25: 18.884,
+                  p75: 19.642,
+                  min: 18.556,
+                  max: 21.389,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 30.462,
+                  p25: 30.034,
+                  p75: 31.053,
+                  min: 29.632,
+                  max: 31.523,
+                },
+                script: {
+                  count: 15,
+                  median: 10.365,
+                  p25: 10.27,
+                  p75: 10.692,
+                  min: 10.019,
+                  max: 10.944,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.391,
+                  p25: 19.247,
+                  p75: 19.786,
+                  min: 18.64,
+                  max: 20.581,
+                },
+              },
+            },
+          },
+          {
+            id: '03_update10th1k_x16',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 18.144,
+                  p25: 17.238,
+                  p75: 19.271,
+                  min: 16.787,
+                  max: 23.35,
+                },
+                script: {
+                  count: 15,
+                  median: 6.023,
+                  p25: 5.647,
+                  p75: 6.416,
+                  min: 5.498,
+                  max: 7.237,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.301,
+                  p25: 9.574,
+                  p75: 10.987,
+                  min: 8.594,
+                  max: 13.102,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 16.503,
+                  p25: 15.423,
+                  p75: 18.377,
+                  min: 14.452,
+                  max: 21.222,
+                },
+                script: {
+                  count: 15,
+                  median: 4.445,
+                  p25: 4.211,
+                  p75: 4.837,
+                  min: 3.904,
+                  max: 5.13,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.451,
+                  p25: 10.247,
+                  p75: 11.925,
+                  min: 9.036,
+                  max: 15.034,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 15.513,
+                  p25: 14.602,
+                  p75: 16.028,
+                  min: 14.169,
+                  max: 19.82,
+                },
+                script: {
+                  count: 15,
+                  median: 4.032,
+                  p25: 3.952,
+                  p75: 4.862,
+                  min: 3.798,
+                  max: 5.098,
+                },
+                paint: {
+                  count: 15,
+                  median: 9.959,
+                  p25: 9.426,
+                  p75: 10.456,
+                  min: 8.786,
+                  max: 12.057,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 23.09,
+                  p25: 22.543,
+                  p75: 23.807,
+                  min: 22.384,
+                  max: 25.205,
+                },
+                script: {
+                  count: 15,
+                  median: 10.945,
+                  p25: 10.513,
+                  p75: 11.302,
+                  min: 10.124,
+                  max: 11.669,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.416,
+                  p25: 9.573,
+                  p75: 10.942,
+                  min: 8.626,
+                  max: 12.142,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 14.148,
+                  p25: 13.644,
+                  p75: 15.887,
+                  min: 12.718,
+                  max: 24.177,
+                },
+                script: {
+                  count: 15,
+                  median: 2.583,
+                  p25: 2.429,
+                  p75: 2.883,
+                  min: 2.214,
+                  max: 3.042,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.385,
+                  p25: 9.922,
+                  p75: 11.313,
+                  min: 9.415,
+                  max: 17.573,
+                },
+              },
+            },
+          },
+          {
+            id: '04_select1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 25,
+                  median: 7.473,
+                  p25: 7.0375,
+                  p75: 8.043,
+                  min: 6.8,
+                  max: 10.926,
+                },
+                script: {
+                  count: 25,
+                  median: 4.421,
+                  p25: 3.923,
+                  p75: 4.881,
+                  min: 3.668,
+                  max: 6.102,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.475,
+                  p25: 2.137,
+                  p75: 2.7435,
+                  min: 1.462,
+                  max: 3.428,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 25,
+                  median: 6.676,
+                  p25: 6.075,
+                  p75: 7.0845,
+                  min: 5.702,
+                  max: 10.3,
+                },
+                script: {
+                  count: 25,
+                  median: 3.438,
+                  p25: 3.0374999999999996,
+                  p75: 3.7775,
+                  min: 2.744,
+                  max: 4.186,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.358,
+                  p25: 2.0555,
+                  p75: 2.5735,
+                  min: 1.667,
+                  max: 3.015,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 25,
+                  median: 6.547,
+                  p25: 6.2675,
+                  p75: 7.2330000000000005,
+                  min: 6.074,
+                  max: 9.487,
+                },
+                script: {
+                  count: 25,
+                  median: 3.404,
+                  p25: 3.1950000000000003,
+                  p75: 3.8230000000000004,
+                  min: 2.86,
+                  max: 4.26,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.295,
+                  p25: 2.0795,
+                  p75: 2.7025,
+                  min: 1.794,
+                  max: 3.376,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 25,
+                  median: 14.767,
+                  p25: 14.397,
+                  p75: 15.8565,
+                  min: 13.406,
+                  max: 16.936,
+                },
+                script: {
+                  count: 25,
+                  median: 10.982,
+                  p25: 10.4475,
+                  p75: 11.278,
+                  min: 9.634,
+                  max: 11.938,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.903,
+                  p25: 2.3890000000000002,
+                  p75: 3.173,
+                  min: 1.673,
+                  max: 4.039,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 25,
+                  median: 4.404,
+                  p25: 4.0845,
+                  p75: 5.755,
+                  min: 3.844,
+                  max: 11.932,
+                },
+                script: {
+                  count: 25,
+                  median: 1.478,
+                  p25: 1.2805,
+                  p75: 1.621,
+                  min: 1.047,
+                  max: 2.896,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.379,
+                  p25: 2.0445,
+                  p75: 2.5949999999999998,
+                  min: 1.683,
+                  max: 3.817,
+                },
+              },
+            },
+          },
+          {
+            id: '05_swap1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 16.957,
+                  p25: 16.325,
+                  p75: 18.592,
+                  min: 15.769,
+                  max: 22.361,
+                },
+                script: {
+                  count: 15,
+                  median: 3.547,
+                  p25: 3.234,
+                  p75: 4.099,
+                  min: 2.79,
+                  max: 4.404,
+                },
+                paint: {
+                  count: 15,
+                  median: 12.177,
+                  p25: 11.899,
+                  p75: 13.423,
+                  min: 10.699,
+                  max: 14.993,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 98.587,
+                  p25: 95.412,
+                  p75: 102.748,
+                  min: 93.8,
+                  max: 110.362,
+                },
+                script: {
+                  count: 15,
+                  median: 21.536,
+                  p25: 19.615,
+                  p75: 21.961,
+                  min: 18.326,
+                  max: 22.901,
+                },
+                paint: {
+                  count: 15,
+                  median: 74.054,
+                  p25: 72.105,
+                  p75: 80.255,
+                  min: 70.825,
+                  max: 84.208,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 99.082,
+                  p25: 97.47,
+                  p75: 104.995,
+                  min: 92.758,
+                  max: 118.968,
+                },
+                script: {
+                  count: 15,
+                  median: 20.78,
+                  p25: 20.112,
+                  p75: 21.77,
+                  min: 18.883,
+                  max: 24.603,
+                },
+                paint: {
+                  count: 15,
+                  median: 75.545,
+                  p25: 74.433,
+                  p75: 81.867,
+                  min: 71.554,
+                  max: 88.683,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 25.287,
+                  p25: 24.623,
+                  p75: 26.425,
+                  min: 24.294,
+                  max: 29.552,
+                },
+                script: {
+                  count: 15,
+                  median: 9.414,
+                  p25: 8.992,
+                  p75: 9.682,
+                  min: 8.535,
+                  max: 10.411,
+                },
+                paint: {
+                  count: 15,
+                  median: 14.121,
+                  p25: 13.154,
+                  p75: 14.732,
+                  min: 12.772,
+                  max: 16.898,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 17.79,
+                  p25: 15.671,
+                  p75: 18.099,
+                  min: 14.523,
+                  max: 19.451,
+                },
+                script: {
+                  count: 15,
+                  median: 1.577,
+                  p25: 1.319,
+                  p75: 2.101,
+                  min: 1.104,
+                  max: 3.309,
+                },
+                paint: {
+                  count: 15,
+                  median: 14.059,
+                  p25: 12.918,
+                  p75: 15.008,
+                  min: 10.804,
+                  max: 15.699,
+                },
+              },
+            },
+          },
+          {
+            id: '06_remove-one-1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 13.081,
+                  p25: 11.968,
+                  p75: 14.505,
+                  min: 11.325,
+                  max: 15.997,
+                },
+                script: {
+                  count: 15,
+                  median: 1.302,
+                  p25: 1.168,
+                  p75: 1.426,
+                  min: 1.126,
+                  max: 1.957,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.832,
+                  p25: 10.007,
+                  p75: 12.184,
+                  min: 9.329,
+                  max: 13.447,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 13.68,
+                  p25: 13.107,
+                  p75: 14.73,
+                  min: 11.905,
+                  max: 16.806,
+                },
+                script: {
+                  count: 15,
+                  median: 1.338,
+                  p25: 1.216,
+                  p75: 1.418,
+                  min: 1.139,
+                  max: 1.548,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.952,
+                  p25: 10.525,
+                  p75: 11.157,
+                  min: 9.789,
+                  max: 13.485,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 14.26,
+                  p25: 13.446,
+                  p75: 14.794,
+                  min: 13.095,
+                  max: 15.168,
+                },
+                script: {
+                  count: 15,
+                  median: 1.745,
+                  p25: 1.682,
+                  p75: 1.949,
+                  min: 1.646,
+                  max: 2.025,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.544,
+                  p25: 10.402,
+                  p75: 11.743,
+                  min: 9.93,
+                  max: 12.174,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 16.878,
+                  p25: 16.17,
+                  p75: 18.467,
+                  min: 15.925,
+                  max: 21.93,
+                },
+                script: {
+                  count: 15,
+                  median: 4.666,
+                  p25: 4.635,
+                  p75: 4.912,
+                  min: 4.495,
+                  max: 5.634,
+                },
+                paint: {
+                  count: 15,
+                  median: 11.154,
+                  p25: 10.702,
+                  p75: 12.464,
+                  min: 10.209,
+                  max: 13.846,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 11.53,
+                  p25: 11.206,
+                  p75: 11.765,
+                  min: 10.866,
+                  max: 13.639,
+                },
+                script: {
+                  count: 15,
+                  median: 0.748,
+                  p25: 0.641,
+                  p75: 0.897,
+                  min: 0.598,
+                  max: 1.269,
+                },
+                paint: {
+                  count: 15,
+                  median: 9.948,
+                  p25: 9.695,
+                  p75: 10.017,
+                  min: 9.14,
+                  max: 11.068,
+                },
+              },
+            },
+          },
+          {
+            id: '07_create10k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 295.432,
+                  p25: 289.363,
+                  p75: 296.531,
+                  min: 285.489,
+                  max: 300.457,
+                },
+                script: {
+                  count: 15,
+                  median: 63.966,
+                  p25: 63.613,
+                  p75: 65.676,
+                  min: 62.551,
+                  max: 69.126,
+                },
+                paint: {
+                  count: 15,
+                  median: 221.848,
+                  p25: 215.935,
+                  p75: 223.694,
+                  min: 214.429,
+                  max: 228.666,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 451.602,
+                  p25: 439.483,
+                  p75: 461.015,
+                  min: 409.934,
+                  max: 465.973,
+                },
+                script: {
+                  count: 15,
+                  median: 223.086,
+                  p25: 213.889,
+                  p75: 228.404,
+                  min: 186.888,
+                  max: 229.996,
+                },
+                paint: {
+                  count: 15,
+                  median: 221.487,
+                  p25: 219.71,
+                  p75: 223.938,
+                  min: 215.276,
+                  max: 230.163,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 384.921,
+                  p25: 383.068,
+                  p75: 387.718,
+                  min: 381.282,
+                  max: 400.617,
+                },
+                script: {
+                  count: 15,
+                  median: 156.511,
+                  p25: 155.256,
+                  p75: 158.224,
+                  min: 152.289,
+                  max: 164.439,
+                },
+                paint: {
+                  count: 15,
+                  median: 221.092,
+                  p25: 219.552,
+                  p75: 223.989,
+                  min: 218.014,
+                  max: 235.799,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 287.929,
+                  p25: 287.224,
+                  p75: 293.247,
+                  min: 286.611,
+                  max: 300.624,
+                },
+                script: {
+                  count: 15,
+                  median: 61.126,
+                  p25: 60.711,
+                  p75: 61.908,
+                  min: 60.498,
+                  max: 63.701,
+                },
+                paint: {
+                  count: 15,
+                  median: 219.182,
+                  p25: 218.323,
+                  p75: 223.834,
+                  min: 217.249,
+                  max: 229.9,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 286.173,
+                  p25: 281.399,
+                  p75: 291.39,
+                  min: 280.403,
+                  max: 314.254,
+                },
+                script: {
+                  count: 15,
+                  median: 55.535,
+                  p25: 54.788,
+                  p75: 56.206,
+                  min: 54.161,
+                  max: 60.483,
+                },
+                paint: {
+                  count: 15,
+                  median: 222.15,
+                  p25: 218.401,
+                  p75: 225.234,
+                  min: 217.576,
+                  max: 244.103,
+                },
+              },
+            },
+          },
+          {
+            id: '08_create1k-after1k_x2',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 30.646,
+                  p25: 30.489,
+                  p75: 31.92,
+                  min: 30.029,
+                  max: 32.901,
+                },
+                script: {
+                  count: 15,
+                  median: 7.98,
+                  p25: 7.933,
+                  p75: 8.333,
+                  min: 7.637,
+                  max: 8.589,
+                },
+                paint: {
+                  count: 15,
+                  median: 21.614,
+                  p25: 21.567,
+                  p75: 22.357,
+                  min: 21.307,
+                  max: 23.491,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 29.841,
+                  p25: 29.561,
+                  p75: 30.532,
+                  min: 29.255,
+                  max: 31.604,
+                },
+                script: {
+                  count: 15,
+                  median: 6.826,
+                  p25: 6.628,
+                  p75: 6.957,
+                  min: 6.384,
+                  max: 7.364,
+                },
+                paint: {
+                  count: 15,
+                  median: 22.012,
+                  p25: 21.843,
+                  p75: 22.656,
+                  min: 21.576,
+                  max: 23.252,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 30.425,
+                  p25: 30.213,
+                  p75: 31.79,
+                  min: 29.94,
+                  max: 33.968,
+                },
+                script: {
+                  count: 15,
+                  median: 7.394,
+                  p25: 7.222,
+                  p75: 7.48,
+                  min: 7.021,
+                  max: 7.579,
+                },
+                paint: {
+                  count: 15,
+                  median: 22.069,
+                  p25: 21.918,
+                  p75: 23.045,
+                  min: 21.769,
+                  max: 25.273,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 32.959,
+                  p25: 31.949,
+                  p75: 34.392,
+                  min: 31.239,
+                  max: 36.593,
+                },
+                script: {
+                  count: 15,
+                  median: 8.63,
+                  p25: 8.548,
+                  p75: 8.754,
+                  min: 8.53,
+                  max: 8.946,
+                },
+                paint: {
+                  count: 15,
+                  median: 23.161,
+                  p25: 22.148,
+                  p75: 24.238,
+                  min: 21.691,
+                  max: 25.618,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 30.415,
+                  p25: 30.03,
+                  p75: 31.071,
+                  min: 29.874,
+                  max: 33.774,
+                },
+                script: {
+                  count: 15,
+                  median: 6.954,
+                  p25: 6.897,
+                  p75: 7.028,
+                  min: 6.819,
+                  max: 7.261,
+                },
+                paint: {
+                  count: 15,
+                  median: 22.47,
+                  p25: 22.173,
+                  p75: 23.013,
+                  min: 21.991,
+                  max: 25.22,
+                },
+              },
+            },
+          },
+          {
+            id: '09_clear1k_x8',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 13.174,
+                  p25: 11.975,
+                  p75: 13.744,
+                  min: 11.298,
+                  max: 15.13,
+                },
+                script: {
+                  count: 15,
+                  median: 10.552,
+                  p25: 9.506,
+                  p75: 11.305,
+                  min: 8.945,
+                  max: 12.04,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.344,
+                  p25: 1.22,
+                  p75: 1.575,
+                  min: 0.791,
+                  max: 2.383,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 19.661,
+                  p25: 18.432,
+                  p75: 20.539,
+                  min: 17.353,
+                  max: 22.29,
+                },
+                script: {
+                  count: 15,
+                  median: 17.065,
+                  p25: 15.921,
+                  p75: 17.789,
+                  min: 15.126,
+                  max: 19.399,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.248,
+                  p25: 1.058,
+                  p75: 1.434,
+                  min: 0.326,
+                  max: 2.108,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 19.944,
+                  p25: 18.575,
+                  p75: 20.263,
+                  min: 17.698,
+                  max: 21.248,
+                },
+                script: {
+                  count: 15,
+                  median: 17.213,
+                  p25: 15.873,
+                  p75: 17.451,
+                  min: 15.533,
+                  max: 18.926,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.588,
+                  p25: 0.912,
+                  p75: 1.892,
+                  min: 0.617,
+                  max: 2.086,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 14.658,
+                  p25: 13.651,
+                  p75: 15.106,
+                  min: 12.907,
+                  max: 16.483,
+                },
+                script: {
+                  count: 15,
+                  median: 11.856,
+                  p25: 11.199,
+                  p75: 12.149,
+                  min: 9.754,
+                  max: 13.17,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.592,
+                  p25: 1.499,
+                  p75: 2.175,
+                  min: 0.478,
+                  max: 2.688,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 14.024,
+                  p25: 13.638,
+                  p75: 14.983,
+                  min: 13.247,
+                  max: 15.094,
+                },
+                script: {
+                  count: 15,
+                  median: 11.476,
+                  p25: 11.069,
+                  p75: 11.961,
+                  min: 10.681,
+                  max: 12.408,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.493,
+                  p25: 1.338,
+                  p75: 1.949,
+                  min: 0.842,
+                  max: 2.207,
+                },
+              },
+            },
+          },
+        ],
+        reverse: [
+          {
+            id: '01_run1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 27.489,
+                  p25: 27.142,
+                  p75: 28.287,
+                  min: 26.901,
+                  max: 29.551,
+                },
+                script: {
+                  count: 15,
+                  median: 8.035,
+                  p25: 7.895,
+                  p75: 8.077,
+                  min: 7.687,
+                  max: 8.542,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.044,
+                  p25: 18.725,
+                  p75: 19.674,
+                  min: 18.516,
+                  max: 20.321,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 24.634,
+                  p25: 24.445,
+                  p75: 25.366,
+                  min: 24.11,
+                  max: 26.68,
+                },
+                script: {
+                  count: 15,
+                  median: 5.317,
+                  p25: 5.285,
+                  p75: 5.482,
+                  min: 5.245,
+                  max: 6.062,
+                },
+                paint: {
+                  count: 15,
+                  median: 18.75,
+                  p25: 18.64,
+                  p75: 19.188,
+                  min: 18.266,
+                  max: 20.016,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 26.384,
+                  p25: 25.971,
+                  p75: 27.036,
+                  min: 25.66,
+                  max: 28.972,
+                },
+                script: {
+                  count: 15,
+                  median: 7.084,
+                  p25: 6.898,
+                  p75: 7.311,
+                  min: 6.803,
+                  max: 7.943,
+                },
+                paint: {
+                  count: 15,
+                  median: 18.665,
+                  p25: 18.511,
+                  p75: 19.043,
+                  min: 18.344,
+                  max: 20.444,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 26.231,
+                  p25: 25.974,
+                  p75: 26.595,
+                  min: 25.726,
+                  max: 28.932,
+                },
+                script: {
+                  count: 15,
+                  median: 6.718,
+                  p25: 6.641,
+                  p75: 6.942,
+                  min: 6.422,
+                  max: 7.078,
+                },
+                paint: {
+                  count: 15,
+                  median: 18.967,
+                  p25: 18.846,
+                  p75: 19.168,
+                  min: 18.541,
+                  max: 21.299,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 26.599,
+                  p25: 26.289,
+                  p75: 27.227,
+                  min: 26.056,
+                  max: 28.571,
+                },
+                script: {
+                  count: 15,
+                  median: 6.693,
+                  p25: 6.53,
+                  p75: 6.761,
+                  min: 6.374,
+                  max: 6.898,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.441,
+                  p25: 19.076,
+                  p75: 20.217,
+                  min: 18.872,
+                  max: 21.04,
+                },
+              },
+            },
+          },
+          {
+            id: '02_replace1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 32.31,
+                  p25: 31.55,
+                  p75: 33.576,
+                  min: 31.387,
+                  max: 35.488,
+                },
+                script: {
+                  count: 15,
+                  median: 11.821,
+                  p25: 11.724,
+                  p75: 12.24,
+                  min: 11.564,
+                  max: 12.713,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.677,
+                  p25: 19.255,
+                  p75: 20.621,
+                  min: 19.037,
+                  max: 22.027,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 31.365,
+                  p25: 30.427,
+                  p75: 32.103,
+                  min: 29.984,
+                  max: 34.052,
+                },
+                script: {
+                  count: 15,
+                  median: 11.258,
+                  p25: 10.624,
+                  p75: 11.785,
+                  min: 10.445,
+                  max: 12.679,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.366,
+                  p25: 19.041,
+                  p75: 20.16,
+                  min: 18.564,
+                  max: 21.559,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 31.044,
+                  p25: 30.584,
+                  p75: 31.413,
+                  min: 29.631,
+                  max: 32.032,
+                },
+                script: {
+                  count: 15,
+                  median: 11.398,
+                  p25: 11.046,
+                  p75: 11.625,
+                  min: 10.14,
+                  max: 12.327,
+                },
+                paint: {
+                  count: 15,
+                  median: 18.979,
+                  p25: 18.859,
+                  p75: 19.204,
+                  min: 18.563,
+                  max: 19.623,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 31.055,
+                  p25: 30.28,
+                  p75: 31.302,
+                  min: 29.901,
+                  max: 33.588,
+                },
+                script: {
+                  count: 15,
+                  median: 10.964,
+                  p25: 10.823,
+                  p75: 11.09,
+                  min: 10.587,
+                  max: 11.38,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.248,
+                  p25: 18.821,
+                  p75: 19.697,
+                  min: 18.664,
+                  max: 21.61,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 30.332,
+                  p25: 30.169,
+                  p75: 31.296,
+                  min: 29.073,
+                  max: 31.718,
+                },
+                script: {
+                  count: 15,
+                  median: 10.456,
+                  p25: 10.318,
+                  p75: 10.646,
+                  min: 9.859,
+                  max: 11.28,
+                },
+                paint: {
+                  count: 15,
+                  median: 19.295,
+                  p25: 19.043,
+                  p75: 20.012,
+                  min: 18.449,
+                  max: 20.907,
+                },
+              },
+            },
+          },
+          {
+            id: '03_update10th1k_x16',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 18.905,
+                  p25: 18.275,
+                  p75: 20.339,
+                  min: 17.572,
+                  max: 23.828,
+                },
+                script: {
+                  count: 15,
+                  median: 6.313,
+                  p25: 6.029,
+                  p75: 6.605,
+                  min: 5.726,
+                  max: 6.963,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.893,
+                  p25: 9.829,
+                  p75: 11.792,
+                  min: 9.285,
+                  max: 14.538,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 18.347,
+                  p25: 16.728,
+                  p75: 19.468,
+                  min: 16.154,
+                  max: 20.485,
+                },
+                script: {
+                  count: 15,
+                  median: 4.981,
+                  p25: 4.679,
+                  p75: 5.218,
+                  min: 4.426,
+                  max: 5.64,
+                },
+                paint: {
+                  count: 15,
+                  median: 11.186,
+                  p25: 10.563,
+                  p75: 12.44,
+                  min: 9.399,
+                  max: 12.499,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 16.01,
+                  p25: 15.775,
+                  p75: 17.24,
+                  min: 15.23,
+                  max: 19.396,
+                },
+                script: {
+                  count: 15,
+                  median: 4.126,
+                  p25: 3.812,
+                  p75: 4.407,
+                  min: 3.516,
+                  max: 5.217,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.801,
+                  p25: 10.262,
+                  p75: 11.288,
+                  min: 9.247,
+                  max: 13.57,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 24.962,
+                  p25: 24.335,
+                  p75: 25.986,
+                  min: 23.115,
+                  max: 29.512,
+                },
+                script: {
+                  count: 15,
+                  median: 11.166,
+                  p25: 10.919,
+                  p75: 11.843,
+                  min: 10.271,
+                  max: 12.433,
+                },
+                paint: {
+                  count: 15,
+                  median: 11.247,
+                  p25: 10.966,
+                  p75: 12.567,
+                  min: 10.03,
+                  max: 14.074,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 15.876,
+                  p25: 14.651,
+                  p75: 17.575,
+                  min: 13.661,
+                  max: 27.937,
+                },
+                script: {
+                  count: 15,
+                  median: 2.691,
+                  p25: 2.439,
+                  p75: 3.04,
+                  min: 2.247,
+                  max: 4.01,
+                },
+                paint: {
+                  count: 15,
+                  median: 11.463,
+                  p25: 10.697,
+                  p75: 12.649,
+                  min: 8.898,
+                  max: 13.912,
+                },
+              },
+            },
+          },
+          {
+            id: '04_select1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 25,
+                  median: 7.541,
+                  p25: 7.118,
+                  p75: 8.696,
+                  min: 6.69,
+                  max: 10.489,
+                },
+                script: {
+                  count: 25,
+                  median: 4.351,
+                  p25: 4.122,
+                  p75: 4.6240000000000006,
+                  min: 3.591,
+                  max: 5.224,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.377,
+                  p25: 1.759,
+                  p75: 3.057,
+                  min: 1.35,
+                  max: 3.541,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 25,
+                  median: 6.363,
+                  p25: 6.0265,
+                  p75: 6.6195,
+                  min: 5.452,
+                  max: 7.405,
+                },
+                script: {
+                  count: 25,
+                  median: 3.107,
+                  p25: 2.8665000000000003,
+                  p75: 3.5205,
+                  min: 2.572,
+                  max: 3.853,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.324,
+                  p25: 2.028,
+                  p75: 2.816,
+                  min: 1.642,
+                  max: 3.458,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 25,
+                  median: 6.601,
+                  p25: 6.33,
+                  p75: 7.381,
+                  min: 6.028,
+                  max: 9.728,
+                },
+                script: {
+                  count: 25,
+                  median: 3.587,
+                  p25: 3.4290000000000003,
+                  p75: 3.7525,
+                  min: 2.949,
+                  max: 4.331,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.219,
+                  p25: 2.0495,
+                  p75: 2.8745000000000003,
+                  min: 1.563,
+                  max: 4.528,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 25,
+                  median: 15.114,
+                  p25: 14.6395,
+                  p75: 16.509,
+                  min: 13.802,
+                  max: 19.137,
+                },
+                script: {
+                  count: 25,
+                  median: 10.643,
+                  p25: 10.408000000000001,
+                  p75: 11.284500000000001,
+                  min: 10.098,
+                  max: 13.008,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.939,
+                  p25: 2.6639999999999997,
+                  p75: 3.3685,
+                  min: 2.2,
+                  max: 5.091,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 25,
+                  median: 4.788,
+                  p25: 4.5169999999999995,
+                  p75: 5.3735,
+                  min: 4.046,
+                  max: 9.965,
+                },
+                script: {
+                  count: 25,
+                  median: 1.524,
+                  p25: 1.3330000000000002,
+                  p75: 1.6135000000000002,
+                  min: 0.854,
+                  max: 2.89,
+                },
+                paint: {
+                  count: 25,
+                  median: 2.26,
+                  p25: 2.0185,
+                  p75: 2.7685,
+                  min: 1.524,
+                  max: 3.608,
+                },
+              },
+            },
+          },
+          {
+            id: '05_swap1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 17.781,
+                  p25: 17.261,
+                  p75: 18.428,
+                  min: 16.578,
+                  max: 20.439,
+                },
+                script: {
+                  count: 15,
+                  median: 3.695,
+                  p25: 3.421,
+                  p75: 4.068,
+                  min: 3.295,
+                  max: 4.526,
+                },
+                paint: {
+                  count: 15,
+                  median: 12.694,
+                  p25: 12.264,
+                  p75: 13.19,
+                  min: 11.575,
+                  max: 14.631,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 100.568,
+                  p25: 96.523,
+                  p75: 104.661,
+                  min: 92.994,
+                  max: 108.553,
+                },
+                script: {
+                  count: 15,
+                  median: 20.829,
+                  p25: 19.974,
+                  p75: 21.875,
+                  min: 18.333,
+                  max: 22.911,
+                },
+                paint: {
+                  count: 15,
+                  median: 78.037,
+                  p25: 73.673,
+                  p75: 81.012,
+                  min: 71.516,
+                  max: 84.505,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 96.324,
+                  p25: 95.606,
+                  p75: 101.755,
+                  min: 92.636,
+                  max: 110.507,
+                },
+                script: {
+                  count: 15,
+                  median: 21.019,
+                  p25: 20.071,
+                  p75: 21.574,
+                  min: 18.635,
+                  max: 21.992,
+                },
+                paint: {
+                  count: 15,
+                  median: 74.073,
+                  p25: 72.106,
+                  p75: 78.29,
+                  min: 71.193,
+                  max: 85.51,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 25.004,
+                  p25: 23.911,
+                  p75: 26.569,
+                  min: 22.35,
+                  max: 36,
+                },
+                script: {
+                  count: 15,
+                  median: 8.93,
+                  p25: 8.67,
+                  p75: 9.489,
+                  min: 8.405,
+                  max: 10.749,
+                },
+                paint: {
+                  count: 15,
+                  median: 13.931,
+                  p25: 12.952,
+                  p75: 14.398,
+                  min: 11.897,
+                  max: 22.871,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 16.277,
+                  p25: 15.711,
+                  p75: 16.972,
+                  min: 14.503,
+                  max: 21.109,
+                },
+                script: {
+                  count: 15,
+                  median: 1.66,
+                  p25: 1.437,
+                  p75: 2.334,
+                  min: 1.162,
+                  max: 3.189,
+                },
+                paint: {
+                  count: 15,
+                  median: 13.163,
+                  p25: 12.409,
+                  p75: 13.479,
+                  min: 10.957,
+                  max: 16.09,
+                },
+              },
+            },
+          },
+          {
+            id: '06_remove-one-1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 12.889,
+                  p25: 12.31,
+                  p75: 14.454,
+                  min: 12.024,
+                  max: 16.452,
+                },
+                script: {
+                  count: 15,
+                  median: 1.342,
+                  p25: 1.328,
+                  p75: 1.394,
+                  min: 1.164,
+                  max: 1.536,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.642,
+                  p25: 10.455,
+                  p75: 11.559,
+                  min: 9.919,
+                  max: 12.743,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 13.791,
+                  p25: 13.233,
+                  p75: 14.566,
+                  min: 12.222,
+                  max: 15.363,
+                },
+                script: {
+                  count: 15,
+                  median: 1.352,
+                  p25: 1.211,
+                  p75: 1.539,
+                  min: 1.138,
+                  max: 1.678,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.712,
+                  p25: 10.064,
+                  p75: 10.933,
+                  min: 9.705,
+                  max: 12.407,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 13.776,
+                  p25: 13.583,
+                  p75: 14.648,
+                  min: 12.686,
+                  max: 15.647,
+                },
+                script: {
+                  count: 15,
+                  median: 1.835,
+                  p25: 1.616,
+                  p75: 1.96,
+                  min: 1.569,
+                  max: 2.207,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.768,
+                  p25: 10.384,
+                  p75: 11.698,
+                  min: 9.994,
+                  max: 12.55,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 15.807,
+                  p25: 15.625,
+                  p75: 16.259,
+                  min: 15.315,
+                  max: 19.882,
+                },
+                script: {
+                  count: 15,
+                  median: 4.658,
+                  p25: 4.579,
+                  p75: 4.904,
+                  min: 4.469,
+                  max: 5.145,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.504,
+                  p25: 10.088,
+                  p75: 10.71,
+                  min: 9.847,
+                  max: 13.158,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 12.208,
+                  p25: 11.706,
+                  p75: 12.563,
+                  min: 10.941,
+                  max: 15.88,
+                },
+                script: {
+                  count: 15,
+                  median: 0.75,
+                  p25: 0.633,
+                  p75: 0.902,
+                  min: 0.608,
+                  max: 1.795,
+                },
+                paint: {
+                  count: 15,
+                  median: 10.162,
+                  p25: 9.85,
+                  p75: 10.721,
+                  min: 9.143,
+                  max: 11.957,
+                },
+              },
+            },
+          },
+          {
+            id: '07_create10k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 284.274,
+                  p25: 283.418,
+                  p75: 287.16,
+                  min: 282.652,
+                  max: 293.265,
+                },
+                script: {
+                  count: 15,
+                  median: 64.276,
+                  p25: 63.345,
+                  p75: 64.73,
+                  min: 62.558,
+                  max: 65.637,
+                },
+                paint: {
+                  count: 15,
+                  median: 213.581,
+                  p25: 212.886,
+                  p75: 214.848,
+                  min: 211.452,
+                  max: 219.471,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 433.187,
+                  p25: 410.219,
+                  p75: 442.864,
+                  min: 401.284,
+                  max: 453.48,
+                },
+                script: {
+                  count: 15,
+                  median: 209.167,
+                  p25: 182.791,
+                  p75: 215.878,
+                  min: 175.88,
+                  max: 220.08,
+                },
+                paint: {
+                  count: 15,
+                  median: 219.373,
+                  p25: 216.422,
+                  p75: 222.729,
+                  min: 213.65,
+                  max: 226.931,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 382.581,
+                  p25: 377.777,
+                  p75: 386.7,
+                  min: 374.942,
+                  max: 402.713,
+                },
+                script: {
+                  count: 15,
+                  median: 153.907,
+                  p25: 152.581,
+                  p75: 156.796,
+                  min: 146.986,
+                  max: 161.664,
+                },
+                paint: {
+                  count: 15,
+                  median: 222.387,
+                  p25: 217.064,
+                  p75: 224.141,
+                  min: 216.187,
+                  max: 231.633,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 290.813,
+                  p25: 288.429,
+                  p75: 299.577,
+                  min: 281.943,
+                  max: 314.442,
+                },
+                script: {
+                  count: 15,
+                  median: 61.274,
+                  p25: 60.727,
+                  p75: 61.527,
+                  min: 59.304,
+                  max: 64.07,
+                },
+                paint: {
+                  count: 15,
+                  median: 221.924,
+                  p25: 218.91,
+                  p75: 229.154,
+                  min: 214.671,
+                  max: 243.169,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 292.847,
+                  p25: 287.901,
+                  p75: 299.675,
+                  min: 280.634,
+                  max: 305.269,
+                },
+                script: {
+                  count: 15,
+                  median: 56.165,
+                  p25: 55.419,
+                  p75: 56.824,
+                  min: 54.911,
+                  max: 58.688,
+                },
+                paint: {
+                  count: 15,
+                  median: 229.443,
+                  p25: 223.94,
+                  p75: 234.031,
+                  min: 219.05,
+                  max: 238.026,
+                },
+              },
+            },
+          },
+          {
+            id: '08_create1k-after1k_x2',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 32.844,
+                  p25: 31.093,
+                  p75: 33.457,
+                  min: 30.351,
+                  max: 36.096,
+                },
+                script: {
+                  count: 15,
+                  median: 8.267,
+                  p25: 7.899,
+                  p75: 8.954,
+                  min: 7.746,
+                  max: 9.057,
+                },
+                paint: {
+                  count: 15,
+                  median: 23.027,
+                  p25: 22.221,
+                  p75: 23.553,
+                  min: 21.513,
+                  max: 26.142,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 32.09,
+                  p25: 30.777,
+                  p75: 32.939,
+                  min: 29.901,
+                  max: 34.928,
+                },
+                script: {
+                  count: 15,
+                  median: 6.829,
+                  p25: 6.779,
+                  p75: 6.958,
+                  min: 6.506,
+                  max: 7.22,
+                },
+                paint: {
+                  count: 15,
+                  median: 23.596,
+                  p25: 22.788,
+                  p75: 24.368,
+                  min: 22.344,
+                  max: 25.932,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 31.442,
+                  p25: 30.351,
+                  p75: 33.671,
+                  min: 29.592,
+                  max: 38.555,
+                },
+                script: {
+                  count: 15,
+                  median: 7.356,
+                  p25: 7.17,
+                  p75: 7.528,
+                  min: 6.922,
+                  max: 9.784,
+                },
+                paint: {
+                  count: 15,
+                  median: 23.243,
+                  p25: 22.057,
+                  p75: 24.662,
+                  min: 21.611,
+                  max: 27.022,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 33.062,
+                  p25: 32.221,
+                  p75: 37.039,
+                  min: 31.782,
+                  max: 39.497,
+                },
+                script: {
+                  count: 15,
+                  median: 8.785,
+                  p25: 8.574,
+                  p75: 9.107,
+                  min: 8.442,
+                  max: 10.052,
+                },
+                paint: {
+                  count: 15,
+                  median: 22.985,
+                  p25: 22.464,
+                  p75: 26.327,
+                  min: 22.331,
+                  max: 28.188,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 30.598,
+                  p25: 30.016,
+                  p75: 32.391,
+                  min: 29.705,
+                  max: 33.318,
+                },
+                script: {
+                  count: 15,
+                  median: 6.963,
+                  p25: 6.836,
+                  p75: 6.994,
+                  min: 6.697,
+                  max: 7.128,
+                },
+                paint: {
+                  count: 15,
+                  median: 22.642,
+                  p25: 22.2,
+                  p75: 24.041,
+                  min: 21.891,
+                  max: 24.559,
+                },
+              },
+            },
+          },
+          {
+            id: '09_clear1k_x8',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 15,
+                  median: 12.595,
+                  p25: 11.787,
+                  p75: 13.621,
+                  min: 11.288,
+                  max: 15.05,
+                },
+                script: {
+                  count: 15,
+                  median: 10.301,
+                  p25: 9.534,
+                  p75: 11.029,
+                  min: 8.744,
+                  max: 12.278,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.387,
+                  p25: 1.173,
+                  p75: 1.852,
+                  min: 1.084,
+                  max: 2.022,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 15,
+                  median: 19.375,
+                  p25: 18.895,
+                  p75: 19.795,
+                  min: 17.577,
+                  max: 21.574,
+                },
+                script: {
+                  count: 15,
+                  median: 16.827,
+                  p25: 16.525,
+                  p75: 17.142,
+                  min: 15.071,
+                  max: 19.4,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.054,
+                  p25: 0.823,
+                  p75: 1.58,
+                  min: 0.703,
+                  max: 1.967,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 15,
+                  median: 19.483,
+                  p25: 18.685,
+                  p75: 20.65,
+                  min: 18.063,
+                  max: 21.417,
+                },
+                script: {
+                  count: 15,
+                  median: 17.131,
+                  p25: 16.456,
+                  p75: 17.992,
+                  min: 15.735,
+                  max: 18.373,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.419,
+                  p25: 1.304,
+                  p75: 1.67,
+                  min: 0.377,
+                  max: 2.652,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 15,
+                  median: 14.007,
+                  p25: 13.67,
+                  p75: 14.409,
+                  min: 13.376,
+                  max: 15.523,
+                },
+                script: {
+                  count: 15,
+                  median: 11.392,
+                  p25: 11.025,
+                  p75: 11.905,
+                  min: 10.637,
+                  max: 12.544,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.077,
+                  p25: 1.006,
+                  p75: 1.5,
+                  min: 0.354,
+                  max: 2.223,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 15,
+                  median: 13.995,
+                  p25: 13.202,
+                  p75: 15.69,
+                  min: 12.851,
+                  max: 16.12,
+                },
+                script: {
+                  count: 15,
+                  median: 11.202,
+                  p25: 11.028,
+                  p75: 12.901,
+                  min: 10.493,
+                  max: 13.473,
+                },
+                paint: {
+                  count: 15,
+                  median: 1.33,
+                  p25: 1.026,
+                  p75: 1.621,
+                  min: 0.377,
+                  max: 1.722,
+                },
+              },
+            },
+          },
+        ],
+        pooled: [
+          {
+            id: '01_run1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 27.474,
+                  p25: 27.142,
+                  p75: 28.179,
+                  min: 26.901,
+                  max: 30.217,
+                },
+                script: {
+                  count: 30,
+                  median: 8.0485,
+                  p25: 7.981,
+                  p75: 8.267,
+                  min: 7.687,
+                  max: 9.2,
+                },
+                paint: {
+                  count: 30,
+                  median: 18.911,
+                  p25: 18.628,
+                  p75: 19.322,
+                  min: 18.401,
+                  max: 21.024,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 24.5995,
+                  p25: 24.364,
+                  p75: 25.355,
+                  min: 23.836,
+                  max: 26.68,
+                },
+                script: {
+                  count: 30,
+                  median: 5.3595,
+                  p25: 5.29,
+                  p75: 5.549,
+                  min: 5.174,
+                  max: 6.147,
+                },
+                paint: {
+                  count: 30,
+                  median: 18.733,
+                  p25: 18.389,
+                  p75: 19.149,
+                  min: 18.005,
+                  max: 20.016,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 26.6145,
+                  p25: 25.971,
+                  p75: 27.863,
+                  min: 25.648,
+                  max: 29.613,
+                },
+                script: {
+                  count: 30,
+                  median: 7.2095,
+                  p25: 6.942,
+                  p75: 7.551,
+                  min: 6.803,
+                  max: 8.303,
+                },
+                paint: {
+                  count: 30,
+                  median: 18.8695,
+                  p25: 18.511,
+                  p75: 19.772,
+                  min: 18.096,
+                  max: 20.94,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 26.216,
+                  p25: 25.974,
+                  p75: 26.555,
+                  min: 25.346,
+                  max: 28.932,
+                },
+                script: {
+                  count: 30,
+                  median: 6.754,
+                  p25: 6.605,
+                  p75: 6.942,
+                  min: 6.422,
+                  max: 7.334,
+                },
+                paint: {
+                  count: 30,
+                  median: 18.897,
+                  p25: 18.724,
+                  p75: 19.101,
+                  min: 18.212,
+                  max: 21.299,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 26.417,
+                  p25: 26.209,
+                  p75: 27.074,
+                  min: 25.54,
+                  max: 28.571,
+                },
+                script: {
+                  count: 30,
+                  median: 6.679,
+                  p25: 6.545,
+                  p75: 6.733,
+                  min: 6.374,
+                  max: 6.98,
+                },
+                paint: {
+                  count: 30,
+                  median: 19.1915,
+                  p25: 18.934,
+                  p75: 19.744,
+                  min: 18.441,
+                  max: 21.04,
+                },
+              },
+            },
+          },
+          {
+            id: '02_replace1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 32.091,
+                  p25: 31.516,
+                  p75: 32.598,
+                  min: 30.89,
+                  max: 35.488,
+                },
+                script: {
+                  count: 30,
+                  median: 11.777,
+                  p25: 11.613,
+                  p75: 12.082,
+                  min: 11.265,
+                  max: 12.713,
+                },
+                paint: {
+                  count: 30,
+                  median: 19.4065,
+                  p25: 19.147,
+                  p75: 20.221,
+                  min: 18.944,
+                  max: 22.027,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 31.445999999999998,
+                  p25: 30.489,
+                  p75: 32.245,
+                  min: 29.984,
+                  max: 34.052,
+                },
+                script: {
+                  count: 30,
+                  median: 11.134,
+                  p25: 10.668,
+                  p75: 11.774,
+                  min: 10.445,
+                  max: 12.679,
+                },
+                paint: {
+                  count: 30,
+                  median: 19.51,
+                  p25: 19.135,
+                  p75: 20.538,
+                  min: 18.564,
+                  max: 21.559,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 31.167,
+                  p25: 30.725,
+                  p75: 31.575,
+                  min: 29.631,
+                  max: 33.478,
+                },
+                script: {
+                  count: 30,
+                  median: 11.2995,
+                  p25: 10.954,
+                  p75: 11.617,
+                  min: 10.14,
+                  max: 12.327,
+                },
+                paint: {
+                  count: 30,
+                  median: 19.188499999999998,
+                  p25: 18.959,
+                  p75: 19.589,
+                  min: 18.563,
+                  max: 21.052,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 30.8565,
+                  p25: 30.279,
+                  p75: 31.231,
+                  min: 29.389,
+                  max: 33.588,
+                },
+                script: {
+                  count: 30,
+                  median: 10.846499999999999,
+                  p25: 10.66,
+                  p75: 11.044,
+                  min: 10.211,
+                  max: 11.527,
+                },
+                paint: {
+                  count: 30,
+                  median: 19.314500000000002,
+                  p25: 18.884,
+                  p75: 19.653,
+                  min: 18.556,
+                  max: 21.61,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 30.378,
+                  p25: 30.121,
+                  p75: 31.175,
+                  min: 29.073,
+                  max: 31.718,
+                },
+                script: {
+                  count: 30,
+                  median: 10.441,
+                  p25: 10.302,
+                  p75: 10.689,
+                  min: 9.859,
+                  max: 11.28,
+                },
+                paint: {
+                  count: 30,
+                  median: 19.3505,
+                  p25: 19.073,
+                  p75: 19.786,
+                  min: 18.449,
+                  max: 20.907,
+                },
+              },
+            },
+          },
+          {
+            id: '03_update10th1k_x16',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 18.895000000000003,
+                  p25: 17.717,
+                  p75: 19.326,
+                  min: 16.787,
+                  max: 23.828,
+                },
+                script: {
+                  count: 30,
+                  median: 6.2125,
+                  p25: 5.904,
+                  p75: 6.451,
+                  min: 5.498,
+                  max: 7.237,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.4475,
+                  p25: 9.635,
+                  p75: 11.406,
+                  min: 8.594,
+                  max: 14.538,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 17.1265,
+                  p25: 16.154,
+                  p75: 18.826,
+                  min: 14.452,
+                  max: 21.222,
+                },
+                script: {
+                  count: 30,
+                  median: 4.7405,
+                  p25: 4.426,
+                  p75: 5.013,
+                  min: 3.904,
+                  max: 5.64,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.864,
+                  p25: 10.441,
+                  p75: 12.292,
+                  min: 9.036,
+                  max: 15.034,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 15.847000000000001,
+                  p25: 15.23,
+                  p75: 16.462,
+                  min: 14.169,
+                  max: 19.82,
+                },
+                script: {
+                  count: 30,
+                  median: 4.0495,
+                  p25: 3.944,
+                  p75: 4.438,
+                  min: 3.516,
+                  max: 5.217,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.408000000000001,
+                  p25: 9.791,
+                  p75: 10.888,
+                  min: 8.786,
+                  max: 13.57,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 24.064999999999998,
+                  p25: 23.09,
+                  p75: 25.205,
+                  min: 22.384,
+                  max: 29.512,
+                },
+                script: {
+                  count: 30,
+                  median: 11.036999999999999,
+                  p25: 10.841,
+                  p75: 11.41,
+                  min: 10.124,
+                  max: 12.433,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.954,
+                  p25: 10.328,
+                  p75: 11.61,
+                  min: 8.626,
+                  max: 14.074,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 14.8895,
+                  p25: 13.811,
+                  p75: 16.411,
+                  min: 12.718,
+                  max: 27.937,
+                },
+                script: {
+                  count: 30,
+                  median: 2.6445,
+                  p25: 2.439,
+                  p75: 2.999,
+                  min: 2.214,
+                  max: 4.01,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.919,
+                  p25: 10.128,
+                  p75: 12.011,
+                  min: 8.898,
+                  max: 17.573,
+                },
+              },
+            },
+          },
+          {
+            id: '04_select1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 50,
+                  median: 7.5065,
+                  p25: 7.096,
+                  p75: 8.234,
+                  min: 6.69,
+                  max: 10.926,
+                },
+                script: {
+                  count: 50,
+                  median: 4.387499999999999,
+                  p25: 3.993,
+                  p75: 4.77,
+                  min: 3.591,
+                  max: 6.102,
+                },
+                paint: {
+                  count: 50,
+                  median: 2.4240000000000004,
+                  p25: 2.103,
+                  p75: 2.84,
+                  min: 1.35,
+                  max: 3.541,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 50,
+                  median: 6.485,
+                  p25: 6.066,
+                  p75: 6.893,
+                  min: 5.452,
+                  max: 10.3,
+                },
+                script: {
+                  count: 50,
+                  median: 3.277,
+                  p25: 2.927,
+                  p75: 3.623,
+                  min: 2.572,
+                  max: 4.186,
+                },
+                paint: {
+                  count: 50,
+                  median: 2.341,
+                  p25: 2.039,
+                  p75: 2.715,
+                  min: 1.642,
+                  max: 3.458,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 50,
+                  median: 6.592499999999999,
+                  p25: 6.326,
+                  p75: 7.041,
+                  min: 6.028,
+                  max: 9.728,
+                },
+                script: {
+                  count: 50,
+                  median: 3.5595,
+                  p25: 3.276,
+                  p75: 3.769,
+                  min: 2.86,
+                  max: 4.331,
+                },
+                paint: {
+                  count: 50,
+                  median: 2.293,
+                  p25: 2.093,
+                  p75: 2.862,
+                  min: 1.563,
+                  max: 4.528,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 50,
+                  median: 15.058,
+                  p25: 14.469,
+                  p75: 15.884,
+                  min: 13.406,
+                  max: 19.137,
+                },
+                script: {
+                  count: 50,
+                  median: 10.6725,
+                  p25: 10.432,
+                  p75: 11.249,
+                  min: 9.634,
+                  max: 13.008,
+                },
+                paint: {
+                  count: 50,
+                  median: 2.9085,
+                  p25: 2.537,
+                  p75: 3.234,
+                  min: 1.673,
+                  max: 5.091,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 50,
+                  median: 4.6065,
+                  p25: 4.186,
+                  p75: 5.446,
+                  min: 3.844,
+                  max: 11.932,
+                },
+                script: {
+                  count: 50,
+                  median: 1.5034999999999998,
+                  p25: 1.316,
+                  p75: 1.619,
+                  min: 0.854,
+                  max: 2.896,
+                },
+                paint: {
+                  count: 50,
+                  median: 2.3575,
+                  p25: 2.031,
+                  p75: 2.751,
+                  min: 1.524,
+                  max: 3.817,
+                },
+              },
+            },
+          },
+          {
+            id: '05_swap1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 17.4625,
+                  p25: 16.809,
+                  p75: 18.568,
+                  min: 15.769,
+                  max: 22.361,
+                },
+                script: {
+                  count: 30,
+                  median: 3.6505,
+                  p25: 3.305,
+                  p75: 4.068,
+                  min: 2.79,
+                  max: 4.526,
+                },
+                paint: {
+                  count: 30,
+                  median: 12.584,
+                  p25: 11.955,
+                  p75: 13.19,
+                  min: 10.699,
+                  max: 14.993,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 100.4515,
+                  p25: 95.905,
+                  p75: 104.251,
+                  min: 92.994,
+                  max: 110.362,
+                },
+                script: {
+                  count: 30,
+                  median: 21.052999999999997,
+                  p25: 19.974,
+                  p75: 21.889,
+                  min: 18.326,
+                  max: 22.911,
+                },
+                paint: {
+                  count: 30,
+                  median: 76.904,
+                  p25: 72.785,
+                  p75: 80.545,
+                  min: 70.825,
+                  max: 84.505,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 98.549,
+                  p25: 95.73,
+                  p75: 103.446,
+                  min: 92.636,
+                  max: 118.968,
+                },
+                script: {
+                  count: 30,
+                  median: 20.855,
+                  p25: 20.112,
+                  p75: 21.574,
+                  min: 18.635,
+                  max: 24.603,
+                },
+                paint: {
+                  count: 30,
+                  median: 75.018,
+                  p25: 72.491,
+                  p75: 78.675,
+                  min: 71.193,
+                  max: 88.683,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 25.2335,
+                  p25: 24.45,
+                  p75: 26.425,
+                  min: 22.35,
+                  max: 36,
+                },
+                script: {
+                  count: 30,
+                  median: 9.1025,
+                  p25: 8.827,
+                  p75: 9.581,
+                  min: 8.405,
+                  max: 10.749,
+                },
+                paint: {
+                  count: 30,
+                  median: 13.965,
+                  p25: 13.154,
+                  p75: 14.722,
+                  min: 11.897,
+                  max: 22.871,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 16.371499999999997,
+                  p25: 15.711,
+                  p75: 17.978,
+                  min: 14.503,
+                  max: 21.109,
+                },
+                script: {
+                  count: 30,
+                  median: 1.617,
+                  p25: 1.428,
+                  p75: 2.101,
+                  min: 1.104,
+                  max: 3.309,
+                },
+                paint: {
+                  count: 30,
+                  median: 13.375499999999999,
+                  p25: 12.593,
+                  p75: 14.389,
+                  min: 10.804,
+                  max: 16.09,
+                },
+              },
+            },
+          },
+          {
+            id: '06_remove-one-1k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 12.930499999999999,
+                  p25: 12.31,
+                  p75: 14.454,
+                  min: 11.325,
+                  max: 16.452,
+                },
+                script: {
+                  count: 30,
+                  median: 1.3315000000000001,
+                  p25: 1.232,
+                  p75: 1.424,
+                  min: 1.126,
+                  max: 1.957,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.737,
+                  p25: 10.367,
+                  p75: 11.559,
+                  min: 9.329,
+                  max: 13.447,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 13.755500000000001,
+                  p25: 13.113,
+                  p75: 14.709,
+                  min: 11.905,
+                  max: 16.806,
+                },
+                script: {
+                  count: 30,
+                  median: 1.3405,
+                  p25: 1.216,
+                  p75: 1.433,
+                  min: 1.138,
+                  max: 1.678,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.7485,
+                  p25: 10.466,
+                  p75: 11.089,
+                  min: 9.705,
+                  max: 13.485,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 14.029,
+                  p25: 13.583,
+                  p75: 14.648,
+                  min: 12.686,
+                  max: 15.647,
+                },
+                script: {
+                  count: 30,
+                  median: 1.7745,
+                  p25: 1.68,
+                  p75: 1.949,
+                  min: 1.569,
+                  max: 2.207,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.7535,
+                  p25: 10.402,
+                  p75: 11.698,
+                  min: 9.93,
+                  max: 12.55,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 16.1885,
+                  p25: 15.807,
+                  p75: 16.974,
+                  min: 15.315,
+                  max: 21.93,
+                },
+                script: {
+                  count: 30,
+                  median: 4.665,
+                  p25: 4.628,
+                  p75: 4.904,
+                  min: 4.469,
+                  max: 5.634,
+                },
+                paint: {
+                  count: 30,
+                  median: 10.706,
+                  p25: 10.362,
+                  p75: 11.309,
+                  min: 9.847,
+                  max: 13.846,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 11.7265,
+                  p25: 11.327,
+                  p75: 12.453,
+                  min: 10.866,
+                  max: 15.88,
+                },
+                script: {
+                  count: 30,
+                  median: 0.749,
+                  p25: 0.641,
+                  p75: 0.897,
+                  min: 0.598,
+                  max: 1.795,
+                },
+                paint: {
+                  count: 30,
+                  median: 9.972000000000001,
+                  p25: 9.788,
+                  p75: 10.522,
+                  min: 9.14,
+                  max: 11.957,
+                },
+              },
+            },
+          },
+          {
+            id: '07_create10k',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 287.495,
+                  p25: 284.274,
+                  p75: 295.432,
+                  min: 282.652,
+                  max: 300.457,
+                },
+                script: {
+                  count: 30,
+                  median: 64.24549999999999,
+                  p25: 63.613,
+                  p75: 64.73,
+                  min: 62.551,
+                  max: 69.126,
+                },
+                paint: {
+                  count: 30,
+                  median: 215.15550000000002,
+                  p25: 213.581,
+                  p75: 221.848,
+                  min: 211.452,
+                  max: 228.666,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 442.3045,
+                  p25: 419.733,
+                  p75: 453.236,
+                  min: 401.284,
+                  max: 465.973,
+                },
+                script: {
+                  count: 30,
+                  median: 214.52100000000002,
+                  p25: 186.888,
+                  p75: 223.086,
+                  min: 175.88,
+                  max: 229.996,
+                },
+                paint: {
+                  count: 30,
+                  median: 220.4115,
+                  p25: 216.945,
+                  p75: 223.163,
+                  min: 213.65,
+                  max: 230.163,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 384.4825,
+                  p25: 381.477,
+                  p75: 387.245,
+                  min: 374.942,
+                  max: 402.713,
+                },
+                script: {
+                  count: 30,
+                  median: 155.6135,
+                  p25: 153.044,
+                  p75: 157.288,
+                  min: 146.986,
+                  max: 164.439,
+                },
+                paint: {
+                  count: 30,
+                  median: 221.106,
+                  p25: 218.907,
+                  p75: 223.989,
+                  min: 216.187,
+                  max: 235.799,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 289.70399999999995,
+                  p25: 287.289,
+                  p75: 294.709,
+                  min: 281.943,
+                  max: 314.442,
+                },
+                script: {
+                  count: 30,
+                  median: 61.2565,
+                  p25: 60.727,
+                  p75: 61.602,
+                  min: 59.304,
+                  max: 64.07,
+                },
+                paint: {
+                  count: 30,
+                  median: 220.63400000000001,
+                  p25: 218.783,
+                  p75: 225.19,
+                  min: 214.671,
+                  max: 243.169,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 288.07550000000003,
+                  p25: 284.688,
+                  p75: 293.44,
+                  min: 280.403,
+                  max: 314.254,
+                },
+                script: {
+                  count: 30,
+                  median: 55.698499999999996,
+                  p25: 55.06,
+                  p75: 56.368,
+                  min: 54.161,
+                  max: 60.483,
+                },
+                paint: {
+                  count: 30,
+                  median: 224.98700000000002,
+                  p25: 221.946,
+                  p75: 229.676,
+                  min: 217.576,
+                  max: 244.103,
+                },
+              },
+            },
+          },
+          {
+            id: '08_create1k-after1k_x2',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 31.3175,
+                  p25: 30.615,
+                  p75: 32.901,
+                  min: 30.029,
+                  max: 36.096,
+                },
+                script: {
+                  count: 30,
+                  median: 8.0375,
+                  p25: 7.933,
+                  p75: 8.461,
+                  min: 7.637,
+                  max: 9.057,
+                },
+                paint: {
+                  count: 30,
+                  median: 22.287,
+                  p25: 21.603,
+                  p75: 23.166,
+                  min: 21.307,
+                  max: 26.142,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 30.5865,
+                  p25: 29.841,
+                  p75: 32.09,
+                  min: 29.255,
+                  max: 34.928,
+                },
+                script: {
+                  count: 30,
+                  median: 6.827,
+                  p25: 6.746,
+                  p75: 6.957,
+                  min: 6.384,
+                  max: 7.364,
+                },
+                paint: {
+                  count: 30,
+                  median: 22.7245,
+                  p25: 22.012,
+                  p75: 23.596,
+                  min: 21.576,
+                  max: 25.932,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 30.6085,
+                  p25: 30.251,
+                  p75: 33.123,
+                  min: 29.592,
+                  max: 38.555,
+                },
+                script: {
+                  count: 30,
+                  median: 7.391500000000001,
+                  p25: 7.198,
+                  p75: 7.48,
+                  min: 6.922,
+                  max: 9.784,
+                },
+                paint: {
+                  count: 30,
+                  median: 22.4055,
+                  p25: 21.934,
+                  p75: 24.511,
+                  min: 21.611,
+                  max: 27.022,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 33.0105,
+                  p25: 32.197,
+                  p75: 34.581,
+                  min: 31.239,
+                  max: 39.497,
+                },
+                script: {
+                  count: 30,
+                  median: 8.684999999999999,
+                  p25: 8.574,
+                  p75: 8.852,
+                  min: 8.442,
+                  max: 10.052,
+                },
+                paint: {
+                  count: 30,
+                  median: 23.073,
+                  p25: 22.464,
+                  p75: 24.614,
+                  min: 21.691,
+                  max: 28.188,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 30.5965,
+                  p25: 30.03,
+                  p75: 32.366,
+                  min: 29.705,
+                  max: 33.774,
+                },
+                script: {
+                  count: 30,
+                  median: 6.9585,
+                  p25: 6.897,
+                  p75: 7.014,
+                  min: 6.697,
+                  max: 7.261,
+                },
+                paint: {
+                  count: 30,
+                  median: 22.5865,
+                  p25: 22.2,
+                  p75: 23.774,
+                  min: 21.891,
+                  max: 25.22,
+                },
+              },
+            },
+          },
+          {
+            id: '09_clear1k_x8',
+            conditions: {
+              lithent: {
+                total: {
+                  count: 30,
+                  median: 13.173,
+                  p25: 11.975,
+                  p75: 13.737,
+                  min: 11.288,
+                  max: 15.13,
+                },
+                script: {
+                  count: 30,
+                  median: 10.431000000000001,
+                  p25: 9.534,
+                  p75: 11.143,
+                  min: 8.744,
+                  max: 12.278,
+                },
+                paint: {
+                  count: 30,
+                  median: 1.3725,
+                  p25: 1.22,
+                  p75: 1.693,
+                  min: 0.791,
+                  max: 2.383,
+                },
+              },
+              'react-hooks': {
+                total: {
+                  count: 30,
+                  median: 19.383499999999998,
+                  p25: 18.786,
+                  p75: 19.966,
+                  min: 17.353,
+                  max: 22.29,
+                },
+                script: {
+                  count: 30,
+                  median: 16.864,
+                  p25: 16.32,
+                  p75: 17.478,
+                  min: 15.071,
+                  max: 19.4,
+                },
+                paint: {
+                  count: 30,
+                  median: 1.2075,
+                  p25: 0.89,
+                  p75: 1.434,
+                  min: 0.326,
+                  max: 2.108,
+                },
+              },
+              'react-classes': {
+                total: {
+                  count: 30,
+                  median: 19.639,
+                  p25: 18.685,
+                  p75: 20.315,
+                  min: 17.698,
+                  max: 21.417,
+                },
+                script: {
+                  count: 30,
+                  median: 17.142,
+                  p25: 16.431,
+                  p75: 17.5,
+                  min: 15.533,
+                  max: 18.926,
+                },
+                paint: {
+                  count: 30,
+                  median: 1.4889999999999999,
+                  p25: 1.261,
+                  p75: 1.795,
+                  min: 0.377,
+                  max: 2.652,
+                },
+              },
+              'preact-hooks': {
+                total: {
+                  count: 30,
+                  median: 14.193,
+                  p25: 13.67,
+                  p75: 14.897,
+                  min: 12.907,
+                  max: 16.483,
+                },
+                script: {
+                  count: 30,
+                  median: 11.526499999999999,
+                  p25: 11.097,
+                  p75: 12.126,
+                  min: 9.754,
+                  max: 13.17,
+                },
+                paint: {
+                  count: 30,
+                  median: 1.5,
+                  p25: 1.074,
+                  p75: 1.833,
+                  min: 0.354,
+                  max: 2.688,
+                },
+              },
+              'preact-classes': {
+                total: {
+                  count: 30,
+                  median: 14.0095,
+                  p25: 13.497,
+                  p75: 14.995,
+                  min: 12.851,
+                  max: 16.12,
+                },
+                script: {
+                  count: 30,
+                  median: 11.4295,
+                  p25: 11.038,
+                  p75: 11.961,
+                  min: 10.493,
+                  max: 13.473,
+                },
+                paint: {
+                  count: 30,
+                  median: 1.4385,
+                  p25: 1.213,
+                  p75: 1.648,
+                  min: 0.377,
+                  max: 2.207,
+                },
+              },
+            },
+          },
+        ],
+      },
+      memory: {
+        main: [
+          {
+            id: '21_ready-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 0.641840934753418,
+                p25: 0.6414051055908203,
+                p75: 0.6419858932495117,
+                min: 0.6414051055908203,
+                max: 0.6419858932495117,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 1.1816883087158203,
+                p25: 1.1771793365478516,
+                p75: 1.188070297241211,
+                min: 1.1771793365478516,
+                max: 1.188070297241211,
+              },
+              'react-classes': {
+                count: 3,
+                median: 1.1905126571655273,
+                p25: 1.1531009674072266,
+                p75: 1.1906986236572266,
+                min: 1.1531009674072266,
+                max: 1.1906986236572266,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 0.6430158615112305,
+                p25: 0.5815916061401367,
+                p75: 0.6430501937866211,
+                min: 0.5815916061401367,
+                max: 0.6430501937866211,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 0.6547489166259766,
+                p25: 0.6519918441772461,
+                p75: 0.6603784561157227,
+                min: 0.6519918441772461,
+                max: 0.6603784561157227,
+              },
+            },
+          },
+          {
+            id: '22_run-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 3.4627532958984375,
+                p25: 3.4094486236572266,
+                p75: 3.5176916122436523,
+                min: 3.4094486236572266,
+                max: 3.5176916122436523,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 4.425410270690918,
+                p25: 4.395198822021484,
+                p75: 4.434906005859375,
+                min: 4.395198822021484,
+                max: 4.434906005859375,
+              },
+              'react-classes': {
+                count: 3,
+                median: 4.539127349853516,
+                p25: 4.538753509521484,
+                p75: 4.55510139465332,
+                min: 4.538753509521484,
+                max: 4.55510139465332,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 3.295133590698242,
+                p25: 3.273357391357422,
+                p75: 3.310084342956543,
+                min: 3.273357391357422,
+                max: 3.310084342956543,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 3.4912195205688477,
+                p25: 3.465097427368164,
+                p75: 3.4948301315307617,
+                min: 3.465097427368164,
+                max: 3.4948301315307617,
+              },
+            },
+          },
+          {
+            id: '23_update5-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 3.583974838256836,
+                p25: 3.517178535461426,
+                p75: 3.5997447967529297,
+                min: 3.517178535461426,
+                max: 3.5997447967529297,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 4.904705047607422,
+                p25: 4.888052940368652,
+                p75: 4.905474662780762,
+                min: 4.888052940368652,
+                max: 4.905474662780762,
+              },
+              'react-classes': {
+                count: 3,
+                median: 5.00452995300293,
+                p25: 4.992351531982422,
+                p75: 5.00860595703125,
+                min: 4.992351531982422,
+                max: 5.00860595703125,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 3.35888671875,
+                p25: 3.3535232543945312,
+                p75: 3.369784355163574,
+                min: 3.3535232543945312,
+                max: 3.369784355163574,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 3.5253524780273438,
+                p25: 3.523037910461426,
+                p75: 3.530848503112793,
+                min: 3.523037910461426,
+                max: 3.530848503112793,
+              },
+            },
+          },
+          {
+            id: '25_run-clear-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 0.9034872055053711,
+                p25: 0.8895854949951172,
+                p75: 0.9048881530761719,
+                min: 0.8895854949951172,
+                max: 0.9048881530761719,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 1.9755229949951172,
+                p25: 1.9346256256103516,
+                p75: 1.9847116470336914,
+                min: 1.9346256256103516,
+                max: 1.9847116470336914,
+              },
+              'react-classes': {
+                count: 3,
+                median: 1.9487638473510742,
+                p25: 1.939291000366211,
+                p75: 1.9571771621704102,
+                min: 1.939291000366211,
+                max: 1.9571771621704102,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 0.7900857925415039,
+                p25: 0.7896728515625,
+                p75: 0.7924585342407227,
+                min: 0.7896728515625,
+                max: 0.7924585342407227,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 0.7760248184204102,
+                p25: 0.7734584808349609,
+                p75: 0.7833280563354492,
+                min: 0.7734584808349609,
+                max: 0.7833280563354492,
+              },
+            },
+          },
+          {
+            id: '26_run-10k-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 27.470748901367188,
+                p25: 27.414713859558105,
+                p75: 27.472189903259277,
+                min: 27.414713859558105,
+                max: 27.472189903259277,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 30.747636795043945,
+                p25: 30.747572898864746,
+                p75: 30.749428749084473,
+                min: 30.747572898864746,
+                max: 30.749428749084473,
+              },
+              'react-classes': {
+                count: 3,
+                median: 31.562676429748535,
+                p25: 31.468222618103027,
+                p75: 31.565115928649902,
+                min: 31.468222618103027,
+                max: 31.565115928649902,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 26.236180305480957,
+                p25: 26.230164527893066,
+                p75: 26.23976993560791,
+                min: 26.230164527893066,
+                max: 26.23976993560791,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 27.644933700561523,
+                p25: 27.644432067871094,
+                p75: 27.647696495056152,
+                min: 27.644432067871094,
+                max: 27.647696495056152,
+              },
+            },
+          },
+        ],
+        reverse: [
+          {
+            id: '21_ready-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 0.6335592269897461,
+                p25: 0.5889005661010742,
+                p75: 0.6415882110595703,
+                min: 0.5889005661010742,
+                max: 0.6415882110595703,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 1.1881580352783203,
+                p25: 1.1871347427368164,
+                p75: 1.1882991790771484,
+                min: 1.1871347427368164,
+                max: 1.1882991790771484,
+              },
+              'react-classes': {
+                count: 3,
+                median: 1.1863698959350586,
+                p25: 1.1827898025512695,
+                p75: 1.1904945373535156,
+                min: 1.1827898025512695,
+                max: 1.1904945373535156,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 0.6424655914306641,
+                p25: 0.6382246017456055,
+                p75: 0.6430425643920898,
+                min: 0.6382246017456055,
+                max: 0.6430425643920898,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 0.6600770950317383,
+                p25: 0.6496601104736328,
+                p75: 0.6605625152587891,
+                min: 0.6496601104736328,
+                max: 0.6605625152587891,
+              },
+            },
+          },
+          {
+            id: '22_run-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 3.5071640014648438,
+                p25: 3.4942712783813477,
+                p75: 3.517512321472168,
+                min: 3.4942712783813477,
+                max: 3.517512321472168,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 4.4334716796875,
+                p25: 4.430118560791016,
+                p75: 4.447832107543945,
+                min: 4.430118560791016,
+                max: 4.447832107543945,
+              },
+              'react-classes': {
+                count: 3,
+                median: 4.528499603271484,
+                p25: 4.52269172668457,
+                p75: 4.5578460693359375,
+                min: 4.52269172668457,
+                max: 4.5578460693359375,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 3.310811996459961,
+                p25: 3.3067283630371094,
+                p75: 3.319943428039551,
+                min: 3.3067283630371094,
+                max: 3.319943428039551,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 3.4891281127929688,
+                p25: 3.4824113845825195,
+                p75: 3.5065460205078125,
+                min: 3.4824113845825195,
+                max: 3.5065460205078125,
+              },
+            },
+          },
+          {
+            id: '23_update5-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 3.578568458557129,
+                p25: 3.5624828338623047,
+                p75: 3.5929012298583984,
+                min: 3.5624828338623047,
+                max: 3.5929012298583984,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 4.870332717895508,
+                p25: 4.8486785888671875,
+                p75: 4.906933784484863,
+                min: 4.8486785888671875,
+                max: 4.906933784484863,
+              },
+              'react-classes': {
+                count: 3,
+                median: 5.01676082611084,
+                p25: 5.00318717956543,
+                p75: 5.018834114074707,
+                min: 5.00318717956543,
+                max: 5.018834114074707,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 3.3588790893554688,
+                p25: 3.34963321685791,
+                p75: 3.3692989349365234,
+                min: 3.34963321685791,
+                max: 3.3692989349365234,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 3.525282859802246,
+                p25: 3.523482322692871,
+                p75: 3.5302724838256836,
+                min: 3.523482322692871,
+                max: 3.5302724838256836,
+              },
+            },
+          },
+          {
+            id: '25_run-clear-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 0.8893451690673828,
+                p25: 0.8676347732543945,
+                p75: 0.896235466003418,
+                min: 0.8676347732543945,
+                max: 0.896235466003418,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 1.9756097793579102,
+                p25: 1.9698963165283203,
+                p75: 1.9854068756103516,
+                min: 1.9698963165283203,
+                max: 1.9854068756103516,
+              },
+              'react-classes': {
+                count: 3,
+                median: 1.9407167434692383,
+                p25: 1.7730045318603516,
+                p75: 1.947648048400879,
+                min: 1.7730045318603516,
+                max: 1.947648048400879,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 0.7902231216430664,
+                p25: 0.7880144119262695,
+                p75: 0.7956886291503906,
+                min: 0.7880144119262695,
+                max: 0.7956886291503906,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 0.7746782302856445,
+                p25: 0.7746715545654297,
+                p75: 0.7835960388183594,
+                min: 0.7746715545654297,
+                max: 0.7835960388183594,
+              },
+            },
+          },
+          {
+            id: '26_run-10k-memory',
+            conditions: {
+              lithent: {
+                count: 3,
+                median: 27.46019744873047,
+                p25: 27.446884155273438,
+                p75: 27.47893714904785,
+                min: 27.446884155273438,
+                max: 27.47893714904785,
+              },
+              'react-hooks': {
+                count: 3,
+                median: 30.748310089111328,
+                p25: 30.745078086853027,
+                p75: 30.749414443969727,
+                min: 30.745078086853027,
+                max: 30.749414443969727,
+              },
+              'react-classes': {
+                count: 3,
+                median: 31.567537307739258,
+                p25: 31.56422710418701,
+                p75: 31.57278823852539,
+                min: 31.56422710418701,
+                max: 31.57278823852539,
+              },
+              'preact-hooks': {
+                count: 3,
+                median: 26.239322662353516,
+                p25: 26.137882232666016,
+                p75: 26.239742279052734,
+                min: 26.137882232666016,
+                max: 26.239742279052734,
+              },
+              'preact-classes': {
+                count: 3,
+                median: 27.643165588378906,
+                p25: 27.64106845855713,
+                p75: 27.649361610412598,
+                min: 27.64106845855713,
+                max: 27.649361610412598,
+              },
+            },
+          },
+        ],
+        pooled: [
+          {
+            id: '21_ready-memory',
+            conditions: {
+              lithent: {
+                count: 6,
+                median: 0.6414966583251953,
+                p25: 0.6335592269897461,
+                p75: 0.641840934753418,
+                min: 0.5889005661010742,
+                max: 0.6419858932495117,
+              },
+              'react-hooks': {
+                count: 6,
+                median: 1.1876025199890137,
+                p25: 1.1816883087158203,
+                p75: 1.1881580352783203,
+                min: 1.1771793365478516,
+                max: 1.1882991790771484,
+              },
+              'react-classes': {
+                count: 6,
+                median: 1.188432216644287,
+                p25: 1.1827898025512695,
+                p75: 1.1905126571655273,
+                min: 1.1531009674072266,
+                max: 1.1906986236572266,
+              },
+              'preact-hooks': {
+                count: 6,
+                median: 0.6427407264709473,
+                p25: 0.6382246017456055,
+                p75: 0.6430425643920898,
+                min: 0.5815916061401367,
+                max: 0.6430501937866211,
+              },
+              'preact-classes': {
+                count: 6,
+                median: 0.6574130058288574,
+                p25: 0.6519918441772461,
+                p75: 0.6603784561157227,
+                min: 0.6496601104736328,
+                max: 0.6605625152587891,
+              },
+            },
+          },
+          {
+            id: '22_run-memory',
+            conditions: {
+              lithent: {
+                count: 6,
+                median: 3.5007176399230957,
+                p25: 3.4627532958984375,
+                p75: 3.517512321472168,
+                min: 3.4094486236572266,
+                max: 3.5176916122436523,
+              },
+              'react-hooks': {
+                count: 6,
+                median: 4.431795120239258,
+                p25: 4.425410270690918,
+                p75: 4.434906005859375,
+                min: 4.395198822021484,
+                max: 4.447832107543945,
+              },
+              'react-classes': {
+                count: 6,
+                median: 4.5389404296875,
+                p25: 4.528499603271484,
+                p75: 4.55510139465332,
+                min: 4.52269172668457,
+                max: 4.5578460693359375,
+              },
+              'preact-hooks': {
+                count: 6,
+                median: 3.308406352996826,
+                p25: 3.295133590698242,
+                p75: 3.310811996459961,
+                min: 3.273357391357422,
+                max: 3.319943428039551,
+              },
+              'preact-classes': {
+                count: 6,
+                median: 3.490173816680908,
+                p25: 3.4824113845825195,
+                p75: 3.4948301315307617,
+                min: 3.465097427368164,
+                max: 3.5065460205078125,
+              },
+            },
+          },
+          {
+            id: '23_update5-memory',
+            conditions: {
+              lithent: {
+                count: 6,
+                median: 3.5812716484069824,
+                p25: 3.5624828338623047,
+                p75: 3.5929012298583984,
+                min: 3.517178535461426,
+                max: 3.5997447967529297,
+              },
+              'react-hooks': {
+                count: 6,
+                median: 4.896378993988037,
+                p25: 4.870332717895508,
+                p75: 4.905474662780762,
+                min: 4.8486785888671875,
+                max: 4.906933784484863,
+              },
+              'react-classes': {
+                count: 6,
+                median: 5.00656795501709,
+                p25: 5.00318717956543,
+                p75: 5.01676082611084,
+                min: 4.992351531982422,
+                max: 5.018834114074707,
+              },
+              'preact-hooks': {
+                count: 6,
+                median: 3.3588829040527344,
+                p25: 3.3535232543945312,
+                p75: 3.3692989349365234,
+                min: 3.34963321685791,
+                max: 3.369784355163574,
+              },
+              'preact-classes': {
+                count: 6,
+                median: 3.525317668914795,
+                p25: 3.523482322692871,
+                p75: 3.5302724838256836,
+                min: 3.523037910461426,
+                max: 3.530848503112793,
+              },
+            },
+          },
+          {
+            id: '25_run-clear-memory',
+            conditions: {
+              lithent: {
+                count: 6,
+                median: 0.8929104804992676,
+                p25: 0.8893451690673828,
+                p75: 0.9034872055053711,
+                min: 0.8676347732543945,
+                max: 0.9048881530761719,
+              },
+              'react-hooks': {
+                count: 6,
+                median: 1.9755663871765137,
+                p25: 1.9698963165283203,
+                p75: 1.9847116470336914,
+                min: 1.9346256256103516,
+                max: 1.9854068756103516,
+              },
+              'react-classes': {
+                count: 6,
+                median: 1.9441823959350586,
+                p25: 1.939291000366211,
+                p75: 1.9487638473510742,
+                min: 1.7730045318603516,
+                max: 1.9571771621704102,
+              },
+              'preact-hooks': {
+                count: 6,
+                median: 0.7901544570922852,
+                p25: 0.7896728515625,
+                p75: 0.7924585342407227,
+                min: 0.7880144119262695,
+                max: 0.7956886291503906,
+              },
+              'preact-classes': {
+                count: 6,
+                median: 0.7753515243530273,
+                p25: 0.7746715545654297,
+                p75: 0.7833280563354492,
+                min: 0.7734584808349609,
+                max: 0.7835960388183594,
+              },
+            },
+          },
+          {
+            id: '26_run-10k-memory',
+            conditions: {
+              lithent: {
+                count: 6,
+                median: 27.465473175048828,
+                p25: 27.446884155273438,
+                p75: 27.472189903259277,
+                min: 27.414713859558105,
+                max: 27.47893714904785,
+              },
+              'react-hooks': {
+                count: 6,
+                median: 30.747973442077637,
+                p25: 30.747572898864746,
+                p75: 30.749414443969727,
+                min: 30.745078086853027,
+                max: 30.749428749084473,
+              },
+              'react-classes': {
+                count: 6,
+                median: 31.564671516418457,
+                p25: 31.562676429748535,
+                p75: 31.567537307739258,
+                min: 31.468222618103027,
+                max: 31.57278823852539,
+              },
+              'preact-hooks': {
+                count: 6,
+                median: 26.237751483917236,
+                p25: 26.230164527893066,
+                p75: 26.239742279052734,
+                min: 26.137882232666016,
+                max: 26.23976993560791,
+              },
+              'preact-classes': {
+                count: 6,
+                median: 27.64468288421631,
+                p25: 27.643165588378906,
+                p75: 27.647696495056152,
+                min: 27.64106845855713,
+                max: 27.649361610412598,
+              },
+            },
+          },
+        ],
+      },
+      goal: {
+        metric: 'CPU click-to-final-paint total median',
+        threshold: 1.1,
+        reference: [
+          'react-hooks',
+          'react-classes',
+          'preact-hooks',
+          'preact-classes',
+        ],
+        rule: 'All 9 CPU items; pooled medians plus separate opposite-order consistency',
+        memory: 'Separate costs; no CPU 1.10 threshold',
+        rows: [
+          {
+            id: '01_run1k',
+            bestAll: 24.5995,
+            bestPeer: 24.5995,
+            referencePeers: ['react-hooks'],
+            factors: {
+              lithent: {
+                ratio: 1.116851968535946,
+                color: 'rgb(117, 196, 125)',
+              },
+              'react-hooks': { ratio: 1, color: 'rgb(99, 191, 124)' },
+              'react-classes': {
+                ratio: 1.0819122339884957,
+                color: 'rgb(112, 195, 125)',
+              },
+              'preact-hooks': {
+                ratio: 1.0657127177381656,
+                color: 'rgb(109, 194, 125)',
+              },
+              'preact-classes': {
+                ratio: 1.0738836155206408,
+                color: 'rgb(111, 194, 125)',
+              },
+            },
+            lithentPeerRatio: 1.116851968535946,
+            delta: 2.874500000000001,
+            allowedMs: 27.059450000000002,
+            excessMs: 0.4145499999999984,
+            requiredReduction: 0.015088811239717503,
+            pass: false,
+            orders: { main: 1.1192971011538304, reverse: 1.1158967280993748 },
+            consistent: false,
+          },
+          {
+            id: '02_replace1k',
+            bestAll: 30.378,
+            bestPeer: 30.378,
+            referencePeers: ['preact-classes'],
+            factors: {
+              lithent: {
+                ratio: 1.0563894923958128,
+                color: 'rgb(108, 194, 124)',
+              },
+              'react-hooks': {
+                ratio: 1.0351570215287378,
+                color: 'rgb(104, 193, 124)',
+              },
+              'react-classes': {
+                ratio: 1.0259727434327475,
+                color: 'rgb(103, 192, 124)',
+              },
+              'preact-hooks': {
+                ratio: 1.015751530713016,
+                color: 'rgb(101, 192, 124)',
+              },
+              'preact-classes': { ratio: 1, color: 'rgb(99, 191, 124)' },
+            },
+            lithentPeerRatio: 1.0563894923958128,
+            delta: 1.713000000000001,
+            allowedMs: 33.415800000000004,
+            excessMs: 0,
+            requiredReduction: 0,
+            pass: true,
+            orders: { main: 1.0492416781563916, reverse: 1.0652116576552817 },
+            consistent: true,
+          },
+          {
+            id: '03_update10th1k_x16',
+            bestAll: 14.8895,
+            bestPeer: 14.8895,
+            referencePeers: ['preact-classes'],
+            factors: {
+              lithent: {
+                ratio: 1.2690150777393467,
+                color: 'rgb(141, 203, 126)',
+              },
+              'react-hooks': {
+                ratio: 1.150240102085362,
+                color: 'rgb(122, 198, 125)',
+              },
+              'react-classes': {
+                ratio: 1.0643070620235737,
+                color: 'rgb(109, 194, 125)',
+              },
+              'preact-hooks': {
+                ratio: 1.6162396319554047,
+                color: 'rgb(195, 219, 129)',
+              },
+              'preact-classes': { ratio: 1, color: 'rgb(99, 191, 124)' },
+            },
+            lithentPeerRatio: 1.2690150777393467,
+            delta: 4.005500000000003,
+            allowedMs: 16.37845,
+            excessMs: 2.5165500000000023,
+            requiredReduction: 0.13318602804974866,
+            pass: false,
+            orders: { main: 1.282442748091603, reverse: 1.1907911312673218 },
+            consistent: false,
+          },
+          {
+            id: '04_select1k',
+            bestAll: 4.6065,
+            bestPeer: 4.6065,
+            referencePeers: ['preact-classes'],
+            factors: {
+              lithent: {
+                ratio: 1.629545207858461,
+                color: 'rgb(197, 219, 129)',
+              },
+              'react-hooks': {
+                ratio: 1.4077933355041792,
+                color: 'rgb(163, 209, 127)',
+              },
+              'react-classes': {
+                ratio: 1.4311299251058287,
+                color: 'rgb(166, 210, 127)',
+              },
+              'preact-hooks': {
+                ratio: 3.26885922066645,
+                color: 'rgb(251, 153, 117)',
+              },
+              'preact-classes': { ratio: 1, color: 'rgb(99, 191, 124)' },
+            },
+            lithentPeerRatio: 1.629545207858461,
+            delta: 2.9000000000000004,
+            allowedMs: 5.06715,
+            excessMs: 2.43935,
+            requiredReduction: 0.32496503030706714,
+            pass: false,
+            orders: { main: 1.696866485013624, reverse: 1.5749791144527987 },
+            consistent: false,
+          },
+          {
+            id: '05_swap1k',
+            bestAll: 16.371499999999997,
+            bestPeer: 16.371499999999997,
+            referencePeers: ['preact-classes'],
+            factors: {
+              lithent: {
+                ratio: 1.0666401979048958,
+                color: 'rgb(109, 194, 125)',
+              },
+              'react-hooks': {
+                ratio: 6.135754207006078,
+                color: 'rgb(249, 105, 108)',
+              },
+              'react-classes': {
+                ratio: 6.01954616253856,
+                color: 'rgb(249, 105, 108)',
+              },
+              'preact-hooks': {
+                ratio: 1.541306538802187,
+                color: 'rgb(183, 215, 128)',
+              },
+              'preact-classes': { ratio: 1, color: 'rgb(99, 191, 124)' },
+            },
+            lithentPeerRatio: 1.0666401979048958,
+            delta: 1.091000000000001,
+            allowedMs: 18.00865,
+            excessMs: 0,
+            requiredReduction: 0,
+            pass: true,
+            orders: { main: 0.9531759415401913, reverse: 1.0924003194691896 },
+            consistent: true,
+          },
+          {
+            id: '06_remove-one-1k',
+            bestAll: 11.7265,
+            bestPeer: 11.7265,
+            referencePeers: ['preact-classes'],
+            factors: {
+              lithent: {
+                ratio: 1.1026734319703235,
+                color: 'rgb(115, 196, 125)',
+              },
+              'react-hooks': {
+                ratio: 1.173026904873577,
+                color: 'rgb(126, 199, 125)',
+              },
+              'react-classes': {
+                ratio: 1.196350147102716,
+                color: 'rgb(130, 200, 126)',
+              },
+              'preact-hooks': {
+                ratio: 1.380505692235535,
+                color: 'rgb(158, 208, 127)',
+              },
+              'preact-classes': { ratio: 1, color: 'rgb(99, 191, 124)' },
+            },
+            lithentPeerRatio: 1.1026734319703235,
+            delta: 1.2039999999999988,
+            allowedMs: 12.89915,
+            excessMs: 0.03134999999999799,
+            requiredReduction: 0.0024245002126752624,
+            pass: false,
+            orders: { main: 1.1345186470078057, reverse: 1.055783093053735 },
+            consistent: false,
+          },
+          {
+            id: '07_create10k',
+            bestAll: 287.495,
+            bestPeer: 288.07550000000003,
+            referencePeers: ['preact-classes'],
+            factors: {
+              lithent: { ratio: 1, color: 'rgb(99, 191, 124)' },
+              'react-hooks': {
+                ratio: 1.538477190907668,
+                color: 'rgb(183, 215, 128)',
+              },
+              'react-classes': {
+                ratio: 1.3373536931077064,
+                color: 'rgb(152, 206, 127)',
+              },
+              'preact-hooks': {
+                ratio: 1.0076836118889023,
+                color: 'rgb(100, 191, 124)',
+              },
+              'preact-classes': {
+                ratio: 1.0020191655507054,
+                color: 'rgb(99, 191, 124)',
+              },
+            },
+            lithentPeerRatio: 0.997984903263207,
+            delta: -0.5805000000000291,
+            allowedMs: 316.8830500000001,
+            excessMs: 0,
+            requiredReduction: 0,
+            pass: true,
+            orders: { main: 1.0323545547623292, reverse: 0.9775147603442763 },
+            consistent: true,
+          },
+          {
+            id: '08_create1k-after1k_x2',
+            bestAll: 30.5865,
+            bestPeer: 30.5865,
+            referencePeers: ['react-hooks'],
+            factors: {
+              lithent: {
+                ratio: 1.0238994327562814,
+                color: 'rgb(103, 192, 124)',
+              },
+              'react-hooks': { ratio: 1, color: 'rgb(99, 191, 124)' },
+              'react-classes': {
+                ratio: 1.0007192715740605,
+                color: 'rgb(99, 191, 124)',
+              },
+              'preact-hooks': {
+                ratio: 1.079250649796479,
+                color: 'rgb(111, 195, 125)',
+              },
+              'preact-classes': {
+                ratio: 1.0003269416245728,
+                color: 'rgb(99, 191, 124)',
+              },
+            },
+            lithentPeerRatio: 1.0238994327562814,
+            delta: 0.7309999999999981,
+            allowedMs: 33.64515,
+            excessMs: 0,
+            requiredReduction: 0,
+            pass: true,
+            orders: { main: 1.0269763077644851, reverse: 1.073403490424211 },
+            consistent: true,
+          },
+          {
+            id: '09_clear1k_x8',
+            bestAll: 13.173,
+            bestPeer: 14.0095,
+            referencePeers: ['preact-classes'],
+            factors: {
+              lithent: { ratio: 1, color: 'rgb(99, 191, 124)' },
+              'react-hooks': {
+                ratio: 1.4714567676307597,
+                color: 'rgb(173, 212, 128)',
+              },
+              'react-classes': {
+                ratio: 1.4908525013284748,
+                color: 'rgb(176, 213, 128)',
+              },
+              'preact-hooks': {
+                ratio: 1.0774311090867683,
+                color: 'rgb(111, 194, 125)',
+              },
+              'preact-classes': {
+                ratio: 1.0635011007363546,
+                color: 'rgb(109, 194, 125)',
+              },
+            },
+            lithentPeerRatio: 0.9402905171490775,
+            delta: -0.8364999999999991,
+            allowedMs: 15.41045,
+            excessMs: 0,
+            requiredReduction: 0,
+            pass: true,
+            orders: { main: 0.9393896177980605, reverse: 0.8999642729546268 },
+            consistent: true,
+          },
+        ],
+        pooledPassed: 5,
+        mainPassed: 5,
+        reversePassed: 6,
+        allPooled: false,
+        allOrders: false,
+      },
+      weights: [
+        0.64280248137063, 0.5607178150466176, 0.5643800750716564,
+        0.1925635870170522, 0.13200612879341714, 0.5277091212292658,
+        0.5644449600965534, 0.5508359820582848, 0.4225836631419211,
+      ],
+      versions: {
+        lithent: '1.25.2',
+        'react-hooks': '19.2.0',
+        'react-classes': '19.0.0',
+        'preact-hooks': '11.0.0',
+        'preact-classes': '11.0.0',
+      },
+    };
+    const computeColor = function (factor) {
+      if (factor < 2.0) {
+        const a = factor - 1.0;
+        const r = (1.0 - a) * 99 + a * 255;
+        const g = (1.0 - a) * 191 + a * 236;
+        const b = (1.0 - a) * 124 + a * 132;
+        return `rgb(${r.toFixed(0)}, ${g.toFixed(0)}, ${b.toFixed(0)})`;
+      } else {
+        const a = Math.min((factor - 2.0) / 2.0, 1.0);
+        const r = (1.0 - a) * 255 + a * 249;
+        const g = (1.0 - a) * 236 + a * 105;
+        const b = (1.0 - a) * 132 + a * 108;
+        return `rgb(${r.toFixed(0)}, ${g.toFixed(0)}, ${b.toFixed(0)})`;
+      }
+    };
+
+    const names = Object.keys(data.versions),
+      peers = names.slice(1);
+    const el = id => document.getElementById(id);
+    el('summary').textContent =
+      '합산 ' +
+      data.goal.pooledPassed +
+      '/9 통과 · 첫 차수 ' +
+      data.goal.mainPassed +
+      '/9 · 반대 차수 ' +
+      data.goal.reversePassed +
+      '/9';
+    function render() {
+      const metric = el('metric').value,
+        round = el('round').value,
+        memory = metric === 'memory',
+        primary = metric === 'total';
+      const rows = (memory ? data.memory : data.rows)[round];
+      el('head').replaceChildren();
+      el('body').replaceChildren();
+      const header = document.createElement('tr');
+      for (const label of [
+        '항목',
+        ...names.map(n => n + ' ' + data.versions[n]),
+        'L / 최저 peer',
+        ...(primary ? ['1.10 목표'] : []),
+      ]) {
+        const th = document.createElement('th');
+        th.textContent = label;
+        header.append(th);
+      }
+      el('head').append(header);
+      for (const row of rows) {
+        const value = n =>
+          memory ? row.conditions[n].median : row.conditions[n][metric].median;
+        const best = Math.min(...names.map(value)),
+          bestPeer = Math.min(...peers.map(value)),
+          ratio = value('lithent') / bestPeer;
+        const tr = document.createElement('tr'),
+          label = document.createElement('td');
+        label.textContent = row.id;
+        tr.append(label);
+        for (const name of names) {
+          const stat = memory
+            ? row.conditions[name]
+            : row.conditions[name][metric];
+          const td = document.createElement('td');
+          td.textContent = value(name).toFixed(3);
+          td.style.backgroundColor = computeColor(value(name) / best);
+          td.title =
+            'n=' +
+            stat.count +
+            '; Q1=' +
+            stat.p25.toFixed(3) +
+            '; Q3=' +
+            stat.p75.toFixed(3) +
+            '; min=' +
+            stat.min.toFixed(3) +
+            '; max=' +
+            stat.max.toFixed(3);
+          const small = document.createElement('small');
+          small.textContent = (value(name) / best).toFixed(3) + '×';
+          td.append(small);
+          tr.append(td);
+        }
+        const relative = document.createElement('td');
+        relative.textContent = ratio.toFixed(3) + '×';
+        tr.append(relative);
+        if (primary) {
+          const td = document.createElement('td');
+          td.textContent = ratio <= 1.1 ? '통과' : '미달';
+          td.className = 'goal ' + (ratio <= 1.1 ? 'pass' : 'fail');
+          tr.append(td);
+        }
+        el('body').append(tr);
+      }
+      el('caption').textContent = memory
+        ? '공식 메모리 중앙값 · MB (bytes/1024²)'
+        : '공식 클릭→최종 paint 중 ' +
+          { total: '전체', script: 'JS', paint: 'paint' }[metric] +
+          ' 시간 중앙값 · ms';
+    }
+    el('metric').addEventListener('change', render);
+    el('round').addEventListener('change', render);
+    render();
+  </script>
+</html>

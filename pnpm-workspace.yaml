@@ -19,3 +19,13 @@ packages:
   - 'packages/lithentMdx'
   - 'packages/lithentTemplateVite'
   - 'packages/lithentTemplateParser'
+
+autoInstallPeers: true
+linkWorkspacePackages: true
+
+# Dependencies allowed to run install scripts. msw's postinstall only copies
+# its service worker into configured directories, and none is configured.
+allowBuilds:
+  '@tailwindcss/oxide': true
+  esbuild: true
+  msw: false

@@ -7,6 +7,7 @@ import {
   NodeType,
   createTextNode,
 } from '../parser/ast';
+import { getConditionalGroup } from './directives';
 
 /**
  * Optimize the AST
@@ -48,9 +49,26 @@ function optimizeNodeList(
     result = mergeTextNodes(result);
   }
 
-  // Remove whitespace-only text nodes
+  // Only discard multiline indentation; a single space between inline nodes is meaningful.
   if (options.removeWhitespace) {
     result = removeWhitespaceNodes(result);
+  }
+  if (options.trimText) {
+    result = result.map((node, index) =>
+      node.type === NodeType.TEXT
+        ? {
+            ...node,
+            content:
+              result.length === 1
+                ? node.content.trim()
+                : index === 0
+                  ? node.content.trimStart()
+                  : index === result.length - 1
+                    ? node.content.trimEnd()
+                    : node.content,
+          }
+        : node
+    );
   }
 
   return result;
@@ -72,7 +90,7 @@ function optimizeNode(
   }
 
   if (node.type === NodeType.TEXT) {
-    return optimizeTextNode(node, options);
+    return node;
   }
 
   return node;
@@ -85,10 +103,24 @@ function optimizeElementNode(
   node: ElementNode,
   options: Required<OptimizeOptions>
 ): ElementNode {
-  return {
+  const childOptions = /^(pre|textarea)$/.test(node.tag)
+    ? { ...options, trimText: false, removeWhitespace: false }
+    : options;
+  const result = {
     ...node,
-    children: optimizeNodeList(node.children, options),
+    children: optimizeNodeList(node.children, childOptions),
   };
+  const group = getConditionalGroup(node);
+  if (group) {
+    (result as any).__conditionalGroup = {
+      if: optimizeElementNode(group.if, options),
+      elseIfs: group.elseIfs.map(branch =>
+        optimizeElementNode(branch, options)
+      ),
+      else: group.else ? optimizeElementNode(group.else, options) : undefined,
+    };
+  }
+  return result;
 }
 
 /**
@@ -101,26 +133,6 @@ function optimizeFragmentNode(
   return {
     ...node,
     children: optimizeNodeList(node.children, options),
-  };
-}
-
-/**
- * Optimize a text node
- */
-function optimizeTextNode(
-  node: TextNode,
-  options: Required<OptimizeOptions>
-): TextNode {
-  let content = node.content;
-
-  // Trim text if enabled
-  if (options.trimText) {
-    content = content.trim();
-  }
-
-  return {
-    ...node,
-    content,
   };
 }
 
@@ -167,7 +179,7 @@ function mergeTextNodes(nodes: TemplateNode[]): TemplateNode[] {
 function removeWhitespaceNodes(nodes: TemplateNode[]): TemplateNode[] {
   return nodes.filter(node => {
     if (node.type === NodeType.TEXT) {
-      return node.content.trim().length > 0;
+      return node.content.trim().length > 0 || !/[\r\n]/.test(node.content);
     }
     return true;
   });

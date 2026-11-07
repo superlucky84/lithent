@@ -115,9 +115,20 @@ Rules:
 Rules:
 - Syntax: `l-for={item in list}` or `l-for={(item, index) in list}`.
 - `item` receives each element, `index` is optional.
-- `list` can be any JavaScript expression that yields an iterable.
+- `list` can be any JavaScript expression that yields an array.
+- When `l-for` and `l-if` share an element, the loop runs first, so the condition can reference `item` and `index`. A following conditional chain is evaluated within that loop.
 
 ---
+
+### 4.3 Whitespace
+
+Compilation preserves spaces around interpolations and between inline elements.
+By default, multiline indentation-only nodes are removed and text is trimmed
+only at the outer boundaries of a child list. `pre` and `textarea` retain their
+whitespace. Use `transform: { optimize: false }` to preserve all template
+whitespace, or control `trimText` and `removeWhitespace` separately through
+`optimizeOptions`. The low-level `parse()` API retains its whitespace-filtering
+default; pass `true` as its second argument to retain whitespace tokens as text.
 
 ## 5. Comments
 Standard HTML comments pass through:

@@ -1,0 +1,644 @@
+{
+  "at": "2026-10-25T23:24:49.793Z",
+  "samples": [
+    {
+      "name": "base",
+      "format": "esm",
+      "file": "dist/lithent.mjs",
+      "sha256": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45",
+      "first": {
+        "calls": [
+          "a"
+        ],
+        "trusted": [
+          true
+        ]
+      },
+      "next": [
+        "a",
+        "b"
+      ],
+      "nodeExports": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "creationFailure": {
+        "empty": {
+          "documents": 1,
+          "nodes": 4,
+          "jsEventListeners": 13
+        },
+        "observed": {
+          "caught": [
+            "failure-dom-setter",
+            "failure-component"
+          ],
+          "refs": 3,
+          "bodyChildren": 0
+        },
+        "settled": {
+          "documents": 1,
+          "nodes": 4,
+          "jsEventListeners": 13
+        },
+        "remaining": 0
+      },
+      "svg": [
+        {
+          "version": 0,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        },
+        {
+          "version": 1,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "base",
+      "format": "umd",
+      "file": "dist/lithent.umd.js",
+      "sha256": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2",
+      "first": {
+        "calls": [
+          "a"
+        ],
+        "trusted": [
+          true
+        ]
+      },
+      "next": [
+        "a",
+        "b"
+      ],
+      "nodeExports": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "svg": [
+        {
+          "version": 0,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        },
+        {
+          "version": 1,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "base",
+      "format": "cjs",
+      "file": "dist/lithent.cjs",
+      "sha256": "6632c90c646f5695824dfb2caaf7bd59b9f85c18a36b6de5c56087246854d776",
+      "first": {
+        "calls": [
+          "a"
+        ],
+        "trusted": [
+          true
+        ]
+      },
+      "next": [
+        "a",
+        "b"
+      ],
+      "nodeExports": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "updateCallback",
+        "useRenew"
+      ],
+      "svg": [
+        {
+          "version": 0,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        },
+        {
+          "version": 1,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "concurrent",
+      "format": "esm",
+      "file": "lithentConcurrent/dist/lithentConcurrent.mjs",
+      "sha256": "5ec069e06ff94766bae858cdbe113cebea9eb45801526ecb467a9d943fa9f39c",
+      "first": {
+        "calls": [
+          "a"
+        ],
+        "trusted": [
+          true
+        ]
+      },
+      "next": [
+        "a",
+        "b"
+      ],
+      "nodeExports": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "deferRender",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "hasPending",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "notifyStoreWrite",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "storeVersion",
+        "updateCallback",
+        "useRenew",
+        "whenIdle"
+      ],
+      "creationFailure": {
+        "empty": {
+          "documents": 1,
+          "nodes": 6,
+          "jsEventListeners": 15
+        },
+        "observed": {
+          "caught": [
+            "failure-dom-setter",
+            "failure-component"
+          ],
+          "refs": 3,
+          "bodyChildren": 0
+        },
+        "settled": {
+          "documents": 1,
+          "nodes": 6,
+          "jsEventListeners": 15
+        },
+        "remaining": 0
+      },
+      "svg": [
+        {
+          "version": 0,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        },
+        {
+          "version": 1,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        }
+      ],
+      "portalPublication": {
+        "duringBuild": [],
+        "committedRenders": 2,
+        "targetChildren": 1,
+        "first": [
+          2
+        ],
+        "afterRemove": [
+          2
+        ],
+        "remaining": 0
+      },
+      "errors": []
+    },
+    {
+      "name": "concurrent",
+      "format": "umd",
+      "file": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+      "sha256": "6c540d468240bed97bc8053f22e38c9dbd62bd1dfd3aa7a3cb6e01e0f8e8b6ff",
+      "first": {
+        "calls": [
+          "a"
+        ],
+        "trusted": [
+          true
+        ]
+      },
+      "next": [
+        "a",
+        "b"
+      ],
+      "nodeExports": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "deferRender",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "hasPending",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "notifyStoreWrite",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "storeVersion",
+        "updateCallback",
+        "useRenew",
+        "whenIdle"
+      ],
+      "svg": [
+        {
+          "version": 0,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        },
+        {
+          "version": 1,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        }
+      ],
+      "portalPublication": {
+        "duringBuild": [],
+        "committedRenders": 2,
+        "targetChildren": 1,
+        "first": [
+          2
+        ],
+        "afterRemove": [
+          2
+        ],
+        "remaining": 0
+      },
+      "errors": []
+    },
+    {
+      "name": "concurrent",
+      "format": "cjs",
+      "file": "lithentConcurrent/dist/lithentConcurrent.cjs",
+      "sha256": "11db27ee2a98082f2fb5819a008430d23a51430f3726e9117938a6c08cd85066",
+      "first": {
+        "calls": [
+          "a"
+        ],
+        "trusted": [
+          true
+        ]
+      },
+      "next": [
+        "a",
+        "b"
+      ],
+      "nodeExports": [
+        "Fragment",
+        "componentMap",
+        "componentUpdate",
+        "deferRender",
+        "disposeComponentEntry",
+        "getComponentKey",
+        "getComponentSubInfo",
+        "h",
+        "hasPending",
+        "isPropType",
+        "lmount",
+        "lmountComponentSet",
+        "mount",
+        "mountCallback",
+        "mountReadyCallback",
+        "nextTick",
+        "notifyStoreWrite",
+        "portal",
+        "ref",
+        "render",
+        "replaceWDom",
+        "setComponentMapManualMode",
+        "storeVersion",
+        "updateCallback",
+        "useRenew",
+        "whenIdle"
+      ],
+      "svg": [
+        {
+          "version": 0,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        },
+        {
+          "version": 1,
+          "svg": true,
+          "current": true,
+          "target": "circle"
+        }
+      ],
+      "portalPublication": {
+        "duringBuild": [],
+        "committedRenders": 2,
+        "targetChildren": 1,
+        "first": [
+          2
+        ],
+        "afterRemove": [
+          2
+        ],
+        "remaining": 0
+      },
+      "errors": []
+    }
+  ],
+  "complete": true,
+  "browser": "156.0.8078.47",
+  "controls": {
+    "baseline": {
+      "helper": "d7e09f9d60ed6b03d2c1858fd29ce1812885927b00db70c91e0e944a1ff1b25a",
+      "observed": {
+        "externalOrder": [
+          "external",
+          "new"
+        ],
+        "externalRemove": 0,
+        "externalDedup": 1,
+        "sameDispatchReplacement": [],
+        "nextDispatchReplacement": [
+          "new"
+        ],
+        "aliasReplacementOrder": [
+          "b",
+          "c"
+        ],
+        "aliasDedup": [
+          "a",
+          "b"
+        ],
+        "reusedFrozenEvent": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    "slot": {
+      "helper": "e4b1201ecbacb68c48ce53ddd87439b7a8c30e68af3a8b3ab7cb86eaffed7d98",
+      "observed": {
+        "externalOrder": [
+          "new",
+          "external"
+        ],
+        "externalRemove": 1,
+        "externalDedup": 2,
+        "sameDispatchReplacement": [
+          "new"
+        ],
+        "nextDispatchReplacement": [
+          "new",
+          "new"
+        ],
+        "aliasReplacementOrder": [
+          "b",
+          "c"
+        ],
+        "aliasDedup": [
+          "a",
+          "b"
+        ],
+        "reusedFrozenEvent": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    "flat-original": {
+      "helper": "61d591635b3bd7a9692989733f8e5ab99c07b9880bbb32da571181b2db3e770d",
+      "observed": {
+        "externalOrder": [
+          "new",
+          "external"
+        ],
+        "externalRemove": 1,
+        "externalDedup": 2,
+        "sameDispatchReplacement": [
+          "new"
+        ],
+        "nextDispatchReplacement": [
+          "new",
+          "new"
+        ],
+        "aliasReplacementOrder": [
+          "b",
+          "c"
+        ],
+        "aliasDedup": [
+          "a",
+          "b"
+        ],
+        "reusedFrozenEvent": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    "event": {
+      "helper": "15d1adc970b5f6d291173cf8ad754c60a241418f7576c9c1b55f748171830db9",
+      "observed": {
+        "externalOrder": [
+          "new",
+          "external"
+        ],
+        "externalRemove": 1,
+        "externalDedup": 2,
+        "sameDispatchReplacement": [
+          "new"
+        ],
+        "nextDispatchReplacement": [
+          "new",
+          "new"
+        ],
+        "aliasReplacementOrder": [
+          "b",
+          "c"
+        ],
+        "aliasDedup": [
+          "a",
+          "b"
+        ],
+        "reusedFrozenEvent": [
+          "a",
+          "b"
+        ]
+      }
+    }
+  },
+  "directory": [
+    {
+      "variant": "baseline",
+      "bundle": "8338350a5ec75c2a8b13d831159d56036d82d434b4b230d064fcaa4895e8bbd8",
+      "rows": [
+        1000,
+        250,
+        249,
+        999,
+        0
+      ],
+      "selectedIdentity": true,
+      "trusted": {
+        "run": true,
+        "filter": true,
+        "select": true,
+        "remove": true,
+        "clear": true
+      },
+      "errors": []
+    },
+    {
+      "variant": "event",
+      "bundle": "e2aa8e1ee5131018e13403c4bd0b2aa1da86ea8b48d0933d117cb7fd929ac759",
+      "rows": [
+        1000,
+        250,
+        249,
+        999,
+        0
+      ],
+      "selectedIdentity": true,
+      "trusted": {
+        "run": true,
+        "filter": true,
+        "select": true,
+        "remove": true,
+        "clear": true
+      },
+      "errors": []
+    },
+    {
+      "variant": "c2",
+      "bundle": "9bde1273be77de094bd7ee4b3913ae1e1b95c4613a1be7cd7f302c2e35a3adee",
+      "rows": [
+        1000,
+        250,
+        249,
+        999,
+        0
+      ],
+      "selectedIdentity": true,
+      "trusted": {
+        "run": true,
+        "filter": true,
+        "select": true,
+        "remove": true,
+        "clear": true
+      },
+      "errors": []
+    },
+    {
+      "variant": "combined",
+      "bundle": "e08d75637202a513d722aaaaaaef5c5c6897344a45841f0006d1b55957548fab",
+      "rows": [
+        1000,
+        250,
+        249,
+        999,
+        0
+      ],
+      "selectedIdentity": true,
+      "trusted": {
+        "run": true,
+        "filter": true,
+        "select": true,
+        "remove": true,
+        "clear": true
+      },
+      "errors": []
+    }
+  ],
+  "interactiveTable": {
+    "cpuRows": 9,
+    "memoryRows": 5,
+    "orderAndMetricControls": true,
+    "errors": []
+  },
+  "finishedAt": "2026-10-25T23:24:53.695Z"
+}

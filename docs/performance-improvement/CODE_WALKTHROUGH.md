@@ -105,11 +105,15 @@ origChildren.forEach((item, index) => {
   if (!keyMap.has(key)) keyMap.set(key, index);   // 중복 key는 첫 등장만
 });
 
+const used: boolean[] = [];
 const getParent = () => newWDom;                  // 클로저는 부모당 1개 공유
 const remaked = (newWDom.children || []).map(item => {
   const origIndex = keyMap.get(getKey(item));
   const matched = origIndex !== undefined;
-  if (matched) keyMap.delete(key);
+  if (matched) {
+    keyMap.delete(key);
+    used[origIndex] = true;
+  }
 
   const child = makeNewWDomTree(item, matched ? origChildren[origIndex] : undefined);
   if (matched) child.oi = origIndex;              // ★ render의 LIS 입력
@@ -117,13 +121,29 @@ const remaked = (newWDom.children || []).map(item => {
   return child;
 });
 
-return [remaked, [...keyMap.values()].map(index => origChildren[index])];
-// Map에 남은 인덱스들 = 짝이 안 된(삭제될) 이전 자식들
+return [remaked, origChildren.filter((_item, index) => !used[index])];
+// 짝이 안 된(삭제될) 이전 자식들
 ```
 
 주의할 동작 차이 하나: **중복 key**. 기존은 "남은 것 중 첫 매칭"이라 같은
 key 2개가 각각 짝을 찾을 수 있었지만, Map은 첫 등장만 유지하므로 두 번째
 중복은 삭제+재생성된다. 중복 key는 원래 금지된 사용이므로 허용 처리했다.
+
+> 처음 구현은 삭제 대상을 `[...keyMap.values()]`(Map에 남은 인덱스)로 구했다.
+> 그러면 Map에 들어가지 못한 두 번째 중복 key, 그리고 key 없는 이전 자식들
+> (모두 key `undefined`, 키 없는 배열 → 키 있는 배열 전환)이 삭제 대상에서
+> 빠져 DOM에 남았다. 짝이 된 원본을 `used`로 표시하고 나머지를 모두 삭제하도록
+> 고쳤다(`src/tests/core-structuralRegressions.test.tsx`).
+>
+> 그 뒤로 두 가지가 더 바뀌었다(`src/tests/core-edgeRegressions.test.tsx`).
+> - key가 있는 리스트인지는 **첫 자식이 아니라 자식 중 하나라도** key가 있는지로
+>   판단한다(`checkKeyedChildren`). 첫 행이 `null`(숨긴 행)이면 key 매칭이 꺼져
+>   위치로 짝지어지던 문제다.
+> - key 없는 자식(`null`, 중첩 배열, key 없는 요소)은 Map에 넣지 않고, **같은
+>   인덱스의 key 없는 원본**과 짝짓는다(React와 같은 방식). 전에는 모두 key
+>   `undefined`라 첫 하나만 짝을 찾고 나머지는 매 렌더 다시 만들어졌다. 위치로
+>   짝지은 자식도 `oi`를 받아 LIS·이동에 참여한다. 이런 자식은 `wDomUpdate`가
+>   diff 메타를 지우므로 `updateChildren`은 `oi`를 내용 패스 전에 읽어 둔다.
 
 ### 3.2 `chkDiffLoopOrder` 삭제 + `'L'` RenderType 폐기
 
@@ -393,6 +413,10 @@ if (items.length > 1 && count === items.length &&
 안전조건이 핵심이다: **부모의 실제 자식 수 == 삭제 대상 수**여야만 발동한다.
 리스트 옆에 다른 형제가 있으면(count 불일치) 기존 경로로 떨어진다.
 unmount 콜백/이벤트 해제는 이 함수에 오기 전에 기존 순서대로 이미 끝나 있다.
+
+> 2026-10-30 DC-28(`perf/c4-key-snapshot` 커밋): 개수 대신 부모 자식과의 순서·정체성을 비교하고
+> Fragment/component 래퍼를 통과한다. 행이 component여도 한 번에 지우며, 외부 노드가
+> 자식을 대체한 경우는 지우지 않는다. [결과](../benchmark/BULK_REMOVAL_V2_RESULTS.md).
 
 ### 4.5 `wDomChildrenToDom` — 중간 DocumentFragment 제거
 

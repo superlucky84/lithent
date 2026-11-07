@@ -1,0 +1,216 @@
+--- a/src/diff.ts
++++ b/src/diff.ts
+@@ -14,6 +14,7 @@
+ 
+ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
+ import { keys, isEnumerableProp } from '@/utils';
++import { childOrderRef } from '@/utils/childOrder';
+ 
+ /**
+  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
+@@ -254,6 +255,7 @@
+  */
+ const diffLoopChildren = (newWDom: WDom, originalWDom: WDom) => {
+   const origChildren = originalWDom.children || [];
++  const frame = childOrderRef.value;
+   const keyMap = new Map<unknown, number>();
+   origChildren.forEach((item, index) => {
+     const key = getKey(item);
+@@ -264,7 +266,9 @@
+ 
+   const used: boolean[] = [];
+   const getParent = makeParentGetter(newWDom);
+-  const remaked = (newWDom.children || []).map((item, index) => {
++  const children = newWDom.children || [];
++  let sameOrder = children.length === origChildren.length;
++  const remaked = children.map((item, index) => {
+     const key = getKey(item);
+     // Unkeyed items among keyed ones (a hidden row's null, a nested array)
+     // pair with the unkeyed original at the same index, as in React.
+@@ -287,6 +291,12 @@
+     }
+     child.getParent = getParent;
+ 
++    sameOrder =
++      sameOrder &&
++      origIndex === index &&
++      (child.nr === 'N' || child.nr === 'U' || child.nr === 'T') &&
++      child.tag !== 'portal';
++
+     return child;
+   });
+ 
+@@ -297,5 +307,10 @@
+     originalWDom
+   );
+ 
++  // Staged until the entire root diff and wrapper publication succeed.
++  if (sameOrder && frame && !frame.invalid) {
++    frame.proofs.set(newWDom, remaked);
++  }
++
+   return remaked;
+ };
+--- a/src/render.ts
++++ b/src/render.ts
+@@ -21,6 +21,7 @@
+   makeParentGetter,
+ } from '@/utils';
+ import { cloneWDom } from '@/wDom';
++import { childOrderRef } from '@/utils/childOrder';
+ 
+ const DF = () => new DocumentFragment();
+ 
+@@ -268,6 +269,21 @@
+     return;
+   }
+ 
++  let sameOrder = false;
++  if (newWDom.type === 'l') {
++    const frame = childOrderRef.value;
++    const children = frame && frame.proofs.get(newWDom);
++    // Consume before props, DOM setters, or callbacks can synchronously reenter.
++    if (frame) frame.proofs.delete(newWDom);
++    sameOrder = !!(
++      frame &&
++      frame.ready &&
++      !frame.invalid &&
++      children &&
++      children === newWDom.children
++    );
++  }
++
+   if (newWDom.el) {
+     const { op: oldProps, props } = newWDom;
+     updateProps(props, newWDom.el, oldProps);
+@@ -279,7 +295,7 @@
+     }
+   }
+ 
+-  updateChildren(newWDom);
++  updateChildren(newWDom, sameOrder);
+   runUpdatedQueueFromWDom(newWDom);
+ };
+ 
+@@ -290,8 +306,16 @@
+  * children that can stay in place, and a right-to-left placement pass that
+  * inserts only added children and non-LIS moves before a running anchor.
+  */
+-const updateChildren = (newWDom: WDom) => {
++const updateChildren = (newWDom: WDom, sameOrder?: boolean) => {
+   const children = newWDom.children || [];
++
++  if (sameOrder) {
++    children.forEach(wDomUpdate);
++    // Match the keyed path's cleanup and mount-queue timing, including N nodes.
++    children.forEach(clearDiffMeta);
++    execMountedQueue();
++    return;
++  }
+ 
+   if (
+     newWDom.type !== 'l' ||
+--- a/src/wDom.ts
++++ b/src/wDom.ts
+@@ -23,6 +23,7 @@
+   lmountComponentSet,
+ } from '@/utils/universalRef';
+ import { bindRedraw, componentUpdate } from '@/utils/redraw';
++import { childOrderRef } from '@/utils/childOrder';
+ import { runUpdateCallback } from '@/hook/updateCallback';
+ import {
+   checkFragmentFunction,
+@@ -139,37 +140,52 @@
+   if (originalWDom.il) {
+     return;
+   }
+-  needDiffRef.value = true;
+-
+-  let newWDomTree: WDom;
++  const previousFrame = childOrderRef.value;
++  // A nested replacement makes the outer proof conservatively unsafe.
++  if (previousFrame) previousFrame.invalid = true;
++  const frame = {
++    proofs: new WeakMap<WDom, WDom[]>(),
++    ready: false,
++    invalid: false,
++  };
++  childOrderRef.value = frame;
+   try {
+-    const newWDom = makeWDomResolver(tag, props, children);
+-    newWDomTree = makeNewWDomTree(newWDom, originalWDom);
+-    // NOTE: we/ae are short for wrapElement/afterElement
+-    const { isRoot, getParent, we, ae } = originalWDom;
+-
+-    newWDomTree.getParent = getParent;
+-
+-    if (!isRoot && getParent) {
+-      const parent = getParent();
+-      const brothers = (parent && parent.children) || [];
+-      const index = brothers.indexOf(originalWDom);
+-
+-      if (index !== -1) {
+-        brothers.splice(index, 1, newWDomTree);
++    needDiffRef.value = true;
++
++    let newWDomTree: WDom;
++    try {
++      const newWDom = makeWDomResolver(tag, props, children);
++      newWDomTree = makeNewWDomTree(newWDom, originalWDom);
++      // NOTE: we/ae are short for wrapElement/afterElement
++      const { isRoot, getParent, we, ae } = originalWDom;
++
++      newWDomTree.getParent = getParent;
++
++      if (!isRoot && getParent) {
++        const parent = getParent();
++        const brothers = (parent && parent.children) || [];
++        const index = brothers.indexOf(originalWDom);
++
++        if (index !== -1) {
++          brothers.splice(index, 1, newWDomTree);
++        }
++
++        syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
++      } else {
++        newWDomTree.isRoot = true;
++        newWDomTree.we = we;
++        newWDomTree.ae = ae;
+       }
+-
+-      syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
+-    } else {
+-      newWDomTree.isRoot = true;
+-      newWDomTree.we = we;
+-      newWDomTree.ae = ae;
+-    }
++    } finally {
++      needDiffRef.value = false;
++    }
++
++    frame.ready = true;
++    wDomUpdate(newWDomTree);
+   } finally {
+-    needDiffRef.value = false;
+-  }
+-
+-  wDomUpdate(newWDomTree);
++    // Discard unvisited proofs on success, diff/render failure, and deletion.
++    childOrderRef.value = previousFrame;
++  }
+ };
+ 
+ // ============================================================================
+--- /dev/null
++++ b/src/utils/childOrder.ts
+@@ -0,0 +1,10 @@
++import type { WDom } from '@/types';
++
++type ChildOrderFrame = {
++  proofs: WeakMap<WDom, WDom[]>;
++  ready: boolean;
++  invalid: boolean;
++};
++
++// Lives only for one synchronous replacement. No flags on reusable WDom nodes.
++export const childOrderRef: { value?: ChildOrderFrame } = {};

@@ -1,6 +1,7 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { ElementDemo } from '@/components/ElementDemo';
 import { navigateTo } from '@/store';
+import { LifecycleLink } from './Lifecycle';
 
 const copy = {
   en: {
@@ -426,6 +427,27 @@ function Orders({ filters }) {
         >
           {t.stateRefLink}
         </a>
+      </p>
+      <h2>
+        {language === 'ko'
+          ? '숨김 중 상태와 작업 보존'
+          : 'Retain state and work while hidden'}
+      </h2>
+      <p>
+        {language === 'ko'
+          ? 'createRetainedHost를 element 컴포넌트로 넘기고 active를 Boolean prop으로 선언하면 연결된 상태로 숨김·재활성화를 제어합니다. 활동 검색·폴링은 정리하고 인스턴스 저장은 계속할 수 있습니다. 실제 제거·재연결은 새 인스턴스이며 자식 갱신 중단은 지원하는 Concurrent에서만 선택합니다.'
+          : 'Use createRetainedHost as the element component and declare active as a Boolean prop to hide and reactivate it while connected. Activity search and polling are cleaned up; instance saves can continue. Actual removal and reconnection create a new instance. Native child freezing is optional and requires a supported Concurrent core.'}
+      </p>
+      <p>
+        <LifecycleLink
+          language={language}
+          path="/guide/lifecycle"
+          label={
+            language === 'ko'
+              ? '보존 host와 수명 관리 가이드 →'
+              : 'Retained hosts and lifecycle guide →'
+          }
+        />
       </p>
     </div>
   );

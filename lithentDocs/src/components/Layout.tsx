@@ -48,6 +48,10 @@ import { ConcurrentRendering } from '@/pages/ConcurrentRendering';
 import { ConcurrentRenderingKo } from '@/pages/ConcurrentRendering_ko';
 import { Element } from '@/pages/Element';
 import { ElementKo } from '@/pages/Element_ko';
+import { Lifecycle } from '@/pages/Lifecycle';
+import { LifecycleKo } from '@/pages/Lifecycle_ko';
+import { Example22Page } from '@/pages/Example22';
+import { Example22PageKo } from '@/pages/Example22_ko';
 import { ConcurrentHelpers } from '@/pages/ConcurrentHelpers';
 import { ConcurrentHelpersKo } from '@/pages/ConcurrentHelpers_ko';
 import { VitePlugin } from '@/pages/VitePlugin';
@@ -160,6 +164,10 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/concurrent-rendering': ConcurrentRenderingKo,
   '/guide/element': Element,
   '/ko/guide/element': ElementKo,
+  '/guide/lifecycle': Lifecycle,
+  '/ko/guide/lifecycle': LifecycleKo,
+  '/examples/22': Example22Page,
+  '/ko/examples/22': Example22PageKo,
   '/guide/concurrent-helpers': ConcurrentHelpers,
   '/ko/guide/concurrent-helpers': ConcurrentHelpersKo,
   '/guide/mount-hooks': MountHooks,

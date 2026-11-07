@@ -8,12 +8,24 @@ import {
 
 const MAX_RETRY = 3;
 
+type Registration = { callerCtor?: TagFunction };
+
+type PendingUpdate = {
+  ctor: TagFunction;
+  instances: Map<CompKey, Registration>;
+  retryCount: number;
+  updated: boolean;
+};
+
 type InstanceRegistry = {
   instances: Set<CompKey>;
   domMap: Map<CompKey, WDom>;
   scheduled: boolean;
-  pendingCtor?: TagFunction;
-  retryCount: number;
+  pendingUpdate?: PendingUpdate;
+  owners: number;
+  registrations: Map<CompKey, Registration>;
+  onFailure?: (reason: string) => void;
+  onApplied?: () => void;
 };
 
 const boundaryRegistry = new Map<string, InstanceRegistry>();
@@ -26,61 +38,72 @@ const getRegistry = (moduleId: string): InstanceRegistry => {
       instances: new Set(),
       domMap: new Map(),
       scheduled: false,
-      pendingCtor: undefined,
-      retryCount: 0,
+      owners: 0,
+      registrations: new Map(),
     };
     boundaryRegistry.set(moduleId, registry);
+    enableComponentMapManualMode();
   }
 
   return registry;
 };
 
 export type BoundaryController = {
-  register: (compKey: CompKey) => () => void;
+  register: (compKey: CompKey, callerCtor?: TagFunction) => () => void;
   update: (nextCtor: TagFunction) => boolean;
   dispose: () => void;
 };
 
 export const registerBoundaryInstance = (
   moduleId: string,
-  compKey: CompKey
+  compKey: CompKey,
+  callerCtor?: TagFunction
 ) => {
   const registry = getRegistry(moduleId);
 
+  const registration = { callerCtor };
+  registry.registrations.set(compKey, registration);
   registry.instances.add(compKey);
 
   queueMicrotask(() => {
     const entry = componentMap.get(compKey);
     const currentWDom = entry?.vd?.value ?? null;
 
-    if (currentWDom) {
+    if (
+      currentWDom &&
+      boundaryRegistry.get(moduleId) === registry &&
+      registry.registrations.get(compKey) === registration
+    ) {
       registry.domMap.set(compKey, currentWDom);
     }
   });
 
   return () => {
     const currentRegistry = boundaryRegistry.get(moduleId);
-    if (!currentRegistry) return;
+    if (
+      currentRegistry !== registry ||
+      currentRegistry.registrations.get(compKey) !== registration
+    )
+      return;
 
+    currentRegistry.registrations.delete(compKey);
     currentRegistry.instances.delete(compKey);
     currentRegistry.domMap.delete(compKey);
-
-    if (!currentRegistry.instances.size) {
-      boundaryRegistry.delete(moduleId);
-    }
   };
 };
 
 export const disposeBoundary = (moduleId: string) => {
   const registry = boundaryRegistry.get(moduleId);
 
-  if (registry) {
-    Array.from(registry.instances).forEach(compKey =>
-      removeComponentEntry(compKey)
-    );
-  }
-
+  if (!registry) return;
   boundaryRegistry.delete(moduleId);
+  for (const [compKey, registration] of Array.from(registry.registrations)) {
+    // A direct call observes its caller; it does not own that caller's lifetime.
+    if (!registration.callerCtor) removeComponentEntry(compKey);
+  }
+  registry.instances.clear();
+  registry.registrations.clear();
+  registry.domMap.clear();
   disableComponentMapManualMode();
 };
 
@@ -90,111 +113,135 @@ export const applyBoundaryUpdate = (
 ) => {
   const registry = boundaryRegistry.get(moduleId);
 
-  if (!registry) return false;
+  if (!registry?.instances.size) return false;
 
-  registry.pendingCtor = nextCtor;
-  registry.retryCount = 0;
+  registry.pendingUpdate = {
+    ctor: nextCtor,
+    instances: new Map(registry.registrations),
+    retryCount: 0,
+    updated: false,
+  };
 
   if (!registry.scheduled) {
     registry.scheduled = true;
-    queueMicrotask(() => flushBoundary(moduleId));
+    queueMicrotask(() => flushBoundary(moduleId, registry));
   }
 
   return true;
 };
 
-const flushBoundary = (moduleId: string) => {
-  const registry = boundaryRegistry.get(moduleId);
-  if (!registry) return;
+const flushBoundary = (moduleId: string, registry: InstanceRegistry) => {
+  if (boundaryRegistry.get(moduleId) !== registry) return;
 
   registry.scheduled = false;
 
-  const ctor = registry.pendingCtor;
-  if (!ctor) {
-    return;
-  }
+  const update = registry.pendingUpdate;
+  if (!update) return;
 
-  registry.pendingCtor = undefined;
+  registry.pendingUpdate = undefined;
 
-  let updated = false;
-  let hasMissing = false;
+  let failed = false;
 
-  registry.instances.forEach(compKey => {
-    const entry = componentMap.get(compKey);
-    const cached = registry.domMap.get(compKey);
-    const currentWDom = entry?.vd?.value || cached;
+  // Replacement can unregister old instances and register new descendants.
+  // Never consume additions made during this flush, or revisit retired nodes.
+  const instances = Array.from(update.instances, ([compKey, registration]) => ({
+    compKey,
+    wDom: componentMap.get(compKey)?.vd?.value || registry.domMap.get(compKey),
+    registration,
+  }));
+  update.instances.clear();
+  instances.forEach(({ compKey, wDom: currentWDom, registration }) => {
+    if (
+      boundaryRegistry.get(moduleId) !== registry ||
+      registry.registrations.get(compKey) !== registration ||
+      currentWDom?.il
+    )
+      return;
 
     if (!currentWDom || !currentWDom.el) {
-      hasMissing = true;
+      update.instances.set(compKey, registration);
       return;
     }
 
     const { compProps, compChild } = currentWDom;
 
     if (!compProps || !compChild) {
-      hasMissing = true;
+      update.instances.set(compKey, registration);
       return;
     }
 
+    const ctor = registration.callerCtor || update.ctor;
+    const previousCtor = currentWDom.ctor;
+    // A stable HMR proxy has the same identity across versions. Force only this
+    // replacement to remount; the new WDom retains the proxy for later redraws.
+    if (!registration.callerCtor && previousCtor === ctor)
+      currentWDom.ctor = undefined;
     try {
-      replaceWDom(ctor, compProps, compChild, currentWDom as any);
-      const refreshed = componentMap.get(compKey)?.vd?.value || currentWDom;
-      registry.domMap.set(compKey, refreshed as WDom);
-      updated = true;
+      // A remount reuses the props/key. Release the old hooks before the core
+      // initializes its new hook state under that key.
+      if (!registration.callerCtor) removeComponentEntry(compKey);
+      replaceWDom(ctor, compProps, compChild, currentWDom);
+      update.updated = true;
     } catch (error) {
+      failed = true;
       console.warn(`[Lithent HMR] boundary update 실패: ${moduleId}`, error);
+    } finally {
+      currentWDom.ctor = previousCtor;
     }
   });
 
-  let nextPendingCtor: TagFunction | undefined = registry.pendingCtor;
-  const shouldRetryMissing = hasMissing && !updated;
-  const hasQueuedUpdate = Boolean(nextPendingCtor);
-  const shouldRetry = shouldRetryMissing || hasQueuedUpdate;
+  if (boundaryRegistry.get(moduleId) !== registry) return;
+  if (failed) registry.onFailure?.(`replacement failed: ${moduleId}`);
+  else if (update.updated && !update.instances.size) registry.onApplied?.();
 
-  if (!shouldRetry) {
-    registry.retryCount = 0;
-    return;
-  }
+  // A newer update supersedes retries for the older implementation.
+  if (!registry.pendingUpdate && !failed && update.instances.size) {
+    update.retryCount += 1;
 
-  if (shouldRetryMissing) {
-    registry.retryCount += 1;
-
-    if (registry.retryCount > MAX_RETRY) {
+    if (update.retryCount > MAX_RETRY) {
       console.warn(
-        `[Lithent HMR] boundary update failed after ${registry.retryCount} attempts; aborting: ${moduleId}`
+        `[Lithent HMR] boundary update failed after ${update.retryCount} attempts; aborting: ${moduleId}`
       );
 
-      const hot = (
-        import.meta as unknown as {
-          hot?: { invalidate?: () => void };
-        }
-      ).hot;
-      hot?.invalidate?.();
+      registry.onFailure?.(
+        `missing DOM after ${update.retryCount} attempts: ${moduleId}`
+      );
 
-      registry.pendingCtor = undefined;
-      registry.scheduled = false;
       return;
     }
-
-    if (!nextPendingCtor) {
-      nextPendingCtor = ctor;
-    }
+    registry.pendingUpdate = update;
   }
 
-  registry.pendingCtor = nextPendingCtor;
-
-  if (!registry.scheduled) {
+  if (registry.pendingUpdate && !registry.scheduled) {
     registry.scheduled = true;
-    setTimeout(() => flushBoundary(moduleId), 0);
+    setTimeout(() => flushBoundary(moduleId, registry), 0);
   }
 };
 
-export const createBoundary = (moduleId: string): BoundaryController => {
-  enableComponentMapManualMode();
+export const createBoundary = (
+  moduleId: string,
+  onFailure?: (reason: string) => void,
+  onApplied?: () => void
+): BoundaryController => {
+  const registry = getRegistry(moduleId);
+  registry.owners += 1;
+  registry.onFailure = onFailure;
+  registry.onApplied = onApplied;
 
+  let disposed = false;
+  const active = () => !disposed && boundaryRegistry.get(moduleId) === registry;
   return {
-    register: (compKey: CompKey) => registerBoundaryInstance(moduleId, compKey),
-    update: (nextCtor: TagFunction) => applyBoundaryUpdate(moduleId, nextCtor),
-    dispose: () => disposeBoundary(moduleId),
+    register: (compKey: CompKey, callerCtor?: TagFunction) =>
+      active()
+        ? registerBoundaryInstance(moduleId, compKey, callerCtor)
+        : () => {},
+    update: (nextCtor: TagFunction) =>
+      active() && applyBoundaryUpdate(moduleId, nextCtor),
+    dispose: () => {
+      if (!active()) return;
+      disposed = true;
+      registry.owners -= 1;
+      if (!registry.owners) disposeBoundary(moduleId);
+    },
   };
 };

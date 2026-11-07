@@ -1,0 +1,164 @@
+{
+  "baselineCommit": "e09902f4586df76c4f3a68933d910231c7de9cd5",
+  "node": "v24.19.0",
+  "production": [
+    {
+      "path": "dist/lithent.mjs",
+      "raw": 18487,
+      "gzip": 5951,
+      "brotli": 5420,
+      "sha256": "64516ce9c8622673133098b6bacb188753aa383f204cf1f6579f299248d2344f"
+    },
+    {
+      "path": "dist/lithent.cjs",
+      "raw": 12819,
+      "gzip": 5171,
+      "brotli": 4785,
+      "sha256": "c1715fad8c0ea4b15bf603ed8fff8278109e16b6d5c85dd9a19a4e7cc5c63394"
+    },
+    {
+      "path": "dist/lithent.umd.js",
+      "raw": 12966,
+      "gzip": 5142,
+      "brotli": 4758,
+      "sha256": "ef1f48dc17504ac6c60c82617c9e1a8fd1b01adbd55b7a6e061738e419cf4414"
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.mjs",
+      "raw": 24795,
+      "gzip": 7902,
+      "brotli": 7219,
+      "sha256": "cd3b251d55626555f34a342b9ab3d831776a443d495ddc3caca912c852f5be92"
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.cjs",
+      "raw": 16984,
+      "gzip": 6819,
+      "brotli": 6298,
+      "sha256": "bc47852ebd1d4d0997f41bd2eaf5e06bb700fbba2e2b450c2b9265085ce79bd1"
+    },
+    {
+      "path": "lithentConcurrent/dist/lithentConcurrent.umd.js",
+      "raw": 17045,
+      "gzip": 6906,
+      "brotli": 6385,
+      "sha256": "25568c92870172eae7d2ce0bd51d6fcbb176ca2947e4e7a2e25f7d7fed4add62"
+    },
+    {
+      "path": "helper/dist/lithentHelper.mjs",
+      "raw": 9130,
+      "gzip": 2457,
+      "brotli": 2115,
+      "sha256": "919ba0763da8edd34ac5c5691d3918a201ad218f53dba20c6b4e7b1d88902c2e"
+    },
+    {
+      "path": "helper/dist/lithentHelper.cjs",
+      "raw": 5982,
+      "gzip": 2040,
+      "brotli": 1807,
+      "sha256": "8ea45730216c45fcfd46518a3835dd79ee3470335a4fb19a22bb577c83a47f32"
+    },
+    {
+      "path": "helper/dist/lithentHelper.umd.js",
+      "raw": 6145,
+      "gzip": 2134,
+      "brotli": 1879,
+      "sha256": "c3298d1cf1ab4e7d3b769d7a18f5a81ac12b30f139ae5fac598f28b0d994b0ea"
+    }
+  ],
+  "productionUnchanged": true,
+  "productionSourceDiff": "",
+  "experiment": [
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.mjs",
+      "raw": 6651,
+      "gzip": 1990,
+      "brotli": 1778,
+      "sha256": "d4a56c26f970be62ea2818f093ddc25710e1648b0d86553096ab85a43eb5c12f"
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.cjs",
+      "raw": 4048,
+      "gzip": 1647,
+      "brotli": 1489,
+      "sha256": "8fdc0ad0b0d4196121dba5a6a20fa9fa928a8a07d28f74e69cfc06fe489407fc"
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.umd.js",
+      "raw": 4251,
+      "gzip": 1769,
+      "brotli": 1582,
+      "sha256": "e1fae03999f8855adda0bac70091b02fe4d9a675ece98629690c1a899b078d8d"
+    }
+  ],
+  "experimentDeltaFromPhase2": [
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.mjs",
+      "raw": 469,
+      "gzip": 148,
+      "brotli": 132
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.cjs",
+      "raw": 359,
+      "gzip": 122,
+      "brotli": 118
+    },
+    {
+      "path": "experiments/closure-lifecycle/dist/lifecycle.umd.js",
+      "raw": 353,
+      "gzip": 126,
+      "brotli": 114
+    }
+  ],
+  "demo": [
+    {
+      "path": "experiments/closure-lifecycle/demo/dist/base/index.html",
+      "raw": 3129,
+      "gzip": 1285,
+      "brotli": 966,
+      "sha256": "6a2191b4997c4246afbd62a452fbe7f05d5dbd3ecb0700b8bd5f5e330eece409"
+    },
+    {
+      "path": "experiments/closure-lifecycle/demo/dist/base/assets/index-C7D9mGBP.css",
+      "raw": 2075,
+      "gzip": 825,
+      "brotli": 664,
+      "sha256": "2f80126c12fbf13335296c92c4192647767c9cc6e29b0568e28670ad6132dc80"
+    },
+    {
+      "path": "experiments/closure-lifecycle/demo/dist/base/assets/index-CHDTHLwm.js",
+      "raw": 23691,
+      "gzip": 9536,
+      "brotli": 8621,
+      "sha256": "91877dc0afbdf76928ae601d0c65b1234643ddab6eb19606ac3ae5b6cee698c3"
+    },
+    {
+      "path": "experiments/closure-lifecycle/demo/dist/concurrent/index.html",
+      "raw": 3129,
+      "gzip": 1285,
+      "brotli": 967,
+      "sha256": "d44dbe2addbbbfe26f18e60782c43e39cd48a34ff93f6f38f9688c956e2a4b4c"
+    },
+    {
+      "path": "experiments/closure-lifecycle/demo/dist/concurrent/assets/index-BpICjrva.js",
+      "raw": 27839,
+      "gzip": 11185,
+      "brotli": 10135,
+      "sha256": "66329ea4050d363ac00f69e8e282f658bafb6dd8b11bc5216ccd5d5efcfcd176"
+    },
+    {
+      "path": "experiments/closure-lifecycle/demo/dist/concurrent/assets/index-C7D9mGBP.css",
+      "raw": 2075,
+      "gzip": 825,
+      "brotli": 664,
+      "sha256": "2f80126c12fbf13335296c92c4192647767c9cc6e29b0568e28670ad6132dc80"
+    }
+  ],
+  "browser": {
+    "name": "Chromium",
+    "version": "151.0.7922.173",
+    "playwright": "1.63.0",
+    "headless": true
+  }
+}

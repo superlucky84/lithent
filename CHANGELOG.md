@@ -1,5 +1,313 @@
 # Release notes
 
+## Unreleased — Vite 8
+
+### lithent 1.25.7 / lithent-concurrent 0.2.6
+
+- Rebuild both cores and the bundled subpaths with Vite 8 / Rolldown while
+  preserving the previous JavaScript browser targets and public APIs. The
+  runtime source is unchanged from the preceding cleanup recovery releases.
+- See the [migration report](./docs/benchmark/VITE8_MIGRATION_RESULTS.md) for
+  bundle measurements and validation. Local CPU diagnostics do not establish
+  a general runtime speed improvement.
+
+### Toolchain packages
+
+- `@lithent/lithent-vite` 0.4.0, `@lithent/lithent-template-vite` 0.2.0 and
+  `@lithent/lithent-mdx` 0.3.0 require Vite `^8.0.0`. This drops Vite 5
+  support for these plugin versions. Keep the preceding plugin release when
+  using Vite 5, or upgrade Vite and the plugins together. Vite 8 requires
+  Node `^20.19.0 || >=22.12.0`.
+- Use native Oxc JSX transforms and Rolldown dependency scanning. Preserve
+  classic JSX without development DOM props, automatic JSX, mixed TSX and
+  templates, JSON/CSS template loaders, and ESM/CommonJS package entry points.
+- `@lithent/hmr-parser` 0.2.5 and `@lithent/lithent-template-parser` 0.1.3
+  contain rebuilt artifacts from the new toolchain; parser APIs are unchanged.
+
+### create-lithent 0.4.0
+
+- Correct the repository URL used to validate release provenance.
+- Generate SPA and Express SSR projects using Vite 8 and matching plugin/core
+  versions. Both templates declare Node `^20.19.0 || >=22.12.0`.
+- Bound Tailwind scanning to the declared template content paths and keep the
+  SSR stylesheet filename compatible with the server's asset lookup.
+
+## 2026-11-07
+
+### lithent 1.25.6 / lithent-concurrent 0.2.5
+
+- Continue unmounting after a cleanup throws: run the remaining component,
+  child and sibling cleanups, remove retired DOM and release automatically
+  managed component entries. Failed cleanups are not run again on disposal
+  retries or reentry. Custom elements can reconnect with a fresh instance.
+- Compatibility note: cleanup failures are reported after teardown through
+  `reportError`, with an asynchronous throw fallback when it is unavailable
+  or fails. A `try/catch` around destroy no longer receives cleanup failures
+  synchronously. The original thrown value is preserved.
+- The base cleanup recovery allowance is 28B Brotli, bringing its budget to
+  4,953B. The concurrent and element budgets are unchanged.
+- Preserve the JSX intrinsic key/value types while allowing ESM and CommonJS
+  declaration graphs, including both cores, in one strict TypeScript program.
+  Merged declarations previously reported duplicate index signatures.
+
+### Toolchain packages
+
+- `@lithent/hmr-parser` 0.2.4, `@lithent/lithent-mdx` 0.2.7 and
+  `@lithent/lithent-vite` 0.3.5 provide real `.cjs` entry points alongside
+  ESM and the existing browser UMD files. CommonJS consumers previously
+  received an empty namespace from the declared `.umd.js` entry points.
+- These packages and `@lithent/lithent-template-parser` 0.1.2 expose separate
+  ESM/CommonJS declaration graphs. `@lithent/lithent-template-vite` 0.1.2
+  adopts the updated parser dependency and remains ESM only.
+
+### Release automation
+
+- These are the first versions published from CI. After every check passes
+  on `main`, CI publishes only packages whose version was bumped. It uploads
+  the exact archives it tested, using npm Trusted Publishing (OIDC) with
+  provenance, and tags each package at the commit it was built from.
+- `lithent` 1.25.6 was published from the #104 merge commit. The other six
+  packages were published from the #105 merge commit, which changed only
+  release scripts. `create-lithent` stays at 0.3.4.
+- npm can take over a minute to serve a new version after accepting it.
+  Publishing and tag recording now wait up to five minutes for it instead of
+  25 seconds (#105).
+- Release candidate checks exempt only first-party packages from pnpm's
+  minimum release age, so a sibling published minutes earlier can be
+  installed. Third-party packages keep the age gate (#105).
+
+See the [GitHub release](https://github.com/superlucky84/lithent/releases/tag/lithent%401.25.6)
+and [RELEASING.md](./RELEASING.md).
+
+## 2026-11-02
+
+### lithent 1.25.5
+
+- Reduce keyed-list matching and DOM placement work when rows retain their
+  keys and order, and return a reused identical virtual node without diffing
+  it again. Ordinary element props also skip the pending custom-element check.
+- In a local Mac run of the official js-framework-benchmark runner, weighted
+  total time fell 2.59% and script time 6.84% against 1.25.4, using the same
+  cached-row app and 580 samples across two execution orders. Partial updates
+  were 9.21% faster and selection 12.91% faster. These are local comparison
+  results, not published upstream rankings; see the
+  [measurement report](./docs/benchmark/POSITIONAL_KEYS_OFFICIAL_RESULTS.md).
+- Compatibility note: the base core returns a reused identical nonempty
+  virtual node before its usual comparison, so that comparison no longer
+  re-reads its children getter. Do not depend on getter side effects when
+  returning a cached virtual node. Keep keys stable during a
+  reconciliation; changing an existing node's `props.key` or key getter result
+  from an update callback is not a supported way to change row identity. To
+  change identity, render a new node with the new key.
+- The base bundle is 4,925B Brotli, up 108B from 1.25.4. The size budget is
+  4,925B. This release changes only the base core; lithent-concurrent remains
+  at 0.2.4.
+
+## 2026-10-31
+
+### lithent 1.25.4
+
+- Clear a list of component or Fragment rows in one DOM operation when the
+  list is all of its parent element's content. Removing 1,000 component rows
+  now takes one DOM removal instead of 1,000; on a benchmark app with a
+  component per row, clearing 1,000 rows was 7.8% faster (script time 10.4%).
+  Lists of plain elements were already cleared this way and are unchanged.
+- Stop deleting a node that other code put in place of one of a list's
+  elements. When a whole list was removed, the renderer cleared its parent if
+  it had the same number of children as the list, without checking that they
+  were the same nodes. It now clears the parent only when its children are
+  exactly the list's nodes, and otherwise removes them one by one.
+- The base bundle is 4,817B Brotli (budget 4,824B).
+
+### lithent-concurrent 0.2.4
+
+- Include the list removal changes above.
+
+## 2026-10-27
+
+### lithent 1.25.3
+
+- Stop treating a portal's target container as a sibling element (#100). A
+  portal near other nodes could throw `NotFoundError` on insert, drag its
+  target into a keyed list on reorder, delete its siblings when removed, fail
+  to show a node that replaced it, or remove its target from the document when
+  a parent component or keyed row was deleted. Deleting a portal now clears
+  only its children and keeps the target.
+- Create virtual nodes with one shared object layout. On the same benchmark
+  app, total time fell 5.9% and script time 14.4% across all nine actions,
+  while 10k-row memory rose 2.5% (+0.68 MB).
+- Compatibility note: virtual nodes now always carry their common fields, some
+  set to `undefined`, so code that inspects them with `Object.keys` or `in`
+  sees more keys. Rendering behavior is unchanged.
+- Compatibility note: the UMD and CJS builds no longer tag their exports object
+  as a module, so `Object.prototype.toString.call(lithent)` returns
+  `[object Object]` instead of `[object Module]`. Named exports are unchanged.
+- Shrink the base UMD build with syntax-only minification. The base bundle is
+  4,819B Brotli; its budget is now 4,824B.
+- Document the native DOM event contract that event props follow; see
+  [events.md](./skills/lithent/reference/events.md).
+
+### lithent-concurrent 0.2.3
+
+- Include the portal fixes above (#100).
+
+See [RELEASING.md](./RELEASING.md) for the two-package publication order,
+[NODE_SHAPE_RESULTS](./docs/benchmark/NODE_SHAPE_RESULTS.md) for the node
+layout benchmark and
+[BUNDLE_SIZE_RESULTS](./docs/benchmark/BUNDLE_SIZE_RESULTS.md) for the build
+size changes.
+
+## 2026-10-16
+
+### lithent 1.25.2
+
+- Keep each reused component attached to its actual parent when its own
+  render changes tags, becomes empty, or inserts multiple nodes (#99).
+- Render hoisted or shared element/component nodes safely in multiple places,
+  with separate component instances and the correct props for each position.
+- Compatibility note: components created outside a diff, including a top-level
+  `h(Comp, props)` before `render`, now receive shallow copies of props and
+  children. `componentUpdate(originalProps)()` no longer finds those instances
+  and returns `false` without a warning. Use the instance's `renew()` or
+  `useRenew()` for updates; external data must also be passed into the instance,
+  for example through a parent that renders fresh props. Calling `renew()` alone
+  does not synchronize the original props object. See the
+  [props guide](https://superlucky84.github.io/lithent/#/guide/props).
+- Preserve keyed identity and input focus through lists with empty or mixed
+  keyed/unkeyed children, reorders, and rows that redraw themselves.
+- Run renewals raised during a flush, including a new child's mount callback
+  renewing a parent that has already rendered.
+- Resume already queued updates after a render throws without requiring a new
+  `renew()`, while still reporting the original error.
+- Set up components created inside new component output once, avoiding duplicate
+  instances and HMR registration. Release retired component output so previous
+  render trees can be collected.
+- Accept `true` as an empty child in public types, matching runtime behavior.
+- Reduce render, diff, and hook overhead while keeping the base bundle within
+  its size budget. Preserve the parent-getter scopes used for VDOM reclamation.
+
+### lithent-concurrent 0.2.2
+
+- Include the reused-node, component-instance, keyed-list, focus, and renewal
+  fixes above (#99), along with the shared public type fix for `true` children.
+- Resume queued sync and low-lane work after render errors. Low-lane errors also
+  finish pending `whenIdle()` waits, even when no render entries remain.
+
+See [RELEASING.md](./RELEASING.md) for the two-package publication order and
+[the benchmark report](./docs/benchmark/EDGE_OFFICIAL_RESULTS.md) for the
+same-app rendering comparison against 1.25.1.
+
+## 2026-10-15
+
+### lithent 1.25.1
+
+- Unmount a component that is replaced by a fragment with the same number of
+  children. The DOM was already correct, but unmount callbacks never ran (#98).
+- Insert a fragment or component replaced inside an unkeyed array at its own
+  position instead of after the array's last item (#98).
+- Remove old items when an unkeyed array becomes keyed, or when a key had
+  appeared twice (#98).
+- Add structural render matrix and seeded fuzz suites that check every update
+  against independently built HTML and the expected mounted instances.
+
+### lithent-concurrent 0.2.1
+
+- Include the three structural render fixes above (#98).
+- Insert next to a newly added sibling at the right position. A sibling built
+  ahead of the commit was used as the anchor, so the insert fell back to
+  appending at the end (#98).
+
+## 2026-10-12
+
+### lithent 1.25.0
+
+- Add nine lifecycle APIs and their types to `lithent/helper`: owner scopes,
+  latest tasks, activity scopes, scoped tasks, retained views/hosts, and render
+  boundary helpers. Activity work stops on hide; instance work can continue;
+  stale task results cannot reach observers (#96).
+- Preserve a hidden view's state and DOM. Freezing native child updates with
+  `freezeChildren: true` requires `lithent-concurrent ^0.2.0`.
+- Fix stateless components rendering twice on first mount and restore the
+  parent component's hook context after nested component construction (#95).
+- Fix HMR replacement loops, instance cleanup, and parent state preservation
+  in `lithent/devHelper`. Use `@lithent/lithent-vite ^0.3.4` for the matching
+  transform and bootstrap fixes.
+- Add English/Korean lifecycle guides and the retained-editor example.
+- Build Custom Element declarations before the documentation site, avoiding
+  a parallel-build race that failed fresh CI runs with TS7016.
+- Build SSR and the remaining shared runtime declarations before toolchain
+  checks, including the template plugin's SSR regression test. Check root
+  build manifest changes through the docs deployment workflow as well.
+
+`lithent/helper` and `lithent/devHelper` ship inside this package. Their private
+workspace versions are 0.22.0 and 0.21.1; publish only `lithent` for these entries.
+
+### lithent-concurrent 0.2.0
+
+- Add render boundaries that pause native child renews and parent diffs for
+  retained views, while keeping the default core's behavior (#96).
+- Include the stateless component and hook-context fixes from the base core
+  (#95).
+- Require `lithent ^1.25.0` for the matching shared helper and development
+  helper. Continue to alias only the bare `lithent` import.
+
+### @lithent/hmr-parser 0.2.3 / @lithent/lithent-vite 0.3.4
+
+- Fix stable component proxies, stateless/default/nested component detection,
+  direct calls, mixed exports, render disposal, and repeated HMR updates (#95).
+- Require `lithent ^1.25.0` in the Vite plugin so generated HMR code uses the
+  matching `lithent/devHelper` contract.
+- Publish the Vite plugin with the updated HMR and template plugin dependencies.
+- Fix the Vite plugin's declaration output path and keep its template option
+  type import on the public package entry, so packed TypeScript consumers can
+  resolve both declarations.
+- Emit explicit relative declaration paths for the HMR/template toolchain,
+  so ESM TypeScript consumers can use Node16/NodeNext resolution without
+  `skipLibCheck`.
+
+### @lithent/lithent-template-parser 0.1.1 / @lithent/lithent-template-vite 0.1.1
+
+- Preserve JavaScript expressions, directive behavior, generated element
+  semantics, and source text while compiling templates (#97).
+- Publish the template Vite plugin with the fixed parser dependency.
+
+See [RELEASING.md](./RELEASING.md) for the build, validation, publication order,
+and documentation deployment commands.
+
+## 2026-10-09
+
+### lithent 1.24.1
+
+A packaging fix. No runtime code changes; the ESM and UMD bundles are the same
+as in 1.24.0.
+
+- Fix `require('lithent')` and `require` of every subpath. The `require` entry
+  was a `.js` UMD file inside a `"type": "module"` package, so Node.js read it
+  as an ES module. On Node.js 24 the call returned an empty object and
+  `mount`, `useRenew` and the rest were `undefined` (#92). Each entry now ships
+  a `.cjs` bundle, and `main` and `exports.require` point to it.
+- Fix the types a CommonJS TypeScript project gets under `node16`/`nodenext`
+  resolution. It resolved the ESM declarations and failed with TS1479 and
+  TS1471. Each entry now also ships `.d.cts` declarations, and `exports` picks
+  the declarations by `import` or `require`.
+- The ESM (`.mjs`) and browser UMD (`.umd.js`) paths are unchanged, including
+  the CDN URLs.
+- The ESM and CommonJS bundles keep separate module state. Load the core and
+  its subpaths (`lithent/helper`, `lithent/ssr`, ...) in the same format; do
+  not mix `import` and `require` of lithent in one program.
+
+This applies to `lithent`, `lithent/jsx-runtime`, `lithent/jsx-dev-runtime`,
+`lithent/helper`, `lithent/devHelper`, `lithent/ssr`, `lithent/tag`,
+`lithent/ftags` and `lithent/element`.
+
+### lithent-concurrent 0.1.4
+
+- Fix `require('lithent-concurrent')` and `require('lithent-concurrent/helper')`
+  the same way: `.cjs` bundles for `main` and `exports.require`, and `.d.cts`
+  declarations for CommonJS TypeScript projects.
+- No runtime code changes. The ESM and UMD bundles are the same as in 0.1.3.
+  Still works with `lithent ^1.22.1`.
+
 ## 2026-10-08
 
 ### lithent 1.24.0
@@ -71,7 +379,7 @@ and `renderToString` fixes are not separate npm releases.
   DOM). `styles` are shared by every instance through one adopted style sheet,
   with a `<style>` fallback. Slots project the element's children.
 - The component receives the element as `props.host`; `emit(host, name,
-  detail, init?)` dispatches a `CustomEvent` that bubbles, is composed and is
+detail, init?)` dispatches a `CustomEvent` that bubbles, is composed and is
   cancelable unless `init` says otherwise.
 - Moving an element keeps its state; removing it unmounts after a microtask.
   `defineElement` returns `undefined` without `customElements` (SSR).

@@ -21,7 +21,7 @@ export const ManualJSX = () => (
       <br />
       <br />
       You can configure Lithent JSX in various environments such as TypeScript,
-      Babel, and Vite (esbuild).
+      Babel, and Vite 8 (Oxc).
     </p>
 
     <div class="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mb-6 rounded-r">
@@ -424,12 +424,12 @@ const App = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Vite Configuration (esbuild)
+      Vite 8 Configuration (Oxc)
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      This section explains how to configure JSX using esbuild only, without the
-      Vite plugin.
+      This section configures JSX with Vite 8’s Oxc transform, without the
+      Lithent Vite plugin.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
@@ -454,9 +454,13 @@ const App = mount((renew) => {
       code={`import { defineConfig } from 'vite';
 
 export default defineConfig({
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
   },
 });`}
     />
@@ -466,8 +470,9 @@ export default defineConfig({
         <span class="font-medium text-gray-700 dark:text-gray-300">
           💡 Note:
         </span>{' '}
-        esbuild currently does not support the Automatic Transform. Only the
-        Classic Transform is available.
+        For automatic JSX, use runtime: 'automatic' with importSource: 'lithent'
+        instead. Classic JSX uses development: false to avoid adding development
+        metadata to DOM props.
       </p>
     </div>
 

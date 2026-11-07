@@ -1,4 +1,4 @@
-import { componentMap, getComponentKey } from '@/utils/universalRef';
+import { getCurrentComponent } from '@/utils/universalRef';
 
 import { useUpdated } from '@/hook/internal/useUpdate';
 
@@ -8,10 +8,7 @@ export const updateCallback = (
   effectAction: () => (() => void) | void,
   dependencies: DependencyFactory = () => []
 ) => {
-  const compKey = getComponentKey();
-  if (!compKey) return;
-
-  const component = componentMap.get(compKey);
+  const component = getCurrentComponent();
   if (!component) return;
 
   component.upR.push(() => useUpdated(effectAction, dependencies));
@@ -19,10 +16,7 @@ export const updateCallback = (
 };
 
 export const runUpdateCallback = () => {
-  const compKey = getComponentKey();
-  if (!compKey) return;
-
-  const comp = componentMap.get(compKey);
+  const comp = getCurrentComponent();
   const updateReqs = comp && comp.upR;
 
   if (updateReqs && updateReqs.length) {

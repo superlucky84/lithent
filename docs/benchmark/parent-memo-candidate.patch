@@ -1,0 +1,686 @@
+diff --git a/lithentConcurrent/src/tests/concurrent-exportSurface.test.ts b/lithentConcurrent/src/tests/concurrent-exportSurface.test.ts
+index b8876ac..3018f38 100644
+--- a/lithentConcurrent/src/tests/concurrent-exportSurface.test.ts
++++ b/lithentConcurrent/src/tests/concurrent-exportSurface.test.ts
+@@ -28,6 +28,9 @@ const CONCURRENT_ONLY: string[] = [
+   'notifyStoreWrite',
+   'storeVersion',
+ ];
++// The C3 candidate is deliberately base-only until its commit/abandon
++// protocol is implemented. Existing satellite imports remain shared.
++const BASE_ONLY: string[] = ['useParentMemo'];
+ 
+ const baseBundle = resolve(__dirname, '../../../dist/lithent.mjs');
+ 
+@@ -45,11 +48,17 @@ describe('public export surface', () => {
+     );
+ 
+     const expected = [
+-      ...Object.keys(baseCore).filter(name => name !== 'default'),
++      ...Object.keys(baseCore).filter(
++        name => name !== 'default' && !BASE_ONLY.includes(name)
++      ),
+       ...CONCURRENT_ONLY,
+     ].sort();
+ 
+     expect(Object.keys(concurrentCore).sort()).toEqual(expected);
++    for (const name of BASE_ONLY) {
++      expect(typeof baseCore[name]).toBe('function');
++      expect(name in concurrentCore).toBe(false);
++    }
+   });
+ 
+   it('exports every name as something defined', () => {
+diff --git a/src/diff.ts b/src/diff.ts
+index e879dd5..4bed136 100644
+--- a/src/diff.ts
++++ b/src/diff.ts
+@@ -14,13 +14,15 @@ import {
+ 
+ import { runUnmountQueueFromWDom } from '@/hook/internal/unmount';
+ import { keys, isEnumerableProp } from '@/utils';
++import { invalidateParentMemo, skipParentUpdate } from '@/hook/useParentMemo';
+ 
+ /**
+  * The starting point of the diffing process between the original virtual DOM and the new virtual DOM for re-rendering.
+  */
+ export const makeNewWDomTree = (
+   newWDom: WDom | TagFunctionResolver,
+-  originalWDom?: WDom
++  originalWDom?: WDom,
++  selfUpdate = false
+ ) => {
+   // Already drawn or taken by a diff (it has nr, 'N' once drawn): the node
+   // belongs to another place, so this place draws a copy. The same node in the same place is still left
+@@ -35,7 +37,8 @@ export const makeNewWDomTree = (
+     newWDom,
+     !!originalWDom &&
+       checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+-    originalWDom
++    originalWDom,
++    selfUpdate
+   );
+ };
+ 
+@@ -45,9 +48,10 @@ export const makeNewWDomTree = (
+ const remakeNewWDom = (
+   newWDom: WDom | TagFunctionResolver,
+   isSameType: boolean,
+-  originalWDom?: WDom
++  originalWDom?: WDom,
++  selfUpdate = false
+ ) => {
+-  const remakeWDom = generalize(newWDom, isSameType, originalWDom);
++  const remakeWDom = generalize(newWDom, isSameType, originalWDom, selfUpdate);
+   const needRerender = addReRenderTypeProperty(
+     remakeWDom,
+     isSameType,
+@@ -157,10 +161,17 @@ const syncResolverProps = (props: Props, infoProps: Props) => {
+  * It is crucial that props and children references remain stable as nodes update—many ancestors/closures share these arrays,
+  * so mutate the existing arrays instead of replacing their references.
+  */
+-const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
++const runUpdate = (
++  vDom: WDom,
++  infoVdom: TagFunctionResolver,
++  selfUpdate: boolean
++) => {
+   const { compProps: props, compChild: children } = vDom;
+   const { props: infoProps, children: infoChidren } = infoVdom;
+ 
++  const skip = !selfUpdate && skipParentUpdate(vDom, infoVdom);
++  if (!skip) invalidateParentMemo(vDom.compKey);
++
+   if (props) {
+     syncResolverProps(props, infoProps);
+   }
+@@ -177,7 +188,7 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
+     children.splice(0, children.length, ...infoChidren);
+   }
+ 
+-  return (vDom.reRender && vDom.reRender()) as WDom;
++  return skip ? vDom : ((vDom.reRender && vDom.reRender()) as WDom);
+ };
+ 
+ /**
+@@ -186,11 +197,12 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
+ const generalize = (
+   newWDom: WDom | TagFunctionResolver,
+   isSameType: boolean,
+-  originalWDom?: WDom
++  originalWDom?: WDom,
++  selfUpdate = false
+ ): WDom => {
+   return checkCustemComponentFunction(newWDom)
+     ? isSameType && originalWDom
+-      ? runUpdate(originalWDom, newWDom)
++      ? runUpdate(originalWDom, newWDom, selfUpdate)
+       : // Resolved before (children a component draws again somewhere else):
+         // the first instance owns its props, which are also its key, so the
+         // new instance is made from a copy.
+diff --git a/src/index.ts b/src/index.ts
+index 82fc412..d9f1382 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -17,6 +17,7 @@ export { mountReadyCallback } from '@/hook/mountReadyCallback';
+ export { updateCallback } from '@/hook/updateCallback';
+ export { ref, nextTick } from '@/hook/ref';
+ export { useRenew } from '@/hook/useRenew';
++export { useParentMemo } from '@/hook/useParentMemo';
+ 
+ export type {
+   WDom,
+diff --git a/src/render.ts b/src/render.ts
+index 5d9163c..21d801f 100644
+--- a/src/render.ts
++++ b/src/render.ts
+@@ -21,6 +21,10 @@ import {
+   makeParentGetter,
+ } from '@/utils';
+ import { cloneWDom } from '@/wDom';
++import {
++  visitParentMemoOutput,
++  withParentMemoWork,
++} from '@/hook/useParentMemo';
+ 
+ const DF = () => new DocumentFragment();
+ 
+@@ -43,27 +47,28 @@ export const render = (
+   wrapElement: HTMLElement | null,
+   afterElement?: HTMLElement | null,
+   isHydration?: boolean
+-) => {
+-  wDom.isRoot = true;
+-  wrapElement = wrapElement || document.body;
+-  wDom.we = wrapElement;
++) =>
++  withParentMemoWork(() => {
++    wDom.isRoot = true;
++    wrapElement = wrapElement || document.body;
++    wDom.we = wrapElement;
+ 
+-  const Dom = wDomToDom(wDom, isHydration);
++    const Dom = wDomToDom(wDom, isHydration);
+ 
+-  wDom.ae = afterElement as HTMLElement;
+-  if (afterElement || !isHydration) {
+-    insertRoot(wrapElement, Dom, afterElement);
+-  }
++    wDom.ae = afterElement as HTMLElement;
++    if (afterElement || !isHydration) {
++      insertRoot(wrapElement, Dom, afterElement);
++    }
+ 
+-  execMountedQueue();
++    execMountedQueue();
+ 
+-  return () => {
+-    const compData = componentMap.get(wDom.compProps as Props);
+-    const comp = (compData && compData.vd.value) || wDom;
+-    runUnmountQueueFromWDom(comp);
+-    rootDelete(comp);
+-  };
+-};
++    return () => {
++      const compData = componentMap.get(wDom.compProps as Props);
++      const comp = (compData && compData.vd.value) || wDom;
++      runUnmountQueueFromWDom(comp);
++      rootDelete(comp);
++    };
++  });
+ 
+ const rootDelete = (newWDom: WDom) =>
+   deleteRealDom(newWDom, newWDom.we as HTMLElement);
+@@ -473,6 +478,7 @@ export const wDomUpdate = (newWDomTree: WDom) => {
+   const { nr: needRerender } = newWDomTree;
+ 
+   if (needRerender && needRerender !== 'N') {
++    visitParentMemoOutput(newWDomTree);
+     renderHandlers[needRerender](newWDomTree);
+     clearDiffMeta(newWDomTree);
+   }
+@@ -603,6 +609,7 @@ const setAttr = (k: string, el: HTMLElement, v: string) =>
+     : el.setAttribute(k, v);
+ 
+ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
++  visitParentMemoOutput(wDom);
+   let element;
+   const { type, tag, text, props, children = [] } = wDom;
+   const isVirtualType = checkVirtualType(type);
+diff --git a/src/wDom.ts b/src/wDom.ts
+index 920ed04..18a9a69 100644
+--- a/src/wDom.ts
++++ b/src/wDom.ts
+@@ -24,6 +24,14 @@ import {
+ } from '@/utils/universalRef';
+ import { bindRedraw, componentUpdate } from '@/utils/redraw';
+ import { runUpdateCallback } from '@/hook/updateCallback';
++import {
++  beginParentMemoOutput,
++  forgetParentMemo,
++  invalidateParentMemo,
++  stageParentMemoOutput,
++  withParentMemoSetup,
++  withParentMemoWork,
++} from '@/hook/useParentMemo';
+ import {
+   checkFragmentFunction,
+   checkCustemComponentFunction,
+@@ -135,42 +143,43 @@ export const replaceWDom = (
+   props: Props,
+   children: WDom[],
+   originalWDom: WDom
+-) => {
+-  if (originalWDom.il) {
+-    return;
+-  }
+-  needDiffRef.value = true;
++) =>
++  withParentMemoWork(() => {
++    if (originalWDom.il) {
++      return;
++    }
++    needDiffRef.value = true;
+ 
+-  let newWDomTree: WDom;
+-  try {
+-    const newWDom = makeWDomResolver(tag, props, children);
+-    newWDomTree = makeNewWDomTree(newWDom, originalWDom);
+-    // NOTE: we/ae are short for wrapElement/afterElement
+-    const { isRoot, getParent, we, ae } = originalWDom;
++    let newWDomTree: WDom;
++    try {
++      const newWDom = makeWDomResolver(tag, props, children);
++      newWDomTree = makeNewWDomTree(newWDom, originalWDom, true);
++      // NOTE: we/ae are short for wrapElement/afterElement
++      const { isRoot, getParent, we, ae } = originalWDom;
+ 
+-    newWDomTree.getParent = getParent;
++      newWDomTree.getParent = getParent;
+ 
+-    if (!isRoot && getParent) {
+-      const parent = getParent();
+-      const brothers = (parent && parent.children) || [];
+-      const index = brothers.indexOf(originalWDom);
++      if (!isRoot && getParent) {
++        const parent = getParent();
++        const brothers = (parent && parent.children) || [];
++        const index = brothers.indexOf(originalWDom);
+ 
+-      if (index !== -1) {
+-        brothers.splice(index, 1, newWDomTree);
+-      }
++        if (index !== -1) {
++          brothers.splice(index, 1, newWDomTree);
++        }
+ 
+-      syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
+-    } else {
+-      newWDomTree.isRoot = true;
+-      newWDomTree.we = we;
+-      newWDomTree.ae = ae;
++        syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
++      } else {
++        newWDomTree.isRoot = true;
++        newWDomTree.we = we;
++        newWDomTree.ae = ae;
++      }
++    } finally {
++      needDiffRef.value = false;
+     }
+-  } finally {
+-    needDiffRef.value = false;
+-  }
+ 
+-  wDomUpdate(newWDomTree);
+-};
++    wDomUpdate(newWDomTree);
++  });
+ 
+ // ============================================================================
+ // Mid-Level - Virtual DOM Node Creation (Intermediate abstraction level)
+@@ -267,58 +276,61 @@ const createComponentResolver = (
+   props: Props,
+   wrappedChildren: WDom[]
+ ) => {
+-  return (compKey = props) => {
+-    // Diff mode sets needDiffRef to true so h()/makeNode return a resolver
+-    // placeholder. During actual resolution we must force a real WDom tree,
+-    // otherwise nested components leave only resolvers (no getParent/children)
+-    // and CSR renders a blank area. Temporarily drop needDiffRef, then restore.
+-    // Regression tests: src/tests/core-composedRenew.test.tsx,
+-    // src/tests/core-component-remount.test.tsx
+-    const prevNeedDiff = needDiffRef.value;
+-    const previousKey = compKeyRef.value;
+-    needDiffRef.value = false;
+-    try {
+-      initMountHookState(compKey, tag);
+-
+-      const initialComponent = tag(props, wrappedChildren);
+-
+-      let componentMaker: (nextProps: Props) => MiddleStateWDom;
+-
+-      if (typeof initialComponent === 'function') {
+-        const component = initialComponent;
+-        // Check if component is created with lmount (no renew parameter)
+-        // TypeScript cannot infer that component is LComponent when has() returns true,
+-        // because WeakSet.has() is a runtime check that doesn't narrow types.
+-        // We use 'as any' since the runtime check guarantees type safety.
+-        componentMaker = lmountComponentSet.has(component)
+-          ? (component as any)(props, wrappedChildren)
+-          : component(componentUpdate(compKey), props, wrappedChildren);
+-      } else {
+-        // For components that directly return a VDom, recreate it each render.
+-        // The first call already rendered this stateless component. Repeating it
+-        // creates orphan child instances and can register hooks under a child's key.
+-        let firstRender = true;
+-        componentMaker = (nextProps: Props) => {
+-          if (firstRender) {
+-            firstRender = false;
+-            return initialComponent as MiddleStateWDom;
++  return (compKey = props) =>
++    withParentMemoWork(() => {
++      // Diff mode sets needDiffRef to true so h()/makeNode return a resolver
++      // placeholder. During actual resolution we must force a real WDom tree,
++      // otherwise nested components leave only resolvers (no getParent/children)
++      // and CSR renders a blank area. Temporarily drop needDiffRef, then restore.
++      // Regression tests: src/tests/core-composedRenew.test.tsx,
++      // src/tests/core-component-remount.test.tsx
++      const prevNeedDiff = needDiffRef.value;
++      const previousKey = compKeyRef.value;
++      needDiffRef.value = false;
++      try {
++        initMountHookState(compKey, tag);
++
++        const componentMaker = withParentMemoSetup(compKey, () => {
++          const initialComponent = tag(props, wrappedChildren);
++
++          if (typeof initialComponent === 'function') {
++            const component = initialComponent;
++            // Check if component is created with lmount (no renew parameter)
++            // TypeScript cannot infer that component is LComponent when has() returns true,
++            // because WeakSet.has() is a runtime check that doesn't narrow types.
++            // We use 'as any' since the runtime check guarantees type safety.
++            return lmountComponentSet.has(component)
++              ? (component as any)(props, wrappedChildren)
++              : component(componentUpdate(compKey), props, wrappedChildren);
+           }
+-          return tag(nextProps, wrappedChildren) as MiddleStateWDom;
+-        };
++          // For components that directly return a VDom, recreate it each render.
++          // The first call already rendered this stateless component. Repeating it
++          // creates orphan child instances and can register hooks under a child's key.
++          let firstRender = true;
++          return (nextProps: Props) => {
++            if (firstRender) {
++              firstRender = false;
++              return initialComponent as MiddleStateWDom;
++            }
++            return tag(nextProps, wrappedChildren) as MiddleStateWDom;
++          };
++        });
++
++        return makeCustomNode(
++          componentMaker,
++          compKey,
++          tag,
++          props,
++          wrappedChildren
++        );
++      } catch (error) {
++        forgetParentMemo(compKey);
++        throw error;
++      } finally {
++        compKeyRef.value = previousKey;
++        needDiffRef.value = prevNeedDiff;
+       }
+-
+-      return makeCustomNode(
+-        componentMaker,
+-        compKey,
+-        tag,
+-        props,
+-        wrappedChildren
+-      );
+-    } finally {
+-      compKeyRef.value = previousKey;
+-      needDiffRef.value = prevNeedDiff;
+-    }
+-  };
++    });
+ };
+ 
+ /**
+@@ -379,6 +391,7 @@ const makeCustomNode = (
+   children: WDom[]
+ ) => {
+   const wrappedComponentMaker = wrapComponentMaker(componentMaker);
++  const memoOutput = beginParentMemoOutput(compKey, props, children);
+   const customNode = wrappedComponentMaker(props);
+   const reRender = makeReRender(
+     wrappedComponentMaker,
+@@ -389,6 +402,7 @@ const makeCustomNode = (
+   );
+ 
+   addComponentProps(customNode, compKey, tag, props, children, reRender);
++  stageParentMemoOutput(customNode, memoOutput);
+   bindRedraw(compKey, wDom =>
+     replaceWDom(
+       tag,
+@@ -414,10 +428,13 @@ const makeReRender = (
+     const previousKey = compKeyRef.value;
+     try {
+       initUpdateHookState(compKey);
++      invalidateParentMemo(compKey);
+       runUpdateCallback();
+ 
++      const memoOutput = beginParentMemoOutput(compKey, props, children);
+       const customNode = componentMaker(props);
+       addComponentProps(customNode, compKey, tag, props, children, reRender);
++      stageParentMemoOutput(customNode, memoOutput);
+ 
+       return customNode;
+     } finally {
+diff --git a/src/hook/useParentMemo.ts b/src/hook/useParentMemo.ts
+new file mode 100644
+index 0000000..4a1158f
+--- /dev/null
++++ b/src/hook/useParentMemo.ts
+@@ -0,0 +1,237 @@
++import type {
++  ComponentInfo,
++  CompKey,
++  Props,
++  TagFunctionResolver,
++  WDom,
++} from '@/types';
++import { componentMap, getCurrentComponent } from '@/utils/universalRef';
++
++type Snapshot = { keys: string[]; deps: unknown[] };
++type Memo = {
++  dependencies: (props: Props) => readonly unknown[];
++  version: number;
++  snapshot?: Snapshot;
++  pending?: Snapshot;
++};
++type Output = { component: ComponentInfo; memo: Memo; version: number };
++type Work = {
++  touched?: Map<Memo, number>;
++  outputs?: Map<WDom, Output>;
++  created?: Set<ComponentInfo>;
++};
++
++const memos = new WeakMap<ComponentInfo, Memo>();
++const outputs = new WeakMap<WDom, Output>();
++let setup: ComponentInfo | undefined;
++let work: Work | undefined;
++
++const invalidate = (memo: Memo) => {
++  memo.version++;
++  memo.snapshot = memo.pending = undefined;
++};
++const touch = (memo: Memo) => {
++  if (work) (work.touched ||= new Map()).set(memo, memo.version);
++};
++const forget = (component: ComponentInfo) => {
++  const memo = memos.get(component);
++  if (memo) {
++    invalidate(memo);
++    memo.dependencies = () => [];
++    memos.delete(component);
++  }
++};
++
++/**
++ * Opt into skipping parent-driven renders with unchanged declared inputs.
++ * Call once during mount/lmount setup. Self renew always renders. Nonempty
++ * slots and unsupported props fall back to the ordinary component path.
++ */
++export const useParentMemo = <P extends object = Props>(
++  dependencies: (nextProps: Readonly<P>) => readonly unknown[]
++): void => {
++  const component = getCurrentComponent();
++  if (!component || setup !== component || memos.has(component)) {
++    throw new Error('useParentMemo must be called once during component setup');
++  }
++  if (typeof dependencies !== 'function') {
++    throw new TypeError('useParentMemo requires a dependency selector');
++  }
++  memos.set(component, {
++    dependencies: dependencies as Memo['dependencies'],
++    version: 0,
++  });
++  if (work) (work.created ||= new Set()).add(component);
++  // Clear even if a later user cleanup throws, including manual map mode.
++  component.umts.unshift(() => forget(component));
++};
++
++export const withParentMemoSetup = <T>(key: CompKey, action: () => T): T => {
++  const previous = setup;
++  setup = componentMap.get(key);
++  try {
++    return action();
++  } finally {
++    setup = previous;
++  }
++};
++
++export const forgetParentMemo = (key: CompKey) => {
++  const component = componentMap.get(key);
++  if (component) forget(component);
++};
++
++// Inspect descriptors without invoking accessors. Exotic inputs keep the
++// baseline path; this is not a new props/slot mutation protocol.
++const propKeys = (props: Props): string[] | undefined => {
++  if (
++    !props ||
++    Object.getPrototypeOf(props) !== Object.prototype ||
++    !Object.isExtensible(props)
++  ) {
++    return;
++  }
++  const descriptors = Object.getOwnPropertyDescriptors(props);
++  for (const key of Reflect.ownKeys(descriptors)) {
++    const descriptor = descriptors[key as string];
++    if (
++      descriptor.enumerable &&
++      (typeof key !== 'string' ||
++        !('value' in descriptor) ||
++        !descriptor.writable ||
++        !descriptor.configurable)
++    ) {
++      return;
++    }
++  }
++  return Object.keys(props);
++};
++
++const snapshot = (
++  memo: Memo,
++  props: Props,
++  children: WDom[]
++): Snapshot | undefined => {
++  if (children.length) return;
++  const keys = propKeys(props);
++  if (!keys) return;
++  const deps = memo.dependencies(props);
++  if (!Array.isArray(deps)) {
++    throw new TypeError('useParentMemo selector must return an array');
++  }
++  return { keys, deps: [...deps] };
++};
++
++const sameKeys = (a: string[], b: string[]) =>
++  a.length === b.length && a.every((key, index) => key === b[index]);
++
++export const skipParentUpdate = (
++  node: WDom,
++  incoming: TagFunctionResolver
++): boolean => {
++  const component = node.compKey && componentMap.get(node.compKey);
++  const memo = component && memos.get(component);
++  if (!memo) return false;
++  touch(memo);
++  try {
++    const before = memo.snapshot;
++    const heldKeys = propKeys(node.compProps as Props);
++    if (!before || !heldKeys || node.compChild?.length) return false;
++    const next = snapshot(memo, incoming.props, incoming.children);
++    return !!(
++      next &&
++      sameKeys(before.keys, heldKeys) &&
++      sameKeys(before.keys, next.keys) &&
++      before.deps.length === next.deps.length &&
++      before.deps.every((value, index) => Object.is(value, next.deps[index]))
++    );
++  } catch (error) {
++    invalidate(memo);
++    throw error;
++  }
++};
++
++export const invalidateParentMemo = (key: CompKey | undefined) => {
++  const component = key && componentMap.get(key);
++  const memo = component && memos.get(component);
++  if (memo) {
++    invalidate(memo);
++    touch(memo);
++  }
++};
++
++// Runs after pre-update callbacks, before evaluating the component output.
++export const beginParentMemoOutput = (
++  key: CompKey,
++  props: Props,
++  children: WDom[]
++): Output | undefined => {
++  const component = componentMap.get(key);
++  const memo = component && memos.get(component);
++  if (!component || !memo) return;
++  invalidate(memo);
++  touch(memo);
++  memo.pending = snapshot(memo, props, children);
++  return { component, memo, version: memo.version };
++};
++
++export const stageParentMemoOutput = (
++  node: WDom,
++  output: Output | undefined
++) => {
++  if (output) outputs.set(node, output);
++};
++
++// Called by the base DOM renderer. Creating an eager h() tree does not count
++// as a successful mount, and a speculative output never becomes a cache hit.
++export const visitParentMemoOutput = (node: WDom) => {
++  const output = outputs.get(node);
++  if (output && work) {
++    touch(output.memo);
++    (work.outputs ||= new Map()).set(node, output);
++  }
++};
++
++/** Memo publication only: existing DOM/props mutations are not rolled back. */
++export const withParentMemoWork = <T>(action: () => T): T => {
++  const previous = work;
++  const current: Work = {};
++  work = current;
++  try {
++    const result = action();
++    if (previous) {
++      current.created?.forEach(component =>
++        (previous.created ||= new Set()).add(component)
++      );
++      current.touched?.forEach((version, memo) =>
++        (previous.touched ||= new Map()).set(memo, version)
++      );
++      current.outputs?.forEach((output, node) =>
++        (previous.outputs ||= new Map()).set(node, output)
++      );
++    } else {
++      current.outputs?.forEach(({ component, memo, version }, node) => {
++        if (
++          memo.version === version &&
++          memos.get(component) === memo &&
++          node.compKey &&
++          componentMap.get(node.compKey) === component &&
++          component.vd.value === node &&
++          !node.il
++        ) {
++          memo.snapshot = memo.pending;
++          memo.pending = undefined;
++        }
++      });
++    }
++    return result;
++  } catch (error) {
++    current.touched?.forEach((version, memo) => {
++      if (memo.version === version) invalidate(memo);
++    });
++    current.created?.forEach(forget);
++    throw error;
++  } finally {
++    work = previous;
++  }
++};

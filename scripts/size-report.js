@@ -1,9 +1,9 @@
 /**
  * RC-4 size gate.
  *
- * The base core budget is a REGRESSION GUARD, not a target: `src/` is frozen
- * for the concurrent work (P1), so any movement there means something leaked
- * across the boundary. The concurrent budget is staged and rises per phase
+ * The base core keeps its 4,800B reference plus measured layout, render-path
+ * and cleanup-recovery allowances. DC-23 removed the DC-22 event allowance.
+ * The concurrent budget is staged and rises per phase
  * (REQUIREMENTS §8) — raise `CONCURRENT_BUDGET` only when entering the phase
  * that is allowed to spend it.
  *
@@ -14,7 +14,18 @@ import { readFileSync } from 'fs';
 import { brotliCompressSync, gzipSync } from 'zlib';
 
 /** Budgets in brotli bytes. Baseline at f3921cc: base = 4,734. */
-const BASE_BUDGET = 4800;
+const BASE_REFERENCE = 4800;
+const BASE_LAYOUT_ALLOWANCE = 24; // DC-18 compact13; no extra headroom.
+// Keyed list and cache-hit render paths (POSITIONAL_KEYS_RESULTS.md): the
+// measured growth, within the 150B the owner allowed over 4,817B.
+const BASE_RENDER_ALLOWANCE = 101;
+// Cleanup failures no longer interrupt teardown (docs/reliability, DC-10).
+const BASE_CLEANUP_ALLOWANCE = 28;
+const BASE_BUDGET =
+  BASE_REFERENCE +
+  BASE_LAYOUT_ALLOWANCE +
+  BASE_RENDER_ALLOWANCE +
+  BASE_CLEANUP_ALLOWANCE;
 const CONCURRENT_PHASE = 'T2 (fiber work loop)';
 const CONCURRENT_BUDGET = 9000; // Phase 0 4800, T1 5400, T1.5 6200; T2 (D15)
 /** lithent/element RC-3 (docs/element/REQUIREMENTS.md §4). */
@@ -22,7 +33,7 @@ const ELEMENT_BUDGET = 1000;
 
 const targets = [
   {
-    label: 'lithent (base, frozen)',
+    label: `lithent (base; ${BASE_REFERENCE}B reference + ${BASE_LAYOUT_ALLOWANCE}B DC-18 + ${BASE_RENDER_ALLOWANCE}B render paths + ${BASE_CLEANUP_ALLOWANCE}B cleanup)`,
     file: 'dist/lithent.umd.js',
     budget: BASE_BUDGET,
   },
@@ -47,6 +58,7 @@ for (const { label, file, budget } of targets) {
     bytes = readFileSync(file);
   } catch {
     console.log(`${label}\n  ${file} — not built`);
+    failed = true;
     continue;
   }
 
@@ -61,6 +73,6 @@ for (const { label, file, budget } of targets) {
 }
 
 if (failed && !reportOnly) {
-  console.error('\nRC-4: brotli budget exceeded.');
+  console.error('\nRC-4: required build missing or brotli budget exceeded.');
   process.exit(1);
 }

@@ -44,14 +44,17 @@ const assert = (condition, message) => {
 };
 
 /** Every `exports` target a consumer can reach must exist on disk. */
-const exportTargets = pkg =>
-  Object.entries(pkg.exports ?? {}).flatMap(([subpath, conditions]) =>
-    Object.entries(conditions).map(([condition, file]) => ({
-      subpath,
-      condition,
-      file,
-    }))
+const exportTargets = pkg => {
+  const visit = (value, subpath, condition = '') =>
+    typeof value === 'string'
+      ? [{ subpath, condition, file: value }]
+      : Object.entries(value).flatMap(([key, target]) =>
+          visit(target, subpath, condition ? `${condition}.${key}` : key)
+        );
+  return Object.entries(pkg.exports ?? {}).flatMap(([subpath, value]) =>
+    visit(value, subpath)
   );
+};
 
 // ---------------------------------------------------------------------------
 
@@ -148,7 +151,7 @@ check('A-9', 'emitted declarations carry no unresolved "@/" specifiers', () => {
       const full = join(dir, name);
       return statSync(full).isDirectory()
         ? walk(full)
-        : full.endsWith('.d.ts')
+        : /\.d\.(ts|cts)$/.test(full)
           ? [full]
           : [];
     });
@@ -169,8 +172,11 @@ check('A-9', 'emitted declarations carry no unresolved "@/" specifiers', () => {
 
 check('A-9', 'a consumer type-checks against the shipped declarations', () => {
   const dir = mkdtempSync(join(tmpdir(), 'lithent-concurrent-types-'));
-  const corePath = resolve(pkgDir, concurrentPkg.exports['.'].types);
-  const helperPath = resolve(pkgDir, concurrentPkg.exports['./helper'].types);
+  const corePath = resolve(pkgDir, concurrentPkg.exports['.'].import.types);
+  const helperPath = resolve(
+    pkgDir,
+    concurrentPkg.exports['./helper'].import.types
+  );
 
   writeFileSync(
     join(dir, 'consumer.ts'),
@@ -246,10 +252,10 @@ check(
           baseUrl: dir,
           paths: {
             'lithent-concurrent': [
-              withoutExt(concurrentPkg.exports['.'].types),
+              withoutExt(concurrentPkg.exports['.'].import.types),
             ],
             'lithent-concurrent-helper': [
-              withoutExt(concurrentPkg.exports['./helper'].types),
+              withoutExt(concurrentPkg.exports['./helper'].import.types),
             ],
           },
         },

@@ -2,36 +2,52 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import dts from 'vite-plugin-dts';
+import { emitDeclarationFormats } from '../scripts/emit-declaration-formats.mjs';
 
 export default defineConfig({
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
+  },
   plugins: [
-    checker({
-      typescript: true,
-      eslint: {
-        useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
-    }),
+    !process.env.VITEST &&
+      checker({
+        typescript: true,
+        eslint: {
+          useFlatConfig: true,
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
+      }),
     dts({
-      outputDir: ['dist'],
+      outDir: ['dist'],
+      afterBuild: () =>
+        emitDeclarationFormats(resolve(import.meta.dirname, 'dist')),
     }),
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(import.meta.dirname, './src'),
     },
   },
   build: {
+    // Preserve the browser target used before the Vite 8 migration.
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     emptyOutDir: false,
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      formats: ['es', 'umd', 'cjs'],
+      entry: resolve(import.meta.dirname, 'src/index.ts'),
       name: 'lithentTag',
       fileName: format => {
+        if (format === 'cjs') return 'lithentTag.cjs';
         return format === 'umd' ? 'lithentTag.umd.js' : 'lithentTag.mjs';
       },
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['lithent'],
       output: {
         globals: {

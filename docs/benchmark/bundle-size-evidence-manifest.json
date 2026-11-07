@@ -1,0 +1,523 @@
+{
+  "archive": "bundle-size-evidence.tar.gz",
+  "bytes": 1630274,
+  "sha256": "1b7f9ff9969ba0733de5438ce9dbd5b1931699b21ae8ae5b651bd02f7d02b11e",
+  "entries": {
+    "repo/docs/benchmark/BUNDLE_SIZE_RESULTS.md": {
+      "bytes": 6333,
+      "sha256": "4d68c2afcb1fcd6e15779d199a7883fc48a81608e47eed2785f1f36c3c2f2d69"
+    },
+    "repo/docs/performance-improvement/BOTTLENECK_ANALYSIS.md": {
+      "bytes": 8021,
+      "sha256": "5735bbb99db26b74606071b97c79c42514fd8fb04622164cb5d8ebdf8b1908e8"
+    },
+    "repo/docs/performance-improvement/CODE_WALKTHROUGH.md": {
+      "bytes": 23662,
+      "sha256": "773f3394276ee835b1877f299acfb1a8df839a1404baaf115dc2a8bab38ad2c4"
+    },
+    "repo/docs/performance-improvement/DESIGN.md": {
+      "bytes": 83919,
+      "sha256": "87e917d99bc8943e14a7d8d1c82dd22ee802db19ce63ac351d11680b4fa9e0d5"
+    },
+    "repo/docs/performance-improvement/IMPLEMENT.md": {
+      "bytes": 57117,
+      "sha256": "0b8135f0447397b9a363d4a5fe0d12fb90d41c9582243ffadb5e23a34167a2a8"
+    },
+    "repo/docs/performance-improvement/MANUAL_TEST_CHECKLIST.md": {
+      "bytes": 36476,
+      "sha256": "74c7af8f8ff3827d7c49835d448e5fdf0c3d9590d7488f7719654a3a0204858f"
+    },
+    "repo/docs/performance-improvement/REQUIREMENTS.md": {
+      "bytes": 48272,
+      "sha256": "6ff31efc35b5c1c3ef2c8a992a6992250138d015aaf1087d418d5fe1d937ceaf"
+    },
+    "repo/experiments/native-events/README.md": {
+      "bytes": 3395,
+      "sha256": "dd0f5ad46643a0b8583c0cb92398c5355b6754e0dcd6572d1251b4a10db59247"
+    },
+    "repo/experiments/native-events/size-build.mjs": {
+      "bytes": 4564,
+      "sha256": "23afb48cc7f9adb0670d3557fb429be5e548d13c10fd48ffc0a8b39e7bce0f07"
+    },
+    "repo/experiments/native-events/size-proof.mjs": {
+      "bytes": 5437,
+      "sha256": "ff42995b8d224ec199ec8e4c0a3d6a73a1c445de4416eb90fbd90bc07005c4ae"
+    },
+    "repo/experiments/native-events/size-scan.mjs": {
+      "bytes": 4356,
+      "sha256": "85f76b0b531b6983b705bc54a2e18cd8584876200654f74801bb76886bf20046"
+    },
+    "repo/lithentConcurrent/vite.config.js": {
+      "bytes": 995,
+      "sha256": "2d84468cb8487054d5f666a8bd1fa7258f83d68af587d195f61a03d968cad16b"
+    },
+    "repo/vite.config.js": {
+      "bytes": 2584,
+      "sha256": "769d90442dde5941c2937fe1894b0838533f01c3cf29656d0a6598aebb7d98e7"
+    },
+    "run/alphabet-0-hidden.js": {
+      "bytes": 12719,
+      "sha256": "2b1c45350530822ea1a23f918d9c43fa3c883037943b7dd9249ca6de4114f56a"
+    },
+    "run/alphabet-0.js": {
+      "bytes": 12759,
+      "sha256": "ddd2ca1abed72f4676a5ce1f3c9f30038be8af847777785ed45cd0880533de9c"
+    },
+    "run/alphabet-1-hidden.js": {
+      "bytes": 12719,
+      "sha256": "e9baf8aed391bce26cd1de3f66152bb25d32fb385698a5a10d6f9d63932b35d0"
+    },
+    "run/alphabet-1.js": {
+      "bytes": 12759,
+      "sha256": "161c3f622067ed4d73bc37d4c90cba1dc1484faf2deaeb4c12780ef69f0ff40d"
+    },
+    "run/alphabet-10-hidden.js": {
+      "bytes": 12719,
+      "sha256": "b88095d738a8dba64459bf991118df3c7ce3060bd5f7f0ad9203558cce0aee7a"
+    },
+    "run/alphabet-10.js": {
+      "bytes": 12759,
+      "sha256": "b7795ec0f4346e8318f4814b24b17f76a654d48ba9006c1e07618921abf60c03"
+    },
+    "run/alphabet-11-hidden.js": {
+      "bytes": 12719,
+      "sha256": "20bfd070a5fd4c98b7473e09c77e261ce1ce1ac7f288864c94ac56f96052e491"
+    },
+    "run/alphabet-11.js": {
+      "bytes": 12759,
+      "sha256": "fb8c11bcf015c174fce666008db01a3d85a28573ba93eb639e8c34aaccbdad37"
+    },
+    "run/alphabet-12-hidden.js": {
+      "bytes": 12719,
+      "sha256": "5b750c13448e1e4e09b199931f57a053b5403d7094a8472ec85cbf47a54dd220"
+    },
+    "run/alphabet-12.js": {
+      "bytes": 12759,
+      "sha256": "10c16a6909a8031da6abbc83a25fc94e4375cece6cdd76cd63a974c3697710b6"
+    },
+    "run/alphabet-13-hidden.js": {
+      "bytes": 12719,
+      "sha256": "a550998695985ef7afbf8eb45e5a6c22ae02e0734214fbea5eebfdcbe7e54a2a"
+    },
+    "run/alphabet-13.js": {
+      "bytes": 12759,
+      "sha256": "9418e2a9e2445b63b21b483f7bbcc750dc6369ad1999715a15c9ff36224fb354"
+    },
+    "run/alphabet-14-hidden.js": {
+      "bytes": 12719,
+      "sha256": "ed9fcc9b8e861a5d9647bfd1326ed686b60210e122496353ba30e4924e941d28"
+    },
+    "run/alphabet-14.js": {
+      "bytes": 12759,
+      "sha256": "e00cc889324f67890e676abbe2ec5950c0d49834df5b3b6f9369176844ecd54e"
+    },
+    "run/alphabet-15-hidden.js": {
+      "bytes": 12719,
+      "sha256": "2bed5031639910d42469bf2eaae779108006531b9a506ef83a3bd0e43d74e5a5"
+    },
+    "run/alphabet-15.js": {
+      "bytes": 12759,
+      "sha256": "f362fea058d3e3de0c60afca7747a1fa300a9a61c091832bc12d1b3834f750ee"
+    },
+    "run/alphabet-2-hidden.js": {
+      "bytes": 12719,
+      "sha256": "b64f9450572650dd5bd885d86bd6543de8f06bea0e959e31ea39cccb415219d6"
+    },
+    "run/alphabet-2.js": {
+      "bytes": 12759,
+      "sha256": "983bb63e782410e70257de0656b22455f3f5b9b147c29e10a0f3ae6eed395c70"
+    },
+    "run/alphabet-3-hidden.js": {
+      "bytes": 12719,
+      "sha256": "ee080da01f4e1e407711f1805be526f4dd6bbd985b7cdbae1f3405a90b83c69d"
+    },
+    "run/alphabet-3.js": {
+      "bytes": 12759,
+      "sha256": "f6fd35368d7c66027ae4c969c672a2b318eefe93c27d3d862f288b599779ba48"
+    },
+    "run/alphabet-4-hidden.js": {
+      "bytes": 12719,
+      "sha256": "ab4f5de6d8f4ddbb467a259b8d7b24cbc92fd007b4bc67c7a79afeaece4200cf"
+    },
+    "run/alphabet-4.js": {
+      "bytes": 12759,
+      "sha256": "c1ff60cf1052a4e55575fec0cc5ad9215b8fd1c2901b110cbfbf20e2f7f74317"
+    },
+    "run/alphabet-5-hidden.js": {
+      "bytes": 12719,
+      "sha256": "38e92d8d371d4d99ea7dc21e810485032a1d9c281e15fa6e328828d693b02af8"
+    },
+    "run/alphabet-5.js": {
+      "bytes": 12759,
+      "sha256": "5db3697fa2f043a701ea656c7c0893a74d8213e215e956c60f2c458007515610"
+    },
+    "run/alphabet-6-hidden.js": {
+      "bytes": 12719,
+      "sha256": "abb6f1f97488b7f328913110ec36304c1f187f07e601f3678adfd091cef51c57"
+    },
+    "run/alphabet-6.js": {
+      "bytes": 12759,
+      "sha256": "18a27616443523a72e99fca7a02ac2a0204002f4beba70f63603e8b28de56614"
+    },
+    "run/alphabet-7-hidden.js": {
+      "bytes": 12719,
+      "sha256": "128ce5b1b8d5a01999070352d161adcd6b6648d6d4a9311a64f9195402c6b5c2"
+    },
+    "run/alphabet-7.js": {
+      "bytes": 12759,
+      "sha256": "6199a19fc04b426787b386fc9507061c12228b19499cd93a0b86b38953008f85"
+    },
+    "run/alphabet-8-hidden.js": {
+      "bytes": 12719,
+      "sha256": "81e9ad70182432abb711b96c2454168f32cec7ec0dbeeb575da7cbc6e73cf817"
+    },
+    "run/alphabet-8.js": {
+      "bytes": 12759,
+      "sha256": "8dd2fba747dbaf4648852b8865832f640289fdd0624b1109c6d05607cc0fb401"
+    },
+    "run/alphabet-9-hidden.js": {
+      "bytes": 12719,
+      "sha256": "8b457a334d7ac3515e674d96ef628ad0b84122baa439c0f9af32b715198d53aa"
+    },
+    "run/alphabet-9.js": {
+      "bytes": 12759,
+      "sha256": "b8d98dea39c5d3a7f8ff4b838f17d437a08619ae2851adbe306d0c6dc8e8be6b"
+    },
+    "run/builds.json": {
+      "bytes": 14512,
+      "sha256": "4410d0fa73d7b51f47725011785a566f64ea7ae0f5978d9707ba5aed4b7784b4"
+    },
+    "run/builds/base/control/lithent.cjs": {
+      "bytes": 12606,
+      "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820"
+    },
+    "run/builds/base/control/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/control/lithent.mjs": {
+      "bytes": 18868,
+      "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e"
+    },
+    "run/builds/base/control/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/control/lithent.umd.js": {
+      "bytes": 12759,
+      "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+    },
+    "run/builds/base/control/lithent.umd.js.map": {
+      "bytes": 91378,
+      "sha256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce"
+    },
+    "run/builds/base/generated-es2015-hidden/lithent.cjs": {
+      "bytes": 12569,
+      "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408"
+    },
+    "run/builds/base/generated-es2015-hidden/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/generated-es2015-hidden/lithent.mjs": {
+      "bytes": 18831,
+      "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d"
+    },
+    "run/builds/base/generated-es2015-hidden/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/generated-es2015-hidden/lithent.umd.js": {
+      "bytes": 12719,
+      "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c"
+    },
+    "run/builds/base/generated-es2015-hidden/lithent.umd.js.map": {
+      "bytes": 91378,
+      "sha256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce"
+    },
+    "run/builds/base/generated-es2015/lithent.cjs": {
+      "bytes": 12606,
+      "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820"
+    },
+    "run/builds/base/generated-es2015/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/generated-es2015/lithent.mjs": {
+      "bytes": 18868,
+      "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e"
+    },
+    "run/builds/base/generated-es2015/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/generated-es2015/lithent.umd.js": {
+      "bytes": 12759,
+      "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+    },
+    "run/builds/base/generated-es2015/lithent.umd.js.map": {
+      "bytes": 91378,
+      "sha256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce"
+    },
+    "run/builds/base/hidden/lithent.cjs": {
+      "bytes": 12569,
+      "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408"
+    },
+    "run/builds/base/hidden/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/hidden/lithent.mjs": {
+      "bytes": 18831,
+      "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d"
+    },
+    "run/builds/base/hidden/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/hidden/lithent.umd.js": {
+      "bytes": 12719,
+      "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c"
+    },
+    "run/builds/base/hidden/lithent.umd.js.map": {
+      "bytes": 91378,
+      "sha256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce"
+    },
+    "run/builds/base/syntax-hidden/lithent.cjs": {
+      "bytes": 12569,
+      "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408"
+    },
+    "run/builds/base/syntax-hidden/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/syntax-hidden/lithent.mjs": {
+      "bytes": 18831,
+      "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d"
+    },
+    "run/builds/base/syntax-hidden/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/syntax-hidden/lithent.umd.js": {
+      "bytes": 12700,
+      "sha256": "0ce1b8a5535022a77464b9c92f7edb0498eb35efebf2725c2410912cd5f44417"
+    },
+    "run/builds/base/syntax-hidden/lithent.umd.js.map": {
+      "bytes": 91384,
+      "sha256": "17b904e04c6e54ee63db558040271a905c9aed64a1ac7e6ce94d5d27294b8658"
+    },
+    "run/builds/base/syntax-return-hidden/lithent.cjs": {
+      "bytes": 12569,
+      "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408"
+    },
+    "run/builds/base/syntax-return-hidden/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/syntax-return-hidden/lithent.mjs": {
+      "bytes": 18831,
+      "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d"
+    },
+    "run/builds/base/syntax-return-hidden/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/syntax-return-hidden/lithent.umd.js": {
+      "bytes": 12688,
+      "sha256": "a7c20b8bb058b801cd6016193bf93c235f3aa76702fa7452b43599f50ee4d951"
+    },
+    "run/builds/base/syntax-return-hidden/lithent.umd.js.map": {
+      "bytes": 91372,
+      "sha256": "49945dae2ea20d41d9d9f406ec022ca6b0fb74df7dbdd30abe85676017d4fd2a"
+    },
+    "run/builds/base/syntax-return/lithent.cjs": {
+      "bytes": 12606,
+      "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820"
+    },
+    "run/builds/base/syntax-return/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/syntax-return/lithent.mjs": {
+      "bytes": 18868,
+      "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e"
+    },
+    "run/builds/base/syntax-return/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/syntax-return/lithent.umd.js": {
+      "bytes": 12728,
+      "sha256": "0e1675c520481d3b7da760bc0f2fbeb81ad05bdb0e5a70bbb9e6510f139ac5c9"
+    },
+    "run/builds/base/syntax-return/lithent.umd.js.map": {
+      "bytes": 91372,
+      "sha256": "49945dae2ea20d41d9d9f406ec022ca6b0fb74df7dbdd30abe85676017d4fd2a"
+    },
+    "run/builds/base/syntax/lithent.cjs": {
+      "bytes": 12606,
+      "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820"
+    },
+    "run/builds/base/syntax/lithent.cjs.map": {
+      "bytes": 92677,
+      "sha256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2"
+    },
+    "run/builds/base/syntax/lithent.mjs": {
+      "bytes": 18868,
+      "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e"
+    },
+    "run/builds/base/syntax/lithent.mjs.map": {
+      "bytes": 94663,
+      "sha256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc"
+    },
+    "run/builds/base/syntax/lithent.umd.js": {
+      "bytes": 12740,
+      "sha256": "f342ba8f0ccca2f95a9a69bc159999fe434dd9b4e3e595ad1db2cda66fba8289"
+    },
+    "run/builds/base/syntax/lithent.umd.js.map": {
+      "bytes": 91384,
+      "sha256": "17b904e04c6e54ee63db558040271a905c9aed64a1ac7e6ce94d5d27294b8658"
+    },
+    "run/builds/concurrent/control/lithentConcurrent.cjs": {
+      "bytes": 18358,
+      "sha256": "218f069c7acaca3d490f7ab04395977dde6c14c07614d91abc96d0a6d7f3c4cb"
+    },
+    "run/builds/concurrent/control/lithentConcurrent.cjs.map": {
+      "bytes": 145664,
+      "sha256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a"
+    },
+    "run/builds/concurrent/control/lithentConcurrent.mjs": {
+      "bytes": 27645,
+      "sha256": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c"
+    },
+    "run/builds/concurrent/control/lithentConcurrent.mjs.map": {
+      "bytes": 148667,
+      "sha256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90"
+    },
+    "run/builds/concurrent/control/lithentConcurrent.umd.js": {
+      "bytes": 18419,
+      "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0"
+    },
+    "run/builds/concurrent/control/lithentConcurrent.umd.js.map": {
+      "bytes": 145636,
+      "sha256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64"
+    },
+    "run/builds/concurrent/generated-es2015-hidden/lithentConcurrent.cjs": {
+      "bytes": 18311,
+      "sha256": "264c59d5cdf3808995f5ec6a1b879bfe267517934bc17f75949b71e8c038d0e0"
+    },
+    "run/builds/concurrent/generated-es2015-hidden/lithentConcurrent.cjs.map": {
+      "bytes": 145664,
+      "sha256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a"
+    },
+    "run/builds/concurrent/generated-es2015-hidden/lithentConcurrent.mjs": {
+      "bytes": 27598,
+      "sha256": "2ef8a692e030526f76ad14bb6dcd71869ee6a7f1e594c8b0313a62d976f37be6"
+    },
+    "run/builds/concurrent/generated-es2015-hidden/lithentConcurrent.mjs.map": {
+      "bytes": 148667,
+      "sha256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90"
+    },
+    "run/builds/concurrent/generated-es2015-hidden/lithentConcurrent.umd.js": {
+      "bytes": 18369,
+      "sha256": "e95e6dcacd7cc978d2cdebd501a54837330859b1d226e7ce8b5cabebfeb52923"
+    },
+    "run/builds/concurrent/generated-es2015-hidden/lithentConcurrent.umd.js.map": {
+      "bytes": 145636,
+      "sha256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64"
+    },
+    "run/builds/concurrent/generated-es2015/lithentConcurrent.cjs": {
+      "bytes": 18358,
+      "sha256": "218f069c7acaca3d490f7ab04395977dde6c14c07614d91abc96d0a6d7f3c4cb"
+    },
+    "run/builds/concurrent/generated-es2015/lithentConcurrent.cjs.map": {
+      "bytes": 145664,
+      "sha256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a"
+    },
+    "run/builds/concurrent/generated-es2015/lithentConcurrent.mjs": {
+      "bytes": 27645,
+      "sha256": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c"
+    },
+    "run/builds/concurrent/generated-es2015/lithentConcurrent.mjs.map": {
+      "bytes": 148667,
+      "sha256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90"
+    },
+    "run/builds/concurrent/generated-es2015/lithentConcurrent.umd.js": {
+      "bytes": 18419,
+      "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0"
+    },
+    "run/builds/concurrent/generated-es2015/lithentConcurrent.umd.js.map": {
+      "bytes": 145636,
+      "sha256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64"
+    },
+    "run/builds/concurrent/hidden/lithentConcurrent.cjs": {
+      "bytes": 18311,
+      "sha256": "264c59d5cdf3808995f5ec6a1b879bfe267517934bc17f75949b71e8c038d0e0"
+    },
+    "run/builds/concurrent/hidden/lithentConcurrent.cjs.map": {
+      "bytes": 145664,
+      "sha256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a"
+    },
+    "run/builds/concurrent/hidden/lithentConcurrent.mjs": {
+      "bytes": 27598,
+      "sha256": "2ef8a692e030526f76ad14bb6dcd71869ee6a7f1e594c8b0313a62d976f37be6"
+    },
+    "run/builds/concurrent/hidden/lithentConcurrent.mjs.map": {
+      "bytes": 148667,
+      "sha256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90"
+    },
+    "run/builds/concurrent/hidden/lithentConcurrent.umd.js": {
+      "bytes": 18369,
+      "sha256": "e95e6dcacd7cc978d2cdebd501a54837330859b1d226e7ce8b5cabebfeb52923"
+    },
+    "run/builds/concurrent/hidden/lithentConcurrent.umd.js.map": {
+      "bytes": 145636,
+      "sha256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64"
+    },
+    "run/hidden-map.js": {
+      "bytes": 12719,
+      "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c"
+    },
+    "run/proof.json": {
+      "bytes": 6447,
+      "sha256": "353fa3226e13e877d1bf5dbdc35dd7cd5bc2a976dc1882a18bb892fbacc36e70"
+    },
+    "run/rename-lines-hidden.js": {
+      "bytes": 12719,
+      "sha256": "36b27a067abcf89be19ac1ebbf9dec93f0bb6e40f3c79d8b00b2604741ecdcd0"
+    },
+    "run/rename-lines.js": {
+      "bytes": 12759,
+      "sha256": "d93ea9219f5428c258172fca4db384ad9a86ebc052303f6c5d27b6e7a33ba482"
+    },
+    "run/rename-standard-hidden.js": {
+      "bytes": 12719,
+      "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c"
+    },
+    "run/rename-standard.js": {
+      "bytes": 12759,
+      "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d"
+    },
+    "run/scan.json": {
+      "bytes": 20198,
+      "sha256": "745611f05d55ff741c26c873220a58432e5d0890c57bd0901178590f606cd390"
+    },
+    "run/syntax-hidden.js": {
+      "bytes": 12700,
+      "sha256": "0ce1b8a5535022a77464b9c92f7edb0498eb35efebf2725c2410912cd5f44417"
+    },
+    "run/syntax-return-hidden.js": {
+      "bytes": 12688,
+      "sha256": "a7c20b8bb058b801cd6016193bf93c235f3aa76702fa7452b43599f50ee4d951"
+    },
+    "run/syntax-return.js": {
+      "bytes": 12728,
+      "sha256": "0e1675c520481d3b7da760bc0f2fbeb81ad05bdb0e5a70bbb9e6510f139ac5c9"
+    },
+    "run/syntax.js": {
+      "bytes": 12740,
+      "sha256": "f342ba8f0ccca2f95a9a69bc159999fe434dd9b4e3e595ad1db2cda66fba8289"
+    }
+  }
+}

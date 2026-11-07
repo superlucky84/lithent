@@ -1,0 +1,2727 @@
+{
+  "sourceSHA256": "d5de7349122e0a45e60a52de29ce618068402a6b516c680052b0e3b8e4818c01",
+  "extractedSHA256": "ec7d26ec5edb33e66aeb14b81985672c15422c7fcc75d198c0ea10f3a1ccd2d6",
+  "normalization": "Minimum among all six displayed apps for color; four fixed peers for the CPU goal.",
+  "rows": {
+    "main": [
+      {
+        "id": "01_run1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0553145336225598,
+              "color": "rgb(108, 193, 124)"
+            },
+            "event": {
+              "factor": 1.0671647786615248,
+              "color": "rgb(109, 194, 125)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0366755041375433,
+              "color": "rgb(105, 193, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0190407327066764,
+              "color": "rgb(102, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0106853056961518,
+              "color": "rgb(101, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.2747841105354059,
+              "color": "rgb(142, 203, 126)"
+            },
+            "event": {
+              "factor": 1.2929188255613127,
+              "color": "rgb(145, 204, 126)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.1276338514680484,
+              "color": "rgb(119, 197, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.055440414507772,
+              "color": "rgb(108, 193, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0208981001727115,
+              "color": "rgb(102, 192, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0085692591387352,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.004881223560039,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0163792168347976,
+              "color": "rgb(102, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0134504826987742,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0152945004881224,
+              "color": "rgb(101, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "02_replace1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0033032925209149,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0641269613299345,
+              "color": "rgb(109, 194, 125)"
+            },
+            "react-classes": {
+              "factor": 1.0706258303112994,
+              "color": "rgb(110, 194, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.0734982585903559,
+              "color": "rgb(110, 194, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0634447596136585,
+              "color": "rgb(109, 194, 125)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.020979020979021,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.208158508158508,
+              "color": "rgb(131, 200, 126)"
+            },
+            "react-classes": {
+              "factor": 1.2193473193473192,
+              "color": "rgb(133, 201, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1.2181818181818183,
+              "color": "rgb(133, 201, 126)"
+            },
+            "preact-classes": {
+              "factor": 1.1803030303030304,
+              "color": "rgb(127, 199, 125)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0017207076410173,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0103780179598858,
+              "color": "rgb(101, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0129053073076302,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0141958380383933,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0183362907995912,
+              "color": "rgb(102, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.1447646844217438,
+              "color": "rgb(122, 198, 125)"
+            },
+            "event": {
+              "factor": 1.129952572053995,
+              "color": "rgb(119, 197, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.2010215249908793,
+              "color": "rgb(130, 200, 126)"
+            },
+            "react-classes": {
+              "factor": 1.1329441809558554,
+              "color": "rgb(120, 197, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.7157241882524625,
+              "color": "rgb(211, 223, 130)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.574051896207585,
+              "color": "rgb(189, 217, 129)"
+            },
+            "event": {
+              "factor": 1.542115768463074,
+              "color": "rgb(184, 215, 128)"
+            },
+            "react-hooks": {
+              "factor": 1.81437125748503,
+              "color": "rgb(226, 228, 131)"
+            },
+            "react-classes": {
+              "factor": 1.4742514970059881,
+              "color": "rgb(173, 212, 128)"
+            },
+            "preact-hooks": {
+              "factor": 4.132934131736527,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.034592762436447,
+              "color": "rgb(104, 193, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.025321503339647,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.054929717874589,
+              "color": "rgb(108, 193, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0732728541521284,
+              "color": "rgb(110, 194, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0076762037683182,
+              "color": "rgb(100, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "04_select1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.408530805687204,
+              "color": "rgb(163, 209, 127)"
+            },
+            "event": {
+              "factor": 1.4090047393364928,
+              "color": "rgb(163, 209, 127)"
+            },
+            "react-hooks": {
+              "factor": 1.4355450236966825,
+              "color": "rgb(167, 211, 127)"
+            },
+            "react-classes": {
+              "factor": 1.6002369668246448,
+              "color": "rgb(193, 218, 129)"
+            },
+            "preact-hooks": {
+              "factor": 3.4018957345971566,
+              "color": "rgb(251, 144, 115)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 2.3698315467075037,
+              "color": "rgb(254, 212, 128)"
+            },
+            "event": {
+              "factor": 2.3162327718223583,
+              "color": "rgb(254, 215, 128)"
+            },
+            "react-hooks": {
+              "factor": 2.276416539050536,
+              "color": "rgb(254, 218, 129)"
+            },
+            "react-classes": {
+              "factor": 2.0773353751914243,
+              "color": "rgb(255, 231, 131)"
+            },
+            "preact-hooks": {
+              "factor": 7.853751914241959,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0137594318686194,
+              "color": "rgb(101, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0492676431424766,
+              "color": "rgb(107, 193, 124)"
+            },
+            "react-classes": {
+              "factor": 1.1109631602308034,
+              "color": "rgb(116, 196, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.1846426986240568,
+              "color": "rgb(128, 199, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0989791389258765,
+              "color": "rgb(114, 195, 125)"
+            }
+          }
+        }
+      },
+      {
+        "id": "05_swap1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.1204787056227852,
+              "color": "rgb(118, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1156649060640502,
+              "color": "rgb(117, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 6.482516547435983,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 6.378217556996724,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 1.6314769004479508,
+              "color": "rgb(198, 219, 129)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 2.0225314777998675,
+              "color": "rgb(255, 235, 132)"
+            },
+            "event": {
+              "factor": 2.023194168323393,
+              "color": "rgb(255, 234, 132)"
+            },
+            "react-hooks": {
+              "factor": 12.622929092113983,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 11.961563949635522,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 6.001988071570577,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0248112189859762,
+              "color": "rgb(103, 192, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 6.238154509999171,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 6.121151771637209,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 1.0870467181146792,
+              "color": "rgb(113, 195, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0300390009127873,
+              "color": "rgb(104, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "06_remove-one-1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0110628882648285,
+              "color": "rgb(101, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.251042464471109,
+              "color": "rgb(138, 202, 126)"
+            },
+            "react-classes": {
+              "factor": 1.2788698834141776,
+              "color": "rgb(143, 204, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1.3056761126712622,
+              "color": "rgb(147, 205, 126)"
+            },
+            "preact-classes": {
+              "factor": 1.0257850395711003,
+              "color": "rgb(103, 192, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.5204513399153738,
+              "color": "rgb(180, 214, 128)"
+            },
+            "event": {
+              "factor": 1.5091678420310297,
+              "color": "rgb(178, 214, 128)"
+            },
+            "react-hooks": {
+              "factor": 1.9449929478138224,
+              "color": "rgb(246, 234, 132)"
+            },
+            "react-classes": {
+              "factor": 2.1861777150916786,
+              "color": "rgb(254, 224, 130)"
+            },
+            "preact-hooks": {
+              "factor": 6.225669957686883,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0181744749596122,
+              "color": "rgb(102, 192, 124)"
+            },
+            "event": {
+              "factor": 1.0261510500807756,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0250403877221324,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0930936995153473,
+              "color": "rgb(114, 195, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.0390751211631664,
+              "color": "rgb(105, 193, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "07_create10k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.01630951977943,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.3452908894631321,
+              "color": "rgb(153, 207, 127)"
+            },
+            "react-classes": {
+              "factor": 1.3596331862617872,
+              "color": "rgb(155, 207, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1.0244454725660785,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.000725954178374,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.060721363456203,
+              "color": "rgb(108, 194, 124)"
+            },
+            "event": {
+              "factor": 1.1707689258818865,
+              "color": "rgb(126, 199, 125)"
+            },
+            "react-hooks": {
+              "factor": 2.9397938961553707,
+              "color": "rgb(252, 174, 121)"
+            },
+            "react-classes": {
+              "factor": 2.971244550138724,
+              "color": "rgb(252, 172, 120)"
+            },
+            "preact-hooks": {
+              "factor": 1.1616527942925088,
+              "color": "rgb(124, 198, 125)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.015689749924497,
+              "color": "rgb(101, 192, 124)"
+            },
+            "event": {
+              "factor": 1.0113378123468282,
+              "color": "rgb(101, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0073423474717667,
+              "color": "rgb(100, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0260720173879463,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0307457705999137,
+              "color": "rgb(104, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0167997796750208,
+              "color": "rgb(102, 192, 124)"
+            },
+            "event": {
+              "factor": 1.0412420820710548,
+              "color": "rgb(105, 193, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0123588543101074,
+              "color": "rgb(101, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0193128614706695,
+              "color": "rgb(102, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.05996970531534,
+              "color": "rgb(108, 194, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.118614854277656,
+              "color": "rgb(118, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1991538702601066,
+              "color": "rgb(130, 200, 126)"
+            },
+            "react-hooks": {
+              "factor": 1.030397994359135,
+              "color": "rgb(104, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0916640551551238,
+              "color": "rgb(113, 195, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.2558759009714824,
+              "color": "rgb(139, 203, 126)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0065798684026321,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.019786270941248,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.008679826403472,
+              "color": "rgb(100, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0163330066732,
+              "color": "rgb(102, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0125997480050402,
+              "color": "rgb(101, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "09_clear1k_x8",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0255480905233383,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.571782178217822,
+              "color": "rgb(188, 217, 129)"
+            },
+            "react-classes": {
+              "factor": 1.5915841584158419,
+              "color": "rgb(191, 218, 129)"
+            },
+            "preact-hooks": {
+              "factor": 1.1027227722772277,
+              "color": "rgb(115, 196, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0750530410183876,
+              "color": "rgb(111, 194, 125)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0380741560597675,
+              "color": "rgb(105, 193, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.7026009961261759,
+              "color": "rgb(209, 223, 130)"
+            },
+            "react-classes": {
+              "factor": 1.7159933591588268,
+              "color": "rgb(211, 223, 130)"
+            },
+            "preact-hooks": {
+              "factor": 1.1319313779745435,
+              "color": "rgb(120, 197, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.1401217487548423,
+              "color": "rgb(121, 197, 125)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.10912343470483,
+              "color": "rgb(116, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1010733452593917,
+              "color": "rgb(115, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.3980322003577816,
+              "color": "rgb(161, 209, 127)"
+            },
+            "react-classes": {
+              "factor": 1.0500894454382825,
+              "color": "rgb(107, 193, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.146690518783542,
+              "color": "rgb(122, 198, 125)"
+            }
+          }
+        }
+      }
+    ],
+    "reverse": [
+      {
+        "id": "01_run1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0504208416833667,
+              "color": "rgb(107, 193, 124)"
+            },
+            "event": {
+              "factor": 1.0633266533066132,
+              "color": "rgb(109, 194, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.0062525050100202,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0227254509018036,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0083366733466934,
+              "color": "rgb(100, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.225294418842806,
+              "color": "rgb(134, 201, 126)"
+            },
+            "event": {
+              "factor": 1.2756443079023725,
+              "color": "rgb(142, 203, 126)"
+            },
+            "react-hooks": {
+              "factor": 1.0220174091141834,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.1065028161802355,
+              "color": "rgb(116, 196, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.025430960914832,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0005400442836314,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0016201328508938,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0037263055570556,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0045363719825025,
+              "color": "rgb(100, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0002160177134525,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "02_replace1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.005492730210016,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.075569915634536,
+              "color": "rgb(111, 194, 125)"
+            },
+            "react-classes": {
+              "factor": 1.0708310895709927,
+              "color": "rgb(110, 194, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.0737749057619816,
+              "color": "rgb(111, 194, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0691078800933405,
+              "color": "rgb(110, 194, 125)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0188833197342346,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.2295139293623965,
+              "color": "rgb(135, 201, 126)"
+            },
+            "react-classes": {
+              "factor": 1.2203053968994053,
+              "color": "rgb(133, 201, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1.2330108404242917,
+              "color": "rgb(135, 201, 126)"
+            },
+            "preact-classes": {
+              "factor": 1.1927963632124956,
+              "color": "rgb(129, 200, 126)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0013415615776764,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0062248457204186,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0092299436544137,
+              "color": "rgb(100, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.011376442178696,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0160450764690099,
+              "color": "rgb(102, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0730032526201663,
+              "color": "rgb(110, 194, 125)"
+            },
+            "event": {
+              "factor": 1.0647632815323453,
+              "color": "rgb(109, 194, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.133068305023491,
+              "color": "rgb(120, 197, 125)"
+            },
+            "react-classes": {
+              "factor": 1.1116010119262738,
+              "color": "rgb(116, 196, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.66093241778099,
+              "color": "rgb(202, 221, 129)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.6550994498518832,
+              "color": "rgb(201, 220, 129)"
+            },
+            "event": {
+              "factor": 1.654676258992806,
+              "color": "rgb(201, 220, 129)"
+            },
+            "react-hooks": {
+              "factor": 1.8184511214557764,
+              "color": "rgb(227, 228, 131)"
+            },
+            "react-classes": {
+              "factor": 1.5065594583157005,
+              "color": "rgb(178, 214, 128)"
+            },
+            "preact-hooks": {
+              "factor": 4.358019466779518,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0211829717560374,
+              "color": "rgb(102, 192, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0372492836676217,
+              "color": "rgb(105, 193, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0487106017191976,
+              "color": "rgb(107, 193, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0724519033974622,
+              "color": "rgb(110, 194, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.047687269750307,
+              "color": "rgb(106, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "04_select1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.361947318908749,
+              "color": "rgb(155, 207, 127)"
+            },
+            "event": {
+              "factor": 1.3640639698965193,
+              "color": "rgb(156, 207, 127)"
+            },
+            "react-hooks": {
+              "factor": 1.4325023518344309,
+              "color": "rgb(166, 210, 127)"
+            },
+            "react-classes": {
+              "factor": 1.3995766698024459,
+              "color": "rgb(161, 209, 127)"
+            },
+            "preact-hooks": {
+              "factor": 3.4021636876763877,
+              "color": "rgb(251, 144, 115)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 2.300688599846978,
+              "color": "rgb(254, 216, 128)"
+            },
+            "event": {
+              "factor": 2.3175210405508797,
+              "color": "rgb(254, 215, 128)"
+            },
+            "react-hooks": {
+              "factor": 2.2899770466717673,
+              "color": "rgb(254, 217, 129)"
+            },
+            "react-classes": {
+              "factor": 2.2348890589135424,
+              "color": "rgb(254, 221, 129)"
+            },
+            "preact-hooks": {
+              "factor": 7.999234889058914,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.1603498542274053,
+              "color": "rgb(124, 198, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.0996112730806609,
+              "color": "rgb(115, 195, 125)"
+            },
+            "react-classes": {
+              "factor": 1.1156462585034013,
+              "color": "rgb(117, 196, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.3547133138969873,
+              "color": "rgb(154, 207, 127)"
+            },
+            "preact-classes": {
+              "factor": 1.15354713313897,
+              "color": "rgb(123, 198, 125)"
+            }
+          }
+        }
+      },
+      {
+        "id": "05_swap1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.1024917724494594,
+              "color": "rgb(115, 196, 125)"
+            },
+            "event": {
+              "factor": 1.0875814359594334,
+              "color": "rgb(113, 195, 125)"
+            },
+            "react-hooks": {
+              "factor": 6.253744375041977,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 6.292564980858352,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 1.5804285042648936,
+              "color": "rgb(190, 217, 129)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 2.069511355815554,
+              "color": "rgb(255, 231, 131)"
+            },
+            "event": {
+              "factor": 1.9972470750172058,
+              "color": "rgb(255, 236, 132)"
+            },
+            "react-hooks": {
+              "factor": 12.344115622849277,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 12.626290433585684,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 6.258086717136957,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0062924325219407,
+              "color": "rgb(100, 191, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 6.0397416790859415,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 6.0718662030137445,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 1.0335320417287632,
+              "color": "rgb(104, 193, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0354363305182979,
+              "color": "rgb(105, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "06_remove-one-1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0414443258626824,
+              "color": "rgb(105, 193, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.2869085734614016,
+              "color": "rgb(144, 204, 126)"
+            },
+            "react-classes": {
+              "factor": 1.3287975809320527,
+              "color": "rgb(150, 206, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1.4018143009605124,
+              "color": "rgb(162, 209, 127)"
+            },
+            "preact-classes": {
+              "factor": 1.082799715403771,
+              "color": "rgb(112, 195, 125)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.4965325936199723,
+              "color": "rgb(176, 213, 128)"
+            },
+            "event": {
+              "factor": 1.5048543689320388,
+              "color": "rgb(178, 214, 128)"
+            },
+            "react-hooks": {
+              "factor": 1.9625520110957004,
+              "color": "rgb(249, 234, 132)"
+            },
+            "react-classes": {
+              "factor": 2.0485436893203883,
+              "color": "rgb(255, 233, 131)"
+            },
+            "preact-hooks": {
+              "factor": 6.349514563106797,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.010765050167224,
+              "color": "rgb(101, 191, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0388795986622072,
+              "color": "rgb(105, 193, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0139005016722409,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0907190635451505,
+              "color": "rgb(113, 195, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.046613712374582,
+              "color": "rgb(106, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "07_create10k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0027936234316581,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.017366584634693,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.3549224854553907,
+              "color": "rgb(154, 207, 127)"
+            },
+            "react-classes": {
+              "factor": 1.362233537846226,
+              "color": "rgb(156, 207, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1.037564595453841,
+              "color": "rgb(105, 193, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.0673682532089612,
+              "color": "rgb(110, 194, 125)"
+            },
+            "event": {
+              "factor": 1.1742406122937097,
+              "color": "rgb(126, 199, 125)"
+            },
+            "react-hooks": {
+              "factor": 2.960376305509049,
+              "color": "rgb(252, 173, 120)"
+            },
+            "react-classes": {
+              "factor": 2.997907199234633,
+              "color": "rgb(252, 171, 120)"
+            },
+            "preact-hooks": {
+              "factor": 1.1839272901219804,
+              "color": "rgb(128, 199, 125)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0067697925147412,
+              "color": "rgb(100, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0029753534157353,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.001509880837836,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0259245553006193,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.023743616312634,
+              "color": "rgb(103, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0268449455195408,
+              "color": "rgb(103, 192, 124)"
+            },
+            "event": {
+              "factor": 1.040868937545114,
+              "color": "rgb(105, 193, 124)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0271886708142852,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.068126353418348,
+              "color": "rgb(110, 194, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.013783384319252,
+              "color": "rgb(101, 192, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.1079492731209402,
+              "color": "rgb(116, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1622332199195793,
+              "color": "rgb(124, 198, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.0272193009588617,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.085833591091865,
+              "color": "rgb(112, 195, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.24791215589236,
+              "color": "rgb(138, 202, 126)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0071385247048943,
+              "color": "rgb(100, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0062986982690245,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.020342462557738,
+              "color": "rgb(102, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0273876732142024,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0233285121074978,
+              "color": "rgb(103, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "09_clear1k_x8",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0129570465033724,
+              "color": "rgb(101, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.5784522541711041,
+              "color": "rgb(189, 217, 129)"
+            },
+            "react-classes": {
+              "factor": 1.5217429889953848,
+              "color": "rgb(180, 214, 128)"
+            },
+            "preact-hooks": {
+              "factor": 1.123535676251331,
+              "color": "rgb(118, 197, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.1066737664181754,
+              "color": "rgb(116, 196, 125)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0040080160320644,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.7080828323313295,
+              "color": "rgb(209, 223, 130)"
+            },
+            "react-classes": {
+              "factor": 1.6486305945223783,
+              "color": "rgb(200, 220, 129)"
+            },
+            "preact-hooks": {
+              "factor": 1.1354932086395013,
+              "color": "rgb(120, 197, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.136383878868849,
+              "color": "rgb(120, 197, 125)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.1194174757281554,
+              "color": "rgb(118, 196, 125)"
+            },
+            "event": {
+              "factor": 1.212621359223301,
+              "color": "rgb(132, 201, 126)"
+            },
+            "react-hooks": {
+              "factor": 1.4194174757281552,
+              "color": "rgb(164, 210, 127)"
+            },
+            "react-classes": {
+              "factor": 1.3174757281553398,
+              "color": "rgb(149, 205, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1.1553398058252426,
+              "color": "rgb(123, 198, 125)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      }
+    ],
+    "pooled": [
+      {
+        "id": "01_run1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.051279998398751,
+              "color": "rgb(107, 193, 124)"
+            },
+            "event": {
+              "factor": 1.0630291627469426,
+              "color": "rgb(109, 194, 125)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0292828406156802,
+              "color": "rgb(104, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0115890394507716,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0043033566181623,
+              "color": "rgb(100, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.230704058290265,
+              "color": "rgb(135, 201, 126)"
+            },
+            "event": {
+              "factor": 1.2679827162585784,
+              "color": "rgb(141, 203, 126)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0992967889519614,
+              "color": "rgb(114, 195, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.0272811996949927,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.008241162437649,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0054489264801563,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0109520711342443,
+              "color": "rgb(101, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0104098893949254,
+              "color": "rgb(101, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0090544350466275,
+              "color": "rgb(100, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "02_replace1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0043980899723548,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0701540229059707,
+              "color": "rgb(110, 194, 125)"
+            },
+            "react-classes": {
+              "factor": 1.070728467310523,
+              "color": "rgb(110, 194, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.0737443004344236,
+              "color": "rgb(111, 194, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0649840232649983,
+              "color": "rgb(109, 194, 125)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.020572294422752,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.2232064805641354,
+              "color": "rgb(134, 201, 126)"
+            },
+            "react-classes": {
+              "factor": 1.2198263302057228,
+              "color": "rgb(133, 201, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1.22087534238592,
+              "color": "rgb(133, 201, 126)"
+            },
+            "preact-classes": {
+              "factor": 1.1882976863453583,
+              "color": "rgb(128, 199, 126)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0015027908973808,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0067357234864749,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0101975096607985,
+              "color": "rgb(101, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0121565049377415,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0163160154572777,
+              "color": "rgb(102, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.1215401380312386,
+              "color": "rgb(118, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1107882310207047,
+              "color": "rgb(116, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.1632037776970576,
+              "color": "rgb(124, 198, 125)"
+            },
+            "react-classes": {
+              "factor": 1.1194333454413365,
+              "color": "rgb(118, 196, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.675227025063567,
+              "color": "rgb(204, 221, 129)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.5819391251763757,
+              "color": "rgb(190, 217, 129)"
+            },
+            "event": {
+              "factor": 1.5718605119935496,
+              "color": "rgb(188, 217, 129)"
+            },
+            "react-hooks": {
+              "factor": 1.7943962910703488,
+              "color": "rgb(223, 227, 130)"
+            },
+            "react-classes": {
+              "factor": 1.4609957669824631,
+              "color": "rgb(171, 212, 128)"
+            },
+            "preact-hooks": {
+              "factor": 4.1662971175166295,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0098410295230886,
+              "color": "rgb(101, 191, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0282614181175878,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0634872571284382,
+              "color": "rgb(109, 194, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.084279586172092,
+              "color": "rgb(112, 195, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.030885692657078,
+              "color": "rgb(104, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "04_select1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.3957743153918791,
+              "color": "rgb(161, 209, 127)"
+            },
+            "event": {
+              "factor": 1.3726392823418319,
+              "color": "rgb(157, 208, 127)"
+            },
+            "react-hooks": {
+              "factor": 1.433663833805477,
+              "color": "rgb(167, 211, 127)"
+            },
+            "react-classes": {
+              "factor": 1.4265816808309726,
+              "color": "rgb(166, 210, 127)"
+            },
+            "preact-hooks": {
+              "factor": 3.3981350330500475,
+              "color": "rgb(251, 144, 115)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 2.3340987370838118,
+              "color": "rgb(254, 214, 128)"
+            },
+            "event": {
+              "factor": 2.3161117489475695,
+              "color": "rgb(254, 215, 128)"
+            },
+            "react-hooks": {
+              "factor": 2.284347493302717,
+              "color": "rgb(254, 217, 129)"
+            },
+            "react-classes": {
+              "factor": 2.174894756984309,
+              "color": "rgb(254, 225, 130)"
+            },
+            "preact-hooks": {
+              "factor": 7.942594718714121,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0828870779976716,
+              "color": "rgb(112, 195, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.0728754365541329,
+              "color": "rgb(110, 194, 125)"
+            },
+            "react-classes": {
+              "factor": 1.139697322467986,
+              "color": "rgb(121, 197, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.250058207217695,
+              "color": "rgb(138, 202, 126)"
+            },
+            "preact-classes": {
+              "factor": 1.152037252619325,
+              "color": "rgb(123, 198, 125)"
+            }
+          }
+        }
+      },
+      {
+        "id": "05_swap1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.116478887365852,
+              "color": "rgb(117, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1020026077362843,
+              "color": "rgb(115, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 6.33539500518204,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 6.284577580154458,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 1.6027882718732238,
+              "color": "rgb(193, 218, 129)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 2.058903182125931,
+              "color": "rgb(255, 232, 131)"
+            },
+            "event": {
+              "factor": 2.0622884224779963,
+              "color": "rgb(255, 232, 131)"
+            },
+            "react-hooks": {
+              "factor": 12.526066350710902,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 12.340893703452945,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 6.143872714962763,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0178623233453523,
+              "color": "rgb(102, 192, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 6.155207426747897,
+              "color": "rgb(249, 105, 108)"
+            },
+            "react-classes": {
+              "factor": 6.098470719880641,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-hooks": {
+              "factor": 1.051721994280741,
+              "color": "rgb(107, 193, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0303369389531272,
+              "color": "rgb(104, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "06_remove-one-1k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0129449838187705,
+              "color": "rgb(101, 192, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.2652427184466022,
+              "color": "rgb(140, 203, 126)"
+            },
+            "react-classes": {
+              "factor": 1.2896655879180152,
+              "color": "rgb(144, 204, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1.3511111111111112,
+              "color": "rgb(154, 207, 127)"
+            },
+            "preact-classes": {
+              "factor": 1.0464293419633228,
+              "color": "rgb(106, 193, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.496877168632894,
+              "color": "rgb(177, 213, 128)"
+            },
+            "event": {
+              "factor": 1.4857737682165164,
+              "color": "rgb(175, 213, 128)"
+            },
+            "react-hooks": {
+              "factor": 1.914642609299098,
+              "color": "rgb(242, 232, 131)"
+            },
+            "react-classes": {
+              "factor": 2.092297015961138,
+              "color": "rgb(255, 230, 131)"
+            },
+            "preact-hooks": {
+              "factor": 6.279666897987509,
+              "color": "rgb(249, 105, 108)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.005392058052812,
+              "color": "rgb(100, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0125478734126183,
+              "color": "rgb(101, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.01476516831284,
+              "color": "rgb(101, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0454545454545454,
+              "color": "rgb(106, 193, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0498891352549888,
+              "color": "rgb(107, 193, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "07_create10k",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0018685944017667,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0169966591797062,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.3507144070515849,
+              "color": "rgb(154, 207, 127)"
+            },
+            "react-classes": {
+              "factor": 1.3622562805534062,
+              "color": "rgb(156, 207, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1.0329438855438744,
+              "color": "rgb(104, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.0646806733551422,
+              "color": "rgb(109, 194, 125)"
+            },
+            "event": {
+              "factor": 1.1734098298714342,
+              "color": "rgb(126, 199, 125)"
+            },
+            "react-hooks": {
+              "factor": 2.9510693937616215,
+              "color": "rgb(252, 174, 121)"
+            },
+            "react-classes": {
+              "factor": 2.9903351860874405,
+              "color": "rgb(252, 171, 120)"
+            },
+            "preact-hooks": {
+              "factor": 1.1717791411042944,
+              "color": "rgb(126, 199, 125)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0092478589035316,
+              "color": "rgb(100, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0049175514393647,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0020824954414569,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.024089340041403,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0248122916579279,
+              "color": "rgb(103, 192, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1.0236239398413627,
+              "color": "rgb(103, 192, 124)"
+            },
+            "event": {
+              "factor": 1.039006970435738,
+              "color": "rgb(105, 193, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.007708683858119,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0209799814579543,
+              "color": "rgb(102, 192, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.0646911375888473,
+              "color": "rgb(109, 194, 125)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1.11382746807848,
+              "color": "rgb(117, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1841326689504825,
+              "color": "rgb(128, 199, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.0269386483961382,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0931174089068825,
+              "color": "rgb(114, 195, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.2538928682653379,
+              "color": "rgb(139, 202, 126)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.0003709026844079,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.0058417172794287,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-classes": {
+              "factor": 1.0060967128749592,
+              "color": "rgb(100, 191, 124)"
+            },
+            "preact-hooks": {
+              "factor": 1.016551532291715,
+              "color": "rgb(102, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0067457925726737,
+              "color": "rgb(100, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "09_clear1k_x8",
+        "metrics": {
+          "total": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0223206377325067,
+              "color": "rgb(102, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.5751107174490702,
+              "color": "rgb(189, 217, 129)"
+            },
+            "react-classes": {
+              "factor": 1.5402568644818424,
+              "color": "rgb(183, 215, 128)"
+            },
+            "preact-hooks": {
+              "factor": 1.1131089459698849,
+              "color": "rgb(117, 196, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.0931355181576616,
+              "color": "rgb(114, 195, 125)"
+            }
+          },
+          "script": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.026974631660574,
+              "color": "rgb(103, 192, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.7018389276614603,
+              "color": "rgb(208, 223, 130)"
+            },
+            "react-classes": {
+              "factor": 1.6871053506148224,
+              "color": "rgb(206, 222, 129)"
+            },
+            "preact-hooks": {
+              "factor": 1.1313836268970867,
+              "color": "rgb(119, 197, 125)"
+            },
+            "preact-classes": {
+              "factor": 1.1359255566633435,
+              "color": "rgb(120, 197, 125)"
+            }
+          },
+          "paint": {
+            "baseline": {
+              "factor": 1.1012425218591808,
+              "color": "rgb(115, 196, 125)"
+            },
+            "event": {
+              "factor": 1.1412793373216752,
+              "color": "rgb(121, 197, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.3939254486884491,
+              "color": "rgb(160, 209, 127)"
+            },
+            "react-classes": {
+              "factor": 1.218591808559595,
+              "color": "rgb(133, 201, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1.0556833870225493,
+              "color": "rgb(108, 194, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "memory": {
+    "main": [
+      {
+        "id": "21_ready-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1.0033097740207642,
+              "color": "rgb(100, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.8749454785287276,
+              "color": "rgb(235, 230, 131)"
+            },
+            "react-classes": {
+              "factor": 1.880092003567855,
+              "color": "rgb(236, 231, 131)"
+            },
+            "preact-hooks": {
+              "factor": 1.012205263340593,
+              "color": "rgb(101, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0445015945172151,
+              "color": "rgb(106, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "22_run-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0818192063981165,
+              "color": "rgb(112, 195, 125)"
+            },
+            "event": {
+              "factor": 1.1083181452241695,
+              "color": "rgb(116, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.3370566900077856,
+              "color": "rgb(152, 206, 127)"
+            },
+            "react-classes": {
+              "factor": 1.3745879177498674,
+              "color": "rgb(157, 208, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0546711398446533,
+              "color": "rgb(108, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "23_update5-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0828772389538213,
+              "color": "rgb(112, 195, 125)"
+            },
+            "event": {
+              "factor": 1.1124260674827202,
+              "color": "rgb(117, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.4589677195830963,
+              "color": "rgb(171, 212, 128)"
+            },
+            "react-classes": {
+              "factor": 1.497809865178492,
+              "color": "rgb(177, 213, 128)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0500370213711305,
+              "color": "rgb(107, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "25_run-clear-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.1388155699699956,
+              "color": "rgb(121, 197, 125)"
+            },
+            "event": {
+              "factor": 1.141078660810652,
+              "color": "rgb(121, 197, 125)"
+            },
+            "react-hooks": {
+              "factor": 2.410354412374096,
+              "color": "rgb(254, 209, 127)"
+            },
+            "react-classes": {
+              "factor": 2.45565541176736,
+              "color": "rgb(254, 206, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1.0011529177367666,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "26_run-10k-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0736812060557306,
+              "color": "rgb(110, 194, 125)"
+            },
+            "event": {
+              "factor": 1.1085911563791058,
+              "color": "rgb(116, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.1718679592588048,
+              "color": "rgb(126, 199, 125)"
+            },
+            "react-classes": {
+              "factor": 1.20345109374929,
+              "color": "rgb(131, 200, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0535785077014677,
+              "color": "rgb(107, 193, 124)"
+            }
+          }
+        }
+      }
+    ],
+    "reverse": [
+      {
+        "id": "21_ready-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0068388688371188,
+              "color": "rgb(100, 191, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.8113128440701447,
+              "color": "rgb(226, 228, 130)"
+            },
+            "react-classes": {
+              "factor": 1.8875627377350006,
+              "color": "rgb(237, 231, 131)"
+            },
+            "preact-hooks": {
+              "factor": 1.010516545748417,
+              "color": "rgb(101, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.046706952495534,
+              "color": "rgb(106, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "22_run-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0840538259168706,
+              "color": "rgb(112, 195, 125)"
+            },
+            "event": {
+              "factor": 1.1222146562366788,
+              "color": "rgb(118, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.3517510206067727,
+              "color": "rgb(154, 207, 127)"
+            },
+            "react-classes": {
+              "factor": 1.3889197258646275,
+              "color": "rgb(160, 209, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.065458109740978,
+              "color": "rgb(109, 194, 125)"
+            }
+          }
+        }
+      },
+      {
+        "id": "23_update5-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0993925289943756,
+              "color": "rgb(115, 195, 125)"
+            },
+            "event": {
+              "factor": 1.1260205461013308,
+              "color": "rgb(119, 197, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.4776683212920951,
+              "color": "rgb(174, 212, 128)"
+            },
+            "react-classes": {
+              "factor": 1.5148155364543132,
+              "color": "rgb(179, 214, 128)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.063429934174308,
+              "color": "rgb(109, 194, 125)"
+            }
+          }
+        }
+      },
+      {
+        "id": "25_run-clear-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.2029792192122892,
+              "color": "rgb(131, 200, 126)"
+            },
+            "event": {
+              "factor": 1.1760679172681585,
+              "color": "rgb(126, 199, 125)"
+            },
+            "react-hooks": {
+              "factor": 2.5998234090826426,
+              "color": "rgb(253, 197, 125)"
+            },
+            "react-classes": {
+              "factor": 2.596113494781914,
+              "color": "rgb(253, 197, 125)"
+            },
+            "preact-hooks": {
+              "factor": 1.045701679244171,
+              "color": "rgb(106, 193, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "26_run-10k-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0737356802844873,
+              "color": "rgb(111, 194, 125)"
+            },
+            "event": {
+              "factor": 1.10841525378613,
+              "color": "rgb(116, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.172261606682335,
+              "color": "rgb(126, 199, 125)"
+            },
+            "react-classes": {
+              "factor": 1.2035830525317812,
+              "color": "rgb(131, 200, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0540934989895216,
+              "color": "rgb(107, 193, 124)"
+            }
+          }
+        }
+      }
+    ],
+    "pooled": [
+      {
+        "id": "21_ready-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.001745180912301,
+              "color": "rgb(99, 191, 124)"
+            },
+            "event": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "react-hooks": {
+              "factor": 1.8685589295215983,
+              "color": "rgb(234, 230, 131)"
+            },
+            "react-classes": {
+              "factor": 1.8800564141634015,
+              "color": "rgb(236, 231, 131)"
+            },
+            "preact-hooks": {
+              "factor": 1.0106932956029604,
+              "color": "rgb(101, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0438676050887632,
+              "color": "rgb(106, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "22_run-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0829304864099478,
+              "color": "rgb(112, 195, 125)"
+            },
+            "event": {
+              "factor": 1.1152289033164486,
+              "color": "rgb(117, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.344364205110401,
+              "color": "rgb(153, 206, 127)"
+            },
+            "react-classes": {
+              "factor": 1.3817151498167446,
+              "color": "rgb(159, 208, 127)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0600355179561873,
+              "color": "rgb(108, 194, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "23_update5-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0852665932067311,
+              "color": "rgb(112, 195, 125)"
+            },
+            "event": {
+              "factor": 1.1132149278411352,
+              "color": "rgb(117, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.4604327395875667,
+              "color": "rgb(171, 212, 128)"
+            },
+            "react-classes": {
+              "factor": 1.4982305250239873,
+              "color": "rgb(177, 213, 128)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0510587372846576,
+              "color": "rgb(107, 193, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "25_run-clear-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.1700190419960794,
+              "color": "rgb(126, 199, 125)"
+            },
+            "event": {
+              "factor": 1.1610902854103666,
+              "color": "rgb(124, 198, 125)"
+            },
+            "react-hooks": {
+              "factor": 2.499832879342545,
+              "color": "rgb(254, 203, 126)"
+            },
+            "react-classes": {
+              "factor": 2.523182196892532,
+              "color": "rgb(253, 202, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1.027818270313394,
+              "color": "rgb(103, 192, 124)"
+            },
+            "preact-classes": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            }
+          }
+        }
+      },
+      {
+        "id": "26_run-10k-memory",
+        "metrics": {
+          "memory": {
+            "baseline": {
+              "factor": 1.0737084416711515,
+              "color": "rgb(110, 194, 125)"
+            },
+            "event": {
+              "factor": 1.1085032099228977,
+              "color": "rgb(116, 196, 125)"
+            },
+            "react-hooks": {
+              "factor": 1.1721673852401817,
+              "color": "rgb(126, 199, 125)"
+            },
+            "react-classes": {
+              "factor": 1.2035170695094495,
+              "color": "rgb(131, 200, 126)"
+            },
+            "preact-hooks": {
+              "factor": 1,
+              "color": "rgb(99, 191, 124)"
+            },
+            "preact-classes": {
+              "factor": 1.0538359891745723,
+              "color": "rgb(107, 193, 124)"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

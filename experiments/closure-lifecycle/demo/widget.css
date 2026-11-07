@@ -1,0 +1,61 @@
+:host {
+  display: block;
+}
+.editor {
+  margin: 20px 0;
+  padding: 18px;
+  border: 1px solid #d9e1db;
+  border-radius: 12px;
+  background: #f5f8f5;
+  color: #193b2c;
+  font:
+    14px/1.5 system-ui,
+    sans-serif;
+}
+.editor label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+.editor textarea {
+  box-sizing: border-box;
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #bdcbc0;
+  border-radius: 6px;
+  padding: 10px;
+  color: inherit;
+  font: inherit;
+  background: white;
+}
+.editor .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0;
+}
+.editor button {
+  padding: 7px 10px;
+  border: 1px solid #bdcbc0;
+  border-radius: 6px;
+  background: white;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+.editor button.save {
+  background: #245a40;
+  color: white;
+  border-color: #245a40;
+}
+.editor p {
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+.editor small {
+  color: #607565;
+}
+.editor :focus-visible {
+  outline: 2px solid #3e7653;
+  outline-offset: 3px;
+}

@@ -1,0 +1,72 @@
+{
+  "at": "2026-10-25T17:32:40.898Z",
+  "head": "fb481f3aa6d315c3d55fb1b2cb97d86f4e53c2e4",
+  "selected": "event",
+  "sources": {
+    "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+    "src/hook/internal/unmount.ts": "63645732e461a8864d7b80ec63e2f5a42e6cecfb510a67df327ea89d22b0f2e4",
+    "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+    "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+    "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+    "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+    "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+    "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+    "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+    "src/render.ts": "c7851fca5cd74c4a46bc3e007246b9d73bb5ec66d04999776c25d6a1c2f6e41b",
+    "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+    "src/utils/createWDom.ts": "8207679680fb3152f49de96ff3fa8c9150bf054cd4ac5d6d9a6385c412f2706c",
+    "src/utils/event.ts": "b031bb96252c91fde631d3171b85f55de1a5842176d4499c8cbe0e36b0a9458b",
+    "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+    "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+    "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+    "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+    "src/wDom.ts": "98d1679764744c1dda8101925e965996443cea6999b180e1c9b578130808131f",
+    "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+    "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+    "lithentConcurrent/src/render.ts": "9b4e475377fce93a721a00a1d3e006d7fe2359efb3dd02026aa56052cf2f24b2",
+    "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+    "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+    "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c"
+  },
+  "bundles": {
+    "lithent.mjs": {
+      "sha256": "e6dd2eab51497aa6cac6bbefa8deaa2430cb11f55a4abb6ae092983e5e886d45",
+      "raw": 19531,
+      "gzip": 6566,
+      "br": 6002
+    },
+    "lithent.umd.js": {
+      "sha256": "8c270bf2f91f678c47a087edf51be928af2425a8b6fbd54ee3687841956eb4f2",
+      "raw": 13252,
+      "gzip": 5412,
+      "br": 5006
+    },
+    "lithent.cjs": {
+      "sha256": "6632c90c646f5695824dfb2caaf7bd59b9f85c18a36b6de5c56087246854d776",
+      "raw": 13098,
+      "gzip": 5434,
+      "br": 5035
+    }
+  },
+  "concurrentBundles": {
+    "lithentConcurrent.mjs": {
+      "sha256": "5ec069e06ff94766bae858cdbe113cebea9eb45801526ecb467a9d943fa9f39c",
+      "raw": 28315,
+      "gzip": 9225,
+      "br": 8403
+    },
+    "lithentConcurrent.umd.js": {
+      "sha256": "6c540d468240bed97bc8053f22e38c9dbd62bd1dfd3aa7a3cb6e01e0f8e8b6ff",
+      "raw": 18914,
+      "gzip": 7673,
+      "br": 7076
+    },
+    "lithentConcurrent.cjs": {
+      "sha256": "11db27ee2a98082f2fb5819a008430d23a51430f3726e9117938a6c08cd85066",
+      "raw": 18853,
+      "gzip": 7607,
+      "br": 7003
+    }
+  },
+  "siblingUnchanged": true
+}

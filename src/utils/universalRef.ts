@@ -1,4 +1,10 @@
-import { ComponentMap, ComponentSubKey, CompKey, ComponentInfo } from '@/types';
+import {
+  ComponentMap,
+  ComponentSubKey,
+  CompKey,
+  ComponentInfo,
+  TagFunction,
+} from '@/types';
 
 export const wdomSymbol = Symbol.for('lithentWDomSymbol');
 export const xmlnsRef: { value: string } = { value: '' };
@@ -8,8 +14,9 @@ export const componentMap: ComponentMap = new WeakMap();
 export const lmountComponentSet: WeakSet<Function> = new WeakSet();
 let componentMapManualMode = false;
 
-const setComponetRef = (compKey: CompKey): void => {
+const setComponetRef = (compKey: CompKey, ctor?: TagFunction): void => {
   componentMap.set(compKey, {
+    ctor,
     vd: { value: null },
     up: () => {},
     upR: [],
@@ -23,6 +30,10 @@ const setComponetRef = (compKey: CompKey): void => {
 };
 
 export const getComponentKey = (): CompKey | null => compKeyRef.value;
+
+/** The component whose setup or render is running (a WeakMap misses null). */
+export const getCurrentComponent = () =>
+  componentMap.get(compKeyRef.value as CompKey);
 
 export const getComponentSubInfo = <K extends ComponentSubKey>(
   compKey: CompKey,
@@ -39,9 +50,12 @@ export const initUpdateHookState = (compKey: CompKey): void => {
   compKeyRef.value = compKey;
 };
 
-export const initMountHookState = (compKey: CompKey): void => {
+export const initMountHookState = (
+  compKey: CompKey,
+  ctor?: TagFunction
+): void => {
   compKeyRef.value = compKey;
-  setComponetRef(compKey);
+  setComponetRef(compKey, ctor);
 };
 
 export const setComponentMapManualMode = (enabled: boolean): void => {
@@ -53,8 +67,23 @@ export const isComponentMapManualMode = (): boolean => componentMapManualMode;
 export const runUnmountEffects = (compKey: CompKey): void => {
   const subInfo = componentMap.get(compKey);
   if (subInfo) {
-    subInfo.umts.forEach(effect => effect());
+    // Clear first so reentrant disposal cannot run these registrations again.
+    const effects = subInfo.umts;
     subInfo.umts = [];
+    effects.forEach(effect => {
+      try {
+        effect();
+      } catch (error) {
+        // Finish teardown before the host error handler can reenter it.
+        queueMicrotask(() => {
+          try {
+            reportError(error);
+          } catch {
+            throw error;
+          }
+        });
+      }
+    });
   }
 };
 

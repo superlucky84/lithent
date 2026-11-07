@@ -1,0 +1,445 @@
+{
+  "node": "v24.11.1",
+  "zlib": "1.3.1-470d3a2",
+  "builds": [
+    {
+      "core": "base",
+      "name": "control",
+      "sourcemap": true,
+      "generatedCode": null,
+      "compress": false,
+      "files": {
+        "lithent.mjs": {
+          "raw": 18868,
+          "gzip": 6343,
+          "br": 5802,
+          "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12759,
+          "gzip": 5187,
+          "br": 4824,
+          "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d",
+          "mapSHA256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12606,
+          "gzip": 5234,
+          "br": 4857,
+          "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "base",
+      "name": "hidden",
+      "sourcemap": "hidden",
+      "generatedCode": null,
+      "compress": false,
+      "files": {
+        "lithent.mjs": {
+          "raw": 18831,
+          "gzip": 6314,
+          "br": 5776,
+          "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12719,
+          "gzip": 5155,
+          "br": 4798,
+          "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c",
+          "mapSHA256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12569,
+          "gzip": 5203,
+          "br": 4833,
+          "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "base",
+      "name": "generated-es2015",
+      "sourcemap": true,
+      "generatedCode": {
+        "preset": "es2015"
+      },
+      "compress": false,
+      "files": {
+        "lithent.mjs": {
+          "raw": 18868,
+          "gzip": 6343,
+          "br": 5802,
+          "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12759,
+          "gzip": 5187,
+          "br": 4824,
+          "sha256": "ec4c46d237528d4fe1f8f3b35ea8f953ad31fb12eae48d2aab7df1f8b87f9c2d",
+          "mapSHA256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12606,
+          "gzip": 5234,
+          "br": 4857,
+          "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "base",
+      "name": "generated-es2015-hidden",
+      "sourcemap": "hidden",
+      "generatedCode": {
+        "preset": "es2015"
+      },
+      "compress": false,
+      "files": {
+        "lithent.mjs": {
+          "raw": 18831,
+          "gzip": 6314,
+          "br": 5776,
+          "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12719,
+          "gzip": 5155,
+          "br": 4798,
+          "sha256": "01b6510fa34a928947439808f80c54be7edb72318af2bae05299f79fed96074c",
+          "mapSHA256": "d010ea4a76afd3222d6cc8a54693ac0b32812e73b443bfa67cbf9c3f5f6671ce",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12569,
+          "gzip": 5203,
+          "br": 4833,
+          "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "base",
+      "name": "syntax",
+      "sourcemap": true,
+      "generatedCode": null,
+      "compress": {
+        "defaults": false,
+        "booleans": true,
+        "comparisons": true,
+        "conditionals": true,
+        "evaluate": true,
+        "properties": true,
+        "typeofs": true
+      },
+      "files": {
+        "lithent.mjs": {
+          "raw": 18868,
+          "gzip": 6343,
+          "br": 5802,
+          "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12740,
+          "gzip": 5177,
+          "br": 4815,
+          "sha256": "f342ba8f0ccca2f95a9a69bc159999fe434dd9b4e3e595ad1db2cda66fba8289",
+          "mapSHA256": "17b904e04c6e54ee63db558040271a905c9aed64a1ac7e6ce94d5d27294b8658",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12606,
+          "gzip": 5234,
+          "br": 4857,
+          "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "base",
+      "name": "syntax-return",
+      "sourcemap": true,
+      "generatedCode": null,
+      "compress": {
+        "defaults": false,
+        "booleans": true,
+        "comparisons": true,
+        "conditionals": true,
+        "evaluate": true,
+        "properties": true,
+        "typeofs": true,
+        "if_return": true
+      },
+      "files": {
+        "lithent.mjs": {
+          "raw": 18868,
+          "gzip": 6343,
+          "br": 5802,
+          "sha256": "61e2d1b70b2453d0ac82fcf5c1a7b1ac4e1ce44729480f01637ee62599f7061e",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12728,
+          "gzip": 5179,
+          "br": 4808,
+          "sha256": "0e1675c520481d3b7da760bc0f2fbeb81ad05bdb0e5a70bbb9e6510f139ac5c9",
+          "mapSHA256": "49945dae2ea20d41d9d9f406ec022ca6b0fb74df7dbdd30abe85676017d4fd2a",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12606,
+          "gzip": 5234,
+          "br": 4857,
+          "sha256": "e3bcff38618ba3150dba04af951444acf952bd17233adac35b2c30d60e226820",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "base",
+      "name": "syntax-hidden",
+      "sourcemap": "hidden",
+      "generatedCode": null,
+      "compress": {
+        "defaults": false,
+        "booleans": true,
+        "comparisons": true,
+        "conditionals": true,
+        "evaluate": true,
+        "properties": true,
+        "typeofs": true
+      },
+      "files": {
+        "lithent.mjs": {
+          "raw": 18831,
+          "gzip": 6314,
+          "br": 5776,
+          "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12700,
+          "gzip": 5145,
+          "br": 4788,
+          "sha256": "0ce1b8a5535022a77464b9c92f7edb0498eb35efebf2725c2410912cd5f44417",
+          "mapSHA256": "17b904e04c6e54ee63db558040271a905c9aed64a1ac7e6ce94d5d27294b8658",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12569,
+          "gzip": 5203,
+          "br": 4833,
+          "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "base",
+      "name": "syntax-return-hidden",
+      "sourcemap": "hidden",
+      "generatedCode": null,
+      "compress": {
+        "defaults": false,
+        "booleans": true,
+        "comparisons": true,
+        "conditionals": true,
+        "evaluate": true,
+        "properties": true,
+        "typeofs": true,
+        "if_return": true
+      },
+      "files": {
+        "lithent.mjs": {
+          "raw": 18831,
+          "gzip": 6314,
+          "br": 5776,
+          "sha256": "d784b0605d2b6c679a199b5a34b4410ddd5b38ec1d6635bdf307e48654a5789d",
+          "mapSHA256": "117b1ab62134dbdc024bf837d2dd0197e3806c0dfb638742bc496e7b1ca578bc",
+          "mapSources": 15
+        },
+        "lithent.umd.js": {
+          "raw": 12688,
+          "gzip": 5147,
+          "br": 4779,
+          "sha256": "a7c20b8bb058b801cd6016193bf93c235f3aa76702fa7452b43599f50ee4d951",
+          "mapSHA256": "49945dae2ea20d41d9d9f406ec022ca6b0fb74df7dbdd30abe85676017d4fd2a",
+          "mapSources": 15
+        },
+        "lithent.cjs": {
+          "raw": 12569,
+          "gzip": 5203,
+          "br": 4833,
+          "sha256": "ea08af700b6842fb8c1ccdb7a3c8392ebf6d320c4a39f7d4819ba5f82b259408",
+          "mapSHA256": "0423bdb354d0ddae5f892a3264ff91419f2bab98bdeeb5e463096946691cffe2",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "concurrent",
+      "name": "control",
+      "sourcemap": true,
+      "generatedCode": null,
+      "compress": false,
+      "files": {
+        "lithentConcurrent.mjs": {
+          "raw": 27645,
+          "gzip": 9015,
+          "br": 8206,
+          "sha256": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c",
+          "mapSHA256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90",
+          "mapSources": 15
+        },
+        "lithentConcurrent.umd.js": {
+          "raw": 18419,
+          "gzip": 7484,
+          "br": 6903,
+          "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0",
+          "mapSHA256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64",
+          "mapSources": 15
+        },
+        "lithentConcurrent.cjs": {
+          "raw": 18358,
+          "gzip": 7413,
+          "br": 6836,
+          "sha256": "218f069c7acaca3d490f7ab04395977dde6c14c07614d91abc96d0a6d7f3c4cb",
+          "mapSHA256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "concurrent",
+      "name": "hidden",
+      "sourcemap": "hidden",
+      "generatedCode": null,
+      "compress": false,
+      "files": {
+        "lithentConcurrent.mjs": {
+          "raw": 27598,
+          "gzip": 8982,
+          "br": 8175,
+          "sha256": "2ef8a692e030526f76ad14bb6dcd71869ee6a7f1e594c8b0313a62d976f37be6",
+          "mapSHA256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90",
+          "mapSources": 15
+        },
+        "lithentConcurrent.umd.js": {
+          "raw": 18369,
+          "gzip": 7451,
+          "br": 6868,
+          "sha256": "e95e6dcacd7cc978d2cdebd501a54837330859b1d226e7ce8b5cabebfeb52923",
+          "mapSHA256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64",
+          "mapSources": 15
+        },
+        "lithentConcurrent.cjs": {
+          "raw": 18311,
+          "gzip": 7376,
+          "br": 6802,
+          "sha256": "264c59d5cdf3808995f5ec6a1b879bfe267517934bc17f75949b71e8c038d0e0",
+          "mapSHA256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "concurrent",
+      "name": "generated-es2015",
+      "sourcemap": true,
+      "generatedCode": {
+        "preset": "es2015"
+      },
+      "compress": false,
+      "files": {
+        "lithentConcurrent.mjs": {
+          "raw": 27645,
+          "gzip": 9015,
+          "br": 8206,
+          "sha256": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c",
+          "mapSHA256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90",
+          "mapSources": 15
+        },
+        "lithentConcurrent.umd.js": {
+          "raw": 18419,
+          "gzip": 7484,
+          "br": 6903,
+          "sha256": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0",
+          "mapSHA256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64",
+          "mapSources": 15
+        },
+        "lithentConcurrent.cjs": {
+          "raw": 18358,
+          "gzip": 7413,
+          "br": 6836,
+          "sha256": "218f069c7acaca3d490f7ab04395977dde6c14c07614d91abc96d0a6d7f3c4cb",
+          "mapSHA256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a",
+          "mapSources": 15
+        }
+      }
+    },
+    {
+      "core": "concurrent",
+      "name": "generated-es2015-hidden",
+      "sourcemap": "hidden",
+      "generatedCode": {
+        "preset": "es2015"
+      },
+      "compress": false,
+      "files": {
+        "lithentConcurrent.mjs": {
+          "raw": 27598,
+          "gzip": 8982,
+          "br": 8175,
+          "sha256": "2ef8a692e030526f76ad14bb6dcd71869ee6a7f1e594c8b0313a62d976f37be6",
+          "mapSHA256": "10d37b2cc814d8d918109141d5213b361b87f0b688a74b8338036532ccbe7e90",
+          "mapSources": 15
+        },
+        "lithentConcurrent.umd.js": {
+          "raw": 18369,
+          "gzip": 7451,
+          "br": 6868,
+          "sha256": "e95e6dcacd7cc978d2cdebd501a54837330859b1d226e7ce8b5cabebfeb52923",
+          "mapSHA256": "babb7d9a1b2f7ea0a90790abb39807105f7d09542eda173115a2bad1f1037b64",
+          "mapSources": 15
+        },
+        "lithentConcurrent.cjs": {
+          "raw": 18311,
+          "gzip": 7376,
+          "br": 6802,
+          "sha256": "264c59d5cdf3808995f5ec6a1b879bfe267517934bc17f75949b71e8c038d0e0",
+          "mapSHA256": "9ff9012d02d7b476c121be4c8b8a3a2b663a0f07f904907d91b428e7f758514a",
+          "mapSources": 15
+        }
+      }
+    }
+  ],
+  "complete": true
+}

@@ -63,7 +63,15 @@ also breaks subpaths such as `lithent/jsx-dev-runtime`.
 // vite.config.js
 export default {
   resolve: {
-    alias: [{ find: /^lithent$/, replacement: 'lithent-concurrent' }],
+    alias: [
+      {
+        find: /^lithent$/,
+        replacement: 'lithent-concurrent',
+        customResolver(source, importer, options) {
+          return this.resolve(source, importer, { ...options, skipSelf: true });
+        },
+      },
+    ],
   },
 };
 ```

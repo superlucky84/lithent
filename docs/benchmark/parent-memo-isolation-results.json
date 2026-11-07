@@ -1,0 +1,2454 @@
+{
+  "status": "Experimental isolated renderer; default runtime preserved; no adoption or public export change",
+  "checkpoint": "d660fdf33578885c9534fec8040ef8b5602bbe23",
+  "provenance": {
+    "at": "2026-10-22T04:10:05.672Z",
+    "head": "d660fdf33578885c9534fec8040ef8b5602bbe23",
+    "node": "v22.13.0",
+    "zlib": "1.3.0.1-motley-82a5fec",
+    "evidence": "94ed789b1277de331a0f473cd610d057f025d1c22950a36253b377cae43783d8",
+    "baseline": {
+      "src/diff.ts": "7591e2877ddfac83f377af9f521290ddc4e3211d3ffd71d6bd4c3f6592368c29",
+      "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+      "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+      "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+      "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+      "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+      "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+      "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+      "src/index.ts": "648840f1c57192fd5424a7f05775ba1cdf4c2404b4895dad4c86e815e8550a7e",
+      "src/render.ts": "0695aa7e4463a6e9194a7b1966ca338408711555be4e63529dc3fb0af7aa5efc",
+      "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+      "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+      "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+      "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+      "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+      "src/wDom.ts": "76a9f33aedf0b4f34e5f836a003aa6481581e3cdbde65a5e36cc606d83b8abbb",
+      "lithentConcurrent/src/diff.ts": "4478b29992495fdb291e9f5d6c85f57d27d903d58427f8e722153f6e25c431e8",
+      "lithentConcurrent/src/index.ts": "cf58ac6f02aad4367bd587eeb34ef185133e401c6ca6e11c8e6a47dd7b749acb",
+      "lithentConcurrent/src/render.ts": "40103a58d15a8304d6308a3915deeb02bfecd4ecf96a1ab872c36b05e54b3c75",
+      "lithentConcurrent/src/renderGate.ts": "acf30acf0ceb490cf96532b91e8fee187bd1cf649072edba50fe483b9c8091b4",
+      "lithentConcurrent/src/scheduler.ts": "c25ad3154742040d3c84a7b27450b793f1f4158fd44b3343b723afee4e9810a1",
+      "lithentConcurrent/src/wDom.ts": "2ce5f399075f7d852d67ec2e0d09f8dfcea7754374290584cb7ed8746beb4b8c",
+      "dist/lithent.mjs": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+      "dist/lithent.umd.js": "1b64873b03874d40999175c2244c84fea27aff6994764ff918f197b30c050773",
+      "dist/lithent.cjs": "60275b5d55315fff6b3038b8dcaa1809dec0a9e1dffea0f58c65c376a545be52",
+      "lithentConcurrent/dist/lithentConcurrent.mjs": "bd35f3c84eeef2fcbbd80d7d088ea00610e9eb1be4aa472e63f44bb8c0e06a1c",
+      "lithentConcurrent/dist/lithentConcurrent.umd.js": "577998412e34798762bb91a2c20054f77a9491cf889b82c1414cd03c7c9ad1e0",
+      "element/dist/lithentElement.umd.js": "5a4c46084d86263a417e8d3aeccbd370334f42eda82b0de53519c8fc9c2ba826"
+    },
+    "source": {
+      "src/diff.ts": "96e26403a4743bed70a5a8cd89d07e99c54c8f9da2b9d11261e69941f96021d0",
+      "src/hook/internal/unmount.ts": "7fcbb880f819df1148cdf3e29cf2abafa132f26ad062d016fc4167c0388124b4",
+      "src/hook/internal/useUpdate.ts": "44f1a85649339069cbb52ffa47147d2d9d942c9310ae38c2f36ffb87c9a935ed",
+      "src/hook/mountCallback.ts": "c8992bfb29b3f715c62f30e3a1c666f8cba305a06ad571a6a0aeb2fe27ae4b5d",
+      "src/hook/mountReadyCallback.ts": "5034590611f71a9cb027c295f01353d433b4d418114699303540c18aa640be12",
+      "src/hook/ref.ts": "9afd305573a073dd3cdcd8791f2f382168595c2f4f35054df77492b293bd9f6a",
+      "src/hook/updateCallback.ts": "59dc8f10ad90afdbca61c1f710f9631ed3aa2ba0763bd196fe4954b1a5f27664",
+      "src/hook/useParentMemo.ts": "ad0072ee96ce0da87d55569a497afe0f32d1e81357de0d5ceb494569a0d6b75f",
+      "src/hook/useRenew.ts": "e5f9e311dd4bc1ccae61ec18cf47f0814458eaf98e50206dc3a4e5b16f775000",
+      "src/index.ts": "f97891366508ed5f1b53825d385583da7a0a21ff09f534ebd1175c1437085264",
+      "src/render.ts": "2b9029d85aa72a4eafdf2703d4d0072405eed5aa9b06073218f2310e79e0db9a",
+      "src/types/index.ts": "bd542918b8d2da6853922ce68ea9d28bd03c75582f11cc06fc66f193e290070c",
+      "src/utils/index.ts": "165ddaabf101b4de483d7eb1cc113ce5ea38004ae775901050c7321a69d2e120",
+      "src/utils/predicator.ts": "4a83e5173a279745738e1eb5e8776ac0e9f9e5b47f82ab00be6872d0f1560b6d",
+      "src/utils/redraw.ts": "abccabd0a0c4f10f90a962b15b84da4e08c8035d325b6c740a0a3827f40903c3",
+      "src/utils/universalRef.ts": "2b0feacfc71e22188f61080a560e86fa03e0b6d7157f5cb31b65ea50c84acb34",
+      "src/wDom.ts": "bf18eb64f5881b7a69f422b8b6bfe33831e3434f3e2bae05b1c6d50371d8095d"
+    },
+    "bundles": {
+      "lithent.mjs": {
+        "sha256": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+        "raw": 22832,
+        "gzip": 7518,
+        "brotli": 6859
+      },
+      "lithent.umd.js": {
+        "sha256": "01e9d6f17939050c2f336c6c562c45936b065b364870caf9e63575e07bba3868",
+        "raw": 15481,
+        "gzip": 6157,
+        "brotli": 5691
+      },
+      "lithent.cjs": {
+        "sha256": "d40f00d16bf935ce579062f4ebc7a01520a782c04200be1c50f8478fffa0a3c1",
+        "raw": 15293,
+        "gzip": 6191,
+        "brotli": 5724
+      }
+    }
+  },
+  "defaultPackageSHA256": "1288231593e510a2c84a1f0416681709496ce37558878e27adc7e7795ca8f336",
+  "weights": [
+    0.64280248137063, 0.5607178150466176, 0.5643800750716564,
+    0.1925635870170522, 0.13200612879341714, 0.5277091212292658,
+    0.5644449600965534, 0.5508359820582848, 0.4225836631419211
+  ],
+  "weightSourceSHA256": "d5de7349122e0a45e60a52de29ce618068402a6b516c680052b0e3b8e4818c01",
+  "samples": [290, 290],
+  "rows": {
+    "main": [
+      {
+        "id": "01_run1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 27.95,
+              "p25": 27.528,
+              "p75": 29.094,
+              "min": 26.897,
+              "max": 29.883
+            },
+            "script": {
+              "count": 15,
+              "median": 8.253,
+              "p25": 8.105,
+              "p75": 8.736,
+              "min": 7.838,
+              "max": 8.771
+            },
+            "paint": {
+              "count": 15,
+              "median": 18.992,
+              "p25": 18.691,
+              "p75": 19.695,
+              "min": 18.385,
+              "max": 20.672
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 27.386,
+              "p25": 27.21,
+              "p75": 28.067,
+              "min": 26.91,
+              "max": 29.173
+            },
+            "script": {
+              "count": 15,
+              "median": 8.158,
+              "p25": 7.963,
+              "p75": 8.366,
+              "min": 7.876,
+              "max": 8.529
+            },
+            "paint": {
+              "count": 15,
+              "median": 18.737,
+              "p25": 18.579,
+              "p75": 19.107,
+              "min": 18.249,
+              "max": 20.205
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9798211091234347,
+          "script": 0.9884890342905609
+        }
+      },
+      {
+        "id": "02_replace1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 31.481,
+              "p25": 31.302,
+              "p75": 32.904,
+              "min": 31.061,
+              "max": 34.267
+            },
+            "script": {
+              "count": 15,
+              "median": 11.696,
+              "p25": 11.577,
+              "p75": 12.122,
+              "min": 11.171,
+              "max": 12.747
+            },
+            "paint": {
+              "count": 15,
+              "median": 19.304,
+              "p25": 19.174,
+              "p75": 19.571,
+              "min": 18.891,
+              "max": 21.46
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 31.605,
+              "p25": 31.258,
+              "p75": 32.777,
+              "min": 30.995,
+              "max": 33.679
+            },
+            "script": {
+              "count": 15,
+              "median": 11.733,
+              "p25": 11.622,
+              "p75": 11.92,
+              "min": 11.473,
+              "max": 12.941
+            },
+            "paint": {
+              "count": 15,
+              "median": 19.235,
+              "p25": 19.126,
+              "p75": 20.045,
+              "min": 18.458,
+              "max": 21.289
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0039388837711636,
+          "script": 1.0031634746922025
+        }
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 18.838,
+              "p25": 18.349,
+              "p75": 19.442,
+              "min": 17.268,
+              "max": 23.797
+            },
+            "script": {
+              "count": 15,
+              "median": 6.326,
+              "p25": 5.945,
+              "p75": 6.936,
+              "min": 5.758,
+              "max": 7.755
+            },
+            "paint": {
+              "count": 15,
+              "median": 10.514,
+              "p25": 9.894,
+              "p75": 11.274,
+              "min": 9.497,
+              "max": 13.41
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 18.764,
+              "p25": 18.083,
+              "p75": 19.628,
+              "min": 17.557,
+              "max": 21.281
+            },
+            "script": {
+              "count": 15,
+              "median": 6.421,
+              "p25": 6.072,
+              "p75": 6.705,
+              "min": 5.414,
+              "max": 7.182
+            },
+            "paint": {
+              "count": 15,
+              "median": 10.738,
+              "p25": 9.98,
+              "p75": 11.917,
+              "min": 9.229,
+              "max": 12.223
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9960717698269455,
+          "script": 1.0150173885551692
+        }
+      },
+      {
+        "id": "04_select1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 25,
+              "median": 8.026,
+              "p25": 7.2115,
+              "p75": 8.604500000000002,
+              "min": 6.645,
+              "max": 10.2
+            },
+            "script": {
+              "count": 25,
+              "median": 4.204,
+              "p25": 3.9979999999999998,
+              "p75": 4.939,
+              "min": 3.668,
+              "max": 5.528
+            },
+            "paint": {
+              "count": 25,
+              "median": 2.327,
+              "p25": 2.037,
+              "p75": 2.924,
+              "min": 1.43,
+              "max": 4.291
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 25,
+              "median": 8.328,
+              "p25": 7.241,
+              "p75": 8.9835,
+              "min": 6.848,
+              "max": 10.681
+            },
+            "script": {
+              "count": 25,
+              "median": 4.619,
+              "p25": 4.024,
+              "p75": 5.0915,
+              "min": 3.671,
+              "max": 5.837
+            },
+            "paint": {
+              "count": 25,
+              "median": 2.68,
+              "p25": 2.1470000000000002,
+              "p75": 3.153,
+              "min": 1.548,
+              "max": 3.987
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0376277099426863,
+          "script": 1.0987155090390104
+        }
+      },
+      {
+        "id": "05_swap1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 19.309,
+              "p25": 17.842,
+              "p75": 21.131,
+              "min": 17.188,
+              "max": 26.117
+            },
+            "script": {
+              "count": 15,
+              "median": 3.865,
+              "p25": 3.637,
+              "p75": 4.186,
+              "min": 3.315,
+              "max": 5.191
+            },
+            "paint": {
+              "count": 15,
+              "median": 13.789,
+              "p25": 13.064,
+              "p75": 15.537,
+              "min": 11.746,
+              "max": 17.128
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 18.561,
+              "p25": 17.669,
+              "p75": 19.284,
+              "min": 16.905,
+              "max": 33.593
+            },
+            "script": {
+              "count": 15,
+              "median": 3.898,
+              "p25": 3.551,
+              "p75": 4.36,
+              "min": 3.145,
+              "max": 5.374
+            },
+            "paint": {
+              "count": 15,
+              "median": 13.429,
+              "p25": 12.436,
+              "p75": 14.301,
+              "min": 11.295,
+              "max": 23.316
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9612615878605831,
+          "script": 1.0085381630012937
+        }
+      },
+      {
+        "id": "06_remove-one-1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 12.657,
+              "p25": 12.534,
+              "p75": 13.814,
+              "min": 12.235,
+              "max": 16.752
+            },
+            "script": {
+              "count": 15,
+              "median": 1.239,
+              "p25": 1.155,
+              "p75": 1.42,
+              "min": 1.124,
+              "max": 1.47
+            },
+            "paint": {
+              "count": 15,
+              "median": 10.65,
+              "p25": 10.446,
+              "p75": 11.226,
+              "min": 9.858,
+              "max": 13.05
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 12.586,
+              "p25": 12.362,
+              "p75": 12.744,
+              "min": 11.829,
+              "max": 14.222
+            },
+            "script": {
+              "count": 15,
+              "median": 1.224,
+              "p25": 1.144,
+              "p75": 1.401,
+              "min": 1.112,
+              "max": 2.05
+            },
+            "paint": {
+              "count": 15,
+              "median": 10.598,
+              "p25": 10.176,
+              "p75": 10.759,
+              "min": 9.934,
+              "max": 12.058
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9943904558742198,
+          "script": 0.9878934624697335
+        }
+      },
+      {
+        "id": "07_create10k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 299.698,
+              "p25": 295.133,
+              "p75": 306.29,
+              "min": 287.182,
+              "max": 320.722
+            },
+            "script": {
+              "count": 15,
+              "median": 64.757,
+              "p25": 63.886,
+              "p75": 67.756,
+              "min": 63.287,
+              "max": 71.123
+            },
+            "paint": {
+              "count": 15,
+              "median": 226.425,
+              "p25": 223.106,
+              "p75": 229.334,
+              "min": 215.838,
+              "max": 239.149
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 293.316,
+              "p25": 288.701,
+              "p75": 300.949,
+              "min": 284.41,
+              "max": 318.945
+            },
+            "script": {
+              "count": 15,
+              "median": 64.78,
+              "p25": 63.999,
+              "p75": 65.733,
+              "min": 62.764,
+              "max": 76.929
+            },
+            "paint": {
+              "count": 15,
+              "median": 219.937,
+              "p25": 217.71,
+              "p75": 226.038,
+              "min": 214.897,
+              "max": 232.581
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9787052299314644,
+          "script": 1.0003551739580276
+        }
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 31.247,
+              "p25": 30.848,
+              "p75": 32.4,
+              "min": 30.739,
+              "max": 33.676
+            },
+            "script": {
+              "count": 15,
+              "median": 7.965,
+              "p25": 7.864,
+              "p75": 8.355,
+              "min": 7.784,
+              "max": 8.536
+            },
+            "paint": {
+              "count": 15,
+              "median": 22.204,
+              "p25": 22.033,
+              "p75": 23.034,
+              "min": 21.889,
+              "max": 24.252
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 31.517,
+              "p25": 31.265,
+              "p75": 33.303,
+              "min": 31.062,
+              "max": 35.111
+            },
+            "script": {
+              "count": 15,
+              "median": 8.108,
+              "p25": 7.997,
+              "p75": 8.446,
+              "min": 7.716,
+              "max": 9.195
+            },
+            "paint": {
+              "count": 15,
+              "median": 22.381,
+              "p25": 22.245,
+              "p75": 24.242,
+              "min": 21.996,
+              "max": 24.891
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0086408295196339,
+          "script": 1.0179535467671061
+        }
+      },
+      {
+        "id": "09_clear1k_x8",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 12.793,
+              "p25": 12.412,
+              "p75": 14.21,
+              "min": 11.609,
+              "max": 14.896
+            },
+            "script": {
+              "count": 15,
+              "median": 10.645,
+              "p25": 9.938,
+              "p75": 11.19,
+              "min": 9.573,
+              "max": 12.037
+            },
+            "paint": {
+              "count": 15,
+              "median": 1.487,
+              "p25": 0.935,
+              "p75": 1.795,
+              "min": 0.591,
+              "max": 1.885
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 14.111,
+              "p25": 12.925,
+              "p75": 14.616,
+              "min": 11.25,
+              "max": 15.758
+            },
+            "script": {
+              "count": 15,
+              "median": 11.198,
+              "p25": 9.808,
+              "p75": 11.978,
+              "min": 9.056,
+              "max": 12.761
+            },
+            "paint": {
+              "count": 15,
+              "median": 1.637,
+              "p25": 1.139,
+              "p75": 2.158,
+              "min": 0.871,
+              "max": 2.594
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.103025091847104,
+          "script": 1.051949271958666
+        }
+      }
+    ],
+    "reverse": [
+      {
+        "id": "01_run1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 27.544,
+              "p25": 27.261,
+              "p75": 27.793,
+              "min": 26.823,
+              "max": 28.119
+            },
+            "script": {
+              "count": 15,
+              "median": 8.124,
+              "p25": 7.945,
+              "p75": 8.484,
+              "min": 7.831,
+              "max": 8.556
+            },
+            "paint": {
+              "count": 15,
+              "median": 18.771,
+              "p25": 18.533,
+              "p75": 18.874,
+              "min": 18.435,
+              "max": 19.715
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 27.746,
+              "p25": 27.323,
+              "p75": 28.848,
+              "min": 27.233,
+              "max": 31.147
+            },
+            "script": {
+              "count": 15,
+              "median": 8.324,
+              "p25": 7.995,
+              "p75": 8.538,
+              "min": 7.712,
+              "max": 10.557
+            },
+            "paint": {
+              "count": 15,
+              "median": 19.115,
+              "p25": 18.752,
+              "p75": 19.761,
+              "min": 18.518,
+              "max": 20.681
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0073337205925064,
+          "script": 1.0246184145741013
+        }
+      },
+      {
+        "id": "02_replace1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 30.866,
+              "p25": 30.581,
+              "p75": 31.89,
+              "min": 30.321,
+              "max": 33.581
+            },
+            "script": {
+              "count": 15,
+              "median": 11.58,
+              "p25": 11.473,
+              "p75": 11.925,
+              "min": 11.374,
+              "max": 12.215
+            },
+            "paint": {
+              "count": 15,
+              "median": 18.749,
+              "p25": 18.468,
+              "p75": 19.138,
+              "min": 18.07,
+              "max": 20.858
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 31.506,
+              "p25": 31.07,
+              "p75": 32.656,
+              "min": 30.828,
+              "max": 34.607
+            },
+            "script": {
+              "count": 15,
+              "median": 11.739,
+              "p25": 11.62,
+              "p75": 11.994,
+              "min": 11.31,
+              "max": 12.234
+            },
+            "paint": {
+              "count": 15,
+              "median": 19.128,
+              "p25": 18.907,
+              "p75": 20.029,
+              "min": 18.655,
+              "max": 21.809
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0207347890883172,
+          "script": 1.0137305699481867
+        }
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 18.298,
+              "p25": 17.857,
+              "p75": 19.531,
+              "min": 16.897,
+              "max": 23.943
+            },
+            "script": {
+              "count": 15,
+              "median": 6.122,
+              "p25": 5.93,
+              "p75": 6.466,
+              "min": 5.68,
+              "max": 7.003
+            },
+            "paint": {
+              "count": 15,
+              "median": 10.424,
+              "p25": 9.751,
+              "p75": 11.299,
+              "min": 9.026,
+              "max": 14.169
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 18.009,
+              "p25": 17.639,
+              "p75": 18.719,
+              "min": 17.087,
+              "max": 21.069
+            },
+            "script": {
+              "count": 15,
+              "median": 5.976,
+              "p25": 5.906,
+              "p75": 6.429,
+              "min": 5.804,
+              "max": 7.003
+            },
+            "paint": {
+              "count": 15,
+              "median": 9.976,
+              "p25": 9.342,
+              "p75": 10.979,
+              "min": 9.222,
+              "max": 11.671
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9842059241447154,
+          "script": 0.9761515844495263
+        }
+      },
+      {
+        "id": "04_select1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 25,
+              "median": 7.822,
+              "p25": 7.3235,
+              "p75": 8.5115,
+              "min": 6.633,
+              "max": 11.188
+            },
+            "script": {
+              "count": 25,
+              "median": 4.556,
+              "p25": 4.098,
+              "p75": 5.0175,
+              "min": 3.905,
+              "max": 5.368
+            },
+            "paint": {
+              "count": 25,
+              "median": 2.549,
+              "p25": 2.09,
+              "p75": 2.8405,
+              "min": 1.633,
+              "max": 4.071
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 25,
+              "median": 7.936,
+              "p25": 7.1665,
+              "p75": 9.315000000000001,
+              "min": 6.743,
+              "max": 10.723
+            },
+            "script": {
+              "count": 25,
+              "median": 4.237,
+              "p25": 3.9825,
+              "p75": 4.8545,
+              "min": 3.634,
+              "max": 5.584
+            },
+            "paint": {
+              "count": 25,
+              "median": 2.649,
+              "p25": 2.258,
+              "p75": 3.4555,
+              "min": 2.08,
+              "max": 4.598
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.014574277678343,
+          "script": 0.929982440737489
+        }
+      },
+      {
+        "id": "05_swap1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 17.205,
+              "p25": 16.537,
+              "p75": 18.814,
+              "min": 15.99,
+              "max": 20.726
+            },
+            "script": {
+              "count": 15,
+              "median": 3.587,
+              "p25": 3.347,
+              "p75": 3.723,
+              "min": 3.071,
+              "max": 4.439
+            },
+            "paint": {
+              "count": 15,
+              "median": 12.359,
+              "p25": 11.675,
+              "p75": 13.62,
+              "min": 11.061,
+              "max": 14.886
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 17.624,
+              "p25": 17.083,
+              "p75": 19.012,
+              "min": 16.149,
+              "max": 21.295
+            },
+            "script": {
+              "count": 15,
+              "median": 3.764,
+              "p25": 3.373,
+              "p75": 4.085,
+              "min": 3.066,
+              "max": 4.52
+            },
+            "paint": {
+              "count": 15,
+              "median": 12.586,
+              "p25": 12.352,
+              "p75": 13.704,
+              "min": 11.206,
+              "max": 14.878
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0243533856437081,
+          "script": 1.0493448564259826
+        }
+      },
+      {
+        "id": "06_remove-one-1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 12.185,
+              "p25": 12.092,
+              "p75": 12.474,
+              "min": 11.741,
+              "max": 16.071
+            },
+            "script": {
+              "count": 15,
+              "median": 1.299,
+              "p25": 1.148,
+              "p75": 1.442,
+              "min": 1.094,
+              "max": 1.825
+            },
+            "paint": {
+              "count": 15,
+              "median": 10.227,
+              "p25": 9.992,
+              "p75": 10.473,
+              "min": 9.248,
+              "max": 10.743
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 12.101,
+              "p25": 11.995,
+              "p75": 12.476,
+              "min": 11.778,
+              "max": 14.967
+            },
+            "script": {
+              "count": 15,
+              "median": 1.31,
+              "p25": 1.178,
+              "p75": 1.443,
+              "min": 1.057,
+              "max": 1.964
+            },
+            "paint": {
+              "count": 15,
+              "median": 10.015,
+              "p25": 9.703,
+              "p75": 10.628,
+              "min": 9.146,
+              "max": 12.587
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9931062782109151,
+          "script": 1.00846805234796
+        }
+      },
+      {
+        "id": "07_create10k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 289.958,
+              "p25": 287.003,
+              "p75": 297.906,
+              "min": 284.481,
+              "max": 303.508
+            },
+            "script": {
+              "count": 15,
+              "median": 64.448,
+              "p25": 63.803,
+              "p75": 64.961,
+              "min": 62.87,
+              "max": 68.052
+            },
+            "paint": {
+              "count": 15,
+              "median": 218.65,
+              "p25": 216.369,
+              "p75": 224.126,
+              "min": 213.34,
+              "max": 231.244
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 292.859,
+              "p25": 287.171,
+              "p75": 295.715,
+              "min": 285.504,
+              "max": 302.118
+            },
+            "script": {
+              "count": 15,
+              "median": 63.679,
+              "p25": 63.196,
+              "p75": 65.189,
+              "min": 62.474,
+              "max": 67.045
+            },
+            "paint": {
+              "count": 15,
+              "median": 221.095,
+              "p25": 216.195,
+              "p75": 222.905,
+              "min": 213.601,
+              "max": 227.914
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0100048972609825,
+          "script": 0.9880678997020855
+        }
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 31.49,
+              "p25": 30.883,
+              "p75": 32.476,
+              "min": 30.224,
+              "max": 34.769
+            },
+            "script": {
+              "count": 15,
+              "median": 8.235,
+              "p25": 8.032,
+              "p75": 8.409,
+              "min": 7.798,
+              "max": 8.649
+            },
+            "paint": {
+              "count": 15,
+              "median": 22.266,
+              "p25": 21.781,
+              "p75": 23.093,
+              "min": 21.225,
+              "max": 25.188
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 30.933,
+              "p25": 30.496,
+              "p75": 31.26,
+              "min": 30.353,
+              "max": 33.255
+            },
+            "script": {
+              "count": 15,
+              "median": 8.035,
+              "p25": 7.973,
+              "p75": 8.229,
+              "min": 7.941,
+              "max": 8.393
+            },
+            "paint": {
+              "count": 15,
+              "median": 21.894,
+              "p25": 21.482,
+              "p75": 22.134,
+              "min": 21.278,
+              "max": 24.17
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9823118450301683,
+          "script": 0.9757134183363693
+        }
+      },
+      {
+        "id": "09_clear1k_x8",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 15,
+              "median": 12.891,
+              "p25": 11.892,
+              "p75": 13.462,
+              "min": 10.905,
+              "max": 14.759
+            },
+            "script": {
+              "count": 15,
+              "median": 10.08,
+              "p25": 9.731,
+              "p75": 11.021,
+              "min": 8.647,
+              "max": 11.923
+            },
+            "paint": {
+              "count": 15,
+              "median": 1.12,
+              "p25": 0.621,
+              "p75": 1.815,
+              "min": 0.302,
+              "max": 2.245
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 15,
+              "median": 12.182,
+              "p25": 11.357,
+              "p75": 13.199,
+              "min": 10.707,
+              "max": 14.269
+            },
+            "script": {
+              "count": 15,
+              "median": 9.432,
+              "p25": 8.866,
+              "p75": 10.284,
+              "min": 8.444,
+              "max": 12.223
+            },
+            "paint": {
+              "count": 15,
+              "median": 1.741,
+              "p25": 1.029,
+              "p75": 2.021,
+              "min": 0.454,
+              "max": 2.139
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9450003878675045,
+          "script": 0.9357142857142857
+        }
+      }
+    ],
+    "pooled": [
+      {
+        "id": "01_run1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 27.5645,
+              "p25": 27.313,
+              "p75": 28.021,
+              "min": 26.823,
+              "max": 29.883
+            },
+            "script": {
+              "count": 30,
+              "median": 8.1865,
+              "p25": 8.049,
+              "p75": 8.551,
+              "min": 7.831,
+              "max": 8.771
+            },
+            "paint": {
+              "count": 30,
+              "median": 18.7955,
+              "p25": 18.608,
+              "p75": 19.195,
+              "min": 18.385,
+              "max": 20.672
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 27.6525,
+              "p25": 27.274,
+              "p75": 28.24,
+              "min": 26.91,
+              "max": 31.147
+            },
+            "script": {
+              "count": 30,
+              "median": 8.231,
+              "p25": 7.989,
+              "p75": 8.445,
+              "min": 7.712,
+              "max": 10.557
+            },
+            "paint": {
+              "count": 30,
+              "median": 18.887,
+              "p25": 18.715,
+              "p75": 19.429,
+              "min": 18.249,
+              "max": 20.681
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.003192512107965,
+          "script": 1.0054357784156842
+        }
+      },
+      {
+        "id": "02_replace1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 31.359,
+              "p25": 30.866,
+              "p75": 32.041,
+              "min": 30.321,
+              "max": 34.267
+            },
+            "script": {
+              "count": 30,
+              "median": 11.664,
+              "p25": 11.519,
+              "p75": 11.931,
+              "min": 11.171,
+              "max": 12.747
+            },
+            "paint": {
+              "count": 30,
+              "median": 19.1625,
+              "p25": 18.749,
+              "p75": 19.553,
+              "min": 18.07,
+              "max": 21.46
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 31.55,
+              "p25": 31.163,
+              "p75": 32.656,
+              "min": 30.828,
+              "max": 34.607
+            },
+            "script": {
+              "count": 30,
+              "median": 11.736,
+              "p25": 11.622,
+              "p75": 11.928,
+              "min": 11.31,
+              "max": 12.941
+            },
+            "paint": {
+              "count": 30,
+              "median": 19.2085,
+              "p25": 19.022,
+              "p75": 20.029,
+              "min": 18.458,
+              "max": 21.809
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0060907554450078,
+          "script": 1.0061728395061729
+        }
+      },
+      {
+        "id": "03_update10th1k_x16",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 18.569499999999998,
+              "p25": 18.034,
+              "p75": 19.442,
+              "min": 16.897,
+              "max": 23.943
+            },
+            "script": {
+              "count": 30,
+              "median": 6.1385000000000005,
+              "p25": 5.945,
+              "p75": 6.568,
+              "min": 5.68,
+              "max": 7.755
+            },
+            "paint": {
+              "count": 30,
+              "median": 10.483,
+              "p25": 9.894,
+              "p75": 11.274,
+              "min": 9.026,
+              "max": 14.169
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 18.394,
+              "p25": 17.868,
+              "p75": 19.217,
+              "min": 17.087,
+              "max": 21.281
+            },
+            "script": {
+              "count": 30,
+              "median": 6.154999999999999,
+              "p25": 5.96,
+              "p75": 6.616,
+              "min": 5.414,
+              "max": 7.182
+            },
+            "paint": {
+              "count": 30,
+              "median": 10.452,
+              "p25": 9.781,
+              "p75": 11.117,
+              "min": 9.222,
+              "max": 12.223
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9905490185519266,
+          "script": 1.0026879530830006
+        }
+      },
+      {
+        "id": "04_select1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 50,
+              "median": 7.8895,
+              "p25": 7.266,
+              "p75": 8.574,
+              "min": 6.633,
+              "max": 11.188
+            },
+            "script": {
+              "count": 50,
+              "median": 4.4315,
+              "p25": 4.09,
+              "p75": 4.963,
+              "min": 3.668,
+              "max": 5.528
+            },
+            "paint": {
+              "count": 50,
+              "median": 2.4275,
+              "p25": 2.087,
+              "p75": 2.857,
+              "min": 1.43,
+              "max": 4.291
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 50,
+              "median": 8.0245,
+              "p25": 7.237,
+              "p75": 9.089,
+              "min": 6.743,
+              "max": 10.723
+            },
+            "script": {
+              "count": 50,
+              "median": 4.4135,
+              "p25": 4.026,
+              "p75": 5.064,
+              "min": 3.634,
+              "max": 5.837
+            },
+            "paint": {
+              "count": 50,
+              "median": 2.6645000000000003,
+              "p25": 2.232,
+              "p75": 3.174,
+              "min": 1.548,
+              "max": 4.598
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0171113505291842,
+          "script": 0.9959381699198917
+        }
+      },
+      {
+        "id": "05_swap1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 17.925,
+              "p25": 17.188,
+              "p75": 20.226,
+              "min": 15.99,
+              "max": 26.117
+            },
+            "script": {
+              "count": 30,
+              "median": 3.6609999999999996,
+              "p25": 3.561,
+              "p75": 4.028,
+              "min": 3.071,
+              "max": 5.191
+            },
+            "paint": {
+              "count": 30,
+              "median": 13.192,
+              "p25": 12.193,
+              "p75": 14.653,
+              "min": 11.061,
+              "max": 17.128
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 18.0835,
+              "p25": 17.292,
+              "p75": 19.061,
+              "min": 16.149,
+              "max": 33.593
+            },
+            "script": {
+              "count": 30,
+              "median": 3.799,
+              "p25": 3.532,
+              "p75": 4.261,
+              "min": 3.066,
+              "max": 5.374
+            },
+            "paint": {
+              "count": 30,
+              "median": 13.038499999999999,
+              "p25": 12.372,
+              "p75": 13.704,
+              "min": 11.206,
+              "max": 23.316
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0088423988842399,
+          "script": 1.0376946189565694
+        }
+      },
+      {
+        "id": "06_remove-one-1k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 12.504000000000001,
+              "p25": 12.185,
+              "p75": 12.701,
+              "min": 11.741,
+              "max": 16.752
+            },
+            "script": {
+              "count": 30,
+              "median": 1.262,
+              "p25": 1.154,
+              "p75": 1.42,
+              "min": 1.094,
+              "max": 1.825
+            },
+            "paint": {
+              "count": 30,
+              "median": 10.4485,
+              "p25": 10.021,
+              "p75": 10.715,
+              "min": 9.248,
+              "max": 13.05
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 12.393,
+              "p25": 12.078,
+              "p75": 12.711,
+              "min": 11.778,
+              "max": 14.967
+            },
+            "script": {
+              "count": 30,
+              "median": 1.2890000000000001,
+              "p25": 1.159,
+              "p75": 1.401,
+              "min": 1.057,
+              "max": 2.05
+            },
+            "paint": {
+              "count": 30,
+              "median": 10.427,
+              "p25": 9.985,
+              "p75": 10.659,
+              "min": 9.146,
+              "max": 12.587
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9911228406909789,
+          "script": 1.0213946117274169
+        }
+      },
+      {
+        "id": "07_create10k",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 295.1485,
+              "p25": 288.942,
+              "p75": 301.059,
+              "min": 284.481,
+              "max": 320.722
+            },
+            "script": {
+              "count": 30,
+              "median": 64.524,
+              "p25": 63.886,
+              "p75": 66.317,
+              "min": 62.87,
+              "max": 71.123
+            },
+            "paint": {
+              "count": 30,
+              "median": 223.315,
+              "p25": 218.135,
+              "p75": 227.711,
+              "min": 213.34,
+              "max": 239.149
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 293.0265,
+              "p25": 288.676,
+              "p75": 297.272,
+              "min": 284.41,
+              "max": 318.945
+            },
+            "script": {
+              "count": 30,
+              "median": 64.326,
+              "p25": 63.302,
+              "p75": 65.458,
+              "min": 62.474,
+              "max": 76.929
+            },
+            "paint": {
+              "count": 30,
+              "median": 220.877,
+              "p25": 217.411,
+              "p75": 223.648,
+              "min": 213.601,
+              "max": 232.581
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9928103988331297,
+          "script": 0.9969313743723265
+        }
+      },
+      {
+        "id": "08_create1k-after1k_x2",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 31.2945,
+              "p25": 30.883,
+              "p75": 32.4,
+              "min": 30.224,
+              "max": 34.769
+            },
+            "script": {
+              "count": 30,
+              "median": 8.158,
+              "p25": 7.908,
+              "p75": 8.386,
+              "min": 7.784,
+              "max": 8.649
+            },
+            "paint": {
+              "count": 30,
+              "median": 22.235,
+              "p25": 22.026,
+              "p75": 23.034,
+              "min": 21.225,
+              "max": 25.188
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 31.262500000000003,
+              "p25": 30.933,
+              "p75": 31.634,
+              "min": 30.353,
+              "max": 35.111
+            },
+            "script": {
+              "count": 30,
+              "median": 8.094000000000001,
+              "p25": 7.98,
+              "p75": 8.338,
+              "min": 7.716,
+              "max": 9.195
+            },
+            "paint": {
+              "count": 30,
+              "median": 22.2185,
+              "p25": 21.894,
+              "p75": 22.434,
+              "min": 21.278,
+              "max": 24.891
+            }
+          }
+        },
+        "ratio": {
+          "total": 0.9989774561025101,
+          "script": 0.9921549399362591
+        }
+      },
+      {
+        "id": "09_clear1k_x8",
+        "variants": {
+          "lithent-before": {
+            "total": {
+              "count": 30,
+              "median": 12.845500000000001,
+              "p25": 12.337,
+              "p75": 13.684,
+              "min": 10.905,
+              "max": 14.896
+            },
+            "script": {
+              "count": 30,
+              "median": 10.374500000000001,
+              "p25": 9.872,
+              "p75": 11.041,
+              "min": 8.647,
+              "max": 12.037
+            },
+            "paint": {
+              "count": 30,
+              "median": 1.185,
+              "p25": 0.91,
+              "p75": 1.795,
+              "min": 0.302,
+              "max": 2.245
+            }
+          },
+          "lithent": {
+            "total": {
+              "count": 30,
+              "median": 13.1155,
+              "p25": 11.69,
+              "p75": 14.131,
+              "min": 10.707,
+              "max": 15.758
+            },
+            "script": {
+              "count": 30,
+              "median": 10.265,
+              "p25": 9.142,
+              "p75": 11.412,
+              "min": 8.444,
+              "max": 12.761
+            },
+            "paint": {
+              "count": 30,
+              "median": 1.689,
+              "p25": 1.139,
+              "p75": 2.021,
+              "min": 0.454,
+              "max": 2.594
+            }
+          }
+        },
+        "ratio": {
+          "total": 1.0210190339029233,
+          "script": 0.9894452744710588
+        }
+      }
+    ]
+  },
+  "weighted": {
+    "main": {
+      "total": 1.0047816043922577,
+      "script": 1.0113597509628025
+    },
+    "reverse": {
+      "total": 0.9955402193045133,
+      "script": 0.9899713265364023
+    },
+    "pooled": {
+      "total": 1.000955740081957,
+      "script": 1.0031711455043437
+    }
+  },
+  "tests": {
+    "isolated": 251,
+    "includesMemo": 33,
+    "dualPassed": 1070,
+    "dualSkipped": 3
+  },
+  "runs": [
+    {
+      "startedAt": "2026-10-22T04:15:25.049Z",
+      "finishedAt": "2026-10-22T04:23:03.297Z",
+      "loadStart": [1.7021484375, 3.14501953125, 3.44091796875],
+      "loadEnd": [3.63525390625, 4.58642578125, 4.11767578125],
+      "failedBatches": [],
+      "chrome": "Chrome/155.0.8059.85",
+      "chromeBinarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "chromeFrameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7"
+    },
+    {
+      "startedAt": "2026-10-22T04:23:28.405Z",
+      "finishedAt": "2026-10-22T04:31:01.842Z",
+      "loadStart": [3.7333984375, 4.52392578125, 4.10693359375],
+      "loadEnd": [4.205078125, 4.0244140625, 3.87451171875],
+      "failedBatches": [],
+      "chrome": "Chrome/155.0.8059.85",
+      "chromeBinarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "chromeFrameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7"
+    }
+  ],
+  "contracts": {
+    "package": {
+      "defaultHasMemo": false,
+      "isolatedOwnsItsRegistry": true,
+      "mixedSetupRejected": true,
+      "esmAndCommonJS": true,
+      "packageSelfReference": true,
+      "nodeNextESMAndCommonJSTypes": true
+    },
+    "editor": {
+      "kind": "C3 production DOM/work-count/retention contract; not official CPU performance",
+      "at": "2026-10-22T04:14:13.188Z",
+      "browserVersion": "155.0.8059.85",
+      "manifest": {
+        "at": "2026-10-22T04:14:11.841Z",
+        "browser": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+        "builds": {
+          "baseline": {
+            "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+            "appSource": "be0505eb841d6fcb6dce540d4db626dd2689b29787d307a540e4f06634c569da",
+            "bundle": "249509ff3a7bffc06758e83cdfb4b7ba9aa6b2167c68c2b6bdcc018edc80f47b"
+          },
+          "candidate": {
+            "core": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+            "appSource": "be0505eb841d6fcb6dce540d4db626dd2689b29787d307a540e4f06634c569da",
+            "bundle": "21fbc5e6092cf8c2f090a5012b6249a8d27afb7b7d3cfb2bfcff4e2b1d8a8eec"
+          }
+        },
+        "types": {
+          "base": {
+            "exitCode": 0,
+            "output": "",
+            "declaration": "69ed6c62dd2bf3ce0c2cc561f750d89335a6d8100bd5771be8a8edad34f0839e"
+          },
+          "concurrent": {
+            "exitCode": 2,
+            "output": "../../../../tmp/lithent-c3-isolated-20261022/contracts/types/concurrent/consumer.ts(1,10): error TS2305: Module '\"lithent\"' has no exported member 'useParentMemo'.\n../../../../tmp/lithent-c3-isolated-20261022/contracts/types/concurrent/consumer.ts(2,34): error TS7006: Parameter 'next' implicitly has an 'any' type.\n",
+            "declaration": "4ea4f531f7fc31a03fd8d5b4d42e7d8ff3075bcbf1e78b8b82bfcbdab42802d6"
+          }
+        },
+        "unsupportedRuntimeImport": {
+          "exitCode": 1,
+          "error": "file:///private/tmp/lithent-c3-isolated-20261022/contracts/unsupported-import.mjs:1\nimport { useParentMemo } from \"/Users/n250109005/project/lithent/lithentConcurrent/dist/lithentConcurrent.mjs\";\n         ^^^^^^^^^^^^^\nSyntaxError: The requested module '/Users/n250109005/project/lithent/lithentConcurrent/dist/lithentConcurrent.mjs' does not provide an export named 'useParentMemo'\n    at ModuleJob._instantiate (node:internal/modules/esm/module_job:122:21)\n    at async ModuleJob.run (node:internal/modules/esm/module_job:188:5)\n    at async DefaultModuleLoader.import (node:internal/modules/esm/loader:246:24)\n    at async loadESM (node:internal/process/esm_loader:40:7)\n    at async handleMainPromise (node:internal/modules/run_main:66:12)\n\nNode.js v20.3.0\n"
+        }
+      },
+      "runs": [
+        {
+          "variant": "baseline",
+          "optIn": false,
+          "contextIndex": 0,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 2000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 4001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 5001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 6000,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "baseline",
+          "optIn": false,
+          "contextIndex": 1,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 2000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 4001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 5001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 6000,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "baseline",
+          "optIn": false,
+          "contextIndex": 2,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 2000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 4001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 5001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 6000,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "candidate",
+          "optIn": false,
+          "contextIndex": 0,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 2000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 4001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 5001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 6000,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "candidate",
+          "optIn": false,
+          "contextIndex": 1,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 2000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 4001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 5001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 6000,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "candidate",
+          "optIn": false,
+          "contextIndex": 2,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 2000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 4001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 5001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 6000,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "candidate",
+          "optIn": true,
+          "contextIndex": 0,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 1001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 1002,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 1002,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "candidate",
+          "optIn": true,
+          "contextIndex": 1,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 1001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 1002,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 1002,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        },
+        {
+          "variant": "candidate",
+          "optIn": true,
+          "contextIndex": 2,
+          "checks": {
+            "states": [
+              {
+                "stage": "mount",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "refresh",
+                "renders": 1000,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "self-then-refresh-and-reverse",
+                "renders": 1001,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "one-prop-change",
+                "renders": 1002,
+                "mounts": 1000,
+                "unmounts": 0
+              },
+              {
+                "stage": "remove-one",
+                "renders": 1002,
+                "mounts": 1000,
+                "unmounts": 1
+              }
+            ],
+            "registeredBeforeDestroy": 999,
+            "focusAfterRefresh": true,
+            "remainingInputs": 0
+          },
+          "retention": {
+            "retainedKeys": 1000,
+            "registered": 0,
+            "retainedOutputsAndHost": 0,
+            "unmounts": 1000
+          },
+          "errors": []
+        }
+      ]
+    },
+    "original": {
+      "startedAt": "2026-10-22T04:14:29.732Z",
+      "chrome": "155.0.8059.85",
+      "load": [2.29443359375, 3.49658203125, 3.57666015625],
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-22T04:14:14.645Z",
+          "libraryHead": "d660fdf33578885c9534fec8040ef8b5602bbe23",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+          "vite": "5.4.21"
+        },
+        "lithent": {
+          "date": "2026-10-22T04:14:14.731Z",
+          "libraryHead": "d660fdf33578885c9534fec8040ef8b5602bbe23",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+          "coreOrigin": "local-unreleased",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "179b5035b81fc11d54c072564529efd06dca8781fc4f2c03cfa2eaa0dedf63c3",
+          "vite": "5.4.21"
+        }
+      },
+      "throttle": 4,
+      "samples": [
+        {
+          "name": "lithent-before",
+          "selection": {
+            "attributes": 2,
+            "childList": 0
+          },
+          "partial": {
+            "text": 100,
+            "childList": 0
+          },
+          "clear": {
+            "removals": 1,
+            "removedNodes": 1000
+          },
+          "batchedOrders": 2,
+          "recreateCycles": 20
+        },
+        {
+          "name": "lithent",
+          "selection": {
+            "attributes": 2,
+            "childList": 0
+          },
+          "partial": {
+            "text": 100,
+            "childList": 0
+          },
+          "clear": {
+            "removals": 1,
+            "removedNodes": 1000
+          },
+          "batchedOrders": 2,
+          "recreateCycles": 20
+        }
+      ],
+      "finishedAt": "2026-10-22T04:14:30.382Z"
+    },
+    "verify": {
+      "startedAt": "2026-10-22T04:14:31.487Z",
+      "mode": "verify",
+      "chrome": "155.0.8059.85",
+      "chromeBinaryPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/MacOS/Google Chrome",
+      "chromeBinarySha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d",
+      "chromeFrameworkPath": "/tmp/lithent-benchmark-chrome-155.0.8059.85.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/Current/Google Chrome Framework",
+      "chromeFrameworkSha256": "b1d0216b347be90a898e9961302916aa1dbf4659f96597ea836dd3eb149574b7",
+      "machine": {
+        "cpu": "Apple M4 Pro",
+        "cores": 12,
+        "memoryGB": 24
+      },
+      "loadStart": [2.5908203125, 3.5380859375, 3.5908203125],
+      "alternatingOrder": false,
+      "build": {
+        "lithent-before": {
+          "date": "2026-10-22T04:14:14.645Z",
+          "libraryHead": "d660fdf33578885c9534fec8040ef8b5602bbe23",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "3aff372ac9a7e8de09f73f5ddcde5c80ef27d7f6dee8bf2221c0e9cc8121a964",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "bccc87087a0d7bb132a6d144dfe288fc5ac0c40833a6e1e350b33fa3f8b503f6",
+          "vite": "5.4.21"
+        },
+        "lithent": {
+          "date": "2026-10-22T04:14:14.731Z",
+          "libraryHead": "d660fdf33578885c9534fec8040ef8b5602bbe23",
+          "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+          "appSource": "4fcb17e3dcd841f628d4130a7d47ca3011550972675ba2da18e324a5f541d632",
+          "core": "43b80396f380e345986581f59ce2a4cafc178946730179fde0450bda4d12d4f9",
+          "coreOrigin": "local-unreleased",
+          "helper": "9f1399db105531d5e4e1e45c8156477741df27888078898c788cab14514f2594",
+          "bundle": "179b5035b81fc11d54c072564529efd06dca8781fc4f2c03cfa2eaa0dedf63c3",
+          "vite": "5.4.21"
+        }
+      },
+      "versions": {
+        "lithent": "1.25.2",
+        "vite": "5.4.21"
+      },
+      "samples": [
+        {
+          "name": "lithent-before",
+          "scenarios": 9,
+          "fontLoaded": true
+        },
+        {
+          "name": "lithent",
+          "scenarios": 9,
+          "fontLoaded": true
+        }
+      ],
+      "complete": true,
+      "finishedAt": "2026-10-22T04:14:35.473Z",
+      "loadEnd": [2.5908203125, 3.5380859375, 3.5908203125]
+    }
+  },
+  "unmeasured": [
+    "memo-enabled benchmark row CPU",
+    "official memory 5 scenarios",
+    "full React/Preact peers",
+    "100-cycle churn",
+    "full B4/hardening/integration"
+  ],
+  "limits": [
+    "CPU comparison uses unchanged original app with no useParentMemo calls.",
+    "Pooled medians keep equal numbers of samples from each round; batch/load/temporal confounding remains.",
+    "Private standalone package and all-API bundler alias are experimental; no new subpath or optional budget has been approved."
+  ],
+  "appSizes": {
+    "lithent-before": {
+      "raw": 14815,
+      "gzip": 6163,
+      "brotli": 5689
+    },
+    "lithent": {
+      "raw": 17164,
+      "gzip": 7043,
+      "brotli": 6492
+    }
+  },
+  "analysisCompression": {
+    "node": "v20.3.0",
+    "zlib": "1.2.13.1-motley",
+    "gzipLevel": 9
+  },
+  "declarations": {
+    "esm": 17,
+    "commonJS": 17
+  },
+  "environment": {
+    "at": "2026-10-22T04:34:07.444Z",
+    "node": "v20.3.0",
+    "zlib": "1.2.13.1-motley",
+    "platform": "darwin",
+    "arch": "arm64",
+    "os": "24.6.0",
+    "cpu": "Apple M4 Pro",
+    "benchmarkHead": "ecbff5f54b75244b89b0b14d34f11e32bca59345",
+    "siblingSourceSHA256": "314efbb41cf0669c13449c4b4800c4ed5e2b193167f20ccebf7d3f7303e5d76b"
+  },
+  "traces": {
+    "count": 580,
+    "preserved": 4,
+    "policy": "All normal trace hashes/sizes; selection trace index 0 per variant per round. Other normal trace contents remain temporary. Failed attempts, if any, retained in full."
+  },
+  "evidence": {
+    "file": "docs/benchmark/parent-memo-isolation-evidence.json.gz",
+    "sha256": "b8d28232b2c7b29b305b947dd3e6a230ba3e8a0e5fdbef7fc609ac0ca02264d4",
+    "bytes": 1229298,
+    "files": 367
+  }
+}

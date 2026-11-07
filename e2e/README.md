@@ -10,6 +10,13 @@ pnpm test:e2e:build
 
 After building once, use `pnpm test:e2e`. To run a subset:
 
+Select Firefox or WebKit with `LITHENT_E2E_BROWSER=firefox` or
+`LITHENT_E2E_BROWSER=webkit`; the default is Chromium. Install the matching
+engines with `pnpm exec playwright install chromium firefox webkit`.
+Set `LITHENT_CHROME=/path/to/chromium` to use an existing Chromium installation
+when Chromium is selected; otherwise Playwright uses its installed browser.
+The mutation runner inherits the same selection and override.
+
 ```sh
 pnpm test:e2e --project=concurrent --grep 'B-4/B-9'
 pnpm exec tsc -p e2e/tsconfig.json
@@ -22,6 +29,7 @@ context/lcontext, portal placement, real server rendering and hydration, keyed
 row state and DOM identity, and real Vite boundary replacement. They also
 exercise all five examples pages and all 42 English/Korean docs example routes,
 including computed, shared store, keyed list, context and portal interactions.
+The lifecycle documentation adds both language routes of example 22.
 The release documentation checks both languages of the concurrent guides,
 their live concurrent demo, language switching, navigation and cleanup.
 
@@ -66,3 +74,33 @@ Performance judgments (A-3/B-1) and equivalence to a previous release (A-7)
 remain separate from these functional tests. The canonical requirements,
 design, implementation status and checklist are in
 [`docs/concurrent-rendering`](../docs/concurrent-rendering/MANUAL_TEST_CHECKLIST.md).
+
+`lifecycle-docs.spec.ts` adds three checks per core for bilingual lifecycle API
+navigation and source, retained drafts and undo, stale search generations,
+hidden instance saves, polling, permanent disposal and route/language cleanup.
+The mock timer clock is controlled only in the retention test; the cleanup
+check tracks the demo's real intervals and request timers.
+
+`events.spec.ts` runs trusted alias transitions, nested dispatch, latest handler
+native replacement timing on the target and ancestor, callback exceptions,
+original prop callback dedup/remove and replacement order, and direct native
+registration through ref/mountCallback for both built cores. The alias test
+depends on the browser's microtask checkpoint between native listeners;
+synthetic dispatch alone does not detect the preserved flat proxy regression.
+
+```sh
+pnpm exec playwright test e2e/lifecycle-docs.spec.ts e2e/release-docs.spec.ts
+```
+
+`hmr-stateless.spec.ts` checks stateless expression/block functions, default
+exports, and nested `mount`/`lmount` components in one module. It exercises
+repeated edits, parent state and props/children preservation, mounted child
+state after a parent redraw, and edits while the components are unmounted.
+All file edits stay in the isolated `.e2e-work` copy.
+
+It also checks JSX lists, mount cleanup, and empty output becoming visible and
+empty again, plus direct function calls from another module that keep the
+caller's state. `hmr-mixed-exports.spec.ts` verifies that component-only changes
+preserve parent state, while ordinary export changes update the importer and
+clean up the previous root. The fixture watcher waits for each file write to
+finish so rapid automated edits are not lost to change-event throttling.

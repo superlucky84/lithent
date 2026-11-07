@@ -1,5 +1,6 @@
 import {
   WDom,
+  TagFunctionResolver,
   TagFunction,
   FragmentFunction,
   Props,
@@ -16,6 +17,7 @@ import { wDomUpdate } from '@/render';
 import { execMountedQueue } from '@/hook/mountCallback';
 import {
   initUpdateHookState,
+  compKeyRef,
   initMountHookState,
   needDiffRef,
   componentMap,
@@ -39,6 +41,7 @@ import {
   checkCustemComponentFunction,
 } from '@/utils/predicator';
 import { assign, getParent } from '@/utils';
+import { renderGate } from './renderGate';
 
 // ============================================================================
 // Public API - Highest Level (User-facing API)
@@ -50,6 +53,7 @@ import { assign, getParent } from '@/utils';
 export const Fragment = (_props: Props, ...children: WDom[]) =>
   ({
     type: 'f', // fragment
+    nr: undefined,
     [wdomSymbol]: true,
     children,
   }) as WDom;
@@ -290,7 +294,7 @@ export const replaceWDom = (
 ) => {
   let originalWDom = original;
 
-  if (originalWDom.il) {
+  if (originalWDom.il || renderGate.blocks?.(originalWDom)) {
     return;
   }
 
@@ -525,6 +529,21 @@ const discardPaused = () => {
   restoreHookState(pass.trace.snapshots);
 };
 
+// A pause must not turn unrelated low work into synchronous work. Related
+// pure builds can be discarded; a queued renew records the boundary's dirty
+// state after pause takes effect, without replaying any user effect.
+renderGate.settle = key => {
+  if (!pausedPass) return;
+  const pass = pausedPass;
+  if (key && pass.props !== key && !relatedComponents(pass.props, key)) return;
+  if (pass.trace.mounted || buildRanUpdateEffects(pass.trace.snapshots)) {
+    drainPendingWork();
+  } else {
+    discardPaused();
+    componentMap.get(pass.props)?.up();
+  }
+};
+
 /**
  * Where a build records what has to happen at commit.
  *
@@ -560,6 +579,8 @@ const finishTree = (pass: Pass, newWDomTree: WDom) => {
   // NOTE: we/ae are short for wrapElement/afterElement
   const { isRoot, getParent, we, ae } = originalWDom;
 
+  if (newWDomTree.getParent && newWDomTree.getParent !== getParent)
+    renderGate.reparent?.(newWDomTree);
   newWDomTree.getParent = getParent;
 
   if (!isRoot && getParent) {
@@ -618,13 +639,23 @@ const makeNode = (
   } else if (checkCustemComponentFunction(tag)) {
     const componetMakeResolver = makeWDomResolver(tag, props, children);
 
-    return needDiffRef.value
-      ? componetMakeResolver
-      : componetMakeResolver.resolve();
+    if (needDiffRef.value) {
+      return componetMakeResolver;
+    }
+
+    // Drawn right away, without a diff. Later updates sync the instance's
+    // props and children in place, so it gets copies; the node keeps the
+    // untouched description to be drawn again elsewhere (cloneWDom).
+    const node = copyResolver(componetMakeResolver).resolve();
+    node.rs = componetMakeResolver;
+    return node;
   }
 
   return {
     type: 'e', // element
+    // Declared on every new node: a diff sets it, and a drawn node keeps it
+    // ('N'), so the node keeps its shape and reading it is a plain lookup.
+    nr: undefined,
     [wdomSymbol]: true,
     tag,
     props,
@@ -644,6 +675,7 @@ const remakeChildren = (
 
   return children.map((item: MiddleStateWDom) => {
     const childItem = makeChildrenItem(item);
+    if (childItem.getParent) renderGate.reparent?.(childItem);
     childItem.getParent = getParent;
     return childItem;
   });
@@ -653,13 +685,14 @@ const remakeChildren = (
  * Recursively process the child virtual DOM elements.
  */
 const makeChildrenItem = (item: MiddleStateWDom): WDom => {
-  if (item === null || item === undefined || item === false) {
-    return { type: null, [wdomSymbol]: true } as WDom;
+  if (item === null || item === undefined || typeof item === 'boolean') {
+    return { type: null, nr: undefined, [wdomSymbol]: true } as WDom;
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
     const node = {
       type: 'l', // loop (array mapping)
+      nr: undefined,
       [wdomSymbol]: true,
       children,
     } as WDom;
@@ -667,7 +700,7 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return { type: 't', [wdomSymbol]: true, text: item } as WDom; // text node
+    return { type: 't', nr: undefined, [wdomSymbol]: true, text: item } as WDom; // text node
   }
 
   return item;
@@ -693,41 +726,85 @@ const createComponentResolver = (
     // Regression tests: src/tests/core-composedRenew.test.tsx,
     // src/tests/core-component-remount.test.tsx
     const prevNeedDiff = needDiffRef.value;
+    const previousKey = compKeyRef.value;
     needDiffRef.value = false;
+    try {
+      markBuildMounted();
+      initMountHookState(compKey, tag);
 
-    markBuildMounted();
-    initMountHookState(compKey);
+      const initialComponent = tag(props, wrappedChildren);
 
-    const initialComponent = tag(props, wrappedChildren);
+      let componentMaker: (nextProps: Props) => MiddleStateWDom;
 
-    let componentMaker: (nextProps: Props) => MiddleStateWDom;
+      if (typeof initialComponent === 'function') {
+        const component = initialComponent;
+        // Check if component is created with lmount (no renew parameter)
+        // TypeScript cannot infer that component is LComponent when has() returns true,
+        // because WeakSet.has() is a runtime check that doesn't narrow types.
+        // We use 'as any' since the runtime check guarantees type safety.
+        componentMaker = lmountComponentSet.has(component)
+          ? (component as any)(props, wrappedChildren)
+          : component(componentUpdate(compKey), props, wrappedChildren);
+      } else {
+        // For components that directly return a VDom, recreate it each render.
+        // The first call already rendered this stateless component. Repeating it
+        // creates orphan child instances and can register hooks under a child's key.
+        let firstRender = true;
+        componentMaker = (nextProps: Props) => {
+          if (firstRender) {
+            firstRender = false;
+            return initialComponent as MiddleStateWDom;
+          }
+          return tag(nextProps, wrappedChildren) as MiddleStateWDom;
+        };
+      }
 
-    if (typeof initialComponent === 'function') {
-      const component = initialComponent;
-      // Check if component is created with lmount (no renew parameter)
-      // TypeScript cannot infer that component is LComponent when has() returns true,
-      // because WeakSet.has() is a runtime check that doesn't narrow types.
-      // We use 'as any' since the runtime check guarantees type safety.
-      componentMaker = lmountComponentSet.has(component)
-        ? (component as any)(props, wrappedChildren)
-        : component(componentUpdate(compKey), props, wrappedChildren);
-    } else {
-      // For components that directly return a VDom, recreate it each render.
-      componentMaker = (nextProps: Props) =>
-        tag(nextProps, wrappedChildren) as MiddleStateWDom;
+      return makeCustomNode(
+        componentMaker,
+        compKey,
+        tag,
+        props,
+        wrappedChildren
+      );
+    } finally {
+      compKeyRef.value = previousKey;
+      needDiffRef.value = prevNeedDiff;
     }
-
-    const node = makeCustomNode(
-      componentMaker,
-      compKey,
-      tag,
-      props,
-      wrappedChildren
-    );
-    needDiffRef.value = prevNeedDiff;
-    return node;
   };
 };
+
+/**
+ * A fresh copy of a node that is already drawn somewhere: a hoisted constant,
+ * children a component renders again in another place, the same node twice.
+ * A node holds the state of the place it is drawn in (el, children, parent,
+ * component instance), so a second place gets its own copy. A component
+ * becomes a resolver for a new instance with its own props and children.
+ */
+export const cloneWDom = (wDom: WDom): WDom | TagFunctionResolver =>
+  wDom.ctor
+    ? copyResolver(
+        wDom.rs || {
+          ctor: wDom.ctor,
+          props: wDom.compProps as Props,
+          children: wDom.compChild as WDom[],
+        }
+      )
+    : ({
+        type: wDom.type,
+        tag: wDom.tag,
+        props: wDom.props,
+        text: wDom.text,
+        children: wDom.children && [...wDom.children],
+        getParent: wDom.getParent,
+        [wdomSymbol]: true,
+      } as WDom);
+
+export const copyResolver = ({
+  ctor,
+  props,
+  children,
+}: Omit<TagFunctionResolver, 'resolve'>) =>
+  makeWDomResolver(ctor as TagFunction, { ...props }, [...(children || [])]);
 
 /**
  * Create an intermediate step for diffing between the existing virtual DOM and the new one during re-rendering
@@ -796,14 +873,19 @@ const wDomMaker = (
   children: WDom[],
   reRender: () => WDom
 ) => {
-  traceHookState(compKey);
-  initUpdateHookState(compKey);
-  runUpdateCallback();
+  const previousKey = compKeyRef.value;
+  try {
+    traceHookState(compKey);
+    initUpdateHookState(compKey);
+    runUpdateCallback();
 
-  const customNode = componentMaker(props);
-  addComponentProps(customNode, compKey, tag, props, children, reRender);
+    const customNode = componentMaker(props);
+    addComponentProps(customNode, compKey, tag, props, children, reRender);
 
-  return customNode;
+    return customNode;
+  } finally {
+    compKeyRef.value = previousKey;
+  }
 };
 
 // ============================================================================
@@ -822,6 +904,7 @@ const wrapComponentMakerIfNeeded = (
   const wrappedComponentMaker = (newProps: Props): WDom => {
     const next = componentMaker(newProps);
     const wrapper = Fragment({}, next);
+    if (next.getParent) renderGate.reparent?.(next);
     next.getParent = () => wrapper;
     return wrapper;
   };

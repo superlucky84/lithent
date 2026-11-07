@@ -1,0 +1,40 @@
+{
+  "core": {
+    "scope": "core",
+    "distributions": 384,
+    "weighted": 45,
+    "ratios": 405,
+    "samples": {
+      "cpu": 1160,
+      "memory": 120
+    },
+    "pass": true
+  },
+  "event": {
+    "timingPages": 128,
+    "nestedUpdateBatches": 3840,
+    "actualUpdates": 19200,
+    "dispatchBatches": 1280,
+    "dispatchEvents": 25600000,
+    "memoryContexts": 48,
+    "distributions": 256,
+    "pass": true
+  },
+  "ui": {
+    "samples": 320,
+    "distributions": 72,
+    "ratios": 90,
+    "pass": true
+  },
+  "final-event": {
+    "scope": "final-event",
+    "distributions": 576,
+    "weighted": 45,
+    "ratios": 405,
+    "samples": {
+      "cpu": 1740,
+      "memory": 180
+    },
+    "pass": true
+  }
+}

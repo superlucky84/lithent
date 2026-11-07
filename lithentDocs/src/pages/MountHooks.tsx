@@ -1,3 +1,4 @@
+import { LifecycleLink } from './Lifecycle';
 import { CodeBlock } from '@/components/CodeBlock';
 import { navigateTo } from '@/store';
 import { ConcurrentNote } from '@/components/ConcurrentNote';
@@ -479,5 +480,12 @@ mountCallback(() => {
         </p>
       </a>
     </div>
+    <p class="mt-8 text-gray-700 dark:text-gray-300">
+      <LifecycleLink
+        language="en"
+        path="/guide/lifecycle"
+        label="Own multiple resources with lifecycle helpers →"
+      />
+    </p>
   </div>
 );

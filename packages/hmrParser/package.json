@@ -1,17 +1,22 @@
 {
   "type": "module",
   "name": "@lithent/hmr-parser",
-  "version": "0.2.2",
+  "version": "0.2.5",
   "description": "Lithent HMR parser utilities for build tools",
-  "packageManager": "pnpm@9.12.3",
-  "main": "./dist/lithentHmrParser.umd.js",
+  "packageManager": "pnpm@12.15.0",
+  "main": "./dist/lithentHmrParser.cjs",
   "module": "./dist/lithentHmrParser.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/lithentHmrParser.mjs",
-      "require": "./dist/lithentHmrParser.umd.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/lithentHmrParser.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/lithentHmrParser.cjs"
+      }
     }
   },
   "scripts": {
@@ -27,7 +32,11 @@
   },
   "homepage": "https://github.com/superlucky84/lithent",
   "license": "MIT",
-  "keywords": ["lithent", "hmr", "parser"],
+  "keywords": [
+    "lithent",
+    "hmr",
+    "parser"
+  ],
   "dependencies": {
     "@babel/parser": "^7.26.2",
     "@babel/types": "^7.26.0",
@@ -40,13 +49,9 @@
   "devDependencies": {
     "lithent": "workspace:*",
     "@types/babel__traverse": "^7.20.6",
-    "vite": "^5.4.8",
+    "vite": "^8.3.6",
     "vite-plugin-checker": "^0.8.0",
-    "vite-plugin-dts": "^4.2.1",
-    "vitest": "^2.1.5"
-  },
-  "volta": {
-    "node": "20.3.0",
-    "pnpm": "9.12.3"
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.12"
   }
 }

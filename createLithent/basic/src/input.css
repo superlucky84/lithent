@@ -1,4 +1,5 @@
-@import 'tailwindcss';
+/* Use the template's declared content paths, including in ignored worktrees. */
+@import 'tailwindcss' source(none);
 
 @config '../tailwind.config.js';
 

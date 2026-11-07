@@ -886,6 +886,14 @@ JS 콜스택에서 힙으로 옮기면서 **노드마다** Frame 객체 + `getPa
 (`anchorIn`) — 아니면 `null`로 떨어져 append가 되고, 그게 base의 거동이다.
 동치성 테스트(4-9)가 이것을 잡았다.
 
+> **후속 수정 (2026-10-14)** — "`null`이면 append"는 base의 거동이 아니었다. base는
+> 엘리먼트가 없는 형제를 **건너뛰고** 그다음, 문서에 있는 형제 앞에 넣는다. 그래서
+> `[p, <Comp/>, null, 'T'] → [p, 'T', <Comp/>, null]`처럼 새로 추가된 형제 뒤에 아직
+> 지워지지 않은 형제가 있으면 'T'가 맨 끝으로 밀렸다. 이제 앵커 탐색 자체가 그 부모에
+> 붙어 있는 엘리먼트만 집는다(`startFindNextBrotherElement` / `findChildFragmentNextElement`의
+> `parentEl`). `anchorIn`은 안전장치로 남겼다. `src/tests/core-renderMatrix.test.ts`의
+> 형제 순서 매트릭스가 잡았다.
+
 #### D16의 처리량 대가 — 두 번 줄여서 0으로
 
 첫 구현은 **브라우저에서 처리량을 오히려 악화시켰다**. 대형 7종 평균 c/b가

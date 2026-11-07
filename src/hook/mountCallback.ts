@@ -2,7 +2,7 @@ import { WDom } from '@/types';
 import {
   compKeyRef,
   componentMap,
-  getComponentKey,
+  getCurrentComponent,
 } from '@/utils/universalRef';
 import { unmount } from '@/hook/internal/unmount';
 
@@ -21,7 +21,7 @@ export const addMountedQueue = (wDom: WDom) => {
  * DOM 렌더링 후 mountCallback 실행
  */
 export const execMountedQueue = () => {
-  mountedQueue.forEach(item => runMountedQueueFromWDom(item));
+  mountedQueue.forEach(runMountedQueueFromWDom);
   mountedQueue = [];
 };
 
@@ -29,13 +29,8 @@ export const execMountedQueue = () => {
  * mountCallback 등록
  */
 export const mountCallback = (effectAction: () => void) => {
-  const compKey = getComponentKey();
-  if (compKey) {
-    const comp = componentMap.get(compKey);
-    if (comp) {
-      comp.mts.push(effectAction);
-    }
-  }
+  const comp = getCurrentComponent();
+  comp && comp.mts.push(effectAction);
 };
 
 /**
@@ -43,27 +38,21 @@ export const mountCallback = (effectAction: () => void) => {
  */
 const runMountedQueueFromWDom = (newWDom: WDom) => {
   const { compKey } = newWDom;
+  // Every entry has all its queues (setComponetRef).
+  const component = compKey && componentMap.get(compKey);
 
-  if (compKey) {
-    const component = componentMap.get(compKey);
-    if (!component) return;
-    const { mts: mountQueue, upS: sequence } = component;
+  if (component) {
+    const mountQueue = component.mts;
 
     compKeyRef.value = compKey;
+    component.upS.value = 0;
+    component.mts = [];
 
-    if (sequence) {
-      sequence.value = 0;
-    }
-
-    if (mountQueue) {
-      component.mts = [];
-
-      mountQueue.forEach((effect: Function) => {
-        const callback = effect();
-        if (callback) {
-          unmount(callback);
-        }
-      });
-    }
+    mountQueue.forEach((effect: Function) => {
+      const callback = effect();
+      if (callback) {
+        unmount(callback);
+      }
+    });
   }
 };

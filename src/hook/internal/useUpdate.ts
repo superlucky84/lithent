@@ -2,7 +2,7 @@ import { WDom } from '@/types';
 import {
   compKeyRef,
   componentMap,
-  getComponentKey,
+  getCurrentComponent,
 } from '@/utils/universalRef';
 
 type DependencyFactory = () => unknown[];
@@ -11,10 +11,7 @@ export const useUpdated = (
   effectAction: () => (() => void) | void,
   dependencies: DependencyFactory = () => []
 ) => {
-  const compKey = getComponentKey();
-  if (!compKey) return;
-
-  const component = componentMap.get(compKey);
+  const component = getCurrentComponent();
   if (!component) return;
 
   const { upD, upS } = component;
@@ -35,19 +32,16 @@ export const useUpdated = (
 
 export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
   const { compKey } = newWDom;
+  // Every entry has all its queues (setComponetRef).
+  const component = compKey && componentMap.get(compKey);
 
-  if (compKey) {
-    const component = componentMap.get(compKey);
-    if (!component) return;
-    const { upCB: queue, upS: sequence } = component;
+  if (component) {
+    const queue = component.upCB;
 
     compKeyRef.value = compKey;
+    component.upS.value = 0;
 
-    if (sequence) {
-      sequence.value = 0;
-    }
-
-    if (newWDom.ctor && queue) {
+    if (newWDom.ctor) {
       component.upCB = [];
       queue.forEach((effect: Function) => effect());
     }
