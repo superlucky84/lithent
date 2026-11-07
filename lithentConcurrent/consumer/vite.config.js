@@ -15,20 +15,30 @@ import { defineConfig } from 'vite';
 const swapCore = process.env.LITHENT_CORE === 'concurrent';
 
 export default defineConfig({
-  root: __dirname,
-  esbuild: { jsxFactory: 'h', jsxFragment: 'Fragment' },
+  root: import.meta.dirname,
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
+  },
   resolve: {
     alias: swapCore
       ? [
           {
             find: /^lithent$/,
-            replacement: resolve(__dirname, '../dist/lithentConcurrent.mjs'),
+            replacement: resolve(
+              import.meta.dirname,
+              '../dist/lithentConcurrent.mjs'
+            ),
           },
         ]
       : [],
   },
   server: {
     open: process.env.LITHENT_NO_OPEN ? false : '/index.html',
-    fs: { allow: [resolve(__dirname, '..', '..')] },
+    fs: { allow: [resolve(import.meta.dirname, '..', '..')] },
   },
 });

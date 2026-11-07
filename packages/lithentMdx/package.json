@@ -26,7 +26,7 @@
   "devDependencies": {
     "@lithent/hmr-parser": "workspace:*",
     "lithent": "workspace:*",
-    "vite": "^5.4.8"
+    "vite": "^8.3.6"
   },
   "keywords": [
     "lithent",
@@ -42,7 +42,7 @@
   },
   "peerDependencies": {
     "lithent": "^1.21.3",
-    "vite": "^5.0.0"
+    "vite": "^8.0.0"
   },
   "files": [
     "dist",

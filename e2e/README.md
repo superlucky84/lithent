@@ -10,6 +10,10 @@ pnpm test:e2e:build
 
 After building once, use `pnpm test:e2e`. To run a subset:
 
+Set `LITHENT_CHROME=/path/to/chromium` to use an existing Chromium installation;
+otherwise Playwright uses its installed browser. The mutation runner inherits
+the same override.
+
 ```sh
 pnpm test:e2e --project=concurrent --grep 'B-4/B-9'
 pnpm exec tsc -p e2e/tsconfig.json

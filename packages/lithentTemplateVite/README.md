@@ -16,11 +16,13 @@ conditional and iterative markup while compiling straight to `h()` calls.
 - **Document pipeline** – scans entire source files, replaces Lithent markup
   with generated `h()` calls, and forwards source maps downstream.
 - **Custom extensions** – default support for `.ljsx` and `.ltsx`, with full
-  control over additional extensions and associated esbuild loaders.
+  control over additional extensions and associated script loaders.
 - **HTML entry transform** – `<script type="module" src="*.ltsx">` tags are
   automatically rewritten to inline imports so the browser receives valid JS.
 - **Tooling-friendly** – exposes warnings, preserves source maps in production,
   and keeps untouched code intact.
+
+Requires Vite 8. Script transforms use Oxc; opt-in JSON/CSS loaders retain an explicit esbuild fallback.
 
 ## Installation
 
@@ -47,7 +49,9 @@ If you prefer a static HTML entry in development, the safest option is to inline
 the import yourself so the browser receives JavaScript immediately:
 
 ```html
-<script type="module">import "/src/dev/main.ltsx";</script>
+<script type="module">
+  import '/src/dev/main.ltsx';
+</script>
 ```
 
 This pattern works in both dev and build modes and avoids relying on HTML entry
@@ -70,7 +74,7 @@ lithentTemplateVite({
 - `extensions` (string[]) – list of file extensions to treat as Lithent
   templates. Values are normalised (leading `.` is optional). Defaults to
   `['.ljsx', '.ltsx']`.
-- `extensionLoaders` (Record<string, LoaderValue>) – override the esbuild loader
+- `extensionLoaders` (Record<string, LoaderValue>) – override the source loader
   used for a given extension (`'js' | 'jsx' | 'ts' | 'tsx' | 'json' | 'css'`).
   When omitted, the loader is inferred from the extension suffix (e.g. `.ltsx`
   → `'ts'`).

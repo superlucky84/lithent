@@ -4,7 +4,7 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "declaration": true,
     "allowJs": false,
     "strict": true,
@@ -20,7 +20,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "lithent",
     "baseUrl": "./",
-    "types": ["vitest/importMeta", "vite/client"],
+    "types": ["vitest/importMeta", "vite/client", "node"],
     "paths": {
       "@/*": ["src/*"]
     }

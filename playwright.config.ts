@@ -12,6 +12,9 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     ...devices['Desktop Chrome'],
+    launchOptions: process.env.LITHENT_CHROME
+      ? { executablePath: process.env.LITHENT_CHROME }
+      : undefined,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

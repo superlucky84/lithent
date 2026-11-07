@@ -196,7 +196,7 @@ try {
         include: /\.e2e-work\/.*(?:Counter|Stateless|Mixed|mixed-app)\.tsx$/,
       })
     );
-  config.esbuild = { jsx: 'automatic', jsxImportSource: 'lithent' };
+  config.oxc = { jsx: { runtime: 'automatic', importSource: 'lithent' } };
   config.ssr = { noExternal: ['lithent', 'lithent/ssr'] };
   config.optimizeDeps = {
     entries: [
