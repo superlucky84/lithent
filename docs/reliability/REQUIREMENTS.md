@@ -3,7 +3,7 @@
 - 작성일: 2026-11-06
 - 브랜치: `review/cleanup-ci-browser`
 - 기준 커밋: `d594983897bab460b469cea8c6e73dfd354f1fd2`
-- 상태: 최종 리뷰의 복구 결함을 수정하고 U-15 재리뷰 APPROVE를 받았다. Phase 7의 CI fixture 47 PASS·결함 주입 33/33 검출과 재리뷰의 빠른 검사 41 PASS를 확인했다. U-16으로 필요한 7개 patch 버전과 내부 의존성을 재확인하고 커밋/PR로 인계한다. Phase 6의 전체 검사/3엔진 270 PASS는 제품 입력이 같은 수정 전 이력이다. GitHub/npm 초기 설정·실제 원격 CI/발행은 별도 미완료다.
+- 상태: 최종 리뷰의 복구 결함을 수정하고 U-15 재리뷰 APPROVE를 받았다. Phase 7의 CI fixture 47 PASS·결함 주입 33/33 검출과 재리뷰의 빠른 검사 41 PASS를 확인했다. U-16의 7개 patch 정렬은 구현 커밋 `4dbed338c808c93d7c198f6066891eb8087aecf6`과 [PR #104](https://github.com/superlucky84/lithent/pull/104)로 인계했다. PR CI는 실행을 시작했으며 최종 결과와 main CI/발행·외부 초기 설정은 별도 미완료다. Phase 6의 전체 검사/3엔진 270 PASS는 제품 입력이 같은 수정 전 이력이다.
 - 적용 절차: ctxbin의 `doc-driven-designer-v1` 스킬 1.3.0과 동명 agent rule.
 - 정본: 이 문서, [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 

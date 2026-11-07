@@ -1,6 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 오류 복구·검증·선택적 npm 배포
 
-- 상태: M-14/Phase 7 수정·검증과 U-15 재리뷰 APPROVE를 완료했다. U-16의 출고 확인에서 7개 patch 미발행과 generator baseline 제외를 다시 확인했다. M-13의 전체 통합은 제품 입력이 같은 수정 전 이력이며 M-4/M-9/M-10의 실제 외부 설정/발행과 실제 Safari/OS IME는 미완료다.
+- 상태: M-14/Phase 7 수정·검증과 U-15 재리뷰 APPROVE를 완료했다. U-16의 7개 patch 정렬은 구현 커밋 `4dbed338c808c93d7c198f6066891eb8087aecf6`과 [PR #104](https://github.com/superlucky84/lithent/pull/104)에 반영했다. PR의 최초 Validate 기동/frozen install 성공을 확인했으며 최종 PR/main CI와 M-4/M-9/M-10의 외부 설정/발행·실제 Safari/OS IME는 미완료다. M-13의 전체 통합은 수정 전 이력이다.
 - 연결: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 각 실행에는 커밋 SHA, 도구/브라우저 버전, 명령, 기대/실제 결과, 근거 경로, 미실행 사유를 적는다.
 - 단위·fixture로 자동화한 항목은 자동 검증 근거를 연결할 수 있다. 실제 서비스 설정과 실제 발행 여부는 별도 기록한다.

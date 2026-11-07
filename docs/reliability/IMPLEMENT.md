@@ -1,6 +1,6 @@
 # IMPLEMENT — 오류 복구·검증·선택적 npm 배포
 
-- 상태: Phase 0~7 구현/로컬 검증과 U-15 수정분 재리뷰 APPROVE를 완료했다. U-16으로 버전업 정렬·커밋·PR 생성으로 인계한다. 배포 도구 검증은 47 fixture·33 mutation, 재리뷰는 빠른 검사 41 PASS다. 이전 전체 Quality/실제 패키지/3엔진 270 PASS는 제품 입력이 같은 수정 전 이력이다. 외부 GitHub/npm 설정·원격 CI·실제 발행은 별도 미완료다.
+- 상태: Phase 0~7 구현/로컬 검증과 U-15 재리뷰 APPROVE를 완료했다. U-16의 7개 patch 정렬은 구현 커밋 `4dbed338c808c93d7c198f6066891eb8087aecf6`과 [PR #104](https://github.com/superlucky84/lithent/pull/104)로 인계했다. 배포 도구 검증은 47 fixture·33 mutation, 재리뷰는 빠른 검사 41 PASS다. PR CI는 시작됐으며 최종 결과/외부 설정/main CI/실제 발행은 별도 미완료다. 이전 전체 Quality/실제 패키지/3엔진 270 PASS는 수정 전 이력이다.
 - 연결: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 각 phase 시작 시 `git status --porcelain -uall`을 기록하고, 완료 시 git의 실제 변경으로 `Files:`를 작성한다.
 - 구현 phase 종료 시 `doc-driven-designer-v1`의 Phase Completion에 따라 리뷰 또는 다음 phase 진행을 사용자에게 묻는다.
@@ -530,8 +530,8 @@ Files:
 
 ## 현재 인계
 
-- done: Phase 0~7 구현/로컬 검증과 U-15 재리뷰 APPROVE 완료. 전체 CI fixture 47 PASS·정상 baseline 58 PASS·33/33 결함 검출과 재리뷰의 빠른 검사 41 PASS를 확인했다. U-16의 npm 재조회에서 root 1.25.6·Concurrent 0.2.5·hmr-parser 0.2.4·MDX 0.2.7·template-parser 0.1.2·template-vite 0.1.2·Vite 0.3.5는 모두 미발행이었다. create-lithent 0.3.4는 기존 발행 버전으로 유지한다. 내부 workspace 의존성은 검증 archive의 새 버전으로 치환된다.
-- next: 사용자가 이미 요청한 커밋/PR 생성을 진행하고 원격 CI 결과를 확인한다. 실제 활성화는 RELEASING의 외부 초기 설정과 원격 main CI·발행/tag/docs 운영 근거를 별도로 남긴다. 추가 구현 phase나 리뷰 선택을 다시 묻지 않는다.
+- done: Phase 0~7 구현/로컬 검증과 U-15 재리뷰 APPROVE 완료. 전체 CI fixture 47 PASS·정상 baseline 58 PASS·33/33 결함 검출과 재리뷰의 빠른 검사 41 PASS를 확인했다. U-16의 root 1.25.6·Concurrent 0.2.5·hmr-parser 0.2.4·MDX 0.2.7·template-parser 0.1.2·template-vite 0.1.2·Vite 0.3.5는 npm 미발행과 검증 archive/내부 의존성 일치를 재확인해 구현 커밋과 PR #104에 반영했다. create-lithent 0.3.4는 유지한다. PR의 최초 Validate 실행은 frozen install 성공 뒤 build를 시작했다. PR 생성/feature branch 기록 외 실제 npm 발행·main 병합·release tag/docs 쓰기는 없다.
+- next: [PR #104](https://github.com/superlucky84/lithent/pull/104)의 최신 commit CI 결과를 확인한다. 저장소 규칙대로 merge commit으로 병합하며 자동 병합은 설정하지 않았다. 실제 발행은 RELEASING의 소유자/관리자 초기 설정과 main 검증 성공을 확인한 뒤 활성화한다. 최초 run의 id는 42333349369이며 새 commit의 실행 상태는 PR checks에서 확인한다.
 - blockers: 코드/버전업/리뷰의 차단 항목은 없다. npm Trusted Publisher와 required CI·npm 환경 main 제한·NPM_PUBLISH_ENABLED=true 설정 및 실제 원격 발행은 별도 미완료다. 이미 확정된 main 검사 성공 후 발행을 재질문하지 않는다.
-- latest commit: 작성 기준 사용자 브랜치 `review/cleanup-ci-browser`의 HEAD는 `d594983897bab460b469cea8c6e73dfd354f1fd2`다. 이 인계를 포함한 최종 변경 커밋은 해당 브랜치 HEAD(`git rev-parse HEAD`)로 확인한다. 이전 전체 검증 사본은 `0f7c8f2af837d128ebe2f284f4b33731b6cb3a04`이며 원격 main/OIDC 실행으로 취급하지 않는다.
+- latest commit: 실제 구현 커밋은 `4dbed338c808c93d7c198f6066891eb8087aecf6`이며 `review/cleanup-ci-browser`와 PR #104에 기록했다. 이 결과 기록만 갱신한 후속 문서 커밋을 포함한 최신 SHA는 해당 브랜치 HEAD(`git rev-parse HEAD`)로 확인한다. 기준 main은 `d594983897bab460b469cea8c6e73dfd354f1fd2`, 이전 전체 검증 사본은 `0f7c8f2af837d128ebe2f284f4b33731b6cb3a04`다.
 - source of truth: 버전은 8개 허용 manifest와 `.github/release-policy.json`에 있고 U-16의 재조회 근거는 `/workspace/work/lithent-pr/npm-versions.json`에 있다. 배포 도구의 최신 검증은 `/workspace/work/lithent-phase7/`, 이전 전체 build/8 pack/7 후보/3엔진 270 PASS는 `/workspace/work/lithent-phase6/`에 보존한다. 이번 출고 정리는 리뷰 결과/인계 기록만 갱신하며 검증된 제품/배포 코드와 준비 버전을 바꾸지 않는다. 실제 Safari/IME·외부 OIDC/패키지 권한·원격 배포는 미확인 상태다.

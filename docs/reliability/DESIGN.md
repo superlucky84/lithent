@@ -1,6 +1,6 @@
 # DESIGN — 오류 복구·검증·선택적 npm 배포
 
-- 상태: Phase 7 로컬 검증과 U-15 재리뷰 APPROVE를 완료했다. DC-31은 47 fixture·33 mutation과 재리뷰의 빠른 검사 41개로 확인했다. U-16의 커밋/PR 준비에서 기존 7개 patch와 내부 의존성을 재확인했으며 발행 단위/초기 기준/인증 계약을 바꾸지 않는다. U-10의 main 필수 검사 성공 후 발행 조건과 외부 설정 미완료 상태는 유지한다.
+- 상태: Phase 7 로컬 검증과 U-15 재리뷰 APPROVE를 완료했다. DC-31은 47 fixture·33 mutation과 재리뷰의 빠른 검사 41개로 확인했다. U-16의 기존 7개 patch 정렬을 [PR #104](https://github.com/superlucky84/lithent/pull/104)로 인계했으며 발행 단위/초기 기준/인증 계약은 같다. U-10의 main 필수 검사 성공 후 발행 조건과 외부 설정 미완료 상태를 유지한다.
 - 정본 연결: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 
 ## 결정 목록
