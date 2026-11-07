@@ -1,0 +1,287 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality:
+    name: Quality
+    outputs:
+      build_artifact: ${{ steps.bundle.outputs.artifact }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITEST_MAX_FORKS: '2'
+      VITEST_MIN_FORKS: '1'
+      VITEST_MAX_THREADS: '2'
+      VITEST_MIN_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: mkdir -p artifacts/logs
+      - name: Frozen install
+        run: pnpm install --frozen-lockfile 2>&1 | tee artifacts/logs/install.log
+      - name: Fresh workspace build
+        run: pnpm build 2>&1 | tee artifacts/logs/build.log
+      - name: Both cores and satellites
+        run: pnpm test:dual 2>&1 | tee artifacts/logs/unit.log
+      - name: All five toolchain suites
+        run: pnpm test:toolchain 2>&1 | tee artifacts/logs/toolchain.log
+      - name: CI and artifact failure fixtures
+        run: pnpm test:ci 2>&1 | tee artifacts/logs/ci-fixtures.log
+      - name: Reliability mutation controls
+        run: node scripts/check-reliability-mutations.mjs 2>&1 | tee artifacts/logs/hardening.log
+      - name: Concurrent artifact verification
+        run: pnpm verify:concurrent 2>&1 | tee artifacts/logs/concurrent.log
+      - name: Eight packed package consumers
+        run: pnpm verify:release --output-dir artifacts/release 2>&1 | tee artifacts/logs/release.log
+      - name: Read-only selective npm release preview
+        run: pnpm release:plan 2>&1 | tee artifacts/logs/release-plan.log
+      - name: Candidates with their actual registry dependencies
+        run: node scripts/verify-plan-consumers.mjs 2>&1 | tee artifacts/logs/release-consumers.log
+      - name: Runtime size budgets
+        run: pnpm size 2>&1 | tee artifacts/logs/size.log
+      - name: Bind validated builds and tarballs to this revision
+        id: bundle
+        run: |
+          node scripts/ci-build-artifacts.mjs create --require-clean
+          echo "artifact=validated-build-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.bundle.outputs.artifact }}
+          path: |
+            artifacts/ci-build.tgz
+            artifacts/build-manifest.json
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/logs
+          if-no-files-found: warn
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-preview-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/release-plan.json
+            artifacts/release-plan.md
+            artifacts/release-consumers.json
+          if-no-files-found: warn
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reliability-hardening-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            artifacts/hardening/run-*/summary.json
+            artifacts/hardening/run-*/logs/*.log
+            artifacts/hardening/run-*/reports/*.json
+          if-no-files-found: warn
+          retention-days: 7
+
+  browser:
+    name: Browser (${{ matrix.browser }})
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      LITHENT_E2E_BROWSER: ${{ matrix.browser }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.quality.outputs.build_artifact }}
+          path: artifacts
+      - name: Restore and verify the same validated build
+        run: |
+          tar -xzf artifacts/ci-build.tgz
+          node scripts/ci-build-artifacts.mjs verify --require-clean
+      - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: warn
+          retention-days: 7
+
+  gate:
+    # Configure this stable check name as required in the repository ruleset.
+    name: CI
+    if: always()
+    needs: [quality, browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Reject failed, cancelled or skipped mandatory jobs
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: node scripts/ci-gate.mjs "$NEEDS_JSON"
+
+  publish:
+    name: Publish versioned packages
+    needs: [quality, browser, gate]
+    if: >-
+      github.repository == 'superlucky84/lithent' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      vars.NPM_PUBLISH_ENABLED == 'true' &&
+      needs.quality.result == 'success' && needs.browser.result == 'success' && needs.gate.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: npm-publish-${{ github.repository }}
+      cancel-in-progress: false
+    outputs:
+      receipt_artifact: ${{ steps.receipt.outputs.artifact }}
+    env:
+      LITHENT_RELEASE_ENVIRONMENT: npm
+      LITHENT_NPM_PUBLISH_ENABLED: ${{ vars.NPM_PUBLISH_ENABLED }}
+      NEEDS_JSON: ${{ toJSON(needs) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.quality.outputs.build_artifact }}
+          path: artifacts
+      - name: Restore the validated tarballs and consumer proof
+        run: |
+          tar -xzf artifacts/ci-build.tgz
+          node scripts/ci-build-artifacts.mjs verify --require-clean
+          mkdir -p artifacts/logs
+      - name: Publish exact validated archives with OIDC
+        run: node scripts/publish-release.mjs 2>&1 | tee artifacts/logs/publish.log
+      - name: Locate durable publication receipt even after partial failure
+        id: receipt
+        if: always()
+        run: |
+          if [[ -f artifacts/release-results.json ]]; then
+            echo "artifact=release-results-${{ github.run_id }}-${{ github.run_attempt }}-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.receipt.outputs.artifact != ''
+        with:
+          name: ${{ steps.receipt.outputs.artifact }}
+          path: artifacts/release-results.json
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: publish-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/logs
+          if-no-files-found: warn
+          retention-days: 30
+
+  release-records:
+    name: Record release tags and dispatch docs
+    needs: [quality, browser, gate, publish]
+    if: >-
+      always() &&
+      github.repository == 'superlucky84/lithent' && github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      vars.NPM_PUBLISH_ENABLED == 'true' && needs.gate.result == 'success' &&
+      needs.publish.outputs.receipt_artifact != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: write
+      actions: write
+    env:
+      LITHENT_RELEASE_ENVIRONMENT: npm
+      LITHENT_NPM_PUBLISH_ENABLED: ${{ vars.NPM_PUBLISH_ENABLED }}
+      NEEDS_JSON: ${{ toJSON(needs) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.quality.outputs.build_artifact }}
+          path: artifacts
+      - name: Verify the original run and source evidence
+        run: |
+          tar -xzf artifacts/ci-build.tgz
+          node scripts/ci-build-artifacts.mjs verify --require-clean
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-results-${{ github.run_id }}-*-${{ github.sha }}
+          path: artifacts/receipts
+          merge-multiple: false
+      - run: node scripts/record-release.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-records-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/release-records.json
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "lithent",
-  "version": "1.25.5",
+  "version": "1.25.6",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@12.15.0",
   "devEngines": {
@@ -33,6 +33,7 @@
     "check:interrupt": "pnpm build:core && pnpm build:concurrent && LITHENT_PAGE=/html/interrupt.html pnpm --filter lithent-concurrent bench",
     "verify:concurrent": "node lithentConcurrent/scripts/verifyArtifacts.js",
     "verify:release": "node scripts/verify-release.mjs",
+    "release:plan": "node scripts/plan-release.mjs",
     "build:concurrent": "pnpm --filter lithent-concurrent build",
     "build:concurrentHelper": "pnpm --filter lithent-concurrent-helper build",
     "build:skills": "node scripts/build-skills.js",
@@ -65,6 +66,8 @@
     "test:satellites": "pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter lithent-ftags test && pnpm --filter lithent-ssr test && pnpm --filter lithent-element test",
     "test:satellites:concurrent": "LITHENT_CORE=concurrent pnpm run test:satellites",
     "test:dual": "pnpm test:core && pnpm test:concurrent && pnpm test:satellites && pnpm test:satellites:concurrent",
+    "test:toolchain": "pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter @lithent/lithent-template-parser test && pnpm --filter @lithent/lithent-template-vite test",
+    "test:ci": "node --test --test-isolation=none scripts/tests/*.test.mjs",
     "test": "pnpm test:core && pnpm test:concurrent && pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter lithent-ftags test && pnpm --filter lithent-element test",
     "test:lithentMdx": "pnpm --filter @lithent/lithent-mdx test",
     "test:lithentVite": "pnpm --filter @lithent/lithent-vite test",
@@ -223,6 +226,7 @@
     "prettier": "^3.4.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "semver": "7.6.2",
     "terser": "^5.18.1",
     "typescript": "^5.6.3",
     "vite": "^5.4.8",

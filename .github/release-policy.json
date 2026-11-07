@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "repository": "superlucky84/lithent",
+  "registry": "https://registry.npmjs.org",
+  "distTag": "latest",
+  "prerelease": "hold",
+  "packages": [
+    {
+      "name": "lithent",
+      "directory": ".",
+      "baseline": "1.25.5",
+      "sourcePaths": [
+        "src/",
+        "helper/",
+        "devHelper/",
+        "jsx-runtime/",
+        "ssr/",
+        "tag/",
+        "ftags/",
+        "element/",
+        "package.json",
+        "vite.config.js",
+        "scripts/emit-declaration-formats.mjs"
+      ]
+    },
+    {
+      "name": "lithent-concurrent",
+      "directory": "lithentConcurrent",
+      "baseline": "0.2.4",
+      "sourcePaths": [
+        "src/",
+        "lithentConcurrent/",
+        "scripts/emit-declaration-formats.mjs"
+      ]
+    },
+    {
+      "name": "create-lithent",
+      "directory": "createLithent",
+      "baseline": "0.3.4"
+    },
+    {
+      "name": "@lithent/hmr-parser",
+      "directory": "packages/hmrParser",
+      "baseline": "0.2.3"
+    },
+    {
+      "name": "@lithent/lithent-mdx",
+      "directory": "packages/lithentMdx",
+      "baseline": "0.2.6"
+    },
+    {
+      "name": "@lithent/lithent-template-parser",
+      "directory": "packages/lithentTemplateParser",
+      "baseline": "0.1.1"
+    },
+    {
+      "name": "@lithent/lithent-template-vite",
+      "directory": "packages/lithentTemplateVite",
+      "baseline": "0.1.1"
+    },
+    {
+      "name": "@lithent/lithent-vite",
+      "directory": "packages/lithentVite",
+      "baseline": "0.3.4"
+    }
+  ]
+}
