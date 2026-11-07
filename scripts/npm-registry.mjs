@@ -1,3 +1,28 @@
+import { setTimeout as delay } from 'node:timers/promises';
+
+// npm can accept an upload and serve the version only a minute or more later
+// (lithent 1.25.6 appeared about 75 seconds after `npm publish` returned), so
+// a missing version is retried for five minutes before it counts as absent.
+export const visibilityWindow = { attempts: 31, delayMs: 10_000 };
+
+// Registry errors are not retried: they still end the lookup immediately.
+export async function waitForVersion(
+  registry,
+  name,
+  version,
+  {
+    attempts = visibilityWindow.attempts,
+    delayMs = visibilityWindow.delayMs,
+    wait = delay,
+  } = {}
+) {
+  for (let attempt = 1; ; attempt++) {
+    const found = await registry.getVersion(name, version);
+    if (found || attempt >= attempts) return found;
+    await wait(delayMs);
+  }
+}
+
 export class NpmRegistry {
   constructor({ fetchImpl = fetch, timeoutMs = 15_000 } = {}) {
     this.fetchImpl = fetchImpl;

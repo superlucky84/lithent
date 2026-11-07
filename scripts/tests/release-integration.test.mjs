@@ -326,6 +326,7 @@ async function fixture(t, bumped) {
         },
       },
       persist: async () => {},
+      wait: async () => {},
     });
   return {
     root,

@@ -75,6 +75,7 @@ function fixture() {
     persist: async value => {
       snapshots.push(value);
     },
+    wait: async () => {},
   };
   return { items, receipt, options, calls, tags, snapshots };
 }
@@ -163,6 +164,26 @@ test('unconfirmed registry errors, missing versions and conflicting bytes fail v
     assert.equal(retry.packages[0].recoveredUnconfirmed, true);
     assert.equal(retry.packages[1].tagResult, 'existing');
   }
+});
+
+test('an unconfirmed version that npm serves only later is tagged in the same recording run', async () => {
+  const f = fixture();
+  f.receipt.packages[0].status = 'unconfirmed';
+  delete f.receipt.packages[0].registryIntegrity;
+  const read = f.options.registry.getVersion;
+  let hidden = 3;
+  f.options.registry.getVersion = async name =>
+    name === 'lithent' && hidden-- > 0 ? null : read(name);
+  const waits = [];
+  f.options.wait = async ms => {
+    waits.push(ms);
+  };
+  const result = await recordReleaseResults(f.options);
+  assert.equal(result.status, 'passed');
+  assert.equal(result.packages[0].status, 'tagged');
+  assert.equal(result.packages[0].recoveredUnconfirmed, true);
+  assert.equal(result.packages[0].docsDispatch, 'accepted');
+  assert.deepEqual(waits, [10_000, 10_000, 10_000]);
 });
 
 test('unconfirmed recovery rejects other runs, sources and archives before any tag or docs write', async () => {

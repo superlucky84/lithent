@@ -243,7 +243,8 @@ jobs:
       vars.NPM_PUBLISH_ENABLED == 'true' && needs.gate.result == 'success' &&
       needs.publish.outputs.receipt_artifact != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    # Each unconfirmed receipt can wait five minutes for npm to show the version.
+    timeout-minutes: 20
     environment: npm
     permissions:
       contents: write

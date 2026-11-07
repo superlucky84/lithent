@@ -290,6 +290,13 @@ cases.push(
     )
   ),
   node(
+    'publish-short-visibility-window',
+    'npm-registry.mjs',
+    'execute-release.test.mjs',
+    /npm serves over a minute after upload/,
+    replace('attempts: 31,', 'attempts: 6,')
+  ),
+  node(
     'publish-conflict-as-unconfirmed',
     'execute-release.mjs',
     'execute-release.test.mjs',

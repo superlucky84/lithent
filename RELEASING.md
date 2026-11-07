@@ -47,6 +47,7 @@ npm Trusted Publishing 운영 준비(미완료):
 - Quality·Chromium/Firefox/WebKit·CI가 모두 성공해야 publish를 시작한다. PR의 진행 중 검증은 새 커밋으로 취소할 수 있지만 main 발행은 자동 취소하지 않는다.
 - 후보가 0개면 정상 종료한다. A 발행 확인 후 B가 실패하면 실패 상태와 A의 성공을 receipt에 저장하고, 후속 job은 A의 태그를 기록한다. 다음 실행은 registry에 있는 A를 다시 발행하지 않는다.
 - GitHub Actions에서 **원래 main run의 실패 job을 재실행**하면 원래 Quality artifact output을 사용한다. run_attempt가 달라져도 올바른 build를 찾고, 같은 run/SHA의 이전 attempt receipt도 합쳐 성공 태그를 복구한다.
+- npm은 업로드를 받은 뒤 1분 넘게 지나서야 새 버전을 보여줄 수 있다(lithent 1.25.6은 약 75초). 발행·기록 job은 버전이 보이지 않으면 10초 간격으로 최대 5분 기다린다. registry 오류는 기다리지 않고 바로 실패로 처리한다.
 - 업로드 시도 뒤 registry 확인이 오류/timeout/가시성 기한 소진으로 끝나면 패키지는 **unconfirmed**, 발행 job은 실패다. 후속 기록 job은 원래 run/clean SHA와 archive 이름·size·SHA-256·SRI가 같은 receipt를 registry에서 재확인한다. 일치하면 태그와 root 문서 요청을 복구하며 `recoveredUnconfirmed: true`를 기록한다. 계속 404/오류/다른 SRI이면 기록 job도 실패하므로 빈 성공으로 취급하지 않는다.
 - 위 미확정 receipt가 남아 있으면 발행 job이 같은 버전을 skipped로 처리하거나, 같은 commit의 Quality 재실행에서 후보가 0개가 되어도 원래 run의 기록 job이 복구한다. 업로드 전 실패·pending·skipped·중단된 publishing 상태만으로는 과거 발행을 인수하지 않는다. 다른 run/SHA에 있는 발행도 자동 복구하지 않는다.
 - 태그/문서 기록만 실패했으면 원래 run의 **Record release tags and dispatch docs** job을 재실행한다. 기존 동일 SHA 태그는 유지하며 docs dispatch를 재시도한다.

@@ -7,7 +7,7 @@ import { readReleaseInputs } from './release-inputs.mjs';
 import { assertReleaseContext } from './release-context.mjs';
 import { writeReleaseResult } from './publish-release.mjs';
 import { GitHubReleaseApi } from './github-release-api.mjs';
-import { NpmRegistry } from './npm-registry.mjs';
+import { NpmRegistry, waitForVersion } from './npm-registry.mjs';
 
 export async function recordReleaseResults({
   inputs,
@@ -16,6 +16,9 @@ export async function recordReleaseResults({
   registry,
   github,
   persist,
+  wait,
+  confirmationAttempts,
+  confirmationDelayMs,
 }) {
   const { plan, artifacts } = inputs;
   const selected = new Map();
@@ -81,7 +84,12 @@ export async function recordReleaseResults({
   await persist(structuredClone(results));
   for (const row of results.packages) {
     try {
-      const published = await registry.getVersion(row.name, row.version);
+      // An unconfirmed upload may still be becoming visible on npm.
+      const published = await waitForVersion(registry, row.name, row.version, {
+        attempts: confirmationAttempts,
+        delayMs: confirmationDelayMs,
+        wait,
+      });
       if (published?.dist?.integrity !== artifacts.get(row.name).integrity)
         throw new Error(
           `Registry no longer confirms release bytes: ${row.name}`
