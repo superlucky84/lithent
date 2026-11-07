@@ -7,6 +7,7 @@ import ts from 'typescript';
  * entry declaration would leave its dependencies interpreted as ESM. Explicit
  * relative paths also let Node16/NodeNext check the ESM graph without relying
  * on a bundler's extension and directory resolution.
+ * `esmTypeImports` lists ESM-only modules imported solely for types in this graph.
  */
 export function emitDeclarationFormats(
   directory,
@@ -78,14 +79,19 @@ export function emitDeclarationFormats(
     const rewrite = extension => {
       let result = content;
       const edits = [];
-      if (extension === '.cjs') {
-        for (const statement of source.statements) {
-          if (
-            ts.isImportDeclaration(statement) &&
-            statement.importClause?.isTypeOnly &&
-            esmTypeImports.includes(statement.moduleSpecifier.text) &&
-            !statement.attributes
-          ) {
+      for (const statement of source.statements) {
+        if (
+          ts.isImportDeclaration(statement) &&
+          statement.importClause &&
+          esmTypeImports.includes(statement.moduleSpecifier.text)
+        ) {
+          // vite-plugin-dts 4 merges named imports and drops `import type`.
+          // These explicitly listed imports are types, including in the ESM graph.
+          if (!statement.importClause.isTypeOnly) {
+            const start = statement.importClause.getStart(source);
+            edits.push({ start, end: start, text: 'type ' });
+          }
+          if (extension === '.cjs' && !statement.attributes) {
             // Vite exposes its types through the ESM condition, even to CJS
             // plugins. This is a type-only resolution choice, not a runtime import.
             edits.push({

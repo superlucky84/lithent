@@ -303,7 +303,7 @@ importers:
         specifier: ^9.16.0
         version: 9.16.0
       '@lithent/lithent-vite':
-        specifier: ^0.3.4
+        specifier: ^0.4.0
         version: link:../../packages/lithentVite
       '@tailwindcss/postcss':
         specifier: 4.3.4
@@ -324,7 +324,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))
       lithent:
-        specifier: ^1.25.2
+        specifier: ^1.25.7
         version: link:../..
       postcss:
         specifier: ^8.4.24
@@ -357,17 +357,17 @@ importers:
         specifier: ^4.21.1
         version: 4.21.1(supports-color@8.1.1)
       lithent:
-        specifier: ^1.25.2
+        specifier: ^1.25.7
         version: link:../..
       state-ref:
         specifier: ^2.0.0
         version: 2.0.0
     devDependencies:
       '@lithent/lithent-mdx':
-        specifier: ^0.2.6
+        specifier: ^0.3.0
         version: link:../../packages/lithentMdx
       '@lithent/lithent-vite':
-        specifier: ^0.3.4
+        specifier: ^0.4.0
         version: link:../../packages/lithentVite
       '@tailwindcss/postcss':
         specifier: 4.3.4

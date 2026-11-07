@@ -1,5 +1,11 @@
 Vite 8 migration checks using the actual production base and concurrent ESM artifacts. The source baseline is `d594983`, built with the original frozen Vite 5 toolchain. Use Node 24.22.1 and pnpm 12.15.0.
 
+`results.json` preserves the initial migration at `5e46512`. Release preparation
+later merged main `933400d`; its separate size and validation record is
+`release-preparation.json`. Do not apply the initial runtime timing samples to
+the later cleanup recovery source. The scripts can compare a newly prepared
+baseline without overwriting the historical results.
+
 `verify-runtime.mjs` compares four isolated browser contexts per artifact, alternating before/after order. It renders 1,000 keyed components, warms up 100 updates, measures 30 updates, verifies a keyed swap and clear, and checks old node/component-key weak references after forced GC. It records live/disposed CDP heap and DOM counters. The timing is a local diagnostic, not the official performance benchmark or a guarantee about startup performance.
 
 Prepare a baseline checkout before installing the new toolchain, build its two cores, then copy its `dist` directories to a scratch directory containing `base/` and `concurrent/`. The original checks used `/tmp/lithent-vite8/baseline`. The checks never modify that baseline.

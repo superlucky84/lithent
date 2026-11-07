@@ -1,4 +1,4 @@
-**Vite 8 전환을 `chore/vite8-migration` 브랜치에서 구현했다.** 코어 런타임 소스는 유지하고 빌드·플러그인·테스트 도구를 전환했다. 비교 기준은 `d594983` 소스를 기존 Vite 5 설정으로 새로 빌드한 산출물이다. 이전 `dist`의 오래된 파일을 대조군으로 쓰지 않았다.
+**Vite 8 전환을 `chore/vite8-migration` 브랜치에서 구현했다.** 코어 런타임 소스는 유지하고 빌드·플러그인·테스트 도구를 전환했다. 아래 초기 측정·검증은 `5e46512` 시점의 기록이며, 비교 기준은 `d594983` 소스를 기존 Vite 5 설정으로 새로 빌드한 산출물이다. 이전 `dist`의 오래된 파일을 대조군으로 쓰지 않았다. 이후 최신 main 병합과 배포 버전 준비는 문서 끝에 별도로 기록한다.
 
 Node 24.22.1 / pnpm 12.15.0 / Vite 8.3.6 / Rolldown 1.2.16을 사용했다. gzip은 level 9, Brotli는 Node 기본 설정이다. JS 브라우저 타깃은 기존 `['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14']`를 명시했다. 소스맵 자동 연결과 기존 크기 예산도 유지했다.
 
@@ -40,7 +40,7 @@ Node 24.22.1 / pnpm 12.15.0 / Vite 8.3.6 / Rolldown 1.2.16을 사용했다. gzip
 
 재현 도구와 정확한 조건은 [실험 안내](../../experiments/vite8-migration/README.md)에 있다. [결과 JSON](../../experiments/vite8-migration/results.json)에 두 워밍업의 원자료와 산출물 해시를 보존한다.
 
-**최종 검증은 기존 산출물을 모두 삭제한 빌드까지 통과했다.**
+**최초 전환 검증은 기존 산출물을 모두 삭제한 빌드까지 통과했다.**
 
 | 검사                        | 결과                                                                              |
 | --------------------------- | --------------------------------------------------------------------------------- |
@@ -58,4 +58,58 @@ Node 24.22.1 / pnpm 12.15.0 / Vite 8.3.6 / Rolldown 1.2.16을 사용했다. gzip
 
 브라우저는 Chromium 151.0.7922.173을 사용했다. SSR scaffold의 외부 PokeAPI 요청은 실행 환경의 프록시·CA 설정을 사용하는 Node 옵션으로 확인했다. Scaffold의 `--check`는 빌드/SSR/CSS 확인 후 종료하며, 기본 대화형 하이드레이션 확인 모드는 유지한다. 일반 하이드레이션 동작은 위 Playwright suite에서 양코어로 검증했다.
 
-플러그인의 Vite 8 peer 전환은 도구 소비자에게 영향을 준다. npm 배포 단계에서는 새 플러그인 버전과 생성 템플릿의 버전 참조를 함께 정리해야 한다. 이 브랜치는 기존 코어 패키지 버전과 릴리스 태그를 변경하지 않는다.
+플러그인의 Vite 8 peer 전환은 도구 소비자에게 영향을 준다. 최초 전환 커밋은 제품 버전을 유지했다. 이후 사용자의 배포 준비 요청에 따라 패키지 버전과 생성 템플릿의 참조를 함께 갱신했다. 후보 목록과 발행 순서는 [RELEASING.md](../../RELEASING.md#vite-8-릴리스-준비)에 있다.
+
+**최신 main 병합 후 배포 준비 — 2026-11-07**
+
+최신 main `933400d`를 `a634a2f`에서 병합했다. main에 추가된 cleanup 오류 복구와
+ESM/CJS 선언·실행 경로를 보존했으며, `src/`와 `lithentConcurrent/src/`는 main과
+동일하다. 새로 합쳐진 Rollup의 `output.interop`은 Rolldown에서 지원하지 않아
+제거했다. MDX/HMR 플러그인 자체의 빌드에는 `legacy.inconsistentCjsInterop`과
+명시적인 named export 설정을 적용해 CJS가 ESM 외부 의존성의 default 함수를
+호출하도록 했다. 이 수정 전후 두 플러그인의 ESM은 바이트 단위로 같았다.
+선언 생성기 4가 없애는 `import type`은 명시된 ESM 타입 의존성에 한해 복원해
+CJS 선언에도 `resolution-mode: import`를 유지한다. 실제 tarball의 플러그인
+호출과 Node16/NodeNext 엄격한 ESM/CJS 타입 검사로 두 문제의 해소를 확인했다.
+사용자 문서의 수동 JSX 예제와 플러그인 버전 안내도 Vite 8에 맞췄다.
+
+8개 독립 공개 패키지의 후보 버전은 [릴리스 준비 표](../../RELEASING.md#vite-8-릴리스-준비)에
+있다. 코어·파서는 patch, Vite 8 전용 플러그인과 기본 템플릿 요건이 바뀐 생성기는
+minor를 올렸다. 두 템플릿의 코어·플러그인 참조와 lockfile도 함께 갱신했다.
+후보 번호 8개 모두 현재 npm의 stable 버전보다 높고 아직 발행되지 않았음을 확인했다.
+
+이번 비교는 cleanup 수정이 포함된 같은 main 소스를 사용했다. Vite 5.4.8의 원래
+빌드 설정에서 JS 산출물에 관여하지 않는 checker·선언 생성 플러그인만 제외하고
+새로 빌드했다. UMD compact 플러그인, 소스맵과 브라우저 타깃은 유지했다.
+
+| 실제 UMD   | main Vite 5 raw / gzip / Brotli | Vite 8 raw / gzip / Brotli |  Brotli 감소 |
+| ---------- | ------------------------------: | -------------------------: | -----------: |
+| base       |         13,101 / 5,354 / 4,953B |    12,673 / 5,241 / 4,857B |  96B / 1.94% |
+| concurrent |         18,571 / 7,571 / 6,986B |    18,003 / 7,259 / 6,702B | 284B / 4.07% |
+
+Element는 968B다. main의 예산 base 4,953B / concurrent 9,000B / element 1,000B를
+유지한다. 초기 CPU·GC 원자료는 cleanup 수정 전 소스에 대한 기록이며 이번 후보의
+성능 측정으로 재사용하지 않았다. 후보의 크기·해시·검증 기록은
+[release-preparation.json](../../experiments/vite8-migration/release-preparation.json)에
+따로 보존한다.
+
+| main 병합 후 검사                        | 결과                                                                                |
+| ---------------------------------------- | ----------------------------------------------------------------------------------- |
+| strict frozen install / 전체 fresh build | 통과, 설치 정책 예외 추가 없음                                                      |
+| 양코어·satellite                         | 1,206 통과, 기존 제외 3개                                                           |
+| toolchain 5종                            | 172 통과                                                                            |
+| CI/release fixtures                      | 49 통과                                                                             |
+| reliability mutation controls            | baseline 8개 통과, 의도한 고장 34개 검출                                            |
+| Chromium 153.0.8010.12                   | 90 통과                                                                             |
+| Firefox 155.0                            | 90 통과                                                                             |
+| WebKit 26.6                              | 90 통과                                                                             |
+| 8개 tarball 사전 검증                    | 설치·ESM/CJS 실행·플러그인 factory·생성기 CLI·Node16/NodeNext strict 타입 모두 통과 |
+| Concurrent 산출물 / 크기 gate            | 통과                                                                                |
+| 혼합 TSX/템플릿 integration              | 실제 prebundle·dev/production·source map 통과                                       |
+
+단위 테스트 첫 실행은 전체 빌드와 겹쳐 한 테스트의 5초 제한을 넘겼다. 빌드 완료 후
+같은 명령을 단독 실행한 위 결과가 최종 단위 테스트 결과다. timeout과 assertion은
+유지했다. WebKit은 권한 없는 컨테이너에서 공식 Debian 라이브러리를 임시 경로에
+풀어 브라우저 번들에 연결했다. 라이브러리 로드와 실제 페이지 실행을 먼저 확인했고,
+이 경로를 보지 못하는 Playwright의 ldconfig 캐시 검사만 실행 환경에서 생략했다.
+라이브러리 경로와 host 검사 옵션은 로컬 실행 환경에만 적용했다.

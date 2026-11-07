@@ -4,6 +4,8 @@ import dts from 'vite-plugin-dts';
 import { emitDeclarationFormats } from '../../scripts/emit-declaration-formats.mjs';
 
 export default defineConfig({
+  // Keep callable defaults when CJS consumers require ESM-only externals.
+  legacy: { inconsistentCjsInterop: true },
   oxc: { jsx: { runtime: 'automatic', importSource: 'lithent' } },
   plugins: [
     dts({
@@ -31,7 +33,7 @@ export default defineConfig({
     rolldownOptions: {
       external: ['vite', 'lithent', '@mdx-js/rollup', '@lithent/hmr-parser'],
       output: {
-        interop: 'auto',
+        exports: 'named',
         globals: {
           vite: 'vite',
           lithent: 'lithent',

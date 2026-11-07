@@ -1,5 +1,36 @@
 # Release notes
 
+## Unreleased — Vite 8
+
+### lithent 1.25.7 / lithent-concurrent 0.2.6
+
+- Rebuild both cores and the bundled subpaths with Vite 8 / Rolldown while
+  preserving the previous JavaScript browser targets and public APIs. The
+  runtime source is unchanged from the preceding cleanup recovery releases.
+- See the [migration report](./docs/benchmark/VITE8_MIGRATION_RESULTS.md) for
+  bundle measurements and validation. Local CPU diagnostics do not establish
+  a general runtime speed improvement.
+
+### Toolchain packages
+
+- `@lithent/lithent-vite` 0.4.0, `@lithent/lithent-template-vite` 0.2.0 and
+  `@lithent/lithent-mdx` 0.3.0 require Vite `^8.0.0`. This drops Vite 5
+  support for these plugin versions. Keep the preceding plugin release when
+  using Vite 5, or upgrade Vite and the plugins together. Vite 8 requires
+  Node `^20.19.0 || >=22.12.0`.
+- Use native Oxc JSX transforms and Rolldown dependency scanning. Preserve
+  classic JSX without development DOM props, automatic JSX, mixed TSX and
+  templates, JSON/CSS template loaders, and ESM/CommonJS package entry points.
+- `@lithent/hmr-parser` 0.2.5 and `@lithent/lithent-template-parser` 0.1.3
+  contain rebuilt artifacts from the new toolchain; parser APIs are unchanged.
+
+### create-lithent 0.4.0
+
+- Generate SPA and Express SSR projects using Vite 8 and matching plugin/core
+  versions. Both templates declare Node `^20.19.0 || >=22.12.0`.
+- Bound Tailwind scanning to the declared template content paths and keep the
+  SSR stylesheet filename compatible with the server's asset lookup.
+
 ## 2026-11-07
 
 ### lithent 1.25.6 / lithent-concurrent 0.2.5

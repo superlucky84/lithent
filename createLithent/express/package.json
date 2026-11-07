@@ -11,12 +11,12 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "express": "^4.21.1",
-    "lithent": "^1.25.2",
+    "lithent": "^1.25.7",
     "state-ref": "^2.0.0"
   },
   "devDependencies": {
-    "@lithent/lithent-mdx": "^0.2.6",
-    "@lithent/lithent-vite": "^0.3.4",
+    "@lithent/lithent-mdx": "^0.3.0",
+    "@lithent/lithent-vite": "^0.4.0",
     "@tailwindcss/postcss": "4.3.4",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "4.3.4",

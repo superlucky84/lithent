@@ -5,6 +5,8 @@ import dts from 'vite-plugin-dts';
 import { emitDeclarationFormats } from '../../scripts/emit-declaration-formats.mjs';
 
 export default defineConfig({
+  // Keep callable defaults when CJS consumers require ESM-only externals.
+  legacy: { inconsistentCjsInterop: true },
   oxc: {
     jsx: {
       runtime: 'classic',
@@ -69,7 +71,7 @@ export default defineConfig({
         '@lithent/lithent-template-vite',
       ],
       output: {
-        interop: 'auto',
+        exports: 'named',
         globals: {
           vite: 'vite',
           lithent: 'lithent',

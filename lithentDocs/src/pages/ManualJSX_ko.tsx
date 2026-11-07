@@ -19,7 +19,7 @@ export const ManualJSXKo = () => (
       Vite 플러그인을 사용하지 않고 직접 JSX를 설정하는 방법을 안내합니다.
       <br />
       <br />
-      TypeScript, Babel, Vite(esbuild) 등 다양한 도구에서 Lithent의 JSX를 사용할
+      TypeScript, Babel, Vite 8(Oxc) 등 다양한 도구에서 Lithent의 JSX를 사용할
       수 있도록 설정할 수 있습니다.
     </p>
 
@@ -418,11 +418,11 @@ const App = mount((renew) => {
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 
     <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
-      Vite 설정 (esbuild)
+      Vite 8 설정 (Oxc)
     </h2>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      Vite 플러그인 없이 esbuild의 JSX 설정만 사용하는 방법입니다.
+      Lithent Vite 플러그인 없이 Vite 8의 Oxc JSX 변환을 설정하는 방법입니다.
       <br />
       <br />
       <strong class="font-semibold text-gray-900 dark:text-white">
@@ -447,9 +447,13 @@ const App = mount((renew) => {
       code={`import { defineConfig } from 'vite';
 
 export default defineConfig({
-  esbuild: {
-    jsxFactory: 'h',
-    jsxFragment: 'Fragment',
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
   },
 });`}
     />
@@ -470,22 +474,22 @@ export default defineConfig({
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-                jsxFactory
+                pragma
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              esbuild의 JSX factory 함수. <code>&lt;div /&gt;</code>를{' '}
+              Oxc의 JSX factory 함수. <code>&lt;div /&gt;</code>를{' '}
               <code>h('div')</code>로 변환
             </td>
           </tr>
           <tr>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
               <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
-                jsxFragment
+                pragmaFrag
               </code>
             </td>
             <td class="border border-gray-300 dark:border-gray-700 px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-              esbuild의 Fragment 컴포넌트. <code>&lt;&gt;&lt;/&gt;</code>를{' '}
+              Oxc의 Fragment 컴포넌트. <code>&lt;&gt;&lt;/&gt;</code>를{' '}
               <code>Fragment</code>로 변환
             </td>
           </tr>
@@ -498,8 +502,9 @@ export default defineConfig({
         <span class="font-medium text-gray-700 dark:text-gray-300">
           💡 참고:
         </span>{' '}
-        esbuild는 현재 Automatic Transform을 지원하지 않습니다. Classic
-        Transform만 사용 가능합니다.
+        자동 JSX는 runtime: 'automatic', importSource: 'lithent'로 설정합니다.
+        Classic JSX의 development: false는 개발 메타데이터가 DOM 속성에 추가되는
+        것을 막습니다.
       </p>
     </div>
 

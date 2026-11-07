@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "lithent",
-  "version": "1.25.6",
+  "version": "1.25.7",
   "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
   "packageManager": "pnpm@12.15.0",
   "devEngines": {
