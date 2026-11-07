@@ -18,6 +18,11 @@ on:
     tags:
       - 'lithent@*'
   workflow_dispatch:
+    inputs:
+      release_sha:
+        description: Expected source SHA when dispatched after a confirmed npm release
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -31,6 +36,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Confirm the source requested by the release workflow
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          if [[ -n "$RELEASE_SHA" && "$RELEASE_SHA" != "$GITHUB_SHA" ]]; then
+            echo "Release documentation source SHA does not match the requested ref."
+            exit 1
+          fi
 
       # Installs the pnpm version in package.json `packageManager`.
       # pnpm 12 needs v6.1.0 or later; the v6 tag predates it.

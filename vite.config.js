@@ -86,6 +86,8 @@ export default defineConfig({
       '**/element/**',
       // Browser contracts use Playwright's runner, not Vitest.
       '**/e2e/**',
+      // Node's CI/artifact failure fixtures use their own mandatory runner.
+      '**/scripts/tests/**',
       // Optional prototypes have dedicated Vitest and Playwright runners.
       '**/experiments/**',
     ],

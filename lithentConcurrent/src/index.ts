@@ -46,8 +46,6 @@ export type {
 
 declare global {
   namespace JSX {
-    interface IntrinsicElements {
-      [name: string]: Props;
-    }
+    interface IntrinsicElements extends Record<string | number, Props> {}
   }
 }
