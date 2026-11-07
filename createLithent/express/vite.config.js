@@ -11,15 +11,16 @@ const cachedEntries = getEntries();
 
 export default defineConfig(({ mode }) => ({
   plugins: [
-    checker({
-      typescript: true,
-      eslint: {
-        useFlatConfig: true,
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
-    }),
+    !process.env.VITEST &&
+      checker({
+        typescript: true,
+        eslint: {
+          useFlatConfig: true,
+          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+        },
+      }),
     dts({
-      outputDir: ['dist'],
+      outDir: ['dist'],
     }),
     lithentMdx(),
     lithentVitePlugin(),
@@ -27,21 +28,25 @@ export default defineConfig(({ mode }) => ({
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(import.meta.dirname, './src'),
     },
   },
   build: {
+    // Preserve the browser target used before the Vite 8 migration.
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     lib: {
+      // The production server resolves the stylesheet by its stable prefix.
+      cssFileName: 'style',
       entry: cachedEntries,
       formats: ['es'],
       fileName: format => `[name]-[hash].${format}.js`, // 파일 이름 패턴 지정
     },
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         // 파일 구조를 유지하는 설정
         entryFileNames: assetInfo => {
           const relativePath = assetInfo.facadeModuleId.replace(
-            `${resolve(__dirname, 'src')}/`,
+            `${resolve(import.meta.dirname, 'src')}/`,
             ''
           );
           const dir = relativePath.substring(0, relativePath.lastIndexOf('/'));
@@ -49,7 +54,7 @@ export default defineConfig(({ mode }) => ({
         },
         assetFileNames: assetInfo => {
           const relativePath = assetInfo.name.replace(
-            `${resolve(__dirname, 'src')}/`,
+            `${resolve(import.meta.dirname, 'src')}/`,
             ''
           );
           const dir = relativePath.substring(0, relativePath.lastIndexOf('/'));
@@ -70,8 +75,8 @@ export default defineConfig(({ mode }) => ({
 }));
 
 function getEntries() {
-  const entriesDir = resolve(__dirname, 'src/pages');
-  const utilDir = resolve(__dirname, 'src');
+  const entriesDir = resolve(import.meta.dirname, 'src/pages');
+  const utilDir = resolve(import.meta.dirname, 'src');
   const files = fs.readdirSync(entriesDir);
   const entries = files.reduce((entries, file) => {
     const name = file; // 확장자 제거

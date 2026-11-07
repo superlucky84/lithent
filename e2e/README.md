@@ -10,6 +10,13 @@ pnpm test:e2e:build
 
 After building once, use `pnpm test:e2e`. To run a subset:
 
+Select Firefox or WebKit with `LITHENT_E2E_BROWSER=firefox` or
+`LITHENT_E2E_BROWSER=webkit`; the default is Chromium. Install the matching
+engines with `pnpm exec playwright install chromium firefox webkit`.
+Set `LITHENT_CHROME=/path/to/chromium` to use an existing Chromium installation
+when Chromium is selected; otherwise Playwright uses its installed browser.
+The mutation runner inherits the same selection and override.
+
 ```sh
 pnpm test:e2e --project=concurrent --grep 'B-4/B-9'
 pnpm exec tsc -p e2e/tsconfig.json

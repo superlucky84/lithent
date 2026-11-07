@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import { concurrentAlias } from './alias.js';
 
-const repoRoot = resolve(__dirname, '..');
+const repoRoot = resolve(import.meta.dirname, '..');
 
 /**
  * Runs the SHARED core suite (`src/tests/*`) against the concurrent core.
@@ -13,9 +13,17 @@ const repoRoot = resolve(__dirname, '..');
  * `root` is the repo root so the base suite is reachable by a plain glob.
  */
 export default defineConfig({
+  oxc: {
+    jsx: {
+      runtime: 'classic',
+      development: false,
+      pragma: 'h',
+      pragmaFrag: 'Fragment',
+    },
+  },
   root: repoRoot,
   resolve: {
-    alias: concurrentAlias(__dirname),
+    alias: concurrentAlias(import.meta.dirname),
   },
   test: {
     environment: 'jsdom',

@@ -29,7 +29,9 @@ export default defineConfig({
     launchOptions:
       browser.name === 'firefox'
         ? { firefoxUserPrefs: { 'browser.chrome.site_icons': false } }
-        : {},
+        : browser.name === 'chromium' && process.env.LITHENT_CHROME
+          ? { executablePath: process.env.LITHENT_CHROME }
+          : {},
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },

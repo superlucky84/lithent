@@ -6,7 +6,7 @@ The official scaffolding tool for [Lithent](https://superlucky84.github.io/lithe
 
 ### Prerequisites
 
-- **Node.js 18.12** or higher
+- **Node.js 20.19 or 22.12+** for the Vite 8 templates
 - Basic command line experience
 
 ### Creating a New Project

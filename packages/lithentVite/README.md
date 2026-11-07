@@ -25,8 +25,9 @@ yarn add @lithent/lithent-vite
 ```
 
 **Peer Dependencies:**
-- `lithent: ^1.21.0`
-- `vite: ^5.0.0`
+
+- `lithent: ^1.25.0`
+- `vite: ^8.0.0`
 
 ## Usage
 
@@ -39,9 +40,7 @@ import { defineConfig } from 'vite';
 import lithentVitePlugin from '@lithent/lithent-vite';
 
 export default defineConfig({
-  plugins: [
-    lithentVitePlugin(),
-  ],
+  plugins: [lithentVitePlugin()],
 });
 ```
 
@@ -91,9 +90,7 @@ import lithentVitePlugin from '@lithent/lithent-vite';
 const app = express();
 
 const vite = await createViteServer({
-  plugins: [
-    lithentVitePlugin(),
-  ],
+  plugins: [lithentVitePlugin()],
   server: { middlewareMode: 'ssr', hmr: true },
 });
 
@@ -112,7 +109,13 @@ arrow functions, function declarations, and default exports):
 export const Badge = ({ label }: { label: string }) => <span>{label}</span>;
 
 export function Card({ title }: { title: string }, children: JSX.Element[]) {
-  return <article><Badge label="Info" />{title}{children}</article>;
+  return (
+    <article>
+      <Badge label="Info" />
+      {title}
+      {children}
+    </article>
+  );
 }
 ```
 
@@ -225,6 +228,7 @@ export const DEFAULT_BOUNDARY_MARKER = '/* lithent:hmr-boundary */';
 ## State Preservation
 
 During HMR updates:
+
 - **Props are preserved**: Component props are maintained
 - **Closure state is reset**: Variables inside mount closures are re-initialized
 - **External state persists**: State from `lithent/helper` (state, store) persists

@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-07",
+  "mainRevision": "933400d17d5353bbe8a425625f2dba706f1edcd0",
+  "migrationMergeRevision": "a634a2f3e9e5901046d3479844bdf20d0276aecd",
+  "runtimeSourceChangedFromMain": false,
+  "toolchain": {
+    "node": "v24.22.1",
+    "pnpm": "12.15.0",
+    "beforeVite": "5.4.8",
+    "afterVite": "8.3.6",
+    "compression": "gzip level 9; Brotli Node defaults",
+    "target": ["es2020", "edge88", "firefox78", "chrome87", "safari14"]
+  },
+  "baselineBuild": "Original main Vite 5 configs with checker and declaration-only plugins omitted; UMD compact plugin retained. Runtime source identical to main.",
+  "packages": [
+    {
+      "name": "lithent",
+      "previous": "1.25.6",
+      "version": "1.25.7",
+      "releaseType": "patch"
+    },
+    {
+      "name": "lithent-concurrent",
+      "previous": "0.2.5",
+      "version": "0.2.6",
+      "releaseType": "patch"
+    },
+    {
+      "name": "create-lithent",
+      "previous": "0.3.4",
+      "version": "0.4.0",
+      "releaseType": "minor"
+    },
+    {
+      "name": "@lithent/hmr-parser",
+      "previous": "0.2.4",
+      "version": "0.2.5",
+      "releaseType": "patch"
+    },
+    {
+      "name": "@lithent/lithent-template-parser",
+      "previous": "0.1.2",
+      "version": "0.1.3",
+      "releaseType": "patch"
+    },
+    {
+      "name": "@lithent/lithent-template-vite",
+      "previous": "0.1.2",
+      "version": "0.2.0",
+      "releaseType": "minor"
+    },
+    {
+      "name": "@lithent/lithent-vite",
+      "previous": "0.3.5",
+      "version": "0.4.0",
+      "releaseType": "minor"
+    },
+    {
+      "name": "@lithent/lithent-mdx",
+      "previous": "0.2.7",
+      "version": "0.3.0",
+      "releaseType": "minor"
+    }
+  ],
+  "bundles": {
+    "base": {
+      "before": {
+        "raw": 13101,
+        "gzip": 5354,
+        "brotli": 4953,
+        "sha256": "e15cf71bd44766fda3fcf6dfb7df361c8831f854358621a9e2786ee910a716ab"
+      },
+      "after": {
+        "raw": 12673,
+        "gzip": 5241,
+        "brotli": 4857,
+        "sha256": "083ed13e09a8f5f56cfca093e10cdb4094369a62c1f4c6187b8740bc69fb0a24"
+      }
+    },
+    "concurrent": {
+      "before": {
+        "raw": 18571,
+        "gzip": 7571,
+        "brotli": 6986,
+        "sha256": "9800222c50ab9f11f8a636351b3ea9d168974423044ffb5a3424f64ab92d94e7"
+      },
+      "after": {
+        "raw": 18003,
+        "gzip": 7259,
+        "brotli": 6702,
+        "sha256": "fedbe329f945660e2530ff6c1dcb460c75d8999a7d84a36c756022c6b5182095"
+      }
+    }
+  },
+  "validation": {
+    "frozenInstall": {
+      "passed": true,
+      "minimumReleaseAgeStrict": true,
+      "policyExceptionsAdded": false
+    },
+    "freshWorkspaceBuild": {
+      "passed": true
+    },
+    "coreAndSatellites": {
+      "passed": 1206,
+      "existingSkipped": 3
+    },
+    "toolchain": {
+      "suites": 5,
+      "passed": 172
+    },
+    "ciFixtures": {
+      "passed": 49
+    },
+    "reliabilityControls": {
+      "passingBaselines": 8,
+      "detectedMutations": 34
+    },
+    "browsers": {
+      "chromium": {
+        "version": "153.0.8010.12",
+        "passed": 90
+      },
+      "firefox": {
+        "version": "155.0",
+        "passed": 90
+      },
+      "webkit": {
+        "version": "26.6",
+        "passed": 90
+      }
+    },
+    "packedPreflight": {
+      "packages": 8,
+      "passed": true,
+      "formats": ["ESM", "CJS"],
+      "strictTypeResolution": ["Node16", "NodeNext"],
+      "skipLibCheck": false
+    },
+    "concurrentArtifacts": {
+      "passed": true
+    },
+    "mixedTemplateIntegration": {
+      "passed": true,
+      "prebundling": true,
+      "developmentAndProduction": true,
+      "sourcemaps": true
+    },
+    "sizeGates": {
+      "passed": true,
+      "base": {
+        "brotli": 4857,
+        "budget": 4953
+      },
+      "concurrent": {
+        "brotli": 6702,
+        "budget": 9000
+      },
+      "element": {
+        "brotli": 968,
+        "budget": 1000
+      }
+    },
+    "esmByteIdenticalAcrossCjsInteropFix": true,
+    "regeneratedPluginAndDocsBuilds": {
+      "passed": true
+    },
+    "finalCoreHashesMatchMeasurements": true
+  },
+  "notes": [
+    "The initial unit run overlapped the workspace build and exceeded one 5s test limit; the completed isolated run passed without changing timeouts or assertions.",
+    "WebKit uses official Debian libraries extracted into user-owned temporary paths and linked into its browser bundle. Libraries were loaded and a real WebKit page verified; Playwright host validation was bypassed because its ldconfig cache check ignores these paths. Test assertions and browser selection were retained.",
+    "Initial results.json timing/GC samples predate the cleanup recovery source merged from main; they are not measurements of these release candidates."
+  ]
+}

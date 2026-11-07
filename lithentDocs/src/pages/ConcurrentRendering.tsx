@@ -90,9 +90,15 @@ export const ConcurrentGuide = ({ language }: { language: 'en' | 'ko' }) => {
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  esbuild: { jsx: 'automatic', jsxImportSource: 'lithent' },
+  oxc: { jsx: { runtime: 'automatic', importSource: 'lithent' } },
   resolve: {
-    alias: [{ find: /^lithent$/, replacement: 'lithent-concurrent' }],
+    alias: [{
+      find: /^lithent$/,
+      replacement: 'lithent-concurrent',
+      customResolver(source, importer, options) {
+        return this.resolve(source, importer, { ...options, skipSelf: true });
+      },
+    }],
   },
 });`}
       />

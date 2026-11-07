@@ -4,7 +4,7 @@ A modern Lithent SPA boilerplate built with Vite. Features Tailwind CSS v4, Hist
 
 ## Prerequisites
 
-- Node.js 20.3.0+ (specified in `.nvmrc`)
+- Node.js 20.19 or 22.12+ (`.nvmrc` selects 24.22.1)
 - pnpm (recommended package manager)
 
 ## Getting Started
@@ -23,11 +23,13 @@ pnpm dev
 ## Available Scripts
 
 ### Development
+
 - `pnpm dev` - Start Vite dev server with HMR
 - `pnpm build` - Build for production
 - `pnpm preview` - Preview production build locally
 
 ### Code Quality
+
 - `pnpm lint` - Check code with ESLint
 - `pnpm lint:fix` - Auto-fix ESLint issues
 - `pnpm format` - Format code with Prettier

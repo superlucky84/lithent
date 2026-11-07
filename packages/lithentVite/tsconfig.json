@@ -4,7 +4,7 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "declaration": true,
     "allowJs": false,
     "strict": true,
@@ -21,7 +21,7 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
     "baseUrl": "./",
-    "types": ["vitest/importMeta"],
+    "types": ["vitest/importMeta", "node"],
     "paths": {
       "@/*": ["src/*"],
       "@lithent/lithent-template-vite": ["../lithentTemplateVite/src"]
