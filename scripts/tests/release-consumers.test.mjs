@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { verifyPlanConsumers } from '../verify-plan-consumers.mjs';
 
 test(
-  'a candidate consumer installs an unselected internal dependency from the registry, never its changed workspace archive',
+  'a candidate consumer installs an unselected internal dependency from the registry, never its changed workspace archive, even minutes after it was published',
   { timeout: 60_000 },
   async t => {
     const root = await mkdtemp(join(tmpdir(), 'release-consumer-registry-'));
@@ -70,6 +70,8 @@ test(
           JSON.stringify({
             name: beta,
             'dist-tags': { latest: '1.0.0' },
+            // Published by an earlier release step moments ago.
+            time: { '1.0.0': new Date().toISOString() },
             versions: {
               '1.0.0': {
                 ...published.packed,
