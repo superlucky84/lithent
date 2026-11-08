@@ -44,7 +44,7 @@ function context() {
     github: {
       repository: 'superlucky84/lithent',
       ref: 'refs/heads/main',
-      event_name: 'push',
+      event_name: 'workflow_dispatch',
     },
     vars: { NPM_PUBLISH_ENABLED: 'true' },
     needs: {
@@ -59,9 +59,10 @@ function context() {
   };
 }
 
-test('actual workflow permits publishing only after every main validation and preserves partial-failure recording', async () => {
+test('actual workflow permits publishing only from a manual main run after every validation and preserves partial-failure recording', async () => {
   const config = await workflow('ci.yml');
   assert.deepEqual(config.on.push.branches, ['main']);
+  assert(Object.hasOwn(config.on, 'workflow_dispatch'));
   assert.deepEqual(config.jobs.browser.strategy.matrix.browser, [
     'chromium',
     'firefox',
@@ -72,6 +73,9 @@ test('actual workflow permits publishing only after every main validation and pr
   assert.deepEqual(config.jobs.publish.needs, ['quality', 'browser', 'gate']);
   assert(evaluate(config.jobs.publish.if, context()));
   for (const mutate of [
+    c => {
+      c.github.event_name = 'push';
+    },
     c => {
       c.github.event_name = 'pull_request';
     },
@@ -97,13 +101,10 @@ test('actual workflow permits publishing only after every main validation and pr
     mutate(c);
     assert.equal(evaluate(config.jobs.publish.if, c), false);
   }
-  const manual = context();
-  manual.github.event_name = 'workflow_dispatch';
-  assert(evaluate(config.jobs.publish.if, manual));
-  assert.equal(
-    evaluate(config.concurrency['cancel-in-progress'], context()),
-    false
-  );
+  const mainPush = context();
+  mainPush.github.event_name = 'push';
+  for (const c of [context(), mainPush])
+    assert.equal(evaluate(config.concurrency['cancel-in-progress'], c), false);
   const pr = context();
   pr.github.event_name = 'pull_request';
   assert.equal(evaluate(config.concurrency['cancel-in-progress'], pr), true);
@@ -115,6 +116,11 @@ test('actual workflow permits publishing only after every main validation and pr
   const missing = context();
   missing.needs.publish.outputs.receipt_artifact = '';
   assert.equal(evaluate(config.jobs['release-records'].if, missing), false);
+  assert.equal(
+    evaluate(config.jobs['release-records'].if, mainPush),
+    false,
+    'A main merge validates only; tags and docs follow a manual release run'
+  );
 });
 
 test('workflow wiring keeps original-attempt artifacts and restricts privilege to the two release jobs', async () => {

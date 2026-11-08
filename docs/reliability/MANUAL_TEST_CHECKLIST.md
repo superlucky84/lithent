@@ -14,6 +14,7 @@
 - U-12(2026-11-07)로 Phase 5 리뷰 없이 Phase 6 동일 소스 전체 통합을 진행한다.
 - U-13/U-14(2026-11-07)로 전체 최종 리뷰의 REQUEST_CHANGES 1건을 수정한다. 업로드 뒤 확인 실패의 원래 run/SHA 복구와 미확정 기록의 명시 실패를 M-14에서 검사한다.
 - U-15/U-16(2026-11-07): 수정분 재리뷰 APPROVE 뒤 사용자가 커밋·PR 생성과 배포 대상 버전업 정렬을 요청했다. npm 재조회는 준비한 7개 patch의 미발행/최신 stable 초과와 미변경 create-lithent 0.3.4 제외를 확인했으며 기존 manifest를 추가 bump하지 않는다. 실제 발행 성공으로 표시하지 않는다.
+- U-17(2026-11-08): 발행은 main 대상 Validate 수동 실행에서만 한다. main push는 검증만 하며 M-9에서 확인한다.
 
 ## cleanup·element
 
@@ -45,10 +46,11 @@
 
 - [x] M-7 — RQ-11/RQ-14, DC-6/DC-20/DC-23: A 성공 후 B 실패를 주입형 실행기로 재현했고 A의 성공을 저장·B에서 중단했다. 재실행은 A를 건너뛰고 B만 처리했다. version diff 없이 재계산하는 planner, 404/401/403/429/5xx·실제 abort deadline·CLI 오류 뒤 지연 확인·잘못된 integrity 거부 fixture PASS. 실제 발행 없음. 실패: 중복 발행·B 영구 누락·부분 성공을 전체 성공으로 보고.
 - [x] M-8 — RQ-12, DC-21/DC-22/DC-23/DC-24, IC-2: 8개 fresh archive와 7개 실제 후보 소비자를 통과했다. 혼합 ESM/CJS·두 코어 strict 타입, 실제 Vite/MDX/template 변환과 로컬 registry의 비선택 의존성이 관측됐다. tarball/plan/proof/source/policy 불일치·dirty 발행 증거와 잘못된 발행 bytes를 fixture에서 거부했다. 436파일 bundle 생성/대조 PASS. 실제 CLI 발행 입력/원격 CI 검증은 아직 미완료다. 실패: 검증 후 repack·다른 SHA artifact·미발행 의존 버전·지원하지 않는 export 진입점.
-- [ ] M-9 — RQ-13/RQ-15, DC-3/DC-7/DC-8: PR/fork/실패한 main/부적절한 ref에서는 발행이 실행되지 않는다. 신뢰하는 main의 필수 검사 성공 후에만 OIDC 발행을 허용한다. 패키지별 Trusted Publisher·repository 메타데이터·runner/CLI·권한을 확인한다. 초기 검증은 mock/dry-run으로 하며 실제 발행은 활성화 후 별도 운영 근거를 남긴다.
+- [ ] M-9 — RQ-13/RQ-15, DC-3/DC-7/DC-8: PR/fork/실패한 main/부적절한 ref에서는 발행이 실행되지 않는다. 신뢰하는 main 수동 실행의 필수 검사 성공 후에만 OIDC 발행을 허용하고 main push는 발행하지 않는다(U-17). 패키지별 Trusted Publisher·repository 메타데이터·runner/CLI·권한을 확인한다. 초기 검증은 mock/dry-run으로 하며 실제 발행은 활성화 후 별도 운영 근거를 남긴다.
 - [ ] M-10 — RQ-15, DC-9: 허락받은 기존 문서에 새 절차와 실패 복구 경로가 연결된다. 실제 발행된 패키지만 동일 SHA에 tag를 남기고 root 발행 후 docs workflow 연계가 작동한다. GITHUB_TOKEN tag push만으로 연쇄 실행된다고 추정하지 않는다. npm 발행·GitHub Release·문서 사이트 결과를 구분한다.
 
 M-9/M-10 코드 검증: production adapter·실제 workflow 조건·부분 성공 receipt·원래 attempt artifact·다른 SHA/tag 충돌·root docs dispatch를 포함해 최종 CI fixture 35 PASS.
+Phase 8(2026-11-08): main push 거부·수동 실행 허용의 워크플로 조건과 발행 가드 회귀, 결함 주입 2개를 추가했다. `pnpm test:ci` 49 PASS, 결함 주입 36/36 검출.
 로컬 production CLI와 --allow-dirty는 발행 전에 거부했다. 원격 npm/GitHub 쓰기는 mock으로 대체했다.
 운영 체크는 실제 main CI·환경 보호·ci.yml/npm Trusted Publisher·NPM_PUBLISH_ENABLED 설정과 최초 발행/tag/docs run을 확인할 때 완료로 바꾼다.
 필요한 담당/설정/재시도 절차는 RELEASING에 있고, 신규 Trusted Publisher의 첫 발행 2일 기한도 포함한다.

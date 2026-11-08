@@ -172,7 +172,7 @@ jobs:
     if: >-
       github.repository == 'superlucky84/lithent' &&
       github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.event_name == 'workflow_dispatch' &&
       vars.NPM_PUBLISH_ENABLED == 'true' &&
       needs.quality.result == 'success' && needs.browser.result == 'success' && needs.gate.result == 'success'
     runs-on: ubuntu-latest
@@ -239,7 +239,7 @@ jobs:
     if: >-
       always() &&
       github.repository == 'superlucky84/lithent' && github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.event_name == 'workflow_dispatch' &&
       vars.NPM_PUBLISH_ENABLED == 'true' && needs.gate.result == 'success' &&
       needs.publish.outputs.receipt_artifact != ''
     runs-on: ubuntu-latest
