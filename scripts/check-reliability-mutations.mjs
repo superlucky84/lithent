@@ -222,10 +222,7 @@ cases.push(
     'release-context.mjs',
     'publish-release.test.mjs',
     /production entry rejects/,
-    replace(
-      "!['push', 'workflow_dispatch'].includes(env.GITHUB_EVENT_NAME)",
-      'false'
-    )
+    replace("env.GITHUB_EVENT_NAME !== 'workflow_dispatch'", 'false')
   ),
   node(
     'publish-ignore-ref',
@@ -348,6 +345,18 @@ for (const [id, expected, before, after] of [
     /actual workflow permits/,
     "cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
     'cancel-in-progress: true',
+  ],
+  [
+    'ci-publish-on-push',
+    /actual workflow permits/,
+    "      github.ref == 'refs/heads/main' &&\n      github.event_name == 'workflow_dispatch' &&",
+    "      github.ref == 'refs/heads/main' &&\n      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&",
+  ],
+  [
+    'ci-record-on-push',
+    /actual workflow permits/,
+    "&& github.ref == 'refs/heads/main' &&\n      github.event_name == 'workflow_dispatch' &&",
+    "&& github.ref == 'refs/heads/main' &&\n      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&",
   ],
 ])
   cases.push({

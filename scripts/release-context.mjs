@@ -12,7 +12,7 @@ export function assertReleaseContext({
     env.GITHUB_SERVER_URL !== 'https://github.com' ||
     env.GITHUB_API_URL !== 'https://api.github.com' ||
     env.GITHUB_REPOSITORY !== releasePolicy.repository ||
-    !['push', 'workflow_dispatch'].includes(env.GITHUB_EVENT_NAME) ||
+    env.GITHUB_EVENT_NAME !== 'workflow_dispatch' ||
     env.GITHUB_REF !== 'refs/heads/main' ||
     env.GITHUB_REF_PROTECTED !== 'true' ||
     env.GITHUB_WORKFLOW_REF !==

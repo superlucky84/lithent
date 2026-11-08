@@ -528,10 +528,47 @@ Files:
 - `scripts/tests/record-release.test.mjs` (added)
 - `scripts/tests/release-integration.test.mjs` (added)
 
+## Phase 8 — 발행을 main 수동 실행으로 전환: done
+
+Refs: RQ-13, DC-7, DC-25, DC-32, M-9
+
+진입: U-17(2026-11-08). 2026-11-07 PR #107 병합의 main push run [42374609169](https://github.com/superlucky84/lithent/actions/runs/42374609169)(attempt 2)이 8개 패키지를 자동 발행했다. registry의 GitHub Actions Trusted Publisher·provenance와 `b569ee3`의 `lithent@1.25.7`·`lithent-concurrent@0.2.6` 태그로 확인했다.
+
+- [x] `ci.yml`의 publish·release-records 조건을 main의 `workflow_dispatch`로 한정한다. PR·main push 검증과 나머지 조건은 그대로 둔다.
+- [x] 발행·기록 스크립트가 공유하는 실행 맥락 가드(`scripts/release-context.mjs`)도 `workflow_dispatch`만 허용한다.
+- [x] 워크플로 조건·발행 가드 회귀와 결함 주입 2개(`ci-publish-on-push`, `ci-record-on-push`)를 추가한다.
+- [x] RELEASING·CONTRIBUTING과 이 정본 4종을 새 발행 시점에 맞춘다.
+
+Baseline: 변경 전 `b569ee3`에서 `pnpm test:ci` 49 PASS, 결함 주입 34/34 검출.
+Exit: main push에서는 발행·기록 job 조건이 거짓이고, main 수동 실행은 기존 검증 뒤 발행한다. 실제 원격 수동 발행은 다음 버전업 때 M-9로 확인한다.
+
+2026-11-08 검증(Linux, Node 24.22.1, pnpm 12.15.0, `pnpm install --frozen-lockfile --ignore-scripts`):
+
+- `pnpm test:ci` 49 PASS, skip 0. 변경 전후 테스트 수는 같고 기존 단언에 push 거부를 더했다.
+- 되돌림 확인: 워크플로 조건에 push를 다시 허용하면 release-workflow 회귀가, 가드가 push를 허용하면 publish-release 회귀가 실패했다.
+- `node scripts/check-reliability-mutations.mjs`: 기준선 PASS, 결함 주입 36/36 검출(새 2개 포함).
+- 변경한 파일의 Prettier check PASS.
+- docs.yml은 바꾸지 않았다. root `package.json`을 바꾼 main 병합은 발행 전에 문서를 먼저 배포할 수 있고, 수동 발행 run의 root 성공 뒤 dispatch가 다시 배포한다.
+
+Files:
+
+- `.github/workflows/ci.yml` (modified)
+- `CONTRIBUTING.md` (modified)
+- `RELEASING.md` (modified)
+- `docs/reliability/DESIGN.md` (modified)
+- `docs/reliability/IMPLEMENT.md` (modified)
+- `docs/reliability/MANUAL_TEST_CHECKLIST.md` (modified)
+- `docs/reliability/REQUIREMENTS.md` (modified)
+- `scripts/check-reliability-mutations.mjs` (modified)
+- `scripts/release-context.mjs` (modified)
+- `scripts/tests/publish-release.test.mjs` (modified)
+- `scripts/tests/release-integration.test.mjs` (modified)
+- `scripts/tests/release-workflow.test.mjs` (modified)
+
 ## 현재 인계
 
-- done: Phase 0~7 구현/로컬 검증과 U-15 재리뷰 APPROVE 완료. 전체 CI fixture 47 PASS·정상 baseline 58 PASS·33/33 결함 검출과 재리뷰의 빠른 검사 41 PASS를 확인했다. U-16의 root 1.25.6·Concurrent 0.2.5·hmr-parser 0.2.4·MDX 0.2.7·template-parser 0.1.2·template-vite 0.1.2·Vite 0.3.5는 npm 미발행과 검증 archive/내부 의존성 일치를 재확인해 구현 커밋과 PR #104에 반영했다. create-lithent 0.3.4는 유지한다. PR의 최초 Validate 실행은 frozen install 성공 뒤 build를 시작했다. PR 생성/feature branch 기록 외 실제 npm 발행·main 병합·release tag/docs 쓰기는 없다.
-- next: [PR #104](https://github.com/superlucky84/lithent/pull/104)의 최신 commit CI 결과를 확인한다. 저장소 규칙대로 merge commit으로 병합하며 자동 병합은 설정하지 않았다. 실제 발행은 RELEASING의 소유자/관리자 초기 설정과 main 검증 성공을 확인한 뒤 활성화한다. 최초 run의 id는 42333349369이며 새 commit의 실행 상태는 PR checks에서 확인한다.
-- blockers: 코드/버전업/리뷰의 차단 항목은 없다. npm Trusted Publisher와 required CI·npm 환경 main 제한·NPM_PUBLISH_ENABLED=true 설정 및 실제 원격 발행은 별도 미완료다. 이미 확정된 main 검사 성공 후 발행을 재질문하지 않는다.
-- latest commit: 실제 구현 커밋은 `4dbed338c808c93d7c198f6066891eb8087aecf6`이며 `review/cleanup-ci-browser`와 PR #104에 기록했다. 이 결과 기록만 갱신한 후속 문서 커밋을 포함한 최신 SHA는 해당 브랜치 HEAD(`git rev-parse HEAD`)로 확인한다. 기준 main은 `d594983897bab460b469cea8c6e73dfd354f1fd2`, 이전 전체 검증 사본은 `0f7c8f2af837d128ebe2f284f4b33731b6cb3a04`다.
-- source of truth: 버전은 8개 허용 manifest와 `.github/release-policy.json`에 있고 U-16의 재조회 근거는 `/workspace/work/lithent-pr/npm-versions.json`에 있다. 배포 도구의 최신 검증은 `/workspace/work/lithent-phase7/`, 이전 전체 build/8 pack/7 후보/3엔진 270 PASS는 `/workspace/work/lithent-phase6/`에 보존한다. 이번 출고 정리는 리뷰 결과/인계 기록만 갱신하며 검증된 제품/배포 코드와 준비 버전을 바꾸지 않는다. 실제 Safari/IME·외부 OIDC/패키지 권한·원격 배포는 미확인 상태다.
+- done: Phase 0~8 완료. 2026-11-07 PR #107 병합 run이 8개 패키지를 Trusted Publishing으로 발행했다. U-17로 Phase 8에서 발행을 main 수동 실행으로 바꿨다.
+- next: Phase 8 브랜치 `chore/manual-npm-publish`를 검토해 main에 병합한다. 이후 릴리스는 버전업을 병합한 뒤 Actions → Validate → Run workflow(main)로 발행하고, 첫 수동 발행에서 publish·태그·docs dispatch를 확인해 M-9에 기록한다.
+- blockers: 없음.
+- latest commit: 기준 main은 `b569ee3`이고 Phase 8 커밋은 `chore/manual-npm-publish` HEAD(`git rev-parse HEAD`)로 확인한다.
+- source of truth: 발행 조건은 `.github/workflows/ci.yml`과 `scripts/release-context.mjs`, 운영 절차는 [RELEASING](../../RELEASING.md)이다. PR #105~#107의 발행 수정과 Vite 8 릴리스는 이 정본의 단계로 기록하지 않았고 CHANGELOG·RELEASING에 있다.

@@ -88,12 +88,14 @@ WebKit automation and actual Safari/OS IME checks are recorded separately in
 ## Releases
 
 Selective npm publishing is maintained in
-[docs/reliability](./docs/reliability/REQUIREMENTS.md). After Quality, all three
-browsers and the final CI gate succeed on main, the workflow publishes only
-versioned candidates using the exact validated archives and npm OIDC. It records
-confirmed successes even when another package fails, then tags the publication
-SHA and explicitly dispatches root release documentation. GitHub Releases are
-not created automatically.
+[docs/reliability](./docs/reliability/REQUIREMENTS.md). A maintainer starts a
+release by running the Validate workflow manually on main. After Quality, all
+three browsers and the final CI gate succeed in that run, the workflow publishes
+only versioned candidates using the exact validated archives and npm OIDC. It
+records confirmed successes even when another package fails, then tags the
+publication SHA and explicitly dispatches root release documentation. GitHub
+Releases are not created automatically. Merging to main runs the same validation
+without publishing.
 
 Repository administrators and package owners must complete the main/environment
 protection and npm Trusted Publisher settings in [RELEASING.md](./RELEASING.md),
@@ -106,10 +108,11 @@ changes, so a release can be cut from `main` at any time.
 
 Follow [RELEASING.md](./RELEASING.md): bump each affected independent package's
 `package.json`, add a `CHANGELOG.md` entry, build and verify, then merge to main.
-After initial activation, successful main validation drives publishing and tag
-recording. A failed job can be rerun against its original Quality artifact even
-when the run attempt changes. Use the original run to recover release tags and
-docs; never tag an older publication at a newer main SHA.
+After initial activation, merge the version bump, then run Validate manually on
+main to publish and record tags. A failed job can be rerun against its original
+Quality artifact even when the run attempt changes. Use the original run to
+recover release tags and docs; never tag an older publication at a newer main
+SHA.
 
 An upload whose registry confirmation fails is retained as `unconfirmed`.
 The recording job rechecks the original run/SHA, validated archive identity and

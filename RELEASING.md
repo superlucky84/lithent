@@ -37,7 +37,9 @@ PR 생성까지이며, 병합·npm 발행·태그 생성은 수행하지 않는�
 
 ## CI 발행 절차
 
-사용자 U-10(2026-11-07)에 따라 **main의 모든 필수 검사 성공 후** 버전업된 패키지만 자동 발행한다.
+사용자 U-17(2026-11-08)에 따라 버전업된 패키지는 **main을 대상으로 Validate를 수동 실행할 때만** 발행한다.
+그 run의 Quality·세 브라우저·CI가 모두 성공해야 발행한다(U-10의 검증 조건 유지). main 병합(push)은 같은 검증만 하고 발행·태그 job을 건너뛴다.
+발행하려면 Actions → **Validate** → **Run workflow** → Branch **main**을 실행한다.
 후보 계산·실제 tarball/소비자 검증·OIDC 발행 job·성공 태그·root 문서 dispatch를 구현했다.
 아래 외부 초기 설정은 아직 적용하지 않았고 이 작업에서 실제 npm 발행도 수행하지 않았다.
 정본은 [설계](./docs/reliability/DESIGN.md), 진행/근거는 [IMPLEMENT](./docs/reliability/IMPLEMENT.md)다.
@@ -66,7 +68,7 @@ CI는 같은 run/SHA의 archive·plan·proof를 hash로 묶어 브라우저 job�
 npm Trusted Publishing 운영 준비(미완료):
 
 - 저장소 관리자가 main의 필수 검사 **CI**를 ruleset/branch protection에 등록한다. 발행 CLI는 보호된 main ref를 요구한다.
-- GitHub environment **npm**을 만들고 deployment branches를 **main만** 허용한다. 자동 발행을 위해 릴리스별 승인 대기는 추가하지 않는다.
+- GitHub environment **npm**을 만들고 deployment branches를 **main만** 허용한다. 수동 실행 자체가 발행 결정이므로 environment 승인 대기는 추가하지 않는다.
 - 발행할 패키지의 소유자가 npm Trusted Publisher를 설정한다: GitHub owner **superlucky84**, repository **lithent**, workflow filename **ci.yml**, environment **npm**. 값은 대소문자까지 일치시킨다.
 - Node >=22.14.0, npm CLI >=11.5.1, GitHub-hosted runner를 사용한다. 현재 고정 Node 24.22.1의 npm 11.9.0은 버전 요건을 만족한다.
 - 새 publisher에는 직접 `npm publish` action을 허용한다. repository 메타데이터와 provenance의 공개 저장소 주소도 대조한다.
@@ -74,10 +76,11 @@ npm Trusted Publishing 운영 준비(미완료):
 - `id-token: write`는 실제 발행 job, 태그/문서에 필요한 쓰기 권한은 별도 후속 job으로 제한한다. 장기 npm 토큰은 추가하지 않는다.
 - 발행·기록 job은 의존성 설치 script를 실행하지 않는다. GitHub 쓰기 토큰은 태그/dispatch step에서만 전달한다.
 - read-only CI와 위 설정을 확인한 뒤 저장소 Actions variable **NPM_PUBLISH_ENABLED=true**로 최초 활성화한다. 변수가 없거나 false이면 발행/태그 job은 생략하고 검증은 그대로 수행한다. 비활성화하려면 이 값을 false로 바꾼다.
-- 변수 활성화 자체는 workflow를 시작하지 않는다. 이후 main push 또는 main 대상으로 Validate 수동 실행을 하면 모든 검증 뒤 발행한다. PR/fork/다른 ref는 발행할 수 없다.
+- 변수 활성화 자체는 workflow를 시작하지 않는다. main 대상으로 Validate를 수동 실행하면 모든 검증 뒤 발행한다. main push·PR/fork/다른 ref는 발행할 수 없다.
 - 검증한 tarball을 그대로 발행하고 registry integrity로 성공을 확인한다. 실패했다고 이미 발행한 버전을 삭제하거나 덮어쓰지 않는다.
 - 성공한 패키지만 해당 발행 SHA에 `<package-name>@<version>` 태그를 만든다. root의 기존 `lithent@<version>` 표기를 유지하며 scoped 이름도 포함한다. 기존 다른 SHA 태그는 덮어쓰지 않는다. GitHub Release는 자동 생성하지 않는다.
 - root 성공 뒤 docs.yml을 해당 태그와 release_sha로 명시 dispatch한다. `GITHUB_TOKEN`의 tag push만으로 연쇄 실행되지 않는 제한을 처리한다. dispatch 접수와 실제 사이트 배포 성공은 별도로 확인한다. 기존 docs의 main/tag/수동 trigger는 유지한다.
+  root `package.json`을 바꾼 main 병합은 발행 전에 docs.yml을 먼저 실행할 수 있다. 수동 발행 run의 root 성공 뒤 dispatch가 다시 배포한다.
 
 실행·실패 복구:
 
