@@ -1,5 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
+- 최신(2026-11-09): **DC-29(#1261 주석 없는 행 구현)를 열었다. `memo`와 컴포넌트 경로 경량화의 base 프로토타입·진단 측정까지 했고, 채택·크기 한도·공식 러너 측정은 미결이다.** 아래 기준일/상태 줄은 DC-28 시점 기록이다.
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
@@ -25,6 +26,16 @@
 - [x] M-22-4: strict types/관련 회귀·Chrome·retention과 새 B/C/P CPU870·메모리90 양순서/해시/분포/비율을 검산한다. 한 peer만 비교했음을 밝히며 concurrent/SSR/HMR은 미완료로 남긴다.
 
 - [x] M-22-5(R95): class 값 한 축의 실제 DOM 차이와 양쪽 keyed/9동작/font를 확인하고 선택100표본/18분포를 별도로 검산했다. 양차수 +14.20%/−13.99%로 방향이 갈려 미채택이며 전체870/90에 합산하지 않는다.
+
+## M-26. #1261 주석 없는 행 구현 — R111~R119
+
+- [x] **M-26-1 형태 근거:** upstream `fa510a7`의 9개 keyed 구현 `package.json`에서 `issues`는 lithent만 있고, 무주석 구현의 생략 방식(React `memo`, class/Inferno SCU, ivi props 비교, Vue `v-memo`)을 source에서 확인했다. 새 앱 형태의 무주석 통과는 maintainer 판정 전까지 미확정으로 표시한다.
+- [x] **M-26-2 memo 계약(base 프로토타입):** `src/tests/core-memo.test.tsx` 6개 통과 — 같은 props 생략과 변경 행만 재실행, 생략 뒤 자기 renew, keyed 이동/삭제/추가와 unmount, children이 있으면 생략 없음, 값·키 집합 비교, memo 없는 컴포넌트 불변. 2026-11-09, 작업 트리.
+- [x] **M-26-3 기본 경로 회귀(base 프로토타입):** 생성 경량화·직접 그리기 적용 뒤 `vitest run` 474개 통과(memo 6개 포함). 실패 1건은 `packages/lithentVite`의 미빌드 의존성 해석 오류로 변경 전 트리에서도 같다. `tsc --noEmit` 통과. `test:dual`·e2e·`verify:concurrent`는 미실행(J5).
+- [ ] **M-26-4 크기:** base 5,026B / guard 4,953B(73B 초과). DC-29-6 결정 뒤 `pnpm size` 통과 또는 승인된 한도를 기록한다.
+- [ ] **M-26-5 공식 측정:** Mac 공식 러너 CPU 9항목 양순서·공식 메모리, keyed/9동작/font 검사, DC-29-8 기준 판정. 진단 측정(이 세션)은 [결과](../benchmark/MEMO_FREE_ROWS_RESULTS.md)에 있고 이 항목을 대신하지 않는다.
+- [ ] **M-26-6 upstream 앱:** M 형태 `main.tsx`가 `tsc --noEmit`, `npm run rebuild-ci keyed/lithent`(keyed·CSP 검사)를 통과하고 `issues`에서 1261을 뺀 PR 설명에 생략 방식을 적었다. 사용자 승인 뒤 진행한다.
+- [ ] **M-26-7 concurrent·문서:** concurrent 코어의 같은 export와 계약 통과, 공개 문서에 memo 계약(값 비교, 객체 prop 직접 변경 주의, children 예외) 기재.
 
 ## M-25. select 프레임 대기와 bulk removal v2 — R107~R110
 

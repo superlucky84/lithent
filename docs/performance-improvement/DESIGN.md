@@ -1,8 +1,37 @@
 # DESIGN — 변경 범위의 근거를 보존하는 코어 최적화
 
+- 최신(2026-11-09): **DC-29(#1261 주석 없는 행 구현)를 열었다. `memo`와 컴포넌트 경로 경량화의 base 프로토타입·진단 측정까지 했고, 채택·크기 한도·공식 러너 측정은 미결이다.** 아래 기준일/상태 줄은 DC-28 시점 기록이다.
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 과거 Map/LIS 설계는 [역사 문서](./history/2026-07-map-lis/DESIGN.md)다. 현재 코어에 이미 있는 Map/LIS를 새 최적화로 제안하지 않는다.
+
+## DC-29 — memo 컴포넌트와 컴포넌트 경로 경량화
+
+R111~R119 / J0~J6 / M-26. 근거는 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_FREE_ROWS_RESULTS.md)다. 아래에서 `[x]`는 프로토타입 구현과 진단 측정까지 한 항목이고 채택 완료가 아니다. `[ ]`는 사용자 결정이 필요한 항목이다.
+
+### 왜 행 컴포넌트 + memo인가
+
+- 과거 실험에서 행 컴포넌트는 A 대비 +16~32%였다([컴포넌트 비용](../benchmark/COMPONENT_COST_RESULTS.md), [C3 캐시](../benchmark/PARENT_MEMO_CACHE_RESULTS.md)). 그때의 생략은 updater 안의 `cacheUpdate`(C/D) 또는 hook 기반 `useParentMemo`(E)였다. 둘 다 부모가 행을 다시 서술할 때마다 props 동기화·updater 진입 또는 deps 조회·래퍼 재생성이 남았다.
+- 이번 후보는 **diff 입구에서** 판정한다. 부모가 넘긴 새 props가 인스턴스의 현재 props와 같으면 이전 노드를 그대로 돌려준다(`nr='N'`). 1.25.5의 "같은 노드 반환" 경로와 같은 처리라서 props 동기화·updater·래퍼 생성·자식 diff가 모두 없다.
+- 남는 비용은 두 가지다. 행마다 `h(Row, props)`가 서술 객체를 만드는 것(갱신 계열), 그리고 행마다 컴포넌트 인스턴스를 만들고 지우는 것(생성·삭제 계열)이다. 뒤쪽이 A와의 구조적 차이다.
+
+### 결정 대장
+
+- [ ] DC-29-1 등재 앱 형태 — **제안: `const Row = memo(mount(...))`와 `<Row key id label selected />`.** React `memo`·Preact SCU와 같은 모양이고 데이터에 캐시를 붙이지 않는다. 대안: (a) 행 컴포넌트 안 `cacheUpdate`(C) — 여전히 앱 코드가 VDOM을 캐시하고 진단 가중 전체 +30.4%다(memo 행은 +7.8%). (b) `v-memo`형 목록 helper — 행이 컴포넌트가 아니어서 생성 비용은 A와 같지만 JS에서는 "VDOM을 손으로 캐시"하는 코드로 읽힌다. 사용자 확인 대기.
+- [ ] DC-29-2 API 이름과 표면 — **제안: core의 `memo(component)`.** `mount`/`lmount`가 돌려준 컴포넌트 함수에 표식을 남기고 같은 함수를 돌려준다. 비교 함수 인자(React의 `areEqual`)는 넣지 않는다. 이름·위치(core 대 helper)는 사용자 확인 대기. helper에 두면 core 크기는 줄지 않는다(판정이 diff 안에 있다).
+- [x] DC-29-3 memo 판정(프로토타입, `src/diff.ts`): 같은 컴포넌트의 서술(resolver)이고 `ctor.mm`이 있고, children이 0개이고, props 객체가 인스턴스의 `compProps`와 **다른 객체**이면서 값이 모두 `===`이고 키 수가 같을 때 건너뛴다. 컴포넌트 자신의 renew는 자기 `compProps`로 서술하므로(같은 객체) 항상 실행된다. children이 있으면 JSX가 매번 새 노드를 만들기 때문에 건너뛰지 않는다. `key`도 props의 하나로 비교된다. 건너뛴 행은 update callback이 실행되지 않는다. 검증: `src/tests/core-memo.test.tsx` 6개(M-26-2).
+- [x] DC-29-4 컴포넌트 생성 경량화(프로토타입, `src/wDom.ts`, `src/utils/createWDom.ts`): ① 서술마다 만들던 `resolve` 클로저를 `this`를 쓰는 공유 함수로 바꿨다. ② 래퍼 노드를 컴포넌트 필드 5개를 포함한 한 번의 객체 생성(`createCompWDom`)으로 만든다(이전에는 일반 노드에 필드를 하나씩 추가했다). ③ 래퍼 생성과 재렌더를 한 클로저 쌍으로 합치고 `componentMap` 조회를 줄였다. ④ `h`는 children이 없으면 부모 포인터·getter·배열 복사를 만들지 않는다(과거 V1). 과거 V1은 A 앱 4세션 전체 −0.6%로 미채택이었으나, 행을 매번 `h(Row)`로 서술하는 M 앱에서는 갱신 계열 전체에 걸린다. 검증: 기존 core 468개(M-26-3).
+- [x] DC-29-5 가상 노드 직접 그리기(프로토타입, `src/render.ts`): Fragment·목록·컴포넌트 래퍼는 자기 DocumentFragment를 만들지 않고 부모 element(또는 운반용 fragment)에 자식을 바로 붙인다. 이런 노드의 `el`은 "자기 element 없음(nodeType 11)" 표식으로만 쓰이므로 하나를 공유한다(첫 사용 때 생성; SSR에서 모듈 로드 시 DOM 없음). 목록 끝에 추가되는 연속 구간은 fragment 하나에 모아 한 번에 삽입한다. hydration 경로와 최상위 호출(typeAdd/typeReplace)은 기존과 같다. A 앱도 끝 추가 구간이 fragment 한 번 삽입으로 바뀐다.
+- [ ] DC-29-6 크기 — base UMD Brotli 4,857 → **5,026B(+169B)**, guard 4,953B를 **73B 초과**한다(memo +85B, 생성 경량화 +20B, 직접 그리기 +64B). 선택지: (a) allowance를 올린다, (b) 초과분만큼 다른 곳에서 줄인다, (c) 직접 그리기를 빼서 guard 안에 둔다(이 경우 생성 이득의 큰 부분을 잃는다). **TBD — 사용자 결정.**
+- [ ] DC-29-7 concurrent — `memo` export와 판정, 생성 경량화, 직접 그리기를 `lithentConcurrent/src`에 옮겨야 한다(중단/재개·commit 효과 검증 포함). **TBD — base 채택 결정 뒤.**
+- [ ] DC-29-8 합격 기준 — **제안: Mac 공식 러너에서 M+새 코어가 A+현재 코어 대비 가중 전체 +3% 이내, 9항목 각각 +10% 이내, 1,000행 메모리 +15% 이내.** 진단 측정의 현재 값은 가중 전체 +7.8%, 항목 최대 +37%(선택), 1,000행 메모리 +12.2%다. **TBD — 사용자 결정.**
+- [ ] DC-29-9 남은 비용(미착수 후보): ① 마운트 때 행마다 도는 `componentMap` 조회(mountReady/mount 큐 확인)와 인스턴스 등록 객체 11개, ② 삭제 때 행 하위 노드를 모두 걷는 unmount 순회, ③ 새 페이지 조건(웜업 5회)에서 선택·갱신이 정상 상태보다 더 벌어지는 차이. 각각 별도 후보로 측정한 뒤 정한다.
+
+### 계약과 경계
+
+- `memo`는 props가 불변 값이거나 교체되는 객체라는 전제다. 객체 prop의 내부를 직접 바꾸고 같은 참조를 넘기면 갱신되지 않는다. 문서에 명시한다(J6).
+- memo로 건너뛴 인스턴스는 이전 노드 객체가 새 부모 목록에 그대로 들어간다(`getParent`·`oi`만 갱신). 자기 renew는 `comp.vd`가 가리키는 그 노드에서 시작하므로 부모 목록 안 위치를 찾을 수 있다.
+- 직접 그리기 뒤에도 `findChildWithRemoveElement`·`getElementFromFragment`·`findChildFragmentNextElement`는 `nodeType`만 보므로 공유 표식으로 동작한다. 가상 노드의 `el`을 운반체로 다시 쓰는 코드는 없다(확인: core `render.ts`, `ssr/src/hydration.ts`는 자기 fragment를 직접 넣는다).
 
 ## DC-28 — select 대기 해석과 대량 삭제의 정체성 비교
 

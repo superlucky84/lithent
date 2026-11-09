@@ -1,6 +1,16 @@
 # summary
 
-## 최신 — lithent 1.25.5 릴리스 준비와 최종 검토 (2026-11-02)
+## 최신 — DC-29 #1261 주석 없는 행 구현: memo 프로토타입과 진단 (2026-11-09)
+
+- request: upstream `keyed/lithent`의 `issues: [1261]`을 지우면서 현재와 비슷한 성능을 얻는다. 정본은 [REQUIREMENTS DC-29](../performance-improvement/REQUIREMENTS.md#dc-29--1261-주석-없는-행-구현과-컴포넌트-경로-비용)와 [IMPLEMENT J0~J6](../performance-improvement/IMPLEMENT.md#dc-29--실행-j0j6)이다.
+- done: base에 `memo(component)`(부모 갱신에서 같은 props면 diff 입구에서 이전 노드 유지), 컴포넌트 생성 경량화, 가상 노드 직접 그리기를 프로토타입으로 넣었다. [결과](./MEMO_FREE_ROWS_RESULTS.md), [원자료](./memo-free-rows-results.json), [도구](../../experiments/memo-free-rows/README.md).
+- result: 샌드박스 진단(Chromium 153, 페이지 안 타이밍, paint 없음)에서 memo 행 앱 + 후보 코어는 현재 등재 조합 대비 가중 전체 +7.8%, 1,000행 heap +12.2%다. 행 컴포넌트 안 캐시 방식 +30.4%, 생략 없는 행 컴포넌트 +70.1%. 공식 러너 값이 아니다.
+- size: base Brotli 4,857 → 5,026B, guard 4,953B를 73B 초과한다. 한도는 바꾸지 않았다(결정 대기).
+- validation: `core-memo.test.tsx` 6개, core 474개, tsc/ESLint 통과. `test:dual`·e2e·`verify:concurrent`는 미실행.
+- next: 앱 형태·API 이름·크기·합격 기준 결정 → 남은 비용 후보(J4) → 양코어 테스트(J5) → Mac 공식 러너 9항목 양순서·메모리(J6). concurrent 이식과 release는 하지 않았다.
+- branch: `ccr-bacc0d37-0f08c0`(main `7e5185f` 기준). PR 없음.
+
+## 이전 — lithent 1.25.5 릴리스 준비와 최종 검토 (2026-11-02)
 
 - scope: 사용자 요청으로 root `lithent`를 1.25.4 → 1.25.5로 올리고 CHANGELOG·RELEASING을 현재 최적화와 호환성 변경에 맞췄다. Concurrent는 런타임 변경이 없어 0.2.4를 유지한다. npm 최신 1.25.4와 origin/main `7796eb1`을 확인했다. PR 생성이 이번 범위이며 병합·npm 발행은 후속이다.
 - review: 전체 빌드·`test:dual` 1,176통과/3제외·E2E 78·타입/린트·실제 tarball import/require/strict types·Concurrent 산출물·크기 검사를 통과했다. 1.25.5 manifest로 재빌드한 base ESM은 실측 후보와 SHA-256이 같다. base Brotli 4,925/4,925B다.
