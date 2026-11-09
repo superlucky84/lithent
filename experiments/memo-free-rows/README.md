@@ -22,6 +22,10 @@ All share `shared.tsx` (data, actions, page shell of the listed app).
 | `c-rowcache` | row component with `cacheUpdate` inside its updater        |
 | `m-memo`     | row component wrapped in `memo` (needs a core with `memo`) |
 
+`upstream/main.tsx` is the `m-memo` row in the listed app's own single-file
+form, ready to stand in for `frameworks/keyed/lithent/src/main.tsx` in an
+official-runner comparison (it needs a lithent build that exports `memo`).
+
 ## Use
 
 ```sh

@@ -32,9 +32,9 @@
 - [x] **M-26-1 형태 근거:** upstream `fa510a7`의 9개 keyed 구현 `package.json`에서 `issues`는 lithent만 있고, 무주석 구현의 생략 방식(React `memo`, class/Inferno SCU, ivi props 비교, Vue `v-memo`)을 source에서 확인했다. 새 앱 형태의 무주석 통과는 maintainer 판정 전까지 미확정으로 표시한다.
 - [x] **M-26-2 memo 계약(base 프로토타입):** `src/tests/core-memo.test.tsx` 6개 통과 — 같은 props 생략과 변경 행만 재실행, 생략 뒤 자기 renew, keyed 이동/삭제/추가와 unmount, children이 있으면 생략 없음, 값·키 집합 비교, memo 없는 컴포넌트 불변. 2026-11-09, 작업 트리.
 - [x] **M-26-3 기본 경로 회귀(base 프로토타입):** 생성 경량화·직접 그리기 적용 뒤 `vitest run` 474개 통과(memo 6개 포함). 실패 1건은 `packages/lithentVite`의 미빌드 의존성 해석 오류로 변경 전 트리에서도 같다. `tsc --noEmit` 통과. `test:dual`·e2e·`verify:concurrent`는 미실행(J5).
-- [ ] **M-26-4 크기:** base 5,026B / guard 4,953B(73B 초과). DC-29-6 결정 뒤 `pnpm size` 통과 또는 승인된 한도를 기록한다.
+- [ ] **M-26-4 크기:** base 5,045B / guard 4,953B(92B 초과, J4-a 포함). 사용자 결정으로 공식 러너 결과 뒤에 한도를 정한다(DC-29-6). 그때 `pnpm size` 통과 또는 승인된 한도를 기록한다.
 - [ ] **M-26-5 공식 측정:** Mac 공식 러너 CPU 9항목 양순서·공식 메모리, keyed/9동작/font 검사, DC-29-8 기준 판정. 진단 측정(이 세션)은 [결과](../benchmark/MEMO_FREE_ROWS_RESULTS.md)에 있고 이 항목을 대신하지 않는다.
-- [ ] **M-26-6 upstream 앱:** M 형태 `main.tsx`가 `tsc --noEmit`, `npm run rebuild-ci keyed/lithent`(keyed·CSP 검사)를 통과하고 `issues`에서 1261을 뺀 PR 설명에 생략 방식을 적었다. 사용자 승인 뒤 진행한다.
+- [ ] **M-26-6 upstream 앱:** M 형태 `main.tsx`([준비한 파일](../../experiments/memo-free-rows/upstream/main.tsx): `tsc --noEmit`와 진단 도구의 9개 시나리오 DOM 확인은 통과)가 `npm run rebuild-ci keyed/lithent`(keyed·CSP 검사)를 통과하고 `issues`에서 1261을 뺀 PR 설명에 생략 방식을 적었다. 사용자 승인 뒤 진행한다.
 - [ ] **M-26-7 concurrent·문서:** concurrent 코어의 같은 export와 계약 통과, 공개 문서에 memo 계약(값 비교, 객체 prop 직접 변경 주의, children 예외) 기재.
 
 ## M-25. select 프레임 대기와 bulk removal v2 — R107~R110

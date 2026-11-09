@@ -14,9 +14,9 @@ Refs: R111, R112, R113, R114, R115, R116, R117, R118, R119, DC-29-1, DC-29-2, DC
 - [x] **J1 memo 프로토타입(base):** 진입은 J0. `memo` export와 diff 입구 판정을 넣었다. 종료는 `core-memo.test.tsx` 6개와 기존 core 테스트 통과, M 앱 빌드·측정이다. 작성 중 자기 renew까지 건너뛰는 결함을 테스트로 발견해 "다른 props 객체일 때만" 조건으로 고쳤다.
 - [x] **J2 컴포넌트 생성 경량화(base):** 진입은 J1과 프로파일(행 생성 차이가 여러 함수에 분산). 공유 resolver, 래퍼 일괄 생성, 자식 없는 `h` 빠른 경로를 넣었다. 종료는 타입 검사와 기존 core 테스트 통과, 반복 측정이다.
 - [x] **J3 가상 노드 직접 그리기(base):** 진입은 J2. 래퍼마다의 DocumentFragment를 없애고 끝 추가 구간을 한 번에 삽입한다. 종료는 타입 검사와 기존 core 테스트 통과, 반복·전체 진단 측정이다.
-- [ ] **J4 남은 비용 후보(DC-29-9):** 진입은 DC-29-6/8 결정. 마운트 큐 조회, unmount 순회, 새 페이지 조건의 차이를 후보별로 측정한다. 종료는 후보별 채택/기각 기록이다. 기준 검사: core 테스트, `loop.mjs`·`measure.mjs` 전후 비교.
+- [ ] **J4 남은 비용 후보(DC-29-9/10):** 진입은 2026-11-09 사용자 결정(행 컴포넌트 + memo, 계속 진행). **J4-a 완료:** memo 판정을 diff 맨 앞으로, 문자열 태그를 `h`에서 먼저 처리했다. core 474개 통과, 40표본 선택 스크립트 M −5%·A 중립, +19B. **미착수:** 마운트 큐 조회·등록 객체, unmount 순회, 행 서술 객체 비용. 이 도구의 9항목 합산 잡음(세 번 +7.8~+10.4%)으로는 더 작은 후보를 구분하기 어려워, 공식 러너 수치를 본 뒤 우선순위를 정한다. 종료는 후보별 채택/기각 기록이다. 기준 검사: core 테스트, `loop.mjs`·`measure.mjs` 전후 비교.
 - [ ] **J5 Test Hardening:** 진입은 DC-29-1/2/6/7 결정. memo 계약(children·객체 prop·자기 renew·keyed 이동/삭제·lifecycle·중첩 memo·예외)과 직접 그리기(중첩 Fragment·portal·svg·빈 목록·중간 삽입·hydration)를 base/concurrent 공유 테스트로 고정한다. `test:dual`, e2e, `verify:concurrent`, `pnpm size`를 통과한다. 종료는 양코어 계약 통과와 크기 결정 반영이다.
-- [ ] **J6 Integration Test·판정:** 진입은 J5. Mac 공식 러너로 A+현재 코어 / A+새 코어 / M+새 코어의 CPU 9항목 양순서와 공식 메모리를 측정하고 keyed·9동작·font 검사를 통과한다. DC-29-8 기준으로 판정한다. 채택하면 CHANGELOG·문서(memo 계약)·release, 이어서 upstream 앱 PR(`issues` 제거, 생략 방식 설명)을 사용자 승인 뒤 진행한다. 종료는 채택/보류 기록과 네 정본·HANDOFF 일치다.
+- [ ] **J6 Integration Test·판정:** 진입은 J5(공식 러너 확인 자체는 사용자 결정에 따라 J4 중에 먼저 할 수 있다). Mac 공식 러너로 A+현재 코어 / A+새 코어 / M+새 코어의 CPU 9항목 양순서와 공식 메모리를 측정하고 keyed·9동작·font 검사를 통과한다. DC-29-8 기준으로 판정한다. 채택하면 CHANGELOG·문서(memo 계약)·release, 이어서 upstream 앱 PR(`issues` 제거, 생략 방식 설명)을 사용자 승인 뒤 진행한다. 종료는 채택/보류 기록과 네 정본·HANDOFF 일치다.
 
 Files:
 
@@ -38,6 +38,7 @@ Files:
 - `experiments/memo-free-rows/loop.mjs` (added)
 - `experiments/memo-free-rows/measure.mjs` (added)
 - `experiments/memo-free-rows/profile.mjs` (added)
+- `experiments/memo-free-rows/upstream/main.tsx` (added)
 - `src/diff.ts` (modified)
 - `src/index.ts` (modified)
 - `src/render.ts` (modified)
@@ -515,11 +516,11 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 ## 상태 / 핸드오프
 
-- done (2026-11-09, DC-29 J0~J3): 사용자 요청 "#1261 주석을 지우면서 현재와 비슷한 성능". upstream `fa510a7`에서 `issues`가 lithent에만 있고 무주석 peer가 라이브러리 memo/SCU/`v-memo`를 쓰는 것을 확인했다. base에 `memo`(diff 입구 판정), 컴포넌트 생성 경량화, 가상 노드 직접 그리기 프로토타입을 넣었다. 도구 `experiments/memo-free-rows/`, 결과 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_FREE_ROWS_RESULTS.md).
-- result (진단, 공식 러너 아님): memo 행 앱 + 후보 코어는 현재 등재 조합 대비 가중 전체 +7.8%·스크립트 +29.2%, 1,000행 heap +12.2%다. 행 컴포넌트 안 `cacheUpdate`는 +30.4%, 생략 없는 행 컴포넌트는 +70.1%다. A 앱 + 후보 코어는 −1.4%(잡음 범위)다. 남은 차이는 선택 +37%·1행 삭제 +21%·추가 +17%·교환 +14%(전체 시간)다.
-- validation: `core-memo.test.tsx` 6개, core `vitest run` 474개, `tsc --noEmit`, 변경 파일 ESLint 통과. `packages/lithentVite` suite 1개는 미빌드 의존성 때문에 변경 전에도 실패한다. `test:dual`·e2e·`verify:concurrent`·공식 keyed/CSP 검사는 미실행이다.
-- blockers: ① base 5,026B로 guard 4,953B를 73B 초과 — **`pnpm size`(크기 gate)가 실패한다**(DC-29-6 결정 필요). ② concurrent에 `memo` export가 없어 양코어 export가 다르다(DC-29-7). ③ 이 세션은 권한 정책상 upstream 공식 러너를 설치·실행하지 못했다. 공식 측정은 Mac에서 해야 한다(J6).
-- decisions pending: DC-29-1 앱 형태, DC-29-2 API 이름, DC-29-6 크기, DC-29-7 concurrent, DC-29-8 합격 기준.
-- next: 결정 뒤 J4(마운트 큐 조회·unmount 순회·서술 객체 비용 후보) → J5 Test Hardening(양코어 공유 테스트) → J6 Mac 공식 러너 9항목 양순서·메모리와 판정. 채택 전에는 release하지 않는다.
-- commit: 기준 main `7e5185f`. 이 변경은 브랜치 `ccr-bacc0d37-0f08c0`에 있고 최종 SHA는 `git log -1 --format=%H`로 확인한다. PR은 만들지 않았다.
+- done (2026-11-09, DC-29 J0~J3, J4-a): 사용자 요청 "#1261 주석을 지우면서 현재와 비슷한 성능". upstream `fa510a7`에서 `issues`가 lithent에만 있고 무주석 peer가 라이브러리 memo/SCU/`v-memo`를 쓰는 것을 확인했다. base에 `memo`(diff 입구 판정), 컴포넌트 생성 경량화, 가상 노드 직접 그리기, 판정 순서·문자열 태그 빠른 경로를 프로토타입으로 넣었다. 도구 `experiments/memo-free-rows/`, 결과 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_FREE_ROWS_RESULTS.md).
+- decisions (2026-11-09 사용자): 앱 형태는 행 컴포넌트 + `memo(component)`(DC-29-1/2). 합격 기준은 Mac 공식 러너 가중 전체 +3%·항목 +10%·1,000행 메모리 +15% 이내(DC-29-8). 크기 한도는 공식 결과를 본 뒤 정한다(DC-29-6). 남은 비용 후보는 계속 진행한다.
+- result (진단, 공식 러너 아님): memo 행 앱 + 후보 코어는 현재 등재 조합 대비 가중 전체 약 +8~10%(세 번 +8.8/+7.8/+10.4%), 스크립트 약 +29%, 1,000행 heap +12.2%다. 행 컴포넌트 안 `cacheUpdate`는 +30.4%, 생략 없는 행 컴포넌트는 +70.1%다. A 앱 + 후보 코어는 −0.3~−1.4%(잡음 범위)다. 전체 시간에서 남은 차이는 선택 +37%·1행 삭제 +21%·추가 +17%·교환 +14%(두 번째 측정 기준)다.
+- validation: `core-memo.test.tsx` 6개, core `vitest run` 474개, `tsc --noEmit`, 변경 파일 ESLint 통과. upstream 형식 M 앱은 `tsc --noEmit`와 진단 도구의 9개 시나리오 DOM 확인을 통과했다. `packages/lithentVite` suite 1개는 미빌드 의존성 때문에 변경 전에도 실패한다. `test:dual`·e2e·`verify:concurrent`·공식 keyed/CSP 검사는 미실행이다.
+- blockers: ① base 5,045B로 guard 4,953B를 92B 초과 — **`pnpm size`(크기 gate)가 실패한다**(결정대로 공식 결과 뒤에 닫는다). ② concurrent에 `memo` export가 없어 양코어 export가 다르다(DC-29-7). ③ 이 세션은 권한 정책상 upstream 공식 러너를 설치·실행하지 못했다. 진단 도구의 9항목 합산은 회차 간 약 ±1.5%p 흔들려 작은 후보를 구분하지 못한다.
+- next: Mac 공식 러너로 A+현재 코어 / A+후보 코어 / M+후보 코어(`experiments/memo-free-rows/upstream/main.tsx`) 9항목 양순서·메모리 → 기준 밖 항목에 맞춰 J4 나머지 후보 → J5 양코어 테스트 → J6 판정·크기 한도·release·upstream PR(각각 사용자 승인). J4-a는 분리된 커밋이라 따로 빼고 잴 수 있다.
+- commit: 기준 main `7e5185f`. 브랜치 `ccr-bacc0d37-0f08c0`: `d127018`(memo·경량화·직접 그리기), `6551624`(J4-a), 문서·도구 커밋. 최종 SHA는 `git log -1 --format=%H`로 확인한다. PR은 만들지 않았다.
 - previous: DC-28(select 프레임 대기·bulk removal v2) 인계는 이 파일의 git 이력과 [HANDOFF](../benchmark/HANDOFF.md)의 2026-10-30 항목에 있다.

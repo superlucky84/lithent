@@ -7,7 +7,7 @@
 
 ## DC-29 — memo 컴포넌트와 컴포넌트 경로 경량화
 
-R111~R119 / J0~J6 / M-26. 근거는 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_FREE_ROWS_RESULTS.md)다. 아래에서 `[x]`는 프로토타입 구현과 진단 측정까지 한 항목이고 채택 완료가 아니다. `[ ]`는 사용자 결정이 필요한 항목이다.
+R111~R119 / J0~J6 / M-26. 근거는 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_FREE_ROWS_RESULTS.md)다. 아래에서 `[x]`는 프로토타입 구현과 진단 측정까지 한 항목이고 채택 완료가 아니다. `[ ]`는 아직 닫히지 않은 항목이다.
 
 ### 왜 행 컴포넌트 + memo인가
 
@@ -17,14 +17,15 @@ R111~R119 / J0~J6 / M-26. 근거는 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_F
 
 ### 결정 대장
 
-- [ ] DC-29-1 등재 앱 형태 — **제안: `const Row = memo(mount(...))`와 `<Row key id label selected />`.** React `memo`·Preact SCU와 같은 모양이고 데이터에 캐시를 붙이지 않는다. 대안: (a) 행 컴포넌트 안 `cacheUpdate`(C) — 여전히 앱 코드가 VDOM을 캐시하고 진단 가중 전체 +30.4%다(memo 행은 +7.8%). (b) `v-memo`형 목록 helper — 행이 컴포넌트가 아니어서 생성 비용은 A와 같지만 JS에서는 "VDOM을 손으로 캐시"하는 코드로 읽힌다. 사용자 확인 대기.
-- [ ] DC-29-2 API 이름과 표면 — **제안: core의 `memo(component)`.** `mount`/`lmount`가 돌려준 컴포넌트 함수에 표식을 남기고 같은 함수를 돌려준다. 비교 함수 인자(React의 `areEqual`)는 넣지 않는다. 이름·위치(core 대 helper)는 사용자 확인 대기. helper에 두면 core 크기는 줄지 않는다(판정이 diff 안에 있다).
+- [x] DC-29-1 등재 앱 형태 — **`const Row = memo(mount(...))`와 `<Row key id label selected />`.** 2026-11-09 사용자 결정. React `memo`·Preact SCU와 같은 모양이고 데이터에 캐시를 붙이지 않는다. 기각한 대안: (a) 행 컴포넌트 안 `cacheUpdate`(C) — 여전히 앱 코드가 VDOM을 캐시하고 진단 가중 전체 +30.4%다(memo 행은 +7.8%). (b) `v-memo`형 목록 helper — 행이 컴포넌트가 아니어서 생성 비용은 A와 같지만 JS에서는 "VDOM을 손으로 캐시"하는 코드로 읽혀 주석이 남을 위험이 있다.
+- [x] DC-29-2 API 이름과 표면 — **core의 `memo(component)`.** DC-29-1과 함께 사용자가 이 형태를 골랐다. `mount`/`lmount`가 돌려준 컴포넌트 함수에 표식을 남기고 같은 함수를 돌려준다. 비교 함수 인자(React의 `areEqual`)는 넣지 않는다. 판정이 diff 안에 있으므로 helper가 아니라 core에 둔다.
 - [x] DC-29-3 memo 판정(프로토타입, `src/diff.ts`): 같은 컴포넌트의 서술(resolver)이고 `ctor.mm`이 있고, children이 0개이고, props 객체가 인스턴스의 `compProps`와 **다른 객체**이면서 값이 모두 `===`이고 키 수가 같을 때 건너뛴다. 컴포넌트 자신의 renew는 자기 `compProps`로 서술하므로(같은 객체) 항상 실행된다. children이 있으면 JSX가 매번 새 노드를 만들기 때문에 건너뛰지 않는다. `key`도 props의 하나로 비교된다. 건너뛴 행은 update callback이 실행되지 않는다. 검증: `src/tests/core-memo.test.tsx` 6개(M-26-2).
 - [x] DC-29-4 컴포넌트 생성 경량화(프로토타입, `src/wDom.ts`, `src/utils/createWDom.ts`): ① 서술마다 만들던 `resolve` 클로저를 `this`를 쓰는 공유 함수로 바꿨다. ② 래퍼 노드를 컴포넌트 필드 5개를 포함한 한 번의 객체 생성(`createCompWDom`)으로 만든다(이전에는 일반 노드에 필드를 하나씩 추가했다). ③ 래퍼 생성과 재렌더를 한 클로저 쌍으로 합치고 `componentMap` 조회를 줄였다. ④ `h`는 children이 없으면 부모 포인터·getter·배열 복사를 만들지 않는다(과거 V1). 과거 V1은 A 앱 4세션 전체 −0.6%로 미채택이었으나, 행을 매번 `h(Row)`로 서술하는 M 앱에서는 갱신 계열 전체에 걸린다. 검증: 기존 core 468개(M-26-3).
 - [x] DC-29-5 가상 노드 직접 그리기(프로토타입, `src/render.ts`): Fragment·목록·컴포넌트 래퍼는 자기 DocumentFragment를 만들지 않고 부모 element(또는 운반용 fragment)에 자식을 바로 붙인다. 이런 노드의 `el`은 "자기 element 없음(nodeType 11)" 표식으로만 쓰이므로 하나를 공유한다(첫 사용 때 생성; SSR에서 모듈 로드 시 DOM 없음). 목록 끝에 추가되는 연속 구간은 fragment 하나에 모아 한 번에 삽입한다. hydration 경로와 최상위 호출(typeAdd/typeReplace)은 기존과 같다. A 앱도 끝 추가 구간이 fragment 한 번 삽입으로 바뀐다.
-- [ ] DC-29-6 크기 — base UMD Brotli 4,857 → **5,026B(+169B)**, guard 4,953B를 **73B 초과**한다(memo +85B, 생성 경량화 +20B, 직접 그리기 +64B). 선택지: (a) allowance를 올린다, (b) 초과분만큼 다른 곳에서 줄인다, (c) 직접 그리기를 빼서 guard 안에 둔다(이 경우 생성 이득의 큰 부분을 잃는다). **TBD — 사용자 결정.**
+- [ ] DC-29-6 크기 — **2026-11-09 사용자 결정: 지금은 guard 4,953B를 바꾸지 않고 초과 상태로 실험을 계속하며, Mac 공식 러너 결과를 본 뒤 필요한 만큼만 allowance를 올릴지 정한다.** 현재 후보의 크기와 초과량은 [결과 문서](../benchmark/MEMO_FREE_ROWS_RESULTS.md)에 단계별로 기록한다. 그때까지 `pnpm size`는 실패한다. 최종 한도 값은 J6에서 닫는다.
 - [ ] DC-29-7 concurrent — `memo` export와 판정, 생성 경량화, 직접 그리기를 `lithentConcurrent/src`에 옮겨야 한다(중단/재개·commit 효과 검증 포함). **TBD — base 채택 결정 뒤.**
-- [ ] DC-29-8 합격 기준 — **제안: Mac 공식 러너에서 M+새 코어가 A+현재 코어 대비 가중 전체 +3% 이내, 9항목 각각 +10% 이내, 1,000행 메모리 +15% 이내.** 진단 측정의 현재 값은 가중 전체 +7.8%, 항목 최대 +37%(선택), 1,000행 메모리 +12.2%다. **TBD — 사용자 결정.**
+- [x] DC-29-8 합격 기준 — **Mac 공식 러너에서 M+새 코어가 A+현재 코어 대비 가중 전체 +3% 이내, 9항목 각각 +10% 이내, 1,000행 메모리 +15% 이내.** 2026-11-09 사용자 결정. 진단 측정(가중 약 +8~10%, 항목 최대 +37%, 메모리 +12.2%)은 방향 확인용이며 이 판정을 대신하지 않는다.
+- [x] DC-29-10 판정 순서와 문자열 태그(J4-a 프로토타입, `src/diff.ts`, `src/wDom.ts`): memo 판정을 diff의 다른 분기(복사 여부·유형 판별)보다 먼저 하고, `h`/`makeNode`가 문자열 태그를 Fragment·컴포넌트 확인 전에 처리한다. 40표본에서 M의 선택 스크립트 −5%, A 중립, +19B다. 9항목 합산에서는 잡음과 구분되지 않아 공식 러너에서 따로 확인한다(분리된 커밋).
 - [ ] DC-29-9 남은 비용(미착수 후보): ① 마운트 때 행마다 도는 `componentMap` 조회(mountReady/mount 큐 확인)와 인스턴스 등록 객체 11개, ② 삭제 때 행 하위 노드를 모두 걷는 unmount 순회, ③ 새 페이지 조건(웜업 5회)에서 선택·갱신이 정상 상태보다 더 벌어지는 차이. 각각 별도 후보로 측정한 뒤 정한다.
 
 ### 계약과 경계
