@@ -1,6 +1,6 @@
 import type { Props } from '@/types';
 
-export { h, Fragment, portal, mount, lmount, replaceWDom } from '@/wDom';
+export { h, Fragment, portal, mount, lmount, memo, replaceWDom } from '@/wDom';
 export { isPropType } from '@/utils';
 export { componentUpdate } from '@/utils/redraw';
 export {

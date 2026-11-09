@@ -38,12 +38,38 @@ export const makeNewWDomTree = (
     newWDom = cloneWDom(newWDom as WDom);
   }
 
-  return remakeNewWDom(
-    newWDom,
+  const isSameType =
     !!originalWDom &&
-      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
-    originalWDom
-  );
+    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom);
+
+  // A memo component given the same props and no children: its parent's
+  // redraw leaves the drawn instance as it is. The component's own redraw
+  // describes it with its own props object, and always runs.
+  const { props, children, resolve, ctor } =
+    newWDom as Partial<TagFunctionResolver>;
+  if (
+    isSameType &&
+    resolve &&
+    (ctor as { mm?: boolean }).mm &&
+    !children!.length &&
+    props !== originalWDom!.compProps &&
+    sameProps(originalWDom!.compProps as Props, props as Props)
+  ) {
+    originalWDom!.nr = 'N';
+    return originalWDom!;
+  }
+
+  return remakeNewWDom(newWDom, isSameType, originalWDom);
+};
+
+const sameProps = (props: Props, nextProps: Props) => {
+  let count = 0;
+  for (const key in props) {
+    if (props[key] !== nextProps[key]) return false;
+    count++;
+  }
+  for (const _key in nextProps) count--;
+  return !count;
 };
 
 /**
