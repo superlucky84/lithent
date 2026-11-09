@@ -48,17 +48,21 @@ export const h = (
   props: Props,
   ...children: MiddleStateWDomChildren
 ) => {
+  props = props || {};
+
   // No children (a row component, an empty cell): nothing to link to a
   // parent, so no pointer, getter or copied array.
   if (!children.length) {
-    return makeNode(tag, props || {}, children as WDom[]);
+    return makeNode(tag, props, children as WDom[]);
   }
 
   const nodeParentPointer: NodePointer = { value: undefined };
   const newChildren = remakeChildren(nodeParentPointer, children);
-  const node = makeNode(tag, props || {}, newChildren);
+  const node = makeNode(tag, props, newChildren);
 
-  if (!checkCustemComponentFunction(node)) {
+  // An element is the common case: known from its tag, without looking at
+  // the node.
+  if (typeof tag === 'string' || !checkCustemComponentFunction(node)) {
     nodeParentPointer.value = node;
   }
 
@@ -195,7 +199,10 @@ const makeNode = (
   props: Props,
   children: WDom[]
 ) => {
-  if (checkFragmentFunction(tag)) {
+  // An element first: the common case, and none of the checks below.
+  if (typeof tag === 'string') {
+    return createWDom('e', tag, props, undefined, children);
+  } else if (checkFragmentFunction(tag)) {
     return Fragment(props, ...children);
   } else if (checkCustemComponentFunction(tag)) {
     const componetMakeResolver = makeWDomResolver(tag, props, children);
