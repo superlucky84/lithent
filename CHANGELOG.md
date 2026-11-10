@@ -1,5 +1,21 @@
 # Release notes
 
+## 2026-11-10
+
+### lithent 1.25.8
+
+- Reduce component creation work and draw Fragment, list and component
+  children directly into their parent, avoiding intermediate DOM fragments.
+  Ordinary string tags also take a shorter virtual-node creation path.
+- In a local Mac run of the official js-framework-benchmark runner, weighted
+  total time fell 2.33% and script time 4.92% against 1.25.7 with the existing
+  listed app. Memory stayed within 0.3%. These are local comparison results,
+  not published upstream rankings; see the
+  [measurement report](./docs/benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md#결정-뒤-적용한-것-2026-11-10)
+  for the measured revision and limits.
+- The base bundle is 4,901B Brotli, within the existing 4,953B budget.
+  This release adds no public API. lithent-concurrent remains at 0.2.6.
+
 ## Unreleased — Vite 8
 
 ### lithent 1.25.7 / lithent-concurrent 0.2.6

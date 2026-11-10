@@ -17,7 +17,7 @@ Refs: R111, R112, R113, R114, R115, R116, R117, R118, R119, R120, DC-29-1, DC-29
 - [x] **J4 남은 비용 후보(DC-29-9/10):** **(2026-11-10 닫음: J4-a는 문자열 태그 빠른 경로만 유지, J4-b 미채택(되돌림), 나머지 후보는 R120으로 진행하지 않는다.)** 진입은 2026-11-09 사용자 결정(행 컴포넌트 + memo, 계속 진행). **J4-a 완료:** memo 판정을 diff 맨 앞으로, 문자열 태그를 `h`에서 먼저 처리했다. core 474개 통과, 40표본 선택 스크립트 M −5%·A 중립, +19B. 공식 확인(2026-11-10)에서 M 가중 전체 −0.01%·스크립트 −2.18%로 유지한다. **J4-b 구현·측정(작업 트리, 미커밋, 채택 TBD — 사용자 결정 대기):** 등록 객체의 큐 6개를 훅이 처음 쓸 때 만들고 마운트 때 `componentMap` 재조회 2회를 없앴다(DC-29-11). core 479개 통과, 공식 2차에서 M 1,000행 메모리 −2.3%·가중 전체 −0.15%(중립), +28B, `ComponentInfo` 타입 변경. **미착수:** unmount 순회, 행 서술 객체·비교 비용. 진단 도구의 9항목 합산 잡음(세 번 +7.8~+10.4%)으로는 작은 후보를 구분하지 못하므로 후보 확인은 공식 러너(`official-*.mjs`, 4회차 약 1시간, 가중 전체 구간 ±0.9%p)로 한다. 남은 후보를 계속할지는 DC-29-8 판정에 달려 있다. 종료는 후보별 채택/기각 기록이다. 기준 검사: core 테스트, 공식 러너 전후 비교.
 - [ ] **J5 Test Hardening:** **(2026-11-10: R120으로 memo 계약 테스트는 범위에서 빠진다. 직접 그리기 계약의 전용 테스트 추가는 미착수다. 기존 테스트·e2e·크기 검사는 J7에서 실행했다.)** 진입은 DC-29-1/2/6/7 결정. memo 계약(children·객체 prop·자기 renew·keyed 이동/삭제·lifecycle·중첩 memo·예외)과 직접 그리기(중첩 Fragment·portal·svg·빈 목록·중간 삽입·hydration)를 base/concurrent 공유 테스트로 고정한다. `test:dual`, e2e, `verify:concurrent`, `pnpm size`를 통과한다. 종료는 양코어 계약 통과와 크기 결정 반영이다.
 - [ ] **J6 Integration Test·판정:** **(2026-11-10: R120으로 DC-29-8 판정·upstream 앱 PR은 보류한다. 최종 코어의 공식 확인은 J7이다.)** 진입은 J5(공식 러너 확인 자체는 사용자 결정에 따라 J4 중에 먼저 할 수 있다). Mac 공식 러너로 A+현재 코어 / A+새 코어 / M+새 코어의 CPU 9항목 양순서와 공식 메모리를 측정하고 keyed·9동작·font 검사를 통과한다. DC-29-8 기준으로 판정한다. 채택하면 CHANGELOG·문서(memo 계약)·release, 이어서 upstream 앱 PR(`issues` 제거, 생략 방식 설명)을 사용자 승인 뒤 진행한다. 종료는 채택/보류 기록과 네 정본·HANDOFF 일치다. **앞당긴 공식 확인(2026-11-10, [MEMO_FREE_ROWS_OFFICIAL_RESULTS](../benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md)):** 두 세션(CPU 1,160 + 2,320표본, 메모리 120 + 120표본)에서 keyed·9동작·font 검사 통과, 실패·재시도 0, trace 3,480개 재계산 일치. 가중 전체 약 +3%로 기준 경계이며 판정은 사용자 결정 대기다. J5 뒤 최종 조합으로 다시 확인한다.
-- [x] **J7 코어 개선만 적용(R120, DC-29-12/13):** 진입은 2026-11-10 사용자 결정. 작업 트리에서 J4-b를 되돌리고, 코드 정리(DC-29-12)를 적용하고, `memo`(판정·`sameProps`·export·`core-memo.test.tsx`)를 뺐다. 자체 리뷰(Critical 0, Warning 3) 뒤 사용자 결정으로 정리 ⑥(끝 추가용 fragment를 항상 만들기)을 되돌렸다. concurrent 코어는 그대로 둔다(DC-29-7). 결과 base 4,901B(main 4,857B 대비 +44B, guard 4,953B 안). 검사: core 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent`, `pnpm test:satellites`, `pnpm test:e2e:build` 90개, `pnpm size` 통과(최종 트리에서 실행). `pnpm test:satellites:concurrent`의 `element-cleanupErrors.test.ts` 4개 실패는 이 변경 전 HEAD 소스에서도 같다(범위 밖). 공식 러너 3차 세션: A+최종 / A+main 가중 전체 −2.33%(구간 −3.23~−1.70%), 스크립트 −4.92%, 메모리 ±0.3%(M-26-8). 종료: M-26-8 통과와 네 정본·HANDOFF 일치. release는 사용자 결정으로 남는다.
+- [x] **J7 코어 개선만 적용(R120, DC-29-12/13):** 진입은 2026-11-10 사용자 결정. 작업 트리에서 J4-b를 되돌리고, 코드 정리(DC-29-12)를 적용하고, `memo`(판정·`sameProps`·export·`core-memo.test.tsx`)를 뺐다. 자체 리뷰(Critical 0, Warning 3) 뒤 사용자 결정으로 정리 ⑥(끝 추가용 fragment를 항상 만들기)을 되돌렸다. concurrent 코어는 그대로 둔다(DC-29-7). 결과 base 4,901B(main 4,857B 대비 +44B, guard 4,953B 안). 검사: core 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent`, `pnpm test:satellites`, `pnpm test:e2e:build` 90개, `pnpm size` 통과(최종 트리에서 실행). 초기 로컬 검사에서 기록한 concurrent element cleanup 4개 실패는 후속 재빌드·전체 dual 1,206개 통과/3개 제외와 `08dc1f0`의 실제 Validate에서 재현되지 않았다(당시 원인 미확정). 공식 러너 3차 세션: A+최종 / A+main 가중 전체 −2.33%(구간 −3.23~−1.70%), 스크립트 −4.92%, 메모리 ±0.3%(M-26-8). 종료: M-26-8 통과와 네 정본·HANDOFF 일치. 후속 릴리스는 사용자 요청에 따라 J8로 진행한다.
 
 아래 `Files:`는 main `7e5185f` 대비 이 단계의 순변경이다. `src/index.ts`와 `src/tests/core-memo.test.tsx`는 커밋 `d127018`에서 바뀌었다가 2026-11-10 작업 트리에서 main과 같게 되돌아갔다(HEAD 대비로는 각각 modified, deleted). HEAD 대비 미커밋 변경 목록에는 아래에 더해 `src/index.ts` (modified)와 `src/tests/core-memo.test.tsx` (deleted)가 있다.
 
@@ -57,6 +57,21 @@ Files:
 - `src/render.ts` (modified)
 - `src/utils/createWDom.ts` (modified)
 - `src/wDom.ts` (modified)
+
+### J8 — lithent 1.25.8 릴리스: 진행 중
+
+Refs: R121, DC-29-14, M-26-9, M-26-10
+
+진입: 사용자 버전업·배포 요청, npm 최신 1.25.7 확인, `08dc1f0`의 Validate 성공.
+범위: root 1.25.8만 발행하고 concurrent 0.2.6과 R120의 런타임 결정을 유지한다.
+
+- [x] root 버전·CHANGELOG·RELEASING과 네 정본에 릴리스 범위를 기록한다.
+- [x] Test Hardening: 1.25.8 root 재빌드·버전 치환, 크기(base 4,901 / 4,953B)·Concurrent 산출물·8개 실제 tarball의 ESM/CJS/strict 타입·생성기 검사를 통과했다. macOS 임시 경로 별칭은 `TMPDIR=/private/tmp`로 지정해 실행했다. 런타임 회귀는 `08dc1f0`의 local dual 1,206개 통과/3개 제외와 아래 최종 후보 CI를 연결한다.
+- [x] Integration Test: `release:plan --allow-dirty`에서 후보가 `lithent@1.25.8` 하나이고 나머지 7개는 already-published임을 확인했다. 선택 archive와 실제 npm 의존성을 설치한 소비자 검사도 통과했다. 로컬 archive는 `artifacts/release`, plan/proof는 `artifacts/release-{plan,consumers}.json`이다. CI는 clean SHA에서 새로 만든다.
+- [ ] 커밋·push하고 PR #109의 제목·설명을 최종 범위로 갱신한다. 최종 후보 Validate 성공 뒤 merge commit으로 main에 병합한다.
+- [ ] main 대상 Validate 수동 실행 뒤 npm 버전·integrity, 동일 발행 SHA의 태그와 문서 배포를 확인한다.
+
+종료: M-26-9/10의 실제 근거와 발행 run/SHA를 현재 핸드오프에 기록한다. 계획과 발행 완료를 구분한다.
 
 ## DC-28 — 실행 H0~H4
 
@@ -530,10 +545,10 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 - done (2026-11-10): ① Mac 공식 러너 두 세션으로 DC-29(memo 행 앱)를 측정했다(CPU 1,160 + 2,320표본, 메모리 120 + 120표본, [MEMO_FREE_ROWS_OFFICIAL_RESULTS](../benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md)). memo 행 앱 + 후보 코어는 현재 등재 조합 대비 가중 전체 약 +3%, 기존 A 앱 + 후보 코어는 −1.9~−2.1%였다. ② 사용자 결정(R120, DC-29-13)에 따라 작업 트리를 **코어 개선 + 코드 정리만** 남기도록 바꿨다: J4-b 되돌림, 정리 적용(DC-29-12), `memo`와 `core-memo.test.tsx` 제거. ③ 3차 세션(CPU 1,740표본, 메모리 90표본)으로 최종 코어를 확인했다: A+최종 / A+main 가중 전체 −2.33%(구간 −3.23~−1.70%, 4회차 모두 감소), 스크립트 −4.92%, 메모리 ±0.3%, 1만 행 생성만 +1.13%. ④ 자체 리뷰 뒤 정리 하나를 되돌렸다. 최종 base 4,901B(guard 4,953B 안).
 - decisions (2026-11-10 사용자): `memo`와 등재 앱 교체는 넣지 않는다. #1261 주석은 유지한다(근거: `memo`의 좁은 사용처, 5KB에 가까운 크기, 표기값이 약 1.31 → 1.35로 느려지는 점). J4-b는 넣지 않는다. concurrent 코어는 그대로 둔다(크기보다 유지보수 우선, DC-29-7). 리뷰 Warning 1(끝 추가용 fragment를 항상 만드는 정리)은 되돌린다. 2026-11-09 결정(행 컴포넌트 + `memo`, 합격 기준 DC-29-8)은 보류됐다.
-- validation (최종 작업 트리): core `vitest run` 74파일 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent`(376 + 8), `pnpm test:satellites`, `pnpm test:e2e:build`(90개), `pnpm size`(base 4,901 / concurrent 6,696 / element 968B) 통과. `pnpm test:satellites:concurrent`는 `element-cleanupErrors.test.ts` 4개 실패 — 이 변경을 뺀 HEAD 소스에서도 같다(원인 미조사). `test:toolchain`·`verify:concurrent`는 미실행이다. 3차 세션의 A+최종 번들(`e63999c`)은 정리 하나를 되돌리기 전 것이고, 그 경로가 최종 코드와 같은 A+HEAD는 같은 세션에서 −1.20%였다. 최종 트리 자체는 공식 러너로 다시 재지 않았다.
+- validation (최종 작업 트리): core `vitest run` 74파일 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent`(376 + 8), `pnpm test:satellites`, `pnpm test:e2e:build`(90개), `pnpm size`(base 4,901 / concurrent 6,696 / element 968B) 통과. 후속 확인: `08dc1f0`에서 전체 재빌드 후 `pnpm test:dual` 1,206개 통과/3개 제외. concurrent element 89개(문제의 4개 포함) 통과. [Validate #15](https://github.com/superlucky84/lithent/actions/runs/42776662776)의 Quality·세 브라우저·CI도 성공해 toolchain·Concurrent 산출물·실제 tarball 검사까지 통과했다. 초기 로컬 실패 원인은 미확정이다. 3차 세션의 A+최종 번들(`e63999c`)은 정리 하나를 되돌리기 전 것이고, 그 경로가 최종 코드와 같은 A+HEAD는 같은 세션에서 −1.20%였다. 최종 트리 자체는 공식 러너로 다시 재지 않았다.
 - review (미반영 권고): 직접 그리기 전용 테스트 추가(끝 추가 구간의 Fragment·컴포넌트·portal 혼합, 중첩 Fragment, 문서에 붙은 portal 대상 안의 컴포넌트 — custom element `connectedCallback` 시점), `swapIn`을 JSDoc 위로 옮기기, `replaceWDom` 안에서 import한 `getParent`를 가리는 지역 이름.
-- blockers(사용자 결정 대기): release 여부. release하려면 root `lithent`만 1.25.7 → 1.25.8로 올리고(concurrent는 올리지 않아도 된다: 공유 hook 정리 두 줄, 동작 동일) CHANGELOG 항목과 버전이 들어가는 생성 파일(`skills/`, `lithent-agent-addon.md`)을 함께 커밋한 뒤 `RELEASING.md`의 CI 발행 절차(main 병합 → Validate 수동 실행)를 따른다. `test:satellites:concurrent`의 element 테스트 4개 실패가 CI에서도 나는지 release 전에 확인한다.
+- release (2026-11-10 사용자 요청): root `lithent` 1.25.8, concurrent 0.2.6 유지. J8에서 버전·CHANGELOG·RELEASING과 `dist/skills/`·`dist/lithent-agent-addon.md`의 버전 치환 산출물을 준비한다. 소스 템플릿은 `{{VERSION}}`을 유지한다. 로컬 root 재빌드·버전 치환·크기·Concurrent 산출물·8개 tarball/타입 소비자·root 단독 선택 계획·실제 npm 소비자를 통과했다. 최종 후보 CI → PR #109 병합 → main 대상 Validate 수동 실행 → npm·태그·문서 확인 순서다. 발행은 아직 하지 않았다.
 - environment: 이 Mac의 `node_modules`를 `pnpm install --frozen-lockfile`로 lockfile에 맞췄다(Vite 8.3.6·vitest 4.1.12). 증거 archive 세 개는 `docs/benchmark/memo-free-rows-official-20261110-s{1,2,3}-evidence.tar.gz`에 있다(gitignore 대상, 업로드하지 않음; [manifest](../benchmark/memo-free-rows-official-20261110-evidence-manifest.json)). J4-b patch는 2차 archive의 `worktree.patch`, 3차에서 잰 작업 트리 patch는 3차 archive의 `worktree.patch`다.
-- next: 사용자 결정(커밋, release). `memo`를 다시 열 경우 커밋 `d127018`·`6551624`와 이 문서의 J1~J4 기록에서 시작한다.
-- commit: 기준 main `7e5185f`. 브랜치 `ccr-bacc0d37-0f08c0`. `ae54a3e`까지는 `memo`가 들어 있고, 2026-11-10 작업은 사용자 요청으로 그 위에 두 커밋(`perf:` 코어 — `memo` 제거·정리 적용, `docs:` 공식 결과·결정·도구)으로 올려 push했다. 최신 SHA는 `git log -1 --format=%H`로 확인한다. PR은 만들지 않았다. 버전·CHANGELOG는 바꾸지 않았다.
+- next: J8 최종 후보 검증과 CI 발행을 완료한다. `memo`를 다시 열 경우 커밋 `d127018`·`6551624`와 이 문서의 J1~J4 기록에서 시작한다.
+- commit: 기준 main `7e5185f`. 브랜치 `ccr-bacc0d37-0f08c0`. `ae54a3e`까지는 `memo`가 들어 있고, 2026-11-10 작업은 사용자 요청으로 그 위에 두 커밋(`perf:` 코어 — `memo` 제거·정리 적용, `docs:` 공식 결과·결정·도구)으로 올려 push했다. 최신 SHA는 `git log -1 --format=%H`로 확인한다. PR #109는 열려 있으며 기존 설명은 memo 프로토타입 기준이라 J8에서 고친다. 현재 커밋은 `08dc1f0`; 1.25.8 준비는 그 위의 작업 트리에 있다.
 - previous: DC-28(select 프레임 대기·bulk removal v2) 인계는 이 파일의 git 이력과 [HANDOFF](../benchmark/HANDOFF.md)의 2026-10-30 항목에 있다.

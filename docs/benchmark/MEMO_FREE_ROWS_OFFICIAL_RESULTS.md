@@ -161,7 +161,10 @@ m-head의 `a-main` 대비 항목별 전체 변화는 1천 행 생성 −0.59%, �
   되돌리기 전 기준).
 - 검사(최종 작업 트리): core 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent`, `pnpm test:satellites`,
   `pnpm test:e2e:build` 90개, `pnpm size` 통과. `pnpm test:satellites:concurrent`의
-  `element-cleanupErrors.test.ts` 4개 실패는 이 변경을 뺀 HEAD 소스에서도 같다.
+  `element-cleanupErrors.test.ts` 4개 실패는 초기 로컬 기록이다. 후속 `08dc1f0` 전체 재빌드 뒤
+  `pnpm test:dual`은 1,206개 통과·3개 제외, concurrent element는 89개 모두 통과했다.
+  [Validate #15](https://github.com/superlucky84/lithent/actions/runs/42776662776)에서도 해당 4개와
+  Quality·세 브라우저·CI가 모두 통과했다. 당시 로컬 실패 원인은 미확정이다.
 
 ### 3차 세션 — A 앱으로 최종 코어 확인
 

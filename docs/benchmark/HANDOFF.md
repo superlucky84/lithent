@@ -1,6 +1,14 @@
 # summary
 
-## 최신 — DC-29 결정: 코어 개선 + 코드 정리만 적용, memo 보류 (2026-11-10)
+## 최신 — lithent 1.25.8 릴리스 진행 (2026-11-10)
+
+- request: 사용자가 버전업·배포를 요청했다. root `lithent`만 1.25.7 → 1.25.8로 올리고 concurrent는 0.2.6을 유지한다. R120의 범위는 그대로다. 정본: R121 / DC-29-14 / J8 / M-26-9·10.
+- verification: `08dc1f0`에서 전체 재빌드 뒤 dual 1,206개 통과/3개 제외. concurrent element는 문제의 cleanup 4개를 포함해 89개 통과했다. [Validate #15](https://github.com/superlucky84/lithent/actions/runs/42776662776)의 Quality·세 브라우저·CI도 성공했다. 초기 로컬 4개 실패는 현재 재현되지 않으며 당시 원인은 미확정이다.
+- done: 버전·CHANGELOG·RELEASING과 네 정본을 갱신했다. 1.25.8 재빌드·버전 치환·크기·Concurrent 산출물·8개 tarball/타입 소비자·root 단독 선택 계획·실제 npm 소비자 검사가 통과했다. 소스 skill/addon은 버전 템플릿을 유지한다. macOS tarball 검증은 `TMPDIR=/private/tmp`로 임시 경로 별칭을 피했다.
+- next: 커밋/push와 기존 PR #109 설명 갱신 → 최종 후보 CI 성공 → merge commit 병합 → main 대상 Validate 수동 실행 → npm·integrity·태그·문서 확인.
+- state: 현재 브랜치 `ccr-bacc0d37-0f08c0`, 커밋 `08dc1f0` 위 작업 트리다. PR #109는 열려 있다. 1.25.8 발행은 아직 하지 않았다.
+
+## 이전 — DC-29 결정: 코어 개선 + 코드 정리만 적용, memo 보류 (2026-11-10)
 
 - decision: 사용자가 아래 공식 측정 결과를 보고 `memo`와 등재 앱 교체를 넣지 않기로 했다. #1261 주석은 유지한다. 근거는 `memo`의 좁은 사용처, 5KB에 가까운 크기, 표기값이 약 1.31 → 1.35로 느려지는 점이다. 정본은 [REQUIREMENTS R120](../performance-improvement/REQUIREMENTS.md#dc-29--1261-주석-없는-행-구현과-컴포넌트-경로-비용), [DESIGN DC-29-12/13](../performance-improvement/DESIGN.md#dc-29--memo-컴포넌트와-컴포넌트-경로-경량화), [IMPLEMENT J7](../performance-improvement/IMPLEMENT.md#dc-29--실행-j0j6)이다.
 - done: 작업 트리에서 J4-b를 되돌리고, 동작을 바꾸지 않는 코드 정리 13가지를 적용하고, `memo`(판정·export·테스트)를 뺐다. 남은 것은 컴포넌트 생성 경량화, 가상 노드 직접 그리기, 문자열 태그 빠른 경로다.
