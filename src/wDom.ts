@@ -13,6 +13,7 @@ import {
 } from '@/types';
 
 import { makeNewWDomTree } from '@/diff';
+import { getParent } from '@/utils';
 import { wDomUpdate } from '@/render';
 import {
   initUpdateHookState,
@@ -38,7 +39,7 @@ import {
  * It allows grouping multiple elements together.
  */
 export const Fragment = (_props: Props, ...children: WDom[]) =>
-  createWDom('f', undefined, undefined, undefined, children);
+  createWDom('f', children);
 
 /**
  * Element creation
@@ -95,15 +96,6 @@ export const lmount =
   };
 
 /**
- * Marks a component so that its parent's redraw leaves it alone while it gets
- * the same props (each value compared with ===) and no children.
- */
-export const memo = <T extends Function>(component: T): T => {
-  (component as T & { mm?: boolean }).mm = true;
-  return component;
-};
-
-/**
  * Maintain compChild references for upward updates (render props, slots, etc.).
  * JSX always returns a fresh children array, so when a subtree re-renders
  * bottom-up we must manually swap the old child instance out of each ancestor's
@@ -116,6 +108,14 @@ export const memo = <T extends Function>(component: T): T => {
  * usually shallow composed pieces like dropdowns or drag-and-drop shells—so the
  * directed walk keeps DX high without introducing observable overhead.
  */
+const swapIn = (list: WDom[], prev: WDom, next: WDom) => {
+  const index = list.indexOf(prev);
+
+  if (index !== -1) {
+    list.splice(index, 1, next);
+  }
+};
+
 const syncAncestorComponentChildren = (
   parent: WDom | undefined,
   prevChild: WDom,
@@ -129,14 +129,10 @@ const syncAncestorComponentChildren = (
     visited.add(node);
 
     if (node.compChild) {
-      const childIndex = node.compChild.indexOf(prevChild);
-
-      if (childIndex !== -1) {
-        node.compChild.splice(childIndex, 1, nextChild);
-      }
+      swapIn(node.compChild, prevChild, nextChild);
     }
 
-    walk(node.getParent ? node.getParent() : undefined, visited);
+    walk(getParent(node), visited);
   };
 
   walk(parent, new Set<WDom>());
@@ -168,11 +164,7 @@ export const replaceWDom = (
     if (!isRoot && getParent) {
       const parent = getParent();
       const brothers = (parent && parent.children) || [];
-      const index = brothers.indexOf(originalWDom);
-
-      if (index !== -1) {
-        brothers.splice(index, 1, newWDomTree);
-      }
+      swapIn(brothers, originalWDom, newWDomTree);
 
       syncAncestorComponentChildren(parent, originalWDom, newWDomTree);
     } else {
@@ -201,7 +193,7 @@ const makeNode = (
 ) => {
   // An element first: the common case, and none of the checks below.
   if (typeof tag === 'string') {
-    return createWDom('e', tag, props, undefined, children);
+    return createWDom('e', children, undefined, tag, props);
   } else if (checkFragmentFunction(tag)) {
     return Fragment(props, ...children);
   } else if (checkCustemComponentFunction(tag)) {
@@ -219,7 +211,7 @@ const makeNode = (
     return node;
   }
 
-  return createWDom('e', tag, props, undefined, children);
+  return createWDom('e', children, undefined, tag, props);
 };
 
 /**
@@ -248,12 +240,12 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
   } else if (Array.isArray(item)) {
     const nodeParentPointer: NodePointer = { value: undefined };
     const children = remakeChildren(nodeParentPointer, item);
-    const node = createWDom('l', undefined, undefined, undefined, children);
+    const node = createWDom('l', children);
     nodeParentPointer.value = node;
 
     return node;
   } else if (typeof item === 'string' || typeof item === 'number') {
-    return createWDom('t', undefined, undefined, item);
+    return createWDom('t', undefined, item);
   }
 
   return item;
@@ -269,9 +261,8 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
  * closure made for each: a list's redraw describes every row again.
  */
 function resolveComponent(this: TagFunctionResolver, compKey?: CompKey) {
-  const tag = this.ctor as TagFunction;
-  const props = this.props;
-  const wrappedChildren = this.children;
+  const { ctor, props, children: wrappedChildren } = this;
+  const tag = ctor as TagFunction;
   compKey = compKey || props;
   // Diff mode sets needDiffRef to true so h()/makeNode return a resolver
   // placeholder. During actual resolution we must force a real WDom tree,
@@ -337,10 +328,10 @@ export const cloneWDom = (wDom: WDom): WDom | TagFunctionResolver =>
       )
     : createWDom(
         wDom.type,
+        wDom.children && [...wDom.children],
+        wDom.text,
         wDom.tag,
         wDom.props,
-        wDom.text,
-        wDom.children && [...wDom.children],
         wDom.getParent
       );
 

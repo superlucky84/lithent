@@ -43,7 +43,6 @@ const insertRoot = (
     : wrapElement.tagName === 'HTML'
       ? wrapElement.replaceWith(element)
       : wrapElement.appendChild(element);
-const CE = (t: string) => document.createElement(t);
 
 export const render = (
   wDom: WDom,
@@ -659,10 +658,8 @@ const wDomToDom = (
   }
 
   if (!isHydration) {
-    if (direct) {
-      element = direct;
-    } else if (!type || isVirtualType) {
-      element = DF();
+    if (!type || isVirtualType) {
+      element = direct || DF();
     } else if (type === 'e' && tag) {
       // element
       if (tag === 'portal' && props && props.portal) {
@@ -670,7 +667,7 @@ const wDomToDom = (
       } else {
         element = xmlnsRef.value
           ? document.createElementNS(xmlnsRef.value, tag)
-          : CE(tag);
+          : document.createElement(tag);
       }
     } else if (type === 't' && checkExisty(text)) {
       // text node
@@ -722,11 +719,7 @@ const wDomChildrenToDom = (
     childItem.getParent = getParent;
     childItem.nr = 'N';
     if (childItem.type) {
-      const childElement = wDomToDom(
-        childItem,
-        isHydration,
-        isHydration ? undefined : parentElement
-      );
+      const childElement = wDomToDom(childItem, isHydration, parentElement);
       if (
         childItem.tag !== 'portal' &&
         !isHydration &&

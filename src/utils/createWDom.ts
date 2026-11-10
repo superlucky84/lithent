@@ -4,10 +4,10 @@ import { wdomSymbol } from '@/utils/universalRef';
 // Common hot fields share one layout; root/component metadata stays sparse.
 export const createWDom = (
   type: WDom['type'],
+  children?: WDom['children'],
+  text?: WDom['text'],
   tag?: WDom['tag'],
   props?: WDom['props'],
-  text?: WDom['text'],
-  children?: WDom['children'],
   getParent?: WDom['getParent']
 ): WDom => ({
   type,

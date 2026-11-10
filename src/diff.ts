@@ -4,7 +4,6 @@ import { getParent, makeParentGetter } from '@/utils';
 import { typeDeleteUnused } from '@/render';
 import { cloneWDom, copyResolver } from '@/wDom';
 import {
-  checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
   checkExistyKey,
@@ -29,26 +28,6 @@ export const makeNewWDomTree = (
     return originalWDom!;
   }
 
-  // A memo component described again by its parent with the same props and
-  // no children: the drawn instance stays as it is. Checked before anything
-  // else, since a list's redraw describes every row. The component's own
-  // redraw describes it with its own props object, and always runs.
-  const { ctor, props, children, resolve } =
-    newWDom as Partial<TagFunctionResolver>;
-  if (
-    ctor &&
-    (ctor as { mm?: boolean }).mm &&
-    resolve &&
-    originalWDom &&
-    ctor === originalWDom.ctor &&
-    !children!.length &&
-    props !== originalWDom.compProps &&
-    sameProps(originalWDom.compProps as Props, props as Props)
-  ) {
-    originalWDom.nr = 'N';
-    return originalWDom;
-  }
-
   // Already drawn or taken by a diff (it has nr, 'N' once drawn): the node
   // belongs to another place, so this place draws a copy. The same node in the same place is still left
   // alone as unchanged. A component made without a diff and not drawn yet
@@ -58,21 +37,12 @@ export const makeNewWDomTree = (
     newWDom = cloneWDom(newWDom as WDom);
   }
 
-  const isSameType =
+  return remakeNewWDom(
+    newWDom,
     !!originalWDom &&
-    checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom);
-
-  return remakeNewWDom(newWDom, isSameType, originalWDom);
-};
-
-const sameProps = (props: Props, nextProps: Props) => {
-  let count = 0;
-  for (const key in props) {
-    if (props[key] !== nextProps[key]) return false;
-    count++;
-  }
-  for (const _key in nextProps) count--;
-  return !count;
+      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+    originalWDom
+  );
 };
 
 /**
@@ -148,7 +118,7 @@ const addReRenderTypeProperty = (
   isSameType: boolean,
   originalWDom?: WDom
 ): RenderType | undefined => {
-  if (checkEmptyElement(newWDom)) return 'D';
+  if (!newWDom.type) return 'D';
 
   if (
     newWDom === originalWDom ||
