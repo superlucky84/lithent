@@ -9,7 +9,7 @@ import http from 'node:http';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { chromium } = require('playwright');
+const { chromium } = require('@playwright/test');
 
 const [outArg, app, scenario = 'create', repeats = '30', top = '35'] =
   process.argv.slice(2);

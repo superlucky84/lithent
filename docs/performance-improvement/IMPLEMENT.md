@@ -1,6 +1,6 @@
 # IMPLEMENT — 코어 구조 개선 실행 계획
 
-- 최신(2026-11-09): **DC-29(#1261 주석 없는 행 구현)를 열었다. `memo`와 컴포넌트 경로 경량화의 base 프로토타입·진단 측정까지 했고, 채택·크기 한도·공식 러너 측정은 미결이다.** 아래 기준일/상태 줄은 DC-28 시점 기록이다.
+- 최신(2026-11-10): **DC-29 사용자 결정 — `memo`와 등재 앱 교체는 보류하고(#1261 주석 유지), 코어 개선(컴포넌트 생성 경량화·가상 노드 직접 그리기·문자열 태그 빠른 경로)과 코드 정리만 base에 적용한다. concurrent 코어는 그대로 둔다. base 4,901B로 기존 guard 4,953B 안이다. Mac 공식 러너 3차 세션에서 기존 A 앱 + 최종 코어는 A 앱 + main 코어 대비 가중 전체 −2.33%(95% 구간 −3.23~−1.70%, 4회차 모두 감소), 스크립트 −4.92%, 메모리 ±0.3%다. release는 사용자 결정 대기다.** 아래 기준일/상태 줄은 DC-28 시점 기록이다.
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 문서의 체크박스는 실제 완료만 표시한다. 명령·검사 계획과 실행 증거를 구분하며, 아직 결과가 없는 항목은 완료로 표시하지 않는다.
@@ -8,20 +8,28 @@
 
 ## DC-29 — 실행 J0~J6
 
-Refs: R111, R112, R113, R114, R115, R116, R117, R118, R119, DC-29-1, DC-29-2, DC-29-3, DC-29-4, DC-29-5, DC-29-6, DC-29-7, DC-29-8, DC-29-9, M-26
+Refs: R111, R112, R113, R114, R115, R116, R117, R118, R119, R120, DC-29-1, DC-29-2, DC-29-3, DC-29-4, DC-29-5, DC-29-6, DC-29-7, DC-29-8, DC-29-9, DC-29-10, DC-29-11, DC-29-12, DC-29-13, M-26
 
 - [x] **J0 문서·기준선·도구:** 진입은 사용자 요청과 main `7e5185f`. upstream `fa510a7`에서 #1261 지정 현황과 peer의 생략 방식을 확인했다. `experiments/memo-free-rows/`에 행 변형 5개(A/N/R/C/M)와 빌드·측정·반복·프로파일 도구를 만들었다. 종료는 현재 코어에서 A/N/R/C의 진단 기준선 확보다. 기준 검사: 측정 도구의 시나리오별 DOM 확인(행 수·id·label·선택 class).
-- [x] **J1 memo 프로토타입(base):** 진입은 J0. `memo` export와 diff 입구 판정을 넣었다. 종료는 `core-memo.test.tsx` 6개와 기존 core 테스트 통과, M 앱 빌드·측정이다. 작성 중 자기 renew까지 건너뛰는 결함을 테스트로 발견해 "다른 props 객체일 때만" 조건으로 고쳤다.
+- [x] **J1 memo 프로토타입(base):** **(2026-11-10: R120으로 `memo`와 테스트를 작업 트리에서 뺐다. 아래는 프로토타입 기록이다.)** 진입은 J0. `memo` export와 diff 입구 판정을 넣었다. 종료는 `core-memo.test.tsx` 6개와 기존 core 테스트 통과, M 앱 빌드·측정이다. 작성 중 자기 renew까지 건너뛰는 결함을 테스트로 발견해 "다른 props 객체일 때만" 조건으로 고쳤다.
 - [x] **J2 컴포넌트 생성 경량화(base):** 진입은 J1과 프로파일(행 생성 차이가 여러 함수에 분산). 공유 resolver, 래퍼 일괄 생성, 자식 없는 `h` 빠른 경로를 넣었다. 종료는 타입 검사와 기존 core 테스트 통과, 반복 측정이다.
 - [x] **J3 가상 노드 직접 그리기(base):** 진입은 J2. 래퍼마다의 DocumentFragment를 없애고 끝 추가 구간을 한 번에 삽입한다. 종료는 타입 검사와 기존 core 테스트 통과, 반복·전체 진단 측정이다.
-- [ ] **J4 남은 비용 후보(DC-29-9/10):** 진입은 2026-11-09 사용자 결정(행 컴포넌트 + memo, 계속 진행). **J4-a 완료:** memo 판정을 diff 맨 앞으로, 문자열 태그를 `h`에서 먼저 처리했다. core 474개 통과, 40표본 선택 스크립트 M −5%·A 중립, +19B. **미착수:** 마운트 큐 조회·등록 객체, unmount 순회, 행 서술 객체 비용. 이 도구의 9항목 합산 잡음(세 번 +7.8~+10.4%)으로는 더 작은 후보를 구분하기 어려워, 공식 러너 수치를 본 뒤 우선순위를 정한다. 종료는 후보별 채택/기각 기록이다. 기준 검사: core 테스트, `loop.mjs`·`measure.mjs` 전후 비교.
-- [ ] **J5 Test Hardening:** 진입은 DC-29-1/2/6/7 결정. memo 계약(children·객체 prop·자기 renew·keyed 이동/삭제·lifecycle·중첩 memo·예외)과 직접 그리기(중첩 Fragment·portal·svg·빈 목록·중간 삽입·hydration)를 base/concurrent 공유 테스트로 고정한다. `test:dual`, e2e, `verify:concurrent`, `pnpm size`를 통과한다. 종료는 양코어 계약 통과와 크기 결정 반영이다.
-- [ ] **J6 Integration Test·판정:** 진입은 J5(공식 러너 확인 자체는 사용자 결정에 따라 J4 중에 먼저 할 수 있다). Mac 공식 러너로 A+현재 코어 / A+새 코어 / M+새 코어의 CPU 9항목 양순서와 공식 메모리를 측정하고 keyed·9동작·font 검사를 통과한다. DC-29-8 기준으로 판정한다. 채택하면 CHANGELOG·문서(memo 계약)·release, 이어서 upstream 앱 PR(`issues` 제거, 생략 방식 설명)을 사용자 승인 뒤 진행한다. 종료는 채택/보류 기록과 네 정본·HANDOFF 일치다.
+- [x] **J4 남은 비용 후보(DC-29-9/10):** **(2026-11-10 닫음: J4-a는 문자열 태그 빠른 경로만 유지, J4-b 미채택(되돌림), 나머지 후보는 R120으로 진행하지 않는다.)** 진입은 2026-11-09 사용자 결정(행 컴포넌트 + memo, 계속 진행). **J4-a 완료:** memo 판정을 diff 맨 앞으로, 문자열 태그를 `h`에서 먼저 처리했다. core 474개 통과, 40표본 선택 스크립트 M −5%·A 중립, +19B. 공식 확인(2026-11-10)에서 M 가중 전체 −0.01%·스크립트 −2.18%로 유지한다. **J4-b 구현·측정(작업 트리, 미커밋, 채택 TBD — 사용자 결정 대기):** 등록 객체의 큐 6개를 훅이 처음 쓸 때 만들고 마운트 때 `componentMap` 재조회 2회를 없앴다(DC-29-11). core 479개 통과, 공식 2차에서 M 1,000행 메모리 −2.3%·가중 전체 −0.15%(중립), +28B, `ComponentInfo` 타입 변경. **미착수:** unmount 순회, 행 서술 객체·비교 비용. 진단 도구의 9항목 합산 잡음(세 번 +7.8~+10.4%)으로는 작은 후보를 구분하지 못하므로 후보 확인은 공식 러너(`official-*.mjs`, 4회차 약 1시간, 가중 전체 구간 ±0.9%p)로 한다. 남은 후보를 계속할지는 DC-29-8 판정에 달려 있다. 종료는 후보별 채택/기각 기록이다. 기준 검사: core 테스트, 공식 러너 전후 비교.
+- [ ] **J5 Test Hardening:** **(2026-11-10: R120으로 memo 계약 테스트는 범위에서 빠진다. 직접 그리기 계약의 전용 테스트 추가는 미착수다. 기존 테스트·e2e·크기 검사는 J7에서 실행했다.)** 진입은 DC-29-1/2/6/7 결정. memo 계약(children·객체 prop·자기 renew·keyed 이동/삭제·lifecycle·중첩 memo·예외)과 직접 그리기(중첩 Fragment·portal·svg·빈 목록·중간 삽입·hydration)를 base/concurrent 공유 테스트로 고정한다. `test:dual`, e2e, `verify:concurrent`, `pnpm size`를 통과한다. 종료는 양코어 계약 통과와 크기 결정 반영이다.
+- [ ] **J6 Integration Test·판정:** **(2026-11-10: R120으로 DC-29-8 판정·upstream 앱 PR은 보류한다. 최종 코어의 공식 확인은 J7이다.)** 진입은 J5(공식 러너 확인 자체는 사용자 결정에 따라 J4 중에 먼저 할 수 있다). Mac 공식 러너로 A+현재 코어 / A+새 코어 / M+새 코어의 CPU 9항목 양순서와 공식 메모리를 측정하고 keyed·9동작·font 검사를 통과한다. DC-29-8 기준으로 판정한다. 채택하면 CHANGELOG·문서(memo 계약)·release, 이어서 upstream 앱 PR(`issues` 제거, 생략 방식 설명)을 사용자 승인 뒤 진행한다. 종료는 채택/보류 기록과 네 정본·HANDOFF 일치다. **앞당긴 공식 확인(2026-11-10, [MEMO_FREE_ROWS_OFFICIAL_RESULTS](../benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md)):** 두 세션(CPU 1,160 + 2,320표본, 메모리 120 + 120표본)에서 keyed·9동작·font 검사 통과, 실패·재시도 0, trace 3,480개 재계산 일치. 가중 전체 약 +3%로 기준 경계이며 판정은 사용자 결정 대기다. J5 뒤 최종 조합으로 다시 확인한다.
+- [x] **J7 코어 개선만 적용(R120, DC-29-12/13):** 진입은 2026-11-10 사용자 결정. 작업 트리에서 J4-b를 되돌리고, 코드 정리(DC-29-12)를 적용하고, `memo`(판정·`sameProps`·export·`core-memo.test.tsx`)를 뺐다. 자체 리뷰(Critical 0, Warning 3) 뒤 사용자 결정으로 정리 ⑥(끝 추가용 fragment를 항상 만들기)을 되돌렸다. concurrent 코어는 그대로 둔다(DC-29-7). 결과 base 4,901B(main 4,857B 대비 +44B, guard 4,953B 안). 검사: core 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent`, `pnpm test:satellites`, `pnpm test:e2e:build` 90개, `pnpm size` 통과(최종 트리에서 실행). `pnpm test:satellites:concurrent`의 `element-cleanupErrors.test.ts` 4개 실패는 이 변경 전 HEAD 소스에서도 같다(범위 밖). 공식 러너 3차 세션: A+최종 / A+main 가중 전체 −2.33%(구간 −3.23~−1.70%), 스크립트 −4.92%, 메모리 ±0.3%(M-26-8). 종료: M-26-8 통과와 네 정본·HANDOFF 일치. release는 사용자 결정으로 남는다.
+
+아래 `Files:`는 main `7e5185f` 대비 이 단계의 순변경이다. `src/index.ts`와 `src/tests/core-memo.test.tsx`는 커밋 `d127018`에서 바뀌었다가 2026-11-10 작업 트리에서 main과 같게 되돌아갔다(HEAD 대비로는 각각 modified, deleted). HEAD 대비 미커밋 변경 목록에는 아래에 더해 `src/index.ts` (modified)와 `src/tests/core-memo.test.tsx` (deleted)가 있다.
 
 Files:
 
 - `docs/benchmark/HANDOFF.md` (modified)
+- `docs/benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md` (added)
 - `docs/benchmark/MEMO_FREE_ROWS_RESULTS.md` (added)
+- `docs/benchmark/memo-free-rows-official-20261110-evidence-manifest.json` (added)
+- `docs/benchmark/memo-free-rows-official-results.json` (added)
+- `docs/benchmark/memo-free-rows-official-s1-results.json` (added)
+- `docs/benchmark/memo-free-rows-official-s3-results.json` (added)
 - `docs/benchmark/memo-free-rows-results.json` (added)
 - `docs/performance-improvement/DESIGN.md` (modified)
 - `docs/performance-improvement/IMPLEMENT.md` (modified)
@@ -37,12 +45,16 @@ Files:
 - `experiments/memo-free-rows/build.mjs` (added)
 - `experiments/memo-free-rows/loop.mjs` (added)
 - `experiments/memo-free-rows/measure.mjs` (added)
+- `experiments/memo-free-rows/official-analyze.py` (added)
+- `experiments/memo-free-rows/official-prepare.mjs` (added)
+- `experiments/memo-free-rows/official-run.mjs` (added)
+- `experiments/memo-free-rows/official-weighted-ci.py` (added)
 - `experiments/memo-free-rows/profile.mjs` (added)
 - `experiments/memo-free-rows/upstream/main.tsx` (added)
 - `src/diff.ts` (modified)
-- `src/index.ts` (modified)
+- `src/hook/mountReadyCallback.ts` (modified)
+- `src/hook/updateCallback.ts` (modified)
 - `src/render.ts` (modified)
-- `src/tests/core-memo.test.tsx` (added)
 - `src/utils/createWDom.ts` (modified)
 - `src/wDom.ts` (modified)
 
@@ -516,11 +528,12 @@ DC-17 당시에는 고정 staging/Chrome155가 없어 B3/공식 측정이 미실
 
 ## 상태 / 핸드오프
 
-- done (2026-11-09, DC-29 J0~J3, J4-a): 사용자 요청 "#1261 주석을 지우면서 현재와 비슷한 성능". upstream `fa510a7`에서 `issues`가 lithent에만 있고 무주석 peer가 라이브러리 memo/SCU/`v-memo`를 쓰는 것을 확인했다. base에 `memo`(diff 입구 판정), 컴포넌트 생성 경량화, 가상 노드 직접 그리기, 판정 순서·문자열 태그 빠른 경로를 프로토타입으로 넣었다. 도구 `experiments/memo-free-rows/`, 결과 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_FREE_ROWS_RESULTS.md).
-- decisions (2026-11-09 사용자): 앱 형태는 행 컴포넌트 + `memo(component)`(DC-29-1/2). 합격 기준은 Mac 공식 러너 가중 전체 +3%·항목 +10%·1,000행 메모리 +15% 이내(DC-29-8). 크기 한도는 공식 결과를 본 뒤 정한다(DC-29-6). 남은 비용 후보는 계속 진행한다.
-- result (진단, 공식 러너 아님): memo 행 앱 + 후보 코어는 현재 등재 조합 대비 가중 전체 약 +8~10%(세 번 +8.8/+7.8/+10.4%), 스크립트 약 +29%, 1,000행 heap +12.2%다. 행 컴포넌트 안 `cacheUpdate`는 +30.4%, 생략 없는 행 컴포넌트는 +70.1%다. A 앱 + 후보 코어는 −0.3~−1.4%(잡음 범위)다. 전체 시간에서 남은 차이는 선택 +37%·1행 삭제 +21%·추가 +17%·교환 +14%(두 번째 측정 기준)다.
-- validation: `core-memo.test.tsx` 6개, core `vitest run` 474개, `tsc --noEmit`, 변경 파일 ESLint 통과. upstream 형식 M 앱은 `tsc --noEmit`와 진단 도구의 9개 시나리오 DOM 확인을 통과했다. `packages/lithentVite` suite 1개는 미빌드 의존성 때문에 변경 전에도 실패한다. `test:dual`·e2e·`verify:concurrent`·공식 keyed/CSP 검사는 미실행이다.
-- blockers: ① base 5,045B로 guard 4,953B를 92B 초과 — **`pnpm size`(크기 gate)가 실패한다**(결정대로 공식 결과 뒤에 닫는다). ② concurrent에 `memo` export가 없어 양코어 export가 다르다(DC-29-7). ③ 이 세션은 권한 정책상 upstream 공식 러너를 설치·실행하지 못했다. 진단 도구의 9항목 합산은 회차 간 약 ±1.5%p 흔들려 작은 후보를 구분하지 못한다.
-- next: Mac 공식 러너로 A+현재 코어 / A+후보 코어 / M+후보 코어(`experiments/memo-free-rows/upstream/main.tsx`) 9항목 양순서·메모리 → 기준 밖 항목에 맞춰 J4 나머지 후보 → J5 양코어 테스트 → J6 판정·크기 한도·release·upstream PR(각각 사용자 승인). J4-a는 분리된 커밋이라 따로 빼고 잴 수 있다.
-- commit: 기준 main `7e5185f`. 브랜치 `ccr-bacc0d37-0f08c0`: `d127018`(memo·경량화·직접 그리기), `6551624`(J4-a), 문서·도구 커밋. 최종 SHA는 `git log -1 --format=%H`로 확인한다. PR은 만들지 않았다.
+- done (2026-11-10): ① Mac 공식 러너 두 세션으로 DC-29(memo 행 앱)를 측정했다(CPU 1,160 + 2,320표본, 메모리 120 + 120표본, [MEMO_FREE_ROWS_OFFICIAL_RESULTS](../benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md)). memo 행 앱 + 후보 코어는 현재 등재 조합 대비 가중 전체 약 +3%, 기존 A 앱 + 후보 코어는 −1.9~−2.1%였다. ② 사용자 결정(R120, DC-29-13)에 따라 작업 트리를 **코어 개선 + 코드 정리만** 남기도록 바꿨다: J4-b 되돌림, 정리 적용(DC-29-12), `memo`와 `core-memo.test.tsx` 제거. ③ 3차 세션(CPU 1,740표본, 메모리 90표본)으로 최종 코어를 확인했다: A+최종 / A+main 가중 전체 −2.33%(구간 −3.23~−1.70%, 4회차 모두 감소), 스크립트 −4.92%, 메모리 ±0.3%, 1만 행 생성만 +1.13%. ④ 자체 리뷰 뒤 정리 하나를 되돌렸다. 최종 base 4,901B(guard 4,953B 안).
+- decisions (2026-11-10 사용자): `memo`와 등재 앱 교체는 넣지 않는다. #1261 주석은 유지한다(근거: `memo`의 좁은 사용처, 5KB에 가까운 크기, 표기값이 약 1.31 → 1.35로 느려지는 점). J4-b는 넣지 않는다. concurrent 코어는 그대로 둔다(크기보다 유지보수 우선, DC-29-7). 리뷰 Warning 1(끝 추가용 fragment를 항상 만드는 정리)은 되돌린다. 2026-11-09 결정(행 컴포넌트 + `memo`, 합격 기준 DC-29-8)은 보류됐다.
+- validation (최종 작업 트리): core `vitest run` 74파일 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent`(376 + 8), `pnpm test:satellites`, `pnpm test:e2e:build`(90개), `pnpm size`(base 4,901 / concurrent 6,696 / element 968B) 통과. `pnpm test:satellites:concurrent`는 `element-cleanupErrors.test.ts` 4개 실패 — 이 변경을 뺀 HEAD 소스에서도 같다(원인 미조사). `test:toolchain`·`verify:concurrent`는 미실행이다. 3차 세션의 A+최종 번들(`e63999c`)은 정리 하나를 되돌리기 전 것이고, 그 경로가 최종 코드와 같은 A+HEAD는 같은 세션에서 −1.20%였다. 최종 트리 자체는 공식 러너로 다시 재지 않았다.
+- review (미반영 권고): 직접 그리기 전용 테스트 추가(끝 추가 구간의 Fragment·컴포넌트·portal 혼합, 중첩 Fragment, 문서에 붙은 portal 대상 안의 컴포넌트 — custom element `connectedCallback` 시점), `swapIn`을 JSDoc 위로 옮기기, `replaceWDom` 안에서 import한 `getParent`를 가리는 지역 이름.
+- blockers(사용자 결정 대기): release 여부. release하려면 root `lithent`만 1.25.7 → 1.25.8로 올리고(concurrent는 올리지 않아도 된다: 공유 hook 정리 두 줄, 동작 동일) CHANGELOG 항목과 버전이 들어가는 생성 파일(`skills/`, `lithent-agent-addon.md`)을 함께 커밋한 뒤 `RELEASING.md`의 CI 발행 절차(main 병합 → Validate 수동 실행)를 따른다. `test:satellites:concurrent`의 element 테스트 4개 실패가 CI에서도 나는지 release 전에 확인한다.
+- environment: 이 Mac의 `node_modules`를 `pnpm install --frozen-lockfile`로 lockfile에 맞췄다(Vite 8.3.6·vitest 4.1.12). 증거 archive 세 개는 `docs/benchmark/memo-free-rows-official-20261110-s{1,2,3}-evidence.tar.gz`에 있다(gitignore 대상, 업로드하지 않음; [manifest](../benchmark/memo-free-rows-official-20261110-evidence-manifest.json)). J4-b patch는 2차 archive의 `worktree.patch`, 3차에서 잰 작업 트리 patch는 3차 archive의 `worktree.patch`다.
+- next: 사용자 결정(커밋, release). `memo`를 다시 열 경우 커밋 `d127018`·`6551624`와 이 문서의 J1~J4 기록에서 시작한다.
+- commit: 기준 main `7e5185f`. 브랜치 `ccr-bacc0d37-0f08c0`. `ae54a3e`까지는 `memo`가 들어 있고, 2026-11-10 작업은 사용자 요청으로 그 위에 두 커밋(`perf:` 코어 — `memo` 제거·정리 적용, `docs:` 공식 결과·결정·도구)으로 올려 push했다. 최신 SHA는 `git log -1 --format=%H`로 확인한다. PR은 만들지 않았다. 버전·CHANGELOG는 바꾸지 않았다.
 - previous: DC-28(select 프레임 대기·bulk removal v2) 인계는 이 파일의 git 이력과 [HANDOFF](../benchmark/HANDOFF.md)의 2026-10-30 항목에 있다.

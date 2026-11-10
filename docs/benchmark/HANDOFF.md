@@ -1,6 +1,29 @@
 # summary
 
-## 최신 — DC-29 #1261 주석 없는 행 구현: memo 프로토타입과 진단 (2026-11-09)
+## 최신 — DC-29 결정: 코어 개선 + 코드 정리만 적용, memo 보류 (2026-11-10)
+
+- decision: 사용자가 아래 공식 측정 결과를 보고 `memo`와 등재 앱 교체를 넣지 않기로 했다. #1261 주석은 유지한다. 근거는 `memo`의 좁은 사용처, 5KB에 가까운 크기, 표기값이 약 1.31 → 1.35로 느려지는 점이다. 정본은 [REQUIREMENTS R120](../performance-improvement/REQUIREMENTS.md#dc-29--1261-주석-없는-행-구현과-컴포넌트-경로-비용), [DESIGN DC-29-12/13](../performance-improvement/DESIGN.md#dc-29--memo-컴포넌트와-컴포넌트-경로-경량화), [IMPLEMENT J7](../performance-improvement/IMPLEMENT.md#dc-29--실행-j0j6)이다.
+- done: 작업 트리에서 J4-b를 되돌리고, 동작을 바꾸지 않는 코드 정리 13가지를 적용하고, `memo`(판정·export·테스트)를 뺐다. 남은 것은 컴포넌트 생성 경량화, 가상 노드 직접 그리기, 문자열 태그 빠른 경로다.
+- size: base UMD Brotli 4,901B(main 4,857B 대비 +44B). guard 4,953B를 바꾸지 않고 `pnpm size`가 통과한다. concurrent 6,696B(공유 hook 정리로 −6B).
+- validation: core 473개, tsc, ESLint, Prettier, `test:concurrent`, `test:satellites`, e2e 90개, `pnpm size` 통과. `test:satellites:concurrent`의 `element-cleanupErrors.test.ts` 4개 실패는 이 변경 전 HEAD 소스에서도 같다.
+- result: 공식 러너 3차 세션(A+main / A+HEAD / A+최종, CPU 1,740표본)에서 A+최종은 A+main 대비 가중 전체 −2.33%(구간 −3.23~−1.70%, 4회차 모두 감소), 스크립트 −4.92%, 메모리 ±0.3%다. 1만 행 생성만 +1.13%다. [공식 결과 문서](./MEMO_FREE_ROWS_OFFICIAL_RESULTS.md#결정-뒤-적용한-것-2026-11-10), [표본/집계](./memo-free-rows-official-s3-results.json).
+- decision (이어서): concurrent 코어는 그대로 둔다(크기보다 유지보수 우선, DC-29-7). 자체 리뷰(Critical 0) 뒤 정리 하나(끝 추가용 fragment를 항상 만들기)를 되돌렸다(+5B). 되돌린 뒤 core·concurrent·satellites·e2e·크기 검사를 다시 통과했다. 3차에서 잰 번들은 되돌리기 전 것이다.
+- open: release(사용자 결정).
+- branch: `ccr-bacc0d37-0f08c0`. `ae54a3e`(memo 포함) 위에 2026-11-10 작업을 두 커밋(`perf:` 코어, `docs:` 결과·결정·도구)으로 올려 push했다. PR 없음. 버전·CHANGELOG는 바꾸지 않았다.
+
+## 이전 — DC-29 Mac 공식 러너 측정과 J4-b 후보 (2026-11-10)
+
+- request: 환경을 Mac으로 옮겨 `~/project/js-framework-benchmark-upstream`의 공식 러너로 DC-29를 이어서 진행한다. 정본은 [IMPLEMENT J0~J6](../performance-improvement/IMPLEMENT.md#dc-29--실행-j0j6)와 [DESIGN DC-29](../performance-improvement/DESIGN.md#dc-29--memo-컴포넌트와-컴포넌트-경로-경량화)다.
+- done: 공식 러너 두 세션(CPU 1,160 + 2,320표본, 메모리 120 + 120표본)을 측정했다. [결과](./MEMO_FREE_ROWS_OFFICIAL_RESULTS.md), [2차 표본/집계](./memo-free-rows-official-results.json), [1차 표본/집계](./memo-free-rows-official-s1-results.json), [재현 도구](../../experiments/memo-free-rows/README.md#official-runner-on-macos). 추가 후보 J4-b(등록 객체 큐를 처음 쓸 때 생성)를 작업 트리에 구현하고 2차에서 함께 쟀다.
+- result: memo 행 앱 + 후보 코어는 현재 등재 조합 대비 가중 전체 **약 +3%**다. 배포 빌드(2차)에서 HEAD +3.11%(95% 구간 +2.19~+3.85%), J4-b 포함 +2.96%(+2.00~+3.75%). 1차(코어를 Vite 5.4.8로 빌드)는 +2.78%. 항목 최대 +9.43%(전체 삭제, 불안정), 선택 −10%, 1,000행 메모리 +12.5%(J4-b +9.95%). A 앱은 후보 코어에서 −1.9~−2.1%다.
+- judgment: 합격 기준(가중 +3%·항목 +10%·메모리 +15%) 중 항목별·메모리는 안이고 가중 전체는 **기준값의 경계**다. 합격·불합격을 단정하지 않았다. **사용자 결정 대기: ① 이 수준을 받아들일지 여유를 더 만들지, ② J4-b 채택(메모리 −2.3~−2.8%, 시간 중립, +28B, `ComponentInfo` 타입 변경), ③ 크기 한도(HEAD 5,045B / J4-b 5,073B, guard 4,953B).**
+- validation: 두 세션 모두 네 앱 official keyed·9개 DOM·font 검사 통과. 실패·재시도·러너 경고 0, trace 3,480개 전체 시간 재계산 일치, 해시 검사 통과. 벤치마크 저장소 작업 트리는 바꾸지 않았다. J4-b는 core 479개·tsc·ESLint 통과, concurrent는 memo 미이식 실패 6개 외 통과. `test:dual` 전체·e2e·`verify:concurrent`는 미실행이다.
+- environment: 이 Mac의 `node_modules`가 lockfile보다 오래돼(Vite 5.4.8) 1차 코어 빌드가 배포 도구와 달랐다. `pnpm install --frozen-lockfile`로 맞춘 뒤 2차를 쟀다. 판정에는 2차를 쓴다.
+- preservation: 로컬 archive `docs/benchmark/memo-free-rows-official-20261110-s1-evidence.tar.gz`(56,819,703B·1,813 entries)와 `…-s2-evidence.tar.gz`(111,412,225B·2,987 entries), [manifest](./memo-free-rows-official-20261110-evidence-manifest.json). 다시 읽어 member 해시를 대조했다. 업로드하지 않았다.
+- next: 사용자 결정 ①②③ → 필요하면 J4 남은 후보(삭제 순회, 행 서술·비교 비용)를 공식 러너로 확인 → J5 concurrent 이식·양코어 테스트 → J6 최종 재확인·release·upstream PR(각각 사용자 승인).
+- branch: `ccr-bacc0d37-0f08c0`, 최신 커밋 `ae54a3e`. 2026-11-10 작업은 커밋하지 않고 작업 트리에 있다. PR 없음.
+
+## 이전 — DC-29 #1261 주석 없는 행 구현: memo 프로토타입과 진단 (2026-11-09)
 
 - request: upstream `keyed/lithent`의 `issues: [1261]`을 지우면서 현재와 비슷한 성능을 얻는다. 정본은 [REQUIREMENTS DC-29](../performance-improvement/REQUIREMENTS.md#dc-29--1261-주석-없는-행-구현과-컴포넌트-경로-비용)와 [IMPLEMENT J0~J6](../performance-improvement/IMPLEMENT.md#dc-29--실행-j0j6)이다.
 - done: base에 `memo(component)`(부모 갱신에서 같은 props면 diff 입구에서 이전 노드 유지), 컴포넌트 생성 경량화, 가상 노드 직접 그리기를 프로토타입으로 넣었다. [결과](./MEMO_FREE_ROWS_RESULTS.md), [원자료](./memo-free-rows-results.json), [도구](../../experiments/memo-free-rows/README.md).

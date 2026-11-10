@@ -1,0 +1,61 @@
+{
+  "note": "Complete installed Chrome and locked Node dependencies are required to reproduce; browser hashes, dependency lockfiles and versions are preserved. Archives are local files (gitignored) and have not been uploaded. Session 1 cores were built with Vite 5.4.8 (stale node_modules); session 2 uses the package toolchain (Vite 8.3.6). Each archive holds tools/ with the scripts at the hashes its initial.json records (session 1 official-prepare.mjs is the earlier Vite 5 version). Session 3 (A app only: main, HEAD, and the working tree after the 2026-11-10 decision, before one trim was reverted) uses the package toolchain.",
+  "results": {
+    "memo-free-rows-official-results.json": {
+      "session": "s2",
+      "sha256": "7036769cd246dffb2eb66fee8e7c4de9af64fa646af67d679ba08e05d9799ab1"
+    },
+    "memo-free-rows-official-s1-results.json": {
+      "session": "s1",
+      "sha256": "68779da02d4f896d85433e7fd8afcce0efbd71db3c6e643bd3c64eb385e82ac6"
+    },
+    "memo-free-rows-official-s3-results.json": {
+      "session": "s3",
+      "sha256": "2fbf5e2554e7d7eb99f6965fb712274fe0120d952cf65e88adf0b824d232845d"
+    }
+  },
+  "archives": {
+    "s1": {
+      "archive": "memo-free-rows-official-20261110-s1-evidence.tar.gz",
+      "sha256": "78a4cc0b7abe2bdd4582a16f09f20ba58973320309f1a396e4f2ea9b4dbd7bbc",
+      "bytes": 56819703,
+      "members": 1813,
+      "uncompressedFileBytes": 548508432,
+      "decodedMemberAudit": "all names, sizes and SHA-256 hashes match",
+      "fileList": "memo-free-rows-official-20261110-s1/FILES.json (inside the archive: path, size, sha256 of every other member)",
+      "fileListSha256": "3f50d9e73e7bcc61de8ce46e8d8743136d7a86ee2b5f095c10b55d8d566939a6",
+      "staging": "/private/tmp/claude-501/-Users-n250109005-project-lithent/80e43d52-6fe3-410e-811f-8f2a51bffe84/scratchpad/memo-official-20261110",
+      "traceCount": 1160,
+      "browserIncluded": false,
+      "dependenciesIncluded": false
+    },
+    "s2": {
+      "archive": "memo-free-rows-official-20261110-s2-evidence.tar.gz",
+      "sha256": "6f34892c7ec6f898a703a769984bc6531ace654db77760c2efca267ee81bec9b",
+      "bytes": 111412225,
+      "members": 2987,
+      "uncompressedFileBytes": 1080155590,
+      "decodedMemberAudit": "all names, sizes and SHA-256 hashes match",
+      "fileList": "memo-free-rows-official-20261110-s2/FILES.json (inside the archive: path, size, sha256 of every other member)",
+      "fileListSha256": "1af15f27f7d89eff386669379ad91df9f503d229d064fc2e1f64913a183be2eb",
+      "staging": "/private/tmp/claude-501/-Users-n250109005-project-lithent/80e43d52-6fe3-410e-811f-8f2a51bffe84/scratchpad/memo-official-20261110-s2",
+      "traceCount": 2320,
+      "browserIncluded": false,
+      "dependenciesIncluded": false
+    },
+    "s3": {
+      "archive": "memo-free-rows-official-20261110-s3-evidence.tar.gz",
+      "sha256": "6826937ebe5fb83ec31d17fc6d194f27cf5d3b985cc0149768a671fc7c342a51",
+      "bytes": 82900983,
+      "members": 2402,
+      "uncompressedFileBytes": 794606233,
+      "decodedMemberAudit": "all names, sizes and SHA-256 hashes match",
+      "fileList": "memo-free-rows-official-20261110-s3/FILES.json (inside the archive: path, size, sha256 of every other member)",
+      "fileListSha256": "769e8c8fa50f87a119c93ed691adb5dbdfe1c688ae6091df06fa02fc04cf82e2",
+      "staging": "/private/tmp/claude-501/-Users-n250109005-project-lithent/80e43d52-6fe3-410e-811f-8f2a51bffe84/scratchpad/core-official-20261110-s3",
+      "traceCount": 1740,
+      "browserIncluded": false,
+      "dependenciesIncluded": false
+    }
+  }
+}
