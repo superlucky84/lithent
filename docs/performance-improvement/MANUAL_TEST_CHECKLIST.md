@@ -1,5 +1,6 @@
 # MANUAL_TEST_CHECKLIST — 코어 구조 개선의 최종 확인
 
+- 최신(2026-11-09): **DC-29(#1261 주석 없는 행 구현)를 열었다. `memo`와 컴포넌트 경로 경량화의 base 프로토타입·진단 측정까지 했고, 채택·크기 한도·공식 러너 측정은 미결이다.** 아래 기준일/상태 줄은 DC-28 시점 기록이다.
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 정본: [REQUIREMENTS](./REQUIREMENTS.md), [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md).
 - 체크에는 결과·실행 시각·소스/번들 해시·증거 경로를 남긴다. 후보에 해당하지 않는 항목은 이유와 함께 N/A로 기록한다. 자동 테스트가 대신한 항목도 해당 증거를 연결한다.
@@ -25,6 +26,20 @@
 - [x] M-22-4: strict types/관련 회귀·Chrome·retention과 새 B/C/P CPU870·메모리90 양순서/해시/분포/비율을 검산한다. 한 peer만 비교했음을 밝히며 concurrent/SSR/HMR은 미완료로 남긴다.
 
 - [x] M-22-5(R95): class 값 한 축의 실제 DOM 차이와 양쪽 keyed/9동작/font를 확인하고 선택100표본/18분포를 별도로 검산했다. 양차수 +14.20%/−13.99%로 방향이 갈려 미채택이며 전체870/90에 합산하지 않는다.
+
+## M-26. #1261 주석 없는 행 구현 — R111~R119
+
+- [x] **M-26-1 형태 근거:** upstream `fa510a7`의 9개 keyed 구현 `package.json`에서 `issues`는 lithent만 있고, 무주석 구현의 생략 방식(React `memo`, class/Inferno SCU, ivi props 비교, Vue `v-memo`)을 source에서 확인했다. 새 앱 형태의 무주석 통과는 maintainer 판정 전까지 미확정으로 표시한다.
+- [x] **M-26-2 memo 계약(base 프로토타입):** **(2026-11-10 보류: `memo`와 이 테스트 파일을 작업 트리에서 뺐다. 아래는 커밋 `d127018` 시점 기록이다.)** `src/tests/core-memo.test.tsx` 6개 통과 — 같은 props 생략과 변경 행만 재실행, 생략 뒤 자기 renew, keyed 이동/삭제/추가와 unmount, children이 있으면 생략 없음, 값·키 집합 비교, memo 없는 컴포넌트 불변. 2026-11-09, 작업 트리.
+- [x] **M-26-3 기본 경로 회귀(base 프로토타입):** 생성 경량화·직접 그리기 적용 뒤 `vitest run` 474개 통과(memo 6개 포함). 실패 1건은 `packages/lithentVite`의 미빌드 의존성 해석 오류로 변경 전 트리에서도 같다. `tsc --noEmit` 통과. `test:dual`·e2e·`verify:concurrent`는 미실행(J5).
+- [x] **M-26-4 크기:** **통과(2026-11-10): `memo` 제외 + 코드 정리 뒤 `pnpm size` base 4,901 / 4,953B(52B 여유), concurrent 6,696 / 9,000B, element 968 / 1,000B(전체 빌드 뒤 측정). guard 변경 없음. 아래는 결정 전 기록이다.** base 5,045B / guard 4,953B(92B 초과, J4-a 포함). J4-b 작업 트리는 5,073B(120B 초과)다. 사용자 결정으로 공식 러너 결과 뒤에 한도를 정한다(DC-29-6). 공식 결과는 2026-11-10에 나왔고 한도 결정은 대기 중이다. 그때 `pnpm size` 통과 또는 승인된 한도를 기록한다.
+- [ ] **M-26-5 공식 측정:** Mac 공식 러너 CPU 9항목 양순서·공식 메모리, keyed/9동작/font 검사, DC-29-8 기준 판정. 진단 측정(2026-11-09)은 [결과](../benchmark/MEMO_FREE_ROWS_RESULTS.md)에 있고 이 항목을 대신하지 않는다. **측정 완료(2026-11-10, [MEMO_FREE_ROWS_OFFICIAL_RESULTS](../benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md)), 판정 대기:** 두 세션 모두 keyed/9동작/font 통과, 실패·재시도 0, trace 3,480개 재계산 일치. 배포 빌드에서 가중 전체 HEAD +3.11%(구간 +2.19~+3.85%)·J4-b +2.96%(+2.00~+3.75%) — **기준 +3%의 경계**. 항목 최대 +9.43%(전체 삭제) — 기준 안. 1,000행 메모리 +12.5%(J4-b +9.95%) — 기준 안. **2026-11-10 사용자 결정(R120)으로 앱을 바꾸지 않으므로 이 판정은 보류한다. 최종 코어의 확인은 M-26-8이다.**
+- [ ] **M-26-6 upstream 앱:** **(2026-11-10 보류, R120: 진행하지 않는다.)** M 형태 `main.tsx`([준비한 파일](../../experiments/memo-free-rows/upstream/main.tsx): `tsc --noEmit`와 진단 도구의 9개 시나리오 DOM 확인은 통과)가 `npm run rebuild-ci keyed/lithent`(keyed·CSP 검사)를 통과하고 `issues`에서 1261을 뺀 PR 설명에 생략 방식을 적었다. 사용자 승인 뒤 진행한다.
+- [ ] **M-26-7 concurrent·문서:** **(2026-11-10 보류, R120: `memo`가 없어 해당 없음.)** concurrent 코어의 같은 export와 계약 통과, 공개 문서에 memo 계약(값 비교, 객체 prop 직접 변경 주의, children 예외) 기재.
+- [x] **M-26-8 코어 개선만 적용(R120):** 최종 작업 트리(2026-11-10, 리뷰 뒤 정리 하나를 되돌린 상태)에서 core `vitest run` 74파일 473개, `tsc --noEmit`, ESLint, `pnpm test:concurrent` 376 + 8개, `pnpm test:satellites`, `pnpm test:e2e:build` 90개, `pnpm size` 통과. Prettier는 바꾼 파일 통과. 초기 로컬 검사에는 concurrent element cleanup 4개 실패가 있었으나, 후속 `08dc1f0` 전체 재빌드·dual 1,206개 통과/3개 제외와 [Validate #15](https://github.com/superlucky84/lithent/actions/runs/42776662776)에서 모두 통과했다. concurrent element는 89개 통과이며 CI toolchain·Concurrent 산출물 검사도 통과했다. 당시 로컬 실패 원인은 미확정이다. **공식 러너 3차 세션([결과](../benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md#결정-뒤-적용한-것-2026-11-10)):** 세 앱 keyed·9동작·font 통과, 실패·재시도 0, trace 1,740개 재계산 일치. A+최종 / A+main 가중 전체 −2.33%(구간 −3.23~−1.70%, 4회차 모두 감소), 스크립트 −4.92%, 메모리 ±0.3%, 항목 최대 +1.13%(1만 행 생성). 측정한 A+최종 번들은 되돌리기 전 것이며, 그 경로가 최종 코드와 같은 A+HEAD도 −1.20%다. 직접 그리기 전용 테스트는 없다(J5, 리뷰 권고).
+
+- [ ] **M-26-9 릴리스 후보(R121, DC-29-14):** root 1.25.8·concurrent 0.2.6, CHANGELOG와 버전 치환 산출물, 크기·실제 tarball·공개 경로/타입 소비자를 확인한다. 선택 발행 계획은 `lithent@1.25.8` 하나여야 하며 실제 npm 의존성 소비자 검사를 통과해야 한다. 로컬 재빌드·버전 치환·크기·Concurrent 산출물·8개 tarball/타입 소비자·root 단독 선택 계획·실제 npm 소비자는 통과했다. 최종 PR SHA의 Validate 성공은 대기 중이다.
+- [ ] **M-26-10 CI 발행(R121, DC-29-14):** PR #109를 merge commit으로 병합하고 main 대상 Validate를 수동 실행한다. 검증 뒤 Publish/Record 성공, npm 버전·archive integrity·동일 발행 SHA의 `lithent@1.25.8` 태그·문서 배포 성공을 확인한다. 발행 대상·SHA가 다르거나 registry/문서 확인이 끝나지 않으면 완료로 표시하지 않는다.
 
 ## M-25. select 프레임 대기와 bulk removal v2 — R107~R110
 

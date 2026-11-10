@@ -1,5 +1,24 @@
 # 릴리스 절차
 
+## 1.25.8 릴리스
+
+2026-11-10 사용자 요청으로 DC-29의 코어 개선과 코드 정리를 `lithent` 패치로 배포한다.
+대상은 **`lithent` 1.25.7 → 1.25.8 하나**이며 `lithent-concurrent`는 0.2.6을 유지한다.
+새 공개 API가 없어 패치 버전을 사용한다. `memo`와 upstream 앱 교체는 보류한 상태다.
+변경 내용과 측정 한계는 [CHANGELOG](./CHANGELOG.md#2026-11-10)에 기록한다.
+
+기존 PR [#109](https://github.com/superlucky84/lithent/pull/109)에 버전과 릴리스 기록을 추가한다.
+최종 후보를 빌드하고 tarball·선택 발행 계획·소비자를 검증한 뒤 PR 검사가 통과하면
+merge commit으로 main에 병합한다. 그다음 아래 **CI 발행 절차**에 따라 main을 대상으로
+Validate를 수동 실행한다. npm의 1.25.8·registry integrity·동일 발행 SHA의 태그와
+문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 현재 배포 계획이며 완료 기록이 아니다.
+
+앞서 기록한 concurrent element cleanup 테스트 4개 실패는 현재 재현되지 않는다.
+`08dc1f0`에서 전체 재빌드 후 `pnpm test:dual`이 1,206개 통과·3개 제외였고,
+해당 커밋의 [Validate](https://github.com/superlucky84/lithent/actions/runs/42776662776)도
+Quality와 세 브라우저를 모두 통과했다. 당시 로컬 실패 원인은 미확정이며,
+릴리스 버전이 들어간 최종 후보는 새 CI에서 다시 검증한다.
+
 ## Vite 8 릴리스 준비
 
 `chore/vite8-migration`은 최신 main `933400d`의 cleanup 수정과 공개 패키지

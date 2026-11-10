@@ -25,6 +25,12 @@ import { cloneWDom } from '@/wDom';
 
 const DF = () => new DocumentFragment();
 
+// The element of a fragment, list or component node drawn straight into its
+// parent's element: such a node only needs one to tell that it has no
+// element of its own (nodeType 11), so they all share this one. Made on first
+// use: the module is also loaded where there is no DOM (SSR).
+let sharedFragment: DocumentFragment | undefined;
+
 // Into the root's wrapper: before its after element, in place of <html>, or
 // at the end.
 const insertRoot = (
@@ -37,7 +43,6 @@ const insertRoot = (
     : wrapElement.tagName === 'HTML'
       ? wrapElement.replaceWith(element)
       : wrapElement.appendChild(element);
-const CE = (t: string) => document.createElement(t);
 
 export const render = (
   wDom: WDom,
@@ -370,6 +375,17 @@ const updateChildren = (newWDom: WDom) => {
   const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
   let createdCount = 0;
 
+  // The trailing run of added children (appended rows) is drawn into one
+  // fragment, inserted in a single step after the content pass.
+  let tail = children.length;
+  while (
+    tail > 0 &&
+    (children[tail - 1].nr === 'A' || children[tail - 1].nr === 'S')
+  ) {
+    tail--;
+  }
+  const trailing = tail < children.length ? DF() : undefined;
+
   movers.forEach(item => moving.add(item));
   try {
     children.forEach((item, index) => {
@@ -379,7 +395,14 @@ const updateChildren = (newWDom: WDom) => {
         if (nr === 'S') {
           typeDelete(item);
         }
-        created[index] = wDomToDom(item);
+        if (index < tail) {
+          created[index] = wDomToDom(item);
+        } else {
+          const el: Node = wDomToDom(item, false, trailing);
+          if (el !== trailing && item.tag !== 'portal') {
+            trailing!.appendChild(el);
+          }
+        }
         createdCount++;
       } else {
         wDomUpdate(item);
@@ -394,19 +417,9 @@ const updateChildren = (newWDom: WDom) => {
     ? newWDom.ae
     : startFindNextBrotherElement(newWDom, getParent(newWDom));
 
-  // Fast-append the trailing run of added children in order
   // (a null anchor makes insertBefore behave as appendChild).
-  let tail = children.length;
-  while (tail > 0 && created[tail - 1] !== undefined) {
-    tail--;
-  }
-
-  for (let i = tail; i < children.length; i++) {
-    const el = created[i];
-
-    if (el && parentEl && children[i].tag !== 'portal') {
-      parentEl.insertBefore(el, baseAnchor || null);
-    }
+  if (trailing && parentEl) {
+    parentEl.insertBefore(trailing, baseAnchor || null);
   }
 
   if (keep || createdCount > children.length - tail) {
@@ -626,10 +639,17 @@ const setAttr = (k: string, el: HTMLElement, v: string) =>
     ? el.setAttributeNS(null, k, v)
     : el.setAttribute(k, v);
 
-const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
+// `into`: the element a fragment, list or component node draws its children
+// straight into (its parent's), instead of a DocumentFragment of its own.
+const wDomToDom = (
+  wDom: WDom,
+  isHydration?: boolean,
+  into?: HTMLElement | Element | DocumentFragment | Text
+): HTMLElement => {
   let element;
   const { type, tag, text, props, children = [] } = wDom;
   const isVirtualType = checkVirtualType(type);
+  const direct = !isHydration && isVirtualType && into;
 
   runWDomCallbacksFromWDom(wDom);
 
@@ -639,7 +659,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
 
   if (!isHydration) {
     if (!type || isVirtualType) {
-      element = DF();
+      element = direct || DF();
     } else if (type === 'e' && tag) {
       // element
       if (tag === 'portal' && props && props.portal) {
@@ -647,7 +667,7 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
       } else {
         element = xmlnsRef.value
           ? document.createElementNS(xmlnsRef.value, tag)
-          : CE(tag);
+          : document.createElement(tag);
       }
     } else if (type === 't' && checkExisty(text)) {
       // text node
@@ -656,7 +676,9 @@ const wDomToDom = (wDom: WDom, isHydration?: boolean): HTMLElement => {
       throw Error('Invalid wDom');
     }
 
-    wDom.el = element as HTMLElement;
+    wDom.el = (
+      direct ? sharedFragment || (sharedFragment = DF()) : element
+    ) as HTMLElement;
   } else {
     element = wDom.el;
   }
@@ -697,8 +719,13 @@ const wDomChildrenToDom = (
     childItem.getParent = getParent;
     childItem.nr = 'N';
     if (childItem.type) {
-      const childElement = wDomToDom(childItem, isHydration);
-      if (childItem.tag !== 'portal' && !isHydration && parentElement) {
+      const childElement = wDomToDom(childItem, isHydration, parentElement);
+      if (
+        childItem.tag !== 'portal' &&
+        !isHydration &&
+        parentElement &&
+        childElement !== parentElement
+      ) {
         parentElement.appendChild(childElement);
       }
     }

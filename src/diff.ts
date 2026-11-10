@@ -4,7 +4,6 @@ import { getParent, makeParentGetter } from '@/utils';
 import { typeDeleteUnused } from '@/render';
 import { cloneWDom, copyResolver } from '@/wDom';
 import {
-  checkEmptyElement,
   checkSameWDomWithOriginal,
   getWDomType,
   checkExistyKey,
@@ -119,7 +118,7 @@ const addReRenderTypeProperty = (
   isSameType: boolean,
   originalWDom?: WDom
 ): RenderType | undefined => {
-  if (checkEmptyElement(newWDom)) return 'D';
+  if (!newWDom.type) return 'D';
 
   if (
     newWDom === originalWDom ||

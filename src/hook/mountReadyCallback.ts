@@ -27,7 +27,7 @@ export const runWDomCallbacksFromWDom = (newWDom: WDom) => {
 
     compKeyRef.value = compKey;
 
-    if (wdCBQueue && wdCBQueue.length > 0) {
+    if (wdCBQueue && wdCBQueue.length) {
       component.wdCB = [];
 
       wdCBQueue.forEach((effect: Function) => {

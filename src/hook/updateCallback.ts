@@ -19,7 +19,5 @@ export const runUpdateCallback = () => {
   const comp = getCurrentComponent();
   const updateReqs = comp && comp.upR;
 
-  if (updateReqs && updateReqs.length) {
-    updateReqs.forEach(callback => callback());
-  }
+  updateReqs && updateReqs.forEach(callback => callback());
 };
