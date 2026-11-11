@@ -35,10 +35,12 @@ export default defineConfig({
         order: 'post',
         async handler(code, _chunk, outputOptions) {
           if (outputOptions.format !== 'umd') return null;
-          // Rename, reprint and a few syntax-only rewrites; preserve the
-          // scopes that isolate parent getters from old diff trees, so no
-          // option that inlines or moves functions. The ESM output keeps its
-          // normal build. See docs/benchmark/BUNDLE_SIZE_RESULTS.md.
+          // A few syntax-only rewrites before the bundler's own minifier,
+          // which runs after this hook and does the renaming and printing.
+          // No option that inlines or moves functions: the scopes that
+          // isolate parent getters from old diff trees stay as written.
+          // Function arguments are not wrapped in parentheses, which the
+          // minifier would keep. See docs/bundle-size/DESIGN.md.
           const result = await minify(code, {
             compress: {
               defaults: false,
@@ -48,6 +50,7 @@ export default defineConfig({
               join_vars: true,
             },
             mangle: true,
+            format: { wrap_func_args: false },
             sourceMap: !!outputOptions.sourcemap,
           });
           return { code: result.code, map: result.map || null };
