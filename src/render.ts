@@ -1,7 +1,6 @@
 import { WDom, Props } from '@/types';
 import {
   checkStyleData,
-  checkRefData,
   checkExisty,
   checkVirtualType,
   hasAccessorMethods,
@@ -67,12 +66,9 @@ export const render = (
     const compData = componentMap.get(wDom.compProps as Props);
     const comp = (compData && compData.vd.value) || wDom;
     runUnmountQueueFromWDom(comp);
-    rootDelete(comp);
+    deleteRealDom(comp, comp.we as HTMLElement);
   };
 };
-
-const rootDelete = (newWDom: WDom) =>
-  deleteRealDom(newWDom, newWDom.we as HTMLElement);
 
 export const typeDelete = (newWDom: WDom) => {
   const parentWDom = getParent(newWDom);
@@ -280,7 +276,9 @@ const typeReplace = (newWDom: WDom) => {
 
 const typeUpdate = (newWDom: WDom) => {
   if (newWDom.type === 't') {
-    updateText(newWDom);
+    if (newWDom.el) {
+      newWDom.el.nodeValue = String(newWDom.text);
+    }
     return;
   }
 
@@ -523,12 +521,6 @@ const renderHandlers = {
   T: typeUpdate,
 } as const;
 
-const updateText = (newWDom: WDom) => {
-  if (newWDom.el) {
-    newWDom.el.nodeValue = String(newWDom.text);
-  }
-};
-
 const updateProps = (
   props?: Props,
   element?: HTMLElement | Element | DocumentFragment | Text,
@@ -570,7 +562,7 @@ const updateProps = (
             : {},
           element
         );
-      } else if (checkRefData(dataKey, dataValue)) {
+      } else if (dataKey === 'ref' && isObject(dataValue)) {
         dataValue.value = element;
       } else if (dataKey) {
         if (dataKey !== 'type' && hasAccessorMethods(element, dataKey)) {
