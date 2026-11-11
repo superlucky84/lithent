@@ -371,7 +371,9 @@ const updateChildren = (newWDom: WDom) => {
   // Content pass (left-to-right, keeps lifecycle order).
   // Added children are created here but inserted in the placement pass.
   const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
-  let createdCount = 0;
+  // Whether the placement pass is needed: a child moves, or one is created
+  // before the trailing run.
+  let place = !!keep;
 
   // The trailing run of added children (appended rows) is drawn into one
   // fragment, inserted in a single step after the content pass.
@@ -395,13 +397,13 @@ const updateChildren = (newWDom: WDom) => {
         }
         if (index < tail) {
           created[index] = wDomToDom(item);
+          place = true;
         } else {
           const el: Node = wDomToDom(item, false, trailing);
           if (el !== trailing && item.tag !== 'portal') {
             trailing!.appendChild(el);
           }
         }
-        createdCount++;
       } else {
         wDomUpdate(item);
       }
@@ -420,7 +422,7 @@ const updateChildren = (newWDom: WDom) => {
     parentEl.insertBefore(trailing, baseAnchor || null);
   }
 
-  if (keep || createdCount > children.length - tail) {
+  if (place) {
     // Placement pass (right-to-left): insert added children and non-LIS
     // moves before a running anchor.
     let anchor =
@@ -428,11 +430,10 @@ const updateChildren = (newWDom: WDom) => {
 
     for (let i = tail - 1; i >= 0; i--) {
       const item = children[i];
-      const isNew = created[i] !== undefined;
-      const needMove = !!keep && keep[i] === false;
-
-      if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
-        const el = isNew ? created[i] : getElementFromFragment(item);
+      if (parentEl && item.tag !== 'portal') {
+        const el =
+          created[i] ||
+          (keep && keep[i] === false && getElementFromFragment(item));
 
         if (el) {
           parentEl.insertBefore(el, anchor || null);
