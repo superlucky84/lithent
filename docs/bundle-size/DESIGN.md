@@ -33,9 +33,9 @@ base UMD 기준이다. 대조 빌드의 UMD와 CJS는 저장소의 `dist`와 byt
 
 - [x] **DC-1 — Terser 출력 옵션.** 플러그인의 `minify` 호출에 `format: { wrap_func_args: false }`를 넣는다. 근거: 결과가 현재 배포본과 **AST가 완전히 같다**(괄호만 빠진다). CJS·ESM은 원래 이 괄호가 없다. 플러그인 주석을 지금 동작에 맞게 고친다. 검증: Phase 1의 AST 대조, M-1.
 - [x] **DC-2 — 작은 소스 정리 15건(S-1~S-15).** 아래 표대로 적용한다. 근거: 동작이 같고, 호출 하나를 없애거나 죽은 코드를 지우는 수준이라 함수 구조에 미치는 영향이 작다. 검증: 양 코어 테스트, M-2.
-- [ ] **DC-3 — 함수 합치기 6건(H-1~H-6)의 채택.** Phase 3에서 작업 트리에 구현하되 **후보**로 둔다. diff·배치의 hot path라서 성능 확인(Phase 5) 뒤에 사용자가 채택 여부를 정한다. 근거: `src/diff.ts`에 "한 함수로 합쳤더니 1,000행 생성이 6% 느려졌다"는 기록이 있다. 느려지면 H 묶음만 되돌린다(S와 파일 단위로 겹치므로 되돌릴 항목을 표로 관리한다). 검증: M-5.
-- [ ] **DC-4 — 크기 guard 하향.** TBD. `scripts/size-report.js`의 base 예산 4,953B를 결과에 맞춰 내릴지, 내린다면 값과 표기 방식(기존 allowance 합 유지 또는 새 기준값). 채택 범위(DC-3)가 정해진 뒤 사용자가 정한다.
-- [ ] **DC-5 — Terser 플러그인 제거.** TBD. DC-1 뒤에는 플러그인이 2B(4,880 → 4,878B)만 기여한다. 빼면 빌드 단계와 source map 체인이 단순해지고 root의 `terser` devDependency도 뺄 수 있는지 확인할 수 있다. 출력의 구문 5곳이 달라지므로 이번에는 넣지 않고 후속 결정으로 둔다.
+- [x] **DC-3 — 함수 합치기 6건(H-1~H-6)의 채택.** Phase 3에서 작업 트리에 구현하되 **후보**로 둔다. diff·배치의 hot path라서 성능 확인(Phase 5) 뒤에 사용자가 채택 여부를 정한다. 근거: `src/diff.ts`에 "한 함수로 합쳤더니 1,000행 생성이 6% 느려졌다"는 기록이 있다. 느려지면 H 묶음만 되돌린다(커밋 `eccd6e5`를 revert). 검증: M-5. **2026-11-11 로컬 선별: 하향 없음**(S+H / main 가중 script −0.23% [−1.30, +0.66], total +0.39% [−0.85, +1.17]; S+H / S는 +0.1% 안, [IMPLEMENT Phase 3.5](./IMPLEMENT.md#phase-35--로컬-성능-선별-done)). **결정(2026-11-11, U-6): 채택한다.** 사용자는 이미 들어간 변경으로 보고 추가 결정 없이 유지하기로 했다. 이 시점의 근거는 로컬 선별 결과였다. **2026-11-11 Mac 공식 러너(U-7): 하향 없음, 채택 유지.** S+H / main 가중 total −0.31% [−1.38, +0.76], script −1.64% [−2.66, −0.62]. H만의 효과(S+H / S)는 total +0.32% [−0.62, +1.30], script −1.07% [−2.02, −0.06]이고 replace 1k가 −2.6% [−3.5, −1.8] 빨라졌다([IMPLEMENT Phase 6](./IMPLEMENT.md#phase-6--mac-공식-러너-확인-done)). 나중에 느려진 것이 확인되면 `eccd6e5`만 되돌린다.
+- [x] **DC-4 — 크기 guard 하향.** `scripts/size-report.js`의 base 예산을 4,953B에서 **4,800B**로 내린다(U-6). 원래 기준값이며, 그 위에 쌓였던 allowance 세 개(layout 24B, 렌더 경로 101B, cleanup 28B)는 이번 축소로 회수했으므로 없앤다. 4,763B에서 여유는 37B다. 근거: 상한을 그대로 두면 190B가 다시 늘어도 gate가 잡지 못한다. 앞으로 넘게 되면 기존 절차대로 초과량을 공개하고 사용자가 상향을 정한다. H 묶음을 되돌리면 4,812B로 이 값을 넘으므로 그때는 guard도 함께 다시 정한다. 검증: `pnpm size`, M-1.
+- [ ] **DC-5 — Terser 플러그인 제거.** TBD. DC-1 뒤에는 플러그인이 2B(4,880 → 4,878B)만 기여한다. 빼면 빌드 단계와 source map 체인이 단순해지고 root의 `terser` devDependency도 뺄 수 있는지 확인할 수 있다. 출력의 구문 5곳이 달라지므로 이번에는 넣지 않고 후속 결정으로 둔다. **2026-11-11: 이번 PR에는 넣지 않는다. 사용자 결정은 아직 없고 후속 주제로 남긴다.**
 - [x] **DC-6 — hidden source map 제외.** U-2. 자동 연결을 유지한다.
 - [x] **DC-7 — concurrent.** `lithentConcurrent/src/*`는 손대지 않는다. 공유 모듈에 들어가는 S-6·S-7·S-8·S-9·S-11·S-13·S-15는 concurrent 번들에도 반영된다. export를 지우는 경우는 concurrent가 쓰지 않는 것만 지운다.
 
@@ -92,6 +92,6 @@ H-1의 동등성: 기존 조건 `createdCount > children.length - tail`은 "끝�
 | ---- | ------------------------------------------------------------------------------------------------- |
 | DC-1 | 배포본 대비 AST 동일, `pnpm size`, source map 주석 유지 — Phase 1, M-1                            |
 | DC-2 | `pnpm test:core`·`pnpm test:concurrent`, `tsc`·ESLint(빌드의 checker), export 대조 — Phase 2, M-2 |
-| DC-3 | 위 검사 + 성능 확인(로컬 선별 → Mac 공식 러너) — Phase 3·5, M-5                                   |
-| DC-4 | 결정 뒤 `pnpm size`의 예산 표기 — Phase 5, M-1                                                    |
+| DC-3 | 위 검사 + 성능 확인(로컬 선별 → Mac 공식 러너) — Phase 3·3.5·6, M-5                               |
+| DC-4 | `pnpm size`가 4,800B 예산으로 통과 — Phase 5, M-1                                                 |
 | DC-7 | concurrent 크기·테스트, `pnpm verify:concurrent` — Phase 5, M-4                                   |

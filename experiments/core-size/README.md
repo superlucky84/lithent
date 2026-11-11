@@ -42,11 +42,28 @@ parentheses, and how many functions each has.
 node experiments/core-size/ast-equal.mjs old/lithent.umd.js dist/lithent.umd.js
 ```
 
+## `speed-summary.py`
+
+Joins sessions of `experiments/memo-free-rows/measure.mjs` (its `--json`
+files): for each app the change against a baseline app per scenario, with a
+95% bootstrap interval, and the weighted geometric mean. Local in-page
+timings, not the official runner's.
+
+```sh
+python3 experiments/core-size/speed-summary.py main-a-cache run1.json run2.json --json summary.json
+```
+
+The 2026-11-11 check of this work (main, S and S+H cores under the listed
+app) is in `docs/bundle-size/local-speed-check.json`. The same three cores on
+the official runner (`experiments/memo-free-rows/official-*.{mjs,py}`) are in
+`docs/bundle-size/official-speed-check.json`.
+
 ## `h-candidates.patch`
 
 The function merges H-1 to H-6 (DESIGN, DC-3) alone, on top of the small
 cleanups S-1 to S-15: `src/diff.ts` and the placement pass in `src/render.ts`.
-They are candidates until their speed is checked.
+Their speed was checked locally and on the official runner (IMPLEMENT, Phase
+3.5 and 6) and they stay.
 
 ```sh
 git apply -R experiments/core-size/h-candidates.patch   # take them out
