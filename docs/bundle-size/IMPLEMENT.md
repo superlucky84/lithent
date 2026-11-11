@@ -273,13 +273,57 @@ Files:
 - `docs/bundle-size/MANUAL_TEST_CHECKLIST.md` (modified)
 - `experiments/core-size/README.md` (modified)
 
+## Phase 7 — 1.25.9 릴리스 준비: done
+
+Refs: RQ-1, RQ-2, RQ-6, RQ-7, M-7
+
+U-8로 했다.
+
+진입: Phase 6 완료. Phase 3.5~6의 변경을 나눠 커밋했다(`9c27d35` 테스트, `3c68596` guard, `3f747f2` 측정 기록).
+
+- [x] root `package.json`의 version을 1.25.8 → 1.25.9로 올렸다. 동작과 공개 API가 같아 패치다. 다른 패키지의 버전은 그대로다.
+- [x] `lithent-concurrent`는 0.2.6을 유지한다. 공유 모듈의 정리(DC-7)는 Concurrent를 다시 빌드하면 6,696 → 6,667B로 반영되지만 이번 발행 대상이 아니다. 사유를 [RELEASING](../../RELEASING.md#1259-릴리스)에 적었다.
+- [x] [CHANGELOG](../../CHANGELOG.md#2026-11-11)에 1.25.9 항목을, RELEASING에 1.25.9 절을 추가했다.
+- [x] 후보 검증(아래 표).
+- [x] 브랜치를 push하고 PR을 열었다. 병합과 발행은 하지 않았다.
+
+종료: 후보가 검증을 통과하고 release plan이 `lithent@1.25.9` 하나만 고른다.
+
+결과 (2026-11-11, `3f747f2` + 버전 변경, Node 24.22.1):
+
+| 검사                                                   | 결과                                                                                     |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| `pnpm build`                                           | 성공                                                                                     |
+| `pnpm size`                                            | base 12,402 / 5,134 / **4,763B** / 4,800B(여유 37B), concurrent 6,667B, element 968B     |
+| `pnpm test:dual`                                       | 1,234개 통과 / 3개 제외                                                                  |
+| `pnpm test:e2e`                                        | 90개 통과(Chromium, base·concurrent)                                                     |
+| `pnpm test:ci`                                         | 통과                                                                                     |
+| `pnpm verify:concurrent`                               | ALL PASS                                                                                 |
+| `pnpm verify:release --output-dir artifacts/release`   | 8개 패키지 ALL PASS. `lithent-1.25.9.tgz`를 만들었다                                     |
+| `pnpm release:plan --allow-dirty`                      | `lithent` 1.25.9만 `version-increased-and-unpublished`. 나머지 7개는 `already-published` |
+| `node scripts/verify-plan-consumers.mjs --allow-dirty` | PASS: `lithent@1.25.9`(선택 archive + registry 의존성)                                   |
+
+- release plan은 `lithent-concurrent`에 "Source paths changed but this version will not be published" 경고를 냈다. 위에 적은 대로 알고 둔 것이다.
+- plan과 소비자 검사는 커밋 전 작업 트리에서 `--allow-dirty`로 돌린 미리보기다. 발행 근거는 main의 수동 Validate run이 만든다.
+- `verify:release`·`test:ci`는 실제 경로인 `TMPDIR`을 주고 돌렸다(Phase 5의 주의와 같다).
+- Firefox·WebKit E2E는 PR의 CI가 돈다.
+
+Files:
+
+- `package.json` (modified)
+- `CHANGELOG.md` (modified)
+- `RELEASING.md` (modified)
+- `docs/bundle-size/IMPLEMENT.md` (modified)
+- `docs/bundle-size/REQUIREMENTS.md` (modified)
+- `docs/bundle-size/MANUAL_TEST_CHECKLIST.md` (modified)
+
 ## 상태 / 핸드오프
 
-- done (2026-11-11): Phase 0~6. base UMD Brotli 4,901 → 4,878(①) → 4,812(②) → **4,763B**(③). concurrent 6,696 → 6,667B. guard 4,953 → 4,800B(여유 37B). 성능은 로컬 선별과 Mac 공식 러너(CPU 4회차·메모리 2회차) 모두에서 S·S+H가 main 대비 하향이 없다. 공식 러너의 S+H / main은 가중 total −0.31% [−1.38, +0.76], script −1.64% [−2.66, −0.62]이고 replace 1k가 −2.4% 빨라졌다. 회귀 테스트 14개를 추가했다. 전체 회귀(build, dual 1,234개, E2E 90개, verify:concurrent, verify:release, test:ci)가 통과했다.
-- decisions (2026-11-11 사용자): hidden source map 제외(U-2), guard 4,800B(U-6), H 묶음 유지(U-6), 공식 러너도 확인(U-7 — 결과가 H 유지를 뒷받침한다).
-- validation: Phase 5 표와 Phase 6 표. M-1~M-5 통과. M-6은 자동 부분만 했다.
+- done (2026-11-11): Phase 0~7. base UMD Brotli 4,901 → 4,878(①) → 4,812(②) → **4,763B**(③). concurrent 6,696 → 6,667B. guard 4,953 → 4,800B(여유 37B). 성능은 로컬 선별과 Mac 공식 러너(CPU 4회차·메모리 2회차) 모두에서 S·S+H가 main 대비 하향이 없다. 공식 러너의 S+H / main은 가중 total −0.31% [−1.38, +0.76], script −1.64% [−2.66, −0.62]이고 replace 1k가 −2.4% 빨라졌다. 회귀 테스트 14개를 추가했다. 전체 회귀(build, dual 1,234개, E2E 90개, verify:concurrent, verify:release, test:ci)가 통과했다. `lithent` 1.25.9로 릴리스를 준비했다(버전·CHANGELOG·RELEASING, 후보 검증 통과).
+- decisions (2026-11-11 사용자): hidden source map 제외(U-2), guard 4,800B(U-6), H 묶음 유지(U-6), 공식 러너도 확인(U-7 — 결과가 H 유지를 뒷받침한다), 코어 버전을 올려 배포(U-8 — `lithent` 1.25.9, Concurrent는 0.2.6 유지).
+- validation: Phase 5·6·7 표. M-1~M-5 통과. M-6은 자동 부분만 했다. M-7(발행 확인)은 병합 뒤에 한다.
 - open: DC-5(Terser 플러그인 제거 — 후속 주제, 사용자 결정 없음).
-- next: 작업 트리의 변경을 커밋하고 PR을 연다(사용자 요청 시). 릴리스할 때 CHANGELOG에 크기(4,763B, 예산 4,800B)를 적는다. 버전 올림은 범위 밖이다. H를 빼야 하면 `git revert eccd6e5` 뒤 guard도 다시 정한다(H 없이는 4,812B로 4,800B를 넘는다).
+- next: PR의 CI(세 브라우저 포함)가 통과하면 merge commit으로 main에 병합한다. 그다음 main을 대상으로 Validate를 수동 실행해 발행하고, npm의 1.25.9·태그·문서 배포를 확인해 M-7과 RELEASING에 기록한다. H를 빼야 하면 `git revert eccd6e5` 뒤 guard도 다시 정한다(H 없이는 4,812B로 4,800B를 넘는다).
 - blockers: 없음.
 - note: `pnpm verify:release`와 `pnpm test:ci`는 이 Mac의 기본 `TMPDIR`(symlink 경로)에서 `Artifact target escapes package`로 실패한다. `scripts/artifact-utils.mjs`의 `safeFile`이 대상만 realpath로 비교하기 때문이며 이번 변경과 무관하다. 실제 경로인 `TMPDIR`을 주면 통과한다. 별도 수정 후보다.
-- commit: 기준 `main` `6639195`. 브랜치 `perf/core-size`. `e5dfab1`(Phase 1, build) → `a8c10ec`(Phase 2, S) → `eccd6e5`(Phase 3, H) → `5fb08a2`(docs·도구). Phase 3.5·4·5·6의 변경(테스트 2개, `scripts/size-report.js`의 guard, 측정 요약 JSON 2개, 도구, 문서)은 작업 트리에 있고 커밋하지 않았다. push하지 않았다.
+- commit: 기준 `main` `6639195`. 브랜치 `perf/core-size`. `e5dfab1`(Phase 1, build) → `a8c10ec`(Phase 2, S) → `eccd6e5`(Phase 3, H) → `5fb08a2`(docs·도구) → `9c27d35`(Phase 4 테스트) → `3c68596`(guard) → `3f747f2`(Phase 3.5·5·6 기록) → 릴리스 준비 커밋(이 문서가 들어 있는 `chore: prepare lithent 1.25.9 release`). push했고 PR을 열었다. 병합·발행·태그는 하지 않았다.

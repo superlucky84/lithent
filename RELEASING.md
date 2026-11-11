@@ -1,5 +1,20 @@
 # 릴리스 절차
 
+## 1.25.9 릴리스
+
+2026-11-11 사용자 요청으로 base 코어 크기 축소([docs/bundle-size](./docs/bundle-size/REQUIREMENTS.md))를 `lithent` 패치로 배포한다.
+대상은 **`lithent` 1.25.8 → 1.25.9 하나**이며 `lithent-concurrent`는 0.2.6을 유지한다.
+동작과 공개 API가 같아 패치 버전을 사용한다. 변경 내용과 측정 한계는 [CHANGELOG](./CHANGELOG.md#2026-11-11)에 기록한다.
+
+Concurrent는 자기 `wDom`·`diff`·`render`·`redraw`를 쓰지만 `src/utils`·`src/hook`의 공유 모듈은 같이 쓴다.
+이번 정리 중 공유 모듈에 들어간 것(DESIGN의 DC-7)은 Concurrent를 다시 빌드하면 6,696 → 6,667B로 반영되고 동작은 같다.
+사용자 요청이 코어 버전이므로 Concurrent는 올리지 않았다. 다음 Concurrent 릴리스에 함께 들어간다.
+release plan은 이 경우 "Source paths changed but this version will not be published" 경고를 낸다.
+
+`perf/core-size` 브랜치의 PR에 버전과 릴리스 기록을 넣었다. PR 검사가 통과하면 merge commit으로 main에 병합하고,
+아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다. npm의 1.25.9·registry integrity·동일 발행 SHA의
+태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
 ## 1.25.8 릴리스
 
 2026-11-10 사용자 요청으로 DC-29의 코어 개선과 코드 정리를 `lithent` 패치로 배포한다.

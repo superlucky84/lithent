@@ -43,3 +43,11 @@
   - 방법: 새 `dist/lithent.umd.js`를 쓰는 Playwright fixture(element-umd, csp)와 `pnpm dev`의 예제 한 개에서 목록 추가·역순·삭제·비우기, 입력 포커스 유지, portal 열고 닫기.
   - 통과: 콘솔 오류 없음, 동작이 1.25.8과 같다.
   - 중간 결과(2026-11-11): 자동 부분은 통과했다. 새 UMD를 쓰는 `e2e/csp.spec.ts` 2개와 element·입력·포커스·portal을 다루는 E2E가 90개 안에 들어 있다. `pnpm dev` 예제를 사람이 직접 눌러 보는 확인은 하지 않았으므로 체크하지 않는다.
+
+## 릴리스
+
+- [ ] **M-7 — RQ-1, RQ-2.** 1.25.9 발행 확인(U-8).
+  - 방법: PR을 main에 병합한 뒤 Actions → Validate → Run workflow → Branch main. [RELEASING의 CI 발행 절차](../../RELEASING.md#ci-발행-절차)를 따른다.
+  - 통과: release plan이 `lithent@1.25.9` 하나만 고른다. npm에 1.25.9가 보이고 registry integrity가 검증한 archive와 같다. 발행 SHA에 `lithent@1.25.9` 태그가 있고 문서 배포가 성공했다. 배포본 `dist/lithent.umd.js`의 Brotli가 4,763B다.
+  - 실패: 다른 패키지가 함께 선택됨, integrity 불일치, 태그가 다른 SHA에 있음.
+  - 준비 결과(2026-11-11, 커밋 전 작업 트리): `pnpm verify:release`가 `lithent-1.25.9.tgz`를 포함한 8개 패키지에서 통과했고, `release:plan --allow-dirty`가 `lithent` 1.25.9만 골랐으며 선택 후보 소비자 검사가 통과했다. 병합과 발행은 하지 않았으므로 체크하지 않는다.

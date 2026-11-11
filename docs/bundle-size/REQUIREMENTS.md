@@ -1,8 +1,8 @@
 # REQUIREMENTS — base 코어 번들 크기 축소
 
 - 작성일: 2026-11-11
-- 브랜치: `perf/core-size` (기준 `main` `6639195`, lithent 1.25.8)
-- 상태: Phase 0~6 완료. base UMD Brotli 4,901 → **4,763B**, guard 4,953 → 4,800B. 로컬 성능 선별과 Mac 공식 러너 모두에서 하향이 없었고 전체 회귀가 통과했다. 남은 것은 DC-5(Terser 플러그인 제거, 후속)와 사람이 하는 브라우저 확인(M-6), 작업 트리 변경의 커밋·PR이다. 현재 상태는 [IMPLEMENT의 핸드오프](./IMPLEMENT.md#상태--핸드오프)를 따른다.
+- 브랜치: `perf/core-size` (기준 `main` `6639195`, lithent 1.25.8 → 1.25.9)
+- 상태: Phase 0~6 완료. base UMD Brotli 4,901 → **4,763B**, guard 4,953 → 4,800B. 로컬 성능 선별과 Mac 공식 러너 모두에서 하향이 없었고 전체 회귀가 통과했다. `lithent` 1.25.9로 릴리스를 준비해 PR을 열었다(U-8, Phase 7). 남은 것은 PR 병합과 main의 수동 Validate 실행(발행, M-7), DC-5(Terser 플러그인 제거, 후속), 사람이 하는 브라우저 확인(M-6)이다. 현재 상태는 [IMPLEMENT의 핸드오프](./IMPLEMENT.md#상태--핸드오프)를 따른다.
 - 적용 절차: `doc-driven-designer-v1`.
 - 정본: 이 문서, [DESIGN](./DESIGN.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 
@@ -28,6 +28,7 @@ DC-29(컴포넌트 생성 경량화·직접 그리기·문자열 태그 빠른 �
 - U-5 (2026-11-11): Phase 5를 진행한다.
 - U-6 (2026-11-11): guard 하향을 적용한다(제안값 4,800B). 함수 합치기(H)는 이미 적용된 변경으로 보고 추가 결정 없이 유지한다. 공식 러너 측정은 요청하지 않았다.
 - U-7 (2026-11-11): 공식 러너도 확인한다. Mac 공식 러너로 main·S·S+H를 비교했고 하향이 없었다([IMPLEMENT Phase 6](./IMPLEMENT.md#phase-6--mac-공식-러너-확인-done)).
+- U-8 (2026-11-11): 코어 버전을 올려 배포한다. 버전을 올려 커밋하고 PR을 올린다. `lithent` 1.25.8 → 1.25.9(패치). 요청이 코어 버전이므로 `lithent-concurrent`는 0.2.6을 유지한다.
 
 ## 요구사항
 
@@ -47,7 +48,8 @@ DC-29(컴포넌트 생성 경량화·직접 그리기·문자열 태그 빠른 �
 - hidden source map(U-2), Terser 전체 compress(함수를 호출 위치로 옮겨 scope 정책과 충돌), property mangling(helper·SSR·devHelper가 읽는 WDom 계약 변경).
 - 기능 제거나 선택 기능 분리(hydration·portal·custom element 처리의 별도 진입점). 수백 B 단위가 필요할 때의 후속 설계 주제다. [CORE_BUNDLE_ANALYSIS_2026_11](../benchmark/CORE_BUNDLE_ANALYSIS_2026_11.md)에 조사 방향이 있다.
 - concurrent 포크 파일의 같은 정리, element 패키지 크기.
-- 버전 올림·CHANGELOG·발행. 채택이 끝난 뒤 별도로 정한다.
+- 실제 npm 발행·태그. PR 병합 뒤 main에서 Validate를 수동 실행해 한다([RELEASING](../../RELEASING.md)). 버전 올림과 CHANGELOG는 U-8로 범위에 들어왔다.
+- `lithent-concurrent`의 버전 올림. 공유 모듈의 정리는 다음 Concurrent 릴리스에 함께 들어간다(U-8).
 
 ## 가정과 제약
 
