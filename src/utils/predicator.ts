@@ -23,9 +23,8 @@ const checkSameCustomComponent = (
   newWDom: WDom | TagFunction | TagFunctionResolver,
   originalWDom?: WDom
 ): boolean =>
-  'ctor' in newWDom
-    ? newWDom.ctor === (originalWDom && originalWDom.ctor)
-    : newWDom === (originalWDom && originalWDom.ctor);
+  ('ctor' in newWDom ? newWDom.ctor : newWDom) ===
+  (originalWDom && originalWDom.ctor);
 
 // The checks below are reached through checkSameWDomWithOriginal only: with
 // a plain node of that type (getWDomType) and an original.
@@ -73,7 +72,7 @@ export const checkVirtualType = (
 export const checkCustemComponentFunction = (
   target: WDomParam
 ): target is TagFunction | TagFunctionResolver =>
-  (typeof target === 'function' && !checkFragmentFunction(target)) ||
+  (typeof target === 'function' && target !== Fragment) ||
   (isObject(target) && 'resolve' in target);
 
 export const checkFragmentFunction = (

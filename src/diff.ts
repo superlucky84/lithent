@@ -1,11 +1,10 @@
-import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
+import { WDom, TagFunctionResolver, RenderType, WDomType } from '@/types';
 import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
 import { getParent, makeParentGetter } from '@/utils';
 import { typeDeleteUnused } from '@/render';
 import { cloneWDom, copyResolver } from '@/wDom';
 import {
   checkSameWDomWithOriginal,
-  getWDomType,
   checkExistyKey,
   checkExisty,
   checkKeyedChildren,
@@ -40,7 +39,11 @@ export const makeNewWDomTree = (
   return remakeNewWDom(
     newWDom,
     !!originalWDom &&
-      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
+      checkSameWDomWithOriginal[
+        checkCustemComponentFunction(newWDom)
+          ? 'c'
+          : ((newWDom.type || 'et') as WDomType)
+      ](newWDom, originalWDom),
     originalWDom
   );
 };
@@ -53,7 +56,19 @@ const remakeNewWDom = (
   isSameType: boolean,
   originalWDom?: WDom
 ) => {
-  const remakeWDom = generalize(newWDom, isSameType, originalWDom);
+  // A component description is run against its instance, or resolved into a
+  // new one; a plain node is taken as it is.
+  const remakeWDom: WDom = checkCustemComponentFunction(newWDom)
+    ? isSameType && originalWDom
+      ? runUpdate(originalWDom, newWDom)
+      : // Resolved before (children a component draws again somewhere else):
+        // the first instance owns its props, which are also its key, so the
+        // new instance is made from a copy.
+        (newWDom.rd
+          ? copyResolver(newWDom)
+          : ((newWDom.rd = true), newWDom)
+        ).resolve()
+    : newWDom;
   const needRerender = addReRenderTypeProperty(
     remakeWDom,
     isSameType,
@@ -62,16 +77,28 @@ const remakeNewWDom = (
   const isNoting = needRerender === 'N';
 
   if (!isNoting) {
-    remakeWDom.children = remakeChildrenForDiff(
-      remakeWDom,
-      isSameType,
-      originalWDom
-    );
+    remakeWDom.children =
+      isSameType && originalWDom
+        ? remakeChildrenForUpdate(remakeWDom, originalWDom)
+        : remakeChildrenForAdd(remakeWDom);
   }
 
   // NOTE: short-key metadata (nr = needRerender) keeps bundle size down
   remakeWDom.nr = needRerender;
-  inheritPropForRender(remakeWDom, originalWDom, needRerender);
+
+  // What the new node takes over from the original.
+  if (needRerender !== 'A' && originalWDom) {
+    remakeWDom.el = originalWDom.el;
+  }
+
+  if (needRerender === 'D' || needRerender === 'R' || needRerender === 'S') {
+    if (originalWDom) {
+      runUnmountQueueFromWDom(originalWDom);
+    }
+    remakeWDom.oc = originalWDom && originalWDom.children;
+  }
+
+  remakeWDom.op = originalWDom && originalWDom.props;
 
   // A retired node keeps its children: it may be a hoisted constant the
   // caller draws again later, which is then copied from them. A component's
@@ -85,28 +112,6 @@ const remakeNewWDom = (
     }
   }
   return remakeWDom;
-};
-
-/**
- * Handle what the new virtual DOM should inherit or reconcile from the original virtual DOM.
- */
-const inheritPropForRender = (
-  remakeWDom: WDom,
-  originalWDom?: WDom,
-  needRerender?: RenderType
-) => {
-  if (needRerender !== 'A' && originalWDom) {
-    remakeWDom.el = originalWDom.el;
-  }
-
-  if (needRerender === 'D' || needRerender === 'R' || needRerender === 'S') {
-    if (originalWDom) {
-      runUnmountQueueFromWDom(originalWDom);
-    }
-    remakeWDom.oc = originalWDom && originalWDom.children;
-  }
-
-  remakeWDom.op = originalWDom && originalWDom.props;
 };
 
 /**
@@ -138,21 +143,6 @@ const addReRenderTypeProperty = (
 };
 
 /**
- * Handling virtual DOM attribute updates.
- */
-const syncResolverProps = (props: Props, infoProps: Props) => {
-  if (props && infoProps !== props) {
-    // Only the keys that are gone: deleting and re-adding every key on every
-    // render changes the object's shape each time.
-    infoProps = infoProps || {};
-    keys(props).forEach(
-      key => isEnumerableProp(infoProps, key) || delete props[key]
-    );
-    keys(infoProps).forEach(key => (props[key] = infoProps[key]));
-  }
-};
-
-/**
  * Keep the existing component node while injecting the props/children from the freshly computed TagFunctionResolver.
  * originalWDom is the fully evaluated node from the previous render, whereas infoVdom is the intermediate resolver,
  * so updating compProps/compChild in place lets reRender() evaluate with the latest slots and props.
@@ -163,8 +153,14 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
   const { compProps: props, compChild: children } = vDom;
   const { props: infoProps, children: infoChidren } = infoVdom;
 
-  if (props) {
-    syncResolverProps(props, infoProps);
+  if (props && infoProps !== props) {
+    // Only the keys that are gone: deleting and re-adding every key on every
+    // render changes the object's shape each time.
+    const next = infoProps || {};
+    keys(props).forEach(
+      key => isEnumerableProp(next, key) || delete props[key]
+    );
+    keys(next).forEach(key => (props[key] = next[key]));
   }
 
   /**
@@ -181,39 +177,6 @@ const runUpdate = (vDom: WDom, infoVdom: TagFunctionResolver) => {
 
   return (vDom.reRender && vDom.reRender()) as WDom;
 };
-
-/**
- * Replace the compared virtual DOM with the new virtual DOM or simply update it.
- */
-const generalize = (
-  newWDom: WDom | TagFunctionResolver,
-  isSameType: boolean,
-  originalWDom?: WDom
-): WDom => {
-  return checkCustemComponentFunction(newWDom)
-    ? isSameType && originalWDom
-      ? runUpdate(originalWDom, newWDom)
-      : // Resolved before (children a component draws again somewhere else):
-        // the first instance owns its props, which are also its key, so the
-        // new instance is made from a copy.
-        (newWDom.rd
-          ? copyResolver(newWDom)
-          : ((newWDom.rd = true), newWDom)
-        ).resolve()
-    : newWDom;
-};
-
-/**
- * 자식 가상돔들도 전부 재귀처리하며 똑같은 처리를 해준다.
- */
-const remakeChildrenForDiff = (
-  newWDom: WDom,
-  isSameType: boolean,
-  originalWDom?: WDom
-) =>
-  isSameType && originalWDom
-    ? remakeChildrenForUpdate(newWDom, originalWDom)
-    : remakeChildrenForAdd(newWDom);
 
 /**
  * Recursive handling for the creation of a new virtual DOM. Kept apart from

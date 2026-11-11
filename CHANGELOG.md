@@ -1,5 +1,25 @@
 # Release notes
 
+## 2026-11-11
+
+### lithent 1.25.9
+
+- Reduce the base bundle from 4,901B to 4,763B Brotli (12,827B to 12,402B
+  raw) without changing behavior or the public API: single-use helpers and
+  unused code in the core are folded into their callers, and the UMD output
+  drops redundant parentheses. The size budget is lowered from 4,953B to
+  4,800B.
+- In a local Mac run of the official js-framework-benchmark runner with the
+  existing listed app, weighted total time changed by −0.31% (95% interval
+  −1.38% to +0.76%) and script time by −1.64% (−2.66% to −0.62%) against
+  1.25.8. Replacing all rows was 2.4% faster. Memory stayed within 0.5%.
+  These are local comparison results from one session, not published
+  upstream rankings; see the
+  [measurement record](./docs/bundle-size/IMPLEMENT.md#phase-6--mac-공식-러너-확인-done)
+  for the measured revisions and limits.
+- Source maps stay linked from the bundles. This release adds no public API.
+  lithent-concurrent remains at 0.2.6.
+
 ## 2026-11-10
 
 ### lithent 1.25.8

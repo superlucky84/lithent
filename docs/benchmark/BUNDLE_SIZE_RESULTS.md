@@ -115,3 +115,7 @@ DC-24가 열어 둔 세 영역을 확인했다: Terser compress flag 29개를 �
 - commit: 이 재확인과 TODO 정리는 `48cb583` 이후의 브랜치 커밋이다. tip은 `git log -1`로 확인한다.
 
 원자료: [bundle-size-recheck.json](./bundle-size-recheck.json). 재현: [도구 안내](../../experiments/bundle-size-recheck/README.md).
+
+## 후속 — 2026-11-11
+
+DC-29 뒤의 크기 축소(Terser 출력 옵션, 소스 정리)는 [docs/bundle-size](../bundle-size/REQUIREMENTS.md)에서 다룬다. Vite 8 전환 뒤로 위의 구문 4종은 최종 출력에 영향이 없다는 점도 그 문서의 [DESIGN](../bundle-size/DESIGN.md#vite-8-이후-terser-후처리가-하는-일)에 있다.

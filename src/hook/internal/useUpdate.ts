@@ -9,7 +9,7 @@ type DependencyFactory = () => unknown[];
 
 export const useUpdated = (
   effectAction: () => (() => void) | void,
-  dependencies: DependencyFactory = () => []
+  dependencies: DependencyFactory
 ) => {
   const component = getCurrentComponent();
   if (!component) return;
@@ -19,7 +19,10 @@ export const useUpdated = (
 
   const nextDependencies = dependencies();
 
-  if (def && checkNeedPushQueue(def, nextDependencies)) {
+  if (
+    def &&
+    (!def.length || def.some((dep, index) => dep !== nextDependencies[index]))
+  ) {
     const callback = effectAction();
     if (callback) {
       component.upCB.push(callback);
@@ -47,8 +50,3 @@ export const runUpdatedQueueFromWDom = (newWDom: WDom) => {
     }
   }
 };
-
-const checkNeedPushQueue = (originalDefs: unknown[], newDefs: unknown[]) =>
-  !originalDefs.length
-    ? true
-    : originalDefs.some((def, index) => def !== newDefs[index]);

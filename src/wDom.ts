@@ -16,7 +16,6 @@ import { makeNewWDomTree } from '@/diff';
 import { getParent } from '@/utils';
 import { wDomUpdate } from '@/render';
 import {
-  initUpdateHookState,
   compKeyRef,
   initMountHookState,
   needDiffRef,
@@ -26,10 +25,7 @@ import {
 import { bindRedraw, componentUpdate } from '@/utils/redraw';
 import { createWDom, createCompWDom } from '@/utils/createWDom';
 import { runUpdateCallback } from '@/hook/updateCallback';
-import {
-  checkFragmentFunction,
-  checkCustemComponentFunction,
-} from '@/utils/predicator';
+import { checkCustemComponentFunction } from '@/utils/predicator';
 
 // ============================================================================
 // Public API - Highest Level (User-facing API)
@@ -121,21 +117,17 @@ const syncAncestorComponentChildren = (
   prevChild: WDom,
   nextChild: WDom
 ) => {
-  const walk = (node: WDom | undefined, visited: Set<WDom>): void => {
-    if (!node || visited.has(node)) {
-      return;
+  const visited = new Set<WDom>();
+
+  while (parent && !visited.has(parent)) {
+    visited.add(parent);
+
+    if (parent.compChild) {
+      swapIn(parent.compChild, prevChild, nextChild);
     }
 
-    visited.add(node);
-
-    if (node.compChild) {
-      swapIn(node.compChild, prevChild, nextChild);
-    }
-
-    walk(getParent(node), visited);
-  };
-
-  walk(parent, new Set<WDom>());
+    parent = getParent(parent);
+  }
 };
 
 /**
@@ -191,27 +183,28 @@ const makeNode = (
   props: Props,
   children: WDom[]
 ) => {
-  // An element first: the common case, and none of the checks below.
-  if (typeof tag === 'string') {
-    return createWDom('e', children, undefined, tag, props);
-  } else if (checkFragmentFunction(tag)) {
-    return Fragment(props, ...children);
-  } else if (checkCustemComponentFunction(tag)) {
-    const componetMakeResolver = makeWDomResolver(tag, props, children);
-
-    if (needDiffRef.value) {
-      return componetMakeResolver;
+  // An element is the common case: a string tag skips the checks below.
+  if (typeof tag !== 'string') {
+    if (tag === Fragment) {
+      return createWDom('f', children);
     }
+    if (checkCustemComponentFunction(tag)) {
+      const componetMakeResolver = makeWDomResolver(tag, props, children);
 
-    // Drawn right away, without a diff. Later updates sync the instance's
-    // props and children in place, so it gets copies; the node keeps the
-    // untouched description to be drawn again elsewhere (cloneWDom).
-    const node = copyResolver(componetMakeResolver).resolve();
-    node.rs = componetMakeResolver;
-    return node;
+      if (needDiffRef.value) {
+        return componetMakeResolver;
+      }
+
+      // Drawn right away, without a diff. Later updates sync the instance's
+      // props and children in place, so it gets copies; the node keeps the
+      // untouched description to be drawn again elsewhere (cloneWDom).
+      const node = copyResolver(componetMakeResolver).resolve();
+      node.rs = componetMakeResolver;
+      return node;
+    }
   }
 
-  return createWDom('e', children, undefined, tag, props);
+  return createWDom('e', children, undefined, tag as string, props);
 };
 
 /**
@@ -261,8 +254,8 @@ const makeChildrenItem = (item: MiddleStateWDom): WDom => {
  * closure made for each: a list's redraw describes every row again.
  */
 function resolveComponent(this: TagFunctionResolver, compKey?: CompKey) {
-  const { ctor, props, children: wrappedChildren } = this;
-  const tag = ctor as TagFunction;
+  const { props, children: wrappedChildren } = this;
+  const tag = this.ctor as TagFunction;
   compKey = compKey || props;
   // Diff mode sets needDiffRef to true so h()/makeNode return a resolver
   // placeholder. During actual resolution we must force a real WDom tree,
@@ -281,14 +274,13 @@ function resolveComponent(this: TagFunctionResolver, compKey?: CompKey) {
     let componentMaker: (nextProps: Props) => MiddleStateWDom;
 
     if (typeof initialComponent === 'function') {
-      const component = initialComponent;
       // Check if component is created with lmount (no renew parameter)
       // TypeScript cannot infer that component is LComponent when has() returns true,
       // because WeakSet.has() is a runtime check that doesn't narrow types.
       // We use 'as any' since the runtime check guarantees type safety.
-      componentMaker = lmountComponentSet.has(component)
-        ? (component as any)(props, wrappedChildren)
-        : component(componentUpdate(compKey), props, wrappedChildren);
+      componentMaker = lmountComponentSet.has(initialComponent)
+        ? (initialComponent as any)(props, wrappedChildren)
+        : initialComponent(componentUpdate(compKey), props, wrappedChildren);
     } else {
       // For components that directly return a VDom, recreate it each render.
       // The first call already rendered this stateless component. Repeating it
@@ -394,7 +386,7 @@ const makeCustomNode = (
   const reRender = (): WDom => {
     const previousKey = compKeyRef.value;
     try {
-      initUpdateHookState(compKey);
+      compKeyRef.value = compKey;
       runUpdateCallback();
 
       return draw();
