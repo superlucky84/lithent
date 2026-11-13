@@ -1,5 +1,29 @@
 # Release notes
 
+## 2026-11-13
+
+### create-lithent 0.4.1
+
+The generator downloads its templates from `main`, so the template changes
+below reach every `npx create-lithent` run, including 0.4.0, once they are
+merged. This release updates the package README.
+
+- Both templates (SPA and Express SSR) start with a local recipe catalog
+  instead of the Pokémon demo: no external API, trademarks or image assets.
+  It shows `mount` + `renew()` next to `lmount` + `lstate`, closure state for
+  search and sorting, a shared favorites store, and real `href` links with
+  client-side navigation.
+- Express template fixes:
+  - Hydration works again. The page glob `*.(tsx|mdx)` matched nothing under
+    Vite 8, so server-rendered pages never became interactive.
+  - Concurrent requests no longer render each other's preload data.
+  - Query values embedded in the page's loader script are escaped, closing a
+    `</script>` injection.
+  - A fixed route segment wins over a parameter (`/blog/:slug` before
+    `/:category/:recipe`) on the server and the client alike.
+  - Unmatched addresses show the Not Found page with HTTP 404 in development
+    as well as in production.
+
 ## 2026-11-11
 
 ### lithent 1.25.9

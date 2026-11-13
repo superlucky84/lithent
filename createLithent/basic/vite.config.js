@@ -29,6 +29,6 @@ export default defineConfig({
     sourcemap: true,
   },
   server: {
-    open: '/index.html',
+    open: '/',
   },
 });

@@ -1,75 +1,88 @@
-# Welcome to Lithent-Ssr-Boilerplate
+# Lithent + Express (SSR)
 
-`Lithent-Ssr-Boilerplate` is a boilerplate designed for building server-side rendering (SSR) websites using the [Lithent](https://superlucky84.github.io/lithent/) UI library.
+A server-rendered [Lithent](https://superlucky84.github.io/lithent/) app with
+Express, Vite, TypeScript and Tailwind CSS v4. Pages are rendered on the server,
+then hydrated in the browser. It ships with a small recipe catalog that shows
+the main Lithent patterns; delete the demo when you are ready to build your own
+app.
 
+## Getting started
 
-## Warning
-
-This project is still experimental and requires [Express](https://expressjs.com/) as a mandatory dependency.
-
-## Usage
-
-### Create a Project
-
-```bash
-npx create-lithent-ssr@latest
-cd project-name
-```
-
-### Install Dependencies
+Requires Node.js 20.19 or 22.12+.
 
 ```bash
 npm install
-```
-
-
-### Run the Development Server
-
-```bash
 npm run dev
 ```
 
-### Build and Run
+Open http://localhost:3000. pnpm and yarn work too (`pnpm install`, `pnpm dev`).
 
-The build files will be generated in the `dist` directory.
+For production:
 
 ```bash
-npm run build
-npm run start
+npm run build   # builds into dist/
+npm run start   # NODE_ENV=production node server.js
 ```
 
-### Routing Rules
+## What the demo shows
 
-Routing is determined by the filenames under the `/src/pages/` directory. The routing behavior is as follows:
+| Route                | File                                    | Lithent pattern                                     |
+| -------------------- | --------------------------------------- | --------------------------------------------------- |
+| `/`                  | `src/pages/index.tsx`                   | `mount` + `renew()` next to `lmount` + `lstate`     |
+| `/:category`         | `src/pages/index._category.tsx`         | Closure variables as state, `computed`, keyed lists |
+| `/:category/:recipe` | `src/pages/index._category._recipe.tsx` | Shared `store` (the header badge follows it)        |
 
-* `src/pages/index.tsx` maps to the root URL: `http://localhost:3000`.
+Each page exports a `preload` function. It runs on the server for the first
+request and in the browser on client-side navigation; the page reads its result
+with `getPreloadData()`. The demo reads local data from `src/data/recipes.ts`;
+replace it with your API or database call.
 
-* A file with a specific name like `one.tsx` will create a static route. For example:
-    * `src/pages/one.tsx` maps to `http://localhost:3000/one`.
+Favorites are saved in `localStorage` and read in `mountCallback`, which runs in
+the browser after hydration, so the server and the first client render match.
 
-* Files with dynamic segments are defined by using an underscore (`_`) in the filename. For example:
-    * `src/pages/index._type.tsx` maps to a dynamic route like `http://localhost:3000/:type`.
+## Routing
 
-* You can chain dynamic segments for more complex routes. For example:
-    * `src/pages/one._type._name.tsx` maps to `http://localhost:3000/one/:type/:name`.
+Routes come from the file names in `src/pages/`:
 
-These routing patterns allow you to create both static and dynamic URLs with flexibility in your project structure.
+- `index.tsx` → `/`
+- `about.tsx` → `/about`
+- `index._category.tsx` → `/:category` (an underscore marks a parameter)
+- `blog._slug.tsx` → `/blog/:slug`
+- `index._category._recipe.tsx` → `/:category/:recipe`
 
-### MDX Support
+Route parameters arrive as `params` in `preload` and in the page props. Use
+`<Link to="/path">` from `src/components/Link.tsx` for internal links: it
+renders a real `<a href>` and navigates without a full page load.
 
-MDX is enabled by default through `@lithent/lithent-mdx` and `@lithent/lithent-vite`.  
-Simply drop an `.mdx` file under `src/pages/` (for example `src/pages/docs.mdx`) and it will be compiled into a Lithent page automatically.  
-Hot reload works the same as for `.tsx` files, so edits inside `.mdx` files refresh instantly during development.
+`.mdx` files in `src/pages/` become pages too, through `@lithent/lithent-mdx`.
 
-### HMR Usage Notice
+## Project structure
 
-This starter wires `@lithent/lithent-vite`, so components and MDX pages participate in Hot Module Replacement out of the box.
+```
+server.js              # Express server: one route per page file
+serverHelper/          # Server rendering (dev with Vite middleware, prod from dist/)
+src/
+├── layout.tsx         # <html> shell, header, current page
+├── base/              # Client routing, hydration and preload plumbing
+├── components/        # Header, Link, Counters, Loading, NotFound, Oops
+├── pages/             # One file per route
+├── data/recipes.ts    # Demo data
+├── favorites.ts       # Shared favorites store
+└── main.css           # Tailwind entry
+```
 
+## Start your own app
 
-### State Management
+1. Replace the files in `src/pages/` and `src/data/`.
+2. Remove `src/favorites.ts` and `src/components/Counters.tsx` if you do not
+   need them, and the `<Header />` in `src/layout.tsx`.
+3. Keep `src/base/` and `serverHelper/`: they connect the server render to the
+   browser.
 
-This template includes [state-ref](https://github.com/superlucky84/state-ref), a lightweight state management library, already configured to simplify your development experience. It provides an intuitive API for managing and sharing state across components, making your application more predictable and maintainable.
+## Notes
 
-### Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience.
+- Component HMR for `.tsx` and `.mdx` files comes from `@lithent/lithent-vite`.
+- `state-ref` holds the client router state in `src/base/routeStore.ts`.
+- An unknown address that matches a page route (for example `/no-such-category`)
+  renders the Not Found component with HTTP 200; addresses that match no route
+  get HTTP 404.
