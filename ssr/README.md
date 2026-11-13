@@ -61,7 +61,10 @@ hydration(h(App, { title: 'Hello' }), document.documentElement);
 ```
 
 Hydrate with the same component and props the server used, so the DOM
-`hydration` walks matches the markup the server sent.
+`hydration` walks matches the markup the server sent. If they differ,
+`hydration` creates the elements the server HTML lacks in the browser and logs
+a `console.warn` for each one. Server nodes the component does not render, such
+as a loader script, are left in place.
 
 ## API
 
