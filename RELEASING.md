@@ -1,5 +1,16 @@
 # 릴리스 절차
 
+## create-lithent 0.4.1 릴리스
+
+2026-11-13 사용자 요청으로 생성 템플릿 교체([docs/create-lithent-templates](./docs/create-lithent-templates/REQUIREMENTS.md))를
+`create-lithent` 패치로 배포한다. 대상은 **`create-lithent` 0.4.0 → 0.4.1 하나**다.
+CLI 코드는 그대로이고 패키지에는 README만 바뀌어 패치 버전을 사용한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
+
+생성기는 템플릿을 `main`에서 내려받으므로 템플릿 변경은 이 PR([#116](https://github.com/superlucky84/lithent/pull/116))의
+병합만으로 0.4.0 사용자에게도 반영된다. 이 릴리스는 npm 페이지의 README와 버전 기록을 맞추기 위한 것이다.
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 0.4.1·registry integrity·동일 발행 SHA의 태그를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
 ## 1.25.9 릴리스
 
 2026-11-11 사용자 요청으로 base 코어 크기 축소([docs/bundle-size](./docs/bundle-size/REQUIREMENTS.md))를 `lithent` 패치로 배포한다.
