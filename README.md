@@ -1,6 +1,6 @@
 <img src="./lithentDocs/public/lithent.png" alt="Lithent" height="60" align="left" style="margin-right: 10px;" />
 
-# Lithent &nbsp; [![npm version](https://img.shields.io/npm/v/lithent.svg)](https://www.npmjs.com/package/lithent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/lithent)](https://bundlephobia.com/package/lithent) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
+# Lithent &nbsp; [![CI](https://github.com/superlucky84/lithent/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/superlucky84/lithent/actions/workflows/ci.yml) [![npm version](https://img.shields.io/npm/v/lithent.svg)](https://www.npmjs.com/package/lithent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/lithent)](https://bundlephobia.com/package/lithent) [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 
 <br clear="left"/>
 
@@ -12,7 +12,7 @@ It trims away unnecessary magic and complex APIs so your UI code stays simple, e
 
 <div align="left">
 
-### 🚀 [Get Started](https://superlucky84.github.io/lithent/#/guide/quick-start) · 📖 [Documentation](https://superlucky84.github.io/lithent/#/) · 💡 [Examples](https://superlucky84.github.io/lithent/#/examples/1)
+### 🚀 [Get Started](https://superlucky84.github.io/lithent/#/guide/quick-start) · 📖 [Documentation](https://superlucky84.github.io/lithent/#/) · 💡 [Examples](https://superlucky84.github.io/lithent/#/examples/1) · ▶️ [Try it online](https://stackblitz.com/github/superlucky84/lithent/tree/main/createLithent/basic)
 
 </div>
 
@@ -30,6 +30,19 @@ Bring in only what you need — let the stack scale with your project.
 - **Closure-based State** — No magic, just JavaScript
 - **Manual or Reactive** — Choose your update strategy
 - **Progressive Enhancement** — From static HTML to full SPA
+
+### How it compares
+
+|                                        | Lithent                                   | Preact                           | React                                |
+| -------------------------------------- | ----------------------------------------- | -------------------------------- | ------------------------------------ |
+| Core size (Brotli)                     | ~4.8KB                                    | ~4.5KB                           | ~94KB (`react` + `react-dom/client`) |
+| Component state                        | Closure variables                         | Hooks (or Signals)               | Hooks                                |
+| Rules of hooks                         | None                                      | When using hooks                 | Yes                                  |
+| Updates                                | Manual `renew()` or reactive helpers      | Automatic                        | Automatic                            |
+| No-build templates                     | Included (`lithent/ftags`, `lithent/tag`) | Separate `htm` package           | Not built in                         |
+| Export a component as a Custom Element | Included (`lithent/element`, <1KB)        | Separate `preact-custom-element` | Not built in                         |
+
+<sub>Sizes are the minified production builds compressed with Node's default Brotli settings (lithent 1.25.9 UMD, Preact 11.2.0, React 19.3.1), measured on 2026-11-13. Lithent is in the same weight class as Preact; it differs in the component model, not in size.</sub>
 
 <br />
 
@@ -101,11 +114,7 @@ const Counter = lmount(() => {
 > **[📚 Explore component patterns in detail](https://superlucky84.github.io/lithent/#/guide/mounter)**
 
 Component updates use `renew()` from `mount`, or `useRenew()` inside `lmount`.
-The instance's props object is stable, but it is not guaranteed to be the
-original object passed to `h()`. Since 1.25.2, components created outside a diff
-receive shallow copies of props. If you previously used
-`componentUpdate(originalProps)()`, see the [props guide](https://superlucky84.github.io/lithent/#/guide/props)
-for the lookup contract and an external-data migration example.
+Upgrading from before 1.25.2? See the [props guide](https://superlucky84.github.io/lithent/#/guide/props).
 
 <br />
 
@@ -148,10 +157,8 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 
 > **[📖 View full API reference](https://superlucky84.github.io/lithent/#/)**
 
-Event props such as `onClick` register the original native callback. Replacing a
-handler follows native removal and registration rules. For listener options,
-use `ref` and `mountCallback` with cleanup. See the
-[DOM event contract and example](skills/lithent/reference/events.md).
+Event props such as `onClick` register native listeners; see the
+[DOM event contract](skills/lithent/reference/events.md) for listener options.
 
 <br />
 
@@ -169,12 +176,10 @@ use `ref` and `mountCallback` with cleanup. See the
 | [lithent-concurrent/helper](./lithentConcurrent/README.md#lithent-concurrenthelper) | Deferred state and component-local pending queries                                                                               |
 | [create-lithent](https://www.npmjs.com/package/create-lithent)                      | Project scaffolding tool                                                                                                         |
 
-For expensive component trees, select the concurrent core with an exact
-`/^lithent$/` bundler alias. `deferRender` defers rendering while state writes
-remain immediate; `whenIdle` waits for deferred work. Keep urgent input and
-heavy rendering in separate components. See the [concurrent rendering
-guide](https://superlucky84.github.io/lithent/#/guide/concurrent-rendering) and
-[release notes](./CHANGELOG.md).
+For expensive component trees, `lithent-concurrent` adds interruptible,
+priority-scheduled rendering as a separate core you select with a bundler
+alias. See the [concurrent rendering guide](https://superlucky84.github.io/lithent/#/guide/concurrent-rendering)
+and [release notes](./CHANGELOG.md).
 
 <br />
 

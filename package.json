@@ -2,7 +2,7 @@
   "type": "module",
   "name": "lithent",
   "version": "1.25.9",
-  "description": "An extensible virtual DOM library for lightweight use in a variety of environments.",
+  "description": "Lightweight virtual DOM library with closure-based components. ~4.8KB core, JSX or no-build templates, SSR and Custom Elements.",
   "packageManager": "pnpm@12.15.0",
   "devEngines": {
     "runtime": {
@@ -207,10 +207,29 @@
     "type": "git",
     "url": "https://github.com/superlucky84/lithent.git"
   },
-  "homepage": "https://github.com/superlucky84/lithent",
+  "homepage": "https://superlucky84.github.io/lithent/",
+  "bugs": {
+    "url": "https://github.com/superlucky84/lithent/issues"
+  },
   "license": "MIT",
   "keywords": [
-    "lithent"
+    "lithent",
+    "virtual-dom",
+    "vdom",
+    "jsx",
+    "htm",
+    "ui",
+    "ui-library",
+    "frontend",
+    "components",
+    "reactive",
+    "closure",
+    "lightweight",
+    "no-build",
+    "ssr",
+    "web-components",
+    "custom-elements",
+    "typescript"
   ],
   "devDependencies": {
     "@playwright/test": "^1.63.0",
