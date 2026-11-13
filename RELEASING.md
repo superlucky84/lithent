@@ -1,5 +1,16 @@
 # 릴리스 절차
 
+## lithent 1.25.11 릴리스
+
+2026-11-13 사용자 요청으로 `lithent/ssr`의 hydration 불일치 수정을 `lithent` 패치로 배포한다.
+대상은 **`lithent` 1.25.10 → 1.25.11 하나**이며 `lithent-concurrent`는 0.2.7을 유지한다.
+바뀐 곳은 `ssr/src/hydration.ts`뿐이고 코어와 공개 API가 같아 패치 버전을 사용한다.
+`lithent-concurrent`의 sourcePaths에는 `ssr/`가 없어 함께 올리지 않는다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
+생성 템플릿은 `lithent ^1.25.10`을 요구하므로 새 프로젝트는 발행 뒤 1.25.11을 받는다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 1.25.11·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
 ## lithent 1.25.10 / lithent-concurrent 0.2.7 릴리스
 
 2026-11-13 사용자 요청(템플릿 후속 과제)으로 JSX 타입 수정([docs/jsx-types](./docs/jsx-types/REQUIREMENTS.md))을 배포한다.

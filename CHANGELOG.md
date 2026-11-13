@@ -2,6 +2,23 @@
 
 ## 2026-11-13
 
+### lithent 1.25.11
+
+- `lithent/ssr`: hydration no longer crashes when the server HTML and the
+  browser's tree differ. An element missing from the server HTML stopped
+  hydration with "Cannot read properties of undefined (reading
+  'addEventListener')", and every sibling after it lost its pair. It is now
+  created in the browser, put in its place and reported with `console.warn`.
+  Server nodes the tree has no place for, such as a loader script or a node a
+  browser extension added, stay in place as before.
+- `lithent/ssr`: a text that was empty on the server now updates after
+  hydration. The server HTML has no node for it, so its changes were dropped.
+- `lithent/ssr`: texts with an empty node between them (`{'x'}{false}{name}`)
+  keep their second part after hydration, and camelCase SVG tags such as
+  `linearGradient` pair with their server node.
+- Only `lithent/ssr` changes: the core, its bundle size and
+  `lithent-concurrent` are unchanged.
+
 ### lithent 1.25.10 / lithent-concurrent 0.2.7
 
 - JSX types: components accept JSX children and a list `key` without
