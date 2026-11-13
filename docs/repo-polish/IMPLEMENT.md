@@ -190,7 +190,7 @@ Refs: RQ-1, RQ-2, RQ-4, RQ-5, RQ-6
 
 Files: none
 
-- 완료: Phase 0~8. 저장소 파일 변경은 미커밋 상태다. GitHub 설정과 이슈는 반영을 마쳤다.
+- 완료: Phase 0~8. 저장소 변경은 main에 병합됐고, GitHub 설정과 이슈도 반영을 마쳤다.
 - 다음 (사용자):
   1. ~~변경분 커밋 → PR → main 병합~~ — PR #115, 2026-11-13 병합 (merge commit `0ba9bac`)
   2. GitHub Settings → Social preview에 `lithentDocs/public/social-preview.png` 업로드 (M-4)
