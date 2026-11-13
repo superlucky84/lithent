@@ -21,7 +21,7 @@
     "@types/node": "^20.19.0",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
-    "lithent": "^1.25.7",
+    "lithent": "^1.25.10",
     "prettier": "^3.4.2",
     "tailwindcss": "4.3.4",
     "typescript": "^5.6.3",
