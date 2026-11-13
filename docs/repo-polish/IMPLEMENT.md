@@ -193,8 +193,8 @@ Files: none
 - 완료: Phase 0~8. 저장소 변경은 main에 병합됐고, GitHub 설정과 이슈도 반영을 마쳤다.
 - 다음 (사용자):
   1. ~~변경분 커밋 → PR → main 병합~~ — PR #115, 2026-11-13 병합 (merge commit `0ba9bac`)
-  2. GitHub Settings → Social preview에 `lithentDocs/public/social-preview.png` 업로드 (M-4)
-  3. 병합 후 MANUAL_TEST_CHECKLIST의 M-1(문서 사이트 메타), M-3(화면), M-4, M-5, M-7 확인. 문서 사이트는 main 푸시 때 `docs.yml`로 배포된다.
-  4. npm 메타데이터는 다음 `lithent` 릴리스 때 나간다(M-2 후반).
+  2. ~~GitHub Settings → Social preview 업로드 (M-4)~~ — 사용자 업로드 완료, 2026-11-13
+  3. ~~병합 후 MANUAL_TEST_CHECKLIST 확인~~ — 2026-11-13 기록. M-5의 첫 화면 육안 확인만 하지 않았다.
+  4. ~~npm 메타데이터 배포~~ — `lithent` 1.25.10(2026-11-13)에 포함되어 나갔다(M-2).
 - 블로커: 없음
 - PR #115로 main에 병합됨: 작업 커밋 `ebc55ee`, `e55f48d`, merge commit `0ba9bac`.
