@@ -1,5 +1,16 @@
 # 릴리스 절차
 
+## lithent 1.25.10 / lithent-concurrent 0.2.7 릴리스
+
+2026-11-13 사용자 요청(템플릿 후속 과제)으로 JSX 타입 수정([docs/jsx-types](./docs/jsx-types/REQUIREMENTS.md))을 배포한다.
+대상은 **`lithent` 1.25.9 → 1.25.10, `lithent-concurrent` 0.2.6 → 0.2.7**이다.
+두 코어가 같은 `declare global { namespace JSX }` 블록과 `src/types`를 쓰므로 함께 올린다.
+타입만 넓어지고 런타임과 크기가 같아 패치 버전을 사용한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
+Concurrent에는 1.25.9 때 공유 모듈 정리(6,696 → 6,667B)도 함께 들어간다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 두 버전·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
 ## create-lithent 0.4.1 릴리스
 
 2026-11-13 사용자 요청으로 생성 템플릿 교체([docs/create-lithent-templates](./docs/create-lithent-templates/REQUIREMENTS.md))를

@@ -2,6 +2,19 @@
 
 ## 2026-11-13
 
+### lithent 1.25.10 / lithent-concurrent 0.2.7
+
+- JSX types: components accept JSX children and a list `key` without
+  declaring them in their props. TypeScript 5.8 and later checked JSX
+  children against the component props type, so
+  `<Card title="t"><p /></Card>` failed with TS2322 when `Card` was typed
+  with `mount<{ title: string }>`; a `key` on a component in a list failed on
+  every TypeScript version. Both now come from `JSX.IntrinsicAttributes`.
+- Components created without a props type keep accepting any props, and
+  `ReturnType<typeof mount>` still accepts them. Typed components still
+  reject wrong, missing and unknown props.
+- Types only: runtime code and bundle sizes are unchanged.
+
 ### create-lithent 0.4.1
 
 The generator downloads its templates from `main`, so the template changes
