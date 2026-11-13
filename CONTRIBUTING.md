@@ -1,6 +1,8 @@
 # Contributing
 
 How branches, releases and benchmark evidence are handled in this repository.
+Everyone taking part is expected to follow the
+[Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Branches
 
