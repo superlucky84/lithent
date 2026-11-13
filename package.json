@@ -188,6 +188,7 @@
     "ssr/dist",
     "ssr/src",
     "ssr/package.json",
+    "ssr/README.md",
     "tag/dist",
     "tag/src",
     "tag/package.json",
