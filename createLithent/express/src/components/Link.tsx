@@ -2,7 +2,13 @@ import { mount } from 'lithent';
 import type { WDom } from 'lithent';
 import { navigate } from '@/base/route';
 
-type LinkProps = { to: string; class?: string };
+type LinkProps = {
+  to: string;
+  class?: string;
+  // Lithent passes children as the third mounter argument. TypeScript 5.8+
+  // also checks JSX children against the props type, so allow them here.
+  children?: unknown;
+};
 
 /**
  * A real link (middle-click, "open in new tab" and crawlers keep working)

@@ -150,12 +150,15 @@ src/
 - [x] DC-8 preload 전역 설정 시점 — 렌더 직전 동기 구간, 요청별 컨텍스트 재설계는 하지 않음 (§3.3)
 - [x] DC-9 라우트 우선순위 — 고정 세그먼트 우선, 서버·클라이언트 같은 비교 함수 (§3.5)
 - [x] DC-10 개발 모드 404 — `appType: 'custom'`, 404 핸들러 공통 등록 (§3.6)
+- [x] DC-11 최신 범위 의존성 호환 — 템플릿에서 우회(`children?: unknown`, 짧은 유니온), 코어 타입 수정은 후속 (§3.7)
 
 ## 7. 후속 과제 (이번 범위 밖)
 
 - express 템플릿의 사용하지 않는 devDependencies 정리(`happy-dom`, `jsdom`, `@testing-library/jest-dom` 등, 실제 사용 여부 확인 필요)
 - express Not Found를 HTTP 404로 응답
 - 문서 사이트 `Mounter.tsx`·`Mounter_ko.tsx`의 PokeAPI 예제 교체
+- **lithent 코어 JSX 타입**: TypeScript 5.8+에서 children을 받는 컴포넌트마다 props에 `children`이 필요하다. `JSX.ElementChildrenAttribute` 선언 등 코어 타입 수정 검토 (§3.7)
+- 템플릿 CI가 lockfile 버전만 검사한다: 생성 프로젝트처럼 최신 범위로 설치해 빌드하는 검사 추가 검토
 - express preload 데이터를 전역 대신 요청별 컨텍스트로 전달(서버 렌더 중 비동기 컴포넌트가 생기면 §3.3 방식으로는 부족하다)
 ` 패턴 방지).
 
@@ -177,6 +180,17 @@ src/
 - `createViteServer`에 `appType: 'custom'`, `middlewareMode: true`를 준다.
   - Vite가 HTML과 404를 처리하지 않고 모듈만 서빙한다(Vite SSR 문서의 권장 설정).
 - 404 핸들러를 개발·운영 공통으로 등록한다(`isDev`, `vite` 전달). 응답을 끝낸 뒤 부르던 `next()`는 지운다.
+
+### 3.7 최신 범위 의존성 호환 (RQ-17) — 확정, 병합 후 발견
+
+생성된 프로젝트는 lockfile 없이 캐럿 범위의 최신 버전을 받는다(2026-11-13 기준 TypeScript 5.9.3, ESLint 9.39.5, Prettier 3.10.1, Vite 8.3.8).
+워크스페이스는 lockfile 버전(TypeScript 5.7.2, Prettier 3.4.2)이라 CI가 이 차이를 보지 못한다.
+
+- **TypeScript 5.8+**: lithent의 JSX 타입에 `ElementChildrenAttribute`가 없어서, JSX children이 `children` prop으로 컴포넌트 props 타입과 대조된다.
+  - 템플릿 `Link`의 props에 `children?: unknown`을 둔다(런타임 children은 마운터의 세 번째 인자).
+  - 근본 해결은 lithent 코어 JSX 타입이다(§7 후속 과제).
+- **Prettier 3.4.2 ↔ 3.10.1**: 여러 줄 유니온 타입의 포맷이 서로 다르다.
+  - 두 버전이 같은 결과를 내도록 `CategoryFound`·`RecipeFound` 타입을 따로 두고 짧은 유니온으로 쓴다.
 
 ## 4. 화면 스타일
 

@@ -15,7 +15,8 @@
 | 4 | express: 직렬화 보안 수정·정리·README | done |
 | 5 | createLithent README·교차 확인 | done |
 | 6 | Test Hardening | done |
-| 7 | Integration Test | done (병합 후 수동 항목 남음) |
+| 7 | Integration Test | done |
+| 8 | 병합 후 실제 생성 검증·수정 | done |
 
 ## Phase 0 — 문서 작성: done
 
@@ -223,12 +224,41 @@ Refs: RQ-1, RQ-3, RQ-4, RQ-5, RQ-6, RQ-9, RQ-10, RQ-12, RQ-13, RQ-14, RQ-16, DC-
 Files:
 - `createLithent/express/server.js` (modified)
 
+## Phase 8 — 병합 후 실제 생성 검증·수정: done
+
+Refs: RQ-17, DC-11
+
+- 진입 조건: PR #116 병합(`ce4392f`, 2026-11-13)
+- [x] 공개된 `create-lithent@0.4.0`으로 SPA·SSR 프로젝트 생성 (`--template <main URL> --yes --no-git-init --install --package-manager npm`)
+- [x] 생성 프로젝트에서 `npm run build`
+- [x] **발견**: SPA는 TypeScript 5.9.3에서 `Link` children 타입 오류 6건으로, SSR은 Prettier 3.10.1의 lint 오류 1건으로 빌드가 실패했다.
+  - 워크스페이스·CI는 lockfile 버전(TS 5.7.2, Prettier 3.4.2)이라 이 차이를 잡지 못했다.
+  - TS 5.7.3에서는 0건, 5.8.3·5.9.3에서는 6건이다.
+- [x] 템플릿 수정 (DESIGN §3.7)
+- 기본 테스트: 생성 프로젝트에 고친 `src`를 넣고 최신 버전으로 `type-check`·`lint`·`format:check`·`build`, 워크스페이스에서 lockfile 버전으로 같은 검사, Prettier 3.4.2·3.10.1 둘 다 `--check`
+- 종료 조건: 모두 통과
+- 결과 (2026-11-13):
+  - 생성 프로젝트(최신 버전): SPA type-check·lint·format·build 통과, SSR tsc·build 통과.
+  - 스모크: SSR `npm run start` 21/21, SSR `npm run dev` 21/21(checker 0 errors), SPA preview 21/21.
+  - 워크스페이스(lockfile 버전): basic type-check·lint·build, express tsc·build 통과.
+  - Prettier 3.4.2와 3.10.1 모두 두 템플릿 `src` 통과.
+
+Files:
+- `createLithent/basic/src/components/Link.tsx` (modified)
+- `createLithent/express/src/components/Link.tsx` (modified)
+- `createLithent/express/src/pages/index._category.tsx` (modified)
+- `createLithent/express/src/pages/index._category._recipe.tsx` (modified)
+- `docs/create-lithent-templates/REQUIREMENTS.md` (modified)
+- `docs/create-lithent-templates/DESIGN.md` (modified)
+- `docs/create-lithent-templates/IMPLEMENT.md` (modified)
+- `docs/create-lithent-templates/MANUAL_TEST_CHECKLIST.md` (modified)
+
 ## Handoff
 
-- 완료: Phase 0~7. 커밋하지 않은 상태다.
-- 다음 (사용자):
-  1. 변경분 리뷰 → 커밋 → PR → CI 통과 후 병합. **병합이 곧 `npx create-lithent` 배포다.**
-  2. 병합 후 MANUAL_TEST_CHECKLIST M-7(`npx create-lithent` 실제 생성), M-8(StackBlitz) 확인
+- 완료: Phase 0~8.
+- PR #116 병합(`ce4392f`), create-lithent 0.4.1 발행 실행(run 43377989485).
+- Phase 8 수정은 `fix/create-lithent-fresh-install` 브랜치 PR로 올린다. 병합 전까지 main 템플릿은 새 설치에서 빌드가 실패한다.
+- 다음: Phase 8 PR 병합, M-8(StackBlitz) 확인
 - 후속 과제: DESIGN §7
 - 블로커: 없음
 - 블로커: 없음
