@@ -161,7 +161,7 @@ const App = lmount((_props) => {
     </p>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      아래는 포켓몬 이름을 props로 받아서, 컴포넌트 마운트 시 단 한 번 API를
+      아래는 사용자 ID를 props로 받아서, 컴포넌트 마운트 시 단 한 번 API를
       호출하는 예제입니다. loading 상태를 통해 로딩 중임을 사용자에게 알리고,
       데이터를 가져온 후 화면을 업데이트합니다.
     </p>
@@ -171,42 +171,39 @@ const App = lmount((_props) => {
       code={`import { lmount } from 'lithent';
 import { lstate } from 'lithent/helper';
 
-type Props = { name: string };
+type Props = { id: string };
 
-const PokemonDetail = lmount<Props>(({ name }) => {
-  const detail = lstate({ img: '', info: '', title: name });
+const UserCard = lmount<Props>(({ id }) => {
+  const user = lstate({ name: '', email: '' });
   const loading = lstate(true);
+  const error = lstate('');
 
-  const loadDetail = async (pokemonName: string) => {
+  const loadUser = async (userId: string) => {
     try {
       loading.value = true;
-      const response = await fetch(\`https://pokeapi.co/api/v2/pokemon/\${pokemonName}\`);
-      const data = await response.json();
-
-      detail.value = {
-        img: data.sprites.other.dream_world.front_default,
-        info: \`Types: \${data.types.map(t => t.type.name).join(', ')}\`,
-        title: data.name
-      };
+      const response = await fetch(\`/api/users/\${userId}\`);
+      if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
+      user.value = await response.json();
     } catch (err) {
-      console.error('Failed to load Pokemon', err);
-      detail.value = { img: '', info: 'Failed to load', title: pokemonName };
+      console.error('Failed to load the user', err);
+      error.value = 'Failed to load the user';
     } finally {
       loading.value = false;
     }
   };
 
-  loadDetail(name);
+  loadUser(id);
 
   return () => (
     <div>
-      <h2>{detail.value.title}</h2>
       {loading.value ? (
         <p>Loading...</p>
+      ) : error.value ? (
+        <p>{error.value}</p>
       ) : (
         <div>
-          <img src={detail.value.img} alt={detail.value.title} />
-          <p>{detail.value.info}</p>
+          <h2>{user.value.name}</h2>
+          <p>{user.value.email}</p>
         </div>
       )}
     </div>
@@ -215,7 +212,7 @@ const PokemonDetail = lmount<Props>(({ name }) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      loadDetail 함수는{' '}
+      loadUser 함수는{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
         컴포넌트가 처음 마운트될 때 단 한 번만 실행
       </strong>
@@ -227,10 +224,10 @@ const PokemonDetail = lmount<Props>(({ name }) => {
         <span class="font-medium text-gray-700 dark:text-gray-300">
           💡 참고:
         </span>{' '}
-        이후 다른 포켓몬을 보고 싶다면, 이 컴포넌트는 적합하지 않습니다. 버튼
-        클릭으로 다른 포켓몬 데이터를 가져와야 한다면 마운터가 아닌 이벤트
-        핸들러에서 처리해야 하고, props가 변경될 때마다 새로운 데이터를 가져와야
-        한다면{' '}
+        같은 화면에서 다른 사용자를 보고 싶다면, 이 컴포넌트는 적합하지
+        않습니다. 버튼 클릭으로 다른 사용자 데이터를 가져와야 한다면 마운터가
+        아닌 이벤트 핸들러에서 처리해야 하고, props가 변경될 때마다 새로운
+        데이터를 가져와야 한다면{' '}
         <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
           updateCallback
         </code>

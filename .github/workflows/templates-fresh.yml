@@ -1,0 +1,29 @@
+name: Template fresh install
+
+# Builds the create-lithent templates as new projects get them: copied out of
+# the workspace and installed with npm at the latest versions in each range,
+# without the lockfile. PR CI uses the lockfile and cannot see this drift.
+# It depends on the npm registry, so it runs weekly and on demand instead of
+# on pull requests.
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  templates:
+    name: Templates (fresh npm install)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Build both templates from a fresh install
+        run: node scripts/check-templates-fresh.mjs

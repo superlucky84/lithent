@@ -305,18 +305,12 @@ importers:
       '@lithent/lithent-vite':
         specifier: ^0.4.0
         version: link:../../packages/lithentVite
-      '@tailwindcss/postcss':
-        specifier: 4.3.4
-        version: 4.3.4
       '@tailwindcss/vite':
         specifier: 4.3.4
         version: 4.3.4(vite@8.3.6(@types/node@20.19.25)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2))
       '@types/node':
         specifier: ^20.19.0
         version: 20.19.25
-      autoprefixer:
-        specifier: ^10.4.14
-        version: 10.4.14(postcss@8.4.47)
       eslint:
         specifier: ^9.16.0
         version: 9.16.0(jiti@2.7.0)(supports-color@8.1.1)
@@ -326,9 +320,6 @@ importers:
       lithent:
         specifier: ^1.25.7
         version: link:../..
-      postcss:
-        specifier: ^8.4.24
-        version: 8.4.47
       prettier:
         specifier: ^3.4.2
         version: 3.4.2
@@ -369,18 +360,9 @@ importers:
       '@lithent/lithent-vite':
         specifier: ^0.4.0
         version: link:../../packages/lithentVite
-      '@tailwindcss/postcss':
-        specifier: 4.3.4
-        version: 4.3.4
-      '@tailwindcss/typography':
-        specifier: ^0.5.16
-        version: 0.5.16(tailwindcss@4.3.4)
       '@tailwindcss/vite':
         specifier: 4.3.4
         version: 4.3.4(vite@8.3.6(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2))
-      '@testing-library/jest-dom':
-        specifier: ^6.5.0
-        version: 6.5.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.17.0
         version: 8.17.0(@typescript-eslint/parser@8.17.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.6.3))(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.6.3)
@@ -393,27 +375,15 @@ importers:
       eslint:
         specifier: ^9.16.0
         version: 9.16.0(jiti@2.7.0)(supports-color@8.1.1)
-      eslint-config-prettier:
-        specifier: ^9.1.0
-        version: 9.1.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))
       eslint-plugin-prettier:
         specifier: ^5.2.1
         version: 5.2.1(eslint-config-prettier@9.1.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1)))(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))(prettier@3.4.2)
-      happy-dom:
-        specifier: ^9.20.3
-        version: 9.20.3
-      jsdom:
-        specifier: ^25.0.1
-        version: 25.0.1(supports-color@8.1.1)
       prettier:
         specifier: ^3.4.2
         version: 3.4.2
       tailwindcss:
         specifier: 4.3.4
         version: 4.3.4
-      terser:
-        specifier: ^5.18.1
-        version: 5.18.1
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
@@ -426,9 +396,6 @@ importers:
       vite-plugin-dts:
         specifier: ^4.5.4
         version: 4.5.4(@types/node@24.19.2)(rollup@4.24.0)(supports-color@8.1.1)(typescript@5.6.3)(vite@8.3.6(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2))
-      vitest:
-        specifier: ^4.1.12
-        version: 4.1.12(@types/node@24.19.2)(happy-dom@9.20.3)(jsdom@25.0.1(supports-color@8.1.1))(vite@8.3.6(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2))
 
   devHelper:
     devDependencies:
@@ -1437,14 +1404,6 @@ packages:
   '@tailwindcss/oxide@4.3.4':
     resolution: {integrity: sha512-riqsRw2sLF7B1sNCCkTl3KYXEqvhTiABzZ/4oxxHfZ3c3Td60bCBfOrUuUGOiHagd3E7V+zG46c+XBDWZGFBcg==}
     engines: {node: '>= 20'}
-
-  '@tailwindcss/postcss@4.3.4':
-    resolution: {integrity: sha512-6O0QLY+1CseO8ivlYK2Y7IxNPaQ8D5ypxrV+ws34mbxknWH824J+gEWtJ0gyFiYAudmdEeXdF8kqwgXIaZRyHw==}
-
-  '@tailwindcss/typography@0.5.16':
-    resolution: {integrity: sha512-0wDLwCVF5V3x3b1SGXPCDcdsbDHMBe+lkFzBRaHeLvNi+nrrnZ1lA18u+OTWO8iSWU2GxUOCvlXtDuqftc1oiA==}
-    peerDependencies:
-      tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20 || >=4.0.0-beta.1'
 
   '@tailwindcss/vite@4.3.4':
     resolution: {integrity: sha512-wGukGWb8SVuN7+FJvSS7M5eSJWDIWwVSvUvj1q41eTIhGPsS2DAgFWjA7YURJNwjHSgty59Hz8iMUiyO+YMHBQ==}
@@ -2986,12 +2945,6 @@ packages:
     resolution: {integrity: sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==}
     engines: {node: '>=10'}
 
-  lodash.castarray@4.4.0:
-    resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
-
-  lodash.isplainobject@4.0.6:
-    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
-
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
@@ -3477,10 +3430,6 @@ packages:
     engines: {node: '>=12.0'}
     peerDependencies:
       postcss: ^8.2.14
-
-  postcss-selector-parser@6.0.10:
-    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
-    engines: {node: '>=4'}
 
   postcss-selector-parser@6.1.0:
     resolution: {integrity: sha512-UMz42UD0UY0EApS0ZL9o1XnLhSTtvvvLe5Dc2H2O56fvRZi+KulDyf5ctDhhtYJBGKStV2FL1fy6253cmLgqVQ==}
@@ -5031,22 +4980,6 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.3.4
       '@tailwindcss/oxide-win32-x64-msvc': 4.3.4
 
-  '@tailwindcss/postcss@4.3.4':
-    dependencies:
-      '@alloc/quick-lru': 5.2.0
-      '@tailwindcss/node': 4.3.4
-      '@tailwindcss/oxide': 4.3.4
-      postcss: 8.5.32
-      tailwindcss: 4.3.4
-
-  '@tailwindcss/typography@0.5.16(tailwindcss@4.3.4)':
-    dependencies:
-      lodash.castarray: 4.4.0
-      lodash.isplainobject: 4.0.6
-      lodash.merge: 4.6.2
-      postcss-selector-parser: 6.0.10
-      tailwindcss: 4.3.4
-
   '@tailwindcss/vite@4.3.4(vite@8.3.6(@types/node@20.19.25)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2))':
     dependencies:
       '@tailwindcss/node': 4.3.4
@@ -5564,16 +5497,6 @@ snapshots:
       normalize-range: 0.1.2
       picocolors: 1.0.1
       postcss: 8.4.24
-      postcss-value-parser: 4.2.0
-
-  autoprefixer@10.4.14(postcss@8.4.47):
-    dependencies:
-      browserslist: 4.24.2
-      caniuse-lite: 1.0.30001683
-      fraction.js: 4.3.7
-      normalize-range: 0.1.2
-      picocolors: 1.0.1
-      postcss: 8.4.47
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -6757,10 +6680,6 @@ snapshots:
     dependencies:
       p-locate: 5.0.0
 
-  lodash.castarray@4.4.0: {}
-
-  lodash.isplainobject@4.0.6: {}
-
   lodash.merge@4.6.2: {}
 
   lodash@4.17.21: {}
@@ -7412,11 +7331,6 @@ snapshots:
     dependencies:
       postcss: 8.4.47
       postcss-selector-parser: 6.1.0
-
-  postcss-selector-parser@6.0.10:
-    dependencies:
-      cssesc: 3.0.0
-      util-deprecate: 1.0.2
 
   postcss-selector-parser@6.1.0:
     dependencies:

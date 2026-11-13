@@ -1,7 +1,7 @@
 # IMPLEMENT — create-lithent 기본 앱 교체 (create-lithent-templates)
 
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [DESIGN.md](./DESIGN.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
-- 규칙: 커밋하지 않는다. main 병합이 곧 배포이므로(REQUIREMENTS §3-1) Phase 7을 통과하기 전에는 PR을 병합하지 않는다.
+- 규칙: 커밋·병합은 사용자가 요청할 때만 한다. main 병합이 곧 배포이므로(REQUIREMENTS §3-1) 검증을 통과하기 전에는 PR을 병합하지 않는다.
 - 각 템플릿 명령은 템플릿 디렉터리에서 `pnpm <script>`로 실행한다(워크스페이스 멤버라 의존성이 이미 설치되어 있다).
 
 ## 진행 현황
@@ -17,6 +17,7 @@
 | 6 | Test Hardening | done |
 | 7 | Integration Test | done |
 | 8 | 병합 후 실제 생성 검증·수정 | done |
+| 9 | 후속 과제 (HTTP 상태, 의존성 정리, 새 설치 정기 검사, 문서 예제, 문서 복구) | done (PR 대기) |
 
 ## Phase 0 — 문서 작성: done
 
@@ -157,7 +158,28 @@ Refs: RQ-2, RQ-8, RQ-11, RQ-14, DC-8
 - 기본 테스트: `grep -ri pokemon createLithent/express --exclude-dir=node_modules --exclude-dir=dist` 결과 없음, `pnpm build` 통과
 - 종료 조건: 위 검사와 직렬화 검사 통과
 - 결과 (2026-11-13):
-  - 직렬화 검사 7건 통과(스크래치 `serialize-test.mjs`): `</script>`, `<!--`, U+2028/2029, `
+  - 직렬화 검사 7건 통과(스크래치 `serialize-test.mjs`): `</script>`, `<!--`, U+2028/2029, `` $' $& $` ``, null, 문자열 key, 중첩 객체.
+  - 운영 서버에 `/?q=</script><script>alert(1)</script>`로 요청: 응답에 `</script><script>alert(1)`가 0회, 쿼리 속 `<`·`>`는 JSON 유니코드 이스케이프로 들어갔다.
+    `?q=$'`도 원래 값 그대로 직렬화됐다.
+  - 경쟁 조건 시뮬레이션(스크래치 `race-unit.mjs`, `MakePage`를 직접 구동, 동시 500건):
+    - 수정 전: 공유 프로미스를 기다리는 preload에서 499건이 섞였다. 요청별 무작위 지연에서는 0건이었다.
+    - 수정 후: 두 경우 모두 0건.
+    - 실제 서버에 1,000건을 동시에 보낸 시험에서는 수정 전에도 0건이었다. 로컬 데이터라 preload가 바로 끝나기 때문이다.
+  - grep 결과 없음, `pnpm build`·prettier 통과.
+
+Files:
+- `createLithent/express/serverHelper/helper.js` (modified)
+- `createLithent/express/serverHelper/makePage.js` (modified)
+- `createLithent/express/serverHelper/devMakePage.js` (modified)
+- `createLithent/express/serverHelper/prodMakePage.js` (modified)
+- `createLithent/express/src/helper/calculator.ts` (deleted)
+- `createLithent/express/src/helper/clsx.ts` (deleted)
+- `createLithent/express/src/helper/constants.ts` (deleted)
+- `createLithent/express/src/helper/request.ts` (deleted)
+- `createLithent/express/assets/*.svg` (deleted, 18 files)
+- `createLithent/express/src/main.css` (modified)
+- `createLithent/express/README.md` (modified)
+
 ## Phase 5 — createLithent README·교차 확인: done
 
 Refs: RQ-1, RQ-11
@@ -253,126 +275,54 @@ Files:
 - `docs/create-lithent-templates/IMPLEMENT.md` (modified)
 - `docs/create-lithent-templates/MANUAL_TEST_CHECKLIST.md` (modified)
 
-## Handoff
+## Phase 9 — 후속 과제: done (PR 대기)
 
-- 완료: Phase 0~8.
-- PR #116 병합(`ce4392f`), create-lithent 0.4.1 발행 실행(run 43377989485).
-- Phase 8 수정은 `fix/create-lithent-fresh-install` 브랜치 PR로 올린다. 병합 전까지 main 템플릿은 새 설치에서 빌드가 실패한다.
-- 다음: Phase 8 PR 병합, M-8(StackBlitz) 확인
-- 후속 과제: DESIGN §7
-- 블로커: 없음
-- 블로커: 없음
-- 브랜치 `feat/create-lithent-demo`, 기준 커밋 `9bbfb65` (작업분 미커밋)
- - [ ] `serverHelper/helper.js`에 `serializeForScript` 추가, dev/prod `addLoaderFromPageString`에 적용 (DESIGN §3.1)
-- [ ] 직렬화 단위 검사: `</script>`, `<!--`, U+2028을 넣은 값이 `JSON.parse` 왕복으로 같고, 결과에 `<`가 없음
-- [ ] 포켓몬 파일 삭제: `src/helper/*`(쓰지 않게 된 것), `assets/*.svg`, `main.css`의 `bg-pokemon-*`
-- [ ] `README.md` 다시 쓰기 (DESIGN §5)
-- 기본 테스트: `grep -ri pokemon createLithent/express --exclude-dir=node_modules --exclude-dir=dist` 결과 없음, `pnpm build` 통과
-- 종료 조건: 위 검사와 직렬화 검사 통과
- $\``, null, 문자열 key, 중첩 객체.
-  - 운영 서버에 `/?q=</script><script>alert(1)</script>`로 요청: 응답에 `</script><script>alert(1)`가 0회, 쿼리는 `\u003c/script\u003e…`로 들어갔다.
-    `?q=
-## Phase 5 — createLithent README·교차 확인: todo
+Refs: RQ-17, RQ-18, RQ-19, RQ-20, RQ-21, DC-4, DC-12, DC-13, DC-14
 
-Refs: RQ-1, RQ-11
-
-- 진입 조건: Phase 2, 4 완료
-- [ ] `createLithent/README.md` 템플릿 설명 갱신
-- [ ] 두 템플릿의 `data/recipes.ts`·`favorites.ts`가 같은지 `diff`
-- [ ] 문서 사이트 QuickStart가 템플릿 내용(포켓몬, `/main`)을 언급하지 않는지 확인
-- 기본 테스트: `diff` 결과 없음
-- 종료 조건: 위 확인 완료
-
-## Phase 6 — Test Hardening: todo
-
-Refs: RQ-2, RQ-7, RQ-8, RQ-12
-
-- 진입 조건: Phase 1~5 완료
-- [ ] 두 템플릿 `src/`에 `fetch(`·`http` 호출 없음 (grep)
-- [ ] `pokemon`·`pokeapi` 흔적 없음 (`createLithent/`, `scripts/check-scaffold.mjs`)
-- [ ] `addEventListener`마다 대응하는 `removeEventListener`가 lifecycle cleanup에 있음 (basic), express는 `base/route.ts`의 앱 수명 리스너만 남음
-- [ ] XSS 회귀 검사: 운영 모드 express 서버에 악성 쿼리로 요청해 응답 확인
-- [ ] 두 템플릿 prettier 검사 (`format:check` 또는 `prettier --check`)
-- 종료 조건: 모두 통과, 결과 기록
-
-## Phase 7 — Integration Test: todo
-
-Refs: RQ-1, RQ-3, RQ-4, RQ-5, RQ-6, RQ-9, RQ-10, RQ-12
-
-- 진입 조건: Phase 6 완료
-- [ ] 저장소 루트 `pnpm build` (CI와 같은 전체 빌드, 두 템플릿 포함)
-- [ ] `node scripts/check-scaffold.mjs --check` (express 복사 → 빌드 → SSR 마크업·CSS)
-- [ ] Playwright 스모크 (스크래치 스크립트): basic preview와 express 운영 서버에서
-  - 홈 렌더, 카운터 두 개 클릭 증가, 카테고리 이동·검색·정렬, 상세 인분 조절, 즐겨찾기 토글 → 헤더 배지 → 새로고침 후 유지, 없는 경로 Not Found, 콘솔 에러 없음
-  - express는 첫 응답 HTML에 레시피 마크업이 있고(SSR) 하이드레이션 후 클릭이 동작
-- [ ] 스크래치에 템플릿을 복사해 `npm install` 없이 워크스페이스 의존성으로 빌드 (`check-scaffold` 방식)
-- 종료 조건: 모두 통과, MANUAL_TEST_CHECKLIST의 병합 전 항목 결과 기록
-
-## Handoff
-
-- 완료: Phase 0~2 (문서, basic 템플릿)
-- 다음: Phase 3 (express 구현)
-- 블로커: 없음
-- 브랜치 `feat/create-lithent-demo`, 기준 커밋 `9bbfb65` (작업분 미커밋)
-`도 원래 값 그대로 직렬화됐다.
-  - 경쟁 조건 시뮬레이션(스크래치 `race-unit.mjs`, `MakePage`를 직접 구동, 동시 500건):
-    - 수정 전: 공유 프로미스를 기다리는 preload에서 499건이 섞였다. 요청별 무작위 지연에서는 0건이었다.
-    - 수정 후: 두 경우 모두 0건.
-    - 실제 서버에 1,000건을 동시에 보낸 시험에서는 수정 전에도 0건이었다. 로컬 데이터라 preload가 바로 끝나기 때문이다.
-  - grep 결과 없음, `pnpm build`·prettier 통과.
+- 진입 조건: PR #117 병합(`5b3550d`), 사용자 요청 "후속과제도 바로 진행해줘"(2026-11-13)
+- [x] M-7 재확인: `create-lithent@0.4.1`로 main 템플릿을 생성 → `npm install` → `npm run build` 두 템플릿 성공, 스모크 SSR 21/21·SPA 21/21
+- [x] M-8: 사용자가 StackBlitz 라이브 데모 정상 확인 (2026-11-13)
+- [x] HTTP 상태 (DESIGN §3.8): `notFound` preload → 404, Oops → 500
+- [x] 의존성 정리 (DESIGN §3.8): express 8개, basic 3개와 `postcss.config.js`, express `vite.config.js`의 `test` 설정. `pnpm install`로 lockfile 갱신(86줄 삭제, 추가 0)
+- [x] 새 설치 정기 검사: `scripts/check-templates-fresh.mjs`, `.github/workflows/templates-fresh.yml`
+- [x] 문서 사이트 PokeAPI 예제 → `UserCard`(영어·한국어)
+- [x] **작업 문서 복구**: 이 폴더의 REQUIREMENTS·DESIGN·IMPLEMENT에 같은 구간이 두세 번 들어가 있었다.
+  - 원인: 문서를 고칠 때 쓴 Node `String.replace()`의 대체 문자열에 `$'`가 들어 있었다. JS가 이를 "일치한 곳 뒤의 전체"로 확장했다(express에서 고친 문제와 같은 원인).
+  - 손상되지 않은 구간과 원래 문장으로 다시 조립했다. 이후 문서 수정은 Python `str.replace`나 파일 전체 쓰기로 한다.
+  - repo-polish·jsx-types 문서는 중복 제목과 줄 구분 문자 검사에서 문제가 없었다.
+- 기본 테스트: 두 템플릿 워크스페이스 빌드·type-check·lint, 빌드 CSS 비교, 상태 코드, 스모크(dev·운영), `check-templates-fresh.mjs`
+- 종료 조건: 모두 통과
+- 결과 (2026-11-13):
+  - CSS: basic·express 빌드 CSS가 정리 전과 바이트 단위로 같다.
+  - 상태 코드: 운영 `/`·`/pasta`·`/pasta/pesto-pasta` 200, `/nope`·`/pasta/nope`·`/a/b/c` 404, 오류를 던지는 임시 페이지 `/boom` 500. 개발 모드도 같다(200/404/500/404).
+  - 스모크: express 운영 21/21, express dev 21/21, basic preview 21/21.
+    스모크 스크립트는 서버가 의도대로 404를 돌려주는 요청의 콘솔 에러를 집계에서 뺀다.
+  - `node scripts/check-templates-fresh.mjs`(로컬, 실제 npm 레지스트리): basic, express 모두 `[ok]`. express 서버 검사 200/404 통과.
+    설치된 버전은 TypeScript 5.9.3, Prettier 3.10.1, ESLint 9.39.5, Vite 8.3.8, lithent 1.25.9다.
+  - `lithentDocs`의 Pokémon 흔적 없음(grep).
+- 남은 것: lithent 1.25.10 발행 뒤 템플릿 `Link`의 `children?: unknown` 제거와 `lithent` 범위 상향
 
 Files:
-- `createLithent/express/serverHelper/helper.js` (modified)
 - `createLithent/express/serverHelper/makePage.js` (modified)
-- `createLithent/express/serverHelper/devMakePage.js` (modified)
-- `createLithent/express/serverHelper/prodMakePage.js` (modified)
-- `createLithent/express/src/helper/calculator.ts` (deleted)
-- `createLithent/express/src/helper/clsx.ts` (deleted)
-- `createLithent/express/src/helper/constants.ts` (deleted)
-- `createLithent/express/src/helper/request.ts` (deleted)
-- `createLithent/express/assets/*.svg` (deleted, 18 files)
-- `createLithent/express/src/main.css` (modified)
+- `createLithent/express/server.js` (modified)
 - `createLithent/express/README.md` (modified)
-
-## Phase 5 — createLithent README·교차 확인: todo
-
-Refs: RQ-1, RQ-11
-
-- 진입 조건: Phase 2, 4 완료
-- [ ] `createLithent/README.md` 템플릿 설명 갱신
-- [ ] 두 템플릿의 `data/recipes.ts`·`favorites.ts`가 같은지 `diff`
-- [ ] 문서 사이트 QuickStart가 템플릿 내용(포켓몬, `/main`)을 언급하지 않는지 확인
-- 기본 테스트: `diff` 결과 없음
-- 종료 조건: 위 확인 완료
-
-## Phase 6 — Test Hardening: todo
-
-Refs: RQ-2, RQ-7, RQ-8, RQ-12
-
-- 진입 조건: Phase 1~5 완료
-- [ ] 두 템플릿 `src/`에 `fetch(`·`http` 호출 없음 (grep)
-- [ ] `pokemon`·`pokeapi` 흔적 없음 (`createLithent/`, `scripts/check-scaffold.mjs`)
-- [ ] `addEventListener`마다 대응하는 `removeEventListener`가 lifecycle cleanup에 있음 (basic), express는 `base/route.ts`의 앱 수명 리스너만 남음
-- [ ] XSS 회귀 검사: 운영 모드 express 서버에 악성 쿼리로 요청해 응답 확인
-- [ ] 두 템플릿 prettier 검사 (`format:check` 또는 `prettier --check`)
-- 종료 조건: 모두 통과, 결과 기록
-
-## Phase 7 — Integration Test: todo
-
-Refs: RQ-1, RQ-3, RQ-4, RQ-5, RQ-6, RQ-9, RQ-10, RQ-12
-
-- 진입 조건: Phase 6 완료
-- [ ] 저장소 루트 `pnpm build` (CI와 같은 전체 빌드, 두 템플릿 포함)
-- [ ] `node scripts/check-scaffold.mjs --check` (express 복사 → 빌드 → SSR 마크업·CSS)
-- [ ] Playwright 스모크 (스크래치 스크립트): basic preview와 express 운영 서버에서
-  - 홈 렌더, 카운터 두 개 클릭 증가, 카테고리 이동·검색·정렬, 상세 인분 조절, 즐겨찾기 토글 → 헤더 배지 → 새로고침 후 유지, 없는 경로 Not Found, 콘솔 에러 없음
-  - express는 첫 응답 HTML에 레시피 마크업이 있고(SSR) 하이드레이션 후 클릭이 동작
-- [ ] 스크래치에 템플릿을 복사해 `npm install` 없이 워크스페이스 의존성으로 빌드 (`check-scaffold` 방식)
-- 종료 조건: 모두 통과, MANUAL_TEST_CHECKLIST의 병합 전 항목 결과 기록
+- `createLithent/express/package.json` (modified)
+- `createLithent/express/vite.config.js` (modified)
+- `createLithent/basic/package.json` (modified)
+- `createLithent/basic/postcss.config.js` (deleted)
+- `pnpm-lock.yaml` (modified)
+- `scripts/check-templates-fresh.mjs` (added)
+- `.github/workflows/templates-fresh.yml` (added)
+- `lithentDocs/src/pages/Mounter.tsx` (modified)
+- `lithentDocs/src/pages/Mounter_ko.tsx` (modified)
+- `docs/create-lithent-templates/REQUIREMENTS.md` (modified)
+- `docs/create-lithent-templates/DESIGN.md` (modified)
+- `docs/create-lithent-templates/IMPLEMENT.md` (modified)
+- `docs/create-lithent-templates/MANUAL_TEST_CHECKLIST.md` (modified)
 
 ## Handoff
 
-- 완료: Phase 0~2 (문서, basic 템플릿)
-- 다음: Phase 3 (express 구현)
+- 완료: Phase 0~9. PR #116(`ce4392f`)·#117(`5b3550d`) 병합, create-lithent 0.4.1 발행(태그 `create-lithent@0.4.1`).
+- 진행 중: Phase 9는 `chore/template-followups` PR. 코어 JSX 타입은 PR #118(jsx-types, lithent 1.25.10·lithent-concurrent 0.2.7).
+- 다음: PR #118 병합·발행 → 템플릿 `Link` 우회 제거와 `lithent ^1.25.10`
 - 블로커: 없음
-- 브랜치 `feat/create-lithent-demo`, 기준 커밋 `9bbfb65` (작업분 미커밋)
