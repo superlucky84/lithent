@@ -8,9 +8,12 @@ import { getCategory, getRecipes } from '@/data/recipes';
 import type { Category, Recipe } from '@/data/recipes';
 import type { PageProps } from '@/base/types';
 
-type CategoryData =
-  | { notFound: true }
-  | { notFound?: false; category: Category; recipes: Recipe[] };
+type CategoryFound = {
+  category: Category;
+  recipes: Recipe[];
+  notFound?: false;
+};
+type CategoryData = CategoryFound | { notFound: true };
 
 type SortKey = 'time' | 'name';
 

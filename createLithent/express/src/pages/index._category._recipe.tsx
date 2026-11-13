@@ -7,9 +7,8 @@ import { getCategory, getRecipe } from '@/data/recipes';
 import type { Category, Recipe } from '@/data/recipes';
 import type { PageProps } from '@/base/types';
 
-type RecipeData =
-  | { notFound: true }
-  | { notFound?: false; category: Category; recipe: Recipe };
+type RecipeFound = { category: Category; recipe: Recipe; notFound?: false };
+type RecipeData = RecipeFound | { notFound: true };
 
 export const preload = async ({
   params,

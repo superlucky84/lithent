@@ -50,6 +50,7 @@
 | RQ-13 | express 클라이언트가 페이지 모듈을 찾아 하이드레이션한다(`.tsx`, `.mdx`) | Phase 3 스모크, M-2 |
 | RQ-15 | 같은 깊이의 라우트는 고정 세그먼트가 파라미터보다 먼저 매칭되고, 서버와 클라이언트의 순서가 같다 | Phase 6 라우트 검사 |
 | RQ-16 | 어느 페이지에도 맞지 않는 주소는 개발·운영 모드 모두 Not Found 화면과 HTTP 404를 돌려준다 | Phase 7 dev 스모크 |
+| RQ-17 | 새로 생성한 프로젝트가 `npm install`로 받는 최신 범위 버전(TypeScript, ESLint, Prettier 등)에서도 `npm run build`가 통과한다 | Phase 8 |
 | RQ-14 | 동시 요청이 서로의 preload 데이터로 렌더되지 않는다. 404·Oops는 이전 요청 데이터를 쓰지 않는다 | Phase 4 시뮬레이션 |
 
 ## 3. 제약

@@ -11,5 +11,5 @@
 | M-4 | XSS 차단 | express 운영 서버 `/?q=</script><script>alert(1)</script>` 접속 시 경고창 없음, 응답 소스에 `</script><script>alert(1)` 없음 | 병합 전 | 2026-11-13 자동: 운영·개발 서버 응답에 주입 문자열 0회 |
 | M-5 | 오프라인 | 네트워크를 끈 상태에서 두 템플릿 `pnpm dev` 첫 화면이 정상 | 병합 전 | 미확인 (src에 외부 호출 없음은 grep으로 확인) |
 | M-6 | 모바일 폭 | 브라우저 폭 375px에서 가로 스크롤 없음, 카드 1열 | 병합 전 | 2026-11-13 자동: 375px에서 가로 넘침 0px (두 템플릿) |
-| M-7 | `npx create-lithent` | 새 폴더에서 SPA·SSR 각각 생성 → `npm install` → `npm run dev`가 README 안내대로 동작 | 병합 후 | |
+| M-7 | `npx create-lithent` | 새 폴더에서 SPA·SSR 각각 생성 → `npm install` → `npm run dev`가 README 안내대로 동작 | 병합 후 | 2026-11-13 1차 실패: 새 설치(TS 5.9.3, Prettier 3.10.1)에서 빌드 실패 → Phase 8 수정. 수정본을 생성 프로젝트에 넣어 build·스모크 통과. 수정 PR 병합 후 재확인 필요 |
 | M-8 | StackBlitz | 루트 README의 "Try it online"이 새 데모로 열림 | 병합 후 | |
