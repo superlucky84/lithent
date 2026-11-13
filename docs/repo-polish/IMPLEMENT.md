@@ -12,7 +12,7 @@
 | 2 | 커뮤니티 파일 | done |
 | 3 | 루트 정리·크기 표기 통일 | done |
 | 4 | 소셜 미리보기 이미지·문서 사이트 OG | done |
-| 5 | README 첫 화면 | done (M-6 대기) |
+| 5 | README 첫 화면 | done |
 | 6 | GitHub 설정·이슈 정리 | done |
 | 7 | Test Hardening | done |
 | 8 | Integration Test | done (푸시 후 수동 항목 남음) |
@@ -109,7 +109,7 @@ Files:
 - `lithentDocs/public/social-preview.png` (added)
 - `lithentDocs/index.html` (modified)
 
-## Phase 5 — README 첫 화면: done (M-6 대기)
+## Phase 5 — README 첫 화면: done
 
 Refs: RQ-1, RQ-5, DC-1, DC-2, DC-6
 
@@ -122,7 +122,7 @@ Refs: RQ-1, RQ-5, DC-1, DC-2, DC-6
 - 종료 조건: DESIGN §5 구조와 일치
 - 결과 (2026-11-13): 상대 링크 35개 모두 존재, prettier 통과.
   새 외부 링크(CI 배지, StackBlitz, CoC 출처 5개, Discussions)는 모두 HTTP 200이고, CI 배지는 `passing`이다.
-  StackBlitz 페이지는 열리지만 그 안에서 앱이 실제로 실행되는지는 확인하지 못했다(M-6).
+  StackBlitz 앱 실행은 사용자가 확인했다(M-6 통과, DC-2 유지).
   README 내용을 검사하는 스크립트나 테스트는 없다(`scripts/`, `.github/` 검색).
 
 Files:
@@ -194,7 +194,7 @@ Files: none
 - 다음 (사용자):
   1. 변경분 커밋 → PR → main 병합 (요청 시 진행)
   2. GitHub Settings → Social preview에 `lithentDocs/public/social-preview.png` 업로드 (M-4)
-  3. 병합 후 MANUAL_TEST_CHECKLIST의 M-4~M-7 확인. M-6(StackBlitz)이 실패하면 README 링크를 빼고 DC-2를 닫는다.
+  3. 병합 후 MANUAL_TEST_CHECKLIST의 M-1(문서 사이트 메타), M-3(화면), M-4, M-5, M-7 확인. 문서 사이트는 main 푸시 때 `docs.yml`로 배포된다.
   4. npm 메타데이터는 다음 `lithent` 릴리스 때 나간다(M-2 후반).
 - 블로커: 없음
-- 브랜치 `chore/repo-polish`, 최신 커밋 `9bbfb65` (작업분 미커밋)
+- 브랜치 `chore/repo-polish`, 작업 커밋 `ebc55ee`. PR로 main에 병합하는 단계.

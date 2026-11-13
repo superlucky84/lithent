@@ -93,7 +93,7 @@ gh repo edit superlucky84/lithent --description "<제안 설명>" --enable-wiki=
 
 1. 배지 줄에 CI 배지(`.github/workflows/ci.yml`, 워크플로 이름 `Validate`)를 추가한다.
 2. "Get Started · Documentation · Examples" 줄에 **Try it online**(StackBlitz, `createLithent/basic`)을 추가한다.
-   - **DC-2 StackBlitz 동작 여부**: `createLithent/basic`이 Tailwind 4(네이티브 바인딩)를 써서 WebContainer에서 실패할 수 있다. M-6에서 확인하고, 실패하면 링크를 빼고 기록한다. — 미확정
+   - **DC-2 StackBlitz 동작 여부**: `createLithent/basic`이 Tailwind 4(네이티브 바인딩)를 써서 WebContainer에서 실패할 수 있다. M-6에서 확인하고, 실패하면 링크를 빼고 기록한다. — 확정: 정상 동작, 유지 (2026-11-13)
 3. "Why Lithent?" 바로 아래에 §5 비교표를 넣는다.
 4. 아래 세 문단은 각각 한 줄 링크로 줄인다(내용은 이미 문서 사이트와 `skills/`에 있다).
    - props 얕은 복사 안내(1.25.2)
@@ -156,7 +156,7 @@ gh repo edit superlucky84/lithent --description "<제안 설명>" --enable-wiki=
 ## 9. 결정 목록
 
 - [x] DC-1 README 비교표 — 넣는다. 사실 항목만 (사용자, 2026-11-13)
-- [ ] DC-2 StackBlitz 링크 — M-6 결과로 결정
+- [x] DC-2 StackBlitz 링크 — 유지. 사용자가 StackBlitz에서 `createLithent/basic`이 정상 실행되는 것을 확인 (2026-11-13)
 - [x] DC-3 GitHub 공개 설정 — 초안 확인 후 `gh`로 반영 (사용자, 2026-11-13)
 - [x] DC-4 #66·#67 — 닫는다 (사용자, 2026-11-13)
 - [x] DC-5 루트 정리 범위 — 참조 없는 오래된 것만 (사용자, 2026-11-13)
