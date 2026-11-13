@@ -13,7 +13,7 @@ export default class MakePage {
     const { Layout, Page, preload } = await this.makeComponents();
     const initProp = await this.makePageData(preload);
 
-    const appHtmlOrig = await this.makePageString(Layout, Page);
+    const appHtmlOrig = await this.makePageString(Layout, Page, initProp);
     const finalHtml = this.addLoaderFromPageString(appHtmlOrig, initProp);
 
     return finalHtml;
@@ -21,7 +21,7 @@ export default class MakePage {
   async runOops() {
     const { Oops, Layout } = await this.makeOopComponents();
 
-    const appHtmlOrig = await this.makePageString(Layout, Oops);
+    const appHtmlOrig = await this.makePageString(Layout, Oops, null);
     const finalHtml = this.addLoaderFromPageString(appHtmlOrig, null);
 
     return finalHtml;
@@ -29,7 +29,7 @@ export default class MakePage {
   async run404() {
     const { Not, Layout } = await this.make404Components();
 
-    const appHtmlOrig = await this.makePageString(Layout, Not);
+    const appHtmlOrig = await this.makePageString(Layout, Not, null);
     const finalHtml = this.addLoaderFromPageString(appHtmlOrig, null);
 
     return finalHtml;
@@ -40,11 +40,13 @@ export default class MakePage {
       initProp = await preload(this.props);
     }
 
-    globalThis.pagedata = initProp;
-
     return initProp;
   }
-  commonPageToString(Layout, Page) {
+  commonPageToString(Layout, Page, initProp) {
+    // Components read the page data from this global while rendering.
+    // Set it right before the synchronous render, never across an `await`:
+    // concurrent requests would otherwise render each other's data.
+    globalThis.pagedata = initProp;
     let pageString = renderToString(
       h(Layout, Object.assign({ page: Page }, this.props))
     );
