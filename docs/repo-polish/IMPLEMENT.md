@@ -192,9 +192,9 @@ Files: none
 
 - 완료: Phase 0~8. 저장소 파일 변경은 미커밋 상태다. GitHub 설정과 이슈는 반영을 마쳤다.
 - 다음 (사용자):
-  1. 변경분 커밋 → PR → main 병합 (요청 시 진행)
+  1. ~~변경분 커밋 → PR → main 병합~~ — PR #115, 2026-11-13 병합 (merge commit `0ba9bac`)
   2. GitHub Settings → Social preview에 `lithentDocs/public/social-preview.png` 업로드 (M-4)
   3. 병합 후 MANUAL_TEST_CHECKLIST의 M-1(문서 사이트 메타), M-3(화면), M-4, M-5, M-7 확인. 문서 사이트는 main 푸시 때 `docs.yml`로 배포된다.
   4. npm 메타데이터는 다음 `lithent` 릴리스 때 나간다(M-2 후반).
 - 블로커: 없음
-- 브랜치 `chore/repo-polish`, 작업 커밋 `ebc55ee`. PR로 main에 병합하는 단계.
+- PR #115로 main에 병합됨: 작업 커밋 `ebc55ee`, `e55f48d`, merge commit `0ba9bac`.
