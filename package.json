@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "lithent",
-  "version": "1.25.10",
+  "version": "1.25.11",
   "description": "Lightweight virtual DOM library with closure-based components. ~4.8KB core, JSX or no-build templates, SSR and Custom Elements.",
   "packageManager": "pnpm@12.15.0",
   "devEngines": {
