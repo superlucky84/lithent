@@ -196,6 +196,7 @@ await writeFile(
   join(consumer, 'types.tsx'),
   `
 import { h as baseH, mount as baseMount } from 'lithent';
+import type { WDom } from 'lithent';
 import { h, mount, deferRender, whenIdle } from 'lithent-concurrent';
 import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper';
 import type { State, Computed } from 'lithent-concurrent/helper';
@@ -209,7 +210,21 @@ const BaseEmpty = baseMount(() => () => true);
 const ConcurrentEmpty = mount(() => () => true);
 baseH('div', {}, true, false, baseH(BaseEmpty, {}));
 h('div', {}, true, false, h(ConcurrentEmpty, {}));
-export { List, ldeferred, whenIdle };
+// JSX children and list keys on components: TypeScript 5.8+ checks children
+// against the props type, so both come from JSX.IntrinsicAttributes.
+const Card = baseMount<{ title: string }>((_r, props, children: WDom[]) => () => (
+  <section><h2>{props.title}</h2>{children}</section>
+));
+const Row = baseMount<{ label: string }>((_r, props) => () => <li>{props.label}</li>);
+const Rows = baseMount(() => () => (
+  <ul>
+    {['a', 'b'].map(label => <Row key={label} label={label} />)}
+    <Card title="card"><p>child</p></Card>
+    {/* @ts-expect-error component props are still checked */}
+    <Row label={1} />
+  </ul>
+));
+export { List, Rows, ldeferred, whenIdle };
 `
 );
 await writeFile(

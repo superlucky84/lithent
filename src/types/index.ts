@@ -25,6 +25,13 @@ export type Component<T> = (
   childen: WDom[]
 ) => (props: T) => MiddleStateWDom;
 
+/**
+ * Props of the function `mount`/`lmount` return. Without a declared props
+ * type, `T` is `unknown` and any props are accepted, as before
+ * `JSX.IntrinsicAttributes` gained `key` and `children`.
+ */
+export type MountProps<T> = unknown extends T ? Props : T;
+
 export type LComponent<T> = (
   props: T,
   childen: WDom[]
