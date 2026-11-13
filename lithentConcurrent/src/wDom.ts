@@ -9,6 +9,7 @@ import {
   NodePointer,
   Component,
   LComponent,
+  MountProps,
 } from '@/types';
 
 import { startWork, commitEffects } from '@/diff';
@@ -88,7 +89,7 @@ export const portal = (wDom: WDom, portal: HTMLElement) =>
  */
 export const mount =
   <T>(component: Component<T>) =>
-  (_props: T, _children?: MiddleStateWDomChildren) =>
+  (_props: MountProps<T>, _children?: MiddleStateWDomChildren) =>
     component;
 
 /**
@@ -97,7 +98,7 @@ export const mount =
  */
 export const lmount =
   <T>(component: LComponent<T>) =>
-  (_props: T, _children?: MiddleStateWDomChildren) => {
+  (_props: MountProps<T>, _children?: MiddleStateWDomChildren) => {
     lmountComponentSet.add(component);
     return component;
   };
