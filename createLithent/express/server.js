@@ -54,10 +54,12 @@ async function createServer() {
 
       const props = { id: key, params: req.params, query: req.query, origin };
       let finalHtml = '';
+      let status = 200;
 
       try {
         const pageIns = createMakePage({ key, req, props, isDev, vite });
         finalHtml = await pageIns.run();
+        status = pageIns.status;
       } catch (e) {
         isDev && vite.ssrFixStacktrace(e);
         console.error(e.stack);
@@ -70,9 +72,10 @@ async function createServer() {
           vite,
         });
         finalHtml = await pageIns.runOops();
+        status = pageIns.status;
       }
 
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+      res.status(status).set({ 'Content-Type': 'text/html' }).end(finalHtml);
     });
   });
 

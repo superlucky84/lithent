@@ -83,6 +83,8 @@ src/
 
 - Component HMR for `.tsx` and `.mdx` files comes from `@lithent/lithent-vite`.
 - `state-ref` holds the client router state in `src/base/routeStore.ts`.
-- An unknown address that matches a page route (for example `/no-such-category`)
-  renders the Not Found component with HTTP 200; addresses that match no route
-  get HTTP 404.
+- A `preload` that returns `{ notFound: true }` makes the server answer with
+  HTTP 404 (the demo pages do this for unknown categories and recipes); the
+  page still renders, here as the Not Found component. Addresses that match no
+  route get the Not Found page with HTTP 404 too, and a render error gets the
+  Oops page with HTTP 500.

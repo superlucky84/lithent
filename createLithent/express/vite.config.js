@@ -68,10 +68,6 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
-  test: {
-    environment: 'jsdom',
-    includeSource: ['src/tests/*.{js,ts,jsx,tsx}'],
-  },
 }));
 
 function getEntries() {
