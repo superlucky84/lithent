@@ -28,6 +28,11 @@ The CLI will prompt you for:
    - **SSR (Express)**: Server-side rendering with Express. Ideal for SEO and optimized first-load performance
    - **SPA (Vite)**: Client-side rendering with Vite. Perfect for fast development and simple deployments
 
+Both templates start with the same small recipe catalog: a counter written in
+both component styles, client-side routing, search and sorting with closure
+state, and favorites shared through a store. Each template's README explains
+how to replace the demo with your own pages.
+
 ### Installation and Development
 
 Once scaffolded, navigate to your project and start developing:
@@ -94,7 +99,7 @@ Hot reload works seamlessly with MDX files.
 - Vite-powered development
 - Fast HMR and build times
 - Tailwind CSS pre-configured
-- Ideal for GitHub Pages and static hosting
+- Static hosting (configure an SPA fallback so History API routes serve `index.html`)
 
 ## Using Lithent from CDN
 
