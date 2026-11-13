@@ -8,6 +8,11 @@
 `lithent-concurrent`의 sourcePaths에는 `ssr/`가 없어 함께 올리지 않는다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
 생성 템플릿은 `lithent ^1.25.10`을 요구하므로 새 프로젝트는 발행 뒤 1.25.11을 받는다.
 
+**발행 기록 (2026-11-14)**: main `53b1f7f`에서 Validate run [43522306787](https://github.com/superlucky84/lithent/actions/runs/43522306787)로 발행했다.
+모든 잡(Quality, Chromium·Firefox·WebKit, 발행, 기록)이 첫 시도에 통과했다. npm `lithent` 1.25.11(`latest`)과
+registry integrity, 태그 `lithent@1.25.11`(`53b1f7f`), 문서 배포 run [43523841604](https://github.com/superlucky84/lithent/actions/runs/43523841604)를 확인했다.
+발행된 archive의 `ssr/dist`에 hydration 수정이, `ssr/README.md`(#122)가 처음으로 들어 있음을 확인했다.
+
 PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
 npm의 1.25.11·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
 
