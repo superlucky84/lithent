@@ -318,7 +318,7 @@ importers:
         specifier: ^9.1.0
         version: 9.1.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))
       lithent:
-        specifier: ^1.25.7
+        specifier: ^1.25.10
         version: link:../..
       prettier:
         specifier: ^3.4.2
@@ -348,7 +348,7 @@ importers:
         specifier: ^4.21.1
         version: 4.21.1(supports-color@8.1.1)
       lithent:
-        specifier: ^1.25.7
+        specifier: ^1.25.10
         version: link:../..
       state-ref:
         specifier: ^2.0.0

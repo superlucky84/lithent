@@ -209,7 +209,7 @@ src/
 | express 템플릿의 사용하지 않는 devDependencies 정리 | 완료 (Phase 9) — basic의 중복 PostCSS 처리도 정리 |
 | express Not Found를 HTTP 404로 응답 | 완료 (Phase 9) — Oops는 500 |
 | 문서 사이트 `Mounter.tsx`·`Mounter_ko.tsx`의 PokeAPI 예제 교체 | 완료 (Phase 9) |
-| lithent 코어 JSX 타입 (TypeScript 5.8+ children, 리스트 key) | 완료, 발행 대기 — [jsx-types](../jsx-types/IMPLEMENT.md), PR #118 |
+| lithent 코어 JSX 타입 (TypeScript 5.8+ children, 리스트 key) | 완료 — [jsx-types](../jsx-types/IMPLEMENT.md), PR #118, lithent 1.25.10 |
 | 새 설치 기준 템플릿 빌드 검사 | 완료 (Phase 9) — 매주·수동 워크플로 |
 | express preload 요청별 컨텍스트 | 하지 않음 (DC-12) |
-| 템플릿 `Link`의 `children?: unknown` 우회 제거 | lithent 1.25.10 발행 후 |
+| 템플릿 `Link`의 `children?: unknown` 우회 제거 | 완료 (Phase 10) |

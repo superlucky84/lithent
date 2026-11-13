@@ -8,6 +8,13 @@
 타입만 넓어지고 런타임과 크기가 같아 패치 버전을 사용한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
 Concurrent에는 1.25.9 때 공유 모듈 정리(6,696 → 6,667B)도 함께 들어간다.
 
+**발행 기록 (2026-11-13)**: main `24af1c4`에서 Validate run [43385051585](https://github.com/superlucky84/lithent/actions/runs/43385051585)로 발행했다.
+
+- 1차 시도: Browser (webkit)의 `e2e/parent-retention.spec.ts`(concurrent, GC 뒤 `WeakRef` 회수 수)가 실패해 발행이 막혔다. 실패 잡 재실행에서 통과했다.
+- 2차 시도: `lithent` 업로드 뒤 registry 확인 시간이 지나 unconfirmed로 끝났고, `lithent-concurrent` 전에 멈췄다. 기록 job이 `lithent@1.25.10` 태그를 복구했다.
+- 3차 시도: 아래 복구 절차대로 실패 잡을 재실행하자 `lithent-concurrent` 0.2.7이 발행됐다.
+- 결과: npm `lithent` 1.25.10, `lithent-concurrent` 0.2.7이 올라갔고, 두 태그 모두 `24af1c4`에 있다.
+
 PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
 npm의 두 버전·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
 
@@ -16,6 +23,9 @@ npm의 두 버전·registry integrity·동일 발행 SHA의 태그와 문서 배
 2026-11-13 사용자 요청으로 생성 템플릿 교체([docs/create-lithent-templates](./docs/create-lithent-templates/REQUIREMENTS.md))를
 `create-lithent` 패치로 배포한다. 대상은 **`create-lithent` 0.4.0 → 0.4.1 하나**다.
 CLI 코드는 그대로이고 패키지에는 README만 바뀌어 패치 버전을 사용한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
+
+**발행 기록 (2026-11-13)**: main `ce4392f`에서 Validate run [43377989485](https://github.com/superlucky84/lithent/actions/runs/43377989485)로 발행했다.
+npm `create-lithent` 0.4.1, 태그 `create-lithent@0.4.1`(`ce4392f`)을 확인했다.
 
 생성기는 템플릿을 `main`에서 내려받으므로 템플릿 변경은 이 PR([#116](https://github.com/superlucky84/lithent/pull/116))의
 병합만으로 0.4.0 사용자에게도 반영된다. 이 릴리스는 npm 페이지의 README와 버전 기록을 맞추기 위한 것이다.

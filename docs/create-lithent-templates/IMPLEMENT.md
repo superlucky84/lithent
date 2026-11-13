@@ -17,7 +17,8 @@
 | 6 | Test Hardening | done |
 | 7 | Integration Test | done |
 | 8 | 병합 후 실제 생성 검증·수정 | done |
-| 9 | 후속 과제 (HTTP 상태, 의존성 정리, 새 설치 정기 검사, 문서 예제, 문서 복구) | done (PR 대기) |
+| 9 | 후속 과제 (HTTP 상태, 의존성 정리, 새 설치 정기 검사, 문서 예제, 문서 복구) | done |
+| 10 | 템플릿 `Link` 우회 제거, `lithent ^1.25.10` | done |
 
 ## Phase 0 — 문서 작성: done
 
@@ -275,7 +276,7 @@ Files:
 - `docs/create-lithent-templates/IMPLEMENT.md` (modified)
 - `docs/create-lithent-templates/MANUAL_TEST_CHECKLIST.md` (modified)
 
-## Phase 9 — 후속 과제: done (PR 대기)
+## Phase 9 — 후속 과제: done
 
 Refs: RQ-17, RQ-18, RQ-19, RQ-20, RQ-21, DC-4, DC-12, DC-13, DC-14
 
@@ -320,9 +321,34 @@ Files:
 - `docs/create-lithent-templates/IMPLEMENT.md` (modified)
 - `docs/create-lithent-templates/MANUAL_TEST_CHECKLIST.md` (modified)
 
+## Phase 10 — 템플릿 `Link` 우회 제거: done
+
+Refs: RQ-17, DC-11
+
+- 진입 조건: lithent 1.25.10 발행(2026-11-13, [jsx-types](../jsx-types/IMPLEMENT.md))
+- [x] 두 템플릿 `Link`의 `children?: unknown` 제거
+- [x] 두 템플릿 `lithent` 의존 범위 `^1.25.7` → `^1.25.10`, `pnpm install`로 lockfile 갱신(specifier 2줄)
+- 기본 테스트: 워크스페이스 basic type-check·lint·build, express tsc·build, Prettier 3.4.2, `node scripts/check-templates-fresh.mjs`
+- 종료 조건: 모두 통과
+- 결과 (2026-11-13): 모두 통과.
+  새 설치 검사의 설치 버전은 lithent 1.25.10, TypeScript 5.9.3이고, 두 템플릿 `[ok]`, express 서버 200/404 `[ok]`.
+
+Files:
+- `createLithent/basic/src/components/Link.tsx` (modified)
+- `createLithent/express/src/components/Link.tsx` (modified)
+- `createLithent/basic/package.json` (modified)
+- `createLithent/express/package.json` (modified)
+- `pnpm-lock.yaml` (modified)
+- `RELEASING.md` (modified)
+- `docs/create-lithent-templates/IMPLEMENT.md` (modified)
+- `docs/create-lithent-templates/DESIGN.md` (modified)
+- `docs/jsx-types/IMPLEMENT.md` (modified)
+- `docs/jsx-types/MANUAL_TEST_CHECKLIST.md` (modified)
+
 ## Handoff
 
-- 완료: Phase 0~9. PR #116(`ce4392f`)·#117(`5b3550d`) 병합, create-lithent 0.4.1 발행(태그 `create-lithent@0.4.1`).
-- 진행 중: Phase 9는 `chore/template-followups` PR. 코어 JSX 타입은 PR #118(jsx-types, lithent 1.25.10·lithent-concurrent 0.2.7).
-- 다음: PR #118 병합·발행 → 템플릿 `Link` 우회 제거와 `lithent ^1.25.10`
+- 완료: Phase 0~10.
+  - PR #116(`ce4392f`)·#117(`5b3550d`)·#119(`24af1c4`) 병합
+  - create-lithent 0.4.1, lithent 1.25.10, lithent-concurrent 0.2.7 발행
+- 남은 것: 없음. 새 설치 정기 검사(`templates-fresh.yml`)가 매주 도구 버전 변화를 확인한다.
 - 블로커: 없음

@@ -78,6 +78,7 @@ Files:
 
 ## Handoff
 
-- 완료: Phase 1~4
-- 다음: PR 병합 → main에서 Validate 수동 실행으로 발행 → 템플릿의 `Link` 우회 코드 제거와 `lithent` 의존 범위 상향(create-lithent-templates 후속)
+- 완료: Phase 1~4. PR #118 병합(`660fea7`).
+- 발행 (2026-11-13): npm `lithent` 1.25.10, `lithent-concurrent` 0.2.7. 태그 둘 다 `24af1c4`. 경과는 [RELEASING](../../RELEASING.md) 참고.
+- 템플릿 후속: `Link`의 `children?: unknown`을 지우고 `lithent ^1.25.10`으로 올렸다. 새 설치 검사(lithent 1.25.10, TS 5.9.3)에서 두 템플릿 통과(create-lithent-templates Phase 10).
 - 블로커: 없음
