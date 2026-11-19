@@ -38,8 +38,41 @@ const en = {
 
 const copy = {
   en,
-  // English placeholder: the maintainer translates this in review.
-  ko: { ...en },
+  ko: {
+    title: '서버 렌더링 (lithent/ssr)',
+    intro:
+      'lithent/ssr은 서버에서 Lithent 컴포넌트를 HTML 문자열로 렌더링하고, 브라우저에서는 페이지를 다시 만들지 않고 그 마크업에 그대로 연결합니다. 서버 사이드 렌더링(SSR)은 서버가 완성된 HTML을 보내는 방식이라 페이지가 바로 보입니다. 하이드레이션은 브라우저가 그 HTML을 새로 만들지 않고 클릭 핸들러와 컴포넌트 상태를 연결하는 과정입니다. 기존 lithent/ssr 엔트리에 포함되어 있고, Lithent 코어를 peer dependency로 필요로 합니다.',
+    render: '서버에서 렌더링하고 브라우저에서 하이드레이션',
+    renderText:
+      '양쪽 모두 같은 루트 컴포넌트를 렌더링합니다. 루트가 문서 전체를 렌더링하므로 브라우저는 document.documentElement를 하이드레이션합니다.',
+    mismatch: '서버와 브라우저 결과가 다를 때',
+    mismatchText:
+      '서버에서 쓴 것과 같은 컴포넌트와 props로 하이드레이션해야 hydration이 따라가는 DOM이 서버가 보낸 마크업과 일치합니다. 둘이 다르면 hydration은 서버 HTML에 없는 엘리먼트를 브라우저에서 새로 만들고, 그때마다 console.warn을 남깁니다. 로더 스크립트처럼 컴포넌트가 렌더링하지 않는 서버 노드는 그대로 둡니다.',
+    api: 'API',
+    apiHead: ['API', '동작'],
+    apiRows: [
+      [
+        'renderToString(wDom)',
+        'h로 만든 WDom의 HTML 문자열을 반환합니다. 이벤트 props, ref, key는 출력에서 빠집니다.',
+      ],
+      [
+        'hydration(wDom, wrapElement)',
+        'wrapElement 안의 기존 DOM에 이벤트와 컴포넌트 상태를 연결하고 render의 결과를 반환합니다.',
+      ],
+      [
+        'renderWithHydration(tagFunction)',
+        '양쪽에서 쓰는 단일 진입점입니다. 브라우저에서는 document.documentElement를 하이드레이션하고, 서버에서는 문자열을 반환합니다.',
+      ],
+    ],
+    apiText:
+      'renderWithHydration은 컴포넌트를 받아 빈 props로 렌더링합니다. 페이지에 props가 필요하면 renderToString과 hydration을 쓰세요.',
+    escaping: '이스케이프',
+    escapingText:
+      '텍스트와 속성 값은 이스케이프됩니다. innerHTML은 그대로 출력되므로 신뢰할 수 있는 HTML만 넘기세요.',
+    full: '전체 예제',
+    fullText:
+      'createLithent/express가 완성된 구성입니다. 서버에서는 serverHelper/makePage.js가 renderToString을 호출하고, 브라우저에서는 src/base/load.ts가 hydration을 호출합니다. npx create-lithent@latest로 생성할 수 있습니다.',
+  },
 };
 
 const table = (head: string[], rows: string[][]) => (
