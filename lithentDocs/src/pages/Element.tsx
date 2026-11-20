@@ -8,6 +8,9 @@ const copy = {
     title: 'Custom Elements (lithent/element)',
     intro:
       'lithent/element registers a lithent component as a standard Custom Element. The host page needs no knowledge of lithent: it adds a script and a tag, sets attributes or properties, and listens to DOM events. That makes it a fit for UI that lives on pages you do not own, such as payment buttons, chat or review widgets, and shared headers, whether the page is plain HTML, a server-rendered template or a React or Vue app. The wrapper adds under 1 KB (brotli) to the core and needs no build step.',
+    start: 'Start a widget project',
+    startText:
+      'create-lithent (0.5.0 or later) sets up a widget project: a demo element, a host page that uses it only through attributes, properties and events, and a build that writes one self-contained script for other pages to load, with a size budget.',
     define: 'Define an element',
     defineText:
       'Pass a mount or lmount component unchanged. Props are declared with constructors; the element observes each one as a kebab-case attribute and also exposes it as a property.',
@@ -96,6 +99,9 @@ const copy = {
     title: '커스텀 엘리먼트 (lithent/element)',
     intro:
       'lithent/element는 lithent 컴포넌트를 표준 Custom Element로 등록합니다. 호스트 페이지는 lithent를 몰라도 됩니다. 스크립트와 태그를 넣고, 속성이나 프로퍼티를 설정하고, DOM 이벤트를 받으면 끝입니다. 그래서 결제 버튼, 상담·리뷰 위젯, 공통 헤더처럼 내가 소유하지 않은 페이지에 들어가는 UI에 맞습니다. 페이지가 순수 HTML이든 서버 렌더링 템플릿이든 React·Vue 앱이든 상관없습니다. 코어에 더해지는 크기는 1KB 미만(brotli)이고 빌드 단계가 필요 없습니다.',
+    start: '위젯 프로젝트 시작하기',
+    startText:
+      'create-lithent(0.5.0 이상)로 위젯 프로젝트를 만들 수 있습니다. 데모 엘리먼트, 속성·프로퍼티·이벤트로만 위젯을 쓰는 호스트 페이지, 그리고 다른 페이지가 불러갈 스크립트 한 파일을 만드는 빌드와 크기 예산이 들어 있습니다.',
     define: '엘리먼트 정의',
     defineText:
       'mount나 lmount 컴포넌트를 수정 없이 넘깁니다. props는 생성자로 선언하고, 각 prop은 kebab-case 속성으로 관찰되며 프로퍼티로도 노출됩니다.',
@@ -203,6 +209,17 @@ export const ElementGuide = ({ language }: { language: 'en' | 'ko' }) => {
     <div class="prose prose-lg dark:prose-invert max-w-none space-y-6 text-gray-700 dark:text-gray-300 [&_h1]:text-3xl [&_h1]:font-semibold [&_h2]:text-2xl [&_h2]:font-medium [&_h2]:mt-10 [&_a]:text-[#42b883] [&_ul]:list-disc [&_ul]:pl-6">
       <h1>{t.title}</h1>
       <p>{t.intro}</p>
+
+      <h2>{t.start}</h2>
+      <p>{t.startText}</p>
+      <CodeBlock
+        language="bash"
+        code={`npx create-lithent@latest my-widget --template widget
+cd my-widget
+npm install
+npm run dev     # the widget on a demo host page
+npm run build   # dist/my-widget.js: one file for a <script> tag`}
+      />
 
       <h2>{t.define}</h2>
       <p>{t.defineText}</p>
