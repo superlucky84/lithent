@@ -176,7 +176,9 @@ jobs:
       vars.NPM_PUBLISH_ENABLED == 'true' &&
       needs.quality.result == 'success' && needs.browser.result == 'success' && needs.gate.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Each candidate can wait fifteen minutes for npm to show its version
+    # (scripts/npm-registry.mjs); five candidates fit.
+    timeout-minutes: 90
     environment: npm
     permissions:
       contents: read
@@ -243,8 +245,9 @@ jobs:
       vars.NPM_PUBLISH_ENABLED == 'true' && needs.gate.result == 'success' &&
       needs.publish.outputs.receipt_artifact != ''
     runs-on: ubuntu-latest
-    # Each unconfirmed receipt can wait five minutes for npm to show the version.
-    timeout-minutes: 20
+    # An unconfirmed receipt can wait fifteen minutes for npm to show the version
+    # (scripts/npm-registry.mjs).
+    timeout-minutes: 30
     environment: npm
     permissions:
       contents: write
