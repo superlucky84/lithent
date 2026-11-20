@@ -8,6 +8,7 @@
 | 1 | 실패하는 테스트 (단위, E2E) | done |
 | 2 | 수정 | done |
 | 3 | Integration Test (toolchain, E2E, mutation, 템플릿) | done |
+| 3a | HMR 반복 점검 | done |
 | 4 | 릴리스 준비 | 대기 — DESIGN DC-3 확정 필요 |
 
 ## Phase 0 — 문서 작성: done
@@ -87,6 +88,37 @@ Files:
 - `e2e/hmr-propagation.spec.ts` (modified)
 - `packages/lithentVite/README.md` (modified) — 진입점 수정은 새로고침된다는 문장 추가
 - `docs/widget-template/README.md` (modified) — 원인 설명을 바로잡고 §6-4를 이 문서로 연결
+
+## Phase 3a — HMR 반복(무한 루프) 점검: done
+
+Refs: RQ-2, RQ-3
+
+사용자 우려: 저장 한 번에 HMR이 끝없이 이어지는 버그가 여러 번 고쳐진 뒤에도 재발했다.
+
+- 이력: 반복 경로는 매번 달랐고 경로별로 막혀 있다.
+  | 시기 | 경로 | 장치 |
+  |---|---|---|
+  | 2025-11 (#82, `502f357`) | 경계 적용 실패 → invalidate 반복 | `__lithentSafeInvalidate` 상한 3회 |
+  | 2025-12 (`2a3cdef`) | DOM 없는 인스턴스 재시도를 `setTimeout`으로 무한 반복 | devHelper `MAX_RETRY` 3 |
+  | 2026-10 (#95, `5c0cd86`) | 교체 중 새로 등록된 자손을 다시 교체 | 교체 전 인스턴스 스냅샷 |
+- Vite 쪽 방어: 한 모듈은 HMR 타임스탬프당 invalidate 1회(`lastHMRInvalidationReceived`),
+  invalidate가 처음 모듈로 돌아오면 전체 새로고침(`circular import invalidate`).
+- 이번 수정과의 관계: 버려지던 갱신을 전달할 뿐이다. 저장 한 번에 importer 경계 갱신 1회 또는
+  새로고침 1회가 추가되고, 새 반복 경로는 없다.
+- 실측 (2026-11-20, 수정 후 코드, Chromium): 저장 후 3초 동안의 HMR 갱신·새로고침·경고를 세고,
+  이어지는 2.5초(SSR 3초) 동안 아무 활동이 없는지 본다. 되돌린 뒤에도 같은 검사를 한다.
+  - 직접 만든 앱 13개 시나리오: 한 파일 여러 컴포넌트(Outer 2·Inner 4·Item 40), 40ms 간격 저장 5회,
+    숨긴 상태에서 수정, store 수정, 진입점 수정, 비컴포넌트 export 3연속, 렌더 중 예외, 예외 후 복구,
+    순환 import 3종, 문법 오류 후 복구, export 삭제 → **모두 수렴, 꼬리 활동 0**.
+    가장 긴 경우가 렌더 중 예외(갱신 2, invalidate 2, 새로고침 1)였다.
+  - SSR(Express) 템플릿 5개 시나리오: 페이지, 레이아웃, store, 클라이언트 진입점(`src/base/load.ts`),
+    라우트 헬퍼 → **모두 수렴, 꼬리 활동 0**.
+  - 한계: 사용자가 겪은 정확한 재현 조건은 모른다. 측정 스크립트는 `.e2e-work/stress/`(git 제외)에 있고
+    CI 테스트로 만들지 않았다.
+- **별도 버그 발견 (수정 전부터 있음):** SSR 템플릿에서 `<html>`을 렌더하는 `src/layout.tsx`를 두 번
+  수정하면 두 번째에 `header`·`main`이 사라진다. 콘솔 오류는 없다. 첫 수정은 정상이고 Header만 수정할
+  때는 정상이다. 수정 전 코드(`395aaee`)에서도 같다. 이번 수정 뒤에는 `src/favorites.ts` 수정도 Layout을
+  교체하므로 이 버그를 만나는 경로가 늘어난다. → 릴리스 전에 고치는 것을 권한다 (DESIGN DC-3).
 
 ## Phase 4 — 릴리스 준비: 대기
 

@@ -42,6 +42,8 @@ import.meta.hot.accept(mod => { ... });
   `@lithent/lithent-vite` 0.4.0 → 0.4.1 (둘 다 patch).
   - `lithent-vite`는 `@lithent/hmr-parser`를 `workspace:*`로 의존하고, 발행할 때 정확한 버전으로
     고정된다. hmr-parser만 올리면 기존 lithent-vite 사용자에게 닿지 않는다.
+  - 권장: SSR 템플릿의 Layout(`<html>` 루트) 두 번째 교체 시 본문이 사라지는 기존 버그
+    (IMPLEMENT Phase 3a)를 먼저 고친다. 이번 수정으로 store 수정도 Layout을 교체하게 되어 더 자주 드러난다.
 - [x] DC-4 위젯 템플릿의 `lithentVitePlugin({ include: /\.tsx$/ })` 우회는 이번에 그대로 둔다.
   템플릿은 발행된 `@lithent/lithent-vite ^0.4.0`을 설치하므로, 0.4.1 발행 뒤 범위를 올리면서 뺀다.
   `feedbackProps.ts` 분리는 우회가 아니라 설계라서 유지한다
