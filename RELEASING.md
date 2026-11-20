@@ -5,6 +5,29 @@
 2026-11-20 사용자 요청으로 컴포넌트 테스트 유틸 `lithent/test`([docs/test-utils](./docs/test-utils/REQUIREMENTS.md))를 배포한다.
 대상은 **`lithent` 1.25.12 → 1.26.0 하나**다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-20)의 "lithent 1.26.0"에 기록한다.
 
+**발행 기록 (2026-11-20)**: main `b54223a`(PR #134 병합)에서 Validate run
+[44788187378](https://github.com/superlucky84/lithent/actions/runs/44788187378)으로 발행했다.
+
+- 1차 시도: Browser (firefox)의 `playwright install --with-deps firefox`가 Ubuntu 패키지 미러가 느려 18분 걸렸고, 이어진
+  E2E가 job 제한(20분)에 걸려 취소됐다. CI 게이트가 "browser: cancelled"로 실패해 발행 job은 건너뛰었다(아무것도 올라가지 않음).
+  같은 날 PR #134의 WebKit job도 같은 원인(테스트 시작 전 패키지 내려받기)으로 취소됐다.
+- 2차 시도: 실패 job 재실행. Firefox E2E 통과 뒤 발행 job이 `lithent` 1.26.0을 OIDC로 올렸다(등록소 시각 18:29:41 UTC).
+  기록 job이 `lithent@1.26.0` 태그를 `b54223a`에 만들고 문서 배포
+  ([44793398913](https://github.com/superlucky84/lithent/actions/runs/44793398913), 성공)를 요청했다.
+- npm `latest`가 1.26.0이다. 15분 확인 창 안에 바로 보였다(1.25.12 때의 "Validating" 지연 없음).
+- 후속 과제(제안): 브라우저 job의 시간 대부분이 `--with-deps`의 apt 내려받기다. 미러가 느린 날 두 번 연속 제한에 걸렸으므로
+  Playwright 시스템 의존성 캐시나 설치 단계의 별도 제한 시간을 검토한다.
+
+발행 뒤 확인 (2026-11-20, npm에 올라간 패키지로):
+
+- `npx create-lithent@0.5.0 m4-spa --template spa` → `lithent@1.26.0`, `@types/node ^22.12.0`(#133 템플릿). 문서의
+  `npm install --save-dev vitest jsdom @testing-library/dom`이 충돌 없이 설치(vitest 5.1.1, jsdom 31.0.1). Testing 가이드의
+  예시와 템플릿 `Counters` 테스트 3개 통과, `tsc --noEmit` 통과 — [test-utils MANUAL M-4](./docs/test-utils/MANUAL_TEST_CHECKLIST.md).
+- 설치된 패키지의 `dist/skills/lithent/reference/test.md`가 `version: 1.26.0`, `SKILL.md`·`lithent-agent-addon.md`에
+  `lithent/test` 안내가 있다.
+- 문서 사이트에 Testing 가이드(`#/guide/testing`)가 올라가 있다.
+- 템플릿의 `lithent ^1.25.12` 범위는 그대로 둔다. 새 설치는 1.26.0을 받고, 템플릿 자체는 `lithent/test`를 쓰지 않는다.
+
 - 새 공개 하위 경로(`exports["./test"]`)를 더하므로 minor를 올린다. 코어 소스와 크기는 그대로다(base brotli 4,774B).
 - `lithent-concurrent`는 0.2.8을 유지한다. sourcePaths(`src/`, `lithentConcurrent/`)가 바뀌지 않았고, `lithent/test`는
   bare `lithent`를 import하므로 `lithent`를 `lithent-concurrent`로 alias한 앱에서도 concurrent 스케줄러를 기다린다
