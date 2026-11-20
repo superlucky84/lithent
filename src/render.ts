@@ -31,17 +31,19 @@ const DF = () => new DocumentFragment();
 let sharedFragment: DocumentFragment | undefined;
 
 // Into the root's wrapper: before its after element, in place of <html>, or
-// at the end.
-const insertRoot = (
-  wrapElement: HTMLElement,
-  element: Node,
-  afterElement?: HTMLElement | null
-) =>
-  afterElement
-    ? wrapElement.insertBefore(element, afterElement)
-    : wrapElement.tagName === 'HTML'
-      ? wrapElement.replaceWith(element)
-      : wrapElement.appendChild(element);
+// at the end. A new <html> also takes the old one's place as the wrapper:
+// the old one has left the document, and the next redraw of this root (an
+// HMR replacement of a layout component) must reach the page.
+const insertRoot = (wDom: WDom, element: Node) => {
+  const { we, ae } = wDom as { we: HTMLElement; ae?: HTMLElement };
+  if (ae) we.insertBefore(element, ae);
+  else if (we.tagName === 'HTML') {
+    wDom.we = (
+      element.nodeType === 11 ? element.firstChild : element
+    ) as HTMLElement;
+    we.replaceWith(element);
+  } else we.appendChild(element);
+};
 
 export const render = (
   wDom: WDom,
@@ -57,7 +59,7 @@ export const render = (
 
   wDom.ae = afterElement as HTMLElement;
   if (afterElement || !isHydration) {
-    insertRoot(wrapElement, Dom, afterElement);
+    insertRoot(wDom, Dom);
   }
 
   execMountedQueue();
@@ -165,7 +167,7 @@ const typeAdd = (
   const parentWDom = getParent(newWDom);
   if (!parentWDom || !parentWDom.type) {
     if (newWDom.isRoot && newWDom.we && newWDom.tag !== 'portal') {
-      insertRoot(newWDom.we, newElement, newWDom.ae);
+      insertRoot(newWDom, newElement);
       execMountedQueue();
     }
     return;
