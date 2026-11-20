@@ -8,7 +8,7 @@
 | 1 | 네 구현과 빌드 | done |
 | 2 | 동작 동일성 E2E | done |
 | 3 | 측정과 공개 페이지 | done |
-| 4 | CI·배포 연결, 문서 사이트 링크 | done — 배포 확인은 병합 후(M-4) |
+| 4 | CI·배포 연결, 문서 사이트 링크 | done |
 
 ## Phase 0 — 문서 작성: done
 
@@ -112,6 +112,8 @@ Refs: RQ-7, DC-9
   합쳐 영어·한국어 링크를 따라가 확인했다.
 - [x] [../widget-template/README.md](../widget-template/README.md) §6-5, IDEAS §2.1 갱신
 - [x] 로컬 E2E (Chromium, base): `element.spec.ts`, `widget-compare.spec.ts`, `widget-template.spec.ts` 23개 통과
+- [x] PR #131 CI 3개 브라우저 통과(MANUAL M-5), 병합 뒤 배포 확인(MANUAL M-4).
+  CI가 빌드한 번들의 해시가 측정한 번들과 같아, 공개 페이지의 로딩 시간이 배포된 번들의 값이다.
 
 Files:
 - `.github/workflows/docs.yml` (modified)

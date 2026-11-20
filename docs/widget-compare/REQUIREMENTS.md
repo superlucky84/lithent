@@ -2,7 +2,7 @@
 
 - 브랜치: `ccr-3e48bc24-eapswq` / 기준 커밋 `e80ae93`
 - 작성일: 2026-11-20
-- 상태: **구현·측정 완료, 병합·배포 전** — [IMPLEMENT.md](./IMPLEMENT.md) 참고
+- 상태: **배포 완료 (2026-11-20, PR #131)** — <https://superlucky84.github.io/lithent/widget-compare/>, [IMPLEMENT.md](./IMPLEMENT.md) 참고
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 출처: [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.1 "외부에 심는 위젯 / SDK", [../widget-template/README.md](../widget-template/README.md) §6-5
 - 코드 범위: `showcase/widget-compare/`, `e2e/widget-compare.spec.ts`, CI·문서 배포 연결
