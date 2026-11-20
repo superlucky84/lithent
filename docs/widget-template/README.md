@@ -2,7 +2,7 @@
 
 - 작성일: 2026-11-20
 - 출처: [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.1 "외부에 심는 위젯 / SDK", §3.1 `lithent/element`
-- 상태: **구현·검증 완료. main 병합 전. create-lithent 릴리스 전.**
+- 상태: **구현·검증 완료. create-lithent 0.5.0 릴리스 준비 완료, main 병합·발행 전.**
 
 ## 1. 목적
 
@@ -92,7 +92,8 @@ Firefox·WebKit E2E는 이 환경에 브라우저가 없어 돌리지 않았다.
 
 1. **main 병합.** 템플릿은 main에서 내려받으므로 병합하는 순간 URL로는 바로 쓸 수 있다:
    `npx create-lithent@latest my-widget --template https://github.com/superlucky84/lithent/tree/main/createLithent/widget`
-2. **create-lithent 릴리스(0.5.0 제안).** 선택지와 `--template widget` 이름은 새 CLI에만 있다.
+2. **create-lithent 0.5.0 발행.** 선택지와 `--template widget` 이름은 새 CLI에만 있다. 릴리스 준비 완료
+   (`69b1311`, [RELEASING](../../RELEASING.md) 첫 절), 병합 후 Validate 수동 실행으로 발행한다.
 3. **문서 사이트.** 릴리스 후 Custom Elements 가이드(영어·한국어)에 `--template widget` 안내를 넣는다.
    CLI 릴리스 전에 넣으면 0.4.1에서 실패하는 명령을 안내하게 된다.
 4. **`@lithent/lithent-vite` 버그.** 컴포넌트가 없고 lithent를 import하는 모듈의 수정이 무시됐다
