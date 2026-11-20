@@ -85,6 +85,7 @@ const paths = [
   'lithent/tag',
   'lithent/ftags',
   'lithent/element',
+  'lithent/test',
   'lithent-concurrent',
   'lithent-concurrent/helper',
 ];
@@ -134,7 +135,10 @@ assert.deepEqual(Object.keys(helper).sort(), ['deferred', 'hasPendingRender', 'l
 const element = await import('lithent/element');
 assert.deepEqual(Object.keys(element).sort(), ['defineElement', 'emit']);
 assert.equal(element.defineElement('no-dom', () => null), undefined);
-console.log('PASS isolated installed consumer: all 11 public import paths and distinct cores');
+const testing = await import('lithent/test');
+assert.deepEqual(Object.keys(testing).sort(), ['act', 'cleanup', 'render']);
+assert.throws(() => testing.render(base.h('p', {})), /needs a DOM/);
+console.log('PASS isolated installed consumer: all 12 public import paths and distinct cores');
 `
 );
 execFileSync(process.execPath, ['imports.mjs'], {
@@ -184,7 +188,9 @@ const paths = ${JSON.stringify(paths)};
     '<p>packed &amp; usable</p><b>CommonJS</b>');
   const element = require('lithent/element');
   assert.equal(element.defineElement('no-dom', () => null), undefined);
-  console.log('PASS isolated CommonJS consumer: all 11 require paths, export parity, main and JSX/helper/SSR integration');
+  const testing = require('lithent/test');
+  assert.throws(() => testing.render(base.h('p', {})), /needs a DOM/);
+  console.log('PASS isolated CommonJS consumer: all 12 require paths, export parity, main and JSX/helper/SSR integration');
 })().catch(error => { console.error(error); process.exitCode = 1; });
 `
 );
@@ -199,6 +205,7 @@ import { h as baseH, mount as baseMount } from 'lithent';
 import type { WDom } from 'lithent';
 import { h, mount, deferRender, whenIdle } from 'lithent-concurrent';
 import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper';
+import { render, act, cleanup } from 'lithent/test';
 import type { State, Computed } from 'lithent-concurrent/helper';
 const List = mount(renew => {
   const value: State<string> = deferred('initial', renew);
@@ -224,7 +231,14 @@ const Rows = baseMount(() => () => (
     <Row label={1} />
   </ul>
 ));
-export { List, Rows, ldeferred, whenIdle };
+// lithent/test: render returns the container; act resolves with its callback's value.
+const rendered: { container: HTMLElement; unmount: () => void } = render(<Rows />);
+const counted: Promise<number> = act(() => 1);
+const waited: Promise<void> = act();
+cleanup();
+// @ts-expect-error render takes a lithent node, not a string.
+render('<p></p>');
+export { List, Rows, ldeferred, whenIdle, rendered, counted, waited };
 `
 );
 await writeFile(
@@ -259,7 +273,7 @@ console.log(
 const typeScopes = [
   {
     name: 'base',
-    paths: paths.slice(0, 9),
+    paths: paths.slice(0, 10),
     names: [
       'core',
       'jsx',
@@ -270,12 +284,13 @@ const typeScopes = [
       'tag',
       'ftags',
       'element',
+      'test',
     ],
     state: 'state',
   },
   {
     name: 'concurrent',
-    paths: paths.slice(9),
+    paths: paths.slice(10),
     names: ['core', 'helper'],
     state: 'deferred',
   },

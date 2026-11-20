@@ -115,6 +115,15 @@ const menuData: MenuSection[] = [
     ],
   },
   {
+    text: { en: 'Testing', ko: '테스트' },
+    items: [
+      {
+        text: { en: 'Component Tests', ko: '컴포넌트 테스트' },
+        link: '/guide/testing',
+      },
+    ],
+  },
+  {
     text: { en: 'JSX & Templates', ko: 'JSX & 템플릿' },
     items: [
       {

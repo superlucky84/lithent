@@ -1,0 +1,35 @@
+{
+  "type": "module",
+  "name": "lithent-test",
+  "version": "0.1.0",
+  "description": "Render, wait for and clean up lithent components in tests",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "main": "./dist/lithentTest.cjs",
+  "module": "./dist/lithentTest.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest",
+    "watch": "vite build --watch",
+    "build": "vite build"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent",
+    "testing"
+  ],
+  "peerDependencies": {
+    "lithent": "workspace:*"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/user-event": "14.6.8"
+  }
+}

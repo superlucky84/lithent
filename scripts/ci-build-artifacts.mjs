@@ -24,6 +24,7 @@ const directories = [
   'tag/dist',
   'ftags/dist',
   'element/dist',
+  'test/dist',
   'element/playground/dist',
   'packages/hmrParser/dist',
   'packages/lithentMdx/dist',
