@@ -8,6 +8,7 @@ packages:
   - 'tag'
   - 'ftags'
   - 'element'
+  - 'test'
   - 'examples'
   - 'jsx-runtime'
   - 'lithentDocs'

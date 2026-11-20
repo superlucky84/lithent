@@ -49,11 +49,12 @@
     "build:tag": "pnpm --filter lithent-tag build",
     "build:ftags": "pnpm --filter lithent-ftags build",
     "build:element": "pnpm --filter lithent-element build",
+    "build:test": "pnpm --filter lithent-test build",
     "playground:element": "pnpm build:core && pnpm build:concurrent && pnpm build:element && pnpm --filter lithent-element playground",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
-    "build:sequence": "pnpm build:core && pnpm build:concurrent && pnpm build:jsxruntime && pnpm build:helper && pnpm build:devHelper && pnpm build:concurrentHelper && pnpm build:ssr && pnpm build:tag && pnpm build:ftags && pnpm build:element && pnpm build:hmrParser && pnpm build:lithentTemplateParser && pnpm build:lithentTemplateVite && pnpm build:lithentMdx && pnpm build:lithentVite",
-    "build:parallel": "pnpm --filter '!lithent-concurrent' --filter '!lithent-concurrent-helper' --filter '!jsx-runtime' --filter '!lithent-helper' --filter '!lithent-dev-helper' --filter '!@lithent/hmr-parser' --filter '!@lithent/lithent-template-parser' --filter '!@lithent/lithent-template-vite' --filter '!@lithent/lithent-mdx' --filter '!@lithent/lithent-vite' --filter '!lithent-ssr' --filter '!lithent-tag' --filter '!lithent-ftags' --filter '!lithent-element' --filter '!create-lithent' build",
+    "build:sequence": "pnpm build:core && pnpm build:concurrent && pnpm build:jsxruntime && pnpm build:helper && pnpm build:devHelper && pnpm build:concurrentHelper && pnpm build:ssr && pnpm build:tag && pnpm build:ftags && pnpm build:element && pnpm build:test && pnpm build:hmrParser && pnpm build:lithentTemplateParser && pnpm build:lithentTemplateVite && pnpm build:lithentMdx && pnpm build:lithentVite",
+    "build:parallel": "pnpm --filter '!lithent-concurrent' --filter '!lithent-concurrent-helper' --filter '!jsx-runtime' --filter '!lithent-helper' --filter '!lithent-dev-helper' --filter '!@lithent/hmr-parser' --filter '!@lithent/lithent-template-parser' --filter '!@lithent/lithent-template-vite' --filter '!@lithent/lithent-mdx' --filter '!@lithent/lithent-vite' --filter '!lithent-ssr' --filter '!lithent-tag' --filter '!lithent-ftags' --filter '!lithent-element' --filter '!lithent-test' --filter '!create-lithent' build",
     "build": "pnpm run build:sequence && pnpm run build:parallel",
     "watch:core": "vite build --watch",
     "watch:concurrent": "pnpm --filter lithent-concurrent watch",
@@ -63,12 +64,12 @@
     "watch:element": "pnpm --filter lithent-element watch",
     "test:core": "vitest run --reporter verbose",
     "test:concurrent": "pnpm --filter lithent-concurrent test && pnpm --filter lithent-concurrent-helper test",
-    "test:satellites": "pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter lithent-ftags test && pnpm --filter lithent-ssr test && pnpm --filter lithent-element test",
+    "test:satellites": "pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter lithent-ftags test && pnpm --filter lithent-ssr test && pnpm --filter lithent-element test && pnpm --filter lithent-test test",
     "test:satellites:concurrent": "LITHENT_CORE=concurrent pnpm run test:satellites",
     "test:dual": "pnpm test:core && pnpm test:concurrent && pnpm test:satellites && pnpm test:satellites:concurrent",
     "test:toolchain": "pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter @lithent/lithent-template-parser test && pnpm --filter @lithent/lithent-template-vite test",
     "test:ci": "node --test --test-isolation=none scripts/tests/*.test.mjs",
-    "test": "pnpm test:core && pnpm test:concurrent && pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter lithent-ftags test && pnpm --filter lithent-element test",
+    "test": "pnpm test:core && pnpm test:concurrent && pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter lithent-ftags test && pnpm --filter lithent-element test && pnpm --filter lithent-test test",
     "test:lithentMdx": "pnpm --filter @lithent/lithent-mdx test",
     "test:lithentVite": "pnpm --filter @lithent/lithent-vite test",
     "test:dev": "vitest",
@@ -169,6 +170,16 @@
         "types": "./element/dist/index.d.cts",
         "default": "./element/dist/lithentElement.cjs"
       }
+    },
+    "./test": {
+      "import": {
+        "types": "./test/dist/index.d.ts",
+        "default": "./test/dist/lithentTest.mjs"
+      },
+      "require": {
+        "types": "./test/dist/index.d.cts",
+        "default": "./test/dist/lithentTest.cjs"
+      }
     }
   },
   "types": "./dist/index.d.ts",
@@ -198,6 +209,10 @@
     "element/dist",
     "element/src",
     "element/package.json",
+    "test/dist",
+    "test/src/index.ts",
+    "test/package.json",
+    "test/README.md",
     "examples/dist",
     "examples/src",
     "examples/package.json"

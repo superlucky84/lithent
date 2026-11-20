@@ -97,6 +97,8 @@ export default defineConfig({
       // lithent/element runs in its own package (`pnpm --filter
       // lithent-element test`), where `@` points at element/src.
       '**/element/**',
+      // lithent/test likewise (`pnpm --filter lithent-test test`).
+      'test/**',
       // Browser contracts use Playwright's runner, not Vitest.
       '**/e2e/**',
       // Node's CI/artifact failure fixtures use their own mandatory runner.

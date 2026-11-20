@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### lithent (next minor): `lithent/test`
+
+- New `lithent/test` entry for component tests: `render` renders into a
+  container attached to the document, `await act(fn)` runs `fn` and waits until
+  lithent has drawn everything it caused, and `cleanup` takes the rendered
+  trees down (automatically after each test when the runner exposes
+  `afterEach` as a global).
+- `act` waits for renders started by `renew()`, `lithent/helper` stores and
+  `mountCallback`s, and, with `lithent` aliased to `lithent-concurrent`, for
+  `deferRender` work the scheduler splits across tasks. It keeps working under
+  fake timers.
+- No dependencies. Queries and events come from `@testing-library/dom` and
+  `@testing-library/user-event`, which work as they are on the DOM lithent
+  renders. ESM and CommonJS builds with declarations; the core and its size
+  are unchanged.
+- Docs: a new Testing guide (English and Korean).
+
 ### create-lithent templates
 
 - The SPA and widget templates require `@types/node ^22.12.0` instead of
