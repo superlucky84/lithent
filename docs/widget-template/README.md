@@ -48,9 +48,10 @@ Object 프로퍼티, 취소 가능한 이벤트, CSS 변수 테마, `::part`, sl
      플러그인이 "exports changed"로 보고 갱신을 `main.ts`로 넘겼다. → props 선언을 `feedbackProps.ts`로
      옮기고 컴포넌트 파일은 `import type`만 한다.
   2. 플러그인은 컴포넌트가 없는 모듈에도 `if ([].length) { import.meta.hot.accept(...) }`를 넣는다.
-     Vite는 accept를 **정적으로** 찾으므로 `main.ts`를 self-accepting으로 보고 다시 실행한다.
-     `defineElement`는 이미 정의된 태그면 기존 생성자를 돌려주므로 수정이 조용히 사라졌다.
+     Vite 서버는 accept를 **정적으로** 찾으므로 `main.ts`를 self-accepting으로 보고 전파를 멈춘다.
+     브라우저에서는 accept가 호출된 적이 없어 갱신을 버린다. 재실행도 새로고침도 없이 수정이 사라졌다.
      → `main.ts`를 변환 대상에서 뺀다. 이제 `main.ts`·props·CSS 수정은 전체 새로고침이 된다.
+     플러그인 자체는 [../hmr-propagation/](../hmr-propagation/)에서 고쳤다. 발행 후 이 우회를 뺀다.
 - **CLI에 이름으로 템플릿 고르기를 추가했다.** `--template ssr|spa|widget`. 그 외 값은 기존처럼
   경로·GitHub 축약·URL이다. 같은 이름의 로컬 폴더는 `./widget`처럼 쓴다.
 - **CLI `tsconfig.json`에서 `basic`, `widget`을 제외했다.** 지금까지 `express`만 제외돼 있어서
@@ -94,9 +95,7 @@ Firefox·WebKit E2E는 이 환경에 브라우저가 없어 돌리지 않았다.
 2. **create-lithent 릴리스(0.5.0 제안).** 선택지와 `--template widget` 이름은 새 CLI에만 있다.
 3. **문서 사이트.** 릴리스 후 Custom Elements 가이드(영어·한국어)에 `--template widget` 안내를 넣는다.
    CLI 릴리스 전에 넣으면 0.4.1에서 실패하는 명령을 안내하게 된다.
-4. **`@lithent/lithent-vite` 버그.** 컴포넌트가 없고 lithent를 import하는 모듈에도
-   `import.meta.hot.accept(`가 들어가 Vite가 self-accepting으로 본다. basic 템플릿의
-   `src/favorites.ts`를 고치면 `hmr update /src/favorites.ts`만 나오고 그 모듈을 쓰는 컴포넌트는 옛
-   모듈을 계속 본다(확인함). 컴포넌트 목록이 비어 있으면 accept 블록을 아예 생성하지 않는 쪽으로
-   `packages/hmrParser`를 고치면 된다. 이 작업에서는 고치지 않았다.
+4. **`@lithent/lithent-vite` 버그.** 컴포넌트가 없고 lithent를 import하는 모듈의 수정이 무시됐다
+   (basic `src/favorites.ts`·`src/index.tsx`에서도 확인). 수정 완료, 발행 대기 —
+   [../hmr-propagation/](../hmr-propagation/). 발행 후 이 템플릿의 `include` 우회를 뺀다.
 5. **비교 쇼케이스.** 같은 위젯을 React·Preact로 만든 크기·로딩 비교 페이지(IDEAS §2.1의 증거).
