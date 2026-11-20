@@ -2,7 +2,7 @@
 
 - 브랜치: `ccr-3e48bc24-eapswq` / 기준 커밋 `b961084`
 - 작성일: 2026-11-20
-- 상태: **구현·검증 완료, 병합·발행 전** — [IMPLEMENT.md](./IMPLEMENT.md) 참고
+- 상태: **main 병합(#133), `lithent` 1.26.0 릴리스 준비 완료 — 발행 대기** — [IMPLEMENT.md](./IMPLEMENT.md), [RELEASING](../../RELEASING.md) 첫 절
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 출처: [../adoption/README.md](../adoption/README.md) "테스트" 항목, [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.2
 - 코드 범위: `test/` (새 workspace 패키지), 루트 `package.json` exports·files, 빌드·테스트·릴리스 검사 연결, 문서 사이트

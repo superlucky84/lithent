@@ -1,5 +1,46 @@
 # 릴리스 절차
 
+## lithent 1.26.0 릴리스
+
+2026-11-20 사용자 요청으로 컴포넌트 테스트 유틸 `lithent/test`([docs/test-utils](./docs/test-utils/REQUIREMENTS.md))를 배포한다.
+대상은 **`lithent` 1.25.12 → 1.26.0 하나**다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-20)의 "lithent 1.26.0"에 기록한다.
+
+- 새 공개 하위 경로(`exports["./test"]`)를 더하므로 minor를 올린다. 코어 소스와 크기는 그대로다(base brotli 4,774B).
+- `lithent-concurrent`는 0.2.8을 유지한다. sourcePaths(`src/`, `lithentConcurrent/`)가 바뀌지 않았고, `lithent/test`는
+  bare `lithent`를 import하므로 `lithent`를 `lithent-concurrent`로 alias한 앱에서도 concurrent 스케줄러를 기다린다
+  (`test:satellites:concurrent`로 확인).
+- `create-lithent`는 발행하지 않는다. SPA·위젯 템플릿의 `@types/node`를 `^22.12.0`으로 올렸지만(#133) 템플릿은
+  패키지에 들어가지 않고 main에서 내려받는다. release plan의 "Source paths changed" 안내는 이 때문이며 예상된 것이다.
+- 패키지에 함께 들어가는 것: `test/dist`(ESM·CJS·`.d.ts`·`.d.cts`), `test/README.md`, 에이전트 스킬의 Testing 절과
+  `reference/test.md`, `lithent-agent-addon.md`의 테스트 규칙.
+- 생성 템플릿은 `lithent ^1.25.12`라 새 프로젝트는 발행 뒤 1.26.0을 받는다. 템플릿 범위는 올리지 않는다
+  (템플릿 자체는 `lithent/test`를 쓰지 않는다).
+
+**로컬 준비 검증 (2026-11-20, 후보 커밋 `ceac992`, 깨끗한 작업 트리, `pnpm clean:dist`부터 CI Quality 순서)**:
+
+- 순서와 결과: `pnpm clean:dist` → `pnpm build` → `pnpm test:dual` → `pnpm test:toolchain` → release 스크립트 테스트 49개 →
+  신뢰성 mutation 대조(Node 22용으로 `--experimental-test-isolation=none`만 바꾼 임시 사본, 모두 검출) →
+  `pnpm verify:concurrent` → `pnpm verify:release --output-dir artifacts/release` → `pnpm release:plan` →
+  `verify-plan-consumers` → `pnpm size` → `ci-build-artifacts create --require-clean`. **모두 통과.**
+- `test:dual`: base 511, concurrent 390 + helper 8, 위성(두 코어) helper 51, devHelper 12, ftags 10, ssr 30,
+  element 86(+3 skip)/89, **test 24(+1 skip)/25**. `test:toolchain`: hmr-parser 38, MDX 6, lithent-vite 5,
+  template-parser 126, template-vite 5.
+- `verify:release`: **ALL PASS** — 8개 pack, 격리 설치 소비자가 공개 경로 12개(`lithent/test` 포함)를 ESM·CommonJS로 불러오고,
+  Bundler·Node16·NodeNext 엄격 타입 검사 통과. 발행 없음.
+- `release:plan`: 후보 **1개 `lithent` 1.26.0** (`version-increased-and-unpublished`), 나머지 7개 already-published.
+  1.25.12 발행 커밋 `ac690e9`를 비교 기준으로 준 실행에서 "create-lithent: Source paths changed but this version will not be
+  published"(템플릿 4개 파일, #130·#133) — 위에 적은 대로 예상된 안내다.
+- `verify-plan-consumers`: `lithent@1.26.0` PASS (선택 archive + registry 의존성).
+- `pnpm size`: base 4,774 / 4,800B, Concurrent 6,690 / 9,000B, element 968 / 1,000B — 변화 없음.
+- `ci-build-artifacts create --require-clean`: 649개 파일을 `ceac992`(dirty=false)에 묶음.
+- 처음 실행에서 `verify:release`가 "Release output directory must be empty"로 멈췄다. 이전 릴리스 때의
+  `artifacts/release`가 남아 있었기 때문이다(CI는 빈 디렉터리에서 시작한다). 비우고 뒤의 네 단계를 같은 빌드로 다시 돌렸다.
+- 환경 차이: Node 22.23.5라 `pnpm_config_runtime_on_fail=ignore`, npm을 쓰는 검사에 `npm_config_force=true`.
+  Node 24.22.1과 Firefox·WebKit은 PR #133 CI에서 같은 코드(버전 번호·문서 제외)로 통과했고, 이 PR의 CI에서 다시 확인한다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 1.26.0·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
 ## lithent 1.25.12 / lithent-concurrent 0.2.8 / create-lithent 0.5.0 / @lithent/hmr-parser 0.2.6 / @lithent/lithent-vite 0.4.1 릴리스
 
 2026-11-20 사용자 요청으로 개발 모드 HMR 수정 두 건과 `create-lithent`의 위젯 템플릿을 배포한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-20)에 기록한다.

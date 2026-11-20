@@ -423,6 +423,24 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 
 See `reference/element.md` for prop conversion, events, styles and lifecycle.
 
+## Testing (optional)
+
+`lithent/test` renders into the test document and waits for lithent's
+renders. Queries and events come from `@testing-library/dom`.
+
+```tsx
+import { render, act } from 'lithent/test';
+import { screen, fireEvent } from '@testing-library/dom';
+
+render(<Counter />);
+await act(() => fireEvent.click(screen.getByRole('button', { name: '+1' })));
+expect(screen.getByText('count: 1')).toBeTruthy();
+```
+
+`renew()` draws in a microtask, so assert after `await act(...)`, not right
+after the event. See `reference/test.md` for setup, cleanup and what `act`
+waits for.
+
 ## Import Reference
 
 ```tsx
@@ -470,6 +488,9 @@ import { renderToString, hydration } from 'lithent/ssr';
 // Custom Elements
 import { defineElement, emit } from 'lithent/element';
 
+// Tests (with @testing-library/dom for queries and events)
+import { render, act, cleanup } from 'lithent/test';
+
 // FTags
 import { fTags, fFragment, fMount } from 'lithent/ftags';
 
@@ -480,5 +501,5 @@ import { lTag } from 'lithent/tag';
 ## Additional materials (optional)
 
 - `constraints/` (rules, mistakes, troubleshooting)
-- `reference/` (props types, children types, lstore inference, events, concurrent, element)
+- `reference/` (props types, children types, lstore inference, events, concurrent, element, test)
 - `examples/` (quick examples)

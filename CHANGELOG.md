@@ -1,8 +1,8 @@
 # Release notes
 
-## Unreleased
+## 2026-11-20
 
-### lithent (next minor): `lithent/test`
+### lithent 1.26.0: `lithent/test`
 
 - New `lithent/test` entry for component tests: `render` renders into a
   container attached to the document, `await act(fn)` runs `fn` and waits until
@@ -17,16 +17,19 @@
   `@testing-library/user-event`, which work as they are on the DOM lithent
   renders. ESM and CommonJS builds with declarations; the core and its size
   are unchanged.
-- Docs: a new Testing guide (English and Korean).
+- Docs: a new Testing guide (English and Korean). The bundled agent skill
+  (`dist/skills/lithent`) and `lithent-agent-addon.md` describe the same
+  workflow, including asserting only after `await act(...)`.
+- `lithent-concurrent` stays at 0.2.8: `lithent/test` imports the bare
+  `lithent`, so an app that aliases it to `lithent-concurrent` gets the
+  concurrent-aware waiting without a new concurrent release.
 
-### create-lithent templates
+### create-lithent templates (no package release)
 
 - The SPA and widget templates require `@types/node ^22.12.0` instead of
   `^20.19.0`, so `npm install --save-dev vitest` (Vitest 5 wants
   `@types/node` 22 or later) installs without a peer conflict. The supported
   Node versions are unchanged.
-
-## 2026-11-20
 
 ### lithent 1.25.12 / lithent-concurrent 0.2.8
 
