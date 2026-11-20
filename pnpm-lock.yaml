@@ -397,6 +397,42 @@ importers:
         specifier: ^4.5.4
         version: 4.5.4(@types/node@24.19.2)(rollup@4.24.0)(supports-color@8.1.1)(typescript@5.6.3)(vite@8.3.6(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2))
 
+  createLithent/widget:
+    devDependencies:
+      '@eslint/js':
+        specifier: ^9.16.0
+        version: 9.16.0
+      '@lithent/lithent-vite':
+        specifier: ^0.4.0
+        version: link:../../packages/lithentVite
+      '@types/node':
+        specifier: ^20.19.0
+        version: 20.19.25
+      eslint:
+        specifier: ^9.16.0
+        version: 9.16.0(jiti@2.7.0)(supports-color@8.1.1)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))
+      lithent:
+        specifier: ^1.25.10
+        version: link:../..
+      prettier:
+        specifier: ^3.4.2
+        version: 3.4.2
+      typescript:
+        specifier: ^5.6.3
+        version: 5.7.2
+      typescript-eslint:
+        specifier: ^8.17.0
+        version: 8.48.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@5.7.2)
+      vite:
+        specifier: ^8.3.6
+        version: 8.3.6(@types/node@20.19.25)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2)
+      vite-plugin-checker:
+        specifier: ^0.8.0
+        version: 0.8.0(eslint@9.16.0(jiti@2.7.0)(supports-color@8.1.1))(optionator@0.9.4)(typescript@5.7.2)(vite@8.3.6(@types/node@20.19.25)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.18.1)(yaml@2.4.2))
+
   devHelper:
     devDependencies:
       lithent:
