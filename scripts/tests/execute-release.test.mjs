@@ -190,8 +190,8 @@ test('an accepted upload with a confirmation failure remains unconfirmed for sou
   }
 });
 
-test('the default window confirms a version npm serves over a minute after upload and still gives up after five minutes', async () => {
-  for (const delayMs of [75_000, Infinity]) {
+test('the default window confirms a version npm serves eight and a half minutes after upload and still gives up after fifteen minutes', async () => {
+  for (const delayMs of [75_000, 510_000, Infinity]) {
     const f = await fixture();
     delete f.options.confirmationAttempts;
     let now = 0;
@@ -212,7 +212,7 @@ test('the default window confirms a version npm serves over a minute after uploa
         /Publication not confirmed: alpha/
       );
       assert.equal(f.snapshots.at(-1).packages[0].status, 'unconfirmed');
-      assert.equal(now, 300_000);
+      assert.equal(now, 900_000);
     } else {
       let result;
       await assert.doesNotReject(async () => {

@@ -1,9 +1,11 @@
 import { setTimeout as delay } from 'node:timers/promises';
 
-// npm can accept an upload and serve the version only a minute or more later
-// (lithent 1.25.6 appeared about 75 seconds after `npm publish` returned), so
-// a missing version is retried for five minutes before it counts as absent.
-export const visibilityWindow = { attempts: 31, delayMs: 10_000 };
+// npm can accept an upload and serve the version only minutes later: lithent
+// 1.25.6 appeared about 75 seconds after `npm publish` returned, and lithent
+// 1.25.12 stayed "Validating" on npm for about eight and a half minutes. A
+// missing version is retried for fifteen minutes before it counts as absent;
+// the publish and record jobs' timeouts in ci.yml leave room for that.
+export const visibilityWindow = { attempts: 91, delayMs: 10_000 };
 
 // Registry errors are not retried: they still end the lookup immediately.
 export async function waitForVersion(

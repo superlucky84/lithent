@@ -11,12 +11,12 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "express": "^4.21.1",
-    "lithent": "^1.25.10",
+    "lithent": "^1.25.12",
     "state-ref": "^2.0.0"
   },
   "devDependencies": {
     "@lithent/lithent-mdx": "^0.3.0",
-    "@lithent/lithent-vite": "^0.4.0",
+    "@lithent/lithent-vite": "^0.4.1",
     "@tailwindcss/vite": "4.3.4",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",

@@ -2,7 +2,7 @@
 
 - 브랜치: `ccr-3e48bc24-eapswq` / 기준 커밋 `395aaee`
 - 작성일: 2026-11-20
-- 상태: **구현·자동 검증·릴리스 준비 완료, 발행 대기** — [IMPLEMENT.md](./IMPLEMENT.md) 참고
+- 상태: **발행 완료 (2026-11-20, `@lithent/hmr-parser` 0.2.6 / `@lithent/lithent-vite` 0.4.1)** — [IMPLEMENT.md](./IMPLEMENT.md) 참고
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../widget-template/README.md](../widget-template/README.md) §3, §6-4
 - 코드 범위: `packages/hmrParser/src/strings.ts`, `packages/hmrParser/src/tests/`, `e2e/`
