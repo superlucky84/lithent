@@ -57,6 +57,8 @@ defineElement('pay-button', PayButton, { shadow: true, props: { amount: Number }
 
 "React 사이트든 jQuery 사이트든 5KB로 어디에나 심는다." → [../element/](../element/)
 
+시작 템플릿: `npx create-lithent my-widget --template widget` → [../widget-template/](../widget-template/)
+
 ### 3.2 `autoMount` — 서버 HTML 위의 선언형 아일랜드 ⛔ 보류 (2026-10-07)
 
 ```html
