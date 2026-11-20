@@ -32,6 +32,14 @@
 
 **로컬 준비 검증 (2026-11-20, 후보 커밋 `69b1311`, 깨끗한 작업 트리)**:
 
+PR #129의 첫 CI는 Quality의 빌드에서 멈췄다. devHelper 빌드가 테스트를 타입 검사하는데 새 테스트가 아직 빌드되지 않은
+`lithent/ssr`을 import했다(TS2307). 로컬에는 ssr dist가 남아 있어 드러나지 않았다. 테스트를 나눈 뒤(`dc80669`)
+`pnpm clean:dist`로 모든 dist를 지우고 CI Quality 단계를 순서대로 다시 돌렸다: `pnpm build`, `pnpm test:dual`,
+`pnpm test:toolchain`, release 스크립트 테스트 49개, 신뢰성 mutation 대조 44개(Node 22용으로
+`--experimental-test-isolation=none`만 바꾼 임시 사본), `pnpm verify:concurrent`, `pnpm verify:release`,
+`pnpm release:plan`(후보 5개), `verify-plan-consumers`(5개), `pnpm size`, `ci-build-artifacts create --require-clean`.
+모두 통과했다. 아래는 그 전 `69b1311`의 기록이다.
+
 - `pnpm build` 통과(`21d7d89`, 이후 `create-lithent` 버전만 바꾸고 CLI를 다시 빌드).
 - `pnpm verify:release --output-dir artifacts/release`: **ALL PASS** (8개 pack, 격리 설치 ESM/CJS 소비자, Node16/NodeNext 엄격 타입,
   도구 5종, 생성기 바이너리). 발행 없음.
