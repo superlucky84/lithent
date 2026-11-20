@@ -36,6 +36,7 @@ const directories = [
   'createLithent/basic/dist',
   'createLithent/express/dist',
   'createLithent/widget/dist',
+  'showcase/widget-compare/dist',
   'artifacts/release',
   'artifacts/release-plan.json',
   'artifacts/release-plan.md',
