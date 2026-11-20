@@ -47,10 +47,9 @@ const hostPage = () => ({
 
 export default defineConfig({
   plugins: [
-    // Hot-swaps edited components. Only .tsx files: a custom element cannot
-    // be defined twice, so edits to main.ts, the props or the CSS reload the
-    // page instead (the plugin would otherwise mark them as handled).
-    lithentVitePlugin({ include: /\.tsx$/ }),
+    // Hot-swaps edited components. A custom element cannot be defined twice,
+    // so edits to main.ts, the props or the CSS reload the page instead.
+    lithentVitePlugin(),
     hostPage(),
     !process.env.VITEST &&
       checker({
