@@ -8,7 +8,7 @@
  * broke both templates' `npm run build`). This needs the npm registry, so it
  * runs on a schedule rather than on pull requests.
  *
- *   node scripts/check-templates-fresh.mjs            # basic and express
+ *   node scripts/check-templates-fresh.mjs            # basic, express and widget
  *   node scripts/check-templates-fresh.mjs basic
  */
 import { cpSync, mkdtempSync, readdirSync, rmSync } from 'fs';
@@ -20,7 +20,7 @@ import { spawn, spawnSync } from 'child_process';
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const templates = process.argv.slice(2).length
   ? process.argv.slice(2)
-  : ['basic', 'express'];
+  : ['basic', 'express', 'widget'];
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 const run = (cwd, args) => {
