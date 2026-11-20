@@ -114,6 +114,13 @@ CODING GUIDELINES:
     - Default is an open shadow root; ship CSS with `styles`, theme via CSS variables and `::part()`
     - Avoid native property names (`title`, `hidden`) as props
 
+13. TESTS (when the user writes component tests)
+    - Use `lithent/test`: `render(<Component />)`, then `await act(() => fireEvent.click(el))`
+    - Queries and events come from `@testing-library/dom` (`screen`, `fireEvent`) or `user-event`
+    - Assert only after `await act(...)`: `renew()` draws in a microtask
+    - Without Vitest `globals: true`, add `afterEach(() => cleanup())`
+    - Test a prop change through a parent that owns the value, not a second `render`
+
 IMPORT PATHS:
 
 - Core: `import { mount, lmount, render, h, Fragment, portal, ref, nextTick } from 'lithent'`
@@ -124,6 +131,7 @@ IMPORT PATHS:
 - Concurrent (optional): `import { deferRender, whenIdle } from 'lithent-concurrent'` and `import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper'`
 - SSR: `import { renderToString, hydration } from 'lithent/ssr'`
 - Custom Elements: `import { defineElement, emit } from 'lithent/element'`
+- Tests: `import { render, act, cleanup } from 'lithent/test'`
 - FTags: `import { fTags, fFragment, fMount } from 'lithent/ftags'`
 - HTM: `import { lTag } from 'lithent/tag'`
 
@@ -157,6 +165,7 @@ COMMON MISTAKES TO CATCH:
 - Mutating state directly instead of using `.value`
 - Using `deferRender` while the urgent state and heavy list share one component
 - Aliasing `lithent` with a prefix match so `lithent/helper` is rewritten too
+- Asserting right after an event in a test without `await act(...)`
 
 REFERENCE MATERIALS (NOT PART OF BEHAVIORAL RULES):
 
@@ -164,6 +173,7 @@ For detailed code examples and API usage, refer to:
 node_modules/lithent/dist/skills/lithent/SKILL.md
 (concurrent details: node_modules/lithent/dist/skills/lithent/reference/concurrent.md)
 (custom elements: node_modules/lithent/dist/skills/lithent/reference/element.md)
+(tests: node_modules/lithent/dist/skills/lithent/reference/test.md)
 
 This reference material provides comprehensive examples, patterns,
 and import references that complement the behavioral guidelines above.
