@@ -1,5 +1,14 @@
 # Release notes
 
+## Unreleased
+
+### create-lithent templates
+
+- The SPA and widget templates require `@types/node ^22.12.0` instead of
+  `^20.19.0`, so `npm install --save-dev vitest` (Vitest 5 wants
+  `@types/node` 22 or later) installs without a peer conflict. The supported
+  Node versions are unchanged.
+
 ## 2026-11-20
 
 ### lithent 1.25.12 / lithent-concurrent 0.2.8
