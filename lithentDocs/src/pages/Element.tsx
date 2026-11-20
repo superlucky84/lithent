@@ -1,6 +1,6 @@
 import { CodeBlock } from '@/components/CodeBlock';
 import { ElementDemo } from '@/components/ElementDemo';
-import { navigateTo } from '@/store';
+import { BASE_URL, navigateTo } from '@/store';
 import { LifecycleLink } from './Lifecycle';
 
 const copy = {
@@ -11,6 +11,10 @@ const copy = {
     start: 'Start a widget project',
     startText:
       'create-lithent (0.5.0 or later) sets up a widget project: a demo element, a host page that uses it only through attributes, properties and events, and a build that writes one self-contained script for other pages to load, with a size budget.',
+    compareText:
+      'The same widget built with React 19, Preact 11 and Lit 3, with the same features and build settings, comes to 58.6 KB, 6.7 KB and 6.7 KB brotli; lithent’s is 6.1 KB. The comparison page has the load times, the four widgets side by side and how they were measured:',
+    compareLink: 'Same widget, four frameworks →',
+    comparePage: 'widget-compare/',
     define: 'Define an element',
     defineText:
       'Pass a mount or lmount component unchanged. Props are declared with constructors; the element observes each one as a kebab-case attribute and also exposes it as a property.',
@@ -102,6 +106,10 @@ const copy = {
     start: '위젯 프로젝트 시작하기',
     startText:
       'create-lithent(0.5.0 이상)로 위젯 프로젝트를 만들 수 있습니다. 데모 엘리먼트, 속성·프로퍼티·이벤트로만 위젯을 쓰는 호스트 페이지, 그리고 다른 페이지가 불러갈 스크립트 한 파일을 만드는 빌드와 크기 예산이 들어 있습니다.',
+    compareText:
+      '같은 위젯을 같은 기능·빌드 설정으로 React 19, Preact 11, Lit 3로 만들면 brotli로 58.6KB, 6.7KB, 6.7KB이고 lithent는 6.1KB입니다. 로딩 시간, 네 위젯을 나란히 써 보는 데모, 측정 방법은 비교 페이지에 있습니다:',
+    compareLink: '같은 위젯, 네 프레임워크 →',
+    comparePage: 'widget-compare/index.ko.html',
     define: '엘리먼트 정의',
     defineText:
       'mount나 lmount 컴포넌트를 수정 없이 넘깁니다. props는 생성자로 선언하고, 각 prop은 kebab-case 속성으로 관찰되며 프로퍼티로도 노출됩니다.',
@@ -220,6 +228,11 @@ npm install
 npm run dev     # the widget on a demo host page
 npm run build   # dist/my-widget.js: one file for a <script> tag`}
       />
+      <p>
+        {t.compareText}{' '}
+        {/* Not a docs route: a static page deployed next to the site. */}
+        <a href={`${BASE_URL}${t.comparePage}`}>{t.compareLink}</a>
+      </p>
 
       <h2>{t.define}</h2>
       <p>{t.defineText}</p>
