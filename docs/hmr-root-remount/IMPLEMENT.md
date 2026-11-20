@@ -8,7 +8,7 @@
 | 1 | 수정 (두 코어) | done |
 | 2 | 회귀 테스트 | done |
 | 3 | Integration Test | done |
-| 4 | 릴리스 준비 | done — 발행 대기 |
+| 4 | 릴리스 준비·발행 | done |
 
 ## Phase 0 — 재현·원인 확인: done
 
@@ -66,10 +66,11 @@ Refs: RQ-2, RQ-3, RQ-4
 
 Files: none
 
-## Phase 4 — 릴리스 준비: done (발행 대기)
+## Phase 4 — 릴리스 준비·발행: done
 
 Refs: DC-3
 
 - [x] `lithent` 1.25.12, `lithent-concurrent` 0.2.8, CHANGELOG, RELEASING (2026-11-20, `21d7d89`).
   준비 검증은 [RELEASING](../../RELEASING.md) 첫 절.
-- [ ] 발행 후 MANUAL M-3
+- [x] 발행 (2026-11-20, Validate run 44709005133, [RELEASING](../../RELEASING.md) 첫 절의 발행 기록)
+- [x] MANUAL M-3 (발행된 패키지로 만든 새 SSR 프로젝트)

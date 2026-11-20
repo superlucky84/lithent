@@ -9,7 +9,7 @@
 | 2 | 수정 | done |
 | 3 | Integration Test (toolchain, E2E, mutation, 템플릿) | done |
 | 3a | HMR 반복 점검 | done |
-| 4 | 릴리스 준비 | done — 발행 대기 |
+| 4 | 릴리스 준비·발행 | done |
 
 ## Phase 0 — 문서 작성: done
 
@@ -121,11 +121,13 @@ Refs: RQ-2, RQ-3
   교체하므로 이 버그를 만나는 경로가 늘어난다. → 릴리스 전에 고치는 것을 권한다 (DESIGN DC-3).
   → 수정 완료: [../hmr-root-remount/](../hmr-root-remount/).
 
-## Phase 4 — 릴리스 준비: done (발행 대기)
+## Phase 4 — 릴리스 준비·발행: done
 
 Refs: DC-3, DC-4
 
 - [x] `@lithent/hmr-parser` 0.2.6, `@lithent/lithent-vite` 0.4.1, CHANGELOG, RELEASING (2026-11-20, `21d7d89`).
   준비 검증은 [RELEASING](../../RELEASING.md) 첫 절.
-- [ ] 발행 후 위젯 템플릿: `@lithent/lithent-vite` 범위를 `^0.4.1`로 올리고 `include` 우회 제거 (DC-4, M-3에서 동작 확인)
-- [ ] 발행 후 MANUAL M-4
+- [x] 발행 (2026-11-20, Validate run 44709005133, 경과는 [RELEASING](../../RELEASING.md) 첫 절의 발행 기록)
+- [x] 위젯 템플릿: `@lithent/lithent-vite` 범위를 `^0.4.1`로 올리고 `include` 우회 제거 (DC-4). 세 템플릿 모두
+  `lithent ^1.25.12`, `@lithent/lithent-vite ^0.4.1`.
+- [x] MANUAL M-4 (발행된 패키지로 만든 새 SPA)

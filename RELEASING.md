@@ -23,12 +23,31 @@
   모든 버전에서 쓸 수 있고, 선택지와 `--template widget`은 0.5.0부터다. 0.4.1을 CI로 발행했으므로 Trusted Publisher는
   설정돼 있다.
 
-발행 뒤 후속 작업:
+**발행 기록 (2026-11-20)**: main `ac690e9`(PR #129 병합)에서 Validate run
+[44709005133](https://github.com/superlucky84/lithent/actions/runs/44709005133)으로 발행했다.
 
-- 위젯 템플릿의 `@lithent/lithent-vite` 범위를 `^0.4.1`로 올리고 `include: /\.tsx$/` 우회를 뺀다
-  ([hmr-propagation DESIGN DC-4](./docs/hmr-propagation/DESIGN.md)). 우회 없이 동작하는 것은 MANUAL M-3에서 확인했다.
-- 새 설치 검사(`node scripts/check-templates-fresh.mjs`)로 세 템플릿을 확인한다.
-- hmr-propagation M-4, hmr-root-remount M-3(새 프로젝트에서 확인).
+- 1차 시도: Browser (webkit)의 `e2e/parent-retention.spec.ts`(base, GC 뒤 `WeakRef` 회수 수)가 실패해 발행이 막혔다.
+  1.25.10 때와 같은 테스트이며 실패 잡 재실행에서 통과했다. 새 HMR·위젯 스펙은 모든 브라우저 실행에서 통과했다.
+- 2차 시도: `lithent` 1.25.12 업로드는 받아들여졌지만(`npm publish` 성공) npm이 이 버전을 "Validating" 상태로
+  약 8분 30초 두었다. 5분 확인 창을 넘겨 `unconfirmed`로 멈췄고, 나머지 4개는 시도하지 않았다(`pending`).
+  기록 job이 등록소에서 같은 integrity를 확인해 `recoveredUnconfirmed`로 `lithent@1.25.12` 태그를 만들고 문서 배포
+  ([44712403484](https://github.com/superlucky84/lithent/actions/runs/44712403484), 성공)를 요청했다.
+- 3차 시도: 실패 잡 재실행. `lithent`는 already-published-identical로 건너뛰고 `lithent-concurrent`(09:42),
+  `create-lithent`(09:46), `@lithent/hmr-parser`(09:48), `@lithent/lithent-vite`(09:50, UTC, 등록소에 보인 시각)를
+  발행했다. 다섯 버전의 integrity가 검증한 archive와 같고, 다섯 태그 모두 `ac690e9`에 있다. 다섯 패키지 모두 npm
+  `latest`가 새 버전이다. `@lithent/lithent-vite` 0.4.1은 `@lithent/hmr-parser`를 `0.2.6`으로 고정한다.
+- 후속 조치: 확인 창을 15분으로 늘리고 발행·기록 job 제한을 90분·30분으로 올렸다(아래 **CI 발행 절차**,
+  `scripts/npm-registry.mjs`).
+
+발행 뒤 후속 작업 (2026-11-20, 발행된 패키지로 확인):
+
+- 세 템플릿을 `lithent ^1.25.12`, `@lithent/lithent-vite ^0.4.1`로 올리고 위젯 템플릿의 `include: /\.tsx$/` 우회를 뺐다
+  ([hmr-propagation DESIGN DC-4](./docs/hmr-propagation/DESIGN.md)).
+- `node scripts/check-templates-fresh.mjs`: 세 템플릿 모두 npm 새 설치(`lithent@1.25.12`)로 빌드 통과, SSR 응답 200/404 통과.
+- `npx create-lithent@0.5.0 my-widget --template widget`: main의 위젯 템플릿을 받아 이름을 넣고, 설치·빌드(6.10KB
+  brotli)·브라우저 20개 항목 통과. 우회를 뺀 설정에서 컴포넌트 수정은 새로고침 없이, `main.ts`·CSS 수정은 새로고침으로 반영.
+- hmr-propagation M-4: 새 SPA에서 store 수정은 importer까지 새로고침 없이, 진입점 수정은 새로고침.
+  hmr-root-remount M-3: 새 SSR에서 `src/layout.tsx` 3회 수정 후에도 본문 유지.
 
 **로컬 준비 검증 (2026-11-20, 후보 커밋 `69b1311`, 깨끗한 작업 트리)**:
 
@@ -221,7 +240,7 @@ npm Trusted Publishing 운영 준비(미완료):
 - Quality·Chromium/Firefox/WebKit·CI가 모두 성공해야 publish를 시작한다. PR의 진행 중 검증은 새 커밋으로 취소할 수 있지만 main 발행은 자동 취소하지 않는다.
 - 후보가 0개면 정상 종료한다. A 발행 확인 후 B가 실패하면 실패 상태와 A의 성공을 receipt에 저장하고, 후속 job은 A의 태그를 기록한다. 다음 실행은 registry에 있는 A를 다시 발행하지 않는다.
 - GitHub Actions에서 **원래 main run의 실패 job을 재실행**하면 원래 Quality artifact output을 사용한다. run_attempt가 달라져도 올바른 build를 찾고, 같은 run/SHA의 이전 attempt receipt도 합쳐 성공 태그를 복구한다.
-- npm은 업로드를 받은 뒤 1분 넘게 지나서야 새 버전을 보여줄 수 있다(lithent 1.25.6은 약 75초). 발행·기록 job은 버전이 보이지 않으면 10초 간격으로 최대 5분 기다린다. registry 오류는 기다리지 않고 바로 실패로 처리한다.
+- npm은 업로드를 받은 뒤 몇 분이 지나서야 새 버전을 보여줄 수 있다(lithent 1.25.6은 약 75초, 1.25.12는 npm의 "Validating" 상태로 약 8분 30초). 발행·기록 job은 버전이 보이지 않으면 10초 간격으로 최대 15분 기다린다(2026-11-20 전에는 5분). 그래서 발행 job은 후보 5개가 모두 끝까지 기다려도 되도록 90분, 기록 job은 30분 제한을 둔다. registry 오류는 기다리지 않고 바로 실패로 처리한다.
 - 업로드 시도 뒤 registry 확인이 오류/timeout/가시성 기한 소진으로 끝나면 패키지는 **unconfirmed**, 발행 job은 실패다. 후속 기록 job은 원래 run/clean SHA와 archive 이름·size·SHA-256·SRI가 같은 receipt를 registry에서 재확인한다. 일치하면 태그와 root 문서 요청을 복구하며 `recoveredUnconfirmed: true`를 기록한다. 계속 404/오류/다른 SRI이면 기록 job도 실패하므로 빈 성공으로 취급하지 않는다.
 - 위 미확정 receipt가 남아 있으면 발행 job이 같은 버전을 skipped로 처리하거나, 같은 commit의 Quality 재실행에서 후보가 0개가 되어도 원래 run의 기록 job이 복구한다. 업로드 전 실패·pending·skipped·중단된 publishing 상태만으로는 과거 발행을 인수하지 않는다. 다른 run/SHA에 있는 발행도 자동 복구하지 않는다.
 - 태그/문서 기록만 실패했으면 원래 run의 **Record release tags and dispatch docs** job을 재실행한다. 기존 동일 SHA 태그는 유지하며 docs dispatch를 재시도한다.

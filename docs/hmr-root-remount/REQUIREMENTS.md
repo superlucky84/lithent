@@ -2,7 +2,7 @@
 
 - 브랜치: `ccr-3e48bc24-eapswq` / 기준 커밋 `d4fdef9`
 - 작성일: 2026-11-20
-- 상태: **구현·자동 검증·릴리스 준비 완료, 발행 대기** — [IMPLEMENT.md](./IMPLEMENT.md) 참고
+- 상태: **발행 완료 (2026-11-20, `lithent` 1.25.12 / `lithent-concurrent` 0.2.8)** — [IMPLEMENT.md](./IMPLEMENT.md) 참고
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../hmr-propagation/IMPLEMENT.md](../hmr-propagation/IMPLEMENT.md) Phase 3a
 - 코드 범위: `src/render.ts`, `lithentConcurrent/src/render.ts`, `devHelper/src/tests/`, `ssr/src/tests/`
