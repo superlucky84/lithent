@@ -9,7 +9,7 @@
 | 2 | 배포 연결 (exports, 빌드, 테스트, 릴리스 검사, CI 산출물) | done |
 | 3 | 문서 사이트, README, CHANGELOG | done |
 | 4 | 통합 검증 | done |
-| 5 | 릴리스 준비 (`lithent` 1.26.0) | done — 발행 대기 |
+| 5 | 릴리스 준비·발행 (`lithent` 1.26.0) | done |
 
 ## Phase 0 — 문서 작성: done
 
@@ -89,11 +89,11 @@ Files:
 - [x] MANUAL M-1~M-3
 - 환경: Node 22.23.5 (저장소 요구 24.22.1 없음, `pnpm_config_runtime_on_fail=ignore`), Chromium만
 
-## Phase 5 — 릴리스 준비: done (발행 대기)
+## Phase 5 — 릴리스 준비·발행: done
 
 - [x] PR #133 병합 (CI: Quality, Chromium·Firefox·WebKit 통과)
 - [x] `lithent` 1.26.0, CHANGELOG `2026-11-20` 절, README 패키지 표, 에이전트 스킬(`reference/test.md`, SKILL.md Testing 절)과
   `lithent-agent-addon.md` 테스트 규칙
 - [x] 로컬 CI Quality 순서 검증 — [RELEASING](../../RELEASING.md) 첫 절
-- [ ] 발행 (main에서 Validate 수동 실행)
-- [ ] 발행 후 MANUAL M-4
+- [x] 발행 (2026-11-20, Validate run 44788187378, 경과는 [RELEASING](../../RELEASING.md) 첫 절의 발행 기록)
+- [x] 발행 후 MANUAL M-4
