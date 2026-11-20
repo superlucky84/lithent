@@ -37,13 +37,18 @@ Files:
 
 Refs: RQ-1, RQ-2
 
-- [x] `devHelper/src/tests/boundary-htmlRoot.test.tsx`: hydration·render 각각 3회 교체 후
+- [x] `devHelper/src/tests/boundary-htmlRoot.test.tsx`: `render`로 붙인 루트, 3회 교체 후
   `header` 1개, `h1` 1개, 최신 내용, `<html lang>` 유지
-- 결과 (2026-11-20): 수정 전 코어에서 두 코어 모두 2개 실패(`expected to have a length of 1 but got +0`),
-  수정 후 두 코어 모두 통과.
+- [x] `ssr/src/tests/hydrationHtmlRootHmr.test.tsx`: `hydration`으로 붙인 루트(SSR 템플릿과 같은 상태), 3회 교체
+- 결과 (2026-11-20): 수정 전 코어에서 두 테스트 모두 두 코어에서 실패, 수정 후 모두 통과.
+- PR #129 첫 CI 실패: 처음에는 두 경우를 devHelper 테스트 하나에 두고 `lithent/ssr`을 import했다.
+  devHelper 빌드가 테스트를 타입 검사할 때 ssr이 아직 빌드되지 않아 TS2307로 Quality가 멈췄다
+  (로컬은 ssr dist가 이미 있어 드러나지 않음). hydration 경우를 ssr 패키지로 옮기고, dist를 모두 지운 뒤
+  CI 순서대로 다시 확인했다(Phase 3).
 
 Files:
 - `devHelper/src/tests/boundary-htmlRoot.test.tsx` (added)
+- `ssr/src/tests/hydrationHtmlRootHmr.test.tsx` (added)
 
 ## Phase 3 — Integration Test: done
 

@@ -5,7 +5,7 @@
 - 상태: **구현·자동 검증·릴리스 준비 완료, 발행 대기** — [IMPLEMENT.md](./IMPLEMENT.md) 참고
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../hmr-propagation/IMPLEMENT.md](../hmr-propagation/IMPLEMENT.md) Phase 3a
-- 코드 범위: `src/render.ts`, `lithentConcurrent/src/render.ts`, `devHelper/src/tests/`
+- 코드 범위: `src/render.ts`, `lithentConcurrent/src/render.ts`, `devHelper/src/tests/`, `ssr/src/tests/`
 
 ## 1. 배경
 
@@ -37,7 +37,7 @@ hmr-propagation 수정 뒤에는 `src/favorites.ts`를 고쳐도 Layout이 교�
 
 | ID | 요구사항 | 검증 |
 |---|---|---|
-| RQ-1 | `<html>`을 렌더하는 루트 컴포넌트를 HMR로 여러 번 교체해도 본문이 남고 최신 내용이 보인다 (hydration, render 둘 다) | devHelper 단위 테스트(두 코어), SSR 템플릿 수동 확인 |
+| RQ-1 | `<html>`을 렌더하는 루트 컴포넌트를 HMR로 여러 번 교체해도 본문이 남고 최신 내용이 보인다 (hydration, render 둘 다) | devHelper·ssr 단위 테스트(두 코어), SSR 템플릿 수동 확인 |
 | RQ-2 | 두 코어가 같은 동작을 한다 | `test:satellites`, `test:satellites:concurrent` |
 | RQ-3 | `<html>`이 아닌 루트, `afterElement`가 있는 루트의 삽입은 그대로다 | `test:dual` |
 | RQ-4 | base 코어 크기 예산(brotli 4,800B)을 지킨다 | `pnpm size` |

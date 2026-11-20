@@ -13,8 +13,9 @@
   instead of `hydration`). Both cores now move the wrapper to the new `<html>`.
 - Base core: brotli 4,763 → 4,774B (budget 4,800). Concurrent: 6,667 →
   6,690B. No public API change.
-- `lithent/devHelper`: new regression test for repeated `<html>` root
-  replacements on both cores.
+- New regression tests for repeated HMR replacements of an `<html>` root on
+  both cores: attached with `render` (`devHelper`) and with `hydration`
+  (`lithent/ssr`).
 
 ### @lithent/hmr-parser 0.2.6 / @lithent/lithent-vite 0.4.1
 
