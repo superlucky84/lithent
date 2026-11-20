@@ -35,6 +35,25 @@
   8 seconds), across ten edit scenarios on both cores. An injected endless
   replacement that logs nothing is caught by its DOM changes.
 
+### create-lithent 0.5.0
+
+- New `widget` template: a lithent component registered as a Custom Element
+  with `lithent/element`, for embedding in any website with one `<script>` tag.
+  The build writes a self-contained `dist/<project-name>.js` (about 6 KB brotli
+  for the demo, lithent included), an ES module build, and a demo host page
+  that uses the widget only through attributes, properties and DOM events. It
+  fails when the bundle passes a 10 KB brotli budget.
+- Name a built-in template with `--template ssr`, `spa` or `widget`, and pick
+  "Widget (Custom Element)" from the prompt. Other `--template` values are
+  paths, GitHub shorthands or URLs as before; use `./widget` for a local folder.
+- The package no longer ships compiled copies of the SPA template's
+  TypeScript files under `dist/basic/`.
+
+The generator downloads templates from `main`, so the widget template is also
+available to earlier versions through
+`--template https://github.com/superlucky84/lithent/tree/main/createLithent/widget`
+once merged; the short name and the prompt choice need 0.5.0.
+
 ## 2026-11-13
 
 ### lithent 1.25.11
