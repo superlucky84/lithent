@@ -204,12 +204,14 @@ ${color.heading("Creating a new project")}:
 
 Lithent projects are created from templates. A template can be:
 
+- a built-in template: ssr (Express), spa (Vite) or widget (Custom Element)
 - a GitHub repo shorthand, :username/:repo or :username/:repo/:directory
 - the URL of a GitHub repo (or directory within it)
 - the URL of a tarball
 - a file path to a directory of files
 - a file path to a tarball
 ${[
+  "widget",
   ":username/:repo",
   ":username/:repo/:directory",
   "https://github.com/:username/:repo",
@@ -320,19 +322,41 @@ function validatePackageManager(pkgManager: string): PackageManager {
     : 'npm';
 }
 
-const TEMPLATE_URLS: Record<'ssr' | 'spa', string> = {
+type TemplateName = 'ssr' | 'spa' | 'widget';
+
+const TEMPLATE_URLS: Record<TemplateName, string> = {
   ssr: 'https://github.com/superlucky84/lithent/tree/main/createLithent/express',
   spa: 'https://github.com/superlucky84/lithent/tree/main/createLithent/basic',
+  widget:
+    'https://github.com/superlucky84/lithent/tree/main/createLithent/widget',
+};
+
+const TEMPLATE_LABELS: Record<TemplateName, string> = {
+  ssr: 'SSR (Express)',
+  spa: 'SPA (Vite)',
+  widget: 'Widget (Custom Element)',
+};
+
+const isTemplateName = (value: string): value is TemplateName =>
+  Object.prototype.hasOwnProperty.call(TEMPLATE_URLS, value);
+
+const useTemplate = (ctx: Context, name: TemplateName) => {
+  ctx.template = TEMPLATE_URLS[name];
+  ctx.templateLabel = TEMPLATE_LABELS[name];
 };
 
 async function templateSelectionStep(ctx: Context) {
   if (ctx.template) {
+    // `--template widget` names a built-in template; anything else is a
+    // path, a GitHub shorthand or a URL (use `./widget` for a local folder).
+    if (isTemplateName(ctx.template)) {
+      useTemplate(ctx, ctx.template);
+    }
     return;
   }
 
   if (!ctx.interactive) {
-    ctx.template = TEMPLATE_URLS.ssr;
-    ctx.templateLabel = 'SSR (Express)';
+    useTemplate(ctx, 'ssr');
     return;
   }
 
@@ -342,16 +366,13 @@ async function templateSelectionStep(ctx: Context) {
     label: title('template'),
     message: 'Which template do you want to install?',
     initial: 'ssr',
-    choices: [
-      { label: 'SSR (Express)', value: 'ssr' },
-      { label: 'SPA (Vite)', value: 'spa' },
-    ],
+    choices: (Object.keys(TEMPLATE_LABELS) as TemplateName[]).map(value => ({
+      label: TEMPLATE_LABELS[value],
+      value,
+    })),
   });
 
-  const choice = templateChoice as 'ssr' | 'spa';
-  ctx.template = TEMPLATE_URLS[choice];
-  ctx.templateLabel =
-    choice === 'spa' ? 'SPA (Vite)' : 'SSR (Express)';
+  useTemplate(ctx, templateChoice as TemplateName);
 }
 
 async function copyTemplateToTempDirStep(ctx: Context) {
