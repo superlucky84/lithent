@@ -102,5 +102,8 @@ It also checks JSX lists, mount cleanup, and empty output becoming visible and
 empty again, plus direct function calls from another module that keep the
 caller's state. `hmr-mixed-exports.spec.ts` verifies that component-only changes
 preserve parent state, while ordinary export changes update the importer and
-clean up the previous root. The fixture watcher waits for each file write to
+clean up the previous root. `hmr-propagation.spec.ts` verifies that modules
+without components pass their updates on: a store edit reaches the importing
+component without a reload, and an edit to an entry that only renders reloads
+the page once. The fixture watcher waits for each file write to
 finish so rapid automated edits are not lost to change-event throttling.

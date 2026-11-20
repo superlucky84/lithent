@@ -193,7 +193,8 @@ try {
   if (mutation !== 'hmr-reload')
     config.plugins.push(
       lithentVite({
-        include: /\.e2e-work\/.*(?:Counter|Stateless|Mixed|mixed-app)\.tsx$/,
+        include:
+          /\.e2e-work\/.*(?:Counter|Stateless|Mixed|mixed-app|Greeting|greeting-store|propagation-app)\.tsx?$/,
       })
     );
   config.oxc = { jsx: { runtime: 'automatic', importSource: 'lithent' } };
