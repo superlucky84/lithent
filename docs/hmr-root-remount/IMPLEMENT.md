@@ -8,7 +8,7 @@
 | 1 | 수정 (두 코어) | done |
 | 2 | 회귀 테스트 | done |
 | 3 | Integration Test | done |
-| 4 | 릴리스 준비 | 대기 — DESIGN DC-3 확정 필요 |
+| 4 | 릴리스 준비 | done — 발행 대기 |
 
 ## Phase 0 — 재현·원인 확인: done
 
@@ -61,8 +61,10 @@ Refs: RQ-2, RQ-3, RQ-4
 
 Files: none
 
-## Phase 4 — 릴리스 준비: 대기
+## Phase 4 — 릴리스 준비: done (발행 대기)
 
 Refs: DC-3
 
-- [ ] DC-3 확정 후 버전, CHANGELOG, RELEASING
+- [x] `lithent` 1.25.12, `lithent-concurrent` 0.2.8, CHANGELOG, RELEASING (2026-11-20, `21d7d89`).
+  준비 검증은 [RELEASING](../../RELEASING.md) 첫 절.
+- [ ] 발행 후 MANUAL M-3

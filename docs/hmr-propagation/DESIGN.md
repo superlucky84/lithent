@@ -38,7 +38,7 @@ import.meta.hot.accept(mod => { ... });
     - store를 고치면 새로고침 없이 새 값이 보인다.
     - 진입점을 고치면 페이지가 한 번 새로고침되고, 앱은 하나만 있다.
   - 고치기 전 코드에서 두 테스트가 실패하는 것을 먼저 확인한다.
-- [ ] DC-3 릴리스 — **메인테이너 확정 필요.** 제안: `@lithent/hmr-parser` 0.2.5 → 0.2.6,
+- [x] DC-3 릴리스 — 사용자 확정(2026-11-20): `@lithent/hmr-parser` 0.2.5 → 0.2.6,
   `@lithent/lithent-vite` 0.4.0 → 0.4.1 (둘 다 patch).
   - `lithent-vite`는 `@lithent/hmr-parser`를 `workspace:*`로 의존하고, 발행할 때 정확한 버전으로
     고정된다. hmr-parser만 올리면 기존 lithent-vite 사용자에게 닿지 않는다.

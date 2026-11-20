@@ -37,7 +37,7 @@ const insertRoot = (wDom: WDom, element: Node) => {
   - HMR이 쓰는 경로(`createBoundary` → `replaceWDom`) 그대로이고, `LITHENT_CORE=concurrent`로
     두 코어를 모두 돈다. jsdom에서 수정 전 코드로 재현된다.
   - 실제 브라우저·Vite는 SSR 템플릿 수동 확인(MANUAL M-1, M-2)과, 다음 작업인 HMR 반복 감지 E2E에서 본다.
-- [ ] DC-3 릴리스 — **메인테이너 확정 필요.** 제안: `lithent` 1.25.11 → 1.25.12,
+- [x] DC-3 릴리스 — 사용자 확정(2026-11-20): `lithent` 1.25.11 → 1.25.12,
   `lithent-concurrent` 0.2.7 → 0.2.8 (patch). 두 코어의 런타임 코드가 바뀐다.
   hmr-propagation의 `@lithent/hmr-parser` 0.2.6, `@lithent/lithent-vite` 0.4.1과 함께 내는 것을 권한다
   (그 수정으로 Layout 교체가 늘어난다).
