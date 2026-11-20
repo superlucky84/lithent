@@ -5,7 +5,7 @@
     "brotli": 6218,
     "sha256": "4758531074f5ab569cab7a7e325aefc339b1903da2fad9bd2cf4ee0b31a1c9d8",
     "packages": {
-      "lithent": "1.25.12"
+      "lithent": "1.26.0"
     }
   },
   "react": {
