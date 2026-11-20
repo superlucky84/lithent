@@ -35,6 +35,11 @@ REQUIREMENTS / DESIGN / IMPLEMENT / MANUAL_TEST_CHECKLIST를 만들고 여기서
 | **레거시 서버 렌더링 페이지** (JSP, Thymeleaf, PHP) | SPA 전환 예산 없음, jQuery 스파게티 | 빌드 없이 영역 단위 컴포넌트화 | `lithent/element`의 `shadow: false` (§3.2 — `autoMount`는 보류) |
 | **폼 많은 백오피스** | 편집 중 덮어쓰기 사고 | draft 격리 + 충돌 표시 | **Draft Boundary** (§3.3) |
 
+위젯 자리의 측정 (2026-11-20, [../widget-compare/](../widget-compare/)): 위젯 템플릿과 같은 위젯을 같은 빌드
+설정으로 만들면 brotli lithent 6.07KB, React 58.56KB, Preact 6.73KB, Lit 6.67KB. 모바일 제한 프로필에서
+표시까지 lithent 391ms, React 694ms, Preact 395ms, Lit 400ms. React 대비 주장은 측정으로 뒷받침되지만
+Preact·Lit과는 크기·로딩이 같은 등급이다. 이 둘과의 차이는 크기가 아닌 데서 보여야 한다.
+
 ### 2.2 기능보다 먼저 채워야 할 도입 승인 체크리스트
 
 | 항목 | 할 일 |

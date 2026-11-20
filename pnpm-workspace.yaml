@@ -15,6 +15,7 @@ packages:
   - 'createLithent/express'
   - 'createLithent/basic'
   - 'createLithent/widget'
+  - 'showcase/widget-compare'
   - 'packages/hmrParser'
   - 'packages/lithentVite'
   - 'packages/lithentMdx'

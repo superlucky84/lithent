@@ -97,4 +97,5 @@ Firefox·WebKit E2E는 이 환경에 브라우저가 없어 돌리지 않았다.
 3. ~~문서 사이트~~ — Custom Elements 가이드(영어·한국어) 첫 절에 "위젯 프로젝트 시작하기"를 넣었다.
 4. ~~`@lithent/lithent-vite` 버그~~ — 0.4.1로 발행, 이 템플릿의 `include` 우회를 뺐다
    ([../hmr-propagation/](../hmr-propagation/)).
-5. **비교 쇼케이스.** 같은 위젯을 React·Preact로 만든 크기·로딩 비교 페이지(IDEAS §2.1의 증거).
+5. ~~비교 쇼케이스~~ — React·Preact·Lit으로 만든 같은 위젯의 크기·로딩 비교 페이지,
+   [../widget-compare/](../widget-compare/). brotli lithent 6.07KB, React 58.56KB, Preact 6.73KB, Lit 6.67KB.
