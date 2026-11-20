@@ -119,6 +119,7 @@ Refs: RQ-2, RQ-3
   수정하면 두 번째에 `header`·`main`이 사라진다. 콘솔 오류는 없다. 첫 수정은 정상이고 Header만 수정할
   때는 정상이다. 수정 전 코드(`395aaee`)에서도 같다. 이번 수정 뒤에는 `src/favorites.ts` 수정도 Layout을
   교체하므로 이 버그를 만나는 경로가 늘어난다. → 릴리스 전에 고치는 것을 권한다 (DESIGN DC-3).
+  → 수정 완료: [../hmr-root-remount/](../hmr-root-remount/).
 
 ## Phase 4 — 릴리스 준비: 대기
 

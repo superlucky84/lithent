@@ -44,6 +44,7 @@ import.meta.hot.accept(mod => { ... });
     고정된다. hmr-parser만 올리면 기존 lithent-vite 사용자에게 닿지 않는다.
   - 권장: SSR 템플릿의 Layout(`<html>` 루트) 두 번째 교체 시 본문이 사라지는 기존 버그
     (IMPLEMENT Phase 3a)를 먼저 고친다. 이번 수정으로 store 수정도 Layout을 교체하게 되어 더 자주 드러난다.
+    → 수정 완료 [../hmr-root-remount/](../hmr-root-remount/). 두 수정을 함께 릴리스한다.
 - [x] DC-4 위젯 템플릿의 `lithentVitePlugin({ include: /\.tsx$/ })` 우회는 이번에 그대로 둔다.
   템플릿은 발행된 `@lithent/lithent-vite ^0.4.0`을 설치하므로, 0.4.1 발행 뒤 범위를 올리면서 뺀다.
   `feedbackProps.ts` 분리는 우회가 아니라 설계라서 유지한다
