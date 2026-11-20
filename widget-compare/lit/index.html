@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Widget host page</title>
+    <!--
+      This page plays the customer's website. It knows nothing about lithent:
+      it loads one script, places a tag, and talks to the widget through
+      attributes, properties and DOM events.
+    -->
+    <style>
+      body {
+        margin: 0;
+        padding: 32px 16px;
+        background: #f8fafc;
+        color: #0f172a;
+        font:
+          16px/1.6 Georgia,
+          'Times New Roman',
+          serif;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      /* Page styles that would wreck an unprotected widget. */
+      button {
+        font:
+          14px/1 'Courier New',
+          monospace;
+        text-transform: uppercase;
+        background: #fde68a;
+        border: 2px dashed #92400e;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+      p {
+        letter-spacing: 0.02em;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin: 16px 0;
+      }
+      .controls label {
+        font-size: 14px;
+      }
+      #log {
+        min-height: 3em;
+        margin: 0;
+        padding: 12px;
+        overflow-x: auto;
+        background: #0f172a;
+        color: #e2e8f0;
+        font:
+          12px/1.5 ui-monospace,
+          Menlo,
+          monospace;
+        white-space: pre-wrap;
+      }
+      feedback-widget.dark {
+        --feedback-bg: #1e293b;
+        --feedback-text: #f1f5f9;
+        --feedback-muted: #94a3b8;
+        --feedback-border: #334155;
+        --feedback-accent: #f59e0b;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Pricing</h1>
+      <p>
+        A page that could be built with anything: a server template, React,
+        WordPress. The card below is the widget, loaded from a single script.
+        The page's own button and paragraph styles do not reach inside it.
+      </p>
+
+      <feedback-widget page-id="pricing" question="Was this page helpful?">
+        <small slot="footer">We read every message.</small>
+      </feedback-widget>
+
+      <h2>What the page does with it</h2>
+      <div class="controls">
+        <button type="button" id="next-page">Go to the next page</button>
+        <button type="button" id="korean">Korean labels</button>
+        <button type="button" id="dark">Dark theme</button>
+        <label>
+          <input type="checkbox" id="reject" />
+          Reject the next submit
+        </label>
+      </div>
+      <pre id="log" aria-live="polite"></pre>
+    </main>
+
+    <script src="./widget.js"></script>
+    <script>
+      const widget = document.querySelector('feedback-widget');
+      const log = document.getElementById('log');
+      const write = line => {
+        log.textContent = `${line}\n${log.textContent}`;
+      };
+
+      // Events: the widget's output.
+      widget.addEventListener('feedback-rate', event => {
+        write(`feedback-rate ${JSON.stringify(event.detail)}`);
+      });
+      widget.addEventListener('feedback-submit', event => {
+        if (document.getElementById('reject').checked) {
+          // Cancelling keeps the form open, e.g. when saving failed.
+          event.preventDefault();
+          write('feedback-submit cancelled by the page');
+          return;
+        }
+        // A real page would send event.detail to its server here.
+        write(`feedback-submit ${JSON.stringify(event.detail)}`);
+      });
+
+      // Attributes: strings, numbers and flags.
+      const pages = ['pricing', 'docs', 'blog'];
+      document.getElementById('next-page').addEventListener('click', () => {
+        const next =
+          pages[
+            (pages.indexOf(widget.getAttribute('page-id')) + 1) % pages.length
+          ];
+        widget.setAttribute('page-id', next);
+        document.querySelector('h1').textContent =
+          next[0].toUpperCase() + next.slice(1);
+        write(`page-id = "${next}" (the widget starts over)`);
+      });
+
+      // Properties: objects as they are, no JSON needed.
+      document.getElementById('korean').addEventListener('click', () => {
+        widget.question = '이 페이지가 도움이 되었나요?';
+        widget.labels = {
+          ratings: ['매우 나쁨', '나쁨', '보통', '좋음', '매우 좋음'],
+          placeholder: '더 나아질 점이 있을까요? (선택)',
+          send: '보내기',
+          thanks: '의견 감사합니다!',
+          again: '다시 보내기',
+        };
+        write('labels = { ... } (property)');
+      });
+
+      // Theme: CSS custom properties set from outside.
+      document.getElementById('dark').addEventListener('click', () => {
+        widget.classList.toggle('dark');
+      });
+    </script>
+  </body>
+</html>

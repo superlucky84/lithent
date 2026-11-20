@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>같은 위젯, 네 프레임워크 · lithent</title>
+<meta name="description" content="같은 위젯, 네 프레임워크: lithent, React, Preact, Lit" />
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --surface: #f6f7f9;
+  --text: #16181d;
+  --muted: #5b616e;
+  --border: #e2e5ea;
+  --accent: #2f6fdf;
+  --bar: #9db6e8;
+  --bar-lithent: #2f6fdf;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #111318;
+    --surface: #1a1d24;
+    --text: #e8eaee;
+    --muted: #a0a6b2;
+    --border: #2c313b;
+    --accent: #7ea6f2;
+    --bar: #3f5784;
+    --bar-lithent: #7ea6f2;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #111318;
+  --surface: #1a1d24;
+  --text: #e8eaee;
+  --muted: #a0a6b2;
+  --border: #2c313b;
+  --accent: #7ea6f2;
+  --bar: #3f5784;
+  --bar-lithent: #7ea6f2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+}
+main { max-width: 1040px; margin: 0 auto; padding: 40px 16px 64px; }
+a { color: var(--accent); }
+code { font: 0.9em ui-monospace, Menlo, Consolas, monospace; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+h1 { margin: 0; font-size: 2rem; line-height: 1.2; }
+h2 { margin: 48px 0 8px; font-size: 1.35rem; }
+h3 { margin: 24px 0 8px; font-size: 1rem; }
+.lede { max-width: 760px; font-size: 1.05rem; }
+.note { max-width: 760px; color: var(--muted); font-size: 0.95rem; }
+.scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 10px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--border); }
+th:first-child, td:first-child { text-align: left; }
+tbody tr:last-child td { border-bottom: 0; }
+th { font-size: 0.85rem; font-weight: 600; color: var(--muted); background: var(--surface); }
+td.bar { width: 40%; min-width: 160px; }
+.track { position: relative; height: 10px; border-radius: 5px; background: var(--surface); }
+.fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 5px; background: var(--bar); }
+tr.lithent .fill { background: var(--bar-lithent); }
+.range { position: absolute; top: 0; bottom: 0; border-radius: 5px; background: var(--bar); }
+tr.lithent .range { background: var(--bar-lithent); }
+.name { font-weight: 600; }
+.small { color: var(--muted); font-size: 0.85rem; }
+.wrap { white-space: normal; text-align: left; }
+.notice { max-width: 760px; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--surface); }
+.demos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 16px; }
+figure { margin: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+figcaption { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; padding: 10px 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
+iframe { display: block; width: 100%; height: 560px; border: 0; background: #f8fafc; }
+ul { padding-left: 20px; max-width: 760px; }
+li { margin: 6px 0; }
+pre { overflow-x: auto; padding: 12px 14px; border-radius: 10px; background: var(--surface); }
+footer { margin-top: 56px; color: var(--muted); font-size: 0.9rem; }
+/* Phones: keep the compared numbers, drop the secondary columns. */
+@media (max-width: 640px) {
+  .opt { display: none; }
+  td.bar { min-width: 96px; }
+  th, td { padding: 8px; }
+  iframe { height: 480px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header><h1>같은 위젯, 네 프레임워크</h1><a href="./index.html" hreflang="en">English</a></header>
+  <p class="lede"><code>npx create-lithent my-widget --template widget</code>이 만드는 피드백 카드를 lithent, React, Preact, Lit으로 네 번 만들었습니다. 빌드마다 프레임워크가 들어 있는 <code>&lt;script&gt;</code> 파일 하나이고, 어떤 페이지든 불러 쓸 수 있습니다. 기능·스타일시트·빌드 설정이 같고, 같은 브라우저 테스트가 네 빌드에 똑같은 단계를 돌립니다.</p>
+
+  <h2>번들 크기</h2>
+  <p class="note">버전마다 minify된 IIFE 하나입니다. Vite가 같은 target과 production 모드로 빌드했습니다. React와 Preact에는 직접 쓴 작은 커스텀 엘리먼트 래퍼(<a href="https://github.com/superlucky84/lithent/blob/main/showcase/widget-compare/src/shared/define-element.ts">소스</a>)가 함께 들어 있습니다. 다른 두 빌드에서는 lithent/element와 LitElement가 그 일을 합니다.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>버전</th><th class="opt">minify</th><th class="opt">gzip</th><th>brotli</th><th></th><th>brotli, lithent 대비</th><th class="wrap">window에 남기는 것</th></tr></thead>
+    <tbody><tr class="lithent">
+      <td><span class="name">lithent</span><br /><span class="small">lithent 1.25.12</span></td>
+      <td class="opt">15.83 KB</td>
+      <td class="opt">6.63 KB</td>
+      <td><strong>6.07 KB</strong></td>
+      <td class="bar"><div class="track"><div class="fill" style="width:10.4%"></div></div></td>
+      <td>1.00×</td>
+      <td class="wrap small">없음</td>
+    </tr><tr class="react">
+      <td><span class="name">React</span><br /><span class="small">react 19.3.1, react-dom 19.3.1</span></td>
+      <td class="opt">218.57 KB</td>
+      <td class="opt">68.02 KB</td>
+      <td><strong>58.56 KB</strong></td>
+      <td class="bar"><div class="track"><div class="fill" style="width:100.0%"></div></div></td>
+      <td>9.64×</td>
+      <td class="wrap small">없음</td>
+    </tr><tr class="preact">
+      <td><span class="name">Preact</span><br /><span class="small">preact 11.2.0</span></td>
+      <td class="opt">17.47 KB</td>
+      <td class="opt">7.46 KB</td>
+      <td><strong>6.73 KB</strong></td>
+      <td class="bar"><div class="track"><div class="fill" style="width:11.5%"></div></div></td>
+      <td>1.11×</td>
+      <td class="wrap small">없음</td>
+    </tr><tr class="lit">
+      <td><span class="name">Lit</span><br /><span class="small">lit 3.3.3</span></td>
+      <td class="opt">19.72 KB</td>
+      <td class="opt">7.47 KB</td>
+      <td><strong>6.67 KB</strong></td>
+      <td class="bar"><div class="track"><div class="fill" style="width:11.4%"></div></div></td>
+      <td>1.10×</td>
+      <td class="wrap small"><code>litPropertyMetadata</code> <code>reactiveElementVersions</code> <code>litHtmlVersions</code> <code>litElementVersions</code></td>
+    </tr></tbody>
+  </table></div>
+
+  <h2>로딩 시간</h2>
+  <p class="note"><strong>표시</strong>: 내비게이션 시작부터 위젯의 질문 문구가 shadow root에 들어갈 때까지. <strong>스크립트</strong>: <code>widget.js</code> 내려받기가 끝난 뒤의 시간(파싱, 실행, 첫 렌더). 버전·프로필마다 30번 불러온 중앙값이고, 매번 캐시가 빈 새 브라우저 컨텍스트입니다. 막대는 25~75 백분위 범위입니다.</p>
+    
+    <h3>모바일: CPU 4배 느리게, 왕복 150ms, 1.6Mbps</h3><div class="scroll"><table>
+    <thead><tr><th>버전</th><th>표시</th><th class="bar">중간 50%</th><th>스크립트</th><th class="opt">전송량</th></tr></thead>
+    <tbody><tr class="lithent">
+          <td class="name">lithent</td>
+          <td><strong>391 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:55.1%;width:1.0%"></div></div><span class="small">387 ms – 394 ms</span></td>
+          <td>22 ms</td>
+          <td class="opt">6.07 KB</td>
+        </tr><tr class="react">
+          <td class="name">React</td>
+          <td><strong>694 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:97.7%;width:2.3%"></div></div><span class="small">686 ms – 702 ms</span></td>
+          <td>66 ms</td>
+          <td class="opt">58.56 KB</td>
+        </tr><tr class="preact">
+          <td class="name">Preact</td>
+          <td><strong>395 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:55.4%;width:1.6%"></div></div><span class="small">389 ms – 400 ms</span></td>
+          <td>27 ms</td>
+          <td class="opt">6.73 KB</td>
+        </tr><tr class="lit">
+          <td class="name">Lit</td>
+          <td><strong>400 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:56.5%;width:2.2%"></div></div><span class="small">397 ms – 412 ms</span></td>
+          <td>33 ms</td>
+          <td class="opt">6.67 KB</td>
+        </tr></tbody>
+  </table></div><h3>데스크톱: 제한 없음</h3><div class="scroll"><table>
+    <thead><tr><th>버전</th><th>표시</th><th class="bar">중간 50%</th><th>스크립트</th><th class="opt">전송량</th></tr></thead>
+    <tbody><tr class="lithent">
+          <td class="name">lithent</td>
+          <td><strong>20 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:44.8%;width:18.4%"></div></div><span class="small">16 ms – 23 ms</span></td>
+          <td>8 ms</td>
+          <td class="opt">6.07 KB</td>
+        </tr><tr class="react">
+          <td class="name">React</td>
+          <td><strong>32 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:86.6%;width:13.4%"></div></div><span class="small">31 ms – 36 ms</span></td>
+          <td>21 ms</td>
+          <td class="opt">58.56 KB</td>
+        </tr><tr class="preact">
+          <td class="name">Preact</td>
+          <td><strong>20 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:48.2%;width:15.9%"></div></div><span class="small">17 ms – 23 ms</span></td>
+          <td>11 ms</td>
+          <td class="opt">6.73 KB</td>
+        </tr><tr class="lit">
+          <td class="name">Lit</td>
+          <td><strong>21 ms</strong></td>
+          <td class="bar"><div class="track"><div class="range" style="left:53.2%;width:13.9%"></div></div><span class="small">19 ms – 24 ms</span></td>
+          <td>11 ms</td>
+          <td class="opt">6.67 KB</td>
+        </tr></tbody>
+  </table></div>
+    <p class="note">2026-11-20 측정, Chromium 157.0.8103.78, Intel(R) Xeon(R) Processor @ 2.10GHz (4 cores), linux 6.18.44-fc-v726, 커밋 <a href="https://github.com/superlucky84/lithent/commit/9d958758fd1e07de8a66abd096c6942360ff0573"><code>9d95875</code></a>.</p>
+
+  <h2>직접 써 보기</h2>
+  <p class="note">각 프레임은 템플릿의 데모 페이지(고객사 웹사이트 역할)이고, 네 번들 중 하나를 불러옵니다. 별점, 보내기, 보내기 거절, 페이지·문구·테마 바꾸기를 해 보세요. 네 위젯이 똑같이 반응합니다.</p>
+  <div class="demos"><figure>
+        <figcaption><span class="name">lithent</span>
+          <a href="./lithent/index.html">따로 열기</a>
+          <a href="https://github.com/superlucky84/lithent/blob/main/createLithent/widget/src/FeedbackWidget.tsx">소스</a>
+        </figcaption>
+        <iframe src="./lithent/index.html" title="lithent" loading="lazy"></iframe>
+      </figure><figure>
+        <figcaption><span class="name">React</span>
+          <a href="./react/index.html">따로 열기</a>
+          <a href="https://github.com/superlucky84/lithent/blob/main/showcase/widget-compare/src/react/FeedbackWidget.tsx">소스</a>
+        </figcaption>
+        <iframe src="./react/index.html" title="React" loading="lazy"></iframe>
+      </figure><figure>
+        <figcaption><span class="name">Preact</span>
+          <a href="./preact/index.html">따로 열기</a>
+          <a href="https://github.com/superlucky84/lithent/blob/main/showcase/widget-compare/src/preact/FeedbackWidget.tsx">소스</a>
+        </figcaption>
+        <iframe src="./preact/index.html" title="Preact" loading="lazy"></iframe>
+      </figure><figure>
+        <figcaption><span class="name">Lit</span>
+          <a href="./lit/index.html">따로 열기</a>
+          <a href="https://github.com/superlucky84/lithent/blob/main/showcase/widget-compare/src/lit/main.ts">소스</a>
+        </figcaption>
+        <iframe src="./lit/index.html" title="Lit" loading="lazy"></iframe>
+      </figure></div>
+
+  <h2>만든 방법</h2>
+  <ul><li><strong>같은 위젯.</strong> lithent 빌드는 템플릿 소스 그대로입니다(<a href="https://github.com/superlucky84/lithent/blob/main/createLithent/widget/src/FeedbackWidget.tsx">FeedbackWidget.tsx</a>). 나머지 셋은 각 프레임워크에서 보통 쓰는 방식으로 썼습니다. React·Preact는 hooks를 쓰는 함수 컴포넌트, Lit은 <code>LitElement</code>입니다. 네 빌드 모두 템플릿의 스타일시트와 props 선언을 씁니다. <a href="https://github.com/superlucky84/lithent/blob/main/e2e/widget-compare.spec.ts">e2e/widget-compare.spec.ts</a>가 모든 PR에서 Chromium·Firefox·WebKit으로 네 빌드에 같은 단계를 돌립니다. 속성, Object 프로퍼티, 이벤트, 취소한 보내기, slot, <code>::part</code>, CSS 변수, 엄격한 Content-Security-Policy를 확인합니다.</li><li><strong>같은 빌드.</strong> <a href="https://github.com/superlucky84/lithent/blob/main/showcase/widget-compare/scripts/build.mjs">scripts/build.mjs</a>가 Vite 설정 하나로 네 빌드를 만듭니다. 라이브러리 모드, IIFE 하나, target <code>es2020</code> / Safari 14, <code>NODE_ENV=production</code>. 다른 것은 JSX import source뿐입니다.</li><li><strong>같은 로딩.</strong> <a href="https://github.com/superlucky84/lithent/blob/main/showcase/widget-compare/scripts/measure.mjs">scripts/measure.mjs</a>가 CDN처럼 brotli로 압축해 보내고, Chromium에서 각 버전의 페이지를 불러옵니다. 모바일 프로필은 Lighthouse 모바일 기본값을 DevTools 제한으로 적용합니다. 바퀴마다 네 버전의 순서를 돌립니다.</li></ul>
+  <h3>이 비교가 보여 주지 않는 것</h3>
+  <ul><li>작은 위젯 하나의 비교입니다. 큰 앱의 렌더 성능이나 개발 경험은 다루지 않습니다.</li><li>한 기계의 실험실 측정입니다. 방문자가 겪을 값이 아니라, 같은 조건에서 버전끼리의 차이로 읽어 주세요.</li><li>React·Preact에 다른 커스텀 엘리먼트 래퍼를 쓰면 크기가 달라집니다.</li><li>이미 React나 Preact를 쓰는 페이지라면 그 런타임을 위젯과 나눠 쓸 수 있습니다. 이 비교는 내가 관리하지 않는 페이지에 들어가는, 필요한 것을 모두 가지고 다니는 위젯을 가정합니다.</li></ul>
+  <h3>재현</h3>
+  <pre><code>pnpm install
+pnpm build
+pnpm --filter lithent-widget-compare measure
+pnpm --filter lithent-widget-compare page</code></pre>
+
+  <footer><a href="https://github.com/superlucky84/lithent">lithent</a>의 일부입니다. 설계 문서: <a href="https://github.com/superlucky84/lithent/tree/main/docs/widget-compare">docs/widget-compare</a>.</footer>
+</main>
+</body>
+</html>

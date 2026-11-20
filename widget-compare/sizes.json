@@ -1,0 +1,39 @@
+{
+  "lithent": {
+    "raw": 16212,
+    "gzip": 6791,
+    "brotli": 6218,
+    "sha256": "4758531074f5ab569cab7a7e325aefc339b1903da2fad9bd2cf4ee0b31a1c9d8",
+    "packages": {
+      "lithent": "1.25.12"
+    }
+  },
+  "react": {
+    "raw": 223815,
+    "gzip": 69648,
+    "brotli": 59967,
+    "sha256": "ba2ee29e9e36be27182c50c35cb1314e05d1dfe2833132d3e4947629e5d4b332",
+    "packages": {
+      "react": "19.3.1",
+      "react-dom": "19.3.1"
+    }
+  },
+  "preact": {
+    "raw": 17891,
+    "gzip": 7640,
+    "brotli": 6890,
+    "sha256": "f1cce725d984e4064bc22091084fe3ddac29ec8d4f6d3163970a38d545c02b20",
+    "packages": {
+      "preact": "11.2.0"
+    }
+  },
+  "lit": {
+    "raw": 20197,
+    "gzip": 7650,
+    "brotli": 6826,
+    "sha256": "74b111ec4e6f6bde3d0aaa617f4ce21efd1ba8b1638f9b07f178bc3324cbeca9",
+    "packages": {
+      "lit": "3.3.3"
+    }
+  }
+}
