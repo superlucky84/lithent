@@ -1,5 +1,60 @@
 # Release notes
 
+## 2026-11-20
+
+### lithent 1.25.12 / lithent-concurrent 0.2.8
+
+- A root component that renders `<html>` stays on the page through repeated
+  replacements. Inserting such a root replaced the page's `<html>`, but the
+  root kept the detached element as its wrapper, so the next replacement
+  emptied the live document and inserted the new one nowhere, with no error.
+  This showed up as a blank page after the second HMR edit of the SSR
+  template's `src/layout.tsx` (the first, for a root attached with `render`
+  instead of `hydration`). Both cores now move the wrapper to the new `<html>`.
+- Base core: brotli 4,763 → 4,774B (budget 4,800). Concurrent: 6,667 →
+  6,690B. No public API change.
+- New regression tests for repeated HMR replacements of an `<html>` root on
+  both cores: attached with `render` (`devHelper`) and with `hydration`
+  (`lithent/ssr`).
+
+### @lithent/hmr-parser 0.2.6 / @lithent/lithent-vite 0.4.1
+
+- Edits to modules without components now reach the page. A store module, an
+  entry that only calls `render`, or an entry that only calls `defineElement`
+  still got an `import.meta.hot.accept()` call, guarded only at runtime. Vite
+  finds accept calls in the source, so it treated these modules as handling
+  their own updates and stopped there, while the browser, where accept never
+  ran, dropped the update: no change and no reload. The accept handler is now
+  generated only for modules with components. A store edit reaches the
+  importing component without a reload, and an entry edit reloads the page,
+  as the plugin README describes.
+- `@lithent/lithent-vite` has no code change; it is released to depend on
+  `@lithent/hmr-parser` 0.2.6. The generated templates' `^0.4.0` range picks
+  it up.
+- Browser tests: a new HMR check fails when a save keeps HMR busy (updates,
+  reloads, Lithent HMR warnings or DOM changes that do not stop within
+  8 seconds), across ten edit scenarios on both cores. An injected endless
+  replacement that logs nothing is caught by its DOM changes.
+
+### create-lithent 0.5.0
+
+- New `widget` template: a lithent component registered as a Custom Element
+  with `lithent/element`, for embedding in any website with one `<script>` tag.
+  The build writes a self-contained `dist/<project-name>.js` (about 6 KB brotli
+  for the demo, lithent included), an ES module build, and a demo host page
+  that uses the widget only through attributes, properties and DOM events. It
+  fails when the bundle passes a 10 KB brotli budget.
+- Name a built-in template with `--template ssr`, `spa` or `widget`, and pick
+  "Widget (Custom Element)" from the prompt. Other `--template` values are
+  paths, GitHub shorthands or URLs as before; use `./widget` for a local folder.
+- The package no longer ships compiled copies of the SPA template's
+  TypeScript files under `dist/basic/`.
+
+The generator downloads templates from `main`, so the widget template is also
+available to earlier versions through
+`--template https://github.com/superlucky84/lithent/tree/main/createLithent/widget`
+once merged; the short name and the prompt choice need 0.5.0.
+
 ## 2026-11-13
 
 ### lithent 1.25.11

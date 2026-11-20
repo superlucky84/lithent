@@ -1,5 +1,62 @@
 # 릴리스 절차
 
+## lithent 1.25.12 / lithent-concurrent 0.2.8 / create-lithent 0.5.0 / @lithent/hmr-parser 0.2.6 / @lithent/lithent-vite 0.4.1 릴리스
+
+2026-11-20 사용자 요청으로 개발 모드 HMR 수정 두 건과 `create-lithent`의 위젯 템플릿을 배포한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-20)에 기록한다.
+
+| 패키지                  | 이전 → 배포 버전  | 변경                                                                                     | 근거 문서                                                   |
+| ----------------------- | ----------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `lithent`               | 1.25.11 → 1.25.12 | `<html>` 루트를 반복 교체해도 페이지가 남는다                                            | [hmr-root-remount](./docs/hmr-root-remount/REQUIREMENTS.md) |
+| `lithent-concurrent`    | 0.2.7 → 0.2.8     | 같은 수정 (Concurrent 자체 `render.ts`)                                                  | 같음                                                        |
+| `create-lithent`        | 0.4.1 → 0.5.0     | `widget` 템플릿, `--template ssr\|spa\|widget`, 패키지에서 SPA 템플릿 컴파일 산출물 제거 | [widget-template](./docs/widget-template/README.md)         |
+| `@lithent/hmr-parser`   | 0.2.5 → 0.2.6     | 컴포넌트 없는 모듈의 수정이 importer로 전파된다                                          | [hmr-propagation](./docs/hmr-propagation/REQUIREMENTS.md)   |
+| `@lithent/lithent-vite` | 0.4.0 → 0.4.1     | 코드 변경 없음. 새 hmr-parser를 의존한다                                                 | 같음                                                        |
+
+- 코어와 플러그인은 공개 API가 같고 동작 수정이라 패치 버전이다(`create-lithent`는 아래).
+- 두 코어는 각자의 `render.ts`를 고쳤으므로 함께 올린다. base brotli 4,774B(예산 4,800B), Concurrent 6,690B.
+- `@lithent/lithent-vite`는 `@lithent/hmr-parser`를 `workspace:*`로 의존하고 pack에서 정확한 버전으로 고정된다
+  (0.4.0은 `0.2.5`). hmr-parser만 올리면 기존 사용자에게 닿지 않아 함께 올린다. pack된 0.4.1은 `0.2.6`을 가리킨다.
+- 생성 템플릿은 `lithent ^1.25.10`, `@lithent/lithent-vite ^0.4.0`이라 새 프로젝트는 발행 뒤 새 버전을 받는다.
+  템플릿 범위는 발행 전에 올리지 않는다(main 병합 즉시 템플릿이 쓰이므로 발행 전 설치가 실패한다).
+- `create-lithent`는 새 템플릿과 CLI 옵션을 더하므로 0.x 정책에서 minor를 올린다. 생성기는 템플릿을 main에서
+  내려받으므로 위젯 템플릿은 병합 즉시 URL(`--template https://github.com/superlucky84/lithent/tree/main/createLithent/widget`)로
+  모든 버전에서 쓸 수 있고, 선택지와 `--template widget`은 0.5.0부터다. 0.4.1을 CI로 발행했으므로 Trusted Publisher는
+  설정돼 있다.
+
+발행 뒤 후속 작업:
+
+- 위젯 템플릿의 `@lithent/lithent-vite` 범위를 `^0.4.1`로 올리고 `include: /\.tsx$/` 우회를 뺀다
+  ([hmr-propagation DESIGN DC-4](./docs/hmr-propagation/DESIGN.md)). 우회 없이 동작하는 것은 MANUAL M-3에서 확인했다.
+- 새 설치 검사(`node scripts/check-templates-fresh.mjs`)로 세 템플릿을 확인한다.
+- hmr-propagation M-4, hmr-root-remount M-3(새 프로젝트에서 확인).
+
+**로컬 준비 검증 (2026-11-20, 후보 커밋 `69b1311`, 깨끗한 작업 트리)**:
+
+PR #129의 첫 CI는 Quality의 빌드에서 멈췄다. devHelper 빌드가 테스트를 타입 검사하는데 새 테스트가 아직 빌드되지 않은
+`lithent/ssr`을 import했다(TS2307). 로컬에는 ssr dist가 남아 있어 드러나지 않았다. 테스트를 나눈 뒤(`dc80669`)
+`pnpm clean:dist`로 모든 dist를 지우고 CI Quality 단계를 순서대로 다시 돌렸다: `pnpm build`, `pnpm test:dual`,
+`pnpm test:toolchain`, release 스크립트 테스트 49개, 신뢰성 mutation 대조 44개(Node 22용으로
+`--experimental-test-isolation=none`만 바꾼 임시 사본), `pnpm verify:concurrent`, `pnpm verify:release`,
+`pnpm release:plan`(후보 5개), `verify-plan-consumers`(5개), `pnpm size`, `ci-build-artifacts create --require-clean`.
+모두 통과했다. 아래는 그 전 `69b1311`의 기록이다.
+
+- `pnpm build` 통과(`21d7d89`, 이후 `create-lithent` 버전만 바꾸고 CLI를 다시 빌드).
+- `pnpm verify:release --output-dir artifacts/release`: **ALL PASS** (8개 pack, 격리 설치 ESM/CJS 소비자, Node16/NodeNext 엄격 타입,
+  도구 5종, 생성기 바이너리). 발행 없음.
+- `pnpm release:plan`: 후보 5개, 순서 `lithent → lithent-concurrent → create-lithent → @lithent/hmr-parser → @lithent/lithent-vite`.
+  나머지 3개는 already-published. main을 비교 기준으로 준 실행에서 출처 경고 없음.
+  (`create-lithent`를 넣기 전 `21d7d89`에서는 "create-lithent: Source paths changed but this version will not be published"가 났다.)
+- `node scripts/verify-plan-consumers.mjs`: 후보 5개 모두 PASS (선택 archive + registry 의존성).
+- pack된 `create-lithent` 0.5.0에는 CLI의 `dist/*.js`·`.d.ts`만 있고 `dist/basic/`이 없다.
+- `pnpm size`, release 스크립트 테스트 49개 통과. 같은 코드에서 `pnpm test:dual`, `pnpm test:toolchain`,
+  Chromium E2E 100개, E2E 음성 대조 6개, `pnpm verify:concurrent` 통과(각 문서 IMPLEMENT 참고).
+- 환경 차이: 이 환경은 Node 22.23.5라 `pnpm_config_runtime_on_fail=ignore`, 그리고 npm을 쓰는 검사에
+  `npm_config_force=true`를 주어 Node 24.22.1 엔진 검사만 넘겼다. Firefox·WebKit E2E는 돌리지 않았다.
+  CI(Node 24.22.1, 세 브라우저)에서 다시 확인한다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 다섯 버전·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
 ## lithent 1.25.11 릴리스
 
 2026-11-13 사용자 요청으로 `lithent/ssr`의 hydration 불일치 수정을 `lithent` 패치로 배포한다.

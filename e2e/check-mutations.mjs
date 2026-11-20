@@ -18,6 +18,7 @@ const cases = [
   ['hydration-rebuild', 'D-1/2/3:', 1, /data-reused/],
   ['hmr-reload', 'D-4:', 1, /Received: undefined/],
   ['jsx-flatten', 'jsx/jsxs:', 1, /Expected: "1"\nReceived: "0"/],
+  ['hmr-storm', 'HMR storm: component', 1, /HMR still active/],
 ];
 
 for (const [fault, grep, count, expectedError] of cases) {
@@ -83,4 +84,6 @@ for (const [fault, grep, count, expectedError] of cases) {
     `PASS ${fault}: ${count} expected assertion failure(s), no skips`
   );
 }
-console.log('All 5 negative controls detected their injected fault.');
+console.log(
+  `All ${cases.length} negative controls detected their injected fault.`
+);

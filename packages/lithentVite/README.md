@@ -137,6 +137,8 @@ stateless function. The caller keeps its state.
 
 HMR remounts the changed module's components; unaffected parents keep their
 state. Files without component boundaries propagate updates to their importers.
+An entry that only renders (or only defines Custom Elements) has no importer but
+the page, so editing it reloads the page.
 Removing a component can also invalidate its importers. Production builds do
 not inject HMR code by default; application function signatures stay unchanged.
 

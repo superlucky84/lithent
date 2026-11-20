@@ -1,3 +1,43 @@
+/**
+ * The self-accept handler, emitted only for modules with components.
+ *
+ * Vite decides that a module handles its own updates by finding
+ * `import.meta.hot.accept(` in its source, whether or not the call runs.
+ * A module without components must not contain it, not even behind a
+ * condition: its edits would be dropped (no update, no reload) instead of
+ * reaching its importers, and a render-only entry would never reload
+ * (docs/hmr-propagation).
+ */
+const createAcceptBlock = (componentNames: string[]) => {
+  if (!componentNames.length) return '';
+  return `
+  import.meta.hot.accept(mod => {
+    const current = __lithentHotData.currentComponents || {};
+    const missing = ${JSON.stringify(componentNames)}.filter(name => !current[name]);
+    if (!mod || missing.length) {
+      import.meta.hot.invalidate('removed or unavailable components: ' + missing.join(', '));
+      return;
+    }
+    const previousExports = __lithentExportSnapshot;
+    if (!previousExports || Object.keys(previousExports).length !== Object.keys(mod).length
+      || Object.keys(previousExports).some(name => !Object.prototype.hasOwnProperty.call(mod, name)
+        || !Object.is(previousExports[name], mod[name]))) {
+      import.meta.hot.invalidate('module exports changed');
+      return;
+    }
+    for (const name of Object.keys(current)) {
+      const entry = current[name];
+      // Existing imports and future parent redraws keep the stable proxy.
+      if (!entry.boundary.update(entry.component)) {
+        __lithentResetInvalidateCount(name);
+      }
+    }
+    // An unmounted component is a valid update: its proxy is already refreshed.
+    __lithentResetInvalidateCount();
+  });
+`;
+};
+
 export const createHmrBootstrapBlock = (
   _targetExports: string[],
   componentNames: string[]
@@ -82,34 +122,7 @@ const __lithentWrapComponent = (name, implementation) => {
 };
 const __lithentSetupHmrHooks = () => {
   if (!import.meta.hot) return;
-  // Entries without components must propagate to importers, not accept an update
-  // that cannot render anything (e.g. the render-only application entry).
-  if (${JSON.stringify(componentNames)}.length) {
-    import.meta.hot.accept(mod => {
-      const current = __lithentHotData.currentComponents || {};
-      const missing = ${JSON.stringify(componentNames)}.filter(name => !current[name]);
-      if (!mod || missing.length) {
-        import.meta.hot.invalidate('removed or unavailable components: ' + missing.join(', '));
-        return;
-      }
-      const previousExports = __lithentExportSnapshot;
-      if (!previousExports || Object.keys(previousExports).length !== Object.keys(mod).length
-        || Object.keys(previousExports).some(name => !Object.prototype.hasOwnProperty.call(mod, name)
-          || !Object.is(previousExports[name], mod[name]))) {
-        import.meta.hot.invalidate('module exports changed');
-        return;
-      }
-      for (const name of Object.keys(current)) {
-        const entry = current[name];
-        // Existing imports and future parent redraws keep the stable proxy.
-        if (!entry.boundary.update(entry.component)) {
-          __lithentResetInvalidateCount(name);
-        }
-      }
-      // An unmounted component is a valid update: its proxy is already refreshed.
-      __lithentResetInvalidateCount();
-    });
-  }
+${createAcceptBlock(componentNames)}
   import.meta.hot.dispose(data => {
     data.components = __lithentModuleHotStore;
     data.currentComponents = undefined;

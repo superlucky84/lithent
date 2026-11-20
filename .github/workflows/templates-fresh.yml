@@ -25,5 +25,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-      - name: Build both templates from a fresh install
+      - name: Build the templates from a fresh install
         run: node scripts/check-templates-fresh.mjs

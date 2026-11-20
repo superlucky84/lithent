@@ -1,6 +1,13 @@
 {
   "include": ["**/*.ts", "./package.json"],
-  "exclude": ["dist", "express", "**/node_modules/**", "__tests__"],
+  "exclude": [
+    "dist",
+    "express",
+    "basic",
+    "widget",
+    "**/node_modules/**",
+    "__tests__"
+  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "target": "ES2020",

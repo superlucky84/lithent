@@ -14,6 +14,7 @@ packages:
   - 'createLithent'
   - 'createLithent/express'
   - 'createLithent/basic'
+  - 'createLithent/widget'
   - 'packages/hmrParser'
   - 'packages/lithentVite'
   - 'packages/lithentMdx'
