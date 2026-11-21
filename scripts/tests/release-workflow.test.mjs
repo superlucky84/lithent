@@ -123,6 +123,42 @@ test('actual workflow permits publishing only from a manual main run after every
   );
 });
 
+test('browser jobs keep the system packages Playwright installs in a cache', async () => {
+  // A slow Ubuntu mirror stopped the job at its time limit twice while
+  // `--with-deps` downloaded packages (RELEASING, lithent 1.26.0).
+  const job = (await workflow('ci.yml')).jobs.browser;
+  const at = name => job.steps.findIndex(step => step.name === name);
+  const restore = at('Restore the browser system packages');
+  const install = at('Install the browser and its system packages');
+  const save = at('Save the browser system packages');
+  const tests = job.steps.findIndex(step => step.run === 'pnpm test:e2e');
+  assert(restore >= 0 && restore < install, 'restore before the install');
+  assert(install < save && save < tests, 'save before the tests can fail');
+  assert.equal(job.steps[restore].uses, 'actions/cache/restore@v4');
+  assert.equal(job.steps[save].uses, 'actions/cache/save@v4');
+  assert.equal(
+    job.steps[save].if,
+    "steps.browser-deps-cache.outputs.cache-hit != 'true'"
+  );
+  const script = job.steps[install].run;
+  assert.match(script, /Dir::Cache::Archives "%s\/"/);
+  assert.match(script, /APT::Keep-Downloaded-Packages "true"/);
+  assert.match(
+    script,
+    /playwright install --with-deps "\$LITHENT_E2E_BROWSER"/
+  );
+  assert(
+    script.indexOf('Dir::Cache::Archives') <
+      script.indexOf('playwright install'),
+    'apt is pointed at the cache before Playwright runs it'
+  );
+  assert(
+    Number(job.steps[install]['timeout-minutes']) <
+      Number(job['timeout-minutes']),
+    'the install step times out before the job, with its own error'
+  );
+});
+
 test('workflow wiring keeps original-attempt artifacts and restricts privilege to the two release jobs', async () => {
   const config = await workflow('ci.yml');
   assert.deepEqual(config.permissions, { contents: 'read' });

@@ -15,8 +15,11 @@
   기록 job이 `lithent@1.26.0` 태그를 `b54223a`에 만들고 문서 배포
   ([44793398913](https://github.com/superlucky84/lithent/actions/runs/44793398913), 성공)를 요청했다.
 - npm `latest`가 1.26.0이다. 15분 확인 창 안에 바로 보였다(1.25.12 때의 "Validating" 지연 없음).
-- 후속 과제(제안): 브라우저 job의 시간 대부분이 `--with-deps`의 apt 내려받기다. 미러가 느린 날 두 번 연속 제한에 걸렸으므로
-  Playwright 시스템 의존성 캐시나 설치 단계의 별도 제한 시간을 검토한다.
+- 후속 조치: 브라우저 job이 `--with-deps`가 받는 Ubuntu 패키지(.deb)를 `actions/cache`에 보관하고, apt가 그 디렉터리로
+  내려받고 거기서 설치하도록 바꿨다(`Dir::Cache::Archives`). 캐시가 있는 실행은 없던 패키지만 받는다. 캐시 키는 runner
+  이미지·브라우저·Playwright 버전이고, `apt-get autoclean`으로 더 이상 받을 수 없는 판은 버린다. 설치 단계에 25분, job에
+  35분 제한을 둬 캐시가 없는 날 느린 미러에서도 테스트까지 갈 여유를 둔다. `scripts/tests/release-workflow.test.mjs`가
+  복원→설치→저장→테스트 순서와 apt 설정을 확인한다.
 
 발행 뒤 확인 (2026-11-20, npm에 올라간 패키지로):
 
