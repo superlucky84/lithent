@@ -65,3 +65,10 @@ keyed 213개 중 **97위, 가중 기하평균 1.29**(페이지 표기값).
 - **#1261 주석**: 행 데이터에 `cacheUpdate`를 붙인 앱이라 "수동 (v)dom 캐싱" 주석이 붙어 있다. 주석 없는
   행 컴포넌트 + `memo` 앱은 가중 약 +3%(1.31 → 1.35 수준)여서 유지하기로 했다
   ([HANDOFF](./HANDOFF.md) 첫 절, DC-29). 이 숫자를 인용할 때는 주석이 있다는 사실을 같이 적는다.
+
+## 4. 인용한 곳
+
+결과가 새로 나오면 함께 고친다.
+
+- `README.md` "Benchmark" 절
+- 문서 사이트 Introduction의 "Performance"/"성능" 절 — `lithentDocs/src/components/BenchmarkTable.tsx`
