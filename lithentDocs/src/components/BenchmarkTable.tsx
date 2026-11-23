@@ -1,17 +1,17 @@
-// Official js-framework-benchmark results (Chrome 156, keyed), checked on
-// 2026-11-21. Source and per-benchmark numbers:
+// Official js-framework-benchmark results (Chrome 158, keyed), checked on
+// 2026-11-23. Source and per-benchmark numbers:
 // docs/benchmark/OFFICIAL_LISTING.md
 const RESULTS_URL =
-  'https://krausest.github.io/js-framework-benchmark/current.html';
+  'https://krausest.github.io/js-framework-benchmark/2026/chrome158.html';
 const NOTE_URL =
   'https://github.com/krausest/js-framework-benchmark/issues/1261';
 
 const rows: [string, string, string, string][] = [
-  ['Lithent 1.25.9', '1.29', '60.5', '5.9'],
-  ['Lit 3.2.0', '1.28', '53.8', '7.3'],
-  ['Vue 3.5.39', '1.30', '95.8', '23.3'],
-  ['Preact 11.0.0 (classes)', '1.31', '55.1', '6.2'],
-  ['React 19.2.0 (hooks)', '1.56', '228.1', '51.4'],
+  ['Lithent 1.25.9', '1.28', '52.4', '5.9'],
+  ['Lit 3.2.0', '1.27', '58.6', '7.3'],
+  ['Vue 3.5.39', '1.29', '94.8', '23.3'],
+  ['Preact 11.0.0 (classes)', '1.31', '53.1', '6.2'],
+  ['React 19.2.0 (hooks)', '1.55', '228.9', '51.4'],
 ];
 
 const copy = {
@@ -24,9 +24,9 @@ const copy = {
     ],
     intro: 'In the official',
     introAfter:
-      'results (Chrome 156, keyed implementations), Lithent sits with Lit, Vue and Preact and well ahead of React:',
+      'results (Chrome 158, keyed implementations), Lithent sits with Lit, Vue and Preact and well ahead of React:',
     note: [
-      'The CPU score is the weighted geometric mean the results page shows: how much slower than the fastest implementation, averaged over the nine CPU benchmarks. Lithent ranks 97th of 213 keyed implementations. First paint and size are medians of the published samples for each benchmark app. The Lithent entry carries note ',
+      'The CPU score is the weighted geometric mean the results page shows: how much slower than the fastest implementation, averaged over the nine CPU benchmarks. Lithent ranks 96th of 214 keyed implementations. First paint and size are medians of the published samples for each benchmark app. The Lithent entry carries note ',
       ' (manual caching of (v)dom nodes) because its rows use ',
       '.',
     ],
@@ -40,9 +40,9 @@ const copy = {
     ],
     intro: '공식',
     introAfter:
-      '결과(Chrome 156, keyed 구현)에서 Lithent는 Lit·Vue·Preact와 같은 층에 있고 React보다 확실히 빠릅니다.',
+      '결과(Chrome 158, keyed 구현)에서 Lithent는 Lit·Vue·Preact와 같은 층에 있고 React보다 확실히 빠릅니다.',
     note: [
-      'CPU 점수는 결과 페이지에 표시된 가중 기하평균입니다. 9개 CPU 항목에서 가장 빠른 구현보다 몇 배 느린지를 평균한 값이며, Lithent는 keyed 구현 213개 중 97위입니다. 첫 페인트와 크기는 각 벤치마크 앱의 공개 표본 중앙값입니다. Lithent 항목에는 행에 ',
+      'CPU 점수는 결과 페이지에 표시된 가중 기하평균입니다. 9개 CPU 항목에서 가장 빠른 구현보다 몇 배 느린지를 평균한 값이며, Lithent는 keyed 구현 214개 중 96위입니다. 첫 페인트와 크기는 각 벤치마크 앱의 공개 표본 중앙값입니다. Lithent 항목에는 행에 ',
       '를 쓰기 때문에 주석 ',
       '((v)dom 노드 수동 캐싱)가 붙어 있습니다.',
     ],

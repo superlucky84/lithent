@@ -1,6 +1,6 @@
 # js-framework-benchmark 등재 준비 — 중간 상태
 
-2026-11-21: 공식 결과에 등재돼 있다(`lithent` 1.25.9, Chrome 156, 가중 1.29, keyed 213개 중 97위).
+2026-11-23: 공식 결과에 등재돼 있다(`lithent` 1.25.9, Chrome 158, 가중 1.28, keyed 214개 중 96위. Chrome 156에서는 1.29·97위).
 [OFFICIAL_LISTING.md](./OFFICIAL_LISTING.md)를 먼저 읽는다. 아래는 등재 전 준비 기록이다.
 
 2026-10-08 후속: 행별 `mount`를 없앤 벤치마크 앱과 `cacheUpdate` 의존 배열 길이 검사를 적용했다.

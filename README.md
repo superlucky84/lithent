@@ -46,17 +46,17 @@ Bring in only what you need — let the stack scale with your project.
 
 ### Benchmark
 
-In the official [js-framework-benchmark](https://krausest.github.io/js-framework-benchmark/current.html) results (Chrome 156, keyed implementations), Lithent sits with Lit, Vue and Preact and well ahead of React:
+In the official [js-framework-benchmark](https://krausest.github.io/js-framework-benchmark/2026/chrome158.html) results (Chrome 158, keyed implementations), Lithent sits with Lit, Vue and Preact and well ahead of React:
 
 | Implementation          | CPU score (lower is faster) | First paint (ms) | Transfer size (kB, compressed) |
 | ----------------------- | --------------------------: | ---------------: | -----------------------------: |
-| **Lithent 1.25.9**      |                    **1.29** |         **60.5** |                        **5.9** |
-| Lit 3.2.0               |                        1.28 |             53.8 |                            7.3 |
-| Vue 3.5.39              |                        1.30 |             95.8 |                           23.3 |
-| Preact 11.0.0 (classes) |                        1.31 |             55.1 |                            6.2 |
-| React 19.2.0 (hooks)    |                        1.56 |            228.1 |                           51.4 |
+| **Lithent 1.25.9**      |                    **1.28** |         **52.4** |                        **5.9** |
+| Lit 3.2.0               |                        1.27 |             58.6 |                            7.3 |
+| Vue 3.5.39              |                        1.29 |             94.8 |                           23.3 |
+| Preact 11.0.0 (classes) |                        1.31 |             53.1 |                            6.2 |
+| React 19.2.0 (hooks)    |                        1.55 |            228.9 |                           51.4 |
 
-<sub>The CPU score is the weighted geometric mean the results page shows: how much slower than the fastest implementation, averaged over the nine CPU benchmarks. Lithent ranks 97th of 213 keyed implementations. First paint and size are medians of the published samples for each benchmark app. The Lithent entry carries note [#1261](https://github.com/krausest/js-framework-benchmark/issues/1261) (manual caching of (v)dom nodes) because its rows use `cacheUpdate`. Checked on 2026-11-21.</sub>
+<sub>The CPU score is the weighted geometric mean the results page shows: how much slower than the fastest implementation, averaged over the nine CPU benchmarks. Lithent ranks 96th of 214 keyed implementations. First paint and size are medians of the published samples for each benchmark app. The Lithent entry carries note [#1261](https://github.com/krausest/js-framework-benchmark/issues/1261) (manual caching of (v)dom nodes) because its rows use `cacheUpdate`. Checked on 2026-11-23.</sub>
 
 <br />
 
