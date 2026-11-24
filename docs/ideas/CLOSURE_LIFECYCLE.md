@@ -10,6 +10,7 @@
 - Concurrent 전용 실험: [5단계 결과와 제한](../closure-lifecycle/PHASE5.md), `experiment/closure-lifecycle-concurrent`. 기본 코어 소스·타입·번들 해시 동일.
 - Concurrent 성능 개선: [6단계 결과와 제한](../closure-lifecycle/PHASE6.md), `experiment/closure-lifecycle-performance`.
 - 활성 경계 정리·다음 API: [7단계 결과](../closure-lifecycle/PHASE7.md), [공개 helper API 검토안](../closure-lifecycle/API_REVIEW.md).
+- 사용성 재검토 대기 (2026-11-12): [TODO](../closure-lifecycle/TODO.md) — 가이드의 동기 설명, scoped task 이름·관계, retained host props.
 
 ## 1. 핵심 아이디어
 

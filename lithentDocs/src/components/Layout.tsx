@@ -48,6 +48,10 @@ import { ConcurrentRendering } from '@/pages/ConcurrentRendering';
 import { ConcurrentRenderingKo } from '@/pages/ConcurrentRendering_ko';
 import { Element } from '@/pages/Element';
 import { ElementKo } from '@/pages/Element_ko';
+import { Ssr } from '@/pages/Ssr';
+import { SsrKo } from '@/pages/Ssr_ko';
+import { Testing } from '@/pages/Testing';
+import { TestingKo } from '@/pages/Testing_ko';
 import { Lifecycle } from '@/pages/Lifecycle';
 import { LifecycleKo } from '@/pages/Lifecycle_ko';
 import { Example22Page } from '@/pages/Example22';
@@ -164,6 +168,10 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/concurrent-rendering': ConcurrentRenderingKo,
   '/guide/element': Element,
   '/ko/guide/element': ElementKo,
+  '/guide/ssr': Ssr,
+  '/ko/guide/ssr': SsrKo,
+  '/guide/testing': Testing,
+  '/ko/guide/testing': TestingKo,
   '/guide/lifecycle': Lifecycle,
   '/ko/guide/lifecycle': LifecycleKo,
   '/examples/22': Example22Page,

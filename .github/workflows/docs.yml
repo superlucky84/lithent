@@ -10,6 +10,9 @@ on:
       - main
     paths:
       - 'lithentDocs/**'
+      # The widget comparison page deploys with the site (docs/widget-compare).
+      - 'showcase/**'
+      - 'createLithent/widget/**'
       - 'package.json'
       - 'mise.toml'
       - '.nvmrc'
@@ -68,11 +71,14 @@ jobs:
           path: site
 
       # Replace everything the previous build left (hashed assets included)
-      # with the new one. The branch's own .gitignore stays.
+      # with the new one. The branch's own .gitignore stays. The widget
+      # comparison page goes to /lithent/widget-compare/.
       - name: Replace the site with the new build
         run: |
           find site -mindepth 1 -maxdepth 1 ! -name .git ! -name .gitignore -exec rm -rf {} +
           cp -R lithentDocs/dist/. site/
+          mkdir -p site/widget-compare
+          cp -R showcase/widget-compare/dist/. site/widget-compare/
 
       - name: Commit and push
         working-directory: site

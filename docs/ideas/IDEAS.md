@@ -35,6 +35,11 @@ REQUIREMENTS / DESIGN / IMPLEMENT / MANUAL_TEST_CHECKLIST를 만들고 여기서
 | **레거시 서버 렌더링 페이지** (JSP, Thymeleaf, PHP) | SPA 전환 예산 없음, jQuery 스파게티 | 빌드 없이 영역 단위 컴포넌트화 | `lithent/element`의 `shadow: false` (§3.2 — `autoMount`는 보류) |
 | **폼 많은 백오피스** | 편집 중 덮어쓰기 사고 | draft 격리 + 충돌 표시 | **Draft Boundary** (§3.3) |
 
+위젯 자리의 측정 (2026-11-20, [../widget-compare/](../widget-compare/)): 위젯 템플릿과 같은 위젯을 같은 빌드
+설정으로 만들면 brotli lithent 6.07KB, React 58.56KB, Preact 6.73KB, Lit 6.67KB. 모바일 제한 프로필에서
+표시까지 lithent 391ms, React 694ms, Preact 395ms, Lit 400ms. React 대비 주장은 측정으로 뒷받침되지만
+Preact·Lit과는 크기·로딩이 같은 등급이다. 이 둘과의 차이는 크기가 아닌 데서 보여야 한다.
+
 ### 2.2 기능보다 먼저 채워야 할 도입 승인 체크리스트
 
 | 항목 | 할 일 |
@@ -56,6 +61,8 @@ defineElement('pay-button', PayButton, { shadow: true, props: { amount: Number }
 ```
 
 "React 사이트든 jQuery 사이트든 5KB로 어디에나 심는다." → [../element/](../element/)
+
+시작 템플릿: `npx create-lithent my-widget --template widget` → [../widget-template/](../widget-template/)
 
 ### 3.2 `autoMount` — 서버 HTML 위의 선언형 아일랜드 ⛔ 보류 (2026-10-07)
 
@@ -129,7 +136,7 @@ state-ref의 React/Vue/Svelte/Solid 커넥터로 기존 앱 안에 lithent 위�
 |---|---|---|---|
 | 1 | `lithent/element` (§3.1) | 구현 작음, 포지션 명확 (코어는 버그 B-1 수정만) | **구현·검증 완료 (2026-10-06)**, 출하 버전 결정 대기 — [../element/](../element/) |
 | 2 | `autoMount` (§3.2) | 레거시 현대화 시장, 1의 변환 규칙 재사용 | **보류 (2026-10-07)** — 서버·클라이언트 마크업 이중 작성이 필요해 현실성 없음. 1의 `shadow: false`로 대체 |
-| 3 | 도입 체크리스트 (§2.2) | 기능과 무관하게 승인에 필요 | **진행 중 (2026-10-07)** — 보안·지속성·탈출구 문서 초안 작성, `lithent/test`·벤치마크 등재·레퍼런스는 대기 — [../adoption/](../adoption/) |
+| 3 | 도입 체크리스트 (§2.2) | 기능과 무관하게 승인에 필요 | **진행 중** — 보안·지속성·탈출구 문서 초안(2026-10-07), `lithent/test` 구현·검증 완료(2026-11-20, [../test-utils/](../test-utils/)), 벤치마크 등재·레퍼런스는 대기 — [../adoption/](../adoption/) |
 | 4 | Draft Boundary (§3.3) | 차별성 최대, state-ref 기능 그대로 활용 | 대기 |
 | 5 | AI 샌드박스 (§3.4) | 4 위에 얹음 | 대기 |
 | 6 | 인과 추적 (§3.5) | 기존 write journal 활용 | 대기 |

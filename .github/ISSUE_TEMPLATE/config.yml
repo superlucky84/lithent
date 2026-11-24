@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or idea
+    url: https://github.com/superlucky84/lithent/discussions
+    about: Ask how to do something or share what you built in Discussions.
+  - name: Documentation
+    url: https://superlucky84.github.io/lithent/
+    about: Guides, API reference and examples.
+  - name: Security vulnerability
+    url: https://github.com/superlucky84/lithent/security/advisories/new
+    about: Report security problems privately.

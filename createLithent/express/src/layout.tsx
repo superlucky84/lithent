@@ -1,10 +1,11 @@
 import type { TagFunction } from 'lithent';
-import { mount } from 'lithent';
+import { mount, mountCallback } from 'lithent';
 import { computed } from 'lithent/helper';
 import LoadingText from '@/components/Loading';
+import { Header } from '@/components/Header';
 import { getPreloadData } from '@/base/data';
-import clsx from '@/helper/clsx';
 import { routeWatch } from '@/base/routeStore';
+import { loadFavorites } from '@/favorites';
 import '@/main.css';
 
 const Layout = mount<{
@@ -12,33 +13,41 @@ const Layout = mount<{
   params: Record<string, string>;
   query: Record<string, string>;
 }>(r => {
-  const preload = computed(
-    () => getPreloadData<{ layout: { title: string } }>()?.layout
-  );
+  const title = computed(() => {
+    const pageTitle = getPreloadData<{ layout?: { title: string } }>()?.layout
+      ?.title;
+
+    return pageTitle ? `${pageTitle} · Lithent App` : 'Lithent App';
+  });
   const routeRef = routeWatch(r);
 
+  // Runs in the browser only, after hydration: the server has no storage.
+  mountCallback(() => {
+    loadFavorites();
+  });
+
   return ({ page: Page, params, query }) => (
-    <html lang="en" class="light" style="color-scheme: light;">
+    <html lang="en">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{preload.value?.title || 'unknown'}</title>
+        <title>{title.value}</title>
       </head>
-      <body
-        class={clsx(
-          params?.type
-            ? `bg-pokemon-${params.type}`
-            : 'bg-linear-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 via-violet-500 to-blue-500',
-          'flex items-center justify-center min-h-screen'
-        )}
-      >
-        <div class="flex">
+      <body class="min-h-screen bg-stone-50 text-stone-900">
+        <Header />
+        <main class="mx-auto max-w-5xl px-4 py-8">
           {routeRef.loading.value ? (
             <LoadingText />
           ) : (
-            <Page params={params} query={query} />
+            // Keyed by address: each page starts with fresh state and
+            // preload data instead of reusing the previous page's.
+            [
+              <div key={routeRef.page.value}>
+                <Page params={params} query={query} />
+              </div>,
+            ]
           )}
-        </div>
+        </main>
       </body>
     </html>
   );

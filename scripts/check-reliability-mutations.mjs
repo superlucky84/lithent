@@ -222,10 +222,7 @@ cases.push(
     'release-context.mjs',
     'publish-release.test.mjs',
     /production entry rejects/,
-    replace(
-      "!['push', 'workflow_dispatch'].includes(env.GITHUB_EVENT_NAME)",
-      'false'
-    )
+    replace("env.GITHUB_EVENT_NAME !== 'workflow_dispatch'", 'false')
   ),
   node(
     'publish-ignore-ref',
@@ -293,8 +290,9 @@ cases.push(
     'publish-short-visibility-window',
     'npm-registry.mjs',
     'execute-release.test.mjs',
-    /npm serves over a minute after upload/,
-    replace('attempts: 31,', 'attempts: 6,')
+    /npm serves eight and a half minutes after upload/,
+    // The five-minute window before lithent 1.25.12's release.
+    replace('attempts: 91,', 'attempts: 31,')
   ),
   node(
     'publish-conflict-as-unconfirmed',
@@ -348,6 +346,18 @@ for (const [id, expected, before, after] of [
     /actual workflow permits/,
     "cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
     'cancel-in-progress: true',
+  ],
+  [
+    'ci-publish-on-push',
+    /actual workflow permits/,
+    "      github.ref == 'refs/heads/main' &&\n      github.event_name == 'workflow_dispatch' &&",
+    "      github.ref == 'refs/heads/main' &&\n      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&",
+  ],
+  [
+    'ci-record-on-push',
+    /actual workflow permits/,
+    "&& github.ref == 'refs/heads/main' &&\n      github.event_name == 'workflow_dispatch' &&",
+    "&& github.ref == 'refs/heads/main' &&\n      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&",
   ],
 ])
   cases.push({

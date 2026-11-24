@@ -1,6 +1,7 @@
 # DESIGN — 오류 복구·검증·선택적 npm 배포
 
 - 상태: Phase 7 로컬 검증과 U-15 재리뷰 APPROVE를 완료했다. DC-31은 47 fixture·33 mutation과 재리뷰의 빠른 검사 41개로 확인했다. U-16의 기존 7개 patch 정렬을 [PR #104](https://github.com/superlucky84/lithent/pull/104)로 인계했으며 발행 단위/초기 기준/인증 계약은 같다. U-10의 main 필수 검사 성공 후 발행 조건과 외부 설정 미완료 상태를 유지한다.
+- U-17(2026-11-08): 발행 시점을 main push 자동에서 main 대상 Validate 수동 실행으로 바꿨다(DC-32). 검증·후보·archive·태그/문서 계약은 같다.
 - 정본 연결: [REQUIREMENTS](./REQUIREMENTS.md), [IMPLEMENT](./IMPLEMENT.md), [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 
 ## 결정 목록
@@ -12,7 +13,7 @@
 - [x] DC-4: 브라우저를 CI job 행렬로 분리하고 기존 프로젝트 이름 `base`/`concurrent`는 유지한다. 테스트·포트·HMR 경로의 이름 의존을 보존하기 위해서다. 검증: RQ-8, RQ-9, M-5.
 - [x] DC-5: 공개 패키지별 manifest 버전업을 발행 의사로 사용한다. 전체 일괄 bump나 git 경로 변경만으로 발행하지 않는다. 사용자 U-3/U-4의 선택이다. 검증: RQ-10, M-6.
 - [x] DC-6: 공개 패키지 허용 목록 8개와 registry 존재가 확인된 초기 기준을 `.github/release-policy.json`에 고정했다. 실제 read-only dry-run은 준비 버전 7개만 후보로, generator 0.3.4는 baseline으로 제외했다. fixture에서 미발행 bootstrap·새 패키지·private 자동 가입을 거부했다. U-4의 선택적 버전업 범위 내 구현 판단이며 npm 권한 활성화는 DC-8에 남긴다. 검증: RQ-10, RQ-11, M-6, M-7.
-- [x] DC-7: U-10(2026-11-07)으로 main의 Quality·세 브라우저·최종 CI 성공 후 stable/latest 자동 발행을 확정했다. 같은 workflow의 main 수동 실행/재실행도 모든 검증 뒤 복구에 사용할 수 있다. prerelease는 보류한다. 운영 활성화는 npm/저장소 초기 설정과 별도로 기록한다. 검증: RQ-13, RQ-15, M-9.
+- [x] DC-7: U-10(2026-11-07)으로 main의 Quality·세 브라우저·최종 CI 성공 후 stable/latest 자동 발행을 확정했다. 같은 workflow의 main 수동 실행/재실행도 모든 검증 뒤 복구에 사용할 수 있다. prerelease는 보류한다. 운영 활성화는 npm/저장소 초기 설정과 별도로 기록한다. U-17(2026-11-08)로 발행 시점은 DC-32의 main 수동 실행으로 바꿨다. 검증: RQ-13, RQ-15, M-9.
 - [x] DC-8: GitHub-hosted runner·지원 Node/npm CLI의 Trusted Publishing/OIDC로 구현한다. `.github/workflows/ci.yml`의 발행 job만 id-token:write를 가지며 environment는 npm이다. 소유자가 각 패키지에 owner/repo·ci.yml·npm 환경과 직접 npm publish 허용을 등록해야 한다. main만 허용하는 환경 보호와 required CI를 설정한 후 저장소 변수 NPM_PUBLISH_ENABLED=true로 활성화한다. 장기 토큰은 추가하지 않는다. 실제 외부 권한/등록은 미확인으로 M-9에 남긴다. 검증: RQ-15, M-9, event/ref/runner/CLI/OIDC guard fixture.
 - [x] DC-9: 기존 `RELEASING.md`와 `CONTRIBUTING.md`를 새 정본에 연결하고 자동화 구현 후 발행 안내를 정렬한다. 2026-11-06 사용자 U-5 승인. 1.25.5 이력을 보존하고 구현 전 안내와 실행 절차가 혼동되지 않게 한다. 검증: RQ-15, M-10.
 - [x] DC-10: base의 cleanup 복구 크기 예산을 별도 28B로 관리한다. 기존 4,925B + 28B = 4,953B이며 Concurrent/element 예산은 유지한다. 구현 판단으로, U-6의 오류 격리를 유지하면서 일반 최적화 경로를 변경하지 않기 위한 선택이다. 사전 측정의 control UMD SHA-256은 기준 빌드와 일치했고 복구 후보는 4,953B였다. 실제 반영본에서도 재측정한다. 검증: Phase 1 fresh build·size, RQ-1, RQ-4.
@@ -88,10 +89,10 @@ U-9에 따라 후보 계산/검증부터 구현했고 U-10으로 main 전체 검
 - [x] DC-22: 후보 소비자가 같은 TypeScript 프로그램에서 ESM/CJS를 함께 읽을 때 나타난 JSX 전역 index signature 중복을 수정한다. 두 코어의 IntrinsicElements를 같은 Record<string | number, Props> base로 선언해 병합하며 기존 key/value 타입을 보존한다. 복사한 실제 tarball에서 수정 전 TS2374, 수정 후 strict 통과와 key/value 타입 동등성을 확인했다. 기존 skipLibCheck:false를 유지하고 양 코어·양 형식의 혼합 프로그램도 검사한다. 런타임 변경 없이 기존 준비 버전 root 1.25.6/Concurrent 0.2.5에 포함한다. 검증: M-8, 후보 소비자·verify:release·fresh build/size/hash.
 - [x] DC-23: 발행 이벤트 결정과 독립적으로 주입형 실행기를 먼저 검증한다. 실제 npm CLI를 기본값으로 두지 않고 검증한 archive/후보 소비자 증거를 요구한다. 매 발행 직전 registry를 새로 조회하고 stable 최신 버전·의존 범위를 확인한다. 순서대로 실행하고 각 결과를 저장하며 첫 실패에서 중단한다. 정확한 버전의 registry integrity가 검증한 tarball과 일치해야 성공이다. CLI 오류 후에도 일치하는 발행이 확인되면 성공으로 복구한다. 오래된 후보의 동일 버전이 다른 내용이면 검증한 의존성을 바꿀 수 있어 실패시키며 재발행·tag 대상으로 삼지 않는다. 재시도는 registry에서 이미 존재하는 버전을 건너뛴다. 실제 발행·권한 활성화는 DC-7/DC-8이 정리된 뒤에만 연결한다. 검증: M-7, M-8, 주입형 partial failure·지연 가시성·integrity 충돌·downgrade fixture.
 - [x] DC-24: PR/main의 Quality에 read-only 후보 계산과 후보 소비자를 연결한다. plan·consumer proof도 기존 same-run/SHA build bundle의 hash 목록에 넣고 브라우저 job에서 다시 대조한다. 후보·검증 실패 보고서는 별도 artifact로 남긴다. 소스 변경 안내는 PR base SHA 또는 push before SHA의 파일 diff와 catalog의 sourcePaths로 계산하며 선택 조건으로 쓰지 않는다. 공유 src 변경은 두 코어에 안내하고, 제외된 소유 패키지는 버전 검토 경고를 남긴다. 비교 기준이 없는 수동 실행은 미검사로 명시한다. 발행 job/권한은 DC-25로 분리한다. 검증: M-6, M-8, source ownership fixture·proof 변조 거부·실제 bundle 복원.
-- [x] DC-25: 실제 publish는 같은 ci.yml의 quality/browser/gate 성공과 신뢰하는 main push 또는 main workflow_dispatch에 한정한다. 보호된 npm environment와 명시적 초기 활성화 변수, clean same-SHA artifact/proof, GitHub-hosted runner, OIDC 요청 변수, Node/npm 최소 버전을 검사한다. 검증한 archive 절대 경로를 npm publish --access public --tag latest --provenance --ignore-scripts에 넘긴다. 별도 빈 npm 설정/작업 경로를 사용하고 장기 토큰 fallback을 허용하지 않는다. PR만 cancel-in-progress=true, main과 저장소 전체 발행 concurrency는 false다. 검증: M-9, mock CLI guard·정확한 argv·실패 job/권한 fixture.
+- [x] DC-25: 실제 publish는 같은 ci.yml의 quality/browser/gate 성공과 신뢰하는 main workflow_dispatch에 한정한다(U-17, DC-32). main push는 검증만 한다. 보호된 npm environment와 명시적 초기 활성화 변수, clean same-SHA artifact/proof, GitHub-hosted runner, OIDC 요청 변수, Node/npm 최소 버전을 검사한다. 검증한 archive 절대 경로를 npm publish --access public --tag latest --provenance --ignore-scripts에 넘긴다. 별도 빈 npm 설정/작업 경로를 사용하고 장기 토큰 fallback을 허용하지 않는다. PR만 cancel-in-progress=true, main과 저장소 전체 발행 concurrency는 false다. 검증: M-9, mock CLI guard·정확한 argv·실패 job/권한 fixture.
 - [x] DC-26: quality가 만든 build artifact 이름을 job output으로 전달해 failed-jobs 재실행 시 run_attempt가 바뀌어도 원래 검증 묶음을 찾는다. 발행 결과는 원자적 파일 교체로 등록별 저장하고 always artifact로 남긴다. 별도 contents:write/actions:write job은 같은 workflow run/SHA의 모든 attempt receipt를 읽어 published 또는 DC-31의 미확정 시도를 registry integrity로 확인한 항목만 동일 SHA에 package-name@version 태그를 만든다. 기존 다른 SHA 태그는 덮어쓰지 않는다. root 성공은 docs.yml workflow_dispatch를 정확한 태그와 release_sha로 명시 호출하며 문서 배포 완료와 dispatch 접수를 구분한다. GitHub Release는 자동 생성하지 않는다. 검증: M-7, M-10, M-14, partial receipt·재실행·tag 충돌·dispatch 실패 fixture.
 
-태그 복구는 원래 발행 run/SHA의 receipt를 사용한다. 다른 main push의 SHA에 과거 발행 버전을 붙이지 않는다.
+태그 복구는 원래 발행 run/SHA의 receipt를 사용한다. 다른 main run의 SHA에 과거 발행 버전을 붙이지 않는다.
 원래 run의 tag/docs job만 재실행하거나 해당 run의 실패 job을 재실행한다. receipt artifact 보관은 30일이며 만료/유실 시 provenance와 원래 SHA를 확인하는 수동 복구가 필요하다.
 
 ### 1. 발행 단위와 초기화
@@ -145,8 +146,8 @@ Phase 2의 `scripts/verify-release.mjs`는 8개 패키지의 manifest/exports/bi
 
 PR에서는 read-only 후보 미리보기와 local pack dry-run만 한다. fork PR의 registry 인증 접근이 필요하면
 secret 없는 manifest 비교 결과와 registry 확인 필요 상태를 분리한다. PR 코드에 발행 권한을 주지 않는다.
-main push에서는 동일 SHA의 quality·browser·artifact 검증 성공 뒤에만 발행 job을 허용한다.
-같은 ci.yml의 quality·browser·gate 뒤에 publish를 연결한다. 수동 main 실행도 같은 검증을 거쳐 복구에 사용할 수 있다.
+main push는 같은 검증만 하고 발행하지 않는다. 발행은 main 대상 수동 실행에서 동일 SHA의 quality·browser·artifact 검증이 성공한 뒤에만 허용한다(U-17, DC-32).
+같은 ci.yml의 quality·browser·gate 뒤에 publish를 연결한다. 실패한 발행은 원래 run의 job을 재실행해 복구한다.
 
 publish는 검증한 tarball을 지원되는 npm CLI의 Trusted Publishing/OIDC로 발행한다.
 지원 CLI/runner는 확인했으며 패키지별 trusted publisher 매핑·보호 환경·초기 활성화는 운영 미완료 상태다.
@@ -187,3 +188,4 @@ publish는 검증한 tarball을 지원되는 npm CLI의 Trusted Publishing/OIDC�
 ## 최종 리뷰의 발행 복구 수정
 
 - [x] DC-31: U-13의 최종 리뷰에서 업로드 성공 뒤 확인 HTTP 오류→failed receipt→동일 버전 skipped→기록 0개 성공을 재현했고 U-14로 수정한다. publish 호출 뒤 registry 확인 오류/가시성 기한 소진은 패키지 `unconfirmed`, 실행 전체 `failed`로 저장한다. 업로드 전 검증/조회 오류와 확인된 integrity 충돌은 `failed`를 유지한다. 기록 job은 같은 repository/run/clean SHA의 이전 attempt를 모아 `published`와 `unconfirmed`만 대상으로 삼고, 허용 패키지·기준 초과 stable 버전·원래 archive 이름/size/SHA-256/SRI를 먼저 대조한다. 이어 registry에서 정확한 버전/SRI가 일치해야 원래 SHA에 tag/docs를 기록한다. 원래 검증 archive와 발행 시도 receipt가 원본 증거이며 이는 기존 CLI 오류 후 SRI 확인 복구와 같은 경계다. 다른 run/SHA나 `skipped`만으로 과거 발행을 인수하지 않는다. 같은 패키지의 published receipt가 있으면 우선 사용한다. 미확정 대상이 404/오류/다른 SRI이면 명시 실패로 남기고, 독립적으로 확인된 다른 패키지의 기록은 계속한다. 원래 receipt가 없는 경우의 provenance 기반 수동 복구는 유지한다. 검증: RQ-11, RQ-12, RQ-14, RQ-16, M-14, executor·record·production adapter 합성 통합·결함 주입.
+- [x] DC-32: U-17(2026-11-08)로 `ci.yml`의 publish·release-records 조건과 발행/기록 스크립트의 실행 맥락 가드를 main의 `workflow_dispatch`로 한정한다. PR·main push는 같은 검증과 후보 미리보기만 한다. 재실행 복구·환경·OIDC·활성화 변수 계약은 그대로다. `environment` 승인 대기 대신 수동 실행을 발행 결정으로 쓴다. 검증: RQ-13, M-9, 결함 주입 `ci-publish-on-push`·`ci-record-on-push`.

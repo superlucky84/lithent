@@ -63,9 +63,10 @@ fail the test. Retries are disabled. Failures retain screenshots and traces in
 `test-results`; view the report with `pnpm exec playwright show-report` or open
 a trace with `pnpm exec playwright show-trace <trace.zip>`.
 
-The mutation command injects five isolated faults: wrong core, synchronous
+The mutation command injects six isolated faults: wrong core, synchronous
 low-priority updates, DOM rebuild instead of hydration, full reload instead of
-boundary HMR, and flattened dynamic JSX arrays. It succeeds only if the exact
+boundary HMR, flattened dynamic JSX arrays, and an endless HMR replacement
+that logs nothing. It succeeds only if the exact
 targeted tests fail with the expected assertions, without skipped tests or
 startup errors. JSON reports are saved under `test-results/mutations`.
 Mutation flags are confined to these fixtures and the E2E server.
@@ -102,5 +103,15 @@ It also checks JSX lists, mount cleanup, and empty output becoming visible and
 empty again, plus direct function calls from another module that keep the
 caller's state. `hmr-mixed-exports.spec.ts` verifies that component-only changes
 preserve parent state, while ordinary export changes update the importer and
-clean up the previous root. The fixture watcher waits for each file write to
+clean up the previous root. `hmr-propagation.spec.ts` verifies that modules
+without components pass their updates on: a store edit reaches the importing
+component without a reload, and an edit to an entry that only renders reloads
+the page once.
+
+`hmr-storm.spec.ts` checks that every save settles: after the expected update,
+HMR updates, reloads, Lithent HMR warnings and DOM changes must stop within
+8 seconds and stay within per-scenario limits. It edits shared and nested
+components, saves five times quickly, edits hidden components, a store, an
+ordinary export, a circular import and the entry, makes a component throw,
+saves a syntax error, and replaces a layout that renders `<html>` three times. The fixture watcher waits for each file write to
 finish so rapid automated edits are not lost to change-event throttling.

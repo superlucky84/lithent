@@ -1,4 +1,5 @@
 import MakePage from './makePage.js';
+import { serializeForScript } from './helper.js';
 
 export default class DevMakePage extends MakePage {
   constructor(info) {
@@ -6,19 +7,21 @@ export default class DevMakePage extends MakePage {
   }
 
   addLoaderFromPageString(appHtmlOrig, initProp) {
+    // A replacer function: a replacement string would expand `$'` and
+    // similar patterns that can appear in the serialized data.
     return appHtmlOrig.replace(
       '</body>',
-      `<script type="module">
+      () => `<script type="module">
         import load from '/src/base/load';
-        load('${this.key}', ${JSON.stringify(
+        load(${serializeForScript(this.key)}, ${serializeForScript(
           Object.assign({}, this.props)
-        )}, ${JSON.stringify(initProp)});
+        )}, ${serializeForScript(initProp)});
        </script></body>`
     );
   }
 
-  async makePageString(Layout, Page) {
-    const pageString = this.commonPageToString(Layout, Page);
+  async makePageString(Layout, Page, initProp) {
+    const pageString = this.commonPageToString(Layout, Page, initProp);
 
     return await this.vite.transformIndexHtml(this.req.originalUrl, pageString);
   }

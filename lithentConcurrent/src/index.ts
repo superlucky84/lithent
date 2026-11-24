@@ -47,5 +47,12 @@ export type {
 declare global {
   namespace JSX {
     interface IntrinsicElements extends Record<string | number, Props> {}
+    // Components receive children as the third mounter argument, and `key`
+    // is read by the list diff. TypeScript 5.8+ checks JSX children against
+    // the props type, so allow both on every element and component.
+    interface IntrinsicAttributes {
+      key?: unknown;
+      children?: unknown;
+    }
   }
 }

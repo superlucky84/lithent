@@ -25,10 +25,33 @@ function compareArraysWithUnderscore(arr1: string[], arr2: string[]) {
   return [true, params];
 }
 
+// Same order as the server (`sortFiles.js`): at the first position where two
+// routes differ, a fixed segment wins over a parameter.
+function routeSegments(key: string) {
+  return key
+    .split(/(?:\/|\.)/)
+    .slice(2, -1)
+    .filter(part => part !== 'index');
+}
+
+function compareRoutes(a: string, b: string) {
+  const segmentsA = routeSegments(a);
+  const segmentsB = routeSegments(b);
+
+  for (let i = 0; i < Math.min(segmentsA.length, segmentsB.length); i++) {
+    const paramA = segmentsA[i].startsWith('_');
+    const paramB = segmentsB[i].startsWith('_');
+
+    if (paramA !== paramB) return paramA ? 1 : -1;
+  }
+
+  return segmentsB.length - segmentsA.length;
+}
+
 function findMatch(targetSegments: string[], pageModuleKeys: string[]) {
   let params: Record<string, string> = {};
 
-  const matchItem = pageModuleKeys.find(item => {
+  const matchItem = [...pageModuleKeys].sort(compareRoutes).find(item => {
     const moduleSegmentList = item.split(/(?:\/|\.)/);
     moduleSegmentList.pop();
     const res = compareArraysWithUnderscore(targetSegments, moduleSegmentList);
@@ -119,7 +142,7 @@ export async function loadPage(dynamicPath: string) {
 }
 
 export function makeRoute() {
-  pageModules.v = import.meta.glob('../pages/*.(tsx|mdx)');
+  pageModules.v = import.meta.glob('../pages/*.{tsx,mdx}');
   routeWatch(state => {
     if (initPage && initPage && state.page.value !== initPage && state.rVDom) {
       loadPage(state.page.value);

@@ -2,20 +2,19 @@ import { mount } from 'lithent';
 
 const Oops = mount(() => {
   return () => (
-    <div class="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-800">
-      <div class="text-center p-8">
-        <h1 class="text-4xl font-bold text-red-500 animate-bounce">Oops!</h1>
-        <p class="mt-4 text-xl text-gray-700 dark:text-gray-300">
-          Something went wrong. Please try again later.
-        </p>
-        <a
-          href="/"
-          class="inline-block mt-6 px-6 py-2 text-sm font-medium text-white bg-red-500 rounded-sm hover:bg-red-600"
-        >
-          Go to Homepage
-        </a>
-      </div>
-    </div>
+    <section class="py-16 text-center">
+      <p class="text-5xl">🔥</p>
+      <h1 class="mt-4 text-2xl font-bold">Something went wrong</h1>
+      <p class="mt-2 text-stone-600">
+        The page failed to render. Check the server log for details.
+      </p>
+      <a
+        href="/"
+        class="mt-6 inline-block rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white"
+      >
+        Back to all recipes
+      </a>
+    </section>
   );
 });
 

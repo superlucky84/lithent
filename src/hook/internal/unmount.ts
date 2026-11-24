@@ -1,9 +1,9 @@
-import { WDom, CompKey } from '@/types';
+import { WDom } from '@/types';
 import { checkEventKey } from '@/utils/predicator';
 import {
   componentMap,
   getCurrentComponent,
-  isComponentMapManualMode,
+  componentMapManualMode,
   runUnmountEffects,
 } from '@/utils/universalRef';
 
@@ -19,7 +19,11 @@ export const runUnmountQueueFromWDom = (newWDom: WDom) => {
     // A redraw queued before this removal still holds the node. Marking it
     // retired makes that stale redraw a no-op instead of drawing it back in.
     newWDom.il = true;
-    removeItem(compKey);
+    runUnmountEffects(compKey);
+
+    if (!componentMapManualMode) {
+      componentMap.delete(compKey);
+    }
   }
   recursiveRunUnmount(newWDom);
 };
@@ -45,12 +49,4 @@ const recursiveRunUnmount = (wDom: WDom) => {
       recursiveRunUnmount(item);
     }
   });
-};
-
-const removeItem = (compKey: CompKey) => {
-  runUnmountEffects(compKey);
-
-  if (!isComponentMapManualMode()) {
-    componentMap.delete(compKey);
-  }
 };

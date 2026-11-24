@@ -103,6 +103,21 @@ const takeDom = (wDom: WDom) => {
 };
 const CE = (t: string) => document.createElement(t);
 
+// Into the root's wrapper: before its after element, in place of <html>, or
+// at the end. A new <html> also takes the old one's place as the wrapper:
+// the old one has left the document, and the next redraw of this root (an
+// HMR replacement of a layout component) must reach the page.
+const insertRoot = (wDom: WDom, element: Node) => {
+  const { we, ae } = wDom as { we: HTMLElement; ae?: HTMLElement };
+  if (ae) we.insertBefore(element, ae);
+  else if (we.tagName === 'HTML') {
+    wDom.we = (
+      element.nodeType === 11 ? element.firstChild : element
+    ) as HTMLElement;
+    we.replaceWith(element);
+  } else we.appendChild(element);
+};
+
 export const render = (
   wDom: WDom,
   wrapElement: HTMLElement | null,
@@ -115,16 +130,8 @@ export const render = (
 
   const Dom = wDomToDom(wDom, isHydration);
 
-  if (afterElement) {
-    wDom.ae = afterElement;
-    wrapElement.insertBefore(Dom, afterElement);
-  } else if (!isHydration) {
-    if (wrapElement.tagName === 'HTML') {
-      wrapElement.replaceWith(Dom);
-    } else {
-      wrapElement.appendChild(Dom);
-    }
-  }
+  if (afterElement) wDom.ae = afterElement;
+  if (afterElement || !isHydration) insertRoot(wDom, Dom);
 
   execMountedQueue();
 
@@ -244,13 +251,7 @@ const typeAdd = (
       newElement &&
       newWDom.tag !== 'portal'
     ) {
-      if (newWDom.ae) {
-        newWDom.we.insertBefore(newElement, newWDom.ae);
-      } else if (newWDom.we.tagName === 'HTML') {
-        newWDom.we.replaceWith(newElement);
-      } else {
-        newWDom.we.appendChild(newElement);
-      }
+      insertRoot(newWDom, newElement);
     }
     return;
   }

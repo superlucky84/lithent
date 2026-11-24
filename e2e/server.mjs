@@ -19,6 +19,15 @@ const bundle =
     : 'dist/lithent.mjs';
 const mutation = process.env.LITHENT_E2E_MUTATION || '';
 const aliases = [
+  // hmr-storm serves the dev helper from source so stormMutation can edit it.
+  ...(mutation === 'hmr-storm'
+    ? [
+        {
+          find: /^lithent\/devHelper$/,
+          replacement: resolve(repo, 'devHelper/src/index.ts'),
+        },
+      ]
+    : []),
   ...(mutation === 'jsx-flatten'
     ? [
         {
@@ -98,6 +107,28 @@ const identity = () => ({
         res.end();
       } else next();
     });
+  },
+});
+
+// Negative control for hmr-storm.spec.ts: a successful HMR replacement queues
+// the same instance again and the retry limit is gone, so replacement never
+// ends and logs nothing, like the endless replacement fixed in #95.
+const stormMutation = () => ({
+  name: 'e2e-hmr-storm-mutation',
+  transform(code, id) {
+    if (!id.endsWith('/devHelper/src/createBoundary.ts')) return;
+    for (const [from, to] of [
+      [
+        'update.updated = true;',
+        'update.updated = true;\n      update.instances.set(compKey, registry.registrations.get(compKey) || registration);',
+      ],
+      ['update.retryCount > MAX_RETRY', 'false'],
+    ]) {
+      if (!code.includes(from))
+        throw new Error(`hmr-storm mutation: "${from}" not found`);
+      code = code.replace(from, to);
+    }
+    return code;
   },
 });
 
@@ -190,10 +221,15 @@ try {
   };
   config.cacheDir = resolve(work, 'fixture-cache');
   config.plugins = [identity(), ssrPage];
+  if (mutation === 'hmr-storm') config.plugins.push(stormMutation());
   if (mutation !== 'hmr-reload')
     config.plugins.push(
       lithentVite({
-        include: /\.e2e-work\/.*(?:Counter|Stateless|Mixed|mixed-app)\.tsx$/,
+        include: [
+          /\.e2e-work\/.*(?:Counter|Stateless|Mixed|mixed-app|Greeting|greeting-store|propagation-app)\.tsx?$/,
+          // hmr-storm.spec.ts: every module of that app, like an app's src/.
+          /\.e2e-work\/[^/]+\/storm\/.*\.tsx?$/,
+        ],
       })
     );
   config.oxc = { jsx: { runtime: 'automatic', importSource: 'lithent' } };

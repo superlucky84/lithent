@@ -1,0 +1,376 @@
+{
+  "tool": "experiments/core-size/speed-summary.py",
+  "baseline": "main-a-cache",
+  "sessions": [
+    {
+      "file": "run1.json",
+      "date": "2026-11-11T08:43:28.389Z",
+      "samples": 40,
+      "chromium": "153.0.8010.12",
+      "node": "v24.22.1",
+      "order": ["main-a-cache", "s-a-cache", "sh-a-cache"]
+    },
+    {
+      "file": "run2.json",
+      "date": "2026-11-11T08:48:27.259Z",
+      "samples": 40,
+      "chromium": "153.0.8010.12",
+      "node": "v24.22.1",
+      "order": ["sh-a-cache", "s-a-cache", "main-a-cache"]
+    }
+  ],
+  "unit": "percent change against the baseline; 95% bootstrap interval",
+  "apps": {
+    "s-a-cache": {
+      "script": {
+        "weighted": {
+          "change": -0.31,
+          "low": -1.25,
+          "high": 0.52
+        },
+        "scenarios": {
+          "01": {
+            "change": -0.27,
+            "low": -1.59,
+            "high": 0.95
+          },
+          "02": {
+            "change": 0.02,
+            "low": -2.52,
+            "high": 2.4
+          },
+          "03": {
+            "change": 0.2,
+            "low": -2.9,
+            "high": 5.09
+          },
+          "04": {
+            "change": -3.98,
+            "low": -13.0,
+            "high": 4.78
+          },
+          "05": {
+            "change": 3.06,
+            "low": -2.57,
+            "high": 8.87
+          },
+          "06": {
+            "change": -0.0,
+            "low": -1.06,
+            "high": 0.54
+          },
+          "07": {
+            "change": -0.51,
+            "low": -0.98,
+            "high": -0.06
+          },
+          "08": {
+            "change": -0.9,
+            "low": -2.05,
+            "high": -0.05
+          },
+          "09": {
+            "change": -0.2,
+            "low": -4.19,
+            "high": 2.05
+          }
+        }
+      },
+      "layout": {
+        "weighted": {
+          "change": 1.22,
+          "low": -0.24,
+          "high": 9.41
+        },
+        "scenarios": {
+          "01": {
+            "change": 0.01,
+            "low": -1.01,
+            "high": 0.6
+          },
+          "02": {
+            "change": -0.24,
+            "low": -0.79,
+            "high": 0.43
+          },
+          "03": {
+            "change": 4.46,
+            "low": -1.47,
+            "high": 10.33
+          },
+          "04": {
+            "change": 0.0,
+            "low": -29.29,
+            "high": 0.0
+          },
+          "05": {
+            "change": 0.53,
+            "low": -4.55,
+            "high": 6.31
+          },
+          "06": {
+            "change": -0.41,
+            "low": -2.71,
+            "high": 1.56
+          },
+          "07": {
+            "change": -0.63,
+            "low": -1.6,
+            "high": 0.18
+          },
+          "08": {
+            "change": -0.41,
+            "low": -4.95,
+            "high": 4.69
+          },
+          "09": {
+            "change": 8.47,
+            "low": 0.0,
+            "high": 130.09
+          }
+        }
+      },
+      "total": {
+        "weighted": {
+          "change": 0.35,
+          "low": -0.89,
+          "high": 1.14
+        },
+        "scenarios": {
+          "01": {
+            "change": -0.27,
+            "low": -1.12,
+            "high": 0.66
+          },
+          "02": {
+            "change": -0.2,
+            "low": -0.96,
+            "high": 0.73
+          },
+          "03": {
+            "change": 4.46,
+            "low": -1.03,
+            "high": 9.05
+          },
+          "04": {
+            "change": -4.78,
+            "low": -12.96,
+            "high": 3.74
+          },
+          "05": {
+            "change": 2.42,
+            "low": -2.77,
+            "high": 5.79
+          },
+          "06": {
+            "change": -0.25,
+            "low": -1.78,
+            "high": 0.91
+          },
+          "07": {
+            "change": -0.38,
+            "low": -1.3,
+            "high": 0.09
+          },
+          "08": {
+            "change": -0.34,
+            "low": -4.2,
+            "high": 2.89
+          },
+          "09": {
+            "change": 1.02,
+            "low": -3.04,
+            "high": 2.95
+          }
+        }
+      }
+    },
+    "sh-a-cache": {
+      "script": {
+        "weighted": {
+          "change": -0.23,
+          "low": -1.3,
+          "high": 0.66
+        },
+        "scenarios": {
+          "01": {
+            "change": -0.52,
+            "low": -1.94,
+            "high": 0.63
+          },
+          "02": {
+            "change": -0.06,
+            "low": -2.83,
+            "high": 2.9
+          },
+          "03": {
+            "change": 1.52,
+            "low": -2.49,
+            "high": 5.68
+          },
+          "04": {
+            "change": -6.1,
+            "low": -13.85,
+            "high": 3.94
+          },
+          "05": {
+            "change": 1.0,
+            "low": -4.74,
+            "high": 8.76
+          },
+          "06": {
+            "change": 0.53,
+            "low": -0.79,
+            "high": 0.94
+          },
+          "07": {
+            "change": -0.4,
+            "low": -0.98,
+            "high": 0.08
+          },
+          "08": {
+            "change": -1.97,
+            "low": -3.23,
+            "high": -0.86
+          },
+          "09": {
+            "change": 1.64,
+            "low": -2.83,
+            "high": 6.08
+          }
+        }
+      },
+      "layout": {
+        "weighted": {
+          "change": 0.58,
+          "low": -0.82,
+          "high": 5.78
+        },
+        "scenarios": {
+          "01": {
+            "change": 0.13,
+            "low": -0.69,
+            "high": 0.72
+          },
+          "02": {
+            "change": -0.13,
+            "low": -0.85,
+            "high": 0.66
+          },
+          "03": {
+            "change": 4.25,
+            "low": -2.03,
+            "high": 8.91
+          },
+          "04": {
+            "change": 0.0,
+            "low": -29.29,
+            "high": 0.0
+          },
+          "05": {
+            "change": -1.92,
+            "low": -6.86,
+            "high": 3.13
+          },
+          "06": {
+            "change": 0.24,
+            "low": -1.89,
+            "high": 2.19
+          },
+          "07": {
+            "change": -0.43,
+            "low": -1.37,
+            "high": 0.53
+          },
+          "08": {
+            "change": -1.42,
+            "low": -4.91,
+            "high": 3.96
+          },
+          "09": {
+            "change": 2.9,
+            "low": 0.0,
+            "high": 20.76
+          }
+        }
+      },
+      "total": {
+        "weighted": {
+          "change": 0.39,
+          "low": -0.85,
+          "high": 1.17
+        },
+        "scenarios": {
+          "01": {
+            "change": -0.03,
+            "low": -0.62,
+            "high": 0.69
+          },
+          "02": {
+            "change": -0.01,
+            "low": -1.4,
+            "high": 1.01
+          },
+          "03": {
+            "change": 4.5,
+            "low": -1.71,
+            "high": 7.9
+          },
+          "04": {
+            "change": -5.86,
+            "low": -13.03,
+            "high": 3.0
+          },
+          "05": {
+            "change": -1.27,
+            "low": -5.25,
+            "high": 3.21
+          },
+          "06": {
+            "change": 0.25,
+            "low": -1.29,
+            "high": 1.11
+          },
+          "07": {
+            "change": 0.02,
+            "low": -1.1,
+            "high": 0.53
+          },
+          "08": {
+            "change": -1.39,
+            "low": -4.52,
+            "high": 1.83
+          },
+          "09": {
+            "change": 2.73,
+            "low": -1.77,
+            "high": 6.89
+          }
+        }
+      }
+    }
+  },
+  "heapMB": {
+    "main-a-cache": {
+      "ready": 1.759,
+      "run1k": 3.605,
+      "update5": 3.674,
+      "runClear": 1.934,
+      "run10k": 18.722
+    },
+    "s-a-cache": {
+      "ready": 1.756,
+      "run1k": 3.602,
+      "update5": 3.671,
+      "runClear": 1.931,
+      "run10k": 18.72
+    },
+    "sh-a-cache": {
+      "ready": 1.756,
+      "run1k": 3.596,
+      "update5": 3.666,
+      "runClear": 1.929,
+      "run10k": 18.72
+    }
+  }
+}

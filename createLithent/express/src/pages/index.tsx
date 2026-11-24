@@ -1,75 +1,63 @@
 import { mount } from 'lithent';
-import { navigate } from '@/base/route';
 import { getPreloadData } from '@/base/data';
-import { fetchTypeList } from '@/helper/request';
-import { TYPE_DESCRIPT } from '@/helper/constants';
+import { Link } from '@/components/Link';
+import { ManualCounter, ReactiveCounter } from '@/components/Counters';
+import { categories, getRecipes } from '@/data/recipes';
+import type { Category } from '@/data/recipes';
 
-export const preload = async () => {
-  const data = await fetchTypeList();
+type HomeData = { categories: (Category & { count: number })[] };
 
-  return { layout: { title: 'EXPRESS-LITHENT' }, data };
-};
+/**
+ * Runs on the server for the first request and in the browser on client-side
+ * navigation. Replace the local data with your own API or database call.
+ */
+export const preload = async (): Promise<
+  HomeData & { layout: { title: string } }
+> => ({
+  layout: { title: 'Recipes' },
+  categories: categories.map(category => ({
+    ...category,
+    count: getRecipes(category.id).length,
+  })),
+});
 
 const Index = mount(() => {
-  const preload = getPreloadData<{ data: { name: string; url: string }[] }>();
-
-  const moveTypePage = (event: Event, name: string) => {
-    event.preventDefault();
-    navigate(`/${name}`);
-  };
+  const data = getPreloadData<HomeData>();
 
   return () => (
-    <div class="container px-8 mx-auto xl:px-5  max-w-(--breakpoint-lg) py-5 lg:py-8">
-      <div class="mt-10 grid gap-10 grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:gap-10 xl:grid-cols-3 ">
-        {preload.data.map(({ name }) => (
-          <div class="group cursor-pointer">
-            <div class="overflow-hidden rounded-[40px] bg-gray-100 transition-all hover:scale-105">
-              <a
-                class="relative block aspect-square"
-                href="#"
-                onClick={(event: Event) => moveTypePage(event, name)}
+    <div>
+      <section>
+        <h1 class="text-3xl font-bold">Welcome to your Lithent app</h1>
+        <p class="mt-2 text-stone-600">
+          Edit <code>src/pages/index.tsx</code> and save to see it update. The
+          same counter is written in both component styles:
+        </p>
+        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+          <ManualCounter />
+          <ReactiveCounter />
+        </div>
+      </section>
+
+      <section class="mt-12">
+        <h2 class="text-2xl font-bold">Recipes</h2>
+        <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {data.categories.map(category => (
+            <li key={category.id}>
+              <Link
+                to={`/${category.id}`}
+                class={`block rounded-2xl p-5 transition hover:-translate-y-0.5 hover:shadow-md ${category.color}`}
               >
-                <img
-                  alt="Thumbnail"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  class="object-cover transition-all"
-                  style="position: absolute; height: 100%; width: 100%; inset: 0px; color: transparent;"
-                  sizes="(max-width: 768px) 30vw, 33vw"
-                  src={`/assets/${name}.svg`}
-                />
-              </a>
-            </div>
-            <div>
-              <div>
-                <div class="flex gap-3">
-                  <a
-                    href="#"
-                    onClick={(event: Event) => moveTypePage(event, name)}
-                  >
-                    <span
-                      class={`bg-pokemon-${name} inline-block text-sm font-bold tracking-wider uppercase mt-5 text-white px-2 py-1 rounded-sm drop-shadow-md`}
-                    >
-                      {name}
-                    </span>
-                  </a>
-                </div>
-                <h2 class="text-lg font-semibold leading-snug tracking-tight mt-2  text-gray-800 font-bold ">
-                  <a
-                    href="#"
-                    onClick={(event: Event) => moveTypePage(event, name)}
-                  >
-                    <span class="bg-linear-to-r from-red-200 to-blue-100 bg-[length:0px_10px] bg-left-bottom bg-no-repeat transition-[background-size] duration-500 hover:bg-[length:100%_3px] group-hover:bg-[length:100%_10px]">
-                      {TYPE_DESCRIPT[name]}
-                    </span>
-                  </a>
-                </h2>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+                <span class="text-4xl">{category.emoji}</span>
+                <h3 class="mt-3 text-lg font-semibold">{category.name}</h3>
+                <p class="text-sm opacity-80">{category.blurb}</p>
+                <p class="mt-2 text-xs font-semibold uppercase tracking-wide opacity-70">
+                  {category.count} recipes
+                </p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 });

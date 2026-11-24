@@ -37,7 +37,13 @@ export default defineConfig({
   },
   projects: ['base', 'concurrent'].map((core, index) => ({
     name: core,
-    testIgnore: core === 'base' ? '**/scheduler.spec.ts' : [],
+    // The widget bundles (the template and the framework comparison) have
+    // their framework built in, so they have nothing to check on the
+    // concurrent server.
+    testIgnore:
+      core === 'base'
+        ? '**/scheduler.spec.ts'
+        : ['**/widget-template.spec.ts', '**/widget-compare.spec.ts'],
     use: { baseURL: `http://127.0.0.1:${43130 + index}` },
   })),
   webServer: ['base', 'concurrent'].map((core, index) => ({

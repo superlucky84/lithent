@@ -106,6 +106,24 @@ const menuData: MenuSection[] = [
     ],
   },
   {
+    text: { en: 'Server Rendering', ko: '서버 렌더링' },
+    items: [
+      {
+        text: { en: 'SSR & Hydration', ko: 'SSR & 하이드레이션' },
+        link: '/guide/ssr',
+      },
+    ],
+  },
+  {
+    text: { en: 'Testing', ko: '테스트' },
+    items: [
+      {
+        text: { en: 'Component Tests', ko: '컴포넌트 테스트' },
+        link: '/guide/testing',
+      },
+    ],
+  },
+  {
     text: { en: 'JSX & Templates', ko: 'JSX & 템플릿' },
     items: [
       {

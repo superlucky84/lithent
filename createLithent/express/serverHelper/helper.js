@@ -62,3 +62,23 @@ export function excludeRoutePath(praamsValue) {
     Object.values(praamsValue).includes('assets')
   );
 }
+
+const SCRIPT_UNSAFE = {
+  '<': '\\u003c',
+  '>': '\\u003e',
+  '&': '\\u0026',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+};
+
+/**
+ * JSON for an inline <script>. Request data (such as the query string) ends
+ * up here, so `</script>` and similar sequences must not reach the HTML
+ * parser. The escapes keep the value identical once parsed as JavaScript.
+ */
+export function serializeForScript(value) {
+  return JSON.stringify(value ?? null).replace(
+    /[<>&\u2028\u2029]/g,
+    char => SCRIPT_UNSAFE[char]
+  );
+}

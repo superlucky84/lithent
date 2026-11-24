@@ -1,0 +1,246 @@
+--- a/src/diff.ts
++++ b/src/diff.ts
+@@ -1,11 +1,10 @@
+-import { WDom, TagFunctionResolver, RenderType, Props } from '@/types';
++import { WDom, TagFunctionResolver, RenderType, WDomType } from '@/types';
+ import { checkCustemComponentFunction, getKey } from '@/utils/predicator';
+ import { getParent, makeParentGetter } from '@/utils';
+ import { typeDeleteUnused } from '@/render';
+ import { cloneWDom, copyResolver } from '@/wDom';
+ import {
+   checkSameWDomWithOriginal,
+-  getWDomType,
+   checkExistyKey,
+   checkExisty,
+   checkKeyedChildren,
+@@ -40,7 +39,11 @@
+   return remakeNewWDom(
+     newWDom,
+     !!originalWDom &&
+-      checkSameWDomWithOriginal[getWDomType(newWDom)](newWDom, originalWDom),
++      checkSameWDomWithOriginal[
++        checkCustemComponentFunction(newWDom)
++          ? 'c'
++          : ((newWDom.type || 'et') as WDomType)
++      ](newWDom, originalWDom),
+     originalWDom
+   );
+ };
+@@ -53,7 +56,19 @@
+   isSameType: boolean,
+   originalWDom?: WDom
+ ) => {
+-  const remakeWDom = generalize(newWDom, isSameType, originalWDom);
++  // A component description is run against its instance, or resolved into a
++  // new one; a plain node is taken as it is.
++  const remakeWDom: WDom = checkCustemComponentFunction(newWDom)
++    ? isSameType && originalWDom
++      ? runUpdate(originalWDom, newWDom)
++      : // Resolved before (children a component draws again somewhere else):
++        // the first instance owns its props, which are also its key, so the
++        // new instance is made from a copy.
++        (newWDom.rd
++          ? copyResolver(newWDom)
++          : ((newWDom.rd = true), newWDom)
++        ).resolve()
++    : newWDom;
+   const needRerender = addReRenderTypeProperty(
+     remakeWDom,
+     isSameType,
+@@ -62,39 +77,16 @@
+   const isNoting = needRerender === 'N';
+ 
+   if (!isNoting) {
+-    remakeWDom.children = remakeChildrenForDiff(
+-      remakeWDom,
+-      isSameType,
+-      originalWDom
+-    );
++    remakeWDom.children =
++      isSameType && originalWDom
++        ? remakeChildrenForUpdate(remakeWDom, originalWDom)
++        : remakeChildrenForAdd(remakeWDom);
+   }
+ 
+   // NOTE: short-key metadata (nr = needRerender) keeps bundle size down
+   remakeWDom.nr = needRerender;
+-  inheritPropForRender(remakeWDom, originalWDom, needRerender);
+ 
+-  // A retired node keeps its children: it may be a hoisted constant the
+-  // caller draws again later, which is then copied from them. A component's
+-  // node is copied from its description instead (cloneWDom), so it lets go
+-  // of its previous output: otherwise every row a list redraws keeps its old
+-  // subtree reachable, for the GC to copy, until the whole redraw is done.
+-  if (!isNoting && originalWDom) {
+-    originalWDom.il = true;
+-    if (originalWDom.ctor) {
+-      originalWDom.children = undefined;
+-    }
+-  }
+-  return remakeWDom;
+-};
+-
+-/**
+- * Handle what the new virtual DOM should inherit or reconcile from the original virtual DOM.
+- */
+-const inheritPropForRender = (
+-  remakeWDom: WDom,
+-  originalWDom?: WDom,
+-  needRerender?: RenderType
+-) => {
++  // What the new node takes over from the original.
+   if (needRerender !== 'A' && originalWDom) {
+     remakeWDom.el = originalWDom.el;
+   }
+@@ -107,6 +99,19 @@
+   }
+ 
+   remakeWDom.op = originalWDom && originalWDom.props;
++
++  // A retired node keeps its children: it may be a hoisted constant the
++  // caller draws again later, which is then copied from them. A component's
++  // node is copied from its description instead (cloneWDom), so it lets go
++  // of its previous output: otherwise every row a list redraws keeps its old
++  // subtree reachable, for the GC to copy, until the whole redraw is done.
++  if (!isNoting && originalWDom) {
++    originalWDom.il = true;
++    if (originalWDom.ctor) {
++      originalWDom.children = undefined;
++    }
++  }
++  return remakeWDom;
+ };
+ 
+ /**
+@@ -138,21 +143,6 @@
+ };
+ 
+ /**
+- * Handling virtual DOM attribute updates.
+- */
+-const syncResolverProps = (props: Props, infoProps: Props) => {
+-  if (props && infoProps !== props) {
+-    // Only the keys that are gone: deleting and re-adding every key on every
+-    // render changes the object's shape each time.
+-    infoProps = infoProps || {};
+-    keys(props).forEach(
+-      key => isEnumerableProp(infoProps, key) || delete props[key]
+-    );
+-    keys(infoProps).forEach(key => (props[key] = infoProps[key]));
+-  }
+-};
+-
+-/**
+  * Keep the existing component node while injecting the props/children from the freshly computed TagFunctionResolver.
+  * originalWDom is the fully evaluated node from the previous render, whereas infoVdom is the intermediate resolver,
+  * so updating compProps/compChild in place lets reRender() evaluate with the latest slots and props.
+@@ -163,8 +153,14 @@
+   const { compProps: props, compChild: children } = vDom;
+   const { props: infoProps, children: infoChidren } = infoVdom;
+ 
+-  if (props) {
+-    syncResolverProps(props, infoProps);
++  if (props && infoProps !== props) {
++    // Only the keys that are gone: deleting and re-adding every key on every
++    // render changes the object's shape each time.
++    const next = infoProps || {};
++    keys(props).forEach(
++      key => isEnumerableProp(next, key) || delete props[key]
++    );
++    keys(next).forEach(key => (props[key] = next[key]));
+   }
+ 
+   /**
+@@ -183,39 +179,6 @@
+ };
+ 
+ /**
+- * Replace the compared virtual DOM with the new virtual DOM or simply update it.
+- */
+-const generalize = (
+-  newWDom: WDom | TagFunctionResolver,
+-  isSameType: boolean,
+-  originalWDom?: WDom
+-): WDom => {
+-  return checkCustemComponentFunction(newWDom)
+-    ? isSameType && originalWDom
+-      ? runUpdate(originalWDom, newWDom)
+-      : // Resolved before (children a component draws again somewhere else):
+-        // the first instance owns its props, which are also its key, so the
+-        // new instance is made from a copy.
+-        (newWDom.rd
+-          ? copyResolver(newWDom)
+-          : ((newWDom.rd = true), newWDom)
+-        ).resolve()
+-    : newWDom;
+-};
+-
+-/**
+- * 자식 가상돔들도 전부 재귀처리하며 똑같은 처리를 해준다.
+- */
+-const remakeChildrenForDiff = (
+-  newWDom: WDom,
+-  isSameType: boolean,
+-  originalWDom?: WDom
+-) =>
+-  isSameType && originalWDom
+-    ? remakeChildrenForUpdate(newWDom, originalWDom)
+-    : remakeChildrenForAdd(newWDom);
+-
+-/**
+  * Recursive handling for the creation of a new virtual DOM. Kept apart from
+  * the update below: one function for both made creating 1,000 rows 6% slower.
+  */
+--- a/src/render.ts
++++ b/src/render.ts
+@@ -371,7 +371,9 @@
+   // Content pass (left-to-right, keeps lifecycle order).
+   // Added children are created here but inserted in the placement pass.
+   const created: (HTMLElement | DocumentFragment | Text | undefined)[] = [];
+-  let createdCount = 0;
++  // Whether the placement pass is needed: a child moves, or one is created
++  // before the trailing run.
++  let place = !!keep;
+ 
+   // The trailing run of added children (appended rows) is drawn into one
+   // fragment, inserted in a single step after the content pass.
+@@ -395,13 +397,13 @@
+         }
+         if (index < tail) {
+           created[index] = wDomToDom(item);
++          place = true;
+         } else {
+           const el: Node = wDomToDom(item, false, trailing);
+           if (el !== trailing && item.tag !== 'portal') {
+             trailing!.appendChild(el);
+           }
+         }
+-        createdCount++;
+       } else {
+         wDomUpdate(item);
+       }
+@@ -420,7 +422,7 @@
+     parentEl.insertBefore(trailing, baseAnchor || null);
+   }
+ 
+-  if (keep || createdCount > children.length - tail) {
++  if (place) {
+     // Placement pass (right-to-left): insert added children and non-LIS
+     // moves before a running anchor.
+     let anchor =
+@@ -428,11 +430,10 @@
+ 
+     for (let i = tail - 1; i >= 0; i--) {
+       const item = children[i];
+-      const isNew = created[i] !== undefined;
+-      const needMove = !!keep && keep[i] === false;
+-
+-      if ((isNew || needMove) && parentEl && item.tag !== 'portal') {
+-        const el = isNew ? created[i] : getElementFromFragment(item);
++      if (parentEl && item.tag !== 'portal') {
++        const el =
++          created[i] ||
++          (keep && keep[i] === false && getElementFromFragment(item));
+ 
+         if (el) {
+           parentEl.insertBefore(el, anchor || null);

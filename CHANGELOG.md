@@ -1,5 +1,179 @@
 # Release notes
 
+## 2026-11-20
+
+### lithent 1.26.0: `lithent/test`
+
+- New `lithent/test` entry for component tests: `render` renders into a
+  container attached to the document, `await act(fn)` runs `fn` and waits until
+  lithent has drawn everything it caused, and `cleanup` takes the rendered
+  trees down (automatically after each test when the runner exposes
+  `afterEach` as a global).
+- `act` waits for renders started by `renew()`, `lithent/helper` stores and
+  `mountCallback`s, and, with `lithent` aliased to `lithent-concurrent`, for
+  `deferRender` work the scheduler splits across tasks. It keeps working under
+  fake timers.
+- No dependencies. Queries and events come from `@testing-library/dom` and
+  `@testing-library/user-event`, which work as they are on the DOM lithent
+  renders. ESM and CommonJS builds with declarations; the core and its size
+  are unchanged.
+- Docs: a new Testing guide (English and Korean). The bundled agent skill
+  (`dist/skills/lithent`) and `lithent-agent-addon.md` describe the same
+  workflow, including asserting only after `await act(...)`.
+- `lithent-concurrent` stays at 0.2.8: `lithent/test` imports the bare
+  `lithent`, so an app that aliases it to `lithent-concurrent` gets the
+  concurrent-aware waiting without a new concurrent release.
+
+### create-lithent templates (no package release)
+
+- The SPA and widget templates require `@types/node ^22.12.0` instead of
+  `^20.19.0`, so `npm install --save-dev vitest` (Vitest 5 wants
+  `@types/node` 22 or later) installs without a peer conflict. The supported
+  Node versions are unchanged.
+
+### lithent 1.25.12 / lithent-concurrent 0.2.8
+
+- A root component that renders `<html>` stays on the page through repeated
+  replacements. Inserting such a root replaced the page's `<html>`, but the
+  root kept the detached element as its wrapper, so the next replacement
+  emptied the live document and inserted the new one nowhere, with no error.
+  This showed up as a blank page after the second HMR edit of the SSR
+  template's `src/layout.tsx` (the first, for a root attached with `render`
+  instead of `hydration`). Both cores now move the wrapper to the new `<html>`.
+- Base core: brotli 4,763 → 4,774B (budget 4,800). Concurrent: 6,667 →
+  6,690B. No public API change.
+- New regression tests for repeated HMR replacements of an `<html>` root on
+  both cores: attached with `render` (`devHelper`) and with `hydration`
+  (`lithent/ssr`).
+
+### @lithent/hmr-parser 0.2.6 / @lithent/lithent-vite 0.4.1
+
+- Edits to modules without components now reach the page. A store module, an
+  entry that only calls `render`, or an entry that only calls `defineElement`
+  still got an `import.meta.hot.accept()` call, guarded only at runtime. Vite
+  finds accept calls in the source, so it treated these modules as handling
+  their own updates and stopped there, while the browser, where accept never
+  ran, dropped the update: no change and no reload. The accept handler is now
+  generated only for modules with components. A store edit reaches the
+  importing component without a reload, and an entry edit reloads the page,
+  as the plugin README describes.
+- `@lithent/lithent-vite` has no code change; it is released to depend on
+  `@lithent/hmr-parser` 0.2.6. The generated templates' `^0.4.0` range picks
+  it up.
+- Browser tests: a new HMR check fails when a save keeps HMR busy (updates,
+  reloads, Lithent HMR warnings or DOM changes that do not stop within
+  8 seconds), across ten edit scenarios on both cores. An injected endless
+  replacement that logs nothing is caught by its DOM changes.
+
+### create-lithent 0.5.0
+
+- New `widget` template: a lithent component registered as a Custom Element
+  with `lithent/element`, for embedding in any website with one `<script>` tag.
+  The build writes a self-contained `dist/<project-name>.js` (about 6 KB brotli
+  for the demo, lithent included), an ES module build, and a demo host page
+  that uses the widget only through attributes, properties and DOM events. It
+  fails when the bundle passes a 10 KB brotli budget.
+- Name a built-in template with `--template ssr`, `spa` or `widget`, and pick
+  "Widget (Custom Element)" from the prompt. Other `--template` values are
+  paths, GitHub shorthands or URLs as before; use `./widget` for a local folder.
+- The package no longer ships compiled copies of the SPA template's
+  TypeScript files under `dist/basic/`.
+
+The generator downloads templates from `main`, so the widget template is also
+available to earlier versions through
+`--template https://github.com/superlucky84/lithent/tree/main/createLithent/widget`
+once merged; the short name and the prompt choice need 0.5.0.
+
+## 2026-11-13
+
+### lithent 1.25.11
+
+- `lithent/ssr`: hydration no longer crashes when the server HTML and the
+  browser's tree differ. An element missing from the server HTML stopped
+  hydration with "Cannot read properties of undefined (reading
+  'addEventListener')", and every sibling after it lost its pair. It is now
+  created in the browser, put in its place and reported with `console.warn`.
+  Server nodes the tree has no place for, such as a loader script or a node a
+  browser extension added, stay in place as before.
+- `lithent/ssr`: a text that was empty on the server now updates after
+  hydration. The server HTML has no node for it, so its changes were dropped.
+- `lithent/ssr`: texts with an empty node between them (`{'x'}{false}{name}`)
+  keep their second part after hydration, and camelCase SVG tags such as
+  `linearGradient` pair with their server node.
+- Only `lithent/ssr` changes: the core, its bundle size and
+  `lithent-concurrent` are unchanged.
+
+### lithent 1.25.10 / lithent-concurrent 0.2.7
+
+- JSX types: components accept JSX children and a list `key` without
+  declaring them in their props. TypeScript 5.8 and later checked JSX
+  children against the component props type, so
+  `<Card title="t"><p /></Card>` failed with TS2322 when `Card` was typed
+  with `mount<{ title: string }>`; a `key` on a component in a list failed on
+  every TypeScript version. Both now come from `JSX.IntrinsicAttributes`.
+- Components created without a props type keep accepting any props, and
+  `ReturnType<typeof mount>` still accepts them. Typed components still
+  reject wrong, missing and unknown props.
+- Types only: runtime code and bundle sizes are unchanged.
+
+### create-lithent 0.4.1
+
+The generator downloads its templates from `main`, so the template changes
+below reach every `npx create-lithent` run, including 0.4.0, once they are
+merged. This release updates the package README.
+
+- Both templates (SPA and Express SSR) start with a local recipe catalog
+  instead of the Pokémon demo: no external API, trademarks or image assets.
+  It shows `mount` + `renew()` next to `lmount` + `lstate`, closure state for
+  search and sorting, a shared favorites store, and real `href` links with
+  client-side navigation.
+- Express template fixes:
+  - Hydration works again. The page glob `*.(tsx|mdx)` matched nothing under
+    Vite 8, so server-rendered pages never became interactive.
+  - Concurrent requests no longer render each other's preload data.
+  - Query values embedded in the page's loader script are escaped, closing a
+    `</script>` injection.
+  - A fixed route segment wins over a parameter (`/blog/:slug` before
+    `/:category/:recipe`) on the server and the client alike.
+  - Unmatched addresses show the Not Found page with HTTP 404 in development
+    as well as in production.
+
+## 2026-11-11
+
+### lithent 1.25.9
+
+- Reduce the base bundle from 4,901B to 4,763B Brotli (12,827B to 12,402B
+  raw) without changing behavior or the public API: single-use helpers and
+  unused code in the core are folded into their callers, and the UMD output
+  drops redundant parentheses. The size budget is lowered from 4,953B to
+  4,800B.
+- In a local Mac run of the official js-framework-benchmark runner with the
+  existing listed app, weighted total time changed by −0.31% (95% interval
+  −1.38% to +0.76%) and script time by −1.64% (−2.66% to −0.62%) against
+  1.25.8. Replacing all rows was 2.4% faster. Memory stayed within 0.5%.
+  These are local comparison results from one session, not published
+  upstream rankings; see the
+  [measurement record](./docs/bundle-size/IMPLEMENT.md#phase-6--mac-공식-러너-확인-done)
+  for the measured revisions and limits.
+- Source maps stay linked from the bundles. This release adds no public API.
+  lithent-concurrent remains at 0.2.6.
+
+## 2026-11-10
+
+### lithent 1.25.8
+
+- Reduce component creation work and draw Fragment, list and component
+  children directly into their parent, avoiding intermediate DOM fragments.
+  Ordinary string tags also take a shorter virtual-node creation path.
+- In a local Mac run of the official js-framework-benchmark runner, weighted
+  total time fell 2.33% and script time 4.92% against 1.25.7 with the existing
+  listed app. Memory stayed within 0.3%. These are local comparison results,
+  not published upstream rankings; see the
+  [measurement report](./docs/benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md#결정-뒤-적용한-것-2026-11-10)
+  for the measured revision and limits.
+- The base bundle is 4,901B Brotli, within the existing 4,953B budget.
+  This release adds no public API. lithent-concurrent remains at 0.2.6.
+
 ## Unreleased — Vite 8
 
 ### lithent 1.25.7 / lithent-concurrent 0.2.6

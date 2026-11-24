@@ -1,101 +1,74 @@
 # Lithent + Vite (SPA)
 
-A modern Lithent SPA boilerplate built with Vite. Features Tailwind CSS v4, History API routing, and includes a Pokémon type/detail demo. A lightweight custom router is included; a dedicated router package is planned.
+A client-side [Lithent](https://superlucky84.github.io/lithent/) app built with
+Vite, TypeScript and Tailwind CSS v4. It ships with a small recipe catalog that
+shows the main Lithent patterns; delete the demo when you are ready to build
+your own app.
 
-## Prerequisites
+## Getting started
 
-- Node.js 20.19 or 22.12+ (`.nvmrc` selects 24.22.1)
-- pnpm (recommended package manager)
-
-## Getting Started
+Requires Node.js 20.19 or 22.12+ (`.nvmrc` selects 24.22.1).
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Copy environment variables (optional)
-cp .env.example .env
-
-# Start dev server
-pnpm dev
+npm install
+npm run dev
 ```
 
-## Available Scripts
+pnpm and yarn work too (`pnpm install`, `pnpm dev`).
 
-### Development
+## What the demo shows
 
-- `pnpm dev` - Start Vite dev server with HMR
-- `pnpm build` - Build for production
-- `pnpm preview` - Preview production build locally
+| Route                | Page                                                   | Lithent pattern                                     |
+| -------------------- | ------------------------------------------------------ | --------------------------------------------------- |
+| `/`                  | Two counters and the recipe categories                 | `mount` + `renew()` next to `lmount` + `lstate`     |
+| `/:category`         | Recipes in a category, with search and sorting         | Closure variables as state, `computed`, keyed lists |
+| `/:category/:recipe` | A recipe with a servings control and a favorite button | Shared `store` (the header badge follows it)        |
+| anything else        | Not found                                              |                                                     |
 
-### Code Quality
+Favorites are saved in `localStorage` and read in `mountCallback`, after the
+first render.
 
-- `pnpm lint` - Check code with ESLint
-- `pnpm lint:fix` - Auto-fix ESLint issues
-- `pnpm format` - Format code with Prettier
-- `pnpm format:check` - Check code formatting
-- `pnpm type-check` - Run TypeScript type checking
-
-## Environment Variables
-
-Create a `.env` file based on `.env.example`:
-
-```env
-VITE_API_BASE_URL=https://pokeapi.co/api/v2
-VITE_API_TIMEOUT=10000
-VITE_ENABLE_DEBUG=false
-VITE_APP_TITLE=Lithent SPA Boilerplate
-```
-
-All environment variables must be prefixed with `VITE_` to be exposed to the app.
-
-## Routes
-
-- `/main` - Pokémon type list (fetches from PokeAPI)
-- `/main/:type` - Pokémon list filtered by type
-- `/main/:type/:name` - Pokémon detail page
-
-Navigation uses the History API. Page refreshes maintain the current route.
-
-## Project Structure
+## Project structure
 
 ```
 src/
-├── index.tsx              # Entry point, loads global styles
-├── input.css              # Tailwind CSS configuration
-├── components/
-│   ├── Main.tsx           # Layout wrapper with background
-│   └── mainbody.tsx       # Route parser and component switcher
-├── pages/
-│   ├── pokemon.tsx        # Type list page
-│   ├── pokemonType.tsx    # Pokémon list by type
-│   └── pokemonDetail.tsx  # Pokémon detail page
-└── helper/
-    ├── request.ts         # API request functions
-    ├── constants.ts       # App constants
-    └── util.ts            # Utility functions
-public/
-└── assets/                # Static assets (type icons)
+├── index.tsx          # Renders <App /> into #app
+├── App.tsx            # Header + the page for the current address
+├── router.ts          # Tiny History API router (routeStore, navigate, matchRoute)
+├── favorites.ts       # Shared favorites store
+├── data/recipes.ts    # Demo data
+├── components/        # Header, Link, Counters, NotFound
+├── pages/             # Home, Category, RecipeDetail
+└── input.css          # Tailwind entry
 ```
 
-## Tech Stack
+## Start your own app
 
-- **Lithent** - Lightweight JSX-based virtual DOM library
-- **Vite** - Fast build tool with HMR support
-- **TypeScript** - Type-safe JavaScript
-- **Tailwind CSS v4** - Utility-first CSS framework
-  - `@tailwindcss/vite` plugin
-  - `@tailwindcss/postcss` for processing
-  - `@config` directive in `src/input.css`
-- **ESLint 9** - Code linting with flat config
-- **Prettier** - Code formatting
-- **@lithent/lithent-vite** - Lithent HMR plugin
+1. Replace `src/pages/` and `src/data/` with your own pages and data.
+2. Update `matchRoute` in `src/router.ts` and the `switch` in `src/App.tsx`.
+3. Remove `src/favorites.ts` and `src/components/Counters.tsx` if you do not
+   need them.
 
-## Development Notes
+Use `<Link to="/path">` for internal links: it renders a real `<a href>` and
+navigates without a page reload.
 
-- TypeScript JSX configuration requires:
-  - `jsx: "react-jsx"` in `tsconfig.json`
-  - `jsxImportSource: "lithent"`
-- Vite's `vite-plugin-checker` provides real-time ESLint and TypeScript feedback
-- Requires network access for PokeAPI calls
-- Uses History API for client-side routing (no page reloads)
+## Scripts
+
+- `npm run dev` — dev server with HMR
+- `npm run build` — production build into `dist/`
+- `npm run preview` — serve the production build
+- `npm run lint` / `npm run lint:fix` — ESLint
+- `npm run format` / `npm run format:check` — Prettier
+- `npm run type-check` — TypeScript
+
+## Deploying
+
+The build is static files in `dist/`. Because routing uses the History API,
+configure your host to serve `index.html` for unknown paths (often called an
+SPA fallback or rewrite rule).
+
+## Tech stack
+
+Lithent, Vite 8, TypeScript, Tailwind CSS v4, ESLint 9, Prettier and
+`@lithent/lithent-vite` for component HMR. JSX is configured with
+`"jsx": "react-jsx"` and `"jsxImportSource": "lithent"` in `tsconfig.json`.

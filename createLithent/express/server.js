@@ -14,7 +14,9 @@ if (isDev) {
 
   vite = await createViteServer({
     root: process.cwd(),
-    server: { middlewareMode: 'ssr', hmr: true },
+    server: { middlewareMode: true, hmr: true },
+    // Express renders the HTML and the 404 page; Vite only serves modules.
+    appType: 'custom',
   });
 }
 
@@ -52,10 +54,12 @@ async function createServer() {
 
       const props = { id: key, params: req.params, query: req.query, origin };
       let finalHtml = '';
+      let status = 200;
 
       try {
         const pageIns = createMakePage({ key, req, props, isDev, vite });
         finalHtml = await pageIns.run();
+        status = pageIns.status;
       } catch (e) {
         isDev && vite.ssrFixStacktrace(e);
         console.error(e.stack);
@@ -68,29 +72,30 @@ async function createServer() {
           vite,
         });
         finalHtml = await pageIns.runOops();
+        status = pageIns.status;
       }
 
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+      res.status(status).set({ 'Content-Type': 'text/html' }).end(finalHtml);
     });
   });
 
   if (isDev) {
     app.use(vite.middlewares);
-  } else {
-    // 404 Handler
-    app.use(async (req, res, next) => {
-      const pageIns = createMakePage({
-        key: 'notfound',
-        req,
-        props: {},
-        isDev: false,
-      });
-      const finalHtml = await pageIns.run404();
-
-      res.status(404).set({ 'Content-Type': 'text/html' }).end(finalHtml);
-      next();
-    });
   }
+
+  // 404 Handler: addresses that match no page (and, in dev, no Vite file).
+  app.use(async (req, res) => {
+    const pageIns = createMakePage({
+      key: 'notfound',
+      req,
+      props: {},
+      isDev,
+      vite,
+    });
+    const finalHtml = await pageIns.run404();
+
+    res.status(404).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+  });
 
   app.listen(3000, () => {
     console.log('Server is running at http://localhost:3000');

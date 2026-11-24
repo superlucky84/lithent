@@ -1,4 +1,4 @@
-import { getScriptPath } from './helper.js';
+import { getScriptPath, serializeForScript } from './helper.js';
 import MakePage from './makePage.js';
 import path from 'path';
 
@@ -15,20 +15,22 @@ export default class ProdMakePage extends MakePage {
   addLoaderFromPageString(appHtmlOrig, initProp) {
     const loadResourcePath = getScriptPath('base/load.ts');
 
+    // A replacer function: a replacement string would expand `$'` and
+    // similar patterns that can appear in the serialized data.
     return appHtmlOrig.replace(
       '</body>',
-      `<script type="module">
+      () => `<script type="module">
         import load from '/${loadResourcePath}';
 
-        load('${this.key}', ${JSON.stringify(
+        load(${serializeForScript(this.key)}, ${serializeForScript(
           Object.assign({}, this.props)
-        )}, ${JSON.stringify(initProp)});
+        )}, ${serializeForScript(initProp)});
         </script></body>`
     );
   }
 
-  async makePageString(Layout, Page) {
-    const pageString = this.commonPageToString(Layout, Page);
+  async makePageString(Layout, Page, initProp) {
+    const pageString = this.commonPageToString(Layout, Page, initProp);
 
     const cssResourcePath = getScriptPath('style');
 

@@ -1,0 +1,280 @@
+{
+ "source": "krausest/js-framework-benchmark master, webdriver-ts-results/src/results.ts, downloaded 2026-11-23; matches the data of the Chrome 158.0.8127.37 results page",
+ "page": "https://krausest.github.io/js-framework-benchmark/2026/chrome158.html",
+ "browser": "Chrome 158.0.8127.37",
+ "method": "Medians of the published samples (CPU: total ms, memory: MB, size: kB, first paint: ms). The weighted geometric mean is recomputed with the results page code (webdriver-ts-results/src/Common.ts: median factor against the fastest keyed implementation, CPU weights from computeGeometricMean); the same code reproduces the Chrome 156 page values exactly.",
+ "weightedGeomean": {
+  "lithent-v1.25.9-keyed": 1.28,
+  "vanillajs-keyed": 1.033,
+  "inferno-v10.0.0-keyed": 1.104,
+  "solid-v1.9.3-keyed": 1.133,
+  "svelte-v5.42.1-keyed": 1.179,
+  "lit-v3.2.0-keyed": 1.274,
+  "vue-v3.5.39-keyed": 1.288,
+  "preact-classes-v11.0.0-keyed": 1.307,
+  "react-hooks-v19.2.0-keyed": 1.555,
+  "preact-hooks-v11.0.0-keyed": 1.618
+ },
+ "rank": {
+  "lithent-v1.25.9-keyed": 96,
+  "vanillajs-keyed": 4,
+  "inferno-v10.0.0-keyed": 32,
+  "solid-v1.9.3-keyed": 53,
+  "svelte-v5.42.1-keyed": 67,
+  "lit-v3.2.0-keyed": 93,
+  "vue-v3.5.39-keyed": 98,
+  "preact-classes-v11.0.0-keyed": 107,
+  "react-hooks-v19.2.0-keyed": 153,
+  "preact-hooks-v11.0.0-keyed": 168
+ },
+ "keyedImplementations": 214,
+ "medians": {
+  "lithent-v1.25.9-keyed": {
+   "01_run1k": 24.1,
+   "02_replace1k": 25.6,
+   "03_update10th1k_x16": 13.1,
+   "04_select1k": 4.4,
+   "05_swap1k": 14.4,
+   "06_remove-one-1k": 10.6,
+   "07_create10k": 254.9,
+   "08_create1k-after1k_x2": 27.3,
+   "09_clear1k_x8": 10.1,
+   "21_ready-memory": 0.64,
+   "22_run-memory": 3.55,
+   "25_run-clear-memory": 0.95,
+   "41_size-uncompressed": 14.7,
+   "42_size-compressed": 5.9,
+   "43_first-paint": 52.4
+  },
+  "vanillajs-keyed": {
+   "01_run1k": 20.1,
+   "02_replace1k": 21,
+   "03_update10th1k_x16": 9.3,
+   "04_select1k": 2.6,
+   "05_swap1k": 11,
+   "06_remove-one-1k": 9.7,
+   "07_create10k": 203.8,
+   "08_create1k-after1k_x2": 22.8,
+   "09_clear1k_x8": 8.7,
+   "21_ready-memory": 0.58,
+   "22_run-memory": 1.87,
+   "25_run-clear-memory": 0.64,
+   "41_size-uncompressed": 11.3,
+   "42_size-compressed": 2.5,
+   "43_first-paint": 52.5
+  },
+  "inferno-v10.0.0-keyed": {
+   "01_run1k": 21,
+   "02_replace1k": 22.4,
+   "03_update10th1k_x16": 10.8,
+   "04_select1k": 3.3,
+   "05_swap1k": 11.6,
+   "06_remove-one-1k": 9.8,
+   "07_create10k": 222.3,
+   "08_create1k-after1k_x2": 24.5,
+   "09_clear1k_x8": 8.3,
+   "21_ready-memory": 0.63,
+   "22_run-memory": 2.57,
+   "25_run-clear-memory": 0.83,
+   "41_size-uncompressed": 28.1,
+   "42_size-compressed": 9.3,
+   "43_first-paint": 67.7
+  },
+  "solid-v1.9.3-keyed": {
+   "01_run1k": 21.1,
+   "02_replace1k": 23.1,
+   "03_update10th1k_x16": 10.1,
+   "04_select1k": 3.1,
+   "05_swap1k": 12.3,
+   "06_remove-one-1k": 10.2,
+   "07_create10k": 220.8,
+   "08_create1k-after1k_x2": 24.5,
+   "09_clear1k_x8": 10.9,
+   "21_ready-memory": 0.6,
+   "22_run-memory": 2.67,
+   "25_run-clear-memory": 0.77,
+   "41_size-uncompressed": 11.5,
+   "42_size-compressed": 4.5,
+   "43_first-paint": 47.5
+  },
+  "svelte-v5.42.1-keyed": {
+   "01_run1k": 21.7,
+   "02_replace1k": 24.4,
+   "03_update10th1k_x16": 10.6,
+   "04_select1k": 4.8,
+   "05_swap1k": 12.8,
+   "06_remove-one-1k": 10.4,
+   "07_create10k": 223.3,
+   "08_create1k-after1k_x2": 24.8,
+   "09_clear1k_x8": 10.3,
+   "21_ready-memory": 0.67,
+   "22_run-memory": 2.86,
+   "25_run-clear-memory": 0.99,
+   "41_size-uncompressed": 26.6,
+   "42_size-compressed": 9.7,
+   "43_first-paint": 61.8
+  },
+  "lit-v3.2.0-keyed": {
+   "01_run1k": 23.1,
+   "02_replace1k": 25.3,
+   "03_update10th1k_x16": 11.5,
+   "04_select1k": 4.9,
+   "05_swap1k": 15.3,
+   "06_remove-one-1k": 11,
+   "07_create10k": 236,
+   "08_create1k-after1k_x2": 27.5,
+   "09_clear1k_x8": 12.1,
+   "21_ready-memory": 0.72,
+   "22_run-memory": 2.76,
+   "25_run-clear-memory": 0.89,
+   "41_size-uncompressed": 22.1,
+   "42_size-compressed": 7.3,
+   "43_first-paint": 58.6
+  },
+  "vue-v3.5.39-keyed": {
+   "01_run1k": 23.7,
+   "02_replace1k": 26.1,
+   "03_update10th1k_x16": 12.4,
+   "04_select1k": 3.6,
+   "05_swap1k": 13,
+   "06_remove-one-1k": 12.4,
+   "07_create10k": 241.7,
+   "08_create1k-after1k_x2": 26.5,
+   "09_clear1k_x8": 12,
+   "21_ready-memory": 0.87,
+   "22_run-memory": 3.91,
+   "25_run-clear-memory": 1.21,
+   "41_size-uncompressed": 64.3,
+   "42_size-compressed": 23.3,
+   "43_first-paint": 94.8
+  },
+  "preact-classes-v11.0.0-keyed": {
+   "01_run1k": 25.2,
+   "02_replace1k": 28.9,
+   "03_update10th1k_x16": 11.9,
+   "04_select1k": 3.8,
+   "05_swap1k": 13.1,
+   "06_remove-one-1k": 10.4,
+   "07_create10k": 256.1,
+   "08_create1k-after1k_x2": 28.6,
+   "09_clear1k_x8": 11.8,
+   "21_ready-memory": 0.66,
+   "22_run-memory": 3.47,
+   "25_run-clear-memory": 0.8,
+   "41_size-uncompressed": 17.6,
+   "42_size-compressed": 6.2,
+   "43_first-paint": 53.1
+  },
+  "react-hooks-v19.2.0-keyed": {
+   "01_run1k": 24.6,
+   "02_replace1k": 28.4,
+   "03_update10th1k_x16": 14.1,
+   "04_select1k": 5.5,
+   "05_swap1k": 87.4,
+   "06_remove-one-1k": 11.2,
+   "07_create10k": 341.6,
+   "08_create1k-after1k_x2": 28,
+   "09_clear1k_x8": 16.4,
+   "21_ready-memory": 1.18,
+   "22_run-memory": 4.39,
+   "25_run-clear-memory": 1.95,
+   "41_size-uncompressed": 190.3,
+   "42_size-compressed": 51.4,
+   "43_first-paint": 228.9
+  },
+  "preact-hooks-v11.0.0-keyed": {
+   "01_run1k": 25.1,
+   "02_replace1k": 28.7,
+   "03_update10th1k_x16": 21,
+   "04_select1k": 13.7,
+   "05_swap1k": 23.1,
+   "06_remove-one-1k": 15.2,
+   "07_create10k": 265.3,
+   "08_create1k-after1k_x2": 30.3,
+   "09_clear1k_x8": 11.8,
+   "21_ready-memory": 0.63,
+   "22_run-memory": 3.26,
+   "25_run-clear-memory": 0.81,
+   "41_size-uncompressed": 14.8,
+   "42_size-compressed": 5.9,
+   "43_first-paint": 60.3
+  }
+ },
+ "lithentRankByBenchmark": {
+  "01_run1k": {
+   "rank": 102,
+   "of": 214,
+   "factorToBest": 1.24
+  },
+  "02_replace1k": {
+   "rank": 86,
+   "of": 214,
+   "factorToBest": 1.22
+  },
+  "03_update10th1k_x16": {
+   "rank": 139,
+   "of": 214,
+   "factorToBest": 1.42
+  },
+  "04_select1k": {
+   "rank": 124,
+   "of": 214,
+   "factorToBest": 2.0
+  },
+  "05_swap1k": {
+   "rank": 125,
+   "of": 214,
+   "factorToBest": 1.33
+  },
+  "06_remove-one-1k": {
+   "rank": 104,
+   "of": 214,
+   "factorToBest": 1.14
+  },
+  "07_create10k": {
+   "rank": 117,
+   "of": 214,
+   "factorToBest": 1.25
+  },
+  "08_create1k-after1k_x2": {
+   "rank": 81,
+   "of": 214,
+   "factorToBest": 1.2
+  },
+  "09_clear1k_x8": {
+   "rank": 86,
+   "of": 214,
+   "factorToBest": 1.29
+  },
+  "21_ready-memory": {
+   "rank": 66,
+   "of": 214,
+   "factorToBest": 1.16
+  },
+  "22_run-memory": {
+   "rank": 128,
+   "of": 214,
+   "factorToBest": 2.11
+  },
+  "25_run-clear-memory": {
+   "rank": 89,
+   "of": 214,
+   "factorToBest": 1.48
+  },
+  "41_size-uncompressed": {
+   "rank": 45,
+   "of": 214,
+   "factorToBest": 4.59
+  },
+  "42_size-compressed": {
+   "rank": 61,
+   "of": 214,
+   "factorToBest": 5.9
+  },
+  "43_first-paint": {
+   "rank": 51,
+   "of": 214,
+   "factorToBest": 1.29
+  }
+ }
+}

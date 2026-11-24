@@ -256,7 +256,7 @@ async function fixture(t, bumped) {
         GITHUB_SERVER_URL: 'https://github.com',
         GITHUB_API_URL: 'https://api.github.com',
         GITHUB_REPOSITORY: releasePolicy.repository,
-        GITHUB_EVENT_NAME: 'push',
+        GITHUB_EVENT_NAME: 'workflow_dispatch',
         GITHUB_REF: 'refs/heads/main',
         GITHUB_REF_PROTECTED: 'true',
         GITHUB_SHA: source.revision,

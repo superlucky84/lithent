@@ -24,9 +24,22 @@ This command installs and runs `create-lithent`, which will guide you through th
 The CLI will prompt you for:
 
 1. **Project name**: Choose a name for your project directory
-2. **Template type**: Select between two options:
+2. **Template type**: Select one of three options:
    - **SSR (Express)**: Server-side rendering with Express. Ideal for SEO and optimized first-load performance
    - **SPA (Vite)**: Client-side rendering with Vite. Perfect for fast development and simple deployments
+   - **Widget (Custom Element)**: A widget other websites embed with one `<script>` tag and one HTML tag, whatever they are built with
+
+The SSR and SPA templates start with the same small recipe catalog: a counter
+written in both component styles, client-side routing, search and sorting with
+closure state, and favorites shared through a store. The widget template starts
+with a feedback card. Each template's README explains how to replace the demo
+with your own code.
+
+To skip the prompts, name the template:
+
+```bash
+npx create-lithent@latest my-widget --template widget   # or ssr, spa
+```
 
 ### Installation and Development
 
@@ -48,7 +61,9 @@ When ready to deploy:
 npm run build
 ```
 
-This creates an optimized production build in the `./dist` directory.
+This creates an optimized production build in the `./dist` directory. The
+widget template builds `dist/<project-name>.js`, the single file a page loads,
+and prints its size.
 
 For **SSR projects**, start the production server with:
 
@@ -94,7 +109,16 @@ Hot reload works seamlessly with MDX files.
 - Vite-powered development
 - Fast HMR and build times
 - Tailwind CSS pre-configured
-- Ideal for GitHub Pages and static hosting
+- Static hosting (configure an SPA fallback so History API routes serve `index.html`)
+
+### Widget Template (Custom Element)
+
+- A lithent component registered as a standard Custom Element with `lithent/element`
+- Shadow DOM styles: the host page's CSS does not break the widget, and the widget's CSS stays inside
+- Builds one self-contained `<script>` file (about 6 KB brotli for the demo, lithent included) and an ES module
+- A dev host page that uses the widget only through attributes, properties and DOM events
+- A size budget that fails the build when the bundle grows past it
+- Hot reload for components
 
 ## Using Lithent from CDN
 

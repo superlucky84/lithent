@@ -19,7 +19,7 @@ function environment() {
     GITHUB_SERVER_URL: 'https://github.com',
     GITHUB_API_URL: 'https://api.github.com',
     GITHUB_REPOSITORY: 'superlucky84/lithent',
-    GITHUB_EVENT_NAME: 'push',
+    GITHUB_EVENT_NAME: 'workflow_dispatch',
     GITHUB_REF: 'refs/heads/main',
     GITHUB_REF_PROTECTED: 'true',
     GITHUB_SHA: 'a'.repeat(40),
@@ -44,6 +44,7 @@ function environment() {
 
 test('production entry rejects PR/fork/ref/failed-or-missing-check/runner/OIDC/token/activation mistakes before any command', async () => {
   for (const override of [
+    { GITHUB_EVENT_NAME: 'push' },
     { GITHUB_EVENT_NAME: 'pull_request' },
     { GITHUB_EVENT_NAME: 'pull_request_target' },
     { GITHUB_REPOSITORY: 'fork/lithent' },
@@ -94,7 +95,7 @@ test('production entry rejects PR/fork/ref/failed-or-missing-check/runner/OIDC/t
       'Context must be rejected before a later mock error can hide a missing guard'
     );
   }
-  const env = { ...environment(), GITHUB_EVENT_NAME: 'workflow_dispatch' };
+  const env = environment();
   assert.equal(
     assertReleaseContext({ env, needs: JSON.parse(env.NEEDS_JSON) }).attempt,
     2

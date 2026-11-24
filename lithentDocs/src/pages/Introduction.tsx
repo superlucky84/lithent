@@ -1,4 +1,5 @@
 import { CodeBlock } from '@/components/CodeBlock';
+import { BenchmarkTable } from '@/components/BenchmarkTable';
 import { navigateTo } from '@/store';
 
 export const Introduction = () => (
@@ -195,6 +196,14 @@ const Counter = lmount((_props) => {
         )
       </li>
     </ul>
+
+    <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
+
+    <h2 class="text-2xl md:text-3xl font-medium text-gray-900 dark:text-white mb-4">
+      Performance
+    </h2>
+
+    <BenchmarkTable language="en" />
 
     <hr class="border-t border-gray-200 dark:border-gray-700 my-10" />
 

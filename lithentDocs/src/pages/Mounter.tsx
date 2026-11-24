@@ -166,9 +166,9 @@ const App = lmount((_props) => {
     </p>
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      In the example below, the component receives a Pokemon name via props and
-      calls the API once when the component mounts. A <code>loading</code> flag
-      is used to indicate progress and update the UI once the data arrives.
+      In the example below, the component receives a user ID via props and calls
+      the API once when the component mounts. A <code>loading</code> flag is
+      used to indicate progress and update the UI once the data arrives.
     </p>
 
     <CodeBlock
@@ -176,42 +176,39 @@ const App = lmount((_props) => {
       code={`import { lmount } from 'lithent';
 import { lstate } from 'lithent/helper';
 
-type Props = { name: string };
+type Props = { id: string };
 
-const PokemonDetail = lmount<Props>(({ name }) => {
-  const detail = lstate({ img: '', info: '', title: name });
+const UserCard = lmount<Props>(({ id }) => {
+  const user = lstate({ name: '', email: '' });
   const loading = lstate(true);
+  const error = lstate('');
 
-  const loadDetail = async (pokemonName: string) => {
+  const loadUser = async (userId: string) => {
     try {
       loading.value = true;
-      const response = await fetch(\`https://pokeapi.co/api/v2/pokemon/\${pokemonName}\`);
-      const data = await response.json();
-
-      detail.value = {
-        img: data.sprites.other.dream_world.front_default,
-        info: \`Types: \${data.types.map(t => t.type.name).join(', ')}\`,
-        title: data.name
-      };
+      const response = await fetch(\`/api/users/\${userId}\`);
+      if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
+      user.value = await response.json();
     } catch (err) {
-      console.error('Failed to load Pokemon', err);
-      detail.value = { img: '', info: 'Failed to load', title: pokemonName };
+      console.error('Failed to load the user', err);
+      error.value = 'Failed to load the user';
     } finally {
       loading.value = false;
     }
   };
 
-  loadDetail(name);
+  loadUser(id);
 
   return () => (
     <div>
-      <h2>{detail.value.title}</h2>
       {loading.value ? (
         <p>Loading...</p>
+      ) : error.value ? (
+        <p>{error.value}</p>
       ) : (
         <div>
-          <img src={detail.value.img} alt={detail.value.title} />
-          <p>{detail.value.info}</p>
+          <h2>{user.value.name}</h2>
+          <p>{user.value.email}</p>
         </div>
       )}
     </div>
@@ -220,7 +217,7 @@ const PokemonDetail = lmount<Props>(({ name }) => {
     />
 
     <p class="text-sm md:text-base text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-      The <code>loadDetail</code> function is{' '}
+      The <code>loadUser</code> function is{' '}
       <strong class="font-semibold text-gray-900 dark:text-white">
         executed exactly once when the component first mounts
       </strong>
@@ -232,10 +229,10 @@ const PokemonDetail = lmount<Props>(({ name }) => {
         <span class="font-medium text-gray-700 dark:text-gray-300">
           💡 Note:
         </span>{' '}
-        This pattern is not a good fit if the user should browse multiple
-        Pokemon in the same view. If you want to fetch another Pokemon on button
-        click, move the fetching logic into an event handler instead of the
-        mounter. If new data should load whenever props change, use{' '}
+        This pattern is not a good fit if the user should browse multiple users
+        in the same view. If you want to fetch another user on button click,
+        move the fetching logic into an event handler instead of the mounter. If
+        new data should load whenever props change, use{' '}
         <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm">
           updateCallback
         </code>{' '}

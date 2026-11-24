@@ -1,5 +1,225 @@
 # 릴리스 절차
 
+## lithent 1.26.0 릴리스
+
+2026-11-20 사용자 요청으로 컴포넌트 테스트 유틸 `lithent/test`([docs/test-utils](./docs/test-utils/REQUIREMENTS.md))를 배포한다.
+대상은 **`lithent` 1.25.12 → 1.26.0 하나**다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-20)의 "lithent 1.26.0"에 기록한다.
+
+**발행 기록 (2026-11-20)**: main `b54223a`(PR #134 병합)에서 Validate run
+[44788187378](https://github.com/superlucky84/lithent/actions/runs/44788187378)으로 발행했다.
+
+- 1차 시도: Browser (firefox)의 `playwright install --with-deps firefox`가 Ubuntu 패키지 미러가 느려 18분 걸렸고, 이어진
+  E2E가 job 제한(20분)에 걸려 취소됐다. CI 게이트가 "browser: cancelled"로 실패해 발행 job은 건너뛰었다(아무것도 올라가지 않음).
+  같은 날 PR #134의 WebKit job도 같은 원인(테스트 시작 전 패키지 내려받기)으로 취소됐다.
+- 2차 시도: 실패 job 재실행. Firefox E2E 통과 뒤 발행 job이 `lithent` 1.26.0을 OIDC로 올렸다(등록소 시각 18:29:41 UTC).
+  기록 job이 `lithent@1.26.0` 태그를 `b54223a`에 만들고 문서 배포
+  ([44793398913](https://github.com/superlucky84/lithent/actions/runs/44793398913), 성공)를 요청했다.
+- npm `latest`가 1.26.0이다. 15분 확인 창 안에 바로 보였다(1.25.12 때의 "Validating" 지연 없음).
+- 후속 조치: 브라우저 job이 `--with-deps`가 받는 Ubuntu 패키지(.deb)를 `actions/cache`에 보관하고, apt가 그 디렉터리로
+  내려받고 거기서 설치하도록 바꿨다(`Dir::Cache::Archives`). 캐시가 있는 실행은 없던 패키지만 받는다. 캐시 키는 runner
+  이미지·브라우저·Playwright 버전이고, `apt-get autoclean`으로 더 이상 받을 수 없는 판은 버린다. 설치 단계에 25분, job에
+  35분 제한을 둬 캐시가 없는 날 느린 미러에서도 테스트까지 갈 여유를 둔다. `scripts/tests/release-workflow.test.mjs`가
+  복원→설치→저장→테스트 순서와 apt 설정을 확인한다.
+
+발행 뒤 확인 (2026-11-20, npm에 올라간 패키지로):
+
+- `npx create-lithent@0.5.0 m4-spa --template spa` → `lithent@1.26.0`, `@types/node ^22.12.0`(#133 템플릿). 문서의
+  `npm install --save-dev vitest jsdom @testing-library/dom`이 충돌 없이 설치(vitest 5.1.1, jsdom 31.0.1). Testing 가이드의
+  예시와 템플릿 `Counters` 테스트 3개 통과, `tsc --noEmit` 통과 — [test-utils MANUAL M-4](./docs/test-utils/MANUAL_TEST_CHECKLIST.md).
+- 설치된 패키지의 `dist/skills/lithent/reference/test.md`가 `version: 1.26.0`, `SKILL.md`·`lithent-agent-addon.md`에
+  `lithent/test` 안내가 있다.
+- 문서 사이트에 Testing 가이드(`#/guide/testing`)가 올라가 있다.
+- 템플릿의 `lithent ^1.25.12` 범위는 그대로 둔다. 새 설치는 1.26.0을 받고, 템플릿 자체는 `lithent/test`를 쓰지 않는다.
+
+- 새 공개 하위 경로(`exports["./test"]`)를 더하므로 minor를 올린다. 코어 소스와 크기는 그대로다(base brotli 4,774B).
+- `lithent-concurrent`는 0.2.8을 유지한다. sourcePaths(`src/`, `lithentConcurrent/`)가 바뀌지 않았고, `lithent/test`는
+  bare `lithent`를 import하므로 `lithent`를 `lithent-concurrent`로 alias한 앱에서도 concurrent 스케줄러를 기다린다
+  (`test:satellites:concurrent`로 확인).
+- `create-lithent`는 발행하지 않는다. SPA·위젯 템플릿의 `@types/node`를 `^22.12.0`으로 올렸지만(#133) 템플릿은
+  패키지에 들어가지 않고 main에서 내려받는다. release plan의 "Source paths changed" 안내는 이 때문이며 예상된 것이다.
+- 패키지에 함께 들어가는 것: `test/dist`(ESM·CJS·`.d.ts`·`.d.cts`), `test/README.md`, 에이전트 스킬의 Testing 절과
+  `reference/test.md`, `lithent-agent-addon.md`의 테스트 규칙.
+- 생성 템플릿은 `lithent ^1.25.12`라 새 프로젝트는 발행 뒤 1.26.0을 받는다. 템플릿 범위는 올리지 않는다
+  (템플릿 자체는 `lithent/test`를 쓰지 않는다).
+
+**로컬 준비 검증 (2026-11-20, 후보 커밋 `ceac992`, 깨끗한 작업 트리, `pnpm clean:dist`부터 CI Quality 순서)**:
+
+- 순서와 결과: `pnpm clean:dist` → `pnpm build` → `pnpm test:dual` → `pnpm test:toolchain` → release 스크립트 테스트 49개 →
+  신뢰성 mutation 대조(Node 22용으로 `--experimental-test-isolation=none`만 바꾼 임시 사본, 모두 검출) →
+  `pnpm verify:concurrent` → `pnpm verify:release --output-dir artifacts/release` → `pnpm release:plan` →
+  `verify-plan-consumers` → `pnpm size` → `ci-build-artifacts create --require-clean`. **모두 통과.**
+- `test:dual`: base 511, concurrent 390 + helper 8, 위성(두 코어) helper 51, devHelper 12, ftags 10, ssr 30,
+  element 86(+3 skip)/89, **test 24(+1 skip)/25**. `test:toolchain`: hmr-parser 38, MDX 6, lithent-vite 5,
+  template-parser 126, template-vite 5.
+- `verify:release`: **ALL PASS** — 8개 pack, 격리 설치 소비자가 공개 경로 12개(`lithent/test` 포함)를 ESM·CommonJS로 불러오고,
+  Bundler·Node16·NodeNext 엄격 타입 검사 통과. 발행 없음.
+- `release:plan`: 후보 **1개 `lithent` 1.26.0** (`version-increased-and-unpublished`), 나머지 7개 already-published.
+  1.25.12 발행 커밋 `ac690e9`를 비교 기준으로 준 실행에서 "create-lithent: Source paths changed but this version will not be
+  published"(템플릿 4개 파일, #130·#133) — 위에 적은 대로 예상된 안내다.
+- `verify-plan-consumers`: `lithent@1.26.0` PASS (선택 archive + registry 의존성).
+- `pnpm size`: base 4,774 / 4,800B, Concurrent 6,690 / 9,000B, element 968 / 1,000B — 변화 없음.
+- `ci-build-artifacts create --require-clean`: 649개 파일을 `ceac992`(dirty=false)에 묶음.
+- 처음 실행에서 `verify:release`가 "Release output directory must be empty"로 멈췄다. 이전 릴리스 때의
+  `artifacts/release`가 남아 있었기 때문이다(CI는 빈 디렉터리에서 시작한다). 비우고 뒤의 네 단계를 같은 빌드로 다시 돌렸다.
+- 환경 차이: Node 22.23.5라 `pnpm_config_runtime_on_fail=ignore`, npm을 쓰는 검사에 `npm_config_force=true`.
+  Node 24.22.1과 Firefox·WebKit은 PR #133 CI에서 같은 코드(버전 번호·문서 제외)로 통과했고, 이 PR의 CI에서 다시 확인한다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 1.26.0·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
+## lithent 1.25.12 / lithent-concurrent 0.2.8 / create-lithent 0.5.0 / @lithent/hmr-parser 0.2.6 / @lithent/lithent-vite 0.4.1 릴리스
+
+2026-11-20 사용자 요청으로 개발 모드 HMR 수정 두 건과 `create-lithent`의 위젯 템플릿을 배포한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-20)에 기록한다.
+
+| 패키지                  | 이전 → 배포 버전  | 변경                                                                                     | 근거 문서                                                   |
+| ----------------------- | ----------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `lithent`               | 1.25.11 → 1.25.12 | `<html>` 루트를 반복 교체해도 페이지가 남는다                                            | [hmr-root-remount](./docs/hmr-root-remount/REQUIREMENTS.md) |
+| `lithent-concurrent`    | 0.2.7 → 0.2.8     | 같은 수정 (Concurrent 자체 `render.ts`)                                                  | 같음                                                        |
+| `create-lithent`        | 0.4.1 → 0.5.0     | `widget` 템플릿, `--template ssr\|spa\|widget`, 패키지에서 SPA 템플릿 컴파일 산출물 제거 | [widget-template](./docs/widget-template/README.md)         |
+| `@lithent/hmr-parser`   | 0.2.5 → 0.2.6     | 컴포넌트 없는 모듈의 수정이 importer로 전파된다                                          | [hmr-propagation](./docs/hmr-propagation/REQUIREMENTS.md)   |
+| `@lithent/lithent-vite` | 0.4.0 → 0.4.1     | 코드 변경 없음. 새 hmr-parser를 의존한다                                                 | 같음                                                        |
+
+- 코어와 플러그인은 공개 API가 같고 동작 수정이라 패치 버전이다(`create-lithent`는 아래).
+- 두 코어는 각자의 `render.ts`를 고쳤으므로 함께 올린다. base brotli 4,774B(예산 4,800B), Concurrent 6,690B.
+- `@lithent/lithent-vite`는 `@lithent/hmr-parser`를 `workspace:*`로 의존하고 pack에서 정확한 버전으로 고정된다
+  (0.4.0은 `0.2.5`). hmr-parser만 올리면 기존 사용자에게 닿지 않아 함께 올린다. pack된 0.4.1은 `0.2.6`을 가리킨다.
+- 생성 템플릿은 `lithent ^1.25.10`, `@lithent/lithent-vite ^0.4.0`이라 새 프로젝트는 발행 뒤 새 버전을 받는다.
+  템플릿 범위는 발행 전에 올리지 않는다(main 병합 즉시 템플릿이 쓰이므로 발행 전 설치가 실패한다).
+- `create-lithent`는 새 템플릿과 CLI 옵션을 더하므로 0.x 정책에서 minor를 올린다. 생성기는 템플릿을 main에서
+  내려받으므로 위젯 템플릿은 병합 즉시 URL(`--template https://github.com/superlucky84/lithent/tree/main/createLithent/widget`)로
+  모든 버전에서 쓸 수 있고, 선택지와 `--template widget`은 0.5.0부터다. 0.4.1을 CI로 발행했으므로 Trusted Publisher는
+  설정돼 있다.
+
+**발행 기록 (2026-11-20)**: main `ac690e9`(PR #129 병합)에서 Validate run
+[44709005133](https://github.com/superlucky84/lithent/actions/runs/44709005133)으로 발행했다.
+
+- 1차 시도: Browser (webkit)의 `e2e/parent-retention.spec.ts`(base, GC 뒤 `WeakRef` 회수 수)가 실패해 발행이 막혔다.
+  1.25.10 때와 같은 테스트이며 실패 잡 재실행에서 통과했다. 새 HMR·위젯 스펙은 모든 브라우저 실행에서 통과했다.
+- 2차 시도: `lithent` 1.25.12 업로드는 받아들여졌지만(`npm publish` 성공) npm이 이 버전을 "Validating" 상태로
+  약 8분 30초 두었다. 5분 확인 창을 넘겨 `unconfirmed`로 멈췄고, 나머지 4개는 시도하지 않았다(`pending`).
+  기록 job이 등록소에서 같은 integrity를 확인해 `recoveredUnconfirmed`로 `lithent@1.25.12` 태그를 만들고 문서 배포
+  ([44712403484](https://github.com/superlucky84/lithent/actions/runs/44712403484), 성공)를 요청했다.
+- 3차 시도: 실패 잡 재실행. `lithent`는 already-published-identical로 건너뛰고 `lithent-concurrent`(09:42),
+  `create-lithent`(09:46), `@lithent/hmr-parser`(09:48), `@lithent/lithent-vite`(09:50, UTC, 등록소에 보인 시각)를
+  발행했다. 다섯 버전의 integrity가 검증한 archive와 같고, 다섯 태그 모두 `ac690e9`에 있다. 다섯 패키지 모두 npm
+  `latest`가 새 버전이다. `@lithent/lithent-vite` 0.4.1은 `@lithent/hmr-parser`를 `0.2.6`으로 고정한다.
+- 후속 조치: 확인 창을 15분으로 늘리고 발행·기록 job 제한을 90분·30분으로 올렸다(아래 **CI 발행 절차**,
+  `scripts/npm-registry.mjs`).
+
+발행 뒤 후속 작업 (2026-11-20, 발행된 패키지로 확인):
+
+- 세 템플릿을 `lithent ^1.25.12`, `@lithent/lithent-vite ^0.4.1`로 올리고 위젯 템플릿의 `include: /\.tsx$/` 우회를 뺐다
+  ([hmr-propagation DESIGN DC-4](./docs/hmr-propagation/DESIGN.md)).
+- `node scripts/check-templates-fresh.mjs`: 세 템플릿 모두 npm 새 설치(`lithent@1.25.12`)로 빌드 통과, SSR 응답 200/404 통과.
+- `npx create-lithent@0.5.0 my-widget --template widget`: main의 위젯 템플릿을 받아 이름을 넣고, 설치·빌드(6.10KB
+  brotli)·브라우저 20개 항목 통과. 우회를 뺀 설정에서 컴포넌트 수정은 새로고침 없이, `main.ts`·CSS 수정은 새로고침으로 반영.
+- hmr-propagation M-4: 새 SPA에서 store 수정은 importer까지 새로고침 없이, 진입점 수정은 새로고침.
+  hmr-root-remount M-3: 새 SSR에서 `src/layout.tsx` 3회 수정 후에도 본문 유지.
+
+**로컬 준비 검증 (2026-11-20, 후보 커밋 `69b1311`, 깨끗한 작업 트리)**:
+
+PR #129의 첫 CI는 Quality의 빌드에서 멈췄다. devHelper 빌드가 테스트를 타입 검사하는데 새 테스트가 아직 빌드되지 않은
+`lithent/ssr`을 import했다(TS2307). 로컬에는 ssr dist가 남아 있어 드러나지 않았다. 테스트를 나눈 뒤(`dc80669`)
+`pnpm clean:dist`로 모든 dist를 지우고 CI Quality 단계를 순서대로 다시 돌렸다: `pnpm build`, `pnpm test:dual`,
+`pnpm test:toolchain`, release 스크립트 테스트 49개, 신뢰성 mutation 대조 44개(Node 22용으로
+`--experimental-test-isolation=none`만 바꾼 임시 사본), `pnpm verify:concurrent`, `pnpm verify:release`,
+`pnpm release:plan`(후보 5개), `verify-plan-consumers`(5개), `pnpm size`, `ci-build-artifacts create --require-clean`.
+모두 통과했다. 아래는 그 전 `69b1311`의 기록이다.
+
+- `pnpm build` 통과(`21d7d89`, 이후 `create-lithent` 버전만 바꾸고 CLI를 다시 빌드).
+- `pnpm verify:release --output-dir artifacts/release`: **ALL PASS** (8개 pack, 격리 설치 ESM/CJS 소비자, Node16/NodeNext 엄격 타입,
+  도구 5종, 생성기 바이너리). 발행 없음.
+- `pnpm release:plan`: 후보 5개, 순서 `lithent → lithent-concurrent → create-lithent → @lithent/hmr-parser → @lithent/lithent-vite`.
+  나머지 3개는 already-published. main을 비교 기준으로 준 실행에서 출처 경고 없음.
+  (`create-lithent`를 넣기 전 `21d7d89`에서는 "create-lithent: Source paths changed but this version will not be published"가 났다.)
+- `node scripts/verify-plan-consumers.mjs`: 후보 5개 모두 PASS (선택 archive + registry 의존성).
+- pack된 `create-lithent` 0.5.0에는 CLI의 `dist/*.js`·`.d.ts`만 있고 `dist/basic/`이 없다.
+- `pnpm size`, release 스크립트 테스트 49개 통과. 같은 코드에서 `pnpm test:dual`, `pnpm test:toolchain`,
+  Chromium E2E 100개, E2E 음성 대조 6개, `pnpm verify:concurrent` 통과(각 문서 IMPLEMENT 참고).
+- 환경 차이: 이 환경은 Node 22.23.5라 `pnpm_config_runtime_on_fail=ignore`, 그리고 npm을 쓰는 검사에
+  `npm_config_force=true`를 주어 Node 24.22.1 엔진 검사만 넘겼다. Firefox·WebKit E2E는 돌리지 않았다.
+  CI(Node 24.22.1, 세 브라우저)에서 다시 확인한다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 다섯 버전·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
+## lithent 1.25.11 릴리스
+
+2026-11-13 사용자 요청으로 `lithent/ssr`의 hydration 불일치 수정을 `lithent` 패치로 배포한다.
+대상은 **`lithent` 1.25.10 → 1.25.11 하나**이며 `lithent-concurrent`는 0.2.7을 유지한다.
+바뀐 곳은 `ssr/src/hydration.ts`뿐이고 코어와 공개 API가 같아 패치 버전을 사용한다.
+`lithent-concurrent`의 sourcePaths에는 `ssr/`가 없어 함께 올리지 않는다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
+생성 템플릿은 `lithent ^1.25.10`을 요구하므로 새 프로젝트는 발행 뒤 1.25.11을 받는다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 1.25.11·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
+## lithent 1.25.10 / lithent-concurrent 0.2.7 릴리스
+
+2026-11-13 사용자 요청(템플릿 후속 과제)으로 JSX 타입 수정([docs/jsx-types](./docs/jsx-types/REQUIREMENTS.md))을 배포한다.
+대상은 **`lithent` 1.25.9 → 1.25.10, `lithent-concurrent` 0.2.6 → 0.2.7**이다.
+두 코어가 같은 `declare global { namespace JSX }` 블록과 `src/types`를 쓰므로 함께 올린다.
+타입만 넓어지고 런타임과 크기가 같아 패치 버전을 사용한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
+Concurrent에는 1.25.9 때 공유 모듈 정리(6,696 → 6,667B)도 함께 들어간다.
+
+**발행 기록 (2026-11-13)**: main `24af1c4`에서 Validate run [43385051585](https://github.com/superlucky84/lithent/actions/runs/43385051585)로 발행했다.
+
+- 1차 시도: Browser (webkit)의 `e2e/parent-retention.spec.ts`(concurrent, GC 뒤 `WeakRef` 회수 수)가 실패해 발행이 막혔다. 실패 잡 재실행에서 통과했다.
+- 2차 시도: `lithent` 업로드 뒤 registry 확인 시간이 지나 unconfirmed로 끝났고, `lithent-concurrent` 전에 멈췄다. 기록 job이 `lithent@1.25.10` 태그를 복구했다.
+- 3차 시도: 아래 복구 절차대로 실패 잡을 재실행하자 `lithent-concurrent` 0.2.7이 발행됐다.
+- 결과: npm `lithent` 1.25.10, `lithent-concurrent` 0.2.7이 올라갔고, 두 태그 모두 `24af1c4`에 있다.
+
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 두 버전·registry integrity·동일 발행 SHA의 태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
+## create-lithent 0.4.1 릴리스
+
+2026-11-13 사용자 요청으로 생성 템플릿 교체([docs/create-lithent-templates](./docs/create-lithent-templates/REQUIREMENTS.md))를
+`create-lithent` 패치로 배포한다. 대상은 **`create-lithent` 0.4.0 → 0.4.1 하나**다.
+CLI 코드는 그대로이고 패키지에는 README만 바뀌어 패치 버전을 사용한다. 변경 내용은 [CHANGELOG](./CHANGELOG.md#2026-11-13)에 기록한다.
+
+**발행 기록 (2026-11-13)**: main `ce4392f`에서 Validate run [43377989485](https://github.com/superlucky84/lithent/actions/runs/43377989485)로 발행했다.
+npm `create-lithent` 0.4.1, 태그 `create-lithent@0.4.1`(`ce4392f`)을 확인했다.
+
+생성기는 템플릿을 `main`에서 내려받으므로 템플릿 변경은 이 PR([#116](https://github.com/superlucky84/lithent/pull/116))의
+병합만으로 0.4.0 사용자에게도 반영된다. 이 릴리스는 npm 페이지의 README와 버전 기록을 맞추기 위한 것이다.
+PR 검사가 통과하면 merge commit으로 main에 병합하고, 아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다.
+npm의 0.4.1·registry integrity·동일 발행 SHA의 태그를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
+## 1.25.9 릴리스
+
+2026-11-11 사용자 요청으로 base 코어 크기 축소([docs/bundle-size](./docs/bundle-size/REQUIREMENTS.md))를 `lithent` 패치로 배포한다.
+대상은 **`lithent` 1.25.8 → 1.25.9 하나**이며 `lithent-concurrent`는 0.2.6을 유지한다.
+동작과 공개 API가 같아 패치 버전을 사용한다. 변경 내용과 측정 한계는 [CHANGELOG](./CHANGELOG.md#2026-11-11)에 기록한다.
+
+Concurrent는 자기 `wDom`·`diff`·`render`·`redraw`를 쓰지만 `src/utils`·`src/hook`의 공유 모듈은 같이 쓴다.
+이번 정리 중 공유 모듈에 들어간 것(DESIGN의 DC-7)은 Concurrent를 다시 빌드하면 6,696 → 6,667B로 반영되고 동작은 같다.
+사용자 요청이 코어 버전이므로 Concurrent는 올리지 않았다. 다음 Concurrent 릴리스에 함께 들어간다.
+release plan은 이 경우 "Source paths changed but this version will not be published" 경고를 낸다.
+
+`perf/core-size` 브랜치의 PR에 버전과 릴리스 기록을 넣었다. PR 검사가 통과하면 merge commit으로 main에 병합하고,
+아래 **CI 발행 절차**에 따라 main을 대상으로 Validate를 수동 실행한다. npm의 1.25.9·registry integrity·동일 발행 SHA의
+태그와 문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 배포 계획이며 완료 기록이 아니다.
+
+## 1.25.8 릴리스
+
+2026-11-10 사용자 요청으로 DC-29의 코어 개선과 코드 정리를 `lithent` 패치로 배포한다.
+대상은 **`lithent` 1.25.7 → 1.25.8 하나**이며 `lithent-concurrent`는 0.2.6을 유지한다.
+새 공개 API가 없어 패치 버전을 사용한다. `memo`와 upstream 앱 교체는 보류한 상태다.
+변경 내용과 측정 한계는 [CHANGELOG](./CHANGELOG.md#2026-11-10)에 기록한다.
+
+기존 PR [#109](https://github.com/superlucky84/lithent/pull/109)에 버전과 릴리스 기록을 추가한다.
+최종 후보를 빌드하고 tarball·선택 발행 계획·소비자를 검증한 뒤 PR 검사가 통과하면
+merge commit으로 main에 병합한다. 그다음 아래 **CI 발행 절차**에 따라 main을 대상으로
+Validate를 수동 실행한다. npm의 1.25.8·registry integrity·동일 발행 SHA의 태그와
+문서 배포를 확인해야 발행 완료로 기록한다. 이 절은 현재 배포 계획이며 완료 기록이 아니다.
+
+앞서 기록한 concurrent element cleanup 테스트 4개 실패는 현재 재현되지 않는다.
+`08dc1f0`에서 전체 재빌드 후 `pnpm test:dual`이 1,206개 통과·3개 제외였고,
+해당 커밋의 [Validate](https://github.com/superlucky84/lithent/actions/runs/42776662776)도
+Quality와 세 브라우저를 모두 통과했다. 당시 로컬 실패 원인은 미확정이며,
+릴리스 버전이 들어간 최종 후보는 새 CI에서 다시 검증한다.
+
 ## Vite 8 릴리스 준비
 
 `chore/vite8-migration`은 최신 main `933400d`의 cleanup 수정과 공개 패키지
@@ -37,7 +257,9 @@ PR 생성까지이며, 병합·npm 발행·태그 생성은 수행하지 않는�
 
 ## CI 발행 절차
 
-사용자 U-10(2026-11-07)에 따라 **main의 모든 필수 검사 성공 후** 버전업된 패키지만 자동 발행한다.
+사용자 U-17(2026-11-08)에 따라 버전업된 패키지는 **main을 대상으로 Validate를 수동 실행할 때만** 발행한다.
+그 run의 Quality·세 브라우저·CI가 모두 성공해야 발행한다(U-10의 검증 조건 유지). main 병합(push)은 같은 검증만 하고 발행·태그 job을 건너뛴다.
+발행하려면 Actions → **Validate** → **Run workflow** → Branch **main**을 실행한다.
 후보 계산·실제 tarball/소비자 검증·OIDC 발행 job·성공 태그·root 문서 dispatch를 구현했다.
 아래 외부 초기 설정은 아직 적용하지 않았고 이 작업에서 실제 npm 발행도 수행하지 않았다.
 정본은 [설계](./docs/reliability/DESIGN.md), 진행/근거는 [IMPLEMENT](./docs/reliability/IMPLEMENT.md)다.
@@ -66,7 +288,7 @@ CI는 같은 run/SHA의 archive·plan·proof를 hash로 묶어 브라우저 job�
 npm Trusted Publishing 운영 준비(미완료):
 
 - 저장소 관리자가 main의 필수 검사 **CI**를 ruleset/branch protection에 등록한다. 발행 CLI는 보호된 main ref를 요구한다.
-- GitHub environment **npm**을 만들고 deployment branches를 **main만** 허용한다. 자동 발행을 위해 릴리스별 승인 대기는 추가하지 않는다.
+- GitHub environment **npm**을 만들고 deployment branches를 **main만** 허용한다. 수동 실행 자체가 발행 결정이므로 environment 승인 대기는 추가하지 않는다.
 - 발행할 패키지의 소유자가 npm Trusted Publisher를 설정한다: GitHub owner **superlucky84**, repository **lithent**, workflow filename **ci.yml**, environment **npm**. 값은 대소문자까지 일치시킨다.
 - Node >=22.14.0, npm CLI >=11.5.1, GitHub-hosted runner를 사용한다. 현재 고정 Node 24.22.1의 npm 11.9.0은 버전 요건을 만족한다.
 - 새 publisher에는 직접 `npm publish` action을 허용한다. repository 메타데이터와 provenance의 공개 저장소 주소도 대조한다.
@@ -74,17 +296,18 @@ npm Trusted Publishing 운영 준비(미완료):
 - `id-token: write`는 실제 발행 job, 태그/문서에 필요한 쓰기 권한은 별도 후속 job으로 제한한다. 장기 npm 토큰은 추가하지 않는다.
 - 발행·기록 job은 의존성 설치 script를 실행하지 않는다. GitHub 쓰기 토큰은 태그/dispatch step에서만 전달한다.
 - read-only CI와 위 설정을 확인한 뒤 저장소 Actions variable **NPM_PUBLISH_ENABLED=true**로 최초 활성화한다. 변수가 없거나 false이면 발행/태그 job은 생략하고 검증은 그대로 수행한다. 비활성화하려면 이 값을 false로 바꾼다.
-- 변수 활성화 자체는 workflow를 시작하지 않는다. 이후 main push 또는 main 대상으로 Validate 수동 실행을 하면 모든 검증 뒤 발행한다. PR/fork/다른 ref는 발행할 수 없다.
+- 변수 활성화 자체는 workflow를 시작하지 않는다. main 대상으로 Validate를 수동 실행하면 모든 검증 뒤 발행한다. main push·PR/fork/다른 ref는 발행할 수 없다.
 - 검증한 tarball을 그대로 발행하고 registry integrity로 성공을 확인한다. 실패했다고 이미 발행한 버전을 삭제하거나 덮어쓰지 않는다.
 - 성공한 패키지만 해당 발행 SHA에 `<package-name>@<version>` 태그를 만든다. root의 기존 `lithent@<version>` 표기를 유지하며 scoped 이름도 포함한다. 기존 다른 SHA 태그는 덮어쓰지 않는다. GitHub Release는 자동 생성하지 않는다.
 - root 성공 뒤 docs.yml을 해당 태그와 release_sha로 명시 dispatch한다. `GITHUB_TOKEN`의 tag push만으로 연쇄 실행되지 않는 제한을 처리한다. dispatch 접수와 실제 사이트 배포 성공은 별도로 확인한다. 기존 docs의 main/tag/수동 trigger는 유지한다.
+  root `package.json`을 바꾼 main 병합은 발행 전에 docs.yml을 먼저 실행할 수 있다. 수동 발행 run의 root 성공 뒤 dispatch가 다시 배포한다.
 
 실행·실패 복구:
 
 - Quality·Chromium/Firefox/WebKit·CI가 모두 성공해야 publish를 시작한다. PR의 진행 중 검증은 새 커밋으로 취소할 수 있지만 main 발행은 자동 취소하지 않는다.
 - 후보가 0개면 정상 종료한다. A 발행 확인 후 B가 실패하면 실패 상태와 A의 성공을 receipt에 저장하고, 후속 job은 A의 태그를 기록한다. 다음 실행은 registry에 있는 A를 다시 발행하지 않는다.
 - GitHub Actions에서 **원래 main run의 실패 job을 재실행**하면 원래 Quality artifact output을 사용한다. run_attempt가 달라져도 올바른 build를 찾고, 같은 run/SHA의 이전 attempt receipt도 합쳐 성공 태그를 복구한다.
-- npm은 업로드를 받은 뒤 1분 넘게 지나서야 새 버전을 보여줄 수 있다(lithent 1.25.6은 약 75초). 발행·기록 job은 버전이 보이지 않으면 10초 간격으로 최대 5분 기다린다. registry 오류는 기다리지 않고 바로 실패로 처리한다.
+- npm은 업로드를 받은 뒤 몇 분이 지나서야 새 버전을 보여줄 수 있다(lithent 1.25.6은 약 75초, 1.25.12는 npm의 "Validating" 상태로 약 8분 30초). 발행·기록 job은 버전이 보이지 않으면 10초 간격으로 최대 15분 기다린다(2026-11-20 전에는 5분). 그래서 발행 job은 후보 5개가 모두 끝까지 기다려도 되도록 90분, 기록 job은 30분 제한을 둔다. registry 오류는 기다리지 않고 바로 실패로 처리한다.
 - 업로드 시도 뒤 registry 확인이 오류/timeout/가시성 기한 소진으로 끝나면 패키지는 **unconfirmed**, 발행 job은 실패다. 후속 기록 job은 원래 run/clean SHA와 archive 이름·size·SHA-256·SRI가 같은 receipt를 registry에서 재확인한다. 일치하면 태그와 root 문서 요청을 복구하며 `recoveredUnconfirmed: true`를 기록한다. 계속 404/오류/다른 SRI이면 기록 job도 실패하므로 빈 성공으로 취급하지 않는다.
 - 위 미확정 receipt가 남아 있으면 발행 job이 같은 버전을 skipped로 처리하거나, 같은 commit의 Quality 재실행에서 후보가 0개가 되어도 원래 run의 기록 job이 복구한다. 업로드 전 실패·pending·skipped·중단된 publishing 상태만으로는 과거 발행을 인수하지 않는다. 다른 run/SHA에 있는 발행도 자동 복구하지 않는다.
 - 태그/문서 기록만 실패했으면 원래 run의 **Record release tags and dispatch docs** job을 재실행한다. 기존 동일 SHA 태그는 유지하며 docs dispatch를 재시도한다.

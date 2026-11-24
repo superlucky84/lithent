@@ -1,0 +1,59 @@
+name: Bug report
+description: Something does not work as documented.
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Security problems go through
+        [a private advisory](https://github.com/superlucky84/lithent/security/advisories/new),
+        not a public issue.
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - lithent (core)
+        - lithent/helper
+        - lithent/ssr
+        - lithent/element
+        - lithent/ftags or lithent/tag
+        - lithent-concurrent
+        - create-lithent
+        - '@lithent/* tooling (Vite plugin, template parser, MDX, HMR)'
+        - Documentation site
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: '1.25.9'
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: A minimal code sample or a link to a repository / StackBlitz that shows the problem.
+      render: tsx
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include error messages or console output if there are any.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: 'Chrome 140, macOS 15, Vite 7, Node 24'

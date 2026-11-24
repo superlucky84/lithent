@@ -108,7 +108,8 @@ jobs:
     name: Browser (${{ matrix.browser }})
     needs: quality
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Room for a cold system-package cache on a slow mirror (below).
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -134,7 +135,48 @@ jobs:
         run: |
           tar -xzf artifacts/ci-build.tgz
           node scripts/ci-build-artifacts.mjs verify --require-clean
-      - run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+      # The Ubuntu packages each browser needs (`--with-deps`) are cached
+      # between runs. Fetching them from the runner's mirror has taken 18
+      # minutes and more on slow days, and twice stopped the job at its time
+      # limit before a test ran (RELEASING, lithent 1.26.0). apt downloads
+      # into and installs from the cached directory, so a run only fetches
+      # what earlier runs did not have.
+      - name: Name the browser system-package cache
+        id: browser-deps
+        run: |
+          version=$(pnpm exec playwright --version | awk '{print $2}')
+          prefix="playwright-apt-$ImageOS-$LITHENT_E2E_BROWSER-"
+          echo "dir=$RUNNER_TEMP/apt-archives" >> "$GITHUB_OUTPUT"
+          echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+          echo "key=$prefix$ImageVersion-$version" >> "$GITHUB_OUTPUT"
+      - name: Restore the browser system packages
+        id: browser-deps-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.browser-deps.outputs.dir }}
+          key: ${{ steps.browser-deps.outputs.key }}
+          restore-keys: ${{ steps.browser-deps.outputs.prefix }}
+      - name: Install the browser and its system packages
+        timeout-minutes: 25
+        env:
+          APT_ARCHIVES: ${{ steps.browser-deps.outputs.dir }}
+        run: |
+          mkdir -p "$APT_ARCHIVES/partial"
+          printf 'Dir::Cache::Archives "%s/";\nAPT::Keep-Downloaded-Packages "true";\nAPT::Sandbox::User "root";\n' "$APT_ARCHIVES" |
+            sudo tee /etc/apt/apt.conf.d/99playwright-archives
+          pnpm exec playwright install --with-deps "$LITHENT_E2E_BROWSER"
+          # Drop packages the mirror no longer serves, so the cache does not
+          # grow with every runner image, and hand the files to the runner
+          # user for actions/cache.
+          sudo apt-get autoclean -qq
+          sudo chown -R "$(id -u):$(id -g)" "$APT_ARCHIVES"
+          echo "Cached system packages: $(ls "$APT_ARCHIVES"/*.deb 2>/dev/null | wc -l)"
+      - name: Save the browser system packages
+        if: steps.browser-deps-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.browser-deps.outputs.dir }}
+          key: ${{ steps.browser-deps.outputs.key }}
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@v4
         if: always()
@@ -172,11 +214,13 @@ jobs:
     if: >-
       github.repository == 'superlucky84/lithent' &&
       github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.event_name == 'workflow_dispatch' &&
       vars.NPM_PUBLISH_ENABLED == 'true' &&
       needs.quality.result == 'success' && needs.browser.result == 'success' && needs.gate.result == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Each candidate can wait fifteen minutes for npm to show its version
+    # (scripts/npm-registry.mjs); five candidates fit.
+    timeout-minutes: 90
     environment: npm
     permissions:
       contents: read
@@ -239,12 +283,13 @@ jobs:
     if: >-
       always() &&
       github.repository == 'superlucky84/lithent' && github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.event_name == 'workflow_dispatch' &&
       vars.NPM_PUBLISH_ENABLED == 'true' && needs.gate.result == 'success' &&
       needs.publish.outputs.receipt_artifact != ''
     runs-on: ubuntu-latest
-    # Each unconfirmed receipt can wait five minutes for npm to show the version.
-    timeout-minutes: 20
+    # An unconfirmed receipt can wait fifteen minutes for npm to show the version
+    # (scripts/npm-registry.mjs).
+    timeout-minutes: 30
     environment: npm
     permissions:
       contents: write

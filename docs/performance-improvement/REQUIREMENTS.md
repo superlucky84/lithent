@@ -2,10 +2,40 @@
 
 > **DC-25 첫 후보는 검증 후 미채택으로 종료했다.** 기본 이벤트 계약은 DC-23/R62~R66을 유지한다. DC-22의 proxy 적용/검증/측정은 당시 이력이다.
 
+- 최신(2026-11-10): **DC-29 사용자 결정 — `memo`와 등재 앱 교체는 보류하고(#1261 주석 유지), 코어 개선(컴포넌트 생성 경량화·가상 노드 직접 그리기·문자열 태그 빠른 경로)과 코드 정리만 base에 적용한다. concurrent 코어는 그대로 둔다. base 4,901B로 기존 guard 4,953B 안이다. Mac 공식 러너 3차 세션에서 기존 A 앱 + 최종 코어는 A 앱 + main 코어 대비 가중 전체 −2.33%(95% 구간 −3.23~−1.70%, 4회차 모두 감소), 스크립트 −4.92%, 메모리 ±0.3%다. 이어진 사용자 요청으로 root만 1.25.8로 올려 CI 발행을 진행한다(R121).** 아래 기준일/상태 줄은 DC-28 시점 기록이다.
 - 기준일: 2026-10-30. 상태: **DC-28 select 프레임 대기 진단과 bulk removal v2 재측정을 완료했다. select 공식 전체에는 runner 강제 GC 시간이 정하는 60Hz BeginFrame 대기가 들어가며, Lithent 앱의 다른 8항목 대기 중앙값은 0.05ms 이하다. bulk removal v2(새 API 없음)는 공식 A 앱 가중 전체 −0.09%(main−1.18/reverse−0.36)·active +0.32%로 중립이다. 행 component 앱 C의 전체 삭제는 −7.84%(main−8.80/reverse−5.95)·JS−10.40%, C 가중은 −0.68%(main−1.55/reverse+0.41)다. 메모리 ±0.6% 이내, base Brotli 4,817B·concurrent 6,953B이며 외부 노드 삭제 버그도 고친다. 판단은 채택 권장이며 사용자 요청으로 `perf/c4-key-snapshot`에 커밋했다(push 없음). DC-27 이하 판단과 기본 guard는 유지한다.**
 - 조사 시작 기준 커밋: `085137b0447a8bbe7d28d3bf55c0a997779132b2`.
 - 문서 순서: REQUIREMENTS → [DESIGN](./DESIGN.md) → [IMPLEMENT](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST](./MANUAL_TEST_CHECKLIST.md).
 - 이 폴더가 범용 코어 성능 작업의 정본이다. 7~8월 Map/LIS 계획·실측은 [과거 문서](./history/2026-07-map-lis/README.md)에 보존한다. 당시 5KB 예산·jsdom 목표·미완료 상태를 이번 기준으로 사용하지 않는다.
+
+## DC-29 — #1261 주석 없는 행 구현과 컴포넌트 경로 비용
+
+2026-11-09 사용자 요청: upstream `keyed/lithent`에 남은 `"issues": [1261]`([수동 (v)dom 캐싱 주석](https://github.com/krausest/js-framework-benchmark/issues/1261))을 지우면서 현재와 비슷한 성능을 얻는다. 계기는 [PR #2136](https://github.com/krausest/js-framework-benchmark/pull/2136)(1.25.5, 앱 변경 없음)이다. 문서 위치는 이 폴더, 도구는 `experiments/memo-free-rows/`, 결과는 [MEMO_FREE_ROWS_RESULTS](../benchmark/MEMO_FREE_ROWS_RESULTS.md)다. 기준 HEAD는 main `7e5185f`(1.25.7)다. 데이터 마이그레이션/배포는 없다.
+
+확인한 사실(upstream `fa510a7`, 2026-11-02 시점 master):
+
+- 대조한 9개 keyed 구현(lithent, react-hooks, react-classes, preact-hooks, preact-classes, vue, ivi, mithril, inferno) 중 `issues`가 있는 것은 lithent뿐이다.
+- 무주석 구현은 변경 없는 행을 라이브러리 기능으로 건너뛴다: React `memo(Row)`, React/Preact class와 Inferno의 `shouldComponentUpdate`, ivi `component`의 props 비교, Vue `v-memo`.
+- 등재된 Lithent 앱(A)은 행 컴포넌트가 없고, 행 **데이터 객체**에 `cacheUpdate` view를 붙여 이전 VDOM을 돌려준다. 데이터가 VDOM 캐시를 들고 다니는 형태다.
+- PR #2120/#2136 페이지에는 주석 지정에 대한 논의가 없다. 어떤 형태가 무주석인지는 maintainer 판정이며, 아래 형태가 통과한다는 것은 **추론/미확정**이다.
+
+요구사항:
+
+- R111. **(2026-11-10 보류 — R120.)** (2026-11-09 사용자 결정: 행 컴포넌트 + `memo`.) 등재 앱을 무주석 peer와 같은 형태로 바꿀 수 있어야 한다: 행은 평범한 컴포넌트이고, 변경 없는 행의 생략은 라이브러리가 props를 비교해 결정한다. 행 데이터에 VDOM/캐시를 붙이지 않는다. 목표는 `issues`에서 1261을 빼는 upstream PR을 낼 수 있는 상태다. → DC-29-1/2, J0~J6, M-26-1.
+- R112. **(2026-11-10 보류 — R120. 측정 결과는 기록으로 남긴다.)** 비교 대상은 **현재 등재 조합(A 앱 + 현재 코어)** 대 **새 조합(memo 행 앱 M + 새 코어)**이다. "비슷한 성능"의 기준은 2026-11-09 사용자 결정으로 **Mac 공식 러너 가중 전체 +3% 이내, 9항목 각각 +10% 이내, 1,000행 메모리 +15% 이내**다. R3의 네 peer 1.10배 목표는 별도로 유지하며 이 작업으로 바꾸지 않는다. → DC-29-8, J6, M-26-5.
+- R113. **(2026-11-10 보류 — R120.)** 추가하는 생략 기능은 일반 앱에 유효한 opt-in 공개 API여야 한다. 벤치마크 전용 분기를 코어/helper에 숨기지 않는다. opt-in하지 않은 컴포넌트는 부모 갱신 때 지금처럼 updater를 다시 실행한다. → DC-29-2/3, J1, M-26-2.
+- R114. **(2026-11-10 보류 — R120.)** opt-in한 컴포넌트는 부모 갱신에서 받은 props가 이전과 같은 값들이고 children이 없으면 그대로 둔다(updater·update callback·diff 없음). 자기 자신의 renew, keyed 이동·삭제·재마운트, unmount callback은 기존과 같아야 한다. props 값은 `===`로 비교하므로 내부를 직접 바꾼 객체 prop은 변경으로 보지 않는다(React `memo`와 같은 계약). → DC-29-3, J1/J5, M-26-2.
+- R115. 컴포넌트 생성·삭제 경로의 비용 절감은 새 API 없이 기본 경로에 넣는다. lifecycle 순서, `getParent`, DOM 정체성, keyed 이동, portal, hydration, SSR에서의 모듈 로드(문서 객체 없음)를 보존한다. → DC-29-4/5, J2/J3/J5, M-26-3.
+- R116. **(2026-11-10 충족: base 4,901B, guard 변경 없음.)** 현행 base guard는 4,953B다. 후보 합계가 넘으면 초과량을 공개한다. 2026-11-09 사용자 결정: 한도는 지금 바꾸지 않고 초과 상태로 실험을 계속하며, 공식 러너 결과를 본 뒤 상향 여부와 값을 정한다. → DC-29-6, J6, M-26-4.
+- R117. **(2026-11-10 사용자 결정: concurrent 코어에는 이번 코어 개선을 옮기지 않는다. concurrent는 크기보다 유지보수를 우선한다. export는 양코어가 같다 — DC-29-7.)** base에서 먼저 검증한다. concurrent 코어는 공개 export가 base와 같아야 하므로 `memo` 채택 시 이식이 필요하다. 이식 시점과 경량화 후보의 이식 범위는 **TBD**다. → DC-29-7, J5.
+- R118. 이 세션(클라우드 컨테이너)은 권한 정책상 upstream 공식 러너를 설치·실행하지 않았다. 자체 도구로 공식 9개 시나리오를 재현하되 **페이지 안 타이밍(paint 제외)**이므로 진단값이다. 채택 판단 전 Mac 공식 러너로 9항목 양순서·메모리를 측정하며, 진단값과 공식값을 합치지 않는다. 2026-11-10에 Mac에서 공식 러너 측정을 했다([MEMO_FREE_ROWS_OFFICIAL_RESULTS](../benchmark/MEMO_FREE_ROWS_OFFICIAL_RESULTS.md)). → J0/J6, M-26-5.
+- R119. **(2026-11-10 보류 — R120.)** upstream 앱 교체(`main.tsx`를 M 형태로, `issues` 제거)는 `memo`가 들어간 lithent 배포 뒤의 별도 PR이다. 배포와 PR은 각각 사용자 승인이 필요하다. PR 설명에 생략 방식(라이브러리 `memo`)을 적는다. → J6, M-26-6.
+- R120. (2026-11-10 사용자 결정.) 이번 범위는 **코어 개선 + 코드 정리**다. `memo` API와 등재 앱 교체는 넣지 않으며 #1261 주석은 유지한다. 조건: ① 새 공개 API가 없다. ② base는 기존 guard 4,953B 안이다(목표였던 "압축 5k 안"보다 작다). ③ 기존 A 앱 + 최종 코어가 A 앱 + main 코어보다 Mac 공식 러너에서 느려지지 않는다. ④ 양코어 export가 같다. `memo`는 이후 별도 결정으로 다시 열 수 있다. **2026-11-10 확인: ①②④ 충족, ③은 3차 세션에서 가중 전체 −2.33%로 충족(1만 행 생성 항목만 +1.13%).** → DC-29-12/13, J7, M-26-8.
+- R121. (2026-11-10 사용자 요청: 버전을 올려 배포.) R120의 변경을 `lithent` 1.25.8로 발행한다(npm 최신 1.25.7 확인). 새 API가 없어 패치 버전이며 concurrent는 0.2.6을 유지한다. CHANGELOG와 버전 치환 산출물을 최종 후보에 맞추고, 실제 tarball·선택 발행 계획·소비자를 검증한다. PR #109를 merge commit으로 병합하고 main 대상 Validate 수동 실행으로 발행한다. npm 버전·integrity·발행 SHA의 태그·문서 배포를 확인해야 완료다. → DC-29-14, J8, M-26-9/10.
+
+비범위: Vue `v-memo`형 목록 helper, C4 목록 경계·compiler 경로, 이벤트 계약 변경, 행 컴포넌트 안에서 `cacheUpdate`를 쓰는 형태(C)의 등재.
+
+진행 상태: base 프로토타입(memo, 컴포넌트 생성 경량화, 래퍼 DocumentFragment 제거)과 진단 측정을 했다. 진단값은 현재 등재 조합 대비 가중 전체 약 +8~10%(행 컴포넌트 안 캐시 방식은 +30.4%), 1,000행 메모리 +12.2%, base 5,045B(guard 92B 초과)다. 남은 차이의 위치는 결과 문서에 있다. 채택, 크기 한도, concurrent 이식, 공식 러너 측정은 미완료다.
 
 ## DC-28 — select 프레임 대기 진단과 bulk removal 재평가
 

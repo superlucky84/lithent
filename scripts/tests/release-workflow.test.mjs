@@ -44,7 +44,7 @@ function context() {
     github: {
       repository: 'superlucky84/lithent',
       ref: 'refs/heads/main',
-      event_name: 'push',
+      event_name: 'workflow_dispatch',
     },
     vars: { NPM_PUBLISH_ENABLED: 'true' },
     needs: {
@@ -59,9 +59,10 @@ function context() {
   };
 }
 
-test('actual workflow permits publishing only after every main validation and preserves partial-failure recording', async () => {
+test('actual workflow permits publishing only from a manual main run after every validation and preserves partial-failure recording', async () => {
   const config = await workflow('ci.yml');
   assert.deepEqual(config.on.push.branches, ['main']);
+  assert(Object.hasOwn(config.on, 'workflow_dispatch'));
   assert.deepEqual(config.jobs.browser.strategy.matrix.browser, [
     'chromium',
     'firefox',
@@ -72,6 +73,9 @@ test('actual workflow permits publishing only after every main validation and pr
   assert.deepEqual(config.jobs.publish.needs, ['quality', 'browser', 'gate']);
   assert(evaluate(config.jobs.publish.if, context()));
   for (const mutate of [
+    c => {
+      c.github.event_name = 'push';
+    },
     c => {
       c.github.event_name = 'pull_request';
     },
@@ -97,13 +101,10 @@ test('actual workflow permits publishing only after every main validation and pr
     mutate(c);
     assert.equal(evaluate(config.jobs.publish.if, c), false);
   }
-  const manual = context();
-  manual.github.event_name = 'workflow_dispatch';
-  assert(evaluate(config.jobs.publish.if, manual));
-  assert.equal(
-    evaluate(config.concurrency['cancel-in-progress'], context()),
-    false
-  );
+  const mainPush = context();
+  mainPush.github.event_name = 'push';
+  for (const c of [context(), mainPush])
+    assert.equal(evaluate(config.concurrency['cancel-in-progress'], c), false);
   const pr = context();
   pr.github.event_name = 'pull_request';
   assert.equal(evaluate(config.concurrency['cancel-in-progress'], pr), true);
@@ -115,6 +116,47 @@ test('actual workflow permits publishing only after every main validation and pr
   const missing = context();
   missing.needs.publish.outputs.receipt_artifact = '';
   assert.equal(evaluate(config.jobs['release-records'].if, missing), false);
+  assert.equal(
+    evaluate(config.jobs['release-records'].if, mainPush),
+    false,
+    'A main merge validates only; tags and docs follow a manual release run'
+  );
+});
+
+test('browser jobs keep the system packages Playwright installs in a cache', async () => {
+  // A slow Ubuntu mirror stopped the job at its time limit twice while
+  // `--with-deps` downloaded packages (RELEASING, lithent 1.26.0).
+  const job = (await workflow('ci.yml')).jobs.browser;
+  const at = name => job.steps.findIndex(step => step.name === name);
+  const restore = at('Restore the browser system packages');
+  const install = at('Install the browser and its system packages');
+  const save = at('Save the browser system packages');
+  const tests = job.steps.findIndex(step => step.run === 'pnpm test:e2e');
+  assert(restore >= 0 && restore < install, 'restore before the install');
+  assert(install < save && save < tests, 'save before the tests can fail');
+  assert.equal(job.steps[restore].uses, 'actions/cache/restore@v4');
+  assert.equal(job.steps[save].uses, 'actions/cache/save@v4');
+  assert.equal(
+    job.steps[save].if,
+    "steps.browser-deps-cache.outputs.cache-hit != 'true'"
+  );
+  const script = job.steps[install].run;
+  assert.match(script, /Dir::Cache::Archives "%s\/"/);
+  assert.match(script, /APT::Keep-Downloaded-Packages "true"/);
+  assert.match(
+    script,
+    /playwright install --with-deps "\$LITHENT_E2E_BROWSER"/
+  );
+  assert(
+    script.indexOf('Dir::Cache::Archives') <
+      script.indexOf('playwright install'),
+    'apt is pointed at the cache before Playwright runs it'
+  );
+  assert(
+    Number(job.steps[install]['timeout-minutes']) <
+      Number(job['timeout-minutes']),
+    'the install step times out before the job, with its own error'
+  );
 });
 
 test('workflow wiring keeps original-attempt artifacts and restricts privilege to the two release jobs', async () => {
