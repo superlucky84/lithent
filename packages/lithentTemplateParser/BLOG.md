@@ -34,9 +34,21 @@
 
 ### 렉서가 문자를 토큰으로 묶는 법
 
-렉서(lexer)는 문자열을 앞에서부터 읽고, 뒤에서 문법을 해석할 때 쓸 조각을 만든다. 단어를 토큰으로 삼는 간단한 문법을 생각해 보자. `"ab c de"`에서 0번 위치부터 읽다가 2번 위치의 공백을 만나면, `slice(0, 2)`로 `ab`를 꺼낼 수 있다. 같은 방식으로 `c`, `de`를 얻는다. Lithent의 렉서는 문맥에 따라 `<`를 태그 시작으로, `div`를 태그 이름에 쓰이는 식별자로, `Hello `를 텍스트로 기록한다. 어떤 조각인지 구분하는 이름이 토큰의 타입이다.
+문자열의 시작과 끝의 포인터 `start`와 `end`가 있다고 상상하면 렉서(lexer)가 하는 일을 따라가기 쉽다. `start`는 이번 조각을 읽기 시작한 자리다. 그 앞은 이미 처리가 끝난 구간이다. `end`는 지금 살펴보는 자리다. `start`를 그대로 두고 `end`를 앞으로 움직이다가 문법상 조각이 끝나는 자리를 찾으면, `start`부터 `end` 바로 앞까지를 토큰 하나로 기록한다. 그런 다음 `start`를 다음 조각의 첫 자리로 옮기고 같은 일을 반복한다.
 
-여기서 **본다**와 **소비한다**를 나누는 게 중요하다. `peek()`는 커서를 그대로 두고 현재 문자를 본다. `peek(1)`로 다음 문자도 볼 수 있다. 이렇게 소비하지 않고 먼저 살펴보는 동작을 **룩어헤드(lookahead)**라고 부른다. 현재 문자가 `<`이고 다음 문자가 `/`이면 닫는 태그를 읽는 함수로 들어가고, 그 함수 안에서 `advance()`로 두 문자를 소비한다. 소비할 때마다 커서가 앞으로 움직이고 줄과 열도 갱신된다. [Lexer 소스](https://github.com/superlucky84/lithent/blob/72222f3f7128d648b71b47f46f2865a7c9d3b2bc/packages/lithentTemplateParser/src/parser/lexer.ts#L47)
+공백으로 단어를 나눈다고 가정하고 `"ab c de"`를 읽어 보자. 처음엔 `start`와 `end` 모두 0이다. `end`가 2번 위치의 공백에 닿으면 `slice(0, 2)`로 `ab`를 얻는다. 공백을 건너뛴 다음엔 `start`를 `c`가 있는 3번 위치로 옮겨 다시 읽기 시작한다. 마지막 단어는 문자열 끝에서 토큰이 된다.
+
+```text
+start = 0, end = 2  →  "ab"
+start = 3, end = 4  →  "c"
+start = 5, end = 7  →  "de"
+```
+
+실제 Lithent 코드에서 움직이는 커서는 `position`이다. 예를 들어 `readText()`는 읽기 시작할 때의 위치를 `start`에 저장하고, `<`나 `{` 앞에서 멈춘 위치를 `end`에 저장한다. 토큰에는 이렇게 찾은 범위와 내용, 조각의 종류가 함께 들어간다. 맨 앞 예제에서 `<`는 태그 시작, `div`는 식별자, `Hello `는 텍스트 타입으로 기록된다. [Lithent의 readText()](https://github.com/superlucky84/lithent/blob/72222f3f7128d648b71b47f46f2865a7c9d3b2bc/packages/lithentTemplateParser/src/parser/lexer.ts#L438)
+
+여기서 **본다**와 **소비한다**를 구분하는 게 중요하다. `peek()`는 현재 `position`에 있는 문자를 본다. `peek(1)`은 그 자리를 기준으로 한 칸 앞에 있는 `input[position + 1]`을 본다. `1`은 어디를 볼지 계산할 때만 쓰이므로 `position` 값은 그대로다. 이렇게 커서를 움직이지 않고 문자를 미리 살펴보는 동작을 **룩어헤드(lookahead)**라고 부른다.
+
+이렇게 확인한 두 문자가 `<`와 `/`라면 닫는 태그를 읽는 함수로 들어간다. 그 안에서 `advance()`를 두 번 호출해 두 문자를 소비한다. **소비한다**는 건 현재 문자를 읽고 `position`을 실제로 한 칸 옮겨 다음 문자로 넘어간다는 뜻이다. 줄과 열 정보도 이때 함께 갱신된다. [Lexer 소스](https://github.com/superlucky84/lithent/blob/72222f3f7128d648b71b47f46f2865a7c9d3b2bc/packages/lithentTemplateParser/src/parser/lexer.ts#L47)
 
 예제 첫 줄의 토큰을 `타입(값)` 형태로 줄여 쓰면 이렇다. `Hello `의 마지막 공백도 토큰 값의 일부다.
 
