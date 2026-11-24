@@ -1,7 +1,5 @@
 # lithentTemplateParser 구현기
 
-처음 JSX를 봤을 때는 자바스크립트 함수 한가운데 태그를 써도 된다는 게 신기했다. 어떻게 돌아가는지 대강 이해하게 되고 나서도, 내가 직접 만들 수 있을 것 같지는 않았다. JSX는 한동안 내게 마법 같은 것이었다.
-
 그때 내게는 약간 병 같은 게 있었다. 편리한 도구를 만나면 잘 쓰다가도, 어느 순간 그 도구에 너무 의존하고 있는 건 아닌지 불안해졌다. 영원할 것 같던 jQuery의 전성기가 저무는 걸 보면서 React의 유행도 언젠가는 끝날 수 있겠다고 생각했다. 내가 겁났던 건 React나 JSX가 사라지면 거기서 당연하게 써먹던 편리한 방식까지 같이 잃어버릴 수 있다는 거였다.
 
 가상 DOM 라이브러리인 Lithent를 만들면서도 JSX 변환은 기존 자바스크립트 파서의 JSX 옵션에 맡겼다. 누가 내일 갑자기 JSX를 못 쓰게 한다면, 나는 어디서부터 손을 대야 할까? 지금 생각해 보면 좀 과한 걱정이다. 그래도 UI를 태그로 표현하는 멘탈 모델부터 그 태그를 함수 호출로 바꾸는 구현까지 제대로 만들어 보면, 기존 JSX 변환기 없이도 필요할 때 내 손으로 다시 만들어 쓸 수 있겠다고 생각했다.
@@ -20,16 +18,19 @@
 
 ## 템플릿 한 줄이 함수 호출이 되기까지
 
+템플릿 컴파일러가 하는 일은 UI를 표현한 문자열을 브라우저의 자바스크립트 엔진이 실행할 수 있는 코드로 바꾸는 것이다. Lithent에서는 그 결과가 `h()` 함수 호출이다. 아래 예제라면 바깥 `div`의 호출에 `p`를 만드는 호출을 자식으로 넘기는 코드가 나온다. 브라우저에서 그 코드가 실행될 때 `h()`가 이 구조대로 가상 DOM 노드를 만든다. [Lithent의 h()](https://github.com/superlucky84/lithent/blob/72222f3f7128d648b71b47f46f2865a7c9d3b2bc/src/wDom.ts#L45)
+
 ```html
 <div><p>Hello {name}!</p></div>
+<!-- 생성 코드 → h('div', null, h('p', null, 'Hello ', name, '!')) -->
 ```
 
-이 문자열을 `compile()`에 넘기면 네 단계를 거친다. 각 단계의 출력이 다음 단계의 입력이 된다. [compile() 소스](https://github.com/superlucky84/lithent/blob/72222f3f7128d648b71b47f46f2865a7c9d3b2bc/packages/lithentTemplateParser/src/compiler.ts#L9)
+우선 첫 단계는 문자열에서 태그와 본문의 경계를 찾아야 한다. 그런 다음 `p`가 `div` 안에 있다는 관계를 트리로 표현하고, 필요하면 트리를 다듬은 뒤 자바스크립트 코드로 다시 써야 한다. `compile()`은 이 일을 네 단계에 나눠 맡긴다. [compile() 소스](https://github.com/superlucky84/lithent/blob/72222f3f7128d648b71b47f46f2865a7c9d3b2bc/packages/lithentTemplateParser/src/compiler.ts#L9)
 
-```text
-문자열 ── tokenize ──▶ 토큰 목록 ── parse ──▶ AST
-AST ── transform ──▶ 변환된 AST ── generate ──▶ 자바스크립트 코드
-```
+1. **렉서**는 문자열을 앞에서부터 읽어 태그 이름이나 본문 같은 조각을 토큰으로 만든다. `tokenize()`가 이 토큰화 작업을 시작하는 함수다.
+2. **파서**는 `parse()`에서 토큰을 문법에 따라 묶어, 어떤 요소가 어디에 중첩됐는지 담은 트리(AST)를 만든다.
+3. **트랜스포머**는 `transform()`에서 이어지는 조건 분기를 묶고 들여쓰기 공백을 정리해, 트리를 코드 생성에 필요한 형태로 다듬는다.
+4. **코드 생성기**는 `generate()`에서 변환된 트리를 순회하며 `h()` 호출과 그 인수를 자바스크립트 코드 문자열로 조립한다.
 
 ### 렉서가 문자를 토큰으로 묶는 법
 
@@ -37,7 +38,7 @@ AST ── transform ──▶ 변환된 AST ── generate ──▶ 자바스
 
 여기서 **본다**와 **소비한다**를 나누는 게 중요하다. `peek()`는 커서를 그대로 두고 현재 문자를 본다. `peek(1)`로 다음 문자도 볼 수 있다. 이렇게 소비하지 않고 먼저 살펴보는 동작을 **룩어헤드(lookahead)**라고 부른다. 현재 문자가 `<`이고 다음 문자가 `/`이면 닫는 태그를 읽는 함수로 들어가고, 그 함수 안에서 `advance()`로 두 문자를 소비한다. 소비할 때마다 커서가 앞으로 움직이고 줄과 열도 갱신된다. [Lexer 소스](https://github.com/superlucky84/lithent/blob/72222f3f7128d648b71b47f46f2865a7c9d3b2bc/packages/lithentTemplateParser/src/parser/lexer.ts#L47)
 
-예제의 토큰을 `타입(값)` 형태로 줄여 쓰면 이렇다. `Hello `의 마지막 공백도 토큰 값의 일부다.
+예제 첫 줄의 토큰을 `타입(값)` 형태로 줄여 쓰면 이렇다. `Hello `의 마지막 공백도 토큰 값의 일부다.
 
 ```text
 TAG_OPEN_START("<") IDENTIFIER("div") TAG_OPEN_END(">")
