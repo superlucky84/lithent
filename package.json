@@ -63,6 +63,7 @@
     "watch:devHelper": "pnpm --filter lithent-dev-helper watch",
     "watch:element": "pnpm --filter lithent-element watch",
     "test:core": "vitest run --reporter verbose",
+    "test:fuzz": "vitest run --bail 1 src/tests/core-keyedPortalFuzz.test.ts",
     "test:concurrent": "pnpm --filter lithent-concurrent test && pnpm --filter lithent-concurrent-helper test",
     "test:satellites": "pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter lithent-ftags test && pnpm --filter lithent-ssr test && pnpm --filter lithent-element test && pnpm --filter lithent-test test",
     "test:satellites:concurrent": "LITHENT_CORE=concurrent pnpm run test:satellites",

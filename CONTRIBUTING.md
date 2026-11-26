@@ -87,6 +87,33 @@ accepted; an empty or unknown selection fails. Each engine keeps the `base` and
 WebKit automation and actual Safari/OS IME checks are recorded separately in
 [docs/reliability](./docs/reliability/IMPLEMENT.md).
 
+## Renderer fuzz tests
+
+`pnpm test:fuzz` exercises the base renderer in jsdom. The default run checks
+100 seeds with 24 update batches each. The shared test suite runs the same
+cases against the concurrent renderer under its default scheduling mode.
+The generator combines keyed moves, conditional rows, fragments, portals and
+row-local counter updates. Each key gets its own portal target. After each
+batch the oracle checks the host, target contents and mounted row identities.
+It checks cleanup again when the root is destroyed.
+
+```sh
+LITHENT_FUZZ_SEEDS=1200 LITHENT_FUZZ_STEPS=30 pnpm test:fuzz
+LITHENT_FUZZ_SEED=42 LITHENT_FUZZ_STEPS=30 pnpm test:fuzz
+```
+
+On failure, the test runner saves the seed, full trace and reduced trace in
+`artifacts/render-fuzz/seed-*/failure.json`. The reducer tries up to 250
+replays, removing batches, individual updates, rows and rendered children
+while retaining the failing phase and check. Copy the accompanying
+`keyed-portal.repro.ts` into `src/tests/` with a `.test.ts` suffix to run or
+commit it as a regression test. It calls the replay helper directly and uses
+the saved inputs, so it also works after the random generator changes. Use
+`pnpm exec vitest run src/tests/<name>.test.ts` for the base renderer. Add
+`-c lithentConcurrent/vitest.config.js` to replay against the concurrent renderer.
+The Quality job retains failing traces and replay files for seven days in its
+`render-fuzz` artifact.
+
 ## Releases
 
 Selective npm publishing is maintained in
