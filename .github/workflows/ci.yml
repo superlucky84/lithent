@@ -104,6 +104,14 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: render-fuzz-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/render-fuzz/
+          if-no-files-found: ignore
+          retention-days: 7
+
   browser:
     name: Browser (${{ matrix.browser }})
     needs: quality
