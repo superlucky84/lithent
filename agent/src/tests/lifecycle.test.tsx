@@ -275,21 +275,25 @@ describe('useAgentBridge (RQ-4)', () => {
 });
 
 describe('name conflicts (DC-3)', () => {
-  it('prefixes names with scopeId', () => {
+  it('prefixes names with scopeId and __ (DC-15)', () => {
     const bridge = createAgentBridge();
-    const First = makeWidget('save', 'cart');
-    const Second = makeWidget('save', 'profile');
+    const First = makeWidget('add_item', 'cart');
+    const Second = makeWidget('add_item', 'profile');
     render(
       <AgentScope bridge={bridge}>
         <First />
         <Second />
       </AgentScope>
     );
-    expect(names(bridge)).toEqual(['cart.save', 'profile.save']);
+    expect(names(bridge)).toEqual(['cart__add_item', 'profile__add_item']);
     expect(Object.keys(bridge.getState())).toEqual([
-      'cart.save',
-      'profile.save',
+      'cart__add_item',
+      'profile__add_item',
     ]);
+    // OpenAI / Anthropic tool names: letters, digits, _ and - only.
+    for (const name of names(bridge)) {
+      expect(name).toMatch(/^[a-zA-Z0-9_-]+$/);
+    }
   });
 
   it('warns and lets the latest instance win; the older one cannot remove it', async () => {

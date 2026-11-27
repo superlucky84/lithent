@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15`·`DC-16` TBD) — Phase 1~2 (`lithent/agent` 코어·어댑터) 구현 완료, Phase 3 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정) — Phase 1~2 (`lithent/agent` 코어·어댑터) 구현 완료, Phase 3 대기**
 - 문서 위치 및 코드 범위:
   - 정규 문서: `docs/agent-ui/` (`REQUIREMENTS.md` → `DESIGN.md` → `IMPLEMENT.md` → `MANUAL_TEST_CHECKLIST.md`)
   - 확정 코드 범위 (`DC-1`):
@@ -12,7 +12,7 @@
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.1, §3.1, §3.4 · [../element/REQUIREMENTS.md](../element/REQUIREMENTS.md)
 
-> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-14`는 **확정 설계**이며, `DC-15`·`DC-16`은 구현 중 발견된 **미결 결정(TBD)**이다. **구현 상태**: Phase 1~2 완료 — `RQ-1`~`RQ-5`가 `agent/`에 구현되었다 (`RQ-4`의 `lithent/element` 연동 포함). `RQ-10`은 현재 `lithent/agent` UMD 2,340 B로 예산 초과 상태이며(`DC-16`), `RQ-10`~`RQ-12`의 배포 게이트 등재는 Phase 3에서 진행한다.
+> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-16`은 **확정 설계**이다 (`DC-15`·`DC-16`은 구현 중 발견되어 2026-11-27 사용자 결정으로 확정). **구현 상태**: Phase 1~2 완료 — `RQ-1`~`RQ-5`가 `agent/`에 구현되었다 (`RQ-4`의 `lithent/element` 연동 포함). `RQ-10`의 `lithent/agent` 예산은 `DC-16`으로 2,500 B가 되었고 현재 2,340 B로 그 안에 있다. `RQ-10`~`RQ-12`의 배포 게이트 등재는 Phase 3에서 진행한다.
 
 ---
 
@@ -119,7 +119,7 @@ AI 시대에 다른 UI 프레임워크가 구조적으로 따라오기 어려운
 | ID | 요구사항 | 측정/검증 방법 |
 |---|---|---|
 | **RQ-9** | 코어 무수정: `src/`와 `lithentConcurrent/src/` diff 0줄 | `git diff --stat main -- src lithentConcurrent/src` |
-| **RQ-10** | 번들 크기 예산 (`DC-9` 확정): `lithent/agent` UMD ≤ **2,000 B**, `lithent/live` 호스트 UMD ≤ **3,000 B**, `lithent/live/runtime` 샌드박스 UMD ≤ **11,000 B** brotli (코어 4,800 B 무변화) | `pnpm size` (`scripts/size-report.js`) |
+| **RQ-10** | 번들 크기 예산 (`DC-9` 확정, `DC-16`으로 `lithent/agent` 상향): `lithent/agent` UMD ≤ **2,500 B** (원래 2,000 B), `lithent/live` 호스트 UMD ≤ **3,000 B**, `lithent/live/runtime` 샌드박스 UMD ≤ **11,000 B** brotli (코어 4,800 B 무변화) | `pnpm size` (`scripts/size-report.js`) |
 | **RQ-11** | 양쪽 코어 호환 및 기존 스위트 무회귀: base + `LITHENT_CORE=concurrent` 테스트 및 기존 `pnpm test` 전부 통과 | `pnpm test:dual`, `pnpm test` |
 | **RQ-12** | 패키지 배포·타입·문서 완결성: ESM/CJS/UMD/d.ts 산출물, `scripts/verify-release.mjs` 통과, `skills/lithent` 및 `lithent-agent-addon.md` 업데이트, 실제 브라우저(Playwright) 검증 | `pnpm build`, `pnpm verify:release`, `pnpm test:e2e` |
 

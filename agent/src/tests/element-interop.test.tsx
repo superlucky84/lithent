@@ -157,9 +157,9 @@ describe('a page bridge handed to elements (RQ-4, DC-3)', () => {
     const left = document.body.appendChild(makePanel(page, 'left', 'L'));
     const right = document.body.appendChild(makePanel(page, 'right', 'R'));
 
-    expect(names(page)).toEqual(['left.read_label', 'right.read_label']);
-    expect(names(defaultAgentBridge)).not.toContain('left.read_label');
-    expect(await page.callTool('right.read_label')).toEqual({
+    expect(names(page)).toEqual(['left__read_label', 'right__read_label']);
+    expect(names(defaultAgentBridge)).not.toContain('left__read_label');
+    expect(await page.callTool('right__read_label')).toEqual({
       ok: true,
       value: 'R',
     });
@@ -181,8 +181,8 @@ describe('a page bridge handed to elements (RQ-4, DC-3)', () => {
 
     expect(events.filter(e => e.type === 'state-changed').at(-1)).toEqual({
       type: 'state-changed',
-      name: 'solo.label',
-      state: { 'solo.label': 'after' },
+      name: 'solo__label',
+      state: { solo__label: 'after' },
     });
     expect(el.shadowRoot!.textContent).toBe('after');
     el.remove();

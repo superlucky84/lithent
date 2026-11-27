@@ -2,10 +2,10 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15`·`DC-16` TBD) — Phase 1~2 (`lithent/agent` 코어·어댑터) 구현 완료, Phase 3 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정) — Phase 1~2 (`lithent/agent` 코어·어댑터) 구현 완료, Phase 3 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
-> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이고, `DC-15`·`DC-16`은 아직 결정되지 않은 항목이다.
+> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`도 같은 날 사용자 결정으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.
 
 ---
 
@@ -297,9 +297,9 @@ const OrderList = lmount(() => {
   - **구현 세부 (Phase 1)**: 브릿지는 각 컴포넌트가 마운트될 때 한 번 결정된다. 이후 `<AgentScope>`의 `bridge` prop을 바꿔도 이미 마운트된 컴포넌트의 등록은 옮겨지지 않는다. `useAgentBridge()`는 마운트 시점에 스코프를 결정하는 위임(delegating) 브릿지를 반환하며, 마운트 전에 호출된 메서드는 `defaultAgentBridge`로 간다 (`mountCallback`·이벤트 핸들러에서 사용 권장). 이 위임 브릿지는 `options.bridge`로 넘겨도 동작한다.
   - 등록은 `createAgentBridge()`로 만든 브릿지(모듈 전용 `Symbol` 레지스트리 보유)에만 가능하다. 직접 만든 객체를 `options.bridge`로 넘기면 경고 1회 후 등록하지 않는다 (액션 함수 자체는 계속 동작).
   - `dispose()`는 도구·상태를 비우고, 도구가 있었다면 `tools-changed`(`tools: []`)를 발행한 뒤 구독자를 모두 해제한다. 브릿지는 이후에도 재사용할 수 있다.
-- **`lithent/element` 경계 (Phase 2 확인)**: Custom Element는 내부 컴포넌트를 자체 render 루트(기본 Shadow Root)에 그리므로 WDom 부모 체인이 요소 밖으로 이어지지 않는다. 따라서 요소 바깥의 `<AgentScope>`는 요소 내부 선언에 적용되지 않고, 내부 선언은 기본적으로 `defaultAgentBridge`에 등록된다. 페이지 브릿지를 쓰려면 `Object` prop(예: `props: { bridge: Object }`, `el.bridge = bridge`)으로 넘기고 내부에서 `<AgentScope bridge={props.bridge}>` 또는 `options.bridge`로 사용한다. 여러 인스턴스는 속성 값을 `scopeId`로 써서 이름을 나눈다 (`widget-id="left"` → `left.read_label`). 요소 이동(DC-4 of `lithent/element`)은 인스턴스를 유지하므로 등록도 유지되고, 제거 시에는 요소의 언마운트 마이크로태스크 뒤에 해제된다.
+- **`lithent/element` 경계 (Phase 2 확인)**: Custom Element는 내부 컴포넌트를 자체 render 루트(기본 Shadow Root)에 그리므로 WDom 부모 체인이 요소 밖으로 이어지지 않는다. 따라서 요소 바깥의 `<AgentScope>`는 요소 내부 선언에 적용되지 않고, 내부 선언은 기본적으로 `defaultAgentBridge`에 등록된다. 페이지 브릿지를 쓰려면 `Object` prop(예: `props: { bridge: Object }`, `el.bridge = bridge`)으로 넘기고 내부에서 `<AgentScope bridge={props.bridge}>` 또는 `options.bridge`로 사용한다. 여러 인스턴스는 속성 값을 `scopeId`로 써서 이름을 나눈다 (`widget-id="left"` → `left__read_label`). 요소 이동(DC-4 of `lithent/element`)은 인스턴스를 유지하므로 등록도 유지되고, 제거 시에는 요소의 언마운트 마이크로태스크 뒤에 해제된다.
 - **동일 브릿지 내 중복 이름 처리 (`DC-3` 확정)**:
-  - `scopeId`가 있으면 등록 이름을 `${scopeId}.${name}`으로 자동 접두사화한다.
+  - `scopeId`가 있으면 등록 이름을 `${scopeId}__${name}`으로 자동 접두사화한다 (예: `cart__add_item`; `DC-15` — `.`은 OpenAI/Anthropic 도구 이름 규칙 `^[a-zA-Z0-9_-]+$`에서 거절되므로 `__` 사용).
   - 같은 브릿지에 동일 최종 이름이 이미 등록돼 있으면:
     - `onConflict: 'warn'`(기본값): `console.warn` 출력 후 최신 인스턴스로 덮어쓴다(이전 인스턴스가 언마운트될 때는 자기 엔트리가 여전히 현재 등록된 엔트리인 경우에만 제거해 최신 인스턴스를 지우지 않도록 보호한다).
     - `onConflict: 'error'`: 등록 시 명시적 `Error`를 던진다.
@@ -308,6 +308,7 @@ const OrderList = lmount(() => {
 
 - `lithent/element`의 `PropSpec` 철학(`String`, `Number`, `Boolean`, `Object`, `Array`)을 계승해 제로 의존성 + 초경량(번들 크기 절감)을 유지한다 (`DC-2` 확정).
 - `listTools()`는 선언된 `params`를 표준 JSON Schema(`type: 'object'`, `properties`, `required`, `enum`, `description`)로 변환해 반환한다 — OpenAI, Anthropic, Gemini, MCP, WebMCP 도구 규격과 즉시 호환된다.
+  - **이름 규칙 주의 (`DC-15`)**: 스코프 구분자는 `__`라서 라이브러리가 만드는 부분은 OpenAI/Anthropic 도구 이름 규칙(`^[a-zA-Z0-9_-]+$`)을 지킨다. 다만 개발자가 정하는 `name`·`scopeId`도 같은 문자만 써야 하며(벤더별 길이 제한도 확인 필요, 예: OpenAI 64자), 라이브러리는 이를 검사하지 않는다.
 - `callTool(name, args)` 호출 시:
   - 등록되지 않은 이름 → `{ ok: false, error: { code: 'NOT_FOUND', ... } }`
   - `params`에 선언되지 않은 여분 키는 무시(strip)하고 선언된 키만 `run(args)`에 전달한다 (`DC-11` 확정; JSON Schema에는 `additionalProperties: false`를 힌트로 유지).
@@ -457,7 +458,7 @@ type LiveRpcMessage =
   - `live/` (패키지명 `lithent-live`, UMD 전역 `lithentLive`): `live/dist/lithentLive.{mjs,cjs,umd.js}`, `index.d.{ts,cts}` + 별도 샌드박스 번들 `live/dist/sandboxRuntime.umd.js` 및 문자열 export `live/dist/runtime.{mjs,cjs}` (`lithent/live/runtime`)
 - 외부 의존성: **0개** (런타임 zero-dependency)
 - 크기 예산(`DC-9` 확정):
-  - `agent/dist/lithentAgent.umd.js`: ≤ **2,000 B** brotli
+  - `agent/dist/lithentAgent.umd.js`: ≤ **2,500 B** brotli (`DC-16`으로 2,000 B에서 상향; `connectWebMCP`는 같은 엔트리, ESM 소비자는 tree-shaking)
   - `live/dist/lithentLive.umd.js` (호스트 컨트롤러): ≤ **3,000 B** brotli
   - `live/dist/sandboxRuntime.umd.js` (iframe 자체 포함 런타임: core + helper + ftags + tag + agent + bootstrap): ≤ **11,000 B** brotli
   - 코어 `dist/lithent.umd.js`: ≤ 4,800 B (무변화)
@@ -493,7 +494,7 @@ type LiveRpcMessage =
   - 검증: Phase 1, Phase 7
 
 - [x] **DC-3 — 다중 인스턴스 이름 충돌 & 브릿지 스코프 주입 방식**
-  - **확정**: 옵션 A — `scopeId`가 있으면 `${scopeId}.${name}` 자동 접두사, 미스코프 충돌은 `console.warn` + 최신 인스턴스 등록(`onConflict: 'error' | 'warn'` 옵션 제공). 서브트리 주입은 `<AgentScope bridge={...}>` + `useAgentBridge()` 제공(WDom 부모 체인 탐색, `mount`/`lmount` 공용).
+  - **확정**: 옵션 A — `scopeId`가 있으면 `${scopeId}__${name}` 자동 접두사(원래 `.` 구분자 → 2026-11-27 `DC-15` 결정으로 `__`), 미스코프 충돌은 `console.warn` + 최신 인스턴스 등록(`onConflict: 'error' | 'warn'` 옵션 제공). 서브트리 주입은 `<AgentScope bridge={...}>` + `useAgentBridge()` 제공(WDom 부모 체인 탐색, `mount`/`lmount` 공용).
   - **근거**: 프로덕션에서 동적 리스트/위젯 중복 마운트로 인한 예기치 않은 크래시를 막으면서 개발 시 충돌을 즉시 인지할 수 있고, `lithent/helper` 없이 양쪽 모드에서 동작한다.
   - 검증: Phase 1, Phase 7
 
@@ -524,9 +525,9 @@ type LiveRpcMessage =
   - 검증: Phase 5, `M-3`, `M-6`
 
 - [x] **DC-9 — 번들 크기 예산**
-  - **확정**: `lithent/agent` ≤ **2,000 B** brotli, `lithent/live` (호스트 컨트롤러) ≤ **3,000 B** brotli, `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
+  - **확정**: `lithent/agent` ≤ **2,500 B** brotli (원래 2,000 B → 2026-11-27 `DC-16` 결정으로 상향), `lithent/live` (호스트 컨트롤러) ≤ **3,000 B** brotli, `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
   - **근거**: 호스트 앱에 추가되는 오버헤드와 샌드박스 자체 포함 런타임 예산을 분리해 `lithent`의 초경량 정체성을 CI 게이트로 강제한다.
-  - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (`lithent/agent` 예산 2,000 B를 340 B 초과). 대응은 `DC-16`(TBD)에서 결정한다.
+  - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (원래 예산 2,000 B 초과 → `DC-16`으로 예산 2,500 B 확정, 여유 160 B).
   - 검증: Phase 3, Phase 6 (`pnpm size`)
 
 - [x] **DC-10 — 릴리스 순서 (단계적 출하 여부)**
@@ -554,17 +555,21 @@ type LiveRpcMessage =
   - **근거**: 호스트 앱이 일관된 자체 승인 모달/오버레이 UI를 띄울 수 있고, 거부된 호출은 샌드박스 내부에 아예 도달하지 않는다.
   - 검증: Phase 4, Phase 7, `M-5`
 
-- [ ] **DC-15 — `scopeId` 구분자와 LLM 도구 이름 규칙 호환성 (TBD — Phase 1 구현 중 발견, 사용자 결정 대기)**
-  - **문제**: `DC-3`의 `${scopeId}.${name}`은 MCP 도구 이름에는 허용되지만, OpenAI 함수 이름 규칙(`^[a-zA-Z0-9_-]{1,64}$`)처럼 `.`을 허용하지 않는 벤더 API에 `listTools()` 결과를 그대로 넘기면 거부된다. §2.5의 "OpenAI, Anthropic, Gemini, MCP, WebMCP 도구 규격과 즉시 호환" 서술과 충돌한다 (다른 벤더의 규칙도 결정 전 확인 필요).
+- [x] **DC-15 — `scopeId` 구분자와 LLM 도구 이름 규칙 호환성 (Phase 1 구현 중 발견)**
+  - **문제**: `DC-3`의 원래 형식 `${scopeId}.${name}`은 MCP 도구 이름에는 허용되지만, OpenAI·Anthropic 도구 이름 규칙(`^[a-zA-Z0-9_-]+$`)은 `.`을 거절하므로 `listTools()` 결과를 그대로 넘길 수 없었다. §2.5의 "OpenAI, Anthropic, Gemini, MCP, WebMCP 도구 규격과 즉시 호환" 서술과 충돌했다.
   - **옵션**: A) `.` 유지, 소비자가 이름을 변환 / B) 구분자를 `_` 또는 `__`로 변경 / C) `createAgentBridge({ separator })` 옵션 제공.
-  - **현재 구현**: `DC-3`대로 `.` (구분자는 `agent/src/hooks.tsx`의 `fullName` 한 곳에만 있어 변경 비용이 작다).
-  - 검증: 결정 후 Phase 7 이름 규칙 테스트에 반영.
+  - **확정 (2026-11-27 사용자 결정)**: 옵션 B — 구분자를 **`__`(더블 언더스코어)**로 변경한다. 등록 이름은 `${scopeId}__${name}` (예: `cart__add_item`).
+  - **근거**: `.`은 OpenAI/Anthropic 도구 이름 규칙(`^[a-zA-Z0-9_-]+$`)에서 거절된다. `__`는 그 규칙 안에 있으면서, 단일 `_`를 쓰는 일반 이름(`add_item`)과 스코프 경계를 구분해 준다.
+  - **구현**: `agent/src/hooks.tsx`의 `fullName` 한 곳 (`DC-3`, §2.4 반영). 이름 규칙을 만족하려면 `scopeId`와 `name` 자체도 `[a-zA-Z0-9_-]`만 써야 한다 (라이브러리는 검사하지 않음 — §2.5 주의).
+  - 검증: `agent/src/tests/lifecycle.test.tsx`(`cart__add_item` 및 `^[a-zA-Z0-9_-]+$` 검사), `agent/src/tests/element-interop.test.tsx`(`left__read_label`), Phase 7 이름 규칙 테스트.
 
-- [ ] **DC-16 — `lithent/agent` UMD 크기 예산 초과 대응 (TBD — Phase 2 구현 후 발견, 사용자 결정 대기)**
-  - **문제**: Phase 2 종료 시 `agent/dist/lithentAgent.umd.js`가 brotli **2,340 B**로 `DC-9` 예산(2,000 B)을 340 B 초과한다. 증가분은 `confirm` 승인 훅 약 165 B, `connectWebMCP` 약 290 B (Phase 1 종료 1,884 B 기준). `connectWebMCP`를 빼고 측정하면 2,049 B로 그래도 49 B 초과다. 메시지 축약 같은 미세 조정으로는 340 B를 회수하기 어렵다.
+- [x] **DC-16 — `lithent/agent` UMD 크기 예산 초과 대응 (Phase 2 구현 후 발견)**
+  - **문제**: Phase 2 종료 시 `agent/dist/lithentAgent.umd.js`가 brotli **2,340 B**로 `DC-9`의 원래 예산(2,000 B)을 340 B 초과했다. 증가분은 `confirm` 승인 훅 약 165 B, `connectWebMCP` 약 290 B (Phase 1 종료 1,884 B 기준). `connectWebMCP`를 빼고 측정해도 2,049 B였다.
   - **옵션**:
-    - A) `lithent/agent` 예산을 **2,400 B**로 상향 (현재 구조 유지, 60 B 여유).
-    - B) `connectWebMCP`를 별도 서브패스(예: `lithent/agent/webmcp`)로 분리하고 코어 예산을 **2,100 B**로 소폭 상향 (WebMCP를 쓰지 않는 소비자는 UMD 기준 2,049 B).
+    - A) `lithent/agent` 예산을 상향 (현재 구조 유지).
+    - B) `connectWebMCP`를 별도 서브패스(예: `lithent/agent/webmcp`)로 분리하고 코어 예산을 소폭 상향.
     - C) 기능·메시지를 줄여 2,000 B 유지 (오류 메시지·경고 품질 저하 위험).
-  - **영향**: Phase 3의 `scripts/size-report.js` 게이트 등재 전에 결정되어야 한다 (Phase 3 진입 조건).
-  - 검증: Phase 3 (`pnpm size`).
+  - **확정 (2026-11-27 사용자 결정)**: 옵션 A — `lithent/agent` 예산을 **2,500 B** brotli로 상향한다 (제안안 2,400 B에 Phase 7 하드닝 여유분 추가). `connectWebMCP`는 분리하지 않고 같은 엔트리에 두며, 쓰지 않는 소비자에게서는 번들러 tree-shaking으로 빠지게 한다.
+  - **근거**: 구조를 단순하게 유지하고(서브패스 추가 없음), Phase 7 하드닝으로 늘어날 코드까지 예산 안에서 수용한다. WebMCP를 쓰지 않는 앱은 tree-shaking으로 비용을 내지 않는다.
+  - **확인 기록**: 결정 반영 후 UMD 2,340 B / 2,500 B (여유 160 B). tree-shaking: `agent/dist/lithentAgent.mjs`를 esbuild로 번들(`lithent` external, minify)하면 `connectWebMCP`를 import하지 않는 소비자 번들은 brotli 1,879 B이고 `modelContext`·`AbortController` 코드가 포함되지 않는다. import하면 2,174 B다. (`sideEffects: false`인 루트 패키지 서브패스로 배포)
+  - 검증: Phase 3 (`scripts/size-report.js`에 2,500 B로 등재, `pnpm size`).

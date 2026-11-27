@@ -77,7 +77,7 @@ export type AgentActionOptions<S extends ParamSpec | undefined, R> = {
   confirm?: boolean | ActionConfirmHandler;
   /** Register on this bridge instead of the nearest scope (§2.4). */
   bridge?: AgentBridge;
-  /** Registers the action as `${scopeId}.${name}` (DC-3). */
+  /** Registers the action as `${scopeId}__${name}` (DC-3, DC-15). */
   scopeId?: string;
   run: S extends ParamSpec
     ? (args: ParamsOf<S>) => R | Promise<R>

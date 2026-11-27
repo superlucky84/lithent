@@ -29,9 +29,13 @@ const warnOnce = (key: string, msg: string) => {
   }
 };
 
-/** DC-3 — the name a declaration registers under. */
+/**
+ * DC-3 — the name a declaration registers under. DC-15: `__` joins the
+ * scope, so names stay within vendor tool-name rules (`^[a-zA-Z0-9_-]+$`),
+ * which reject `.`.
+ */
 const fullName = (name: string, scopeId?: string) =>
-  scopeId ? `${scopeId}.${name}` : name;
+  scopeId ? `${scopeId}__${name}` : name;
 
 const registryOf = (bridge: AgentBridge): Registry | undefined => {
   const registry = (bridge as InternalBridge)[REG];

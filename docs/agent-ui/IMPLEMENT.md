@@ -54,7 +54,7 @@ Refs: RQ-1, RQ-2, RQ-3, RQ-4, RQ-9, RQ-10, RQ-11, DC-1, DC-2, DC-3, DC-5, DC-9, 
   - `DC-5`의 Phase 1 범위는 경로 분리(사람 직접 호출은 검증 없이 즉시 실행, `callTool`만 검증)까지다. `confirm` 승인 훅과 `setConfirmHandler`는 Phase 2 항목이다.
 - [x] `agentState()` 구현 (JSON-safe 스냅샷 수집, 예외·순환참조 시 `{ __agentStateError }` 격리 `DC-12`, `updateCallback` 기반 일반 UI 입력 상태 변경 자동 감지 및 마이크로태스크 알림) — 통지 병합 규칙은 `DESIGN.md` §2.3 항목 6
 - [x] 스코프 격리 및 다중 인스턴스 이름 충돌 정책(`DC-3`) 구현 (`scopeId`, `<AgentScope bridge={...}>`/`useAgentBridge()` WDom 부모 체인 탐색)
-  - 구현 중 `scopeId` 구분자 `.`이 OpenAI 등 일부 벤더 도구 이름 규칙과 맞지 않는 문제를 발견해 `DESIGN.md` `DC-15`(TBD)로 기록했다. 현재 구현은 `DC-3`대로 `.`이다.
+  - 구현 중 `scopeId` 구분자 `.`이 OpenAI 등 일부 벤더 도구 이름 규칙과 맞지 않는 문제를 발견해 `DESIGN.md` `DC-15`(TBD)로 기록했다. 현재 구현은 `DC-3`대로 `.`이다. → 2026-11-27 `DC-15` 결정으로 `__`로 변경 ("Phase 2 후속" 참고).
 - [x] ESM/CJS/UMD(`lithentAgent`) 및 `.d.ts`/`.d.cts` 타입 추론 빌드 검증
   - Node에서 `dist/lithentAgent.mjs`(import), `dist/lithentAgent.cjs`(require), `dist/lithentAgent.umd.js`(`vm` 컨텍스트 + `lithent.umd.js` 전역) 로드 후 `callTool` 동작 확인.
   - 외부 소비자 TSX를 `index.d.ts`·`index.d.cts` 양쪽에 대해 `skipLibCheck: false`로 타입 검사 통과 (`ParamsOf` 추론, 필수 인자 누락 `@ts-expect-error` 포함).
@@ -133,7 +133,7 @@ Refs: RQ-4, RQ-5, RQ-9, RQ-11, DC-4, DC-5, M-1, M-2, M-5
 - [x] `pnpm --filter lithent-element test` → 12 files, 86 passed + 3 skipped(기존 skip) / `LITHENT_CORE=concurrent` → 12 files, 89/89 통과 (무회귀, element 파일 변경 없음)
 - [x] `pnpm --filter lithent-agent build` → 성공 (타입 검사 + ESLint). Node에서 ESM/CJS/UMD 산출물의 `connectWebMCP`·`setConfirmHandler` 동작 확인, 외부 소비자 TSX가 `index.d.ts`·`index.d.cts`에 대해 `confirm`·`ActionConfirmHandler`·`WebMCPModelContext` 타입 검사 통과
 - [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
-- [ ] **크기**: `lithentAgent.umd.js` brotli **2,340 B > 2,000 B** (`DC-9` 초과, 340 B). Phase 2 종료 조건 항목은 아니지만 Phase 3 크기 게이트를 막으므로 `DESIGN.md` `DC-16`(TBD)으로 기록했다. `connectWebMCP` 제외 시 2,049 B.
+- [x] **크기**: `lithentAgent.umd.js` brotli **2,340 B** — 당시 예산 2,000 B를 340 B 초과해 `DESIGN.md` `DC-16`(TBD)으로 기록했고(`connectWebMCP` 제외 시 2,049 B), 2026-11-27 `DC-16` 결정으로 예산이 2,500 B가 되어 통과 ("Phase 2 후속" 참고).
 - 참고: Phase 2는 루트 설정 파일을 바꾸지 않았으므로 Phase 1의 전체 `pnpm build:sequence && pnpm test` 결과가 그대로 유효하다.
 
 Files:
@@ -152,19 +152,49 @@ Files:
 
 ---
 
+## Phase 2 후속 — `DC-15`·`DC-16` 결정 반영: done
+
+Refs: DC-3, DC-9, DC-15, DC-16, RQ-4, RQ-10
+
+### 진입 조건
+- Phase 2 종료 (커밋 `1d08cc8`), 2026-11-27 사용자 결정: `DC-15` → `__`, `DC-16` → 옵션 A + 예산 2,500 B.
+
+### 체크리스트
+- [x] `scopeId` 구분자를 `.` → `__`로 변경 (`agent/src/hooks.tsx` `fullName`, `agent/src/types.ts` 주석) — 예: `cart__add_item`
+- [x] 테스트 기대값 갱신: `lifecycle.test.tsx`(`cart__add_item`·`profile__add_item` + `^[a-zA-Z0-9_-]+$` 검사 추가), `element-interop.test.tsx`(`left__read_label`, `solo__label`)
+- [x] `DESIGN.md`: `DC-15`·`DC-16` 확정 기록, `DC-3`·§2.4(이름 접두사 규칙, `lithent/element` 경계 예시)를 `__`로 갱신, §2.5 이름 규칙 주의 추가, `DC-9`·§5 `lithent/agent` 예산 2,500 B
+- [x] `REQUIREMENTS.md`: 상태 줄, `RQ-10` 예산 2,500 B
+- [x] `connectWebMCP` tree-shaking 확인 (분리하지 않는 결정의 전제)
+
+### 검증 기록 (2026-11-27)
+- [x] `pnpm --filter lithent-agent test` / `LITHENT_CORE=concurrent` → 각 7 files, 86/86 통과
+- [x] `pnpm --filter lithent-agent build` → 성공 (타입 검사 + ESLint), `lithentAgent.umd.js` brotli **2,340 B ≤ 2,500 B** (여유 160 B)
+- [x] tree-shaking: esbuild로 `agent/dist/lithentAgent.mjs`를 번들(`lithent` external, minify) — `connectWebMCP` 미사용 소비자 1,879 B br, `modelContext`·`AbortController` 미포함 / 사용 시 2,174 B br
+
+Files:
+- `agent/src/hooks.tsx` (modified)
+- `agent/src/types.ts` (modified)
+- `agent/src/tests/lifecycle.test.tsx` (modified)
+- `agent/src/tests/element-interop.test.tsx` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
+
+---
+
 ## Phase 3 — `lithent/agent` 배포 연결·스킬·문서: planned
 
 Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-9, DC-10, M-1
 
 ### 진입 조건
 - Phase 2 종료 조건 충족.
-- `DESIGN.md` `DC-16`(크기 예산 초과 대응) 결정 — `scripts/size-report.js`에 등재할 예산과, 옵션 B 선택 시 `lithent/agent/webmcp` 서브패스 추가 여부가 이 결정에 달려 있다. (Phase 2 종료 시 추가)
-- 권장: `DESIGN.md` `DC-15`(`scopeId` 구분자) 결정 — 1차 릴리스 전에 정하면 공개 이름 규칙을 바꿀 필요가 없다.
+- `DESIGN.md` `DC-16`(크기 예산 초과 대응) 결정 — 충족: 옵션 A, `lithent/agent` 예산 2,500 B, `connectWebMCP` 분리 없음 (2026-11-27).
+- 권장: `DESIGN.md` `DC-15`(`scopeId` 구분자) 결정 — 충족: `__` (2026-11-27).
 
 ### 구현 체크리스트
 - [ ] 루트 `package.json`: `exports["./agent"]`, `files`, `build:agent`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
 - [x] 루트 `vite.config.js` vitest `exclude`에 `agent/**` 추가 (Phase 1에서 선반영 — Phase 1 체크리스트 참고)
-- [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `agent` 등록
+- [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `agent` 등록 (`size-report.js` 예산 2,500 B — `DC-16`)
 - [ ] `agent/README.md`, `skills/lithent/reference/agent.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트
 - [ ] `lithentDocs` 가이드 페이지(영어·한국어) 추가
 - [ ] (`DC-10` 옵션 A 확정) `lithent/agent` 단독 1차 minor 릴리스 전 `pnpm verify:release` 및 수동 체크 `M-1`, `M-2`, `M-5` 점검
@@ -317,18 +347,18 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - **Phase 1 (`lithent/agent` 코어 패키지) 구현 완료** — 브릿지, `DC-2` 스키마·검증, `agentAction`, `agentState`, `AgentScope`/`useAgentBridge`, `DC-3` 충돌 정책 (Phase 1 "검증 기록")
   - **Phase 2 (어댑터) 구현 완료** — `setConfirmHandler`·액션별 `confirm`(`DC-5`, 보안 기본값 `REJECTED`), `connectWebMCP`(`DC-4`, 현재 WebMCP에 맞춘 편차 포함), `lithent/element` 연동 확인
   - agent 테스트 7 files base·concurrent 각 86/86, element 무회귀, 빌드·타입 통과, 코어 diff 0줄 (Phase 2 "검증 기록")
-  - `DESIGN.md`: §2.1 구현 상태·`WebMCPModelContext` 계약 갱신, §2.3 `confirm` 세부, §2.4 `lithent/element` 경계, §2.6 편차 기록, `DC-4` 구현 메모, `DC-9` 측정 기록, `DC-16`(TBD) 추가. `REQUIREMENTS.md`·`MANUAL_TEST_CHECKLIST.md`(`M-2`)에 `document.modelContext` 반영
-  - Phase 1·2를 `feat/agent-ui`에 Phase별로 커밋 (Phase 1 `c7917de`, Phase 2는 그 다음 커밋 — Phase별 `Files:`와 일치)
+  - `DESIGN.md`: §2.1 구현 상태·`WebMCPModelContext` 계약 갱신, §2.3 `confirm` 세부, §2.4 `lithent/element` 경계, §2.6 편차 기록, `DC-4` 구현 메모, `DC-9` 측정 기록. `REQUIREMENTS.md`·`MANUAL_TEST_CHECKLIST.md`(`M-2`)에 `document.modelContext` 반영
+  - Phase 1·2를 `feat/agent-ui`에 Phase별로 커밋·푸시 (Phase 1 `c7917de`, Phase 2 `1d08cc8`)
+  - **Phase 2 후속 (`DC-15`·`DC-16` 결정 반영) 완료** — `scopeId` 구분자 `__`(예: `cart__add_item`), `lithent/agent` 예산 2,500 B(현재 2,340 B), `connectWebMCP` tree-shaking 확인. 테스트 base·concurrent 각 86/86 ("Phase 2 후속" 검증 기록)
 - **next**:
-  1. 사용자 결정: `DC-16` (크기 예산 초과 대응: A 예산 2,400 B / B `lithent/agent/webmcp` 분리 + 코어 2,100 B / C 축소) — **Phase 3 진입 조건**
-  2. 사용자 결정: `DC-15` (`scopeId` 구분자) — 1차 릴리스 전 권장
-  3. 사용자 결정: Phase 2 리뷰(`doc-driven-reviewer-v1`) 여부
-  4. Phase 3: 루트 `exports["./agent"]`·빌드/테스트 스크립트·크기/릴리스 검증 스크립트 등재, README·스킬·문서 사이트
-- **blockers**:
-  - Phase 3 착수: `DC-16` 결정 필요 (현재 2,340 B로 `DC-9` 2,000 B 초과)
+  1. 사용자 결정: Phase 2(및 후속) 리뷰(`doc-driven-reviewer-v1`) 여부, 또는 Phase 3 착수
+  2. Phase 3: 루트 `exports["./agent"]`·빌드/테스트 스크립트, `scripts/size-report.js`(예산 2,500 B)·릴리스 검증 스크립트 등재, README·스킬·문서 사이트
+- **blockers**: 없음 (Phase 3 진입 조건 `DC-16` 충족)
 - **risks / follow-ups**:
+  - 크기 여유 160 B (2,340 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
+  - 이름 규칙: 라이브러리는 `name`·`scopeId`에 `[a-zA-Z0-9_-]` 외 문자가 들어가도 검사하지 않는다 (`DESIGN.md` §2.5). 필요하면 Phase 7에서 개발 경고 추가를 검토.
   - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면, 아직 마운트된 이전 인스턴스는 다시 등록되지 않는다 (설계대로의 동작). Phase 7 경계 테스트에서 의도 확인 권장.
   - WebMCP는 표준화 진행 중이다. `annotations`(`consequentialHint` 등)와 `requiresConfirm` 매핑, `execute`의 `{ signal }` 취소는 미반영 (`DESIGN.md` §2.6). 실제 Chrome 검증은 `M-2`(수동)와 Phase 8 E2E에서 한다.
   - `useAgentBridge()` 위임 브릿지의 메서드(`setConfirmHandler` 포함)는 마운트 전에 호출하면 `defaultAgentBridge`로 간다.
   - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. agent의 element 연동 테스트는 `element/dist`(예: `pnpm build:element` 또는 `pnpm build:sequence`)가 필요하다.
-- **latest commit**: `feat/agent-ui`의 Phase 2 커밋 (`feat(agent): add confirm hook, connectWebMCP and element interop (agent-ui Phase 2)`, 직전 Phase 1 커밋 `c7917de`)
+- **latest commit**: `1d08cc8` (Phase 2). "Phase 2 후속" 변경은 아직 커밋하지 않음 — not committed yet
