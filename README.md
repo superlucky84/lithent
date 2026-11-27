@@ -162,6 +162,26 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 
 > **[🧩 Custom Elements guide](https://superlucky84.github.io/lithent/#/guide/element)**
 
+### AI agents and generative UI (optional)
+
+- **lithent/agent** — Declare a component's actions and state once; people use them from the UI and AI agents call the same closures through a bridge with JSON Schema tools (in-app copilots, tests, browser WebMCP). About 2.3KB.
+- **lithent/live** — Run widget code an LLM wrote, with no build step, in a sandboxed iframe, and keep driving it through the same bridge after people use it. `<lithent-live>` puts it on any page.
+
+```js
+import { agentAction, agentState } from 'lithent/agent';
+import { mountLive } from 'lithent/live';
+import { sandboxRuntimeCode } from 'lithent/live/runtime';
+
+const widget = await mountLive({
+  code,
+  container,
+  runtimeCode: sandboxRuntimeCode,
+});
+await widget.bridge.callTool('set_filter', { status: 'done' });
+```
+
+> **[🤖 Agent-Native Components guide](https://superlucky84.github.io/lithent/#/guide/agent-native)** · **[✨ Generative UI guide](https://superlucky84.github.io/lithent/#/guide/live)**
+
 ### Template options
 
 - **JSX** — Via Vite plugin
@@ -187,6 +207,8 @@ Event props such as `onClick` register native listeners; see the
 | [lithent/tag](https://www.npmjs.com/package/lithent)                                | HTM template support                                                                                                             |
 | [lithent/element](./element/README.md)                                              | Register components as Custom Elements, embeddable in any page ([guide](https://superlucky84.github.io/lithent/#/guide/element)) |
 | [lithent/test](./test/README.md)                                                    | Render, wait for and clean up components in tests ([guide](https://superlucky84.github.io/lithent/#/guide/testing))              |
+| [lithent/agent](./agent/README.md)                                                  | People and AI agents share component actions and state ([guide](https://superlucky84.github.io/lithent/#/guide/agent-native))    |
+| [lithent/live](./live/README.md)                                                    | Run LLM-generated widgets in a sandbox, driven by agents ([guide](https://superlucky84.github.io/lithent/#/guide/live))          |
 | [lithent-concurrent](./lithentConcurrent/README.md)                                 | Separate core with priority scheduling and interruptible low-priority builds                                                     |
 | [lithent-concurrent/helper](./lithentConcurrent/README.md#lithent-concurrenthelper) | Deferred state and component-local pending queries                                                                               |
 | [create-lithent](https://www.npmjs.com/package/create-lithent)                      | Project scaffolding tool                                                                                                         |

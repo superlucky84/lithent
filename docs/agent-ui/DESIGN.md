@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-17` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4~5 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 6 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-17` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4~6 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`·배포 연결·문서·플레이그라운드) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 7 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 > **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`·`DC-17`도 같은 날 사용자 결정으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.

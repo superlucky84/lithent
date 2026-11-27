@@ -51,11 +51,12 @@
     "build:element": "pnpm --filter lithent-element build",
     "build:test": "pnpm --filter lithent-test build",
     "build:agent": "pnpm --filter lithent-agent build",
+    "build:live": "pnpm --filter lithent-live build",
     "playground:element": "pnpm build:core && pnpm build:concurrent && pnpm build:element && pnpm --filter lithent-element playground",
     "build:examples": "pnpm --filter lithent-examples build",
     "build:docs": "pnpm --filter lithent-docs build",
-    "build:sequence": "pnpm build:core && pnpm build:concurrent && pnpm build:jsxruntime && pnpm build:helper && pnpm build:devHelper && pnpm build:concurrentHelper && pnpm build:ssr && pnpm build:tag && pnpm build:ftags && pnpm build:element && pnpm build:test && pnpm build:agent && pnpm build:hmrParser && pnpm build:lithentTemplateParser && pnpm build:lithentTemplateVite && pnpm build:lithentMdx && pnpm build:lithentVite",
-    "build:parallel": "pnpm --filter '!lithent-concurrent' --filter '!lithent-concurrent-helper' --filter '!jsx-runtime' --filter '!lithent-helper' --filter '!lithent-dev-helper' --filter '!@lithent/hmr-parser' --filter '!@lithent/lithent-template-parser' --filter '!@lithent/lithent-template-vite' --filter '!@lithent/lithent-mdx' --filter '!@lithent/lithent-vite' --filter '!lithent-ssr' --filter '!lithent-tag' --filter '!lithent-ftags' --filter '!lithent-element' --filter '!lithent-test' --filter '!lithent-agent' --filter '!create-lithent' build",
+    "build:sequence": "pnpm build:core && pnpm build:concurrent && pnpm build:jsxruntime && pnpm build:helper && pnpm build:devHelper && pnpm build:concurrentHelper && pnpm build:ssr && pnpm build:tag && pnpm build:ftags && pnpm build:element && pnpm build:test && pnpm build:agent && pnpm build:live && pnpm build:hmrParser && pnpm build:lithentTemplateParser && pnpm build:lithentTemplateVite && pnpm build:lithentMdx && pnpm build:lithentVite",
+    "build:parallel": "pnpm --filter '!lithent-concurrent' --filter '!lithent-concurrent-helper' --filter '!jsx-runtime' --filter '!lithent-helper' --filter '!lithent-dev-helper' --filter '!@lithent/hmr-parser' --filter '!@lithent/lithent-template-parser' --filter '!@lithent/lithent-template-vite' --filter '!@lithent/lithent-mdx' --filter '!@lithent/lithent-vite' --filter '!lithent-ssr' --filter '!lithent-tag' --filter '!lithent-ftags' --filter '!lithent-element' --filter '!lithent-test' --filter '!lithent-agent' --filter '!lithent-live' --filter '!create-lithent' build",
     "build": "pnpm run build:sequence && pnpm run build:parallel",
     "watch:core": "vite build --watch",
     "watch:concurrent": "pnpm --filter lithent-concurrent watch",
@@ -66,12 +67,12 @@
     "test:core": "vitest run --reporter verbose",
     "test:fuzz": "vitest run --bail 1 src/tests/core-keyedPortalFuzz.test.ts",
     "test:concurrent": "pnpm --filter lithent-concurrent test && pnpm --filter lithent-concurrent-helper test",
-    "test:satellites": "pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter lithent-ftags test && pnpm --filter lithent-ssr test && pnpm --filter lithent-element test && pnpm --filter lithent-test test && pnpm --filter lithent-agent test",
+    "test:satellites": "pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter lithent-ftags test && pnpm --filter lithent-ssr test && pnpm --filter lithent-element test && pnpm --filter lithent-test test && pnpm --filter lithent-agent test && pnpm --filter lithent-live test",
     "test:satellites:concurrent": "LITHENT_CORE=concurrent pnpm run test:satellites",
     "test:dual": "pnpm test:core && pnpm test:concurrent && pnpm test:satellites && pnpm test:satellites:concurrent",
     "test:toolchain": "pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter @lithent/lithent-template-parser test && pnpm --filter @lithent/lithent-template-vite test",
     "test:ci": "node --test --test-isolation=none scripts/tests/*.test.mjs",
-    "test": "pnpm test:core && pnpm test:concurrent && pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter lithent-ftags test && pnpm --filter lithent-element test && pnpm --filter lithent-test test && pnpm --filter lithent-agent test",
+    "test": "pnpm test:core && pnpm test:concurrent && pnpm --filter lithent-helper test && pnpm --filter lithent-dev-helper test && pnpm --filter @lithent/hmr-parser test && pnpm --filter @lithent/lithent-mdx test && pnpm --filter @lithent/lithent-vite test && pnpm --filter lithent-ftags test && pnpm --filter lithent-element test && pnpm --filter lithent-test test && pnpm --filter lithent-agent test && pnpm --filter lithent-live test",
     "test:lithentMdx": "pnpm --filter @lithent/lithent-mdx test",
     "test:lithentVite": "pnpm --filter @lithent/lithent-vite test",
     "test:dev": "vitest",
@@ -192,6 +193,26 @@
         "types": "./agent/dist/index.d.cts",
         "default": "./agent/dist/lithentAgent.cjs"
       }
+    },
+    "./live": {
+      "import": {
+        "types": "./live/dist/index.d.ts",
+        "default": "./live/dist/lithentLive.mjs"
+      },
+      "require": {
+        "types": "./live/dist/index.d.cts",
+        "default": "./live/dist/lithentLive.cjs"
+      }
+    },
+    "./live/runtime": {
+      "import": {
+        "types": "./live/dist/runtime.d.ts",
+        "default": "./live/dist/runtime.mjs"
+      },
+      "require": {
+        "types": "./live/dist/runtime.d.cts",
+        "default": "./live/dist/runtime.cjs"
+      }
     }
   },
   "types": "./dist/index.d.ts",
@@ -229,6 +250,10 @@
     "agent/src",
     "agent/package.json",
     "agent/README.md",
+    "live/dist",
+    "live/src",
+    "live/package.json",
+    "live/README.md",
     "examples/dist",
     "examples/src",
     "examples/package.json"
@@ -264,6 +289,7 @@
     "ai",
     "mcp",
     "webmcp",
+    "generative-ui",
     "typescript"
   ],
   "devDependencies": {

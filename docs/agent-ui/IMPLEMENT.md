@@ -12,7 +12,7 @@
 | 3 | `lithent/agent` 배포 연결·스킬·문서 (선택적 1차 릴리스 게이트) | done (수동 체크 `M-1`·`M-2`·`M-5` 대기) |
 | 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | done |
 | 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | done |
-| 6 | `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모 | planned |
+| 6 | `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모 | done (수동 체크 `M-3`·`M-6`·`M-7`은 Phase 8) |
 | 7 | Test Hardening (보안·경계값·오류 격리·동시성·누수 강화) | planned |
 | 8 | Integration Test (이중 코어, 실제 브라우저 E2E, React 호스트, 릴리스 검증) | planned |
 
@@ -436,7 +436,7 @@ Files:
 
 ---
 
-## Phase 6 — `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모: planned
+## Phase 6 — `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모: done
 
 Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-6, DC-9, DC-10, M-3, M-6, M-7
 
@@ -445,19 +445,59 @@ Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-6, DC-9, DC-10, M-3, M-6, M-7
 - `DESIGN.md` `DC-17`(`lithent/live` 호스트 크기 예산 초과 대응) 결정 — 충족: 옵션 A, 호스트 예산 5,500 B, API 분리 없음, 측정 기준 UMD brotli 유지 (2026-11-27).
 
 ### 구현 체크리스트
-- [ ] 루트 `package.json`: `exports["./live"]`, `exports["./live/runtime"]`, `files`, `build:live`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
+- [x] 루트 `package.json`: `exports["./live"]`, `exports["./live/runtime"]`, `files`, `build:live`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
+  - `exports`는 `lithent/agent`와 같은 모양(`import`/`require` × `types`/`default`). `files`에 `live/dist`·`live/src`·`live/package.json`·`live/README.md`를 넣어 해시 청크(`boot-*`, `names-*`)가 `live/dist`째로 실린다. 키워드 `generative-ui` 추가.
+  - `build:sequence`: `build:agent` 다음에 `build:live` (live 빌드가 `lithent/agent`·`helper`·`ftags`·`tag` dist를 쓰므로).
 - [x] 루트 `vite.config.js` vitest `exclude`에 `live/**` 추가 (Phase 4에서 선반영 — Phase 4 체크리스트 참고)
-- [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `live` 및 `live/runtime` 등록 (`size-report.js` 예산: `lithentLive.umd.js` 5,500 B — `DC-17`, `sandboxRuntime.umd.js` 11,000 B)
-- [ ] `live/README.md`, `skills/lithent/reference/live.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트 (LLM이 1회 시도에 유효한 `lithent/live` 코드를 생성하는 규약 포함)
-- [ ] `lithentDocs` 가이드 페이지(영어·한국어) 및 **양방향 Generative UI 인터랙티브 플레이그라운드** (코드 실행 → 사용자 마우스 조작 → AI 도구 호출로 상태 변경 시연) 구축
-- [ ] `README.md`, `CHANGELOG.md`, `docs/ideas/IDEAS.md` 상태 갱신
+- [x] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `live` 및 `live/runtime` 등록 (`size-report.js` 예산: `lithentLive.umd.js` 5,500 B — `DC-17`, `sandboxRuntime.umd.js` 11,000 B)
+  - `verify-release.mjs`: 소비자 검사 경로 15개(`lithent/live`, `lithent/live/runtime` 추가). ESM: 공개 키 `defineLiveElement`·`mountLive`, DOM 없는 환경에서 `defineLiveElement()`가 조용히 `undefined`, `sandboxRuntimeCode`에 `lithentLiveRuntime` 포함. CJS: 런타임 문자열이 ESM과 같음. 타입: `mountLive` 호출, `code` 누락 `@ts-expect-error`, `defineLiveElement()`. 타입 스코프는 base 13개 + concurrent 쪽은 그대로.
+- [x] `live/README.md`, `skills/lithent/reference/live.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트 (LLM이 1회 시도에 유효한 `lithent/live` 코드를 생성하는 규약 포함)
+  - 규약(`reference/live.md` "The code the model writes"): 함수 본문, `return lmount(props => { ... return () => ... })`, 스코프에 있는 이름 목록, JSX·`import`·`export` 금지, `fTags`/`lTag`, 자식은 `flMount`, 액션·상태는 마운터에서, 이름 `[a-zA-Z0-9_-]`, 파괴적 액션 `confirm: true`, JSON 안전 반환값, 네트워크·`parent`·저장소 없음, React 관용구 금지. 예제 위젯은 Direct 모드에서 실제로 실행해 확인했다 (`flMount` 자식 포함).
+  - UMD Direct 모드에 필요한 전역(`lithent`·`lithentHelper`·`lithentFTags`·`lithentTag`·`lithentAgent`)을 `live/README.md` "Without a bundler"에 명시 (Phase 5 Handoff 항목).
+- [x] `lithentDocs` 가이드 페이지(영어·한국어) 및 **양방향 Generative UI 인터랙티브 플레이그라운드** (코드 실행 → 사용자 마우스 조작 → AI 도구 호출로 상태 변경 시연) 구축
+  - `/guide/live`, `/ko/guide/live` (사이드바 "AI Agents" 그룹 "Generative UI"). `LivePlayground`: 편집 가능한 여행 예산 위젯 코드 → Sandbox 실행 → 사람은 슬라이더 조작, 에이전트 패널은 `listTools()` 결과마다 JSON 인자 + 호출 버튼(`confirm` 액션은 🔒, `window.confirm`으로 승인), `bridge.subscribe`로 갱신되는 `getState()` 표시, 호출 기록, "망가진 버전"(JSX)으로 `LiveError.hint` 시연.
+- [x] `README.md`, `CHANGELOG.md`, `docs/ideas/IDEAS.md` 상태 갱신
+  - `CHANGELOG.md` Unreleased에 `lithent/agent`·`lithent/live` 항목(미출시 표시), `IDEAS.md` 5번 "부분 착수", `README.md` 기능 절과 Ecosystem 표 2행.
 
 ### 기준 테스트
-- [ ] `pnpm build && pnpm size && pnpm verify:release` 통과
-- [ ] 문서 사이트 및 플레이그라운드 빌드(`pnpm build:docs`) 통과
+- [x] `pnpm build && pnpm size && pnpm verify:release` 통과
+- [x] 문서 사이트 및 플레이그라운드 빌드(`pnpm build:docs`) 통과
 
 ### 종료 조건
 - `lithent/agent`와 `lithent/live` 모두 배포 산출물·문서·스킬·크기 게이트 통과.
+
+### 검증 기록 (2026-11-27, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] `pnpm build` → 성공 (`build:sequence`에 `build:live` 포함)
+- [x] `pnpm size` → `lithent/agent` **2,374 / 2,500 B**, `lithent/live` 호스트 **4,536 / 5,500 B**, `lithent/live/runtime` **8,485 / 11,000 B** (brotli, UMD). 코어 기존 항목 변화 없음
+- [x] `pnpm test:dual` → 성공. 루트 코어 516/516·394/394, live base·concurrent 각 **97/97**, agent 91/91 ×2, 나머지 위성 패키지 기존과 같음
+- [x] `pnpm verify:release` → `ALL PASS (8 prepared packages; nothing published)`. 설치된 소비자에서 ESM·CJS **15개** 공개 경로, Node16·NodeNext 선언(`skipLibCheck: false`) 통과. `lithent-1.26.1.tgz`에 `live/dist`의 `boot-*`·`names-*` 청크(ESM·CJS), `lithentLive.umd.js`, `sandboxRuntime.umd.js`, `live/README.md`, `live/package.json`이 실린 것을 확인 (Phase 5 Handoff 항목)
+- [x] `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs` (`pnpm test:ci` 대체) → 50/50
+- [x] `pnpm build:docs` → 성공 (`/guide/live`, `/ko/guide/live` 포함)
+- [x] 실제 Chromium(Playwright, 문서 사이트 빌드 결과를 요청 가로채기로 제공, 저장소에 임시 파일 없음): 플레이그라운드 iframe 자동 높이 145px, 사람이 슬라이더 조작 → `getState().trip.budget` 1200, 에이전트 `add_expense`·`set_budget` 호출로 위젯 갱신, `clear_expenses`(`confirm: true`)는 확인 대화상자 표시, "망가진 버전"은 JSX 힌트 표시, 한국어 경로 동작, 페이지 오류 0건
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+- 수동 체크 `M-3`·`M-6`·`M-7`(`lithent/live` 2차 출하)은 Phase 8에서 수행한다.
+
+Files:
+- `package.json` (modified)
+- `scripts/size-report.js` (modified)
+- `scripts/verify-release.mjs` (modified)
+- `scripts/ci-build-artifacts.mjs` (modified)
+- `.github/release-policy.json` (modified)
+- `live/README.md` (added)
+- `skills/lithent/reference/live.md` (added)
+- `skills/lithent/SKILL.md` (modified)
+- `lithent-agent-addon.md` (modified)
+- `README.md` (modified)
+- `CHANGELOG.md` (modified)
+- `docs/ideas/IDEAS.md` (modified)
+- `lithentDocs/src/components/LivePlayground.tsx` (added)
+- `lithentDocs/src/pages/Live.tsx` (added)
+- `lithentDocs/src/pages/Live_ko.tsx` (added)
+- `lithentDocs/src/components/Layout.tsx` (modified)
+- `lithentDocs/src/components/Sidebar.tsx` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
 
 ---
 
@@ -525,20 +565,19 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - Phase 0 문서 4종 작성 및 `DC-1`~`DC-14` 확정 (커밋 `d290fc3`)
   - **`lithent/agent` (Phase 1~3 + 후속)** — 코어·어댑터·배포 연결·스킬·문서 사이트, `DC-15`·`DC-16` 반영, Phase 1~3 리뷰 반영 (커밋 `c7917de` … `ed97caa`)
   - **Phase 4 (`lithent/live` Sandbox 모드·RPC)** (커밋 `d3c6afe`)
-  - **Phase 5 (`lithent/live` Direct 모드·`<lithent-live>`·힌트·리사이즈·테마)** — `mode: 'direct'`(같은 `boot`를 Shadow Root에서, 동적 청크), `defineLiveElement()`(plain Custom Element, light DOM — 설계 편차), 호스트 측 자기 수정 힌트, `ResizeObserver` 자동 높이, `theme` CSS 변수
-  - Phase 5 검증: live 테스트 base·concurrent 각 97/97, Chromium에서 높이 맞춤·테마·Direct·요소·실제 오류 힌트 확인, 코어 diff 0줄 (Phase 5 "검증 기록", 커밋 `97709b1`)
-  - **Phase 5 후속 (`DC-17` 결정 반영)** — `lithent/live` 호스트 예산 5,500 B(현재 4,536 B, 여유 964 B), API 분리 없음, UMD brotli 기준 유지, ESM tree-shaking 참고 기록
+  - **Phase 5 (`lithent/live` Direct 모드·`<lithent-live>`·힌트·리사이즈·테마)** (커밋 `97709b1`), **Phase 5 후속 (`DC-17`)** — 호스트 예산 5,500 B (커밋 `4a43aa2`)
+  - **Phase 6 (`lithent/live` 배포 연결·스킬·문서·플레이그라운드)** — 루트 `exports["./live"]`·`["./live/runtime"]`·`files`·빌드/테스트 스크립트, `size`·`verify:release`·CI 아티팩트·릴리스 정책 등재, `live/README.md`, 스킬 `reference/live.md`(LLM 코드 규약), `SKILL.md`·`lithent-agent-addon.md`·`README.md`·`CHANGELOG.md`·`IDEAS.md`, 문서 사이트 `/guide/live`(영·한)와 양방향 Generative UI 플레이그라운드
+  - Phase 6 검증: `build`·`size`·`test:dual`·`verify:release`(15개 경로, 청크 패킹 확인)·`build:docs`·CI fixture 통과, Chromium 플레이그라운드 확인, 코어 diff 0줄 (Phase 6 "검증 기록")
 - **next**:
   1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스)
-  2. 사용자 결정: Phase 4~5 리뷰(`doc-driven-reviewer-v1`) 여부
-  3. Phase 6: 루트 `exports["./live"]`·`["./live/runtime"]`, 빌드·테스트·크기·릴리스 스크립트 등재, README·스킬·문서 사이트·인터랙티브 플레이그라운드
-- **blockers**: 없음 (Phase 6 진입 조건 `DC-17` 충족)
+  2. 사용자 결정: Phase 4~6 리뷰(`doc-driven-reviewer-v1`) 여부
+  3. Phase 7 (Test Hardening): `agent/src/tests/hardening.test.tsx`, `live/src/tests/hardening.test.ts` — 보안 음성 대조, 재진입·경합·언마운트, 상태 직렬화 경계, 여분 키·승인 경계, 오류 복구 루프, 대량 등록·해제
+- **blockers**: 없음
 - **risks / follow-ups**:
   - 크기 여유: `lithent/agent` 126 B (2,374 / 2,500 B), `lithent/live` 호스트 964 B (4,536 / 5,500 B), 런타임 2,515 B (8,485 / 11,000 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
-  - Phase 6 `verify-release`: `live/dist`에 해시가 붙은 청크(`boot-*`, `names-*`)가 있으므로 `files`·패킹·소비자 검사에서 청크가 함께 실리는지 확인해야 한다.
-  - Direct 모드를 UMD로 쓰려면 `lithentHelper`·`lithentFTags`·`lithentTag`·`lithentAgent` 전역이 필요하다 — Phase 6 README·문서에 명시.
   - srcdoc 문서는 호스트 페이지 CSP를 상속한다 — 엄격한 호스트 CSP에서의 동작은 Phase 7·8에서 확인 (`DESIGN.md` §3.3 구현 메모).
   - `mountLive`는 시작 실패 시 reject하고 핸들을 주지 않는다 — Phase 7 "오류 복구 루프"는 `reload` 실패 → 성공과 `mountLive` 재호출로 검증.
+  - jsdom은 `iframe.sandbox`·Shadow Root 안 iframe의 `contentWindow`를 지원하지 않는다 — Phase 7 보안 음성 대조(`window.parent.document`·`localStorage`·`document.cookie`·`fetch` 차단)는 실제 브라우저가 필요할 수 있다. jsdom에서 안 되는 항목은 Phase 8 Playwright로 옮기고 그 사실을 기록한다.
   - 이름 규칙 검사 없음(`DESIGN.md` §2.5), `DC-3` 덮어쓰기 후 이전 인스턴스 미재등록, WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건 — Phase 7 검토 후보.
-  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
-- **latest commit**: `97709b1` (Phase 5). "Phase 5 후속" 변경은 아직 커밋하지 않음 — not committed yet
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체, `npm pack`은 `devEngines` 때문에 실패하므로 패킹 확인은 `verify:release`가 만든 tarball로 한다. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
+- **latest commit**: `4a43aa2` (Phase 5 후속). Phase 6 변경은 이 기록과 함께 커밋한다.

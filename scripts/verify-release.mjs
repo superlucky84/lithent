@@ -87,6 +87,8 @@ const paths = [
   'lithent/element',
   'lithent/test',
   'lithent/agent',
+  'lithent/live',
+  'lithent/live/runtime',
   'lithent-concurrent',
   'lithent-concurrent/helper',
 ];
@@ -145,7 +147,13 @@ const bridge = agent.createAgentBridge();
 assert.equal((await bridge.callTool('missing')).error.code, 'NOT_FOUND');
 // No DOM and no WebMCP context: the opt-in adapter is a no-op.
 assert.equal(typeof agent.connectWebMCP(bridge), 'function');
-console.log('PASS isolated installed consumer: all 13 public import paths and distinct cores');
+const live = await import('lithent/live');
+assert.deepEqual(Object.keys(live).sort(), ['defineLiveElement', 'mountLive']);
+// No Custom Elements on the server: the opt-in registration declines.
+assert.equal(live.defineLiveElement('no-dom-live'), undefined);
+const { sandboxRuntimeCode } = await import('lithent/live/runtime');
+assert(typeof sandboxRuntimeCode == 'string' && sandboxRuntimeCode.includes('lithentLiveRuntime'));
+console.log('PASS isolated installed consumer: all 15 public import paths and distinct cores');
 `
 );
 execFileSync(process.execPath, ['imports.mjs'], {
@@ -205,7 +213,10 @@ const paths = ${JSON.stringify(paths)};
   });
   assert.equal(renderToString(jsx.jsx(agent.AgentScope, { bridge, children: jsx.jsx(Agentic, {}) })), '<i></i>');
   assert.equal(typeof agent.connectWebMCP(bridge), 'function');
-  console.log('PASS isolated CommonJS consumer: all 13 require paths, export parity, main and JSX/helper/SSR integration');
+  const live = require('lithent/live');
+  assert.equal(live.defineLiveElement('no-dom-live'), undefined);
+  assert.equal(require('lithent/live/runtime').sandboxRuntimeCode, (await import('lithent/live/runtime')).sandboxRuntimeCode);
+  console.log('PASS isolated CommonJS consumer: all 15 require paths, export parity, main and JSX/helper/SSR integration');
 })().catch(error => { console.error(error); process.exitCode = 1; });
 `
 );
@@ -223,6 +234,9 @@ import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper
 import { render, act, cleanup } from 'lithent/test';
 import { agentAction, AgentScope, createAgentBridge } from 'lithent/agent';
 import type { ToolCallResult } from 'lithent/agent';
+import { mountLive, defineLiveElement } from 'lithent/live';
+import type { LiveError, LiveHandle } from 'lithent/live';
+import { sandboxRuntimeCode } from 'lithent/live/runtime';
 import type { State, Computed } from 'lithent-concurrent/helper';
 const List = mount(renew => {
   const value: State<string> = deferred('initial', renew);
@@ -268,7 +282,19 @@ const Agentic = baseMount(() => {
   return () => <AgentScope bridge={createAgentBridge()}><p>agent</p></AgentScope>;
 });
 const called: Promise<ToolCallResult> = createAgentBridge().callTool('add_item', { id: 'a' });
-export { List, Rows, ldeferred, whenIdle, rendered, counted, waited, Agentic, called };
+// lithent/live: typed options and handle; the runtime is a string.
+const startWidget = (container: HTMLElement): Promise<LiveHandle> =>
+  mountLive({
+    code: 'return lmount(() => () => fTags.p({}, "hi"))',
+    container,
+    runtimeCode: sandboxRuntimeCode,
+    theme: { '--brand': '#0064ff' },
+    onError: (error: LiveError) => error.hint,
+  });
+// @ts-expect-error code is required.
+void (() => mountLive({ container: document.body }));
+const LiveTag = defineLiveElement();
+export { List, Rows, ldeferred, whenIdle, rendered, counted, waited, Agentic, called, startWidget, LiveTag };
 `
 );
 await writeFile(
@@ -303,7 +329,7 @@ console.log(
 const typeScopes = [
   {
     name: 'base',
-    paths: paths.slice(0, 11),
+    paths: paths.slice(0, 13),
     names: [
       'core',
       'jsx',
@@ -316,12 +342,14 @@ const typeScopes = [
       'element',
       'test',
       'agent',
+      'live',
+      'liveRuntime',
     ],
     state: 'state',
   },
   {
     name: 'concurrent',
-    paths: paths.slice(11),
+    paths: paths.slice(13),
     names: ['core', 'helper'],
     state: 'deferred',
   },

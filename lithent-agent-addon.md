@@ -129,6 +129,13 @@ CODING GUIDELINES:
     - Mark destructive actions `confirm: true` and set `bridge.setConfirmHandler`
     - `connectWebMCP(bridge)` is opt-in; inside a Custom Element pass the bridge as an `Object` prop
 
+15. GENERATIVE UI WIDGETS (when the app lets a model build a small interactive UI)
+    - Suggest `lithent/live`: `mountLive({ code, container, runtimeCode: sandboxRuntimeCode })`, or `<lithent-live>` after `defineLiveElement()`
+    - Generated code is a function body: `return lmount(props => { ... return () => fTags.div(...) })`
+    - No JSX, no `import`/`export`; `lmount`, `lstate`, `fTags`, `lTag`, `agentAction`, `agentState` are already in scope
+    - Keep the default sandbox mode for model output; `mode: 'direct'` is for trusted code only
+    - Feed `LiveError.message` and `hint` back to the model, then `mountLive` or `reload` again
+
 IMPORT PATHS:
 
 - Core: `import { mount, lmount, render, h, Fragment, portal, ref, nextTick } from 'lithent'`
@@ -141,6 +148,7 @@ IMPORT PATHS:
 - Custom Elements: `import { defineElement, emit } from 'lithent/element'`
 - Tests: `import { render, act, cleanup } from 'lithent/test'`
 - AI agents: `import { agentAction, agentState, AgentScope, createAgentBridge, connectWebMCP } from 'lithent/agent'`
+- Generative UI: `import { mountLive, defineLiveElement } from 'lithent/live'` and `import { sandboxRuntimeCode } from 'lithent/live/runtime'`
 - FTags: `import { fTags, fFragment, fMount } from 'lithent/ftags'`
 - HTM: `import { lTag } from 'lithent/tag'`
 
@@ -177,6 +185,7 @@ COMMON MISTAKES TO CATCH:
 - Asserting right after an event in a test without `await act(...)`
 - Declaring `agentAction` / `agentState` in the updater instead of the mounter
 - Tool names with `.` or spaces (vendor tool-name rules reject them)
+- JSX, `import` or `export` in `lithent/live` widget code (it runs without a build)
 
 REFERENCE MATERIALS (NOT PART OF BEHAVIORAL RULES):
 
@@ -185,6 +194,7 @@ node_modules/lithent/dist/skills/lithent/SKILL.md
 (concurrent details: node_modules/lithent/dist/skills/lithent/reference/concurrent.md)
 (custom elements: node_modules/lithent/dist/skills/lithent/reference/element.md)
 (AI agents: node_modules/lithent/dist/skills/lithent/reference/agent.md)
+(generative UI widgets: node_modules/lithent/dist/skills/lithent/reference/live.md)
 (tests: node_modules/lithent/dist/skills/lithent/reference/test.md)
 
 This reference material provides comprehensive examples, patterns,

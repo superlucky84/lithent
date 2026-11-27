@@ -112,6 +112,10 @@ const menuData: MenuSection[] = [
         text: { en: 'Agent-Native Components', ko: 'Agent-Native 컴포넌트' },
         link: '/guide/agent-native',
       },
+      {
+        text: { en: 'Generative UI', ko: '생성형 UI' },
+        link: '/guide/live',
+      },
     ],
   },
   {

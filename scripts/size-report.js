@@ -26,6 +26,15 @@ const ELEMENT_BUDGET = 1000;
  * entry; bundlers drop it when unused.
  */
 const AGENT_BUDGET = 2500;
+/**
+ * lithent/live RQ-10 (docs/agent-ui/DESIGN.md DC-9, DC-17): the host
+ * controller, 3,000B raised to 5,500B with room for the Phase 7 hardening
+ * (direct mode and <lithent-live> share the entry; ESM consumers split or
+ * drop them). The sandbox runtime bundles the core, helpers, templates and
+ * lithent/agent for the iframe.
+ */
+const LIVE_BUDGET = 5500;
+const LIVE_RUNTIME_BUDGET = 11000;
 
 const targets = [
   {
@@ -47,6 +56,16 @@ const targets = [
     label: 'lithent/agent',
     file: 'agent/dist/lithentAgent.umd.js',
     budget: AGENT_BUDGET,
+  },
+  {
+    label: 'lithent/live',
+    file: 'live/dist/lithentLive.umd.js',
+    budget: LIVE_BUDGET,
+  },
+  {
+    label: 'lithent/live/runtime (sandbox)',
+    file: 'live/dist/sandboxRuntime.umd.js',
+    budget: LIVE_RUNTIME_BUDGET,
   },
 ];
 

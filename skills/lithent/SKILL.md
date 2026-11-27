@@ -452,6 +452,24 @@ Declare in the mounter. Agents go through `callTool` (checked, optionally
 confirmed); the returned function runs directly for UI handlers. See
 `reference/agent.md` for scopes, names, confirmation and WebMCP.
 
+## Generative UI widgets (optional)
+
+`lithent/live` runs widget code a model wrote (no build, no JSX) in a sandboxed
+iframe and exposes its actions and state through the same bridge.
+
+```ts
+import { mountLive } from 'lithent/live';
+import { sandboxRuntimeCode } from 'lithent/live/runtime';
+
+const handle = await mountLive({ code, container, runtimeCode: sandboxRuntimeCode });
+await handle.bridge.callTool('set_filter', { status: 'done' });
+```
+
+Generated code is a function body that returns a component, uses `fTags` or
+`lTag` (no JSX, no imports) and the injected `lmount`, `lstate`,
+`agentAction`, `agentState`. See `reference/live.md` for the full convention,
+`<lithent-live>`, errors with hints and the sandbox rules.
+
 ## Testing (optional)
 
 `lithent/test` renders into the test document and waits for lithent's
@@ -527,6 +545,10 @@ import {
   connectWebMCP,
 } from 'lithent/agent';
 
+// Generative UI widgets
+import { mountLive, defineLiveElement } from 'lithent/live';
+import { sandboxRuntimeCode } from 'lithent/live/runtime';
+
 // Tests (with @testing-library/dom for queries and events)
 import { render, act, cleanup } from 'lithent/test';
 
@@ -540,5 +562,5 @@ import { lTag } from 'lithent/tag';
 ## Additional materials (optional)
 
 - `constraints/` (rules, mistakes, troubleshooting)
-- `reference/` (props types, children types, lstore inference, events, concurrent, element, agent, test)
+- `reference/` (props types, children types, lstore inference, events, concurrent, element, agent, live, test)
 - `examples/` (quick examples)

@@ -26,6 +26,7 @@ const directories = [
   'element/dist',
   'test/dist',
   'agent/dist',
+  'live/dist',
   'element/playground/dist',
   'packages/hmrParser/dist',
   'packages/lithentMdx/dist',

@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### lithent: `lithent/agent` and `lithent/live` (not yet released)
+
+- New `lithent/agent` entry: `agentAction` and `agentState` declared in a
+  component's mounter are shared by people (the returned function is the UI
+  handler) and AI agents (`bridge.callTool`, `bridge.getState`). Bridges list
+  the actions as JSON Schema tools, check arguments (`INVALID_PARAMS` with
+  details), never throw, and can ask a confirm handler first (`confirm: true`).
+  `<AgentScope>` gives a subtree its own bridge; `scopeId` names tools
+  `scope__name`. `connectWebMCP(bridge)` mirrors the tools into the browser's
+  WebMCP context (opt-in). About 2.3 KB brotli.
+- New `lithent/live` entry: `mountLive` runs widget code an LLM wrote (a
+  function body using `fTags`/`lTag`, no build) in an
+  `iframe sandbox="allow-scripts"` with a CSP that blocks the network, and
+  exposes its actions and state through the same `AgentBridge`. The sandbox
+  runtime is a separate `lithent/live/runtime` string (no request needed).
+  Errors come back with a `hint` for the model; `updateProps` keeps the
+  widget's state; `autoResize` and `theme` fit it into the page;
+  `mode: 'direct'` runs trusted code in a shadow root; `defineLiveElement()`
+  registers `<lithent-live>`. Host about 4.5 KB, runtime about 8.5 KB brotli.
+- Docs: Agent-Native Components and Generative UI guides (English and Korean)
+  with an interactive playground; the bundled skill (`dist/skills/lithent`)
+  and `lithent-agent-addon.md` describe both, including the code convention
+  for generated widgets.
+- The core and `lithent-concurrent` are unchanged.
+
 ### lithent 1.26.1
 
 - Automatic JSX preserves the parent DOM element when its single child
