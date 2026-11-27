@@ -1,5 +1,15 @@
 # Release notes
 
+## Unreleased
+
+### lithent 1.26.1
+
+- Automatic JSX preserves the parent DOM element when its single child
+  changes between `null` or `undefined` and an element. This lets CSS
+  transitions continue on the parent when a conditional child appears.
+- Server rendering keeps void elements such as `<br />` self-closing when
+  their child slot is empty.
+
 ## 2026-11-20
 
 ### lithent 1.26.0: `lithent/test`
