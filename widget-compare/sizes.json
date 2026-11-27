@@ -1,11 +1,11 @@
 {
   "lithent": {
-    "raw": 16212,
-    "gzip": 6791,
-    "brotli": 6218,
-    "sha256": "4758531074f5ab569cab7a7e325aefc339b1903da2fad9bd2cf4ee0b31a1c9d8",
+    "raw": 16269,
+    "gzip": 6808,
+    "brotli": 6224,
+    "sha256": "3d7fee31e8379d9f6706ed279be0a9ce4015400b343f94c74ef9d9616dc732bc",
     "packages": {
-      "lithent": "1.26.0"
+      "lithent": "1.26.1"
     }
   },
   "react": {
