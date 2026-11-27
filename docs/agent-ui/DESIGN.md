@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정) — Phase 1~3 (`lithent/agent` 코어·어댑터·배포 연결) 구현 완료, 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 4 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4 (`lithent/live` 샌드박스 런타임·RPC) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 5 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 > **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`도 같은 날 사용자 결정으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.
@@ -383,6 +383,8 @@ export function mountLive(options: MountLiveOptions): Promise<LiveHandle>;
 
 - 선택적 Custom Element 래퍼(`<lithent-live>`)는 `lithent/element` 위에 얹어 React·Vue·HTML 페이지에서도 태그 한 줄로 Generative UI를 띄울 수 있게 한다 (Phase 5~6).
 
+> **구현 상태 (Phase 4 완료 시점, 2026-11-27)**: `live/` 워크스페이스 패키지에 Sandbox 모드 `mountLive`와 `LiveHandle`(`bridge`, `updateProps`, `reload`, `destroy`), 샌드박스 런타임(`live/dist/sandboxRuntime.umd.js`, 문자열 `live/dist/runtime.{mjs,cjs}`의 `sandboxRuntimeCode`)이 구현되었다. `MountLiveOptions` 중 `code`·`container`·`styles`·`props`·`runtimeCode`·`runtimeUrl`·`allowNetwork`·`timeoutMs`·`onError`가 동작하고, `mode: 'direct'`(지금은 `LiveError(phase: 'compile')`로 거절), `autoResize`·`theme`, `LiveError.hint`, `<lithent-live>`는 Phase 5에서 추가한다. 루트 `exports["./live"]`, `exports["./live/runtime"]` 연결은 Phase 6이다. `LiveRpcMessage`도 공개 타입으로 내보낸다. 결정된 세부 동작은 §3.4 "구현 세부 (Phase 4)".
+
 ### 3.2 LLM 생성 코드 계약 (`RQ-6`, `DC-6`)
 
 LLM이 생성하는 코드는 **빌드 없는 표준 JS**이며, 런타임이 다음 심볼을 함수 스코프로 직접 주입한다:
@@ -412,6 +414,9 @@ LLM이 생성하는 코드는 **빌드 없는 표준 JS**이며, 런타임이 �
 | 네트워크 유출(exfiltration) | 호스트가 `srcdoc` CSP 메타 태그(`default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' <runtimeUrl-origin?>; style-src 'unsafe-inline'`)로 외부 네트워크 차단 (`allowNetwork: true`로 해제 가능, `DC-7`) | 호스트 페이지 CSP에 종속 |
 | `postMessage` 스푸핑 | `event.source === iframe.contentWindow` 및 세션별 랜덤 `channelId` 검증 필수 | 해당 없음 |
 
+- **확인 기록 (Phase 4, Chromium)**: 생성 코드에서 `parent.document`, `top.location`, `localStorage`, `document.cookie` 접근은 모두 `SecurityError`, `location.origin`은 `"null"`이었다. 기본 CSP에서 `fetch`(no-cors 포함)·이미지 요청은 차단되고, `allowNetwork: true`에서만 요청이 나갔다. 자동화된 음성 대조 테스트는 Phase 7·8에서 만든다.
+- **구현 메모 (Phase 4)**: `allowNetwork: true`는 CSP 메타 태그를 넣지 않는다(sandbox 속성은 유지). srcdoc 문서는 호스트 페이지의 CSP도 함께 받으므로(정책 상속), 호스트 CSP가 `'unsafe-eval'`·인라인 스크립트를 막으면 샌드박스 런타임이 시작하지 못한다 — 엄격한 호스트 CSP에서의 동작은 Phase 7·8에서 확인한다.
+
 ### 3.4 `postMessage` RPC 프로토콜 (`RQ-8`, `DC-8`, `DC-14`)
 
 호스트 ↔ 샌드박스 iframe 간 메시지는 JSON 직렬화 가능한 평면 객체만 허용한다:
@@ -431,6 +436,14 @@ type LiveRpcMessage =
 - **호스트 측 `confirm` 승인 처리 (`DC-14` 확정)**: `handle.bridge.callTool(name, args)` 호출 시 호스트 프록시 브릿지가 캐시된 `ToolDescriptor.requiresConfirm`을 먼저 확인해 호스트에 등록된 `confirmHandler`를 실행한다. 거부되면 iframe으로 `call` 메시지를 보내지 않고 즉시 `{ ok: false, error: { code: 'REJECTED', ... } }`를 반환한다.
 - **자동 높이 조절**: `autoResize: true`(기본값)일 때 iframe 내부 `ResizeObserver`가 콘텐츠 높이를 `resize` 메시지로 전달해 호스트가 iframe 높이를 자연스럽게 맞춘다.
 - **오류 자기 수정(Self-Repair)**: 컴파일/마운트/렌더 오류 발생 시 `LiveError`에 `phase`, `message`, 그리고 `lithent` 흔한 실수(`mounter`가 JSX를 직접 반환함, `lstate`를 `mount`에서 사용함 등)에 대한 `hint`를 포함해 호스트 LLM 루프에 즉시 되돌릴 수 있게 한다 (`RQ-8`).
+- **구현 세부 (Phase 4에서 확정된 동작)**:
+  - **시작과 실패**: `mountLive`는 샌드박스가 `ready`를 보내면 `LiveHandle`로 resolve한다. 시작에 실패하면(설정 오류, `error` 메시지, `timeoutMs` 안에 `ready` 없음) iframe을 지우고 `LiveError`로 **reject**하며 `onError`도 호출한다. LLM 루프는 고친 코드로 `mountLive`를 다시 부르거나, 이미 있는 핸들에서는 `reload`를 부른다. `reload(nextCode)`는 기존 iframe을 닫고(진행 중 호출은 `NOT_FOUND`) 구독자에게 `tools-changed`(`[]`)를 알린 뒤 새 채널의 새 iframe을 열며, 실패하면 같은 방식으로 reject하고 샌드박스 없이 남는다(다음 `reload`로 복구). `destroy()` 뒤의 `reload`는 `LiveError(phase: 'mount')`로 reject한다.
+  - **오류 phase 구분**: 문법 오류·최상위 예외·컴포넌트가 아닌 반환값 → `compile`, 첫 렌더(mounter 포함) 예외 → `mount`, 시작 후 샌드박스 창의 `error`·`unhandledrejection` → `render`(위젯은 유지), 응답 없음 → `timeout`. 런타임 스크립트가 로드되지 않으면(잘못된 `runtimeUrl`, 차단) srcdoc의 시작 스크립트가 즉시 `compile` 오류를 보내 타임아웃까지 기다리지 않는다.
+  - **채널과 대상 origin**: 채널 id는 `crypto.getRandomValues` 기반 랜덤 문자열(비보안 origin에서도 동작)이다. 호스트 → 샌드박스는 opaque origin이라 `targetOrigin '*'`로 보내고, 샌드박스 → 호스트는 시작 설정으로 받은 호스트 origin을 대상으로 보낸다(file: 페이지처럼 origin이 `"null"`이면 `'*'`). 호스트는 `event.source === iframe.contentWindow`와 채널을, 샌드박스는 `event.source === parent`와 채널을 확인한다.
+  - **응답 순서**: 샌드박스는 `call`의 `result`와 `props`의 `ack`를 대기 중인 마이크로태스크(상태 변경 알림 포함)가 모두 끝난 뒤 보낸다. 따라서 `await bridge.callTool()`·`await updateProps()` 직후의 `bridge.getState()`는 최신이다.
+  - **샌드박스 안의 브릿지**: 위젯은 런타임이 만든 전용 브릿지의 `<AgentScope>` 아래에 그려진다. 호스트가 이미 승인했으므로(`DC-14`) 샌드박스 브릿지의 승인 핸들러는 항상 승인한다. 인자 검증은 샌드박스 브릿지가 하고, 결과 값을 `postMessage`로 복제할 수 없으면(함수 등) `EXECUTION_ERROR` 결과로 바꿔 보낸다.
+  - **호스트 프록시 브릿지**: `listTools()`·`getState()`는 `ready`·`event`로 받은 캐시의 사본을 준다. 알 수 없는 도구는 왕복 없이 `NOT_FOUND`, 응답이 없으면 `TIMEOUT`(+ `onError` `timeout`), 인자를 복제할 수 없으면 `INVALID_PARAMS`, 형식이 틀린 결과는 `EXECUTION_ERROR`. `notifyStateChange(name?)`는 캐시된 상태로 즉시 `state-changed`를 보내고, `dispose()`는 `destroy()`와 같다.
+  - **`props` 메시지**: `updateProps`는 호스트에 새 props를 기억한 뒤(이후 `reload`에도 사용) `ack`를 기다린다. 응답이 없으면 `LiveError(phase: 'timeout')`로 reject한다.
 
 ---
 

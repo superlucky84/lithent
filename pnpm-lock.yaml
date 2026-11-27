@@ -529,6 +529,12 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2(ts-node@10.9.2(@types/node@24.19.2)(typescript@5.7.2))
 
+  live:
+    dependencies:
+      lithent:
+        specifier: workspace:*
+        version: link:..
+
   packages/hmrParser:
     dependencies:
       '@babel/parser':

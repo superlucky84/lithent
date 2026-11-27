@@ -10,7 +10,7 @@
 | 1 | `lithent/agent` 코어 패키지 (`agentAction`, `agentState`, `createAgentBridge`) | done |
 | 2 | `lithent/agent` 어댑터 (WebMCP, `confirm` 승인 훅, `lithent/element` 연동) | done |
 | 3 | `lithent/agent` 배포 연결·스킬·문서 (선택적 1차 릴리스 게이트) | done (수동 체크 `M-1`·`M-2`·`M-5` 대기) |
-| 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | planned |
+| 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | done |
 | 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | planned |
 | 6 | `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모 | planned |
 | 7 | Test Hardening (보안·경계값·오류 격리·동시성·누수 강화) | planned |
@@ -285,7 +285,7 @@ Files:
 
 ---
 
-## Phase 4 — `lithent/live` 샌드박스 런타임 및 양방향 RPC 브릿지: planned
+## Phase 4 — `lithent/live` 샌드박스 런타임 및 양방향 RPC 브릿지: done
 
 Refs: RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, DC-6, DC-7, DC-8, DC-9, DC-13, DC-14, M-3, M-4
 
@@ -294,21 +294,61 @@ Refs: RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, DC-6, DC-7, DC-8, DC-9, DC-13, DC-14
 - `DESIGN.md`의 `DC-6`, `DC-7`, `DC-8`, `DC-9`, `DC-13`, `DC-14` 확정 (충족 완료).
 
 ### 구현 체크리스트
-- [ ] `live/` 워크스페이스 패키지 구성 (`package.json`, `tsconfig.json`, `vite.config.js`, `pnpm-workspace.yaml` 등록)
-- [ ] Sandbox iframe 부트스트랩 HTML 생성기 구현 (`sandbox="allow-scripts"` 강제, `allow-same-origin` 금지, 기본 CSP 메타 태그 적용 `DC-7`, `runtimeCode`/`runtimeUrl` 필수 검사 `DC-13`)
-- [ ] 별도 샌드박스 번들 `live/dist/sandboxRuntime.umd.js` 및 문자열 export `lithent/live/runtime`(`sandboxRuntimeCode`) 빌드 파이프라인 구성 (`lithent` + `helper` + `ftags` + `tag` + `agent` 심볼 주입, `DC-6`, `DC-9`)
-- [ ] 호스트 ↔ iframe `postMessage` 양방향 RPC 브릿지 구현 (`channelId`·`event.source` 검증, `ready`/`event`/`call`/`result`/`props`/`error` 메시지, `timeoutMs` 만료 시 `TIMEOUT`, 호스트 측 `requiresConfirm` 승인 선실행 `DC-14`)
-- [ ] 호스트 측 `LiveHandle` 구현 (`bridge`가 `lithent/agent`의 `AgentBridge` 계약과 100% 동일, 내부 클로저 상태를 보존하는 `updateProps`, `reload`, `destroy`)
+- [x] `live/` 워크스페이스 패키지 구성 (`package.json`, `tsconfig.json`, `vite.config.js`, `pnpm-workspace.yaml` 등록)
+  - 호스트 빌드(`vite.config.js`, `lithentLive.{mjs,cjs,umd.js}` + `.d.ts`/`.d.cts`)와 샌드박스 런타임 빌드(`vite.runtime.config.js`, 외부 의존 없는 `sandboxRuntime.umd.js`, 전역 `lithentLiveRuntime`)를 분리했다. `pnpm-lock.yaml`에는 `live` importer 6줄만 추가했다.
+  - 루트 `vite.config.js` vitest `exclude`의 `live/**`는 Phase 6 항목이지만 Phase 4에서 선반영했다 (Phase 1의 `agent/**`와 같은 이유: 없으면 루트 `pnpm test:core`가 `live/src/tests`를 수집해 기존 스위트가 깨진다).
+- [x] Sandbox iframe 부트스트랩 HTML 생성기 구현 (`sandbox="allow-scripts"` 강제, `allow-same-origin` 금지, 기본 CSP 메타 태그 적용 `DC-7`, `runtimeCode`/`runtimeUrl` 필수 검사 `DC-13`) — `live/src/srcdoc.ts`, `live/src/mountLive.ts`
+  - 생성 코드는 `<`를 모두 이스케이프한 JSON으로 전달하고, 런타임 코드·스타일의 `</script`·`<!--`·`</style`도 이스케이프한다. 런타임이 로드되지 않으면 시작 스크립트가 즉시 `compile` 오류를 보낸다.
+- [x] 별도 샌드박스 번들 `live/dist/sandboxRuntime.umd.js` 및 문자열 export `lithent/live/runtime`(`sandboxRuntimeCode`) 빌드 파이프라인 구성 (`lithent` + `helper` + `ftags` + `tag` + `agent` 심볼 주입, `DC-6`, `DC-9`) — `live/src/runtime/{symbols,boot,entry}.ts`, `live/scripts/build-runtime-module.mjs`(→ `dist/runtime.{mjs,cjs,d.ts,d.cts}`)
+- [x] 호스트 ↔ iframe `postMessage` 양방향 RPC 브릿지 구현 (`channelId`·`event.source` 검증, `ready`/`event`/`call`/`result`/`props`/`error` 메시지, `timeoutMs` 만료 시 `TIMEOUT`, 호스트 측 `requiresConfirm` 승인 선실행 `DC-14`)
+  - 샌드박스는 `result`·`ack`를 대기 중인 마이크로태스크가 끝난 뒤 보내 호스트 상태 캐시가 먼저 갱신되게 했다 (Chromium 확인 중 발견해 수정).
+- [x] 호스트 측 `LiveHandle` 구현 (`bridge`가 `lithent/agent`의 `AgentBridge` 계약과 100% 동일, 내부 클로저 상태를 보존하는 `updateProps`, `reload`, `destroy`)
+  - 시작·`reload` 실패 시 `LiveError`로 reject하고 iframe을 남기지 않는다. 세부 동작은 `DESIGN.md` §3.4 "구현 세부 (Phase 4)".
+  - `mode: 'direct'`는 Phase 5까지 `LiveError(phase: 'compile')`로 거절한다.
 
 ### 기준 테스트
-- [ ] `live/src/tests/rpc.test.ts`: 메시지 프로토콜, `channelId`/`source` 위조 차단, 타임아웃, 동시 다중 호출 매칭, 호스트 측 `confirm` 선실행(`DC-14`), `destroy()` 후 정리
-- [ ] `live/src/tests/sandbox.test.ts`: `sandbox` 속성 검증(`allow-same-origin` 부재), CSP 메타 태그 포함 여부(`DC-7`), `runtimeCode`·`runtimeUrl` 둘 다 생략 시 설정 오류(`DC-13`), 오류 전파
-- [ ] `live/src/tests/bridge-compat.test.ts`: `LiveHandle.bridge`가 `AgentBridge` 계약(`listTools`, `getState`, `callTool`, `subscribe`)을 준수함
+- [x] `live/src/tests/rpc.test.ts`: 메시지 프로토콜, `channelId`/`source` 위조 차단, 타임아웃, 동시 다중 호출 매칭, 호스트 측 `confirm` 선실행(`DC-14`), `destroy()` 후 정리 (20 tests — `updateProps` ack·타임아웃, `reload` 채널 교체, 복제 불가 인자·잘못된 결과 포함)
+- [x] `live/src/tests/sandbox.test.ts`: `sandbox` 속성 검증(`allow-same-origin` 부재), CSP 메타 태그 포함 여부(`DC-7`), `runtimeCode`·`runtimeUrl` 둘 다 생략 시 설정 오류(`DC-13`), 오류 전파 (13 tests — 이스케이프, 시작 타임아웃, 채널 분리 포함)
+- [x] `live/src/tests/bridge-compat.test.ts`: `LiveHandle.bridge`가 `AgentBridge` 계약(`listTools`, `getState`, `callTool`, `subscribe`)을 준수함 (6 tests — 메서드 집합이 `createAgentBridge()`와 동일, 타입 동일)
+- [x] 추가: `live/src/tests/runtime.test.tsx`: 샌드박스 쪽 `boot`를 가짜 전송으로 검증 (14 tests — `DC-6` 심볼 21개 주입, `fTags`·`lTag` 코드 실행, 오류 phase 구분, 상태 이벤트 후 `result`·`ack` 순서, 샌드박스 내부 인자 검증, 승인된 confirm 액션 실행, 복제 불가 결과, 위젯 내부 도구 변경 전달, teardown)
+- 하니스: `live/src/tests/harness.ts` — jsdom은 srcdoc 스크립트를 실행하지 않으므로 테스트가 샌드박스 역할을 한다(채널 읽기, 호스트 송신 기록, iframe 창을 `source`로 한 응답).
 
 ### 종료 조건
 - `live/` 단위 테스트가 base·concurrent 양쪽에서 100% 통과.
 - `src/`와 `lithentConcurrent/src/` diff 0줄 (`RQ-9`).
 - `live/dist/lithentLive.umd.js` ≤ 3,000 B brotli, `live/dist/sandboxRuntime.umd.js` ≤ 11,000 B brotli (`DC-9`).
+
+### 검증 기록 (2026-11-27, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] `pnpm --filter lithent-live test` → 4 files, **53/53** / `LITHENT_CORE=concurrent` → 4 files, **53/53**
+- [x] `pnpm --filter lithent-live build` → 성공 (타입 검사 + ESLint, 호스트·런타임·문자열 모듈). `lithentLive.umd.js` **2,084 / 3,000 B**, `sandboxRuntime.umd.js` **8,277 / 11,000 B** brotli (`DC-9`)
+- [x] 실제 Chromium(Playwright, 임시 페이지) 확인: `runtimeCode`로 위젯 렌더, 사람 클릭·`callTool`·인자 검증, 호스트 승인(핸들러 없음 `REJECTED` → 승인 후 실행), `updateProps` 뒤 클로저 상태 유지, `await` 직후 `getState()` 최신, 문법 오류 `compile`·비컴포넌트 `compile`·mounter 예외 `mount`, 런타임 없음 즉시 `compile`(`DC-13`), 잘못된 `runtimeUrl` 즉시 `compile`, 생성 코드의 `parent.document`·`top.location`·`localStorage`·`document.cookie` 접근 `SecurityError`·origin `"null"`, 기본 CSP의 `fetch`·이미지 차단과 `allowNetwork: true`의 허용, `destroy()` 뒤 iframe 0개, 페이지 오류 0건. (마지막 재확인 실행 1회는 권한 검사로 막혀 생략 — 동일 항목은 앞선 실행에서 확인)
+- [x] 루트 `pnpm test:core` → 81 files / 516 tests 통과 (`live/**` 제외 확인)
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+
+Files:
+- `live/package.json` (added)
+- `live/tsconfig.json` (added)
+- `live/vite.config.js` (added)
+- `live/vite.runtime.config.js` (added)
+- `live/scripts/build-runtime-module.mjs` (added)
+- `live/src/index.ts` (added)
+- `live/src/types.ts` (added)
+- `live/src/srcdoc.ts` (added)
+- `live/src/mountLive.ts` (added)
+- `live/src/runtime/symbols.ts` (added)
+- `live/src/runtime/boot.ts` (added)
+- `live/src/runtime/entry.ts` (added)
+- `live/src/tests/harness.ts` (added)
+- `live/src/tests/sandbox.test.ts` (added)
+- `live/src/tests/rpc.test.ts` (added)
+- `live/src/tests/bridge-compat.test.ts` (added)
+- `live/src/tests/runtime.test.tsx` (added)
+- `pnpm-workspace.yaml` (modified)
+- `pnpm-lock.yaml` (modified)
+- `vite.config.js` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
 
 ---
 
@@ -344,7 +384,7 @@ Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-6, DC-9, DC-10, M-3, M-6, M-7
 
 ### 구현 체크리스트
 - [ ] 루트 `package.json`: `exports["./live"]`, `exports["./live/runtime"]`, `files`, `build:live`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
-- [ ] 루트 `vite.config.js` vitest `exclude`에 `live/**` 추가
+- [x] 루트 `vite.config.js` vitest `exclude`에 `live/**` 추가 (Phase 4에서 선반영 — Phase 4 체크리스트 참고)
 - [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `live` 및 `live/runtime` 등록
 - [ ] `live/README.md`, `skills/lithent/reference/live.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트 (LLM이 1회 시도에 유효한 `lithent/live` 코드를 생성하는 규약 포함)
 - [ ] `lithentDocs` 가이드 페이지(영어·한국어) 및 **양방향 Generative UI 인터랙티브 플레이그라운드** (코드 실행 → 사용자 마우스 조작 → AI 도구 호출로 상태 변경 시연) 구축
@@ -421,23 +461,21 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
 
 - **done**:
   - Phase 0 문서 4종 작성 및 `DC-1`~`DC-14` 확정 (커밋 `d290fc3`)
-  - **Phase 1 (`lithent/agent` 코어 패키지)** — 브릿지, `DC-2` 스키마·검증, `agentAction`, `agentState`, `AgentScope`/`useAgentBridge`, `DC-3` 충돌 정책 (커밋 `c7917de`)
-  - **Phase 2 (어댑터)** — `setConfirmHandler`·액션별 `confirm`(`DC-5`, 보안 기본값 `REJECTED`), `connectWebMCP`(`DC-4`, 현재 WebMCP에 맞춘 편차 포함), `lithent/element` 연동 확인 (커밋 `1d08cc8`)
-  - **Phase 2 후속** — `DC-15`(`scopeId` 구분자 `__`), `DC-16`(예산 2,500 B, `connectWebMCP` tree-shaking) 반영 (커밋 `effa28f`)
-  - **Phase 3 (배포 연결·스킬·문서)** — 루트 `exports["./agent"]`·`files`·빌드/테스트 스크립트, `size-report.js`(2,500 B)·`verify-release.mjs`(13개 경로)·`ci-build-artifacts.mjs`·`release-policy.json` 등재, `agent/README.md`, `skills/lithent/reference/agent.md`, `SKILL.md`, `lithent-agent-addon.md`, 문서 사이트 `/guide/agent-native`(영어·한국어)
-  - Phase 3 게이트: `pnpm build`·`pnpm size`·`pnpm test:dual`·`pnpm verify:release`·`pnpm build:docs` 통과, CI fixture 50/50 (Phase 3 "검증 기록", 커밋 `381f491`)
-  - **Phase 3 후속 (리뷰 반영)** — `doc-driven-reviewer-v1` `APPROVE` 리뷰의 Warning 1~4·Suggestion 1~2 반영(`useAgentBridge` 자식 전달, `connectWebMCP` 실패 정리, 직접 호출 예외 후 알림, `Number.isFinite`, 경고 키, `Refs:`), Suggestion 3~4는 사유 기록 후 보류. 테스트 base·concurrent 각 91/91, 2,374 / 2,500 B
+  - **`lithent/agent` (Phase 1~3 + 후속)** — 코어·어댑터·배포 연결·스킬·문서 사이트, `DC-15`·`DC-16` 반영, Phase 1~3 리뷰(`APPROVE`) 반영 (커밋 `c7917de` → `1d08cc8` → `effa28f` → `381f491` → `c470fb5` → `ed97caa`)
+  - **Phase 4 (`lithent/live` 샌드박스 런타임·RPC)** — `live/` 패키지, `mountLive`(Sandbox 모드)·`LiveHandle`, srcdoc·CSP·`DC-13` 검사, 샌드박스 런타임(`sandboxRuntime.umd.js`, `sandboxRuntimeCode` 문자열 모듈), postMessage RPC(채널·source 검증, 타임아웃, 호스트 측 승인 `DC-14`)
+  - Phase 4 검증: live 테스트 base·concurrent 각 53/53, 호스트 2,084 / 3,000 B·런타임 8,277 / 11,000 B, 실제 Chromium에서 격리·CSP·RPC 동작 확인, 루트 `test:core` 무회귀, 코어 diff 0줄 (Phase 4 "검증 기록")
 - **next**:
-  1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스 필수, `DC-10`) — 결과 기록 후 릴리스(버전·CHANGELOG·publish) 진행 여부 결정
-  2. Phase 4: `lithent/live` 샌드박스 런타임 및 `postMessage` RPC 브릿지 (`live/` 패키지)
-- **blockers**: 없음 (1차 릴리스만 수동 체크 대기)
+  1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스 필수, `DC-10`)
+  2. 사용자 결정: Phase 4 리뷰(`doc-driven-reviewer-v1`) 여부
+  3. Phase 5: `mode: 'direct'`(Shadow DOM), `<lithent-live>` 래퍼, `LiveError.hint` 생성기, `autoResize`(`resize` 메시지)·`theme`
+- **blockers**: 없음
 - **risks / follow-ups**:
-  - 크기 여유 126 B (2,374 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
-  - 이름 규칙: 라이브러리는 `name`·`scopeId`에 `[a-zA-Z0-9_-]` 외 문자가 들어가도 검사하지 않는다 (`DESIGN.md` §2.5). 필요하면 Phase 7에서 개발 경고 추가를 검토.
-  - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면, 아직 마운트된 이전 인스턴스는 다시 등록되지 않는다 (설계대로의 동작). Phase 7 경계 테스트에서 의도 확인 권장.
-  - WebMCP는 표준화 진행 중이다. `annotations`(`consequentialHint` 등)와 `requiresConfirm` 매핑, `execute`의 `{ signal }` 취소는 미반영 (`DESIGN.md` §2.6). 실제 Chrome 검증은 `M-2`(수동)와 Phase 8 E2E에서 한다.
-  - `useAgentBridge()` 위임 브릿지의 메서드(`setConfirmHandler` 포함)는 컴포넌트가 그려지기 전(mounter 안)에 호출하면 `defaultAgentBridge`로 간다. 자식·Custom Element에 넘기는 것은 Phase 3 후속에서 지원.
-  - 보류한 리뷰 제안: `listTools()` 반환값 방어 복사(Suggestion 3), 위성 패키지 `repository.url` 형식(Suggestion 4) — "Phase 3 후속" 사유 참고.
-  - 패키지 tarball의 `agent/src`에는 `lithent/element`와 같이 테스트 파일도 포함된다 (`files` 패턴 관례).
-  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. `pnpm test:ci`는 Node 24 옵션(`--test-isolation=none`) 때문에 Node 22에서 시작하지 못하므로 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대신 실행했다. agent의 element 연동 테스트는 `element/dist`가 필요하다.
-- **latest commit**: `c470fb5` (Phase 3 handoff 정정). "Phase 3 후속" 변경은 이 기록 직후 커밋한다
+  - `lithent/agent` 크기 여유 126 B (2,374 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
+  - srcdoc 문서는 호스트 페이지 CSP를 상속한다. 호스트 CSP가 `'unsafe-eval'`·인라인 스크립트를 막으면 샌드박스가 시작하지 못한다 — Phase 7·8에서 확인하고 필요하면 문서·`runtimeUrl` 안내를 보강 (`DESIGN.md` §3.3 구현 메모).
+  - `mountLive`는 시작 실패 시 reject하고 핸들을 주지 않는다. IMPLEMENT Phase 7의 "오류 복구 루프"는 `reload` 실패 → `reload` 성공 경로와 `mountLive` 재호출로 검증한다 (`DESIGN.md` §3.4 구현 세부).
+  - 이름 규칙: `name`·`scopeId`에 `[a-zA-Z0-9_-]` 외 문자를 검사하지 않는다 (`DESIGN.md` §2.5). 필요하면 Phase 7에서 개발 경고 추가를 검토.
+  - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면 이전 인스턴스는 다시 등록되지 않는다 (설계대로). Phase 7 경계 테스트에서 의도 확인 권장.
+  - WebMCP 표준화 진행 중: `annotations`와 `requiresConfirm` 매핑, `execute`의 `{ signal }` 취소는 미반영 (`DESIGN.md` §2.6).
+  - 보류한 리뷰 제안: `listTools()` 반환값 방어 복사, 위성 패키지 `repository.url` 형식 ("Phase 3 후속" 사유).
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체. live 런타임 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
+- **latest commit**: `ed97caa` (Phase 1~3 리뷰 반영). Phase 4 변경은 이 기록 직후 커밋한다

@@ -1,0 +1,32 @@
+{
+  "type": "module",
+  "name": "lithent-live",
+  "version": "0.1.0",
+  "description": "Run LLM-generated lithent widgets in a sandbox and drive them through lithent/agent",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "main": "./dist/lithentLive.cjs",
+  "module": "./dist/lithentLive.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest",
+    "build": "vite build && vite build -c vite.runtime.config.js && node scripts/build-runtime-module.mjs"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent",
+    "generative-ui",
+    "sandbox",
+    "agent"
+  ],
+  "peerDependencies": {
+    "lithent": "workspace:*"
+  }
+}
