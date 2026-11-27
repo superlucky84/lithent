@@ -38,6 +38,7 @@ const Row = mount<{ key: number; id: number }>((renew, props) => {
 });
 const App = mount(renew => {
   let ids = [1, 2, 3];
+  let photo: string | null | undefined = null;
   return () =>
     jsxs(
       'section',
@@ -53,6 +54,17 @@ const App = mount(renew => {
           }),
           node('ul', { children: ids.map(id => node(Row, { id }, id)) }),
           node('footer', { children: 'static tail' }),
+          node('button', {
+            children: 'toggle photo',
+            onClick: () => {
+              photo = photo == null ? 'A' : undefined;
+              renew();
+            },
+          }),
+          node('div', {
+            id: 'photo-layer',
+            children: photo && node('img', { alt: photo }),
+          }),
         ],
       },
       undefined

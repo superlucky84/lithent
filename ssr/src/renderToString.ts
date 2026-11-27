@@ -53,7 +53,7 @@ function wDomToString(wDom: WDom) {
 
     if (innerHTML) {
       element = `<${tag}${makeProp(props)}>${innerHTML}</${tag}>`;
-    } else if (isAllowSelfClose(tag) && !children.length) {
+    } else if (isAllowSelfClose(tag) && !children.some(child => child.type)) {
       element = `<${tag}${makeProp(props)} />`;
     } else {
       element = `<${tag}${makeProp(props)}>`;

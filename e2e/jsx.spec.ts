@@ -1,6 +1,23 @@
 import { test, expect, ready } from './test';
 
 for (const mode of ['jsx', 'jsxDEV']) {
+  test(`${mode}: nullish conditional children preserve the parent DOM node`, async ({
+    page,
+  }, info) => {
+    await ready(page, `/e2e/fixtures/jsx.html?mode=${mode}`, info.project.name);
+    const layer = page.locator('#photo-layer');
+    const original = await layer.elementHandle();
+    const image = layer.locator('img');
+    await expect(image).toHaveCount(0);
+    for (const count of [1, 0, 1]) {
+      await page.getByRole('button', { name: 'toggle photo' }).click();
+      await expect(image).toHaveCount(count);
+      expect(
+        await layer.evaluate((el, initial) => el === initial, original)
+      ).toBe(true);
+    }
+  });
+
   test(`${mode}/jsxs: dynamic keyed arrays preserve state and DOM among static siblings`, async ({
     page,
   }, info) => {

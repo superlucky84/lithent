@@ -9,6 +9,10 @@ function render(Comp: ReturnType<typeof mount>): string {
   return renderToString(h(Comp, {}));
 }
 
+it('self-closes a void element with an empty child slot', () => {
+  expect(renderToString(h('br', {}, null))).toBe('<br />');
+});
+
 // ── Text node HTML escaping ──
 
 describe('renderToString — text node HTML escaping', () => {
