@@ -394,4 +394,4 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - `useAgentBridge()` 위임 브릿지의 메서드(`setConfirmHandler` 포함)는 마운트 전에 호출하면 `defaultAgentBridge`로 간다.
   - 패키지 tarball의 `agent/src`에는 `lithent/element`와 같이 테스트 파일도 포함된다 (`files` 패턴 관례).
   - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. `pnpm test:ci`는 Node 24 옵션(`--test-isolation=none`) 때문에 Node 22에서 시작하지 못하므로 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대신 실행했다. agent의 element 연동 테스트는 `element/dist`가 필요하다.
-- **latest commit**: `effa28f` (Phase 2 후속). Phase 3 변경은 아직 커밋하지 않음 — not committed yet
+- **latest commit**: `381f491` (Phase 3, `feat/agent-ui`에 푸시됨)
