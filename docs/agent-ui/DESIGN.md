@@ -2,10 +2,10 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정, `DC-17` TBD) — Phase 1~3 (`lithent/agent`) 및 Phase 4~5 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 6 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-17` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4~5 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 6 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
-> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`도 같은 날 사용자 결정으로 확정되었고, `DC-17`은 아직 결정되지 않았다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.
+> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`·`DC-17`도 같은 날 사용자 결정으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.
 
 ---
 
@@ -398,7 +398,7 @@ LLM이 생성하는 코드는 **빌드 없는 표준 JS**이며, 런타임이 �
 
 코드 진입점 및 런타임 분리 규약 (`DC-6`, `DC-9`, `DC-13` 확정):
 - `import` 문 없이 주입된 심볼을 사용하는 빌드 없는 JS 함수 본문(`return lmount((props) => { ... })`)으로 통일한다.
-- 호스트 컨트롤러(`lithent/live`, ≤ 3,000 B brotli)가 코어 전체(4.8KB+)를 끌어안아 비대해지지 않도록, iframe 내부용 자체 포함 런타임(`lithent` + `helper` + `ftags` + `tag` + `agent` + 부트스트랩)은 별도 서브패스 **`lithent/live/runtime`**(`sandboxRuntimeCode` 문자열 export + `live/dist/sandboxRuntime.umd.js`)로 분리한다.
+- 호스트 컨트롤러(`lithent/live`, ≤ 5,500 B brotli — `DC-17`, 원래 3,000 B)가 코어 전체(4.8KB+)를 끌어안아 비대해지지 않도록, iframe 내부용 자체 포함 런타임(`lithent` + `helper` + `ftags` + `tag` + `agent` + 부트스트랩)은 별도 서브패스 **`lithent/live/runtime`**(`sandboxRuntimeCode` 문자열 export + `live/dist/sandboxRuntime.umd.js`)로 분리한다.
   - 오프라인/단일 HTML/엄격 CSP: `import { sandboxRuntimeCode } from 'lithent/live/runtime'` → `runtimeCode`로 인라인 주입 (외부 요청 0건).
   - CDN/캐시 공유: `runtimeUrl`로 `sandboxRuntime.umd.js` URL 전달.
   - `mode: 'sandbox'`에서 `runtimeCode`와 `runtimeUrl`이 둘 다 생략되면 외부 CDN을 암묵적으로 호출하지 않고 명확한 설정 오류(`LiveError(phase: 'compile')`)를 반환한다 (`DC-13` 확정).
@@ -480,7 +480,7 @@ type LiveRpcMessage =
 - 외부 의존성: **0개** (런타임 zero-dependency)
 - 크기 예산(`DC-9` 확정):
   - `agent/dist/lithentAgent.umd.js`: ≤ **2,500 B** brotli (`DC-16`으로 2,000 B에서 상향; `connectWebMCP`는 같은 엔트리, ESM 소비자는 tree-shaking)
-  - `live/dist/lithentLive.umd.js` (호스트 컨트롤러): ≤ **3,000 B** brotli
+  - `live/dist/lithentLive.umd.js` (호스트 컨트롤러): ≤ **5,500 B** brotli (`DC-17`으로 3,000 B에서 상향; Direct 모드·`<lithent-live>` 포함, ESM 소비자는 tree-shaking·지연 청크)
   - `live/dist/sandboxRuntime.umd.js` (iframe 자체 포함 런타임: core + helper + ftags + tag + agent + bootstrap): ≤ **11,000 B** brotli
   - 코어 `dist/lithent.umd.js`: ≤ 4,800 B (무변화)
 
@@ -547,10 +547,10 @@ type LiveRpcMessage =
   - 검증: Phase 5, `M-3`, `M-6`
 
 - [x] **DC-9 — 번들 크기 예산**
-  - **확정**: `lithent/agent` ≤ **2,500 B** brotli (원래 2,000 B → 2026-11-27 `DC-16` 결정으로 상향), `lithent/live` (호스트 컨트롤러) ≤ **3,000 B** brotli, `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
+  - **확정**: `lithent/agent` ≤ **2,500 B** brotli (원래 2,000 B → 2026-11-27 `DC-16` 결정으로 상향), `lithent/live` (호스트 컨트롤러) ≤ **5,500 B** brotli (원래 3,000 B → 2026-11-27 `DC-17` 결정으로 상향), `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
   - **근거**: 호스트 앱에 추가되는 오버헤드와 샌드박스 자체 포함 런타임 예산을 분리해 `lithent`의 초경량 정체성을 CI 게이트로 강제한다.
   - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (원래 예산 2,000 B 초과 → `DC-16`으로 예산 2,500 B 확정, 여유 160 B) → Phase 3 리뷰 반영 후 **2,374 B** (여유 126 B).
-  - **측정 기록 (`lithent/live`)**: Phase 4 종료 호스트 2,084 B · 런타임 8,277 B → Phase 5 종료 호스트 **4,536 B**(예산 3,000 B를 1,536 B 초과) · 런타임 8,485 B. 호스트 초과 대응은 `DC-17`(TBD)에서 결정한다.
+  - **측정 기록 (`lithent/live`)**: Phase 4 종료 호스트 2,084 B · 런타임 8,277 B → Phase 5 종료 호스트 **4,536 B**(원래 예산 3,000 B 초과 → `DC-17`으로 예산 5,500 B 확정, 여유 964 B) · 런타임 8,485 B.
   - 검증: Phase 3, Phase 6 (`pnpm size`)
 
 - [x] **DC-10 — 릴리스 순서 (단계적 출하 여부)**
@@ -597,13 +597,14 @@ type LiveRpcMessage =
   - **확인 기록**: 결정 반영 후 UMD 2,340 B / 2,500 B (여유 160 B). tree-shaking: `agent/dist/lithentAgent.mjs`를 esbuild로 번들(`lithent` external, minify)하면 `connectWebMCP`를 import하지 않는 소비자 번들은 brotli 1,879 B이고 `modelContext`·`AbortController` 코드가 포함되지 않는다. import하면 2,174 B다. (`sideEffects: false`인 루트 패키지 서브패스로 배포)
   - 검증: Phase 3 (`scripts/size-report.js`에 2,500 B로 등재, `pnpm size`).
 
-- [ ] **DC-17 — `lithent/live` 호스트 UMD 크기 예산 초과 대응 (TBD — Phase 5 구현 후 발견, 사용자 결정 대기)**
-  - **문제**: Phase 5 종료 시 `live/dist/lithentLive.umd.js`가 brotli **4,536 B**로 `DC-9` 예산(3,000 B)을 1,536 B 초과한다. UMD는 코드 분할이 없어 Direct 모드의 `boot`까지 한 파일에 들어간다. esbuild로 기능별 기여를 따로 재면(빌드 도구 차이로 절대값은 vite보다 조금 크다): 기본(Sandbox + 테마·리사이즈) 약 2,800 B, Direct 모드 약 +710~840 B, 자기 수정 힌트 약 +500~660 B, `<lithent-live>` 약 +650 B. 어느 하나만 빼서는 3,000 B 안에 들어오지 않는다.
-  - **ESM 소비자 참고**: Direct 모드는 별도 청크라 Sandbox만 쓰는 ESM 소비자는 `boot`와 helper·ftags·tag·agent를 싣지 않는다.
+- [x] **DC-17 — `lithent/live` 호스트 UMD 크기 예산 초과 대응 (Phase 5 구현 후 발견)**
+  - **문제**: Phase 5 종료 시 `live/dist/lithentLive.umd.js`가 brotli **4,536 B**로 `DC-9`의 원래 예산(3,000 B)을 1,536 B 초과했다. UMD는 코드 분할이 없어 Direct 모드의 `boot`까지 한 파일에 들어간다. esbuild로 기능별 기여를 따로 재면(빌드 도구 차이로 절대값은 vite보다 조금 크다): 기본(Sandbox + 테마·리사이즈) 약 2,800 B, Direct 모드 약 +710~840 B, 자기 수정 힌트 약 +500~660 B, `<lithent-live>` 약 +650 B. 어느 하나만 빼서는 3,000 B 안에 들어오지 않았다.
   - **옵션**:
-    - A) `lithent/live` 호스트 예산을 상향 (예: **5,000 B**, 현재 구조 유지, Phase 7 여유 약 460 B).
-    - B) Direct 모드와 `<lithent-live>`를 별도 서브패스(예: `lithent/live/direct`, `lithent/live/element`)로 분리하고 `lithent/live`는 Sandbox 호스트만 담는다 (현재 API `mode: 'direct'`·`defineLiveElement` 위치가 바뀜).
+    - A) `lithent/live` 호스트 예산을 상향 (현재 구조 유지).
+    - B) Direct 모드와 `<lithent-live>`를 별도 서브패스(예: `lithent/live/direct`, `lithent/live/element`)로 분리하고 `lithent/live`는 Sandbox 호스트만 담는다 (`mode: 'direct'`·`defineLiveElement` 위치가 바뀜).
     - C) 기능·문구를 줄여 3,000 B에 가깝게 (힌트 문구 축약 등으로는 수백 B 수준이라 단독으로는 부족).
-    - D) 예산 측정 대상을 UMD 대신 ESM 기본 청크(minify)로 바꾼다 (Direct 모드 청크 제외).
-  - **영향**: Phase 6의 `scripts/size-report.js` 게이트 등재 전에 결정되어야 한다 (Phase 6 진입 조건).
-  - 검증: Phase 6 (`pnpm size`).
+    - D) 예산 측정 대상을 UMD 대신 ESM 기본 청크(minify)로 바꾼다.
+  - **확정 (2026-11-27 사용자 결정)**: 옵션 A — `lithent/live` 호스트 예산을 **5,500 B** brotli로 상향한다 (5,000 B안은 현재 합계에 거의 붙어 있어 Phase 7 하드닝 여유분 추가). `DC-16`과 같은 원칙으로 API는 분리하지 않고 구조를 유지하며, 측정 기준도 UMD brotli(`scripts/size-report.js`)를 유지한다.
+  - **근거**: `mode: 'direct'`와 `defineLiveElement`를 `lithent/live` 한 엔트리에 두는 단순한 API를 지키고, CDN 사용자가 받는 UMD를 그대로 게이트로 삼는다. Sandbox만 쓰는 ESM 소비자는 아래처럼 tree-shaking·지연 청크로 비용을 덜 낸다.
+  - **확인 기록 (ESM tree-shaking, 참고)**: `live/dist/lithentLive.mjs`를 esbuild로 번들(`lithent`·하위 경로 external, minify, splitting)하면 `defineLiveElement`를 import하지 않는 소비자의 초기 청크는 brotli **3,093 B**이고 `<lithent-live>` 코드(`live-ready`, `customElements.define`)가 포함되지 않는다. import하면 3,741 B(+648 B). 두 경우 모두 Direct 모드 청크(878 B + 147 B)는 `mode: 'direct'`를 쓸 때만 지연 로드된다. 결정 시점 UMD는 4,536 / 5,500 B (여유 964 B).
+  - 검증: Phase 6 (`scripts/size-report.js`에 5,500 B로 등재, `pnpm size`).

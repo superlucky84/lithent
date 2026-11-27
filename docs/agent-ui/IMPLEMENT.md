@@ -385,7 +385,7 @@ Refs: RQ-6, RQ-7, RQ-8, DC-6, DC-7, DC-8, M-3, M-5, M-6
 - [x] `pnpm --filter lithent-live test` → 7 files, **97/97** / `LITHENT_CORE=concurrent` → 7 files, **97/97**
 - [x] `pnpm --filter lithent-live build` → 성공 (타입 검사 + ESLint). 산출물에 Direct 모드 청크 `boot-*.js`·`boot-*.cjs`와 공유 `names-*` 청크 추가
 - [x] 실제 Chromium(Playwright, 요청 가로채기로 빌드 산출물 제공, 저장소에 임시 파일 없음): Sandbox `autoResize`로 iframe 높이 120px → 260px, 테마 변수 적용(계산 색 `rgb(1, 2, 3)`), Direct 모드(ESM 청크 로드·Shadow DOM·`callTool`·테마), `<lithent-live>`(`live-ready`·`el.bridge` 호출·`props` 갱신), 실제 V8 오류의 JSX·React 힌트, 페이지 오류 0건
-- [ ] **크기**: `lithentLive.umd.js` brotli **4,536 B > 3,000 B** (`DC-9` 초과, 1,536 B). 종료 조건 항목은 아니지만 Phase 6 크기 게이트를 막으므로 `DESIGN.md` `DC-17`(TBD)로 기록했다. `sandboxRuntime.umd.js` 8,485 / 11,000 B (통과)
+- [x] **크기**: `lithentLive.umd.js` brotli **4,536 B** — 당시 예산 3,000 B를 1,536 B 초과해 `DESIGN.md` `DC-17`(TBD)로 기록했고, 2026-11-27 `DC-17` 결정으로 예산이 5,500 B가 되어 통과 ("Phase 5 후속" 참고). `sandboxRuntime.umd.js` 8,485 / 11,000 B
 - [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
 
 Files:
@@ -411,18 +411,43 @@ Files:
 
 ---
 
+## Phase 5 후속 — `DC-17` 결정 반영: done
+
+Refs: DC-9, DC-17, RQ-10
+
+### 진입 조건
+- Phase 5 종료 (커밋 `97709b1`), 2026-11-27 사용자 결정: `DC-17` → 옵션 A, `lithent/live` 호스트 예산 5,500 B (Phase 7 하드닝 여유 포함), API 분리 없음, 측정 기준 UMD brotli 유지.
+
+### 체크리스트
+- [x] `DESIGN.md`: `DC-17` 확정 기록(옵션·근거·ESM tree-shaking 참고 기록), `DC-9` 확정 예산과 측정 기록, §3.2·§5 호스트 예산을 5,500 B로 갱신
+- [x] `REQUIREMENTS.md`: 상태 줄, 구분 표기, `RQ-10` 호스트 예산 5,500 B
+- [x] `IMPLEMENT.md`: Phase 5 크기 항목, Phase 6 진입 조건(충족)과 `size-report.js` 등재 예산, Handoff
+- [x] ESM tree-shaking 참고 측정 (`DC-16`과 같은 방식)
+
+### 검증 기록 (2026-11-27)
+- [x] 호스트 UMD `lithentLive.umd.js` **4,536 / 5,500 B** brotli (여유 964 B) — Phase 5 빌드 그대로, 코드 변경 없음
+- [x] ESM tree-shaking: esbuild로 `live/dist/lithentLive.mjs` 번들(`lithent`·하위 경로 external, minify, splitting) — `defineLiveElement` 미사용 소비자 초기 청크 3,093 B br(`live-ready`·`customElements.define` 미포함), 사용 시 3,741 B br. Direct 모드 청크 878 B + 147 B는 두 경우 모두 지연 로드
+- [x] `docatlas check --strict` 통과
+
+Files:
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
+
+---
+
 ## Phase 6 — `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모: planned
 
 Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-6, DC-9, DC-10, M-3, M-6, M-7
 
 ### 진입 조건
 - Phase 5 종료 조건 충족.
-- `DESIGN.md` `DC-17`(`lithent/live` 호스트 크기 예산 초과 대응) 결정 — `scripts/size-report.js`에 등재할 예산과, 옵션 B 선택 시 서브패스 추가 여부가 이 결정에 달려 있다. (Phase 5 종료 시 추가)
+- `DESIGN.md` `DC-17`(`lithent/live` 호스트 크기 예산 초과 대응) 결정 — 충족: 옵션 A, 호스트 예산 5,500 B, API 분리 없음, 측정 기준 UMD brotli 유지 (2026-11-27).
 
 ### 구현 체크리스트
 - [ ] 루트 `package.json`: `exports["./live"]`, `exports["./live/runtime"]`, `files`, `build:live`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
 - [x] 루트 `vite.config.js` vitest `exclude`에 `live/**` 추가 (Phase 4에서 선반영 — Phase 4 체크리스트 참고)
-- [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `live` 및 `live/runtime` 등록
+- [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `live` 및 `live/runtime` 등록 (`size-report.js` 예산: `lithentLive.umd.js` 5,500 B — `DC-17`, `sandboxRuntime.umd.js` 11,000 B)
 - [ ] `live/README.md`, `skills/lithent/reference/live.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트 (LLM이 1회 시도에 유효한 `lithent/live` 코드를 생성하는 규약 포함)
 - [ ] `lithentDocs` 가이드 페이지(영어·한국어) 및 **양방향 Generative UI 인터랙티브 플레이그라운드** (코드 실행 → 사용자 마우스 조작 → AI 도구 호출로 상태 변경 시연) 구축
 - [ ] `README.md`, `CHANGELOG.md`, `docs/ideas/IDEAS.md` 상태 갱신
@@ -501,20 +526,19 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - **`lithent/agent` (Phase 1~3 + 후속)** — 코어·어댑터·배포 연결·스킬·문서 사이트, `DC-15`·`DC-16` 반영, Phase 1~3 리뷰 반영 (커밋 `c7917de` … `ed97caa`)
   - **Phase 4 (`lithent/live` Sandbox 모드·RPC)** (커밋 `d3c6afe`)
   - **Phase 5 (`lithent/live` Direct 모드·`<lithent-live>`·힌트·리사이즈·테마)** — `mode: 'direct'`(같은 `boot`를 Shadow Root에서, 동적 청크), `defineLiveElement()`(plain Custom Element, light DOM — 설계 편차), 호스트 측 자기 수정 힌트, `ResizeObserver` 자동 높이, `theme` CSS 변수
-  - Phase 5 검증: live 테스트 base·concurrent 각 97/97, Chromium에서 높이 맞춤·테마·Direct·요소·실제 오류 힌트 확인, 코어 diff 0줄 (Phase 5 "검증 기록")
+  - Phase 5 검증: live 테스트 base·concurrent 각 97/97, Chromium에서 높이 맞춤·테마·Direct·요소·실제 오류 힌트 확인, 코어 diff 0줄 (Phase 5 "검증 기록", 커밋 `97709b1`)
+  - **Phase 5 후속 (`DC-17` 결정 반영)** — `lithent/live` 호스트 예산 5,500 B(현재 4,536 B, 여유 964 B), API 분리 없음, UMD brotli 기준 유지, ESM tree-shaking 참고 기록
 - **next**:
-  1. 사용자 결정: `DC-17` (`lithent/live` 호스트 4,536 B > 3,000 B: A 예산 상향 / B Direct·요소 서브패스 분리 / C 축소 / D ESM 기본 청크로 측정) — **Phase 6 진입 조건**
-  2. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스)
-  3. 사용자 결정: Phase 4~5 리뷰(`doc-driven-reviewer-v1`) 여부
-  4. Phase 6: 루트 `exports["./live"]`·`["./live/runtime"]`, 빌드·테스트·크기·릴리스 스크립트 등재, README·스킬·문서 사이트·인터랙티브 플레이그라운드
-- **blockers**:
-  - Phase 6 착수: `DC-17` 결정 필요
+  1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스)
+  2. 사용자 결정: Phase 4~5 리뷰(`doc-driven-reviewer-v1`) 여부
+  3. Phase 6: 루트 `exports["./live"]`·`["./live/runtime"]`, 빌드·테스트·크기·릴리스 스크립트 등재, README·스킬·문서 사이트·인터랙티브 플레이그라운드
+- **blockers**: 없음 (Phase 6 진입 조건 `DC-17` 충족)
 - **risks / follow-ups**:
-  - `lithent/agent` 크기 여유 126 B (2,374 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
+  - 크기 여유: `lithent/agent` 126 B (2,374 / 2,500 B), `lithent/live` 호스트 964 B (4,536 / 5,500 B), 런타임 2,515 B (8,485 / 11,000 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
   - Phase 6 `verify-release`: `live/dist`에 해시가 붙은 청크(`boot-*`, `names-*`)가 있으므로 `files`·패킹·소비자 검사에서 청크가 함께 실리는지 확인해야 한다.
   - Direct 모드를 UMD로 쓰려면 `lithentHelper`·`lithentFTags`·`lithentTag`·`lithentAgent` 전역이 필요하다 — Phase 6 README·문서에 명시.
   - srcdoc 문서는 호스트 페이지 CSP를 상속한다 — 엄격한 호스트 CSP에서의 동작은 Phase 7·8에서 확인 (`DESIGN.md` §3.3 구현 메모).
   - `mountLive`는 시작 실패 시 reject하고 핸들을 주지 않는다 — Phase 7 "오류 복구 루프"는 `reload` 실패 → 성공과 `mountLive` 재호출로 검증.
   - 이름 규칙 검사 없음(`DESIGN.md` §2.5), `DC-3` 덮어쓰기 후 이전 인스턴스 미재등록, WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건 — Phase 7 검토 후보.
   - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
-- **latest commit**: `d3c6afe` (Phase 4). Phase 5 변경은 이 기록 직후 커밋한다
+- **latest commit**: `97709b1` (Phase 5). "Phase 5 후속" 변경은 아직 커밋하지 않음 — not committed yet

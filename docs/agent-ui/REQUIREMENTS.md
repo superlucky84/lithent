@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정, `DC-17` TBD) — Phase 1~3 (`lithent/agent`) 및 Phase 4~5 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 6 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-17` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4~5 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 6 대기**
 - 문서 위치 및 코드 범위:
   - 정규 문서: `docs/agent-ui/` (`REQUIREMENTS.md` → `DESIGN.md` → `IMPLEMENT.md` → `MANUAL_TEST_CHECKLIST.md`)
   - 확정 코드 범위 (`DC-1`):
@@ -12,7 +12,7 @@
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.1, §3.1, §3.4 · [../element/REQUIREMENTS.md](../element/REQUIREMENTS.md)
 
-> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-16`은 **확정 설계**이다 (`DC-15`·`DC-16`은 구현 중 발견되어 2026-11-27 사용자 결정으로 확정, `DC-17`은 결정 대기). **구현 상태**: Phase 1~2 완료 — `RQ-1`~`RQ-5`가 `agent/`에 구현되었다 (`RQ-4`의 `lithent/element` 연동 포함). `RQ-10`의 `lithent/agent` 예산은 `DC-16`으로 2,500 B가 되었고 현재 2,374 B로 그 안에 있다. Phase 3에서 `lithent/agent`가 `RQ-10`(`pnpm size` 게이트)·`RQ-11`(`pnpm test:dual`)·`RQ-12`(ESM/CJS/UMD/d.ts, `verify:release`, 스킬·`lithent-agent-addon.md`) 게이트에 등재되어 통과했다. `RQ-12`의 실제 브라우저(Playwright) 검증은 Phase 8에서 한다. Phase 4에서 `lithent/live`의 Sandbox 모드(`RQ-6`의 빌드 없는 코드 실행, `RQ-7`의 Sandbox 격리, `RQ-8`의 양방향 브릿지·구조화된 오류)가 `live/`에 구현되었다 (호스트 2,084 / 3,000 B, 런타임 8,277 / 11,000 B). Phase 5에서 Direct 모드(`RQ-7`의 명시적 opt-in)·`<lithent-live>`·자기 수정 힌트(`RQ-8`)·자동 높이·테마가 추가되었다. 호스트 UMD는 4,536 B로 `RQ-10`의 3,000 B를 넘어 `DC-17`(TBD)로 기록했다 (런타임 8,485 / 11,000 B).
+> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-17`은 **확정 설계**이다 (`DC-15`·`DC-16`·`DC-17`은 구현 중 발견되어 2026-11-27 사용자 결정으로 확정). **구현 상태**: Phase 1~2 완료 — `RQ-1`~`RQ-5`가 `agent/`에 구현되었다 (`RQ-4`의 `lithent/element` 연동 포함). `RQ-10`의 `lithent/agent` 예산은 `DC-16`으로 2,500 B가 되었고 현재 2,374 B로 그 안에 있다. Phase 3에서 `lithent/agent`가 `RQ-10`(`pnpm size` 게이트)·`RQ-11`(`pnpm test:dual`)·`RQ-12`(ESM/CJS/UMD/d.ts, `verify:release`, 스킬·`lithent-agent-addon.md`) 게이트에 등재되어 통과했다. `RQ-12`의 실제 브라우저(Playwright) 검증은 Phase 8에서 한다. Phase 4에서 `lithent/live`의 Sandbox 모드(`RQ-6`의 빌드 없는 코드 실행, `RQ-7`의 Sandbox 격리, `RQ-8`의 양방향 브릿지·구조화된 오류)가 `live/`에 구현되었다 (호스트 2,084 / 3,000 B, 런타임 8,277 / 11,000 B). Phase 5에서 Direct 모드(`RQ-7`의 명시적 opt-in)·`<lithent-live>`·자기 수정 힌트(`RQ-8`)·자동 높이·테마가 추가되었다. 호스트 UMD는 4,536 B로 원래 예산 3,000 B를 넘었고, `DC-17`으로 예산이 5,500 B가 되어 그 안에 있다 (런타임 8,485 / 11,000 B).
 
 ---
 
@@ -119,7 +119,7 @@ AI 시대에 다른 UI 프레임워크가 구조적으로 따라오기 어려운
 | ID | 요구사항 | 측정/검증 방법 |
 |---|---|---|
 | **RQ-9** | 코어 무수정: `src/`와 `lithentConcurrent/src/` diff 0줄 | `git diff --stat main -- src lithentConcurrent/src` |
-| **RQ-10** | 번들 크기 예산 (`DC-9` 확정, `DC-16`으로 `lithent/agent` 상향): `lithent/agent` UMD ≤ **2,500 B** (원래 2,000 B), `lithent/live` 호스트 UMD ≤ **3,000 B**, `lithent/live/runtime` 샌드박스 UMD ≤ **11,000 B** brotli (코어 4,800 B 무변화) | `pnpm size` (`scripts/size-report.js`) |
+| **RQ-10** | 번들 크기 예산 (`DC-9` 확정, `DC-16`·`DC-17`로 `lithent/agent`·`lithent/live` 상향): `lithent/agent` UMD ≤ **2,500 B** (원래 2,000 B), `lithent/live` 호스트 UMD ≤ **5,500 B** (원래 3,000 B, `DC-17`로 상향), `lithent/live/runtime` 샌드박스 UMD ≤ **11,000 B** brotli (코어 4,800 B 무변화) | `pnpm size` (`scripts/size-report.js`) |
 | **RQ-11** | 양쪽 코어 호환 및 기존 스위트 무회귀: base + `LITHENT_CORE=concurrent` 테스트 및 기존 `pnpm test` 전부 통과 | `pnpm test:dual`, `pnpm test` |
 | **RQ-12** | 패키지 배포·타입·문서 완결성: ESM/CJS/UMD/d.ts 산출물, `scripts/verify-release.mjs` 통과, `skills/lithent` 및 `lithent-agent-addon.md` 업데이트, 실제 브라우저(Playwright) 검증 | `pnpm build`, `pnpm verify:release`, `pnpm test:e2e` |
 
