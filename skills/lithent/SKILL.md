@@ -423,6 +423,35 @@ defineElement('pay-button', PayButton, { props: { amount: Number } });
 
 See `reference/element.md` for prop conversion, events, styles and lifecycle.
 
+## AI agents (optional)
+
+`lithent/agent` lets an AI agent call the same actions a person triggers and
+read component state as JSON, through a bridge with JSON Schema tools.
+
+```tsx
+import { agentAction, agentState, AgentScope, createAgentBridge } from 'lithent/agent';
+
+const Counter = mount(renew => {
+  let count = 0;
+  const add = agentAction({
+    name: 'add_count',
+    description: 'Add to the counter',
+    params: { by: { type: Number, required: true } },
+    run: ({ by }) => { count += by; renew(); return count; },
+  });
+  agentState('counter', () => ({ count }));
+  return () => <button onClick={() => add({ by: 1 })}>{count}</button>;
+});
+
+const bridge = createAgentBridge();
+render(<AgentScope bridge={bridge}><Counter /></AgentScope>, root);
+await bridge.callTool('add_count', { by: 5 }); // { ok: true, value: 5 }
+```
+
+Declare in the mounter. Agents go through `callTool` (checked, optionally
+confirmed); the returned function runs directly for UI handlers. See
+`reference/agent.md` for scopes, names, confirmation and WebMCP.
+
 ## Testing (optional)
 
 `lithent/test` renders into the test document and waits for lithent's
@@ -488,6 +517,16 @@ import { renderToString, hydration } from 'lithent/ssr';
 // Custom Elements
 import { defineElement, emit } from 'lithent/element';
 
+// AI agents
+import {
+  agentAction,
+  agentState,
+  AgentScope,
+  createAgentBridge,
+  useAgentBridge,
+  connectWebMCP,
+} from 'lithent/agent';
+
 // Tests (with @testing-library/dom for queries and events)
 import { render, act, cleanup } from 'lithent/test';
 
@@ -501,5 +540,5 @@ import { lTag } from 'lithent/tag';
 ## Additional materials (optional)
 
 - `constraints/` (rules, mistakes, troubleshooting)
-- `reference/` (props types, children types, lstore inference, events, concurrent, element, test)
+- `reference/` (props types, children types, lstore inference, events, concurrent, element, agent, test)
 - `examples/` (quick examples)

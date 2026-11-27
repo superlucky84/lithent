@@ -19,6 +19,7 @@
         "ftags/",
         "element/",
         "test/",
+        "agent/",
         "package.json",
         "vite.config.js",
         "scripts/emit-declaration-formats.mjs"

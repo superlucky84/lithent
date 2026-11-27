@@ -121,6 +121,14 @@ CODING GUIDELINES:
     - Without Vitest `globals: true`, add `afterEach(() => cleanup())`
     - Test a prop change through a parent that owns the value, not a second `render`
 
+14. AI AGENTS (when the user wants an assistant or agent to operate the UI)
+    - Suggest `lithent/agent`: `agentAction({ name, description, params, run })` and `agentState(name, getter)` in the mounter
+    - The returned function is the UI handler (runs directly); agents call `bridge.callTool(name, args)`, which checks arguments
+    - `callTool` resolves `{ ok, value }` or `{ ok: false, error: { code, message } }`; it never throws
+    - Tool and scope names use `[a-zA-Z0-9_-]` only; `scopeId` joins as `scope__name`
+    - Mark destructive actions `confirm: true` and set `bridge.setConfirmHandler`
+    - `connectWebMCP(bridge)` is opt-in; inside a Custom Element pass the bridge as an `Object` prop
+
 IMPORT PATHS:
 
 - Core: `import { mount, lmount, render, h, Fragment, portal, ref, nextTick } from 'lithent'`
@@ -132,6 +140,7 @@ IMPORT PATHS:
 - SSR: `import { renderToString, hydration } from 'lithent/ssr'`
 - Custom Elements: `import { defineElement, emit } from 'lithent/element'`
 - Tests: `import { render, act, cleanup } from 'lithent/test'`
+- AI agents: `import { agentAction, agentState, AgentScope, createAgentBridge, connectWebMCP } from 'lithent/agent'`
 - FTags: `import { fTags, fFragment, fMount } from 'lithent/ftags'`
 - HTM: `import { lTag } from 'lithent/tag'`
 
@@ -166,6 +175,8 @@ COMMON MISTAKES TO CATCH:
 - Using `deferRender` while the urgent state and heavy list share one component
 - Aliasing `lithent` with a prefix match so `lithent/helper` is rewritten too
 - Asserting right after an event in a test without `await act(...)`
+- Declaring `agentAction` / `agentState` in the updater instead of the mounter
+- Tool names with `.` or spaces (vendor tool-name rules reject them)
 
 REFERENCE MATERIALS (NOT PART OF BEHAVIORAL RULES):
 
@@ -173,6 +184,7 @@ For detailed code examples and API usage, refer to:
 node_modules/lithent/dist/skills/lithent/SKILL.md
 (concurrent details: node_modules/lithent/dist/skills/lithent/reference/concurrent.md)
 (custom elements: node_modules/lithent/dist/skills/lithent/reference/element.md)
+(AI agents: node_modules/lithent/dist/skills/lithent/reference/agent.md)
 (tests: node_modules/lithent/dist/skills/lithent/reference/test.md)
 
 This reference material provides comprehensive examples, patterns,

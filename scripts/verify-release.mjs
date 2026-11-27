@@ -86,6 +86,7 @@ const paths = [
   'lithent/ftags',
   'lithent/element',
   'lithent/test',
+  'lithent/agent',
   'lithent-concurrent',
   'lithent-concurrent/helper',
 ];
@@ -138,7 +139,13 @@ assert.equal(element.defineElement('no-dom', () => null), undefined);
 const testing = await import('lithent/test');
 assert.deepEqual(Object.keys(testing).sort(), ['act', 'cleanup', 'render']);
 assert.throws(() => testing.render(base.h('p', {})), /needs a DOM/);
-console.log('PASS isolated installed consumer: all 12 public import paths and distinct cores');
+const agent = await import('lithent/agent');
+assert.deepEqual(Object.keys(agent).sort(), ['AgentScope', 'agentAction', 'agentState', 'connectWebMCP', 'createAgentBridge', 'defaultAgentBridge', 'useAgentBridge']);
+const bridge = agent.createAgentBridge();
+assert.equal((await bridge.callTool('missing')).error.code, 'NOT_FOUND');
+// No DOM and no WebMCP context: the opt-in adapter is a no-op.
+assert.equal(typeof agent.connectWebMCP(bridge), 'function');
+console.log('PASS isolated installed consumer: all 13 public import paths and distinct cores');
 `
 );
 execFileSync(process.execPath, ['imports.mjs'], {
@@ -190,7 +197,15 @@ const paths = ${JSON.stringify(paths)};
   assert.equal(element.defineElement('no-dom', () => null), undefined);
   const testing = require('lithent/test');
   assert.throws(() => testing.render(base.h('p', {})), /needs a DOM/);
-  console.log('PASS isolated CommonJS consumer: all 12 require paths, export parity, main and JSX/helper/SSR integration');
+  const agent = require('lithent/agent');
+  const bridge = agent.createAgentBridge();
+  const Agentic = base.mount(() => {
+    agent.agentAction({ name: 'ping', description: 'Ping', run: () => 'pong' });
+    return () => base.h('i', {});
+  });
+  assert.equal(renderToString(jsx.jsx(agent.AgentScope, { bridge, children: jsx.jsx(Agentic, {}) })), '<i></i>');
+  assert.equal(typeof agent.connectWebMCP(bridge), 'function');
+  console.log('PASS isolated CommonJS consumer: all 13 require paths, export parity, main and JSX/helper/SSR integration');
 })().catch(error => { console.error(error); process.exitCode = 1; });
 `
 );
@@ -206,6 +221,8 @@ import type { WDom } from 'lithent';
 import { h, mount, deferRender, whenIdle } from 'lithent-concurrent';
 import { deferred, ldeferred, hasPendingRender } from 'lithent-concurrent/helper';
 import { render, act, cleanup } from 'lithent/test';
+import { agentAction, AgentScope, createAgentBridge } from 'lithent/agent';
+import type { ToolCallResult } from 'lithent/agent';
 import type { State, Computed } from 'lithent-concurrent/helper';
 const List = mount(renew => {
   const value: State<string> = deferred('initial', renew);
@@ -238,7 +255,20 @@ const waited: Promise<void> = act();
 cleanup();
 // @ts-expect-error render takes a lithent node, not a string.
 render('<p></p>');
-export { List, Rows, ldeferred, whenIdle, rendered, counted, waited };
+// lithent/agent: run arguments are inferred from params; callTool is typed.
+const Agentic = baseMount(() => {
+  const add = agentAction({
+    name: 'add_item',
+    description: 'Add an item',
+    params: { id: { type: String, required: true }, qty: Number },
+    run: ({ id, qty }) => id.length + (qty ?? 0),
+  });
+  // @ts-expect-error id is required.
+  void (() => add({ qty: 1 }));
+  return () => <AgentScope bridge={createAgentBridge()}><p>agent</p></AgentScope>;
+});
+const called: Promise<ToolCallResult> = createAgentBridge().callTool('add_item', { id: 'a' });
+export { List, Rows, ldeferred, whenIdle, rendered, counted, waited, Agentic, called };
 `
 );
 await writeFile(
@@ -273,7 +303,7 @@ console.log(
 const typeScopes = [
   {
     name: 'base',
-    paths: paths.slice(0, 10),
+    paths: paths.slice(0, 11),
     names: [
       'core',
       'jsx',
@@ -285,12 +315,13 @@ const typeScopes = [
       'ftags',
       'element',
       'test',
+      'agent',
     ],
     state: 'state',
   },
   {
     name: 'concurrent',
-    paths: paths.slice(10),
+    paths: paths.slice(11),
     names: ['core', 'helper'],
     state: 'deferred',
   },

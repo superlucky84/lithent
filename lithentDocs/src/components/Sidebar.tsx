@@ -106,6 +106,15 @@ const menuData: MenuSection[] = [
     ],
   },
   {
+    text: { en: 'AI Agents', ko: 'AI 에이전트' },
+    items: [
+      {
+        text: { en: 'Agent-Native Components', ko: 'Agent-Native 컴포넌트' },
+        link: '/guide/agent-native',
+      },
+    ],
+  },
+  {
     text: { en: 'Server Rendering', ko: '서버 렌더링' },
     items: [
       {

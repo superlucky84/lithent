@@ -48,6 +48,8 @@ import { ConcurrentRendering } from '@/pages/ConcurrentRendering';
 import { ConcurrentRenderingKo } from '@/pages/ConcurrentRendering_ko';
 import { Element } from '@/pages/Element';
 import { ElementKo } from '@/pages/Element_ko';
+import { AgentNative } from '@/pages/AgentNative';
+import { AgentNativeKo } from '@/pages/AgentNative_ko';
 import { Ssr } from '@/pages/Ssr';
 import { SsrKo } from '@/pages/Ssr_ko';
 import { Testing } from '@/pages/Testing';
@@ -168,6 +170,8 @@ const routes: Record<string, PageComponent> = {
   '/ko/guide/concurrent-rendering': ConcurrentRenderingKo,
   '/guide/element': Element,
   '/ko/guide/element': ElementKo,
+  '/guide/agent-native': AgentNative,
+  '/ko/guide/agent-native': AgentNativeKo,
   '/guide/ssr': Ssr,
   '/ko/guide/ssr': SsrKo,
   '/guide/testing': Testing,

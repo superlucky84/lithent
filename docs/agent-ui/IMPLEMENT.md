@@ -9,7 +9,7 @@
 | 0 | 문서 작성 (`REQUIREMENTS`, `DESIGN`, `IMPLEMENT`, `MANUAL_TEST_CHECKLIST`) | done |
 | 1 | `lithent/agent` 코어 패키지 (`agentAction`, `agentState`, `createAgentBridge`) | done |
 | 2 | `lithent/agent` 어댑터 (WebMCP, `confirm` 승인 훅, `lithent/element` 연동) | done |
-| 3 | `lithent/agent` 배포 연결·스킬·문서 (선택적 1차 릴리스 게이트) | planned |
+| 3 | `lithent/agent` 배포 연결·스킬·문서 (선택적 1차 릴리스 게이트) | done (수동 체크 `M-1`·`M-2`·`M-5` 대기) |
 | 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | planned |
 | 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | planned |
 | 6 | `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모 | planned |
@@ -182,7 +182,7 @@ Files:
 
 ---
 
-## Phase 3 — `lithent/agent` 배포 연결·스킬·문서: planned
+## Phase 3 — `lithent/agent` 배포 연결·스킬·문서: done
 
 Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-9, DC-10, M-1
 
@@ -192,19 +192,51 @@ Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-9, DC-10, M-1
 - 권장: `DESIGN.md` `DC-15`(`scopeId` 구분자) 결정 — 충족: `__` (2026-11-27).
 
 ### 구현 체크리스트
-- [ ] 루트 `package.json`: `exports["./agent"]`, `files`, `build:agent`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
+- [x] 루트 `package.json`: `exports["./agent"]`, `files`, `build:agent`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
+  - `files`는 `lithent/element`와 같이 `agent/dist`, `agent/src`, `agent/package.json`, `agent/README.md`. `keywords`에 `ai`, `mcp`, `webmcp` 추가.
 - [x] 루트 `vite.config.js` vitest `exclude`에 `agent/**` 추가 (Phase 1에서 선반영 — Phase 1 체크리스트 참고)
-- [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `agent` 등록 (`size-report.js` 예산 2,500 B — `DC-16`)
-- [ ] `agent/README.md`, `skills/lithent/reference/agent.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트
-- [ ] `lithentDocs` 가이드 페이지(영어·한국어) 추가
+- [x] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `agent` 등록 (`size-report.js` 예산 2,500 B — `DC-16`)
+  - `verify-release.mjs`: 공개 import 경로 12 → 13개. 설치된 tarball 소비자에서 ESM export 목록·`callTool`·`connectWebMCP` no-op, CJS 내보내기 동등성·SSR(`renderToString`)에서 미등록, Bundler 타입(`agentAction` 인자 추론·`@ts-expect-error`), Node16/NodeNext ESM·CJS 선언 검사에 `lithent/agent` 추가.
+  - `.github/release-policy.json`: `lithent` 패키지 `sourcePaths`에 `agent/` 추가 (변경 시 `lithent` 릴리스 대상).
+- [x] `agent/README.md`, `skills/lithent/reference/agent.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트
+- [x] `lithentDocs` 가이드 페이지(영어·한국어) 추가 — `/guide/agent-native`, `/ko/guide/agent-native` (`lithentDocs/src/pages/AgentNative.tsx`, 사이드바 "AI Agents / AI 에이전트" 그룹). 기존 `/guide/agent-guide`(AI 코딩 도우미 설정 안내)와는 별도 페이지다.
+  - `pnpm build:docs` 통과, Chromium에서 두 언어 경로 렌더링(제목·섹션 10개·오류 코드 표 4행, 페이지 오류 0건) 확인.
 - [ ] (`DC-10` 옵션 A 확정) `lithent/agent` 단독 1차 minor 릴리스 전 `pnpm verify:release` 및 수동 체크 `M-1`, `M-2`, `M-5` 점검
+  - `pnpm verify:release` 통과 (아래 검증 기록). **수동 체크 `M-1`, `M-2`, `M-5`는 사용자 수행 대기** — `MANUAL_TEST_CHECKLIST.md`에 브라우저별 결과를 기록한 뒤 릴리스(버전·CHANGELOG·publish)를 진행한다. 릴리스 자체는 이 Phase 범위 밖이다.
 
 ### 기준 테스트
-- [ ] `pnpm build && pnpm size && pnpm verify:release` 통과
-- [ ] `pnpm test:dual` 통과
+- [x] `pnpm build && pnpm size && pnpm verify:release` 통과
+- [x] `pnpm test:dual` 통과
 
 ### 종료 조건
 - `lithent/agent`가 공식 서브패스로 빌드·타입·크기·릴리스 검증을 모두 통과.
+
+### 검증 기록 (2026-11-27, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] `pnpm build` (`build:sequence`에 `build:agent` 포함 + `build:parallel`) → 성공
+- [x] `pnpm size` → 성공. `lithent/agent` **2,340 / 2,500 B** (여유 160 B), 코어 4,774 / 4,800 B, concurrent 6,690 / 9,000 B, element 968 / 1,000 B
+- [x] `pnpm test:dual` → 성공. `test:satellites`·`test:satellites:concurrent`에서 `lithent-agent` 각 7 files, 86/86
+- [x] `pnpm verify:release` → `ALL PASS (8 prepared packages; nothing published)`. "all 13 public import paths", "all 13 require paths", 설치된 base Node16/NodeNext ESM·CJS 선언(`skipLibCheck: false`)에 `lithent/agent` 포함
+- [x] `pnpm build:docs` → 성공, `/guide/agent-native`·`/ko/guide/agent-native` Chromium 렌더링 확인
+- [x] CI fixture 테스트: `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs` → 50/50 통과. (`pnpm test:ci`의 `--test-isolation=none`은 Node 24 옵션이라 이 컨테이너의 Node 22에서는 옵션 오류로 시작하지 못함 — 환경 차이이며 CI는 Node 24)
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+
+Files:
+- `package.json` (modified)
+- `scripts/size-report.js` (modified)
+- `scripts/verify-release.mjs` (modified)
+- `scripts/ci-build-artifacts.mjs` (modified)
+- `.github/release-policy.json` (modified)
+- `agent/README.md` (added)
+- `skills/lithent/reference/agent.md` (added)
+- `skills/lithent/SKILL.md` (modified)
+- `lithent-agent-addon.md` (modified)
+- `lithentDocs/src/pages/AgentNative.tsx` (added)
+- `lithentDocs/src/pages/AgentNative_ko.tsx` (added)
+- `lithentDocs/src/components/Layout.tsx` (modified)
+- `lithentDocs/src/components/Sidebar.tsx` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
 
 ---
 
@@ -344,21 +376,22 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
 
 - **done**:
   - Phase 0 문서 4종 작성 및 `DC-1`~`DC-14` 확정 (커밋 `d290fc3`)
-  - **Phase 1 (`lithent/agent` 코어 패키지) 구현 완료** — 브릿지, `DC-2` 스키마·검증, `agentAction`, `agentState`, `AgentScope`/`useAgentBridge`, `DC-3` 충돌 정책 (Phase 1 "검증 기록")
-  - **Phase 2 (어댑터) 구현 완료** — `setConfirmHandler`·액션별 `confirm`(`DC-5`, 보안 기본값 `REJECTED`), `connectWebMCP`(`DC-4`, 현재 WebMCP에 맞춘 편차 포함), `lithent/element` 연동 확인
-  - agent 테스트 7 files base·concurrent 각 86/86, element 무회귀, 빌드·타입 통과, 코어 diff 0줄 (Phase 2 "검증 기록")
-  - `DESIGN.md`: §2.1 구현 상태·`WebMCPModelContext` 계약 갱신, §2.3 `confirm` 세부, §2.4 `lithent/element` 경계, §2.6 편차 기록, `DC-4` 구현 메모, `DC-9` 측정 기록. `REQUIREMENTS.md`·`MANUAL_TEST_CHECKLIST.md`(`M-2`)에 `document.modelContext` 반영
-  - Phase 1·2를 `feat/agent-ui`에 Phase별로 커밋·푸시 (Phase 1 `c7917de`, Phase 2 `1d08cc8`)
-  - **Phase 2 후속 (`DC-15`·`DC-16` 결정 반영) 완료** — `scopeId` 구분자 `__`(예: `cart__add_item`), `lithent/agent` 예산 2,500 B(현재 2,340 B), `connectWebMCP` tree-shaking 확인. 테스트 base·concurrent 각 86/86 ("Phase 2 후속" 검증 기록)
+  - **Phase 1 (`lithent/agent` 코어 패키지)** — 브릿지, `DC-2` 스키마·검증, `agentAction`, `agentState`, `AgentScope`/`useAgentBridge`, `DC-3` 충돌 정책 (커밋 `c7917de`)
+  - **Phase 2 (어댑터)** — `setConfirmHandler`·액션별 `confirm`(`DC-5`, 보안 기본값 `REJECTED`), `connectWebMCP`(`DC-4`, 현재 WebMCP에 맞춘 편차 포함), `lithent/element` 연동 확인 (커밋 `1d08cc8`)
+  - **Phase 2 후속** — `DC-15`(`scopeId` 구분자 `__`), `DC-16`(예산 2,500 B, `connectWebMCP` tree-shaking) 반영 (커밋 `effa28f`)
+  - **Phase 3 (배포 연결·스킬·문서)** — 루트 `exports["./agent"]`·`files`·빌드/테스트 스크립트, `size-report.js`(2,500 B)·`verify-release.mjs`(13개 경로)·`ci-build-artifacts.mjs`·`release-policy.json` 등재, `agent/README.md`, `skills/lithent/reference/agent.md`, `SKILL.md`, `lithent-agent-addon.md`, 문서 사이트 `/guide/agent-native`(영어·한국어)
+  - Phase 3 게이트: `pnpm build`·`pnpm size`·`pnpm test:dual`·`pnpm verify:release`·`pnpm build:docs` 통과, CI fixture 50/50 (Phase 3 "검증 기록")
 - **next**:
-  1. 사용자 결정: Phase 2(및 후속) 리뷰(`doc-driven-reviewer-v1`) 여부, 또는 Phase 3 착수
-  2. Phase 3: 루트 `exports["./agent"]`·빌드/테스트 스크립트, `scripts/size-report.js`(예산 2,500 B)·릴리스 검증 스크립트 등재, README·스킬·문서 사이트
-- **blockers**: 없음 (Phase 3 진입 조건 `DC-16` 충족)
+  1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스 필수, `DC-10`) — 결과 기록 후 릴리스(버전·CHANGELOG·publish) 진행 여부 결정
+  2. 사용자 결정: Phase 3(또는 Phase 1~3) 리뷰(`doc-driven-reviewer-v1`) 여부
+  3. Phase 4: `lithent/live` 샌드박스 런타임 및 `postMessage` RPC 브릿지 (`live/` 패키지)
+- **blockers**: 없음 (1차 릴리스만 수동 체크 대기)
 - **risks / follow-ups**:
   - 크기 여유 160 B (2,340 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
   - 이름 규칙: 라이브러리는 `name`·`scopeId`에 `[a-zA-Z0-9_-]` 외 문자가 들어가도 검사하지 않는다 (`DESIGN.md` §2.5). 필요하면 Phase 7에서 개발 경고 추가를 검토.
   - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면, 아직 마운트된 이전 인스턴스는 다시 등록되지 않는다 (설계대로의 동작). Phase 7 경계 테스트에서 의도 확인 권장.
   - WebMCP는 표준화 진행 중이다. `annotations`(`consequentialHint` 등)와 `requiresConfirm` 매핑, `execute`의 `{ signal }` 취소는 미반영 (`DESIGN.md` §2.6). 실제 Chrome 검증은 `M-2`(수동)와 Phase 8 E2E에서 한다.
   - `useAgentBridge()` 위임 브릿지의 메서드(`setConfirmHandler` 포함)는 마운트 전에 호출하면 `defaultAgentBridge`로 간다.
-  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. agent의 element 연동 테스트는 `element/dist`(예: `pnpm build:element` 또는 `pnpm build:sequence`)가 필요하다.
-- **latest commit**: `1d08cc8` (Phase 2). "Phase 2 후속" 변경은 아직 커밋하지 않음 — not committed yet
+  - 패키지 tarball의 `agent/src`에는 `lithent/element`와 같이 테스트 파일도 포함된다 (`files` 패턴 관례).
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. `pnpm test:ci`는 Node 24 옵션(`--test-isolation=none`) 때문에 Node 22에서 시작하지 못하므로 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대신 실행했다. agent의 element 연동 테스트는 `element/dist`가 필요하다.
+- **latest commit**: `effa28f` (Phase 2 후속). Phase 3 변경은 아직 커밋하지 않음 — not committed yet

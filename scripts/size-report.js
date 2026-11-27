@@ -20,6 +20,12 @@ const CONCURRENT_PHASE = 'T2 (fiber work loop)';
 const CONCURRENT_BUDGET = 9000; // Phase 0 4800, T1 5400, T1.5 6200; T2 (D15)
 /** lithent/element RC-3 (docs/element/REQUIREMENTS.md §4). */
 const ELEMENT_BUDGET = 1000;
+/**
+ * lithent/agent RQ-10 (docs/agent-ui/DESIGN.md DC-9, DC-16): 2,000B raised
+ * to 2,500B, with room for the Phase 7 hardening. connectWebMCP shares the
+ * entry; bundlers drop it when unused.
+ */
+const AGENT_BUDGET = 2500;
 
 const targets = [
   {
@@ -36,6 +42,11 @@ const targets = [
     label: 'lithent/element',
     file: 'element/dist/lithentElement.umd.js',
     budget: ELEMENT_BUDGET,
+  },
+  {
+    label: 'lithent/agent',
+    file: 'agent/dist/lithentAgent.umd.js',
+    budget: AGENT_BUDGET,
   },
 ];
 
