@@ -70,10 +70,14 @@ export default defineConfig({
       },
     },
     rolldownOptions: {
-      external: ['lithent', 'lithent/agent'],
+      // The page's lithent: direct mode runs on it (DESIGN §3.2).
+      external: id => /^lithent(\/|$)/.test(id),
       output: {
         globals: {
           lithent: 'lithent',
+          'lithent/helper': 'lithentHelper',
+          'lithent/ftags': 'lithentFTags',
+          'lithent/tag': 'lithentTag',
           'lithent/agent': 'lithentAgent',
         },
       },

@@ -24,9 +24,31 @@ export const sandboxCsp = (runtimeUrl?: string) =>
     runtimeUrl ? ' ' + new URL(runtimeUrl, location.href).origin : ''
   }; style-src 'unsafe-inline'`;
 
+/**
+ * DC-8 — theme tokens as CSS custom properties on `selector`. Only
+ * `--name: value` pairs whose value cannot end the rule or the element.
+ */
+export const themeCss = (
+  selector: string,
+  theme: Record<string, string> = {}
+) => {
+  const rules = Object.keys(theme)
+    .filter(
+      name => /^--[\w-]+$/.test(name) && !/[;{}<>]/.test(String(theme[name]))
+    )
+    .map(name => `${name}:${theme[name]}`)
+    .join(';');
+  return rules ? `${selector}{${rules}}` : '';
+};
+
+/** Text for a <style> element that cannot close it. */
+export const styleText = (css: string) =>
+  css.replace(/<\/style/gi, '<\\/style');
+
 export type SrcdocOptions = {
   config: LiveBootConfig;
   styles?: string[];
+  theme?: Record<string, string>;
   runtimeCode?: string;
   runtimeUrl?: string;
   allowNetwork?: boolean;
@@ -35,6 +57,7 @@ export type SrcdocOptions = {
 export const buildSrcdoc = ({
   config,
   styles = [],
+  theme,
   runtimeCode,
   runtimeUrl,
   allowNetwork,
@@ -44,8 +67,9 @@ export const buildSrcdoc = ({
     : `<meta http-equiv="Content-Security-Policy" content="${attribute(
         sandboxCsp(runtimeCode == null ? runtimeUrl : undefined)
       )}">`;
-  const css = ['html,body{margin:0}', ...styles]
-    .map(text => `<style>${text.replace(/<\/style/gi, '<\\/style')}</style>`)
+  const css = ['html,body{margin:0}', themeCss(':root', theme), ...styles]
+    .filter(Boolean)
+    .map(text => `<style>${styleText(text)}</style>`)
     .join('');
   const runtime =
     runtimeCode != null

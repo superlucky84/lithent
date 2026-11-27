@@ -23,10 +23,17 @@ export type MountLiveOptions = {
   /** A function body that returns a component: `return lmount(...)` (§3.2). */
   code: string;
   container: HTMLElement;
-  /** Default `'sandbox'` (DC-7). `'direct'` arrives in Phase 5. */
+  /**
+   * Default `'sandbox'` (DC-7). `'direct'` runs the code in this page, in a
+   * shadow root, with the page's lithent: only for code you trust.
+   */
   mode?: LiveMode;
-  /** CSS for the widget document. */
+  /** CSS for the widget document (sandbox) or shadow root (direct). */
   styles?: string[];
+  /** Fit the iframe height to the widget (sandbox). Default `true` (DC-8). */
+  autoResize?: boolean;
+  /** CSS custom properties for the widget, e.g. `{ '--brand': '#0064ff' }` (DC-8). */
+  theme?: Record<string, string>;
   props?: Record<string, unknown>;
   /** The sandbox runtime as a string (`sandboxRuntimeCode`, DC-6). */
   runtimeCode?: string;
@@ -82,4 +89,6 @@ export type LiveBootConfig = {
   props: Record<string, unknown>;
   /** The host page origin, the target of the sandbox's messages. */
   origin: string;
+  /** Report the content height (`resize` messages, DC-8). */
+  resize?: boolean;
 };

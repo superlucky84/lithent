@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { boot } from '@/runtime/boot';
+import { watchHeight } from '@/runtime/entry';
 import { symbolNames } from '@/runtime/symbols';
 import type { LiveRpcMessage } from '@/index';
 
@@ -253,5 +254,45 @@ describe('answering the host', () => {
     fake.teardown!();
     expect(fake.root.textContent).toBe('');
     expect(fake.isListening()).toBe(false);
+  });
+});
+
+describe('watchHeight (DC-8)', () => {
+  it('reports each new content height and stops on request', () => {
+    let notify = () => {};
+    let disconnected = false;
+    class FakeObserver {
+      constructor(callback: () => void) {
+        notify = callback;
+      }
+      observe() {}
+      disconnect() {
+        disconnected = true;
+      }
+    }
+    vi.stubGlobal('ResizeObserver', FakeObserver);
+    let height = 40.2;
+    const target = { getBoundingClientRect: () => ({ height }) } as Element;
+    const reported: number[] = [];
+    const stop = watchHeight(target, h => reported.push(h));
+
+    notify();
+    notify(); // same height: not reported again
+    height = 80;
+    notify();
+    stop();
+
+    expect(reported).toEqual([41, 80]);
+    expect(disconnected).toBe(true);
+    vi.unstubAllGlobals();
+  });
+
+  it('does nothing without ResizeObserver', () => {
+    vi.stubGlobal('ResizeObserver', undefined);
+    const stop = watchHeight(document.body, () => {
+      throw new Error('should not report');
+    });
+    expect(() => stop()).not.toThrow();
+    vi.unstubAllGlobals();
   });
 });

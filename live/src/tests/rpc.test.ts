@@ -253,6 +253,24 @@ describe('events and errors after ready', () => {
   });
 });
 
+describe('resize (DC-8)', () => {
+  it('fits the iframe to the reported height', async () => {
+    const { sandbox } = await ready();
+    sandbox.reply({ type: 'resize', height: 123.5 });
+    expect(sandbox.frame.style.height).toBe('123.5px');
+    // Nonsense heights are ignored.
+    sandbox.reply({ type: 'resize', height: -1 });
+    sandbox.reply({ type: 'resize', height: 'tall' });
+    expect(sandbox.frame.style.height).toBe('123.5px');
+  });
+
+  it('leaves the height alone with autoResize: false', async () => {
+    const { sandbox } = await ready({ autoResize: false });
+    sandbox.reply({ type: 'resize', height: 300 });
+    expect(sandbox.frame.style.height).toBe('');
+  });
+});
+
 describe('updateProps (§3.2)', () => {
   it('posts the props and resolves on the ack', async () => {
     const { handle, sandbox } = await ready();

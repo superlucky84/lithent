@@ -2,10 +2,10 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4 (`lithent/live` 샌드박스 런타임·RPC) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 5 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-16` 확정, `DC-17` TBD) — Phase 1~3 (`lithent/agent`) 및 Phase 4~5 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 6 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
-> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`도 같은 날 사용자 결정으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.
+> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`도 같은 날 사용자 결정으로 확정되었고, `DC-17`은 아직 결정되지 않았다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.
 
 ---
 
@@ -382,8 +382,10 @@ export function mountLive(options: MountLiveOptions): Promise<LiveHandle>;
 ```
 
 - 선택적 Custom Element 래퍼(`<lithent-live>`)는 `lithent/element` 위에 얹어 React·Vue·HTML 페이지에서도 태그 한 줄로 Generative UI를 띄울 수 있게 한다 (Phase 5~6).
+  - **편차 기록 (Phase 5)**: `<lithent-live>`는 `lithent/element` 위가 아니라 `mountLive`를 감싼 plain Custom Element로 구현했고, `defineLiveElement(name = 'lithent-live')`를 호출해야 등록된다(import만으로 등록하지 않음, Custom Elements가 없는 SSR에서는 `undefined`). 근거: `lithent/element`는 lithent 컴포넌트를 요소로 만드는 도구라 이 래퍼에 쓰면 lithent 코어를 함께 끌어오는데, `<lithent-live>`는 iframe 하나를 관리할 뿐이라 코어가 필요 없다. 그래서 React·Vue 호스트가 Sandbox 위젯만 쓸 때 lithent 코어를 싣지 않아도 된다. 위젯은 이미 iframe(Sandbox)이나 Direct 모드의 자체 Shadow Root로 격리되므로, 요소는 별도 Shadow Root 없이 자기 자신(light DOM)에 그린다(인라인 `display`가 없으면 `block`).
+  - **`<lithent-live>` 계약 (Phase 5)**: 속성 `code`, `mode`, `runtime-url`, `allow-network`(불리언). 프로퍼티는 같은 값과 `props`, `styles`, `theme`, `runtimeCode`, `autoResize`, `timeoutMs`, 읽기 전용 `bridge`. 같은 task 안의 변경은 마이크로태스크 한 번에 모아 적용한다: `props`만 바뀌면 `updateProps`, `code`가 바뀌면 `reload`, 그 밖의 값이 바뀌면 다시 마운트. 이벤트(버블링·composed): `live-ready`(`detail.bridge`, 마운트·`reload` 성공마다), `live-error`(`detail`은 `LiveError`). 이동(같은 task 안에서 제거 후 삽입)은 위젯을 유지하고, 제거되면 마이크로태스크 뒤 `destroy()`한다.
 
-> **구현 상태 (Phase 4 완료 시점, 2026-11-27)**: `live/` 워크스페이스 패키지에 Sandbox 모드 `mountLive`와 `LiveHandle`(`bridge`, `updateProps`, `reload`, `destroy`), 샌드박스 런타임(`live/dist/sandboxRuntime.umd.js`, 문자열 `live/dist/runtime.{mjs,cjs}`의 `sandboxRuntimeCode`)이 구현되었다. `MountLiveOptions` 중 `code`·`container`·`styles`·`props`·`runtimeCode`·`runtimeUrl`·`allowNetwork`·`timeoutMs`·`onError`가 동작하고, `mode: 'direct'`(지금은 `LiveError(phase: 'compile')`로 거절), `autoResize`·`theme`, `LiveError.hint`, `<lithent-live>`는 Phase 5에서 추가한다. 루트 `exports["./live"]`, `exports["./live/runtime"]` 연결은 Phase 6이다. `LiveRpcMessage`도 공개 타입으로 내보낸다. 결정된 세부 동작은 §3.4 "구현 세부 (Phase 4)".
+> **구현 상태 (Phase 5 완료 시점, 2026-11-27)**: `live/` 패키지에 `mountLive`(Sandbox·Direct 모드)와 `LiveHandle`, `defineLiveElement`(`<lithent-live>`), 샌드박스 런타임(`live/dist/sandboxRuntime.umd.js`, 문자열 `live/dist/runtime.{mjs,cjs}`의 `sandboxRuntimeCode`)이 구현되었고, `MountLiveOptions`의 모든 옵션이 동작한다. Phase 4: Sandbox 모드·RPC. Phase 5: `mode: 'direct'`, `autoResize`·`theme`, `LiveError.hint`, `<lithent-live>`. 루트 `exports["./live"]`, `exports["./live/runtime"]` 연결은 Phase 6이다. 공개 타입에 `LiveRpcMessage`, `LithentLiveElement`이 추가됐다. 세부 동작은 §3.2 "Direct 모드 구현 (Phase 5)", §3.4 "구현 세부".
 
 ### 3.2 LLM 생성 코드 계약 (`RQ-6`, `DC-6`)
 
@@ -401,6 +403,8 @@ LLM이 생성하는 코드는 **빌드 없는 표준 JS**이며, 런타임이 �
   - CDN/캐시 공유: `runtimeUrl`로 `sandboxRuntime.umd.js` URL 전달.
   - `mode: 'sandbox'`에서 `runtimeCode`와 `runtimeUrl`이 둘 다 생략되면 외부 CDN을 암묵적으로 호출하지 않고 명확한 설정 오류(`LiveError(phase: 'compile')`)를 반환한다 (`DC-13` 확정).
   - `mode: 'direct'` 사용 시: 호스트 번들의 `lithent`를 그대로 사용하므로 `sandboxRuntime`을 전혀 로드하지 않는다.
+  - **Direct 모드 구현 (Phase 5)**: 샌드박스 런타임의 `boot`를 이 페이지에서 그대로 실행하고, iframe 대신 컨테이너에 붙인 `div`의 open Shadow Root에 그린다. 메시지는 `postMessage` 대신 메모리에서 비동기(`queueMicrotask`)로 오가므로, RPC·승인(`DC-14`)·`reload`·`destroy`·타임아웃 로직은 Sandbox 모드와 같은 코드다. 값은 복제하지 않고 그대로 전달된다. `styles`는 Shadow Root의 `<style>`로, `theme`은 `:host{--name:value}`로 들어간다(`autoResize`는 Sandbox 전용). 처음 사용할 때 한 번 `console.warn`으로 신뢰한 코드에만 쓰라고 알린다.
+  - **Direct 모드 의존성 (Phase 5)**: `boot`와 `lithent`·`lithent/helper`·`lithent/ftags`·`lithent/tag`·`lithent/agent`는 호스트 빌드에서 모두 외부(external) 모듈이고, `boot`는 동적 `import()`로 불러온다. ESM·CJS 빌드에서는 별도 청크(`boot-*.js`·`boot-*.cjs`, 공유 `names-*` 청크)로 나뉘어 Sandbox만 쓰는 소비자 번들에 이 의존성이 실리지 않는다. UMD는 코드 분할이 없어 한 파일에 포함되며, Direct 모드를 쓰려면 페이지에 `lithent`, `lithentHelper`, `lithentFTags`, `lithentTag`, `lithentAgent` 전역이 먼저 있어야 한다.
 - `handle.updateProps(nextProps)`는 `lithent/element`와 동일하게 내부 Host 래퍼 컴포넌트의 `renew()`로 props만 갱신하여 위젯 내부 클로저 상태를 보존한다. 반면 `handle.reload(nextCode)`는 기존 위젯을 완전히 정리하고 새로 마운트한다.
 - `skills/lithent`에 LLM이 항상 동일한 형식으로 출력하도록 1페이지 규약을 포함한다.
 
@@ -444,6 +448,10 @@ type LiveRpcMessage =
   - **샌드박스 안의 브릿지**: 위젯은 런타임이 만든 전용 브릿지의 `<AgentScope>` 아래에 그려진다. 호스트가 이미 승인했으므로(`DC-14`) 샌드박스 브릿지의 승인 핸들러는 항상 승인한다. 인자 검증은 샌드박스 브릿지가 하고, 결과 값을 `postMessage`로 복제할 수 없으면(함수 등) `EXECUTION_ERROR` 결과로 바꿔 보낸다.
   - **호스트 프록시 브릿지**: `listTools()`·`getState()`는 `ready`·`event`로 받은 캐시의 사본을 준다. 알 수 없는 도구는 왕복 없이 `NOT_FOUND`, 응답이 없으면 `TIMEOUT`(+ `onError` `timeout`), 인자를 복제할 수 없으면 `INVALID_PARAMS`, 형식이 틀린 결과는 `EXECUTION_ERROR`. `notifyStateChange(name?)`는 캐시된 상태로 즉시 `state-changed`를 보내고, `dispose()`는 `destroy()`와 같다.
   - **`props` 메시지**: `updateProps`는 호스트에 새 props를 기억한 뒤(이후 `reload`에도 사용) `ack`를 기다린다. 응답이 없으면 `LiveError(phase: 'timeout')`로 reject한다.
+- **구현 세부 (Phase 5에서 확정된 동작)**:
+  - **자기 수정 힌트**: 호스트가 오류와 그 오류를 낸 코드로 `hint`를 붙인다(이미 `hint`가 있으면 유지). 엔진마다 문구가 달라 메시지를 느슨하게 맞추고 코드도 함께 본다. 대상: JSX(`'<'` 토큰 오류) → `fTags`/`lTag` 안내, `import` 문 → 이미 주입된 심볼 안내, `export` 문 → `return` 안내, 컴포넌트 미반환 → `return lmount(...)` 예시, React 습관(`useState`·`useEffect`·`React` 등 미정의) → `lstate`/`state`·`mountCallback` 안내, `render`·`createRoot` 직접 호출 → 반환만 하라는 안내, 그 밖의 미정의 이름 → 사용 가능한 심볼 목록, `timeout` → 무한 루프·끝나지 않는 Promise 점검. 처음 예시로 든 "`lstate`를 `mount`에서 사용"은 현재 lithent에서 오류가 나지 않으므로(`lstate`는 `useRenew()`라 두 모드에서 모두 동작) 힌트 대상에서 뺐다. "`mounter`가 JSX를 직접 반환"은 빌드 없는 코드에서 JSX 문법 오류로 나타나므로 JSX 힌트가 맡는다.
+  - **자동 높이 (`DC-8`)**: Sandbox에서 `autoResize`가 `false`가 아니면 런타임이 `document.documentElement`를 `ResizeObserver`로 지켜보다가 높이(올림한 정수)가 바뀔 때만 `resize`를 보내고, 호스트가 iframe `style.height`를 맞춘다. 음수·숫자 아닌 값은 무시한다. `ResizeObserver`가 없는 환경에서는 아무것도 하지 않는다.
+  - **테마 (`DC-8`)**: `theme`의 `--이름: 값` 쌍만 CSS 사용자 정의 속성으로 넣는다(Sandbox는 srcdoc의 `:root{...}`, Direct는 `:host{...}`). 이름은 `^--[\w-]+$`, 값에 `;`·`{`·`}`·`<`·`>`가 있으면 버린다. 마운트·`reload` 때 적용된다.
 
 ---
 
@@ -535,12 +543,14 @@ type LiveRpcMessage =
 - [x] **DC-8 — `lithent/live` iframe 크기 조절 및 테마 전달**
   - **확정**: 옵션 A — `ResizeObserver` 기반 자동 높이 동기화 기본 활성화(`autoResize: true`) + 호스트 CSS 변수/테마 토큰 전달 옵션(`theme?: Record<string, string>`).
   - **근거**: 채팅/사이드바 내 임베드 위젯의 이중 스크롤바 문제를 없애고 호스트 다크모드·브랜드 색상과 자연스럽게 어우러지게 한다.
+  - **구현 메모 (Phase 5)**: `ResizeObserver` → `resize` 메시지 → iframe 높이, `theme` → CSS 사용자 정의 속성으로 구현했다 (§3.4 구현 세부 Phase 5). Chromium에서 120px → 260px 높이 변경과 테마 색 적용을 확인했다.
   - 검증: Phase 5, `M-3`, `M-6`
 
 - [x] **DC-9 — 번들 크기 예산**
   - **확정**: `lithent/agent` ≤ **2,500 B** brotli (원래 2,000 B → 2026-11-27 `DC-16` 결정으로 상향), `lithent/live` (호스트 컨트롤러) ≤ **3,000 B** brotli, `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
   - **근거**: 호스트 앱에 추가되는 오버헤드와 샌드박스 자체 포함 런타임 예산을 분리해 `lithent`의 초경량 정체성을 CI 게이트로 강제한다.
   - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (원래 예산 2,000 B 초과 → `DC-16`으로 예산 2,500 B 확정, 여유 160 B) → Phase 3 리뷰 반영 후 **2,374 B** (여유 126 B).
+  - **측정 기록 (`lithent/live`)**: Phase 4 종료 호스트 2,084 B · 런타임 8,277 B → Phase 5 종료 호스트 **4,536 B**(예산 3,000 B를 1,536 B 초과) · 런타임 8,485 B. 호스트 초과 대응은 `DC-17`(TBD)에서 결정한다.
   - 검증: Phase 3, Phase 6 (`pnpm size`)
 
 - [x] **DC-10 — 릴리스 순서 (단계적 출하 여부)**
@@ -586,3 +596,14 @@ type LiveRpcMessage =
   - **근거**: 구조를 단순하게 유지하고(서브패스 추가 없음), Phase 7 하드닝으로 늘어날 코드까지 예산 안에서 수용한다. WebMCP를 쓰지 않는 앱은 tree-shaking으로 비용을 내지 않는다.
   - **확인 기록**: 결정 반영 후 UMD 2,340 B / 2,500 B (여유 160 B). tree-shaking: `agent/dist/lithentAgent.mjs`를 esbuild로 번들(`lithent` external, minify)하면 `connectWebMCP`를 import하지 않는 소비자 번들은 brotli 1,879 B이고 `modelContext`·`AbortController` 코드가 포함되지 않는다. import하면 2,174 B다. (`sideEffects: false`인 루트 패키지 서브패스로 배포)
   - 검증: Phase 3 (`scripts/size-report.js`에 2,500 B로 등재, `pnpm size`).
+
+- [ ] **DC-17 — `lithent/live` 호스트 UMD 크기 예산 초과 대응 (TBD — Phase 5 구현 후 발견, 사용자 결정 대기)**
+  - **문제**: Phase 5 종료 시 `live/dist/lithentLive.umd.js`가 brotli **4,536 B**로 `DC-9` 예산(3,000 B)을 1,536 B 초과한다. UMD는 코드 분할이 없어 Direct 모드의 `boot`까지 한 파일에 들어간다. esbuild로 기능별 기여를 따로 재면(빌드 도구 차이로 절대값은 vite보다 조금 크다): 기본(Sandbox + 테마·리사이즈) 약 2,800 B, Direct 모드 약 +710~840 B, 자기 수정 힌트 약 +500~660 B, `<lithent-live>` 약 +650 B. 어느 하나만 빼서는 3,000 B 안에 들어오지 않는다.
+  - **ESM 소비자 참고**: Direct 모드는 별도 청크라 Sandbox만 쓰는 ESM 소비자는 `boot`와 helper·ftags·tag·agent를 싣지 않는다.
+  - **옵션**:
+    - A) `lithent/live` 호스트 예산을 상향 (예: **5,000 B**, 현재 구조 유지, Phase 7 여유 약 460 B).
+    - B) Direct 모드와 `<lithent-live>`를 별도 서브패스(예: `lithent/live/direct`, `lithent/live/element`)로 분리하고 `lithent/live`는 Sandbox 호스트만 담는다 (현재 API `mode: 'direct'`·`defineLiveElement` 위치가 바뀜).
+    - C) 기능·문구를 줄여 3,000 B에 가깝게 (힌트 문구 축약 등으로는 수백 B 수준이라 단독으로는 부족).
+    - D) 예산 측정 대상을 UMD 대신 ESM 기본 청크(minify)로 바꾼다 (Direct 모드 청크 제외).
+  - **영향**: Phase 6의 `scripts/size-report.js` 게이트 등재 전에 결정되어야 한다 (Phase 6 진입 조건).
+  - 검증: Phase 6 (`pnpm size`).

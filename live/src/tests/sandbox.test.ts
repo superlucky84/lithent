@@ -78,6 +78,35 @@ describe('the sandbox iframe (DC-7)', () => {
   });
 });
 
+describe('theme and size (DC-8)', () => {
+  it('adds theme tokens as CSS custom properties, dropping unsafe ones', () => {
+    const html = buildSrcdoc({
+      config,
+      runtimeCode: SILENT_RUNTIME,
+      theme: {
+        '--brand': '#0064ff',
+        '--gap': '8px',
+        color: 'red',
+        '--x': 'a;b',
+        '--y': '</style><script>',
+      },
+    });
+    expect(html).toContain('<style>:root{--brand:#0064ff;--gap:8px}</style>');
+    expect(html).not.toContain('color:red');
+    expect(html).not.toContain('--x');
+    expect(html).not.toContain('--y');
+  });
+
+  it('asks the sandbox for its height unless autoResize is false', () => {
+    const configOf = (frame: HTMLIFrameElement) =>
+      JSON.parse(/c=(\{.*?\});r\?/.exec(frame.srcdoc)![1]);
+    expect(configOf(begin().sandbox!.frame).resize).toBe(true);
+    expect(configOf(begin({ autoResize: false }).sandbox!.frame).resize).toBe(
+      false
+    );
+  });
+});
+
 describe('escaping the document', () => {
   it('keeps generated code from closing its script', () => {
     const code = 'return "</script><script>alert(1)</script><!--"';
@@ -118,17 +147,20 @@ describe('starting (DC-13, §3.4)', () => {
     expect(errors).toHaveLength(1);
   });
 
-  it('rejects a mode other than sandbox for now', async () => {
+  it('rejects an unknown mode', async () => {
     const container = document.body.appendChild(document.createElement('div'));
     await expect(
       mountLive({
         code: 'return 1',
         container,
-        mode: 'direct',
+        mode: 'remote' as 'sandbox',
         runtimeCode: SILENT_RUNTIME,
       })
-    ).rejects.toMatchObject({ phase: 'compile' });
-    expect(container.querySelector('iframe')).toBeNull();
+    ).rejects.toMatchObject({
+      phase: 'compile',
+      message: expect.stringContaining('"remote"'),
+    });
+    expect(container.children).toHaveLength(0);
   });
 
   it('rejects with the error the sandbox reports and removes it', async () => {
@@ -158,6 +190,7 @@ describe('starting (DC-13, §3.4)', () => {
       code: 'return lmount(() => () => null)',
       props: { label: 'a' },
       origin: location.origin,
+      resize: true,
     });
     expect(sandbox!.ch).toMatch(/^[a-z0-9]{8,}$/);
   });

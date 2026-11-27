@@ -1,4 +1,5 @@
-import { buildSrcdoc } from '@/srcdoc';
+import { hintFor } from '@/hints';
+import { buildSrcdoc, styleText, themeCss } from '@/srcdoc';
 import type {
   ActionConfirmHandler,
   AgentBridge,
@@ -7,6 +8,7 @@ import type {
   ToolDescriptor,
 } from 'lithent/agent';
 import type {
+  LiveBootConfig,
   LiveError,
   LiveHandle,
   LiveRpcMessage,
@@ -14,19 +16,27 @@ import type {
 } from '@/types';
 
 /**
- * The host side of `lithent/live` (docs/agent-ui/DESIGN.md §3.1–§3.4):
- * one sandbox iframe per widget, a postMessage RPC to it, and an
- * `AgentBridge` that mirrors the widget's tools and state.
+ * The host side of `lithent/live` (docs/agent-ui/DESIGN.md §3.1–§3.4): one
+ * session per widget, an RPC to it, and an `AgentBridge` that mirrors the
+ * widget's tools and state. A session is a sandbox iframe spoken to with
+ * postMessage, or (mode 'direct') the same runtime started in this page,
+ * in a shadow root, spoken to in memory: both share everything above.
  */
 
-/** One sandbox: its iframe, channel and unanswered requests. */
 type Session = {
   ch: string;
-  frame: HTMLIFrameElement;
+  code: string;
+  /** The sandbox iframe; absent in direct mode. */
+  frame?: HTMLIFrameElement;
+  /** Deliver a message to the widget; throws when it cannot be sent. */
+  send: (message: object) => void;
+  /** Remove the widget, its element and its listener. */
+  stop: () => void;
   /** id → settle(reply | 'gone' | 'timeout' | 'unsent: …'). */
   pending: Map<number, (reply: LiveRpcMessage | string) => void>;
-  off: () => void;
 };
+
+type Receive = (message: LiveRpcMessage | undefined) => void;
 
 type Code = 'NOT_FOUND' | 'REJECTED' | 'TIMEOUT' | 'INVALID_PARAMS';
 
@@ -46,10 +56,99 @@ const channelId = () =>
 
 let seq = 0;
 
+/** DC-7: a sandbox iframe with scripts only, spoken to with postMessage. */
+const openSandbox = (
+  session: Session,
+  config: LiveBootConfig,
+  receive: Receive,
+  options: MountLiveOptions
+) => {
+  const frame = document.createElement('iframe');
+  // Without allow-same-origin the document gets an opaque origin: no host
+  // DOM, cookies or storage.
+  frame.setAttribute('sandbox', 'allow-scripts');
+  frame.setAttribute('title', 'lithent live widget');
+  frame.style.cssText = 'border:0;width:100%;display:block';
+  frame.srcdoc = buildSrcdoc({
+    config,
+    styles: options.styles,
+    theme: options.theme,
+    runtimeCode: options.runtimeCode,
+    runtimeUrl: options.runtimeUrl,
+    allowNetwork: options.allowNetwork,
+  });
+  // §3.3: only this iframe (the channel is checked by receive).
+  const onMessage = (event: MessageEvent) => {
+    if (event.source === frame.contentWindow) receive(event.data);
+  };
+  addEventListener('message', onMessage);
+  session.frame = frame;
+  // An opaque-origin sandbox has no origin to target: '*' (§3.3).
+  session.send = message => frame.contentWindow!.postMessage(message, '*');
+  session.stop = () => {
+    removeEventListener('message', onMessage);
+    frame.remove();
+  };
+  options.container.appendChild(frame);
+};
+
+let warnedDirect = false;
+
+/**
+ * Mode 'direct' (§3.2, §3.3): the runtime in this page, in a shadow root,
+ * with the page's lithent. Messages are passed in memory and asynchronously,
+ * like postMessage. The runtime is loaded on first use, so pages that only
+ * use the sandbox do not pull lithent's helpers in.
+ */
+const openDirect = async (
+  session: Session,
+  config: LiveBootConfig,
+  receive: Receive,
+  options: MountLiveOptions
+) => {
+  if (!warnedDirect) {
+    warnedDirect = true;
+    console.warn(
+      "[lithent/live] mode 'direct' runs the widget code in this page: use it only for code you trust."
+    );
+  }
+  const host = document.createElement('div');
+  const shadow = host.attachShadow({ mode: 'open' });
+  shadow.innerHTML =
+    [themeCss(':host', options.theme), ...(options.styles || [])]
+      .filter(Boolean)
+      .map(css => `<style>${styleText(css)}</style>`)
+      .join('') + '<div></div>';
+  let stopped = false;
+  let handler: ((message: LiveRpcMessage) => void) | undefined;
+  let teardown: (() => void) | undefined;
+  session.send = message =>
+    queueMicrotask(() => handler && handler(message as LiveRpcMessage));
+  session.stop = () => {
+    stopped = true;
+    handler = undefined;
+    if (teardown) teardown();
+    host.remove();
+  };
+  options.container.appendChild(host);
+
+  const { boot } = await import('@/runtime/boot');
+  if (stopped) return;
+  teardown = boot(config, shadow.lastChild as HTMLElement, {
+    post: message => queueMicrotask(() => stopped || receive(message)),
+    listen: fn => {
+      handler = fn;
+      return () => {
+        handler = undefined;
+      };
+    },
+  });
+};
+
 export const mountLive = async (
   options: MountLiveOptions
 ): Promise<LiveHandle> => {
-  const { container, timeoutMs = 5000, onError } = options;
+  const { timeoutMs = 5000, onError } = options;
   let props = options.props || {};
   let tools: ToolDescriptor[] = [];
   let state: Record<string, unknown> = {};
@@ -67,19 +166,23 @@ export const mountLive = async (
       }
     });
 
-  /** Tell onError, and hand the error back for throwing. */
-  const report = (error: LiveError) => {
+  /**
+   * Tell onError and hand the error back for throwing. With the code it
+   * came from, a self-repair hint is added (RQ-8).
+   */
+  const report = (error: LiveError, code?: string) => {
+    const hint = code != null && !error.hint && hintFor(error, code);
+    const reported = hint ? { ...error, hint } : error;
     try {
-      if (onError) onError(error);
+      if (onError) onError(reported);
     } catch (thrown) {
       console.error(thrown);
     }
-    return error;
+    return reported;
   };
 
   const close = (session: Session) => {
-    session.off();
-    session.frame.remove();
+    session.stop();
     session.pending.forEach(settle => settle('gone'));
   };
 
@@ -95,56 +198,38 @@ export const mountLive = async (
       };
       session.pending.set(id, settle);
       try {
-        // An opaque-origin sandbox has no origin to target: '*' (§3.3).
-        session.frame.contentWindow!.postMessage(
-          { ...message, ch: session.ch, id },
-          '*'
-        );
+        session.send({ ...message, ch: session.ch, id });
       } catch (error) {
         settle('unsent: ' + messageOf(error));
       }
     });
 
-  /** Start `code` in a fresh sandbox; resolves once it is ready. */
+  /** Start `code` in a fresh session; resolves once it is ready. */
   const open = (code: string) =>
     new Promise<void>((resolve, reject) => {
-      const { runtimeCode, runtimeUrl } = options;
-      if (options.mode && options.mode != 'sandbox') {
-        reject(
-          report({
-            phase: 'compile',
-            message: `mode "${options.mode}" is not available in this version; use "sandbox".`,
-          })
-        );
+      const { mode = 'sandbox', runtimeCode, runtimeUrl } = options;
+      const refuse = (message: string) =>
+        reject(report({ phase: 'compile', message }));
+      if (mode != 'sandbox' && mode != 'direct') {
+        refuse(`mode "${mode}" is not supported; use "sandbox" or "direct".`);
         return;
       }
       // DC-13: never fall back to a hidden CDN request.
-      if (runtimeCode == null && !runtimeUrl) {
-        reject(
-          report({
-            phase: 'compile',
-            message:
-              'Sandbox mode needs runtimeCode (sandboxRuntimeCode from lithent/live/runtime) or runtimeUrl.',
-          })
+      if (mode == 'sandbox' && runtimeCode == null && !runtimeUrl) {
+        refuse(
+          'Sandbox mode needs runtimeCode (sandboxRuntimeCode from lithent/live/runtime) or runtimeUrl.'
         );
         return;
       }
 
       const ch = channelId();
-      const frame = document.createElement('iframe');
-      // DC-7: scripts only. Without allow-same-origin the document gets an
-      // opaque origin: no host DOM, cookies or storage.
-      frame.setAttribute('sandbox', 'allow-scripts');
-      frame.setAttribute('title', 'lithent live widget');
-      frame.style.cssText = 'border:0;width:100%;display:block';
-      frame.srcdoc = buildSrcdoc({
-        config: { ch, code, props, origin: location.origin },
-        styles: options.styles,
-        runtimeCode,
-        runtimeUrl,
-        allowNetwork: options.allowNetwork,
-      });
-
+      const config: LiveBootConfig = {
+        ch,
+        code,
+        props,
+        origin: location.origin,
+        resize: mode == 'sandbox' && options.autoResize !== false,
+      };
       let started = false;
       const timer = setTimeout(
         () =>
@@ -160,7 +245,7 @@ export const mountLive = async (
         clearTimeout(timer);
         if (error) {
           close(session);
-          reject(report(error));
+          reject(report(error, code));
         } else {
           current = session;
           emit({ type: 'tools-changed', tools: tools.slice() });
@@ -169,22 +254,14 @@ export const mountLive = async (
         }
       };
 
-      // §3.3: only this iframe, only this session's channel.
-      const onMessage = (event: MessageEvent) => {
-        const message = event.data as LiveRpcMessage | undefined;
-        if (
-          event.source !== frame.contentWindow ||
-          !message ||
-          message.ch !== ch
-        ) {
-          return;
-        }
+      const receive: Receive = message => {
+        if (!message || message.ch !== ch) return;
         if (message.type == 'ready') {
           tools = message.tools;
           state = message.state;
           finish();
         } else if (message.type == 'error') {
-          if (started) report(message.error);
+          if (started) report(message.error, code);
           else finish(message.error);
         } else if (message.type == 'event' && started) {
           const forwarded = message.event;
@@ -194,17 +271,31 @@ export const mountLive = async (
         } else if (message.type == 'result' || message.type == 'ack') {
           const settle = session.pending.get(message.id);
           if (settle) settle(message);
+        } else if (
+          message.type == 'resize' &&
+          config.resize &&
+          session.frame &&
+          message.height >= 0
+        ) {
+          // DC-8: fit the iframe to its content.
+          session.frame.style.height = `${+message.height}px`;
         }
       };
 
       const session: Session = {
         ch,
-        frame,
+        code,
         pending: new Map(),
-        off: () => removeEventListener('message', onMessage),
+        send: () => {},
+        stop: () => {},
       };
-      addEventListener('message', onMessage);
-      container.appendChild(frame);
+      if (mode == 'direct') {
+        openDirect(session, config, receive, options).catch(error =>
+          finish({ phase: 'mount', message: messageOf(error) })
+        );
+      } else {
+        openSandbox(session, config, receive, options);
+      }
     });
 
   /** Clear the widget's tools and state, telling subscribers. */
@@ -225,7 +316,7 @@ export const mountLive = async (
       if (!tool) return fail('NOT_FOUND', `No tool named "${name}".`);
 
       // DC-14: approval happens here, on the host; a refused call never
-      // reaches the sandbox. Same rules as lithent/agent (DC-5).
+      // reaches the widget. Same rules as lithent/agent (DC-5).
       if (tool.requiresConfirm) {
         let reason = 'The call was not approved.';
         let approved = false;
@@ -249,11 +340,8 @@ export const mountLive = async (
         }
       }
 
-      const reply = await request(current as Session, {
-        type: 'call',
-        name,
-        args,
-      });
+      const session = current as Session;
+      const reply = await request(session, { type: 'call', name, args });
       if (typeof reply != 'string') {
         const result = (reply as { result?: ToolCallResult }).result;
         return result && typeof result.ok == 'boolean'
@@ -267,14 +355,9 @@ export const mountLive = async (
             };
       }
       if (reply == 'timeout') {
-        report({
-          phase: 'timeout',
-          message: `"${name}" did not answer within ${timeoutMs} ms.`,
-        });
-        return fail(
-          'TIMEOUT',
-          `"${name}" did not answer within ${timeoutMs} ms.`
-        );
+        const message = `"${name}" did not answer within ${timeoutMs} ms.`;
+        report({ phase: 'timeout', message }, session.code);
+        return fail('TIMEOUT', message);
       }
       if (reply == 'gone') {
         return fail(
@@ -305,13 +388,17 @@ export const mountLive = async (
     bridge,
     updateProps: async next => {
       props = next;
-      if (!current) return;
-      const reply = await request(current, { type: 'props', props: next });
+      const session = current;
+      if (!session) return;
+      const reply = await request(session, { type: 'props', props: next });
       if (reply == 'timeout') {
-        throw report({
-          phase: 'timeout',
-          message: `The widget did not take the new props within ${timeoutMs} ms.`,
-        });
+        throw report(
+          {
+            phase: 'timeout',
+            message: `The widget did not take the new props within ${timeoutMs} ms.`,
+          },
+          session.code
+        );
       }
       if (typeof reply == 'string' && reply != 'gone') {
         throw report({

@@ -11,7 +11,7 @@
 | 2 | `lithent/agent` 어댑터 (WebMCP, `confirm` 승인 훅, `lithent/element` 연동) | done |
 | 3 | `lithent/agent` 배포 연결·스킬·문서 (선택적 1차 릴리스 게이트) | done (수동 체크 `M-1`·`M-2`·`M-5` 대기) |
 | 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | done |
-| 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | planned |
+| 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | done |
 | 6 | `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모 | planned |
 | 7 | Test Hardening (보안·경계값·오류 격리·동시성·누수 강화) | planned |
 | 8 | Integration Test (이중 코어, 실제 브라우저 E2E, React 호스트, 릴리스 검증) | planned |
@@ -352,7 +352,7 @@ Files:
 
 ---
 
-## Phase 5 — `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 리사이즈: planned
+## Phase 5 — `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 리사이즈: done
 
 Refs: RQ-6, RQ-7, RQ-8, DC-6, DC-7, DC-8, M-3, M-5, M-6
 
@@ -360,18 +360,54 @@ Refs: RQ-6, RQ-7, RQ-8, DC-6, DC-7, DC-8, M-3, M-5, M-6
 - Phase 4 종료 조건 충족.
 
 ### 구현 체크리스트
-- [ ] `mode: 'direct'` 구현 (명시적 opt-in, `lithent/element` Shadow DOM 격리, 비신뢰 코드 금지 주석/문서)
-- [ ] `<lithent-live>` Custom Element 래퍼 구현 (`code`, `mode`, `styles`, `props` 속성/프로퍼티, `live-ready`/`live-error` 이벤트, `el.bridge` 프로퍼티 노출)
-- [ ] `LiveError.hint` 자가 수정(self-repair) 힌트 생성기 구현 (mounter가 JSX 직접 반환, `lstate`를 `mount`에서 사용, 문법 오류 등)
-- [ ] `autoResize` (`ResizeObserver` → `resize` 메시지) 및 `theme` CSS 변수 전달 구현 (`DC-8`)
+- [x] `mode: 'direct'` 구현 (명시적 opt-in, `lithent/element` Shadow DOM 격리, 비신뢰 코드 금지 주석/문서)
+  - 샌드박스 런타임 `boot`를 이 페이지에서 실행하고 open Shadow Root에 그린다. 메시지는 메모리에서 비동기로 오가 RPC·승인·`reload`·타임아웃 로직을 Sandbox 모드와 공유한다. 첫 사용 시 `console.warn`, 타입 주석에 신뢰 코드 전용 명시.
+  - `boot`는 동적 `import()`라 ESM·CJS에서는 별도 청크로 분리되고, 호스트 빌드는 `lithent` 하위 경로를 모두 외부 모듈로 둔다 (`DESIGN.md` §3.2 Direct 모드 의존성).
+  - Shadow DOM 격리는 `lithent/element`를 쓰지 않고 직접 `attachShadow`로 구현했다 (호스트가 lithent 코어를 정적으로 import하지 않게).
+- [x] `<lithent-live>` Custom Element 래퍼 구현 (`code`, `mode`, `styles`, `props` 속성/프로퍼티, `live-ready`/`live-error` 이벤트, `el.bridge` 프로퍼티 노출) — `live/src/element.ts`, `defineLiveElement(name?)`
+  - **설계 편차**: `lithent/element` 대신 plain Custom Element, 등록은 `defineLiveElement()` 호출 시에만, 위젯은 요소 자신(light DOM)에 그린다 (`DESIGN.md` §3.1 편차 기록). Shadow Root 안의 iframe에는 jsdom이 창을 만들지 않아 테스트 중 발견했고, 위젯은 이미 iframe·Direct Shadow Root로 격리되므로 요소의 Shadow Root는 필요 없다고 판단했다.
+  - 추가 속성·프로퍼티: `runtime-url`·`allow-network` 속성, `runtimeCode`·`theme`·`autoResize`·`timeoutMs` 프로퍼티. 같은 task 안의 변경은 한 번에 적용, 이동은 유지, 제거 시 정리.
+- [x] `LiveError.hint` 자가 수정(self-repair) 힌트 생성기 구현 (mounter가 JSX 직접 반환, `lstate`를 `mount`에서 사용, 문법 오류 등) — `live/src/hints.ts` (호스트에서 오류와 코드로 생성)
+  - 대상: JSX, `import`, `export`, 컴포넌트 미반환, React 훅·`React`, `render`·`createRoot` 직접 호출, 그 밖의 미정의 이름(사용 가능한 심볼 목록), `timeout`. "`lstate`를 `mount`에서 사용"은 오류가 나지 않아(`useRenew()` 기반) 대상에서 뺐다 (`DESIGN.md` §3.4 구현 세부 Phase 5).
+  - 심볼 이름 목록을 import 없는 `live/src/names.ts`로 분리해 호스트 힌트가 런타임 의존성을 끌어오지 않게 했다.
+- [x] `autoResize` (`ResizeObserver` → `resize` 메시지) 및 `theme` CSS 변수 전달 구현 (`DC-8`) — `live/src/runtime/entry.ts`(`watchHeight`), `live/src/srcdoc.ts`(`themeCss`), `live/src/mountLive.ts`
 
 ### 기준 테스트
-- [ ] `live/src/tests/direct.test.tsx`: Direct 모드 마운트·`updateProps`·`reload`·`destroy` 및 Shadow DOM 격리
-- [ ] `live/src/tests/error-hints.test.ts`: 대표 LLM 코딩 실수 5종에 대한 구조화된 `LiveError(phase, message, hint)` 검증
-- [ ] `live/src/tests/element-wrapper.test.tsx`: `<lithent-live>` 속성 변경, `el.bridge` 호출, 언마운트 정리
+- [x] `live/src/tests/direct.test.tsx`: Direct 모드 마운트·`updateProps`·`reload`·`destroy` 및 Shadow DOM 격리 (8 tests — jsdom에서 실제 실행, 경고 1회, 스타일·테마, 승인, 시작 실패 정리 포함)
+- [x] `live/src/tests/error-hints.test.ts`: 대표 LLM 코딩 실수 5종에 대한 구조화된 `LiveError(phase, message, hint)` 검증 (19 tests — 엔진별 문구 단위 케이스, Direct 모드 실제 오류 5종, Sandbox 오류에 호스트가 힌트 추가)
+- [x] `live/src/tests/element-wrapper.test.tsx`: `<lithent-live>` 속성 변경, `el.bridge` 호출, 언마운트 정리 (11 tests — 등록·SSR, 변경 묶음 처리, `reload`·`props`·재마운트, `live-error`, 이동 유지, 제거 정리, Direct 모드)
+- [x] 추가: `sandbox.test.ts`(테마 CSS·`autoResize` 설정, 15 tests), `rpc.test.ts`(`resize` 처리, 22 tests), `runtime.test.tsx`(`watchHeight`, 16 tests)
 
 ### 종료 조건
 - Phase 4~5 테스트가 base·concurrent 양쪽에서 100% 통과.
+
+### 검증 기록 (2026-11-27, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] `pnpm --filter lithent-live test` → 7 files, **97/97** / `LITHENT_CORE=concurrent` → 7 files, **97/97**
+- [x] `pnpm --filter lithent-live build` → 성공 (타입 검사 + ESLint). 산출물에 Direct 모드 청크 `boot-*.js`·`boot-*.cjs`와 공유 `names-*` 청크 추가
+- [x] 실제 Chromium(Playwright, 요청 가로채기로 빌드 산출물 제공, 저장소에 임시 파일 없음): Sandbox `autoResize`로 iframe 높이 120px → 260px, 테마 변수 적용(계산 색 `rgb(1, 2, 3)`), Direct 모드(ESM 청크 로드·Shadow DOM·`callTool`·테마), `<lithent-live>`(`live-ready`·`el.bridge` 호출·`props` 갱신), 실제 V8 오류의 JSX·React 힌트, 페이지 오류 0건
+- [ ] **크기**: `lithentLive.umd.js` brotli **4,536 B > 3,000 B** (`DC-9` 초과, 1,536 B). 종료 조건 항목은 아니지만 Phase 6 크기 게이트를 막으므로 `DESIGN.md` `DC-17`(TBD)로 기록했다. `sandboxRuntime.umd.js` 8,485 / 11,000 B (통과)
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+
+Files:
+- `live/src/names.ts` (added)
+- `live/src/hints.ts` (added)
+- `live/src/element.ts` (added)
+- `live/src/index.ts` (modified)
+- `live/src/types.ts` (modified)
+- `live/src/srcdoc.ts` (modified)
+- `live/src/mountLive.ts` (modified)
+- `live/src/runtime/symbols.ts` (modified)
+- `live/src/runtime/entry.ts` (modified)
+- `live/vite.config.js` (modified)
+- `live/src/tests/direct.test.tsx` (added)
+- `live/src/tests/error-hints.test.ts` (added)
+- `live/src/tests/element-wrapper.test.tsx` (added)
+- `live/src/tests/sandbox.test.ts` (modified)
+- `live/src/tests/rpc.test.ts` (modified)
+- `live/src/tests/runtime.test.tsx` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
 
 ---
 
@@ -381,6 +417,7 @@ Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-6, DC-9, DC-10, M-3, M-6, M-7
 
 ### 진입 조건
 - Phase 5 종료 조건 충족.
+- `DESIGN.md` `DC-17`(`lithent/live` 호스트 크기 예산 초과 대응) 결정 — `scripts/size-report.js`에 등재할 예산과, 옵션 B 선택 시 서브패스 추가 여부가 이 결정에 달려 있다. (Phase 5 종료 시 추가)
 
 ### 구현 체크리스트
 - [ ] 루트 `package.json`: `exports["./live"]`, `exports["./live/runtime"]`, `files`, `build:live`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
@@ -461,21 +498,23 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
 
 - **done**:
   - Phase 0 문서 4종 작성 및 `DC-1`~`DC-14` 확정 (커밋 `d290fc3`)
-  - **`lithent/agent` (Phase 1~3 + 후속)** — 코어·어댑터·배포 연결·스킬·문서 사이트, `DC-15`·`DC-16` 반영, Phase 1~3 리뷰(`APPROVE`) 반영 (커밋 `c7917de` → `1d08cc8` → `effa28f` → `381f491` → `c470fb5` → `ed97caa`)
-  - **Phase 4 (`lithent/live` 샌드박스 런타임·RPC)** — `live/` 패키지, `mountLive`(Sandbox 모드)·`LiveHandle`, srcdoc·CSP·`DC-13` 검사, 샌드박스 런타임(`sandboxRuntime.umd.js`, `sandboxRuntimeCode` 문자열 모듈), postMessage RPC(채널·source 검증, 타임아웃, 호스트 측 승인 `DC-14`)
-  - Phase 4 검증: live 테스트 base·concurrent 각 53/53, 호스트 2,084 / 3,000 B·런타임 8,277 / 11,000 B, 실제 Chromium에서 격리·CSP·RPC 동작 확인, 루트 `test:core` 무회귀, 코어 diff 0줄 (Phase 4 "검증 기록")
+  - **`lithent/agent` (Phase 1~3 + 후속)** — 코어·어댑터·배포 연결·스킬·문서 사이트, `DC-15`·`DC-16` 반영, Phase 1~3 리뷰 반영 (커밋 `c7917de` … `ed97caa`)
+  - **Phase 4 (`lithent/live` Sandbox 모드·RPC)** (커밋 `d3c6afe`)
+  - **Phase 5 (`lithent/live` Direct 모드·`<lithent-live>`·힌트·리사이즈·테마)** — `mode: 'direct'`(같은 `boot`를 Shadow Root에서, 동적 청크), `defineLiveElement()`(plain Custom Element, light DOM — 설계 편차), 호스트 측 자기 수정 힌트, `ResizeObserver` 자동 높이, `theme` CSS 변수
+  - Phase 5 검증: live 테스트 base·concurrent 각 97/97, Chromium에서 높이 맞춤·테마·Direct·요소·실제 오류 힌트 확인, 코어 diff 0줄 (Phase 5 "검증 기록")
 - **next**:
-  1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스 필수, `DC-10`)
-  2. 사용자 결정: Phase 4 리뷰(`doc-driven-reviewer-v1`) 여부
-  3. Phase 5: `mode: 'direct'`(Shadow DOM), `<lithent-live>` 래퍼, `LiveError.hint` 생성기, `autoResize`(`resize` 메시지)·`theme`
-- **blockers**: 없음
+  1. 사용자 결정: `DC-17` (`lithent/live` 호스트 4,536 B > 3,000 B: A 예산 상향 / B Direct·요소 서브패스 분리 / C 축소 / D ESM 기본 청크로 측정) — **Phase 6 진입 조건**
+  2. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스)
+  3. 사용자 결정: Phase 4~5 리뷰(`doc-driven-reviewer-v1`) 여부
+  4. Phase 6: 루트 `exports["./live"]`·`["./live/runtime"]`, 빌드·테스트·크기·릴리스 스크립트 등재, README·스킬·문서 사이트·인터랙티브 플레이그라운드
+- **blockers**:
+  - Phase 6 착수: `DC-17` 결정 필요
 - **risks / follow-ups**:
   - `lithent/agent` 크기 여유 126 B (2,374 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
-  - srcdoc 문서는 호스트 페이지 CSP를 상속한다. 호스트 CSP가 `'unsafe-eval'`·인라인 스크립트를 막으면 샌드박스가 시작하지 못한다 — Phase 7·8에서 확인하고 필요하면 문서·`runtimeUrl` 안내를 보강 (`DESIGN.md` §3.3 구현 메모).
-  - `mountLive`는 시작 실패 시 reject하고 핸들을 주지 않는다. IMPLEMENT Phase 7의 "오류 복구 루프"는 `reload` 실패 → `reload` 성공 경로와 `mountLive` 재호출로 검증한다 (`DESIGN.md` §3.4 구현 세부).
-  - 이름 규칙: `name`·`scopeId`에 `[a-zA-Z0-9_-]` 외 문자를 검사하지 않는다 (`DESIGN.md` §2.5). 필요하면 Phase 7에서 개발 경고 추가를 검토.
-  - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면 이전 인스턴스는 다시 등록되지 않는다 (설계대로). Phase 7 경계 테스트에서 의도 확인 권장.
-  - WebMCP 표준화 진행 중: `annotations`와 `requiresConfirm` 매핑, `execute`의 `{ signal }` 취소는 미반영 (`DESIGN.md` §2.6).
-  - 보류한 리뷰 제안: `listTools()` 반환값 방어 복사, 위성 패키지 `repository.url` 형식 ("Phase 3 후속" 사유).
-  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체. live 런타임 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
-- **latest commit**: `ed97caa` (Phase 1~3 리뷰 반영). Phase 4 변경은 이 기록 직후 커밋한다
+  - Phase 6 `verify-release`: `live/dist`에 해시가 붙은 청크(`boot-*`, `names-*`)가 있으므로 `files`·패킹·소비자 검사에서 청크가 함께 실리는지 확인해야 한다.
+  - Direct 모드를 UMD로 쓰려면 `lithentHelper`·`lithentFTags`·`lithentTag`·`lithentAgent` 전역이 필요하다 — Phase 6 README·문서에 명시.
+  - srcdoc 문서는 호스트 페이지 CSP를 상속한다 — 엄격한 호스트 CSP에서의 동작은 Phase 7·8에서 확인 (`DESIGN.md` §3.3 구현 메모).
+  - `mountLive`는 시작 실패 시 reject하고 핸들을 주지 않는다 — Phase 7 "오류 복구 루프"는 `reload` 실패 → 성공과 `mountLive` 재호출로 검증.
+  - 이름 규칙 검사 없음(`DESIGN.md` §2.5), `DC-3` 덮어쓰기 후 이전 인스턴스 미재등록, WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건 — Phase 7 검토 후보.
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
+- **latest commit**: `d3c6afe` (Phase 4). Phase 5 변경은 이 기록 직후 커밋한다
