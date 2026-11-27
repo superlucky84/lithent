@@ -48,7 +48,7 @@ const copy = {
     notesItems: [
       'Declare in the mounter. A declaration in the updater warns and is not registered again.',
       'renderToString registers nothing: mount callbacks do not run on the server.',
-      'useAgentBridge() returns the component’s bridge; call its methods after mount, in mountCallback or handlers.',
+      'useAgentBridge() returns the component’s bridge; call its methods after mount, in mountCallback or handlers. You can also pass it to children or to a Custom Element prop.',
       'Generated UI (LLM-written widgets in a sandbox) is the next step: lithent/live, which exposes the same bridge contract.',
     ],
   },
@@ -99,7 +99,7 @@ const copy = {
     notesItems: [
       'mounter에서 선언하세요. updater에서 선언하면 경고가 나고 다시 등록되지 않습니다.',
       'renderToString은 아무것도 등록하지 않습니다. 서버에서는 mount 콜백이 실행되지 않습니다.',
-      'useAgentBridge()는 컴포넌트의 브릿지를 반환합니다. 메서드는 마운트 이후(mountCallback이나 핸들러)에 호출하세요.',
+      'useAgentBridge()는 컴포넌트의 브릿지를 반환합니다. 메서드는 마운트 이후(mountCallback이나 핸들러)에 호출하세요. 자식 컴포넌트나 Custom Element prop으로 넘겨도 됩니다.',
       '생성형 UI(샌드박스에서 실행하는 LLM 작성 위젯)는 다음 단계인 lithent/live에서 같은 브릿지 계약으로 제공됩니다.',
     ],
   },

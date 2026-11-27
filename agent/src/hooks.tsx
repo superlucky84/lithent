@@ -21,8 +21,9 @@ import type {
 /** Marks an `AgentScope`'s props; a symbol survives the in-place props sync. */
 const SCOPE = Symbol();
 
-const warned = new Set<string>();
-const warnOnce = (key: string, msg: string) => {
+/** Keys: a declaration's name, or REG for the foreign-bridge warning. */
+const warned = new Set<unknown>();
+const warnOnce = (key: unknown, msg: string) => {
   if (!warned.has(key)) {
     warned.add(key);
     console.warn(`[lithent/agent] ${msg}`);
@@ -40,7 +41,7 @@ const fullName = (name: string, scopeId?: string) =>
 const registryOf = (bridge: AgentBridge): Registry | undefined => {
   const registry = (bridge as InternalBridge)[REG];
   if (!registry) {
-    warnOnce('bridge', 'bridge was not made by createAgentBridge; skipped.');
+    warnOnce(REG, 'bridge was not made by createAgentBridge; skipped.');
   }
   return registry;
 };
@@ -95,18 +96,21 @@ export const AgentScope = mount<{ bridge: AgentBridge }>(
 );
 
 /**
- * The bridge a component's declarations use. It resolves the scope when the
- * component mounts; calls made before that go to `defaultAgentBridge`.
+ * The bridge a component's declarations use. The scope is looked up on the
+ * first call after the component has drawn, not in its own mountCallback:
+ * children mount before their parent, so a child handed this bridge uses it
+ * first. Calls made before the component has drawn go to
+ * `defaultAgentBridge`.
  */
 export const useAgentBridge = (): AgentBridge => {
   const compKey = getComponentKey();
+  const vd = compKey && getComponentSubInfo(compKey, 'vd');
+  // Only the component whose mounter is running owns this bridge.
+  const own = vd && !vd.value ? compKey : null;
   let resolved: AgentBridge | undefined;
-  if (compKey) {
-    mountCallback(() => {
-      resolved = resolveBridge(compKey);
-    });
-  }
-  const current = (): InternalBridge => resolved || defaultAgentBridge;
+  const current = (): InternalBridge =>
+    resolved ||
+    (own && drawn(own) ? (resolved = resolveBridge(own)) : defaultAgentBridge);
 
   const proxy = {
     get [REG]() {
@@ -163,8 +167,13 @@ export function agentAction(
   }
 
   return (args?: Record<string, unknown>) => {
-    const result = run(args);
-    report();
+    let result: unknown;
+    // Report even when run throws after changing state, as callTool does.
+    try {
+      result = run(args);
+    } finally {
+      report();
+    }
     if (result && typeof (result as Promise<unknown>).then == 'function') {
       (result as Promise<unknown>).then(report, report);
     }

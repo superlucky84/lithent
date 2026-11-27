@@ -108,6 +108,33 @@ describe('getState — snapshots (RQ-2)', () => {
 });
 
 describe('subscribe — state changes (RQ-2, §2.3)', () => {
+  it('reports a direct call that changes state and then throws', async () => {
+    const bridge = createAgentBridge();
+    let step: () => unknown = () => undefined;
+    const Failing = mount(() => {
+      let count = 0;
+      step = agentAction({
+        name: 'step_then_fail',
+        description: 'Step, then fail',
+        run: () => {
+          count += 1;
+          throw new Error('after the change');
+        },
+      });
+      agentState('steps', () => count);
+      return () => <i />;
+    });
+    inScope(bridge, <Failing />);
+    const events = record(bridge);
+
+    expect(() => step()).toThrow('after the change');
+    await act();
+
+    expect(stateEvents(events)).toEqual([
+      { type: 'state-changed', name: 'steps', state: { steps: 1 } },
+    ]);
+  });
+
   it('lmount: hears about a plain UI change made without an action', async () => {
     const bridge = createAgentBridge();
     const { container } = inScope(bridge, <Slider />);

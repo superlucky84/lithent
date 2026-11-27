@@ -184,7 +184,7 @@ Files:
 
 ## Phase 3 — `lithent/agent` 배포 연결·스킬·문서: done
 
-Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-9, DC-10, M-1
+Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-9, DC-10, DC-15, DC-16, M-1
 
 ### 진입 조건
 - Phase 2 종료 조건 충족.
@@ -234,6 +234,51 @@ Files:
 - `lithentDocs/src/pages/AgentNative_ko.tsx` (added)
 - `lithentDocs/src/components/Layout.tsx` (modified)
 - `lithentDocs/src/components/Sidebar.tsx` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
+
+---
+
+## Phase 3 후속 — Phase 1~3 리뷰 반영: done
+
+Refs: RQ-1, RQ-2, RQ-4, RQ-5, DC-2, DC-4, DC-9
+
+### 진입 조건
+- `doc-driven-reviewer-v1`의 Phase 1~3 리뷰(`d290fc3..c470fb5`, Verdict `APPROVE`, Critical 0 / Warning 4 / Suggestion 4)를 받아, 사용자가 타당하고 도움이 되는 항목만 반영하도록 요청 (2026-11-27).
+
+### 반영한 항목
+- [x] **Warning 1 — `useAgentBridge()`를 자식·Custom Element에 넘기면 `defaultAgentBridge`에 등록되던 문제**: 마운트 콜백은 자식부터 실행되므로(`src/render.ts` `addMountedQueue`가 자식 처리 뒤 호출) 부모의 `mountCallback`보다 자식 등록이 먼저 일어났다. 실패 테스트로 재현 후, 스코프를 컴포넌트가 그려진 뒤 첫 호출에서 찾아 고정하도록 수정 (`agent/src/hooks.tsx`). 자기 mounter가 실행 중인 컴포넌트의 키만 쓰도록 해, 컴포넌트 밖 호출이 남은 키로 다른 컴포넌트의 스코프를 잡지 않게 했다.
+- [x] **Warning 2 — `connectWebMCP` 실패·해제 정리**: 등록이 동기 예외·비동기 거부로 실패하면 등록 목록에서 빼서 해제 때 `unregisterTool`을 부르지 않고 다음 동기화 때 다시 시도한다. `unregisterTool` 예외는 무시해 나머지 도구 해제가 계속된다 (`agent/src/webmcp.ts`).
+- [x] **Warning 3 — 사람 직접 호출에서 `run`이 동기 예외를 던지면 상태 알림 누락**: `try/finally`로 `callTool`과 같게 맞췄다.
+- [x] **Warning 4 — Phase 3 `Refs:`에 `DC-15`·`DC-16` 누락**: 추가. (Handoff `latest commit`은 그 줄을 기록한 커밋 자신을 가리킬 수 없으므로 지적 대상이 아니다.)
+- [x] **Suggestion 1 — `Number` 검증을 `Number.isFinite`로**: `Infinity`처럼 JSON으로 표현할 수 없는 값도 `INVALID_PARAMS`로 거절한다 (`DESIGN.md` §2.5 갱신).
+- [x] **Suggestion 2 — 경고 키 충돌**: 외부 브릿지 경고 키를 문자열 `'bridge'` 대신 모듈 심볼 `REG`로 바꿔, `bridge`라는 이름의 선언 경고와 섞이지 않게 했다 (크기 증가 없음).
+
+### 반영하지 않은 항목 (사유)
+- **Suggestion 3 — `listTools()`가 내부 디스크립터를 그대로 반환**: 얕은 복사로는 중첩된 `inputSchema`를 보호하지 못하고, 깊은 복사는 크기 여유(126 B)를 쓴다. 소비자가 반환값을 제자리 수정하는 경우는 드물어 현재 동작을 유지한다. 필요하면 Phase 7에서 재검토.
+- **Suggestion 4 — `agent/package.json`의 `repository.url` 형식**: `element/package.json`, `test/package.json`과 같은 저장소 관례이며 `private: true`라 배포에 영향이 없다. 위성 패키지 전체를 한꺼번에 고칠 때 함께 다룬다.
+
+### 기준 테스트
+- [x] 실패 재현: `lifecycle.test.tsx` "can be handed to a child, which mounts before its parent"가 수정 전 실패, 수정 후 통과
+- [x] 회귀 테스트 추가: `Infinity` 거절(`action.test.tsx`), 직접 호출 예외 후 상태 알림(`state.test.tsx`), `bridge` 이름 경고 분리(`lifecycle.test.tsx`), 실패 등록 미해제·`unregisterTool` 예외 격리(`webmcp.test.tsx`)
+
+### 검증 기록 (2026-11-27)
+- [x] `pnpm --filter lithent-agent test` / `LITHENT_CORE=concurrent` → 각 7 files, **91/91** 통과 (86 + 신규 5)
+- [x] `pnpm --filter lithent-agent build` → 성공 (타입 검사 + ESLint), `node scripts/size-report.js` → `lithent/agent` **2,374 / 2,500 B** (여유 126 B)
+- [x] `pnpm build:docs` → 성공 (문서 사이트 안내 문구 갱신)
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+
+Files:
+- `agent/src/hooks.tsx` (modified)
+- `agent/src/schema.ts` (modified)
+- `agent/src/webmcp.ts` (modified)
+- `agent/src/tests/action.test.tsx` (modified)
+- `agent/src/tests/lifecycle.test.tsx` (modified)
+- `agent/src/tests/state.test.tsx` (modified)
+- `agent/src/tests/webmcp.test.tsx` (modified)
+- `skills/lithent/reference/agent.md` (modified)
+- `lithentDocs/src/pages/AgentNative.tsx` (modified)
 - `docs/agent-ui/REQUIREMENTS.md` (modified)
 - `docs/agent-ui/DESIGN.md` (modified)
 - `docs/agent-ui/IMPLEMENT.md` (modified)
@@ -380,18 +425,19 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - **Phase 2 (어댑터)** — `setConfirmHandler`·액션별 `confirm`(`DC-5`, 보안 기본값 `REJECTED`), `connectWebMCP`(`DC-4`, 현재 WebMCP에 맞춘 편차 포함), `lithent/element` 연동 확인 (커밋 `1d08cc8`)
   - **Phase 2 후속** — `DC-15`(`scopeId` 구분자 `__`), `DC-16`(예산 2,500 B, `connectWebMCP` tree-shaking) 반영 (커밋 `effa28f`)
   - **Phase 3 (배포 연결·스킬·문서)** — 루트 `exports["./agent"]`·`files`·빌드/테스트 스크립트, `size-report.js`(2,500 B)·`verify-release.mjs`(13개 경로)·`ci-build-artifacts.mjs`·`release-policy.json` 등재, `agent/README.md`, `skills/lithent/reference/agent.md`, `SKILL.md`, `lithent-agent-addon.md`, 문서 사이트 `/guide/agent-native`(영어·한국어)
-  - Phase 3 게이트: `pnpm build`·`pnpm size`·`pnpm test:dual`·`pnpm verify:release`·`pnpm build:docs` 통과, CI fixture 50/50 (Phase 3 "검증 기록")
+  - Phase 3 게이트: `pnpm build`·`pnpm size`·`pnpm test:dual`·`pnpm verify:release`·`pnpm build:docs` 통과, CI fixture 50/50 (Phase 3 "검증 기록", 커밋 `381f491`)
+  - **Phase 3 후속 (리뷰 반영)** — `doc-driven-reviewer-v1` `APPROVE` 리뷰의 Warning 1~4·Suggestion 1~2 반영(`useAgentBridge` 자식 전달, `connectWebMCP` 실패 정리, 직접 호출 예외 후 알림, `Number.isFinite`, 경고 키, `Refs:`), Suggestion 3~4는 사유 기록 후 보류. 테스트 base·concurrent 각 91/91, 2,374 / 2,500 B
 - **next**:
   1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스 필수, `DC-10`) — 결과 기록 후 릴리스(버전·CHANGELOG·publish) 진행 여부 결정
-  2. 사용자 결정: Phase 3(또는 Phase 1~3) 리뷰(`doc-driven-reviewer-v1`) 여부
-  3. Phase 4: `lithent/live` 샌드박스 런타임 및 `postMessage` RPC 브릿지 (`live/` 패키지)
+  2. Phase 4: `lithent/live` 샌드박스 런타임 및 `postMessage` RPC 브릿지 (`live/` 패키지)
 - **blockers**: 없음 (1차 릴리스만 수동 체크 대기)
 - **risks / follow-ups**:
-  - 크기 여유 160 B (2,340 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
+  - 크기 여유 126 B (2,374 / 2,500 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
   - 이름 규칙: 라이브러리는 `name`·`scopeId`에 `[a-zA-Z0-9_-]` 외 문자가 들어가도 검사하지 않는다 (`DESIGN.md` §2.5). 필요하면 Phase 7에서 개발 경고 추가를 검토.
   - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면, 아직 마운트된 이전 인스턴스는 다시 등록되지 않는다 (설계대로의 동작). Phase 7 경계 테스트에서 의도 확인 권장.
   - WebMCP는 표준화 진행 중이다. `annotations`(`consequentialHint` 등)와 `requiresConfirm` 매핑, `execute`의 `{ signal }` 취소는 미반영 (`DESIGN.md` §2.6). 실제 Chrome 검증은 `M-2`(수동)와 Phase 8 E2E에서 한다.
-  - `useAgentBridge()` 위임 브릿지의 메서드(`setConfirmHandler` 포함)는 마운트 전에 호출하면 `defaultAgentBridge`로 간다.
+  - `useAgentBridge()` 위임 브릿지의 메서드(`setConfirmHandler` 포함)는 컴포넌트가 그려지기 전(mounter 안)에 호출하면 `defaultAgentBridge`로 간다. 자식·Custom Element에 넘기는 것은 Phase 3 후속에서 지원.
+  - 보류한 리뷰 제안: `listTools()` 반환값 방어 복사(Suggestion 3), 위성 패키지 `repository.url` 형식(Suggestion 4) — "Phase 3 후속" 사유 참고.
   - 패키지 tarball의 `agent/src`에는 `lithent/element`와 같이 테스트 파일도 포함된다 (`files` 패턴 관례).
   - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. `pnpm test:ci`는 Node 24 옵션(`--test-isolation=none`) 때문에 Node 22에서 시작하지 못하므로 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대신 실행했다. agent의 element 연동 테스트는 `element/dist`가 필요하다.
-- **latest commit**: `381f491` (Phase 3, `feat/agent-ui`에 푸시됨)
+- **latest commit**: `c470fb5` (Phase 3 handoff 정정). "Phase 3 후속" 변경은 이 기록 직후 커밋한다

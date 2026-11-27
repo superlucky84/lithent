@@ -88,7 +88,8 @@ const stop = bridge.subscribe(event => {
 - Which bridge: `options.bridge`, else the nearest `<AgentScope bridge>`, else
   `defaultAgentBridge`, decided when the component mounts. `useAgentBridge()`
   returns the component's bridge; call its methods after mount (in
-  `mountCallback` or handlers).
+  `mountCallback` or handlers). It can also be passed to children (as
+  `options.bridge`) or to a Custom Element prop.
 - Confirmation: `confirm: true` asks `bridge.setConfirmHandler(ctx => boolean |
   Promise<boolean>)`; a function as `confirm` decides itself. No handler, an
   error or anything but `true` returns `REJECTED`. People calling the handler

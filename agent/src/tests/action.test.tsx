@@ -259,6 +259,7 @@ describe('callTool — argument checks (RQ-1, DC-2, DC-11)', () => {
   it.each([
     ['n', 'one', 'number'],
     ['n', Number.NaN, 'number'],
+    ['n', Infinity, 'number'],
     ['b', 'true', 'boolean'],
     ['o', [1], 'object'],
     ['o', null, 'object'],

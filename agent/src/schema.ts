@@ -46,7 +46,7 @@ const matches = (type: string, v: unknown) =>
     : type == 'object'
       ? !!v && typeof v == 'object' && !Array.isArray(v)
       : type == 'number'
-        ? typeof v == 'number' && !Number.isNaN(v)
+        ? Number.isFinite(v)
         : typeof v == type;
 
 const has = {}.hasOwnProperty;

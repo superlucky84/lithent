@@ -208,6 +208,42 @@ describe('connectWebMCP — registration follows the bridge (RQ-5)', () => {
       expect.any(Error)
     );
   });
+
+  it('never unregisters a failed registration, and one failing unregister does not stop the rest', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const bridge = createAgentBridge();
+    const unregistered: string[] = [];
+    const context: WebMCPModelContext = {
+      registerTool: tool => {
+        if (tool.name === 'bad_sync') throw new Error('invalid');
+        if (tool.name === 'bad_async')
+          return Promise.reject(new Error('later'));
+        return Promise.resolve();
+      },
+      unregisterTool: name => {
+        unregistered.push(name);
+        // Like a context whose abort already removed the tool.
+        if (name === 'first') throw new Error('unknown tool');
+      },
+    };
+    const All = mount(() => {
+      for (const name of ['first', 'bad_sync', 'bad_async', 'last']) {
+        agentAction({ name, description: name, run: () => name });
+      }
+      return () => <i />;
+    });
+    render(
+      <AgentScope bridge={bridge}>
+        <All />
+      </AgentScope>
+    );
+
+    const disconnect = connectWebMCP(bridge, { target: context });
+    await act();
+    expect(() => disconnect()).not.toThrow();
+
+    expect(unregistered).toEqual(['first', 'last']);
+  });
 });
 
 describe('connectWebMCP — finding the context (DC-4)', () => {

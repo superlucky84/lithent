@@ -276,10 +276,10 @@ const OrderList = lmount(() => {
      - 핸들러는 `{ name(scopeId 접두사 포함 등록 이름), description, args(검증·strip된 인자) }`를 받고, 동기·비동기 모두 가능하다. 정확히 `true`일 때만 승인한다.
      - **보안 기본값**: 핸들러가 없거나, `false`·`true` 외 값을 반환하거나, 예외·거부(reject)되면 모두 `REJECTED`이며 `run`은 실행되지 않는다. 핸들러 예외 메시지는 `REJECTED`의 `message`로 전달한다.
      - 승인을 기다리는 동안 액션이 언마운트되거나 같은 이름이 다른 인스턴스로 바뀌면 실행하지 않고 `NOT_FOUND`를 반환한다.
-     - `setConfirmHandler(null)`로 핸들러를 해제한다. `useAgentBridge()`의 위임 브릿지로도 설정할 수 있으나, 다른 메서드처럼 마운트 이후에 호출해야 스코프 브릿지에 적용된다.
+     - `setConfirmHandler(null)`로 핸들러를 해제한다. `useAgentBridge()`의 위임 브릿지로도 설정할 수 있으나, 다른 메서드처럼 컴포넌트가 그려진 이후에 호출해야 스코프 브릿지에 적용된다 (§2.4).
 5. `mount` 모드(`renew()` 수동 호출)와 `lmount` 모드(`lstate` 자동 갱신) 모두 `mountCallback`/`updateCallback`/`getComponentKey`를 동일하게 지원하므로 두 모드에서 동작 차이가 없다.
 6. **구현 세부 (Phase 1에서 확정된 동작)**:
-   - 변경 감지는 브릿지 단위로 모은다. `agentState`의 `updateCallback`, 사람 직접 호출, `callTool` 완료가 모두 같은 마이크로태스크 검사 1회를 예약하고, 검사는 각 상태의 직렬화 문자열을 직전 통지값과 비교한다. 바뀐 상태가 있으면 `state-changed`를 **1회** 발행하며, 바뀐 상태가 하나면 `name`에 그 이름을, 여럿이면 `name: undefined`를 담는다. 따라서 액션이 상태를 바꾼 뒤 뒤따르는 재렌더가 같은 이벤트를 다시 보내지 않는다.
+   - 변경 감지는 브릿지 단위로 모은다. `agentState`의 `updateCallback`, 사람 직접 호출, `callTool` 완료가 모두 같은 마이크로태스크 검사 1회를 예약하고, 검사는 각 상태의 직렬화 문자열을 직전 통지값과 비교한다. 바뀐 상태가 있으면 `state-changed`를 **1회** 발행하며, 바뀐 상태가 하나면 `name`에 그 이름을, 여럿이면 `name: undefined`를 담는다. 따라서 액션이 상태를 바꾼 뒤 뒤따르는 재렌더가 같은 이벤트를 다시 보내지 않는다. 사람 직접 호출도 `callTool`처럼 `run`이 예외를 던져도 검사를 예약한다 (예외 전에 바뀐 상태를 놓치지 않음 — Phase 3 리뷰 반영).
    - 상태 등록·해제 시에는 해당 `name`으로 즉시 `state-changed`를 발행한다. `notifyStateChange(name?)`는 비교 없이 즉시 발행하고 직전 통지값을 갱신한다.
    - 호출 위치 검사: 현재 컴포넌트 엔트리가 존재하고 아직 그려지지 않았을 때(`vd.value === null`)만 `mounter`로 본다. 이미 사라진 컴포넌트의 키가 남아 있는 경우(컴포넌트 밖 호출)도 엔트리가 없으므로 밖으로 판정한다. 경고는 이름별 1회다. 한계: 첫 렌더의 `updater`는 `vd.value`가 설정되기 전에 실행되므로 그 1회 호출은 등록되고, 두 번째 렌더부터 경고와 함께 무시된다 (중복 등록은 발생하지 않음).
    - 구독자(listener)가 예외를 던져도 다른 구독자와 등록 흐름은 계속되며, 예외는 `console.error`로 보고한다.
@@ -294,7 +294,7 @@ const OrderList = lmount(() => {
   - `<AgentScope bridge={bridge}>`는 `mount`로 구현되며, 내부 `props`에 모듈 전용 `Symbol` 키로 `bridge`를 저장하고 `children`을 그대로 `Fragment`로 반환한다 (`helper/src/hook/context.tsx`의 `Provider` 패턴과 동일).
   - 하위 컴포넌트에서 `agentAction`·`agentState`·`useAgentBridge`는 `mounter` 시점에 `compKey = getComponentKey()`를 캡처한 뒤, `mountCallback` 시점(WDom 트리 연결 완료)에 `getComponentSubInfo(compKey, 'vd')?.value`에서 `getParent()` 체인을 따라 올라가며 해당 `Symbol` 키가 붙은 조상 WDom의 `bridge`를 찾는다.
   - 이 방식은 `lithent/helper` 의존성 없이 `mount`와 `lmount` 모두에서, base·concurrent 양쪽 코어에서 동일하게 동작한다.
-  - **구현 세부 (Phase 1)**: 브릿지는 각 컴포넌트가 마운트될 때 한 번 결정된다. 이후 `<AgentScope>`의 `bridge` prop을 바꿔도 이미 마운트된 컴포넌트의 등록은 옮겨지지 않는다. `useAgentBridge()`는 마운트 시점에 스코프를 결정하는 위임(delegating) 브릿지를 반환하며, 마운트 전에 호출된 메서드는 `defaultAgentBridge`로 간다 (`mountCallback`·이벤트 핸들러에서 사용 권장). 이 위임 브릿지는 `options.bridge`로 넘겨도 동작한다.
+  - **구현 세부 (Phase 1)**: 브릿지는 각 컴포넌트가 마운트될 때 한 번 결정된다. 이후 `<AgentScope>`의 `bridge` prop을 바꿔도 이미 마운트된 컴포넌트의 등록은 옮겨지지 않는다. `useAgentBridge()`는 위임(delegating) 브릿지를 반환한다. 스코프는 컴포넌트가 그려진(`vd.value` 설정) 뒤 첫 호출에서 찾아 고정하며, 그 전에 호출된 메서드는 `defaultAgentBridge`로 간다 (`mountCallback`·이벤트 핸들러에서 사용 권장). 마운트 콜백은 자식부터 실행되므로(`src/render.ts`의 `addMountedQueue`가 자식 처리 뒤에 호출됨), 처음 구현처럼 자기 `mountCallback`에서 스코프를 정하면 이 브릿지를 자식 컴포넌트나 Custom Element에 prop으로 넘겼을 때 자식이 먼저 `defaultAgentBridge`에 등록되는 문제가 있었다 — Phase 3 리뷰 반영으로 첫 호출 시점 결정으로 바꿨다. 이 위임 브릿지는 `options.bridge`로 넘기거나 자식에게 넘겨도 동작한다.
   - 등록은 `createAgentBridge()`로 만든 브릿지(모듈 전용 `Symbol` 레지스트리 보유)에만 가능하다. 직접 만든 객체를 `options.bridge`로 넘기면 경고 1회 후 등록하지 않는다 (액션 함수 자체는 계속 동작).
   - `dispose()`는 도구·상태를 비우고, 도구가 있었다면 `tools-changed`(`tools: []`)를 발행한 뒤 구독자를 모두 해제한다. 브릿지는 이후에도 재사용할 수 있다.
 - **`lithent/element` 경계 (Phase 2 확인)**: Custom Element는 내부 컴포넌트를 자체 render 루트(기본 Shadow Root)에 그리므로 WDom 부모 체인이 요소 밖으로 이어지지 않는다. 따라서 요소 바깥의 `<AgentScope>`는 요소 내부 선언에 적용되지 않고, 내부 선언은 기본적으로 `defaultAgentBridge`에 등록된다. 페이지 브릿지를 쓰려면 `Object` prop(예: `props: { bridge: Object }`, `el.bridge = bridge`)으로 넘기고 내부에서 `<AgentScope bridge={props.bridge}>` 또는 `options.bridge`로 사용한다. 여러 인스턴스는 속성 값을 `scopeId`로 써서 이름을 나눈다 (`widget-id="left"` → `left__read_label`). 요소 이동(DC-4 of `lithent/element`)은 인스턴스를 유지하므로 등록도 유지되고, 제거 시에는 요소의 언마운트 마이크로태스크 뒤에 해제된다.
@@ -312,7 +312,7 @@ const OrderList = lmount(() => {
 - `callTool(name, args)` 호출 시:
   - 등록되지 않은 이름 → `{ ok: false, error: { code: 'NOT_FOUND', ... } }`
   - `params`에 선언되지 않은 여분 키는 무시(strip)하고 선언된 키만 `run(args)`에 전달한다 (`DC-11` 확정; JSON Schema에는 `additionalProperties: false`를 힌트로 유지).
-  - 필수값 누락 / 타입 불일치(`Number`는 `typeof v === 'number' && !Number.isNaN(v)`, `Array`는 `Array.isArray(v)`, `Object`는 `v !== null && typeof v === 'object' && !Array.isArray(v)`) / `enum` 위반 → `{ ok: false, error: { code: 'INVALID_PARAMS', ... } }`
+  - 필수값 누락 / 타입 불일치(`Number`는 `Number.isFinite(v)` — `NaN`·`Infinity`처럼 JSON으로 표현할 수 없는 값 거절, Phase 3 리뷰 반영으로 원래의 `!Number.isNaN(v)`에서 강화, `Array`는 `Array.isArray(v)`, `Object`는 `v !== null && typeof v === 'object' && !Array.isArray(v)`) / `enum` 위반 → `{ ok: false, error: { code: 'INVALID_PARAMS', ... } }`
   - `confirm` 거부 → `{ ok: false, error: { code: 'REJECTED', ... } }`
   - `run` 예외 → `{ ok: false, error: { code: 'EXECUTION_ERROR', ... } }` (호스트 앱 크래시 방지)
 - **`INVALID_PARAMS` 상세 형식 (Phase 1 구현)**: `details`는 문제를 한 번에 모두 담은 `ParamIssue[]`(`{ param, issue: 'required' | 'type' | 'enum', expected? }`)이며, `message`는 `Invalid arguments for "<name>": status (required), minPrice (type).` 형태로 LLM이 바로 자기 수정할 수 있게 한다. 인자 자체가 객체가 아니면(`null`, 배열, 문자열) `[{ param: '', issue: 'type', expected: 'object' }]`이다. 선택 파라미터에 `null`을 보내면 생략으로 보지 않고 타입 불일치로 처리한다.
@@ -326,8 +326,8 @@ const OrderList = lmount(() => {
 
 > **편차 기록 (Phase 2, 2026-11-27)**: 위 세 항목은 Phase 0 시점의 WebMCP 초안(`navigator.modelContext`, `registerTool`/`unregisterTool`)을 기준으로 했다. Phase 2 착수 시 Chrome 문서([Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api), [Agentic JavaScript Tools](https://developer.chrome.com/docs/modern-web-guidance/guides/webmcp/agentic-javascript-tools))를 확인한 결과, 현재 API는 `document.modelContext`를 쓰고(`navigator.modelContext`는 deprecated), `unregisterTool()` 없이 `registerTool(tool, { signal })`의 `AbortSignal`을 abort해 제거하며, `execute`는 예외를 던지기보다 구조화된 오류 값을 반환하도록 권장한다. `DC-4`(명시적 opt-in 함수)는 그대로 두고, 어댑터를 두 방식 모두에 맞게 다음처럼 구현했다 (원래 계약의 상위 호환):
 > - 대상 결정: `options.target` → `document.modelContext` → `navigator.modelContext` → 없으면 no-op 해제 함수.
-> - 등록: 도구마다 `AbortController`를 만들어 `registerTool({ name, description, inputSchema, execute }, { signal })`로 등록한다. `registerTool`이 Promise를 반환하면 거부(reject)를 잡아 경고한다. 동기 예외도 경고 후 나머지 도구 등록을 계속한다.
-> - 해제: 해당 `AbortController`를 abort하고, 대상에 `unregisterTool`이 있으면 함께 호출한다.
+> - 등록: 도구마다 `AbortController`를 만들어 `registerTool({ name, description, inputSchema, execute }, { signal })`로 등록한다. `registerTool`이 Promise를 반환하면 거부(reject)를 잡아 경고한다. 동기 예외도 경고 후 나머지 도구 등록을 계속한다. 실패한 등록은 등록된 목록에서 빼므로 해제 시 `unregisterTool`을 부르지 않고, 다음 `tools-changed` 동기화 때 다시 등록을 시도한다 (Phase 3 리뷰 반영).
+> - 해제: 해당 `AbortController`를 abort하고, 대상에 `unregisterTool`이 있으면 함께 호출한다. abort로 이미 지워져 `unregisterTool`이 예외를 던져도 무시하고 나머지 도구 해제를 계속한다 (Phase 3 리뷰 반영).
 > - 동기화: `tools-changed`마다 이름별 디스크립터를 비교한다. 사라진 이름은 해제, 새 이름은 등록, 같은 이름이 다른 디스크립터로 바뀐 경우(`DC-3` 최신 인스턴스 덮어쓰기)는 해제 후 재등록한다.
 > - `execute(args)`는 `bridge.callTool(name, args)`의 `ToolCallResult`를 그대로 반환한다. 브라우저는 인자를 검증하지 않으므로 검증은 `callTool`이 맡고, 실패도 예외가 아닌 값(`{ ok: false, error }`)으로 돌아가 에이전트가 자기 수정할 수 있다. `confirm` 승인도 `callTool` 경로이므로 WebMCP 호출에 그대로 적용된다.
 > - 미반영(후속 검토): WebMCP `annotations`(`readOnlyHint`, `consequentialHint` 등)와 `requiresConfirm` 매핑, `execute`의 두 번째 인자 `{ signal }`(진행 중인 액션은 취소하지 않음).
@@ -527,7 +527,7 @@ type LiveRpcMessage =
 - [x] **DC-9 — 번들 크기 예산**
   - **확정**: `lithent/agent` ≤ **2,500 B** brotli (원래 2,000 B → 2026-11-27 `DC-16` 결정으로 상향), `lithent/live` (호스트 컨트롤러) ≤ **3,000 B** brotli, `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
   - **근거**: 호스트 앱에 추가되는 오버헤드와 샌드박스 자체 포함 런타임 예산을 분리해 `lithent`의 초경량 정체성을 CI 게이트로 강제한다.
-  - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (원래 예산 2,000 B 초과 → `DC-16`으로 예산 2,500 B 확정, 여유 160 B).
+  - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (원래 예산 2,000 B 초과 → `DC-16`으로 예산 2,500 B 확정, 여유 160 B) → Phase 3 리뷰 반영 후 **2,374 B** (여유 126 B).
   - 검증: Phase 3, Phase 6 (`pnpm size`)
 
 - [x] **DC-10 — 릴리스 순서 (단계적 출하 여부)**

@@ -272,6 +272,34 @@ describe('useAgentBridge (RQ-4)', () => {
     );
     expect(names(bridge)).toEqual(['forwarded']);
   });
+
+  it('can be handed to a child, which mounts before its parent', () => {
+    // Mount callbacks run children first: the parent's own mountCallback has
+    // not run when the child registers with the parent's bridge.
+    const bridge = createAgentBridge();
+    const Child = mount<{ agent: AgentBridge }>((_renew, props) => {
+      agentAction({
+        name: 'child_tool',
+        description: 'Child',
+        bridge: props.agent,
+        run: () => 1,
+      });
+      agentState('child_state', () => 1, { bridge: props.agent });
+      return () => <i />;
+    });
+    const Parent = mount(() => {
+      const agent = useAgentBridge();
+      return () => <Child agent={agent} />;
+    });
+    render(
+      <AgentScope bridge={bridge}>
+        <Parent />
+      </AgentScope>
+    );
+    expect(names(bridge)).toEqual(['child_tool']);
+    expect(bridge.getState()).toEqual({ child_state: 1 });
+    expect(names(defaultAgentBridge)).not.toContain('child_tool');
+  });
 });
 
 describe('name conflicts (DC-3)', () => {
@@ -403,6 +431,17 @@ describe('declarations outside the mounter (§2.3)', () => {
     expect(names(defaultAgentBridge)).not.toContain('loose');
     expect(defaultAgentBridge.getState()).not.toHaveProperty('loose_state');
     expect(warn).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps the foreign-bridge warning apart from a declaration named "bridge"', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // The foreign-bridge warning has already fired earlier in this file.
+    agentAction({ name: 'bridge', description: 'Named bridge', run: () => 1 });
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining(
+        '"bridge" must be declared in a component mounter'
+      )
+    );
   });
 });
 

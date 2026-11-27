@@ -38,11 +38,19 @@ export const connectWebMCP = (
     if (!entry) return;
     live.delete(name);
     entry[1].abort();
-    if (target.unregisterTool) target.unregisterTool(name);
+    try {
+      if (target.unregisterTool) target.unregisterTool(name);
+    } catch {
+      // Already gone (the abort removed it): keep removing the others.
+    }
   };
 
-  const warn = (name: string, error: unknown) =>
+  /** A registration that failed is not live: never unregister it. */
+  const failed = (name: string, abort: AbortController, error: unknown) => {
+    const entry = live.get(name);
+    if (entry && entry[1] === abort) live.delete(name);
     console.warn(`[lithent/agent] WebMCP could not register "${name}":`, error);
+  };
 
   const sync = (tools: ToolDescriptor[]) => {
     const next = new Map(tools.map(d => [d.name, d]));
@@ -65,9 +73,11 @@ export const connectWebMCP = (
           },
           { signal: abort.signal }
         ) as Promise<unknown> | undefined;
-        if (pending && pending.catch) pending.catch(error => warn(name, error));
+        if (pending && pending.catch) {
+          pending.catch(error => failed(name, abort, error));
+        }
       } catch (error) {
-        warn(name, error);
+        failed(name, abort, error);
       }
     });
   };
