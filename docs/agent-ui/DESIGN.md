@@ -1,0 +1,519 @@
+# DESIGN — `lithent/agent` & `lithent/live`
+
+- 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
+- 작성일: 2026-11-27
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정 — 코드 미구현, Phase 1 대기)**
+- 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
+
+> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다.
+
+---
+
+## 1. 전체 아키텍처
+
+두 서브패스는 계층적으로 분리되며, `lithent` 코어(`src/`, `lithentConcurrent/src/`)는 수정하지 않는다 (`RQ-9`).
+
+```mermaid
+flowchart TB
+  subgraph Host["Host App (Lithent / React / Vue / Plain HTML)"]
+    AI["In-app AI SDK / Copilot / Test"]
+    WMCP["Browser WebMCP (navigator.modelContext)"]
+    Bridge["AgentBridge (lithent/agent)"]
+    LiveHost["mountLive / lithent-live (lithent/live)"]
+  end
+
+  subgraph LocalComp["Local Lithent Component (mount / lmount)"]
+    A1["agentAction(...)"]
+    S1["agentState(...)"]
+  end
+
+  subgraph Sandbox["Sandbox iframe (sandbox='allow-scripts')"]
+    Runtime["lithent + helper + ftags/tag + agent (~6KB)"]
+    GenCode["LLM-generated Widget Code"]
+    SBridge["Inner AgentBridge"]
+  end
+
+  AI <-->|"listTools / getState / callTool / subscribe"| Bridge
+  WMCP <-->|"connectWebMCP (opt-in)"| Bridge
+  LocalComp -->|"mountCallback 자동 등록/해제"| Bridge
+  LiveHost <-->|"postMessage RPC (요청 ID, 타임아웃, source 검증)"| SBridge
+  LiveHost -->|"동일 AgentBridge 계약 노출"| AI
+  GenCode --> Runtime
+  GenCode --> SBridge
+```
+
+### 핵심 설계 원칙
+
+1. **단일 통신 프로토콜**: 로컬 컴포넌트(`lithent/agent`)든 LLM 생성 샌드박스 위젯(`lithent/live`)이든, 소비자는 동일한 `AgentBridge` 인터페이스만 다룬다 (`RQ-4`, `RQ-8`).
+2. **클로저 인스턴스 = 에이전트 엔드포인트**: `mounter`가 1회만 실행된다는 `lithent` 고유 모델 덕분에 `agentAction`·`agentState`는 `mountCallback`으로 등록/해제만 걸어주면 stale closure 없이 동작한다 (`RQ-3`).
+3. **보안 기본값(Secure by Default)**: `lithent/live`는 기본값이 `mode: 'sandbox'`(격리 iframe)이며, 호스트 DOM 직결(`mode: 'direct'`)은 명시적 opt-in으로만 허용한다 (`RQ-7`).
+
+---
+
+## 2. `lithent/agent` 계약
+
+### 2.1 공개 API 표면
+
+```ts
+export type ParamConstructor =
+  | StringConstructor
+  | NumberConstructor
+  | BooleanConstructor
+  | ObjectConstructor
+  | ArrayConstructor;
+
+export type ParamFieldSpec =
+  | ParamConstructor
+  | {
+      type: ParamConstructor;
+      required?: boolean;
+      description?: string;
+      enum?: readonly (string | number | boolean)[];
+    };
+
+export type ParamSpec = Record<string, ParamFieldSpec>;
+
+type ConstructorToType<C> = C extends StringConstructor
+  ? string
+  : C extends NumberConstructor
+    ? number
+    : C extends BooleanConstructor
+      ? boolean
+      : C extends ArrayConstructor
+        ? unknown[]
+        : Record<string, unknown>;
+
+type FieldToType<F> = F extends ParamConstructor
+  ? ConstructorToType<F>
+  : F extends { type: infer C }
+    ? ConstructorToType<C>
+    : unknown;
+
+type IsRequiredField<F> = F extends { required: true } ? true : false;
+
+export type ParamsOf<S extends ParamSpec> = {
+  [K in keyof S as IsRequiredField<S[K]> extends true ? K : never]: FieldToType<S[K]>;
+} & {
+  [K in keyof S as IsRequiredField<S[K]> extends true ? never : K]?: FieldToType<S[K]>;
+};
+
+export type ActionConfirmContext<P = Record<string, unknown>> = {
+  name: string;
+  description: string;
+  args: P;
+};
+
+export type ActionConfirmHandler = (
+  ctx: ActionConfirmContext
+) => boolean | Promise<boolean>;
+
+export type AgentActionOptions<S extends ParamSpec | undefined, R> = {
+  name: string;
+  description: string;
+  params?: S;
+  confirm?: boolean | ActionConfirmHandler;
+  bridge?: AgentBridge;
+  scopeId?: string;
+  run: S extends ParamSpec
+    ? (args: ParamsOf<S>) => R | Promise<R>
+    : () => R | Promise<R>;
+};
+
+export type AgentStateOptions = {
+  bridge?: AgentBridge;
+  scopeId?: string;
+};
+
+export type CreateAgentBridgeOptions = {
+  onConflict?: 'warn' | 'error'; // 기본값: 'warn' (DC-3)
+};
+
+export type ToolDescriptor = {
+  name: string;
+  description: string;
+  inputSchema: {
+    type: 'object';
+    properties: Record<string, Record<string, unknown>>;
+    required?: string[];
+  };
+  requiresConfirm?: boolean;
+};
+
+export type ToolCallResult<T = unknown> =
+  | { ok: true; value: T }
+  | {
+      ok: false;
+      error: {
+        code:
+          | 'NOT_FOUND'
+          | 'INVALID_PARAMS'
+          | 'REJECTED'
+          | 'EXECUTION_ERROR'
+          | 'TIMEOUT';
+        message: string;
+        details?: unknown;
+      };
+    };
+
+export type AgentBridgeEvent =
+  | { type: 'tools-changed'; tools: ToolDescriptor[] }
+  | { type: 'state-changed'; name?: string; state: Record<string, unknown> };
+
+export type AgentBridge = {
+  listTools: () => ToolDescriptor[];
+  getState: () => Record<string, unknown>;
+  callTool: (name: string, args?: Record<string, unknown>) => Promise<ToolCallResult>;
+  subscribe: (listener: (event: AgentBridgeEvent) => void) => () => void;
+  setConfirmHandler: (handler: ActionConfirmHandler | null) => void;
+  notifyStateChange: (name?: string) => void;
+  dispose: () => void;
+};
+
+export type WebMCPModelContext = {
+  registerTool: (tool: {
+    name: string;
+    description: string;
+    inputSchema: ToolDescriptor['inputSchema'];
+    execute: (args: Record<string, unknown>) => Promise<unknown>;
+  }) => void;
+  unregisterTool: (name: string) => void;
+};
+
+export function createAgentBridge(options?: CreateAgentBridgeOptions): AgentBridge;
+export const defaultAgentBridge: AgentBridge;
+
+// 컴포넌트 트리 스코프 주입 (mount / lmount 공용)
+export const AgentScope: ReturnType<
+  typeof import('lithent').mount<{ bridge: AgentBridge }>
+>;
+export function useAgentBridge(): AgentBridge;
+
+// params 미지정 시 0인자 호출, 지정 시 ParamsOf<S> 호출 오버로드
+export function agentAction<R>(
+  options: AgentActionOptions<undefined, R>
+): () => R | Promise<R>;
+export function agentAction<S extends ParamSpec, R>(
+  options: AgentActionOptions<S, R> & { params: S }
+): (args: ParamsOf<S>) => R | Promise<R>;
+
+export function agentState<T>(
+  name: string,
+  getter: () => T,
+  options?: AgentStateOptions
+): void;
+
+export function connectWebMCP(
+  bridge?: AgentBridge,
+  options?: { target?: WebMCPModelContext }
+): () => void;
+```
+
+### 2.2 컴포넌트 내부 사용 예
+
+```tsx
+import { lmount } from 'lithent';
+import { lstate } from 'lithent/helper';
+import { agentAction, agentState } from 'lithent/agent';
+
+const OrderList = lmount(() => {
+  const status = lstate<'all' | 'delayed' | 'done'>('all');
+  const minPrice = lstate(0);
+
+  const applyFilter = agentAction({
+    name: 'filter_orders',
+    description: '주문 목록을 배송 상태와 최소 금액으로 필터링한다',
+    params: {
+      status: { type: String, enum: ['all', 'delayed', 'done'], required: true },
+      minPrice: { type: Number, description: '최소 금액 (원)' },
+    },
+    run: ({ status: nextStatus, minPrice: nextMin = 0 }) => {
+      status.value = nextStatus as 'all' | 'delayed' | 'done';
+      minPrice.value = nextMin;
+      return { status: status.value, minPrice: minPrice.value };
+    },
+  });
+
+  agentState('order_filter', () => ({
+    status: status.value,
+    minPrice: minPrice.value,
+  }));
+
+  return () => (
+    <button onClick={() => applyFilter({ status: 'delayed', minPrice: 0 })}>
+      배송 지연만 보기
+    </button>
+  );
+});
+```
+
+### 2.3 생명주기 연결 및 상태 변경 자동 감지 (`RQ-2`, `RQ-3`)
+
+1. **호출 위치 검증 (`mounter` 전용)**:
+   - `agentAction(...)` / `agentState(...)` 호출 시 `getComponentKey()`와 `getComponentSubInfo(compKey, 'vd')`를 확인한다 (`lithent` 공개 export).
+   - `compKey === null`이거나 `vd.value !== null`(초기 렌더 이후 `updater` 내부 호출)이면 `console.warn`을 1회 출력하고 중복 등록을 방지한다.
+2. **마운트/언마운트 자동 등록·해제**:
+   - 내부적으로 `mountCallback(() => { ... return () => { ... }; })`를 등록한다.
+   - 마운트 완료 시점에 대상 `AgentBridge`를 결정(§2.4)해 등록하고 `tools-changed` / `state-changed` 이벤트를 발행한다.
+   - 언마운트 시 해당 엔트리를 제거하고 변경 이벤트를 발행한다.
+3. **일반 UI 입력을 포함한 상태 변경 자동 감지 (`agentState`)**:
+   - 사용자가 `agentAction`이 아닌 일반 `<input>` / `<button>`으로 컴포넌트 상태를 바꿔도 구독자가 변화를 감지할 수 있도록, `agentState`는 `updateCallback(() => () => { ... })`를 함께 등록한다 (`src/hook/updateCallback.ts`의 기본 빈 의존성 배열은 매 업데이트 완료 후 반환 콜백을 실행함).
+   - 업데이트 완료 시 `getter()` 결과를 직렬화(JSON)해 직전 스냅샷과 다를 때만 마이크로태스크로 디바운스된 `bridge.notifyStateChange(fullName)`를 발행한다.
+4. **사람 직접 호출 vs AI 호출 (`DC-5` 확정)**:
+   - 사람이 UI에서 `applyFilter(args)`를 직접 호출할 때는 `confirm` 확인 훅을 거치지 않고 `run(args)`를 즉시 실행하며, `notifyStateChange`를 마이크로태스크로 1회 디바운스 발행한다.
+   - AI가 `bridge.callTool(name, args)`로 호출할 때만 파라미터 검증과 `confirm` 승인 훅을 거친다.
+5. `mount` 모드(`renew()` 수동 호출)와 `lmount` 모드(`lstate` 자동 갱신) 모두 `mountCallback`/`updateCallback`/`getComponentKey`를 동일하게 지원하므로 두 모드에서 동작 차이가 없다.
+
+### 2.4 스코프 주입 및 중복 이름 처리 (`RQ-3`, `RQ-4`, `DC-3` 확정)
+
+- **브릿지 결정 우선순위**:
+  1. `options.bridge`가 명시적으로 전달된 경우 해당 브릿지 사용
+  2. 가장 가까운 상위 `<AgentScope bridge={...}>` 컴포넌트의 브릿지 사용
+  3. 둘 다 없으면 `defaultAgentBridge` 사용
+- **`AgentScope` 탐색 메커니즘 (코어 무수정, `mount`/`lmount` 공용)**:
+  - `<AgentScope bridge={bridge}>`는 `mount`로 구현되며, 내부 `props`에 모듈 전용 `Symbol` 키로 `bridge`를 저장하고 `children`을 그대로 `Fragment`로 반환한다 (`helper/src/hook/context.tsx`의 `Provider` 패턴과 동일).
+  - 하위 컴포넌트에서 `agentAction`·`agentState`·`useAgentBridge`는 `mounter` 시점에 `compKey = getComponentKey()`를 캡처한 뒤, `mountCallback` 시점(WDom 트리 연결 완료)에 `getComponentSubInfo(compKey, 'vd')?.value`에서 `getParent()` 체인을 따라 올라가며 해당 `Symbol` 키가 붙은 조상 WDom의 `bridge`를 찾는다.
+  - 이 방식은 `lithent/helper` 의존성 없이 `mount`와 `lmount` 모두에서, base·concurrent 양쪽 코어에서 동일하게 동작한다.
+- **동일 브릿지 내 중복 이름 처리 (`DC-3` 확정)**:
+  - `scopeId`가 있으면 등록 이름을 `${scopeId}.${name}`으로 자동 접두사화한다.
+  - 같은 브릿지에 동일 최종 이름이 이미 등록돼 있으면:
+    - `onConflict: 'warn'`(기본값): `console.warn` 출력 후 최신 인스턴스로 덮어쓴다(이전 인스턴스가 언마운트될 때는 자기 엔트리가 여전히 현재 등록된 엔트리인 경우에만 제거해 최신 인스턴스를 지우지 않도록 보호한다).
+    - `onConflict: 'error'`: 등록 시 명시적 `Error`를 던진다.
+
+### 2.5 파라미터 스키마 변환 및 검증 (`RQ-1`)
+
+- `lithent/element`의 `PropSpec` 철학(`String`, `Number`, `Boolean`, `Object`, `Array`)을 계승해 제로 의존성 + 초경량(번들 크기 절감)을 유지한다 (`DC-2` 확정).
+- `listTools()`는 선언된 `params`를 표준 JSON Schema(`type: 'object'`, `properties`, `required`, `enum`, `description`)로 변환해 반환한다 — OpenAI, Anthropic, Gemini, MCP, WebMCP 도구 규격과 즉시 호환된다.
+- `callTool(name, args)` 호출 시:
+  - 등록되지 않은 이름 → `{ ok: false, error: { code: 'NOT_FOUND', ... } }`
+  - `params`에 선언되지 않은 여분 키는 무시(strip)하고 선언된 키만 `run(args)`에 전달한다 (`DC-11` 확정; JSON Schema에는 `additionalProperties: false`를 힌트로 유지).
+  - 필수값 누락 / 타입 불일치(`Number`는 `typeof v === 'number' && !Number.isNaN(v)`, `Array`는 `Array.isArray(v)`, `Object`는 `v !== null && typeof v === 'object' && !Array.isArray(v)`) / `enum` 위반 → `{ ok: false, error: { code: 'INVALID_PARAMS', ... } }`
+  - `confirm` 거부 → `{ ok: false, error: { code: 'REJECTED', ... } }`
+  - `run` 예외 → `{ ok: false, error: { code: 'EXECUTION_ERROR', ... } }` (호스트 앱 크래시 방지)
+
+### 2.6 WebMCP 어댑터 (`RQ-5`, `DC-4` 확정)
+
+- `connectWebMCP(bridge = defaultAgentBridge, options?)`는 `options?.target ?? (typeof navigator !== 'undefined' ? (navigator as { modelContext?: WebMCPModelContext }).modelContext : undefined)`를 확인한다.
+- 대상이 없으면 예외 없이 no-op 해제 함수 `() => {}`를 반환한다 (SSR 및 미지원 브라우저 안전).
+- 대상이 있으면 현재 `bridge.listTools()`를 `target.registerTool(...)`로 등록하고, `bridge.subscribe`의 `tools-changed` 이벤트를 구독해 추가된 도구는 등록, 사라진 도구는 `target.unregisterTool(name)`으로 해제한다.
+- 반환된 해제 함수를 호출하면 구독을 끊고 이 어댑터가 등록한 모든 도구를 `unregisterTool`로 정리한다.
+
+---
+
+## 3. `lithent/live` 계약
+
+### 3.1 공개 API 표면
+
+```ts
+export type LiveMode = 'sandbox' | 'direct';
+
+export type LiveError = {
+  phase: 'compile' | 'mount' | 'render' | 'action' | 'timeout';
+  message: string;
+  stack?: string;
+  hint?: string;
+};
+
+export type MountLiveOptions = {
+  code: string;
+  container: HTMLElement;
+  mode?: LiveMode; // 기본값: 'sandbox' (DC-7)
+  styles?: string[];
+  props?: Record<string, unknown>;
+  /**
+   * Sandbox iframe 내부에 주입할 자체 포함 런타임 JS 문자열.
+   * 오프라인·단일 HTML 환경에서는 `lithent/live/runtime`의 `sandboxRuntimeCode`를 전달한다.
+   */
+  runtimeCode?: string;
+  /**
+   * Sandbox iframe이 `<script src="...">`로 로드할 런타임 URL (CDN/셀프호스트 `sandboxRuntime.umd.js`).
+   * `runtimeCode`가 없을 때 사용한다 (`DC-6`).
+   */
+  runtimeUrl?: string;
+  allowNetwork?: boolean; // 기본값: false (DC-7)
+  autoResize?: boolean; // 기본값: true (DC-8)
+  theme?: Record<string, string>; // CSS 변수 전달 (DC-8)
+  timeoutMs?: number; // 기본값: 5000
+  onError?: (error: LiveError) => void;
+};
+
+export type LiveHandle = {
+  bridge: AgentBridge;
+  updateProps: (props: Record<string, unknown>) => Promise<void>;
+  reload: (nextCode: string) => Promise<void>;
+  destroy: () => void;
+};
+
+export function mountLive(options: MountLiveOptions): Promise<LiveHandle>;
+```
+
+- 선택적 Custom Element 래퍼(`<lithent-live>`)는 `lithent/element` 위에 얹어 React·Vue·HTML 페이지에서도 태그 한 줄로 Generative UI를 띄울 수 있게 한다 (Phase 5~6).
+
+### 3.2 LLM 생성 코드 계약 (`RQ-6`, `DC-6`)
+
+LLM이 생성하는 코드는 **빌드 없는 표준 JS**이며, 런타임이 다음 심볼을 함수 스코프로 직접 주입한다:
+
+- Core: `mount`, `lmount`, `h`, `Fragment`, `ref`, `mountCallback`, `updateCallback`, `nextTick`
+- Helper: `state`, `lstate`, `computed`, `effect`, `store`, `lstore`
+- Templates: `fTags`, `fFragment`, `fMount`, `flMount` (`lithent/ftags`), `lTag` (`lithent/tag`)
+- Agent: `agentAction`, `agentState` (`lithent/agent`)
+
+코드 진입점 및 런타임 분리 규약 (`DC-6`, `DC-9`, `DC-13` 확정):
+- `import` 문 없이 주입된 심볼을 사용하는 빌드 없는 JS 함수 본문(`return lmount((props) => { ... })`)으로 통일한다.
+- 호스트 컨트롤러(`lithent/live`, ≤ 3,000 B brotli)가 코어 전체(4.8KB+)를 끌어안아 비대해지지 않도록, iframe 내부용 자체 포함 런타임(`lithent` + `helper` + `ftags` + `tag` + `agent` + 부트스트랩)은 별도 서브패스 **`lithent/live/runtime`**(`sandboxRuntimeCode` 문자열 export + `live/dist/sandboxRuntime.umd.js`)로 분리한다.
+  - 오프라인/단일 HTML/엄격 CSP: `import { sandboxRuntimeCode } from 'lithent/live/runtime'` → `runtimeCode`로 인라인 주입 (외부 요청 0건).
+  - CDN/캐시 공유: `runtimeUrl`로 `sandboxRuntime.umd.js` URL 전달.
+  - `mode: 'sandbox'`에서 `runtimeCode`와 `runtimeUrl`이 둘 다 생략되면 외부 CDN을 암묵적으로 호출하지 않고 명확한 설정 오류(`LiveError(phase: 'compile')`)를 반환한다 (`DC-13` 확정).
+  - `mode: 'direct'` 사용 시: 호스트 번들의 `lithent`를 그대로 사용하므로 `sandboxRuntime`을 전혀 로드하지 않는다.
+- `handle.updateProps(nextProps)`는 `lithent/element`와 동일하게 내부 Host 래퍼 컴포넌트의 `renew()`로 props만 갱신하여 위젯 내부 클로저 상태를 보존한다. 반면 `handle.reload(nextCode)`는 기존 위젯을 완전히 정리하고 새로 마운트한다.
+- `skills/lithent`에 LLM이 항상 동일한 형식으로 출력하도록 1페이지 규약을 포함한다.
+
+### 3.3 보안 경계 및 샌드박스 정책 (`RQ-7`, `DC-7`)
+
+| 위협 | Sandbox 모드 (`mode: 'sandbox'`, 기본값) | Direct 모드 (`mode: 'direct'`, 명시적 opt-in) |
+|---|---|---|
+| 호스트 DOM / 쿠키 / `localStorage` 탈취 | `iframe`에 `sandbox="allow-scripts"`만 부여(`allow-same-origin` **금지**) → opaque origin으로 호스트 저장소·DOM 접근 원천 차단 | 호스트 JS 컨텍스트 공유 — **비신뢰 LLM 코드 사용 금지** (문서·타입 주석·런타임 경고 명시) |
+| CSS 오염 | iframe 자체 문서 격리 | `lithent/element` Shadow DOM 격리 |
+| 무한 루프 / 응답 없음 | `callTool` / `mount` 타임아웃(`timeoutMs`) 후 `TIMEOUT` 반환 및 `destroy()`로 iframe 강제 종료 가능 | 메인 스레드 공유로 강제 중단 불가 |
+| 네트워크 유출(exfiltration) | 호스트가 `srcdoc` CSP 메타 태그(`default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' <runtimeUrl-origin?>; style-src 'unsafe-inline'`)로 외부 네트워크 차단 (`allowNetwork: true`로 해제 가능, `DC-7`) | 호스트 페이지 CSP에 종속 |
+| `postMessage` 스푸핑 | `event.source === iframe.contentWindow` 및 세션별 랜덤 `channelId` 검증 필수 | 해당 없음 |
+
+### 3.4 `postMessage` RPC 프로토콜 (`RQ-8`, `DC-8`, `DC-14`)
+
+호스트 ↔ 샌드박스 iframe 간 메시지는 JSON 직렬화 가능한 평면 객체만 허용한다:
+
+```ts
+type LiveRpcMessage =
+  | { ch: string; type: 'ready'; tools: ToolDescriptor[]; state: Record<string, unknown> }
+  | { ch: string; type: 'event'; event: AgentBridgeEvent }
+  | { ch: string; type: 'error'; error: LiveError }
+  | { ch: string; type: 'call'; id: number; name: string; args?: Record<string, unknown> }
+  | { ch: string; type: 'result'; id: number; result: ToolCallResult }
+  | { ch: string; type: 'props'; id: number; props: Record<string, unknown> }
+  | { ch: string; type: 'ack'; id: number }
+  | { ch: string; type: 'resize'; height: number };
+```
+
+- **호스트 측 `confirm` 승인 처리 (`DC-14` 확정)**: `handle.bridge.callTool(name, args)` 호출 시 호스트 프록시 브릿지가 캐시된 `ToolDescriptor.requiresConfirm`을 먼저 확인해 호스트에 등록된 `confirmHandler`를 실행한다. 거부되면 iframe으로 `call` 메시지를 보내지 않고 즉시 `{ ok: false, error: { code: 'REJECTED', ... } }`를 반환한다.
+- **자동 높이 조절**: `autoResize: true`(기본값)일 때 iframe 내부 `ResizeObserver`가 콘텐츠 높이를 `resize` 메시지로 전달해 호스트가 iframe 높이를 자연스럽게 맞춘다.
+- **오류 자기 수정(Self-Repair)**: 컴파일/마운트/렌더 오류 발생 시 `LiveError`에 `phase`, `message`, 그리고 `lithent` 흔한 실수(`mounter`가 JSX를 직접 반환함, `lstate`를 `mount`에서 사용함 등)에 대한 `hint`를 포함해 호스트 LLM 루프에 즉시 되돌릴 수 있게 한다 (`RQ-8`).
+
+---
+
+## 4. 기존 `lithent` 패키지와의 통합 경계
+
+| 기존 자산 | 통합 방식 | 코어 변경 여부 |
+|---|---|---|
+| `lithent` (`src/`) | `mount`, `lmount`, `mountCallback`, `updateCallback`, `getComponentKey`, `getComponentSubInfo`, `Fragment`, `render`, `h`, `nextTick`만 import | 0줄 (`RQ-9`) |
+| `lithent-concurrent` | `LITHENT_CORE=concurrent` alias로 동일 코드 테스트 | 0줄 (`RQ-9`, `RQ-11`) |
+| `lithent/element` | Custom Element 내부에서 `agentAction`/`agentState` 사용, `<lithent-live>` 래핑, Direct 모드 Shadow DOM | 0줄 (공개 API만 사용) |
+| `lithent/ftags`, `lithent/tag` | `lithent/live` 런타임에 주입되는 빌드 없는 템플릿 계층 | 0줄 |
+| `lithent/test` | 단위 테스트에서 `render`, `act`, `cleanup` 활용 | 0줄 |
+| `scripts/size-report.js` | `lithent/agent`, `lithent/live`, `lithent/live/runtime` UMD 크기 예산 타깃 추가 | 배포/빌드 설정만 변경 |
+| `scripts/verify-release.mjs` | 새 공개 export 경로(`./agent`, `./live`, `./live/runtime`) ESM/CJS/타입 검증 추가 | 배포/빌드 설정만 변경 |
+| `skills/lithent`, `lithent-agent-addon.md` | `lithent/agent`, `lithent/live` 사용 규칙 및 LLM 생성 코드 규약 추가 | 문서/스킬 업데이트 |
+
+---
+
+## 5. 번들 크기 및 빌드 구성
+
+기존 `element/`, `test/` 위성 패키지 패턴을 그대로 따른다:
+
+- 워크스페이스 패키지 및 산출물:
+  - `agent/` (패키지명 `lithent-agent`, UMD 전역 `lithentAgent`): `agent/dist/lithentAgent.{mjs,cjs,umd.js}`, `index.d.{ts,cts}`
+  - `live/` (패키지명 `lithent-live`, UMD 전역 `lithentLive`): `live/dist/lithentLive.{mjs,cjs,umd.js}`, `index.d.{ts,cts}` + 별도 샌드박스 번들 `live/dist/sandboxRuntime.umd.js` 및 문자열 export `live/dist/runtime.{mjs,cjs}` (`lithent/live/runtime`)
+- 외부 의존성: **0개** (런타임 zero-dependency)
+- 크기 예산(`DC-9` 확정):
+  - `agent/dist/lithentAgent.umd.js`: ≤ **2,000 B** brotli
+  - `live/dist/lithentLive.umd.js` (호스트 컨트롤러): ≤ **3,000 B** brotli
+  - `live/dist/sandboxRuntime.umd.js` (iframe 자체 포함 런타임: core + helper + ftags + tag + agent + bootstrap): ≤ **11,000 B** brotli
+  - 코어 `dist/lithent.umd.js`: ≤ 4,800 B (무변화)
+
+---
+
+## 6. 실패 모드 및 오류 처리 정책
+
+| 실패 시나리오 | 동작 | 검증 |
+|---|---|---|
+| `agentAction`을 `mounter` 밖(`updater` 등)에서 호출 | `getComponentKey()`/`vd.value` 검사로 감지해 1회 경고 출력 및 중복 등록 방지 (`DC-3`) | Phase 1, Phase 7 |
+| `agentState` getter가 예외를 던지거나 순환 참조 반환 | 해당 키를 `{ __agentStateError: message }`로 격리하고 `console.warn` 1회 출력, 나머지 키는 정상 반환 (`DC-12`) | Phase 1, Phase 7 |
+| 언마운트 직후 진행 중이던 `callTool` 완료 | 브릿지 이벤트 누수 없이 결과 반환 또는 정리, 이후 호출은 `NOT_FOUND` | Phase 1, Phase 7 |
+| `lithent/live` Sandbox 모드에서 `runtimeCode`·`runtimeUrl` 모두 미지정 | 숨겨진 외부 CDN 호출 없이 `LiveError(phase: 'compile')` 반환 (`DC-13`) | Phase 4, Phase 7 |
+| `lithent/live`에 문법 오류/런타임 예외 코드 전달 | 호스트 페이지 무영향, `onError` + `LiveError(phase, message, hint)` 반환 | Phase 4, Phase 7 |
+| Sandbox iframe이 무한 루프/무응답 | `timeoutMs` 만료 시 `TIMEOUT` 오류 반환, `destroy()`로 iframe 제거 | Phase 4, Phase 7 |
+| 악성 LLM 코드가 `window.parent` / `document.cookie` 접근 시도 | 브라우저 opaque-origin `SecurityError` 차단, 호스트 데이터 유출 0건 | Phase 4, Phase 8, `M-4` |
+
+---
+
+## 7. 결정 체크리스트 (`DC-*`)
+
+> **확정 이력 (2026-11-27)**: 사용자가 `DC-1`~`DC-14` 전 항목을 권장안으로 확정함.
+
+- [x] **DC-1 — 배포 위치 및 서브패스 이름**
+  - **확정**: 옵션 A — `lithent` 패키지 내 서브패스 `lithent/agent`, `lithent/live` (및 인라인 샌드박스 번들용 `lithent/live/runtime`)로 제공.
+  - **근거**: `lithent/element`, `lithent/test`와 동일한 위성 패키지·서브패스 관례를 따라 설치 장벽과 버전 불일치 리스크를 없앤다.
+  - 검증: Phase 3, Phase 6 (`verify-release.mjs`)
+
+- [x] **DC-2 — `agentAction` 파라미터 스키마 형식**
+  - **확정**: 옵션 A — `lithent/element`와 일관된 경량 생성자 스펙(`String`, `Number`, `Boolean`, `Object`, `Array` 및 `{ type, required, description, enum }`) → JSON Schema 자동 변환.
+  - **근거**: 외부 스키마 라이브러리 없이 제로 의존성·2KB 이내 크기를 지키면서도 LLM/MCP 표준 JSON Schema를 출력할 수 있다.
+  - 검증: Phase 1, Phase 7
+
+- [x] **DC-3 — 다중 인스턴스 이름 충돌 & 브릿지 스코프 주입 방식**
+  - **확정**: 옵션 A — `scopeId`가 있으면 `${scopeId}.${name}` 자동 접두사, 미스코프 충돌은 `console.warn` + 최신 인스턴스 등록(`onConflict: 'error' | 'warn'` 옵션 제공). 서브트리 주입은 `<AgentScope bridge={...}>` + `useAgentBridge()` 제공(WDom 부모 체인 탐색, `mount`/`lmount` 공용).
+  - **근거**: 프로덕션에서 동적 리스트/위젯 중복 마운트로 인한 예기치 않은 크래시를 막으면서 개발 시 충돌을 즉시 인지할 수 있고, `lithent/helper` 없이 양쪽 모드에서 동작한다.
+  - 검증: Phase 1, Phase 7
+
+- [x] **DC-4 — WebMCP 어댑터 범위 및 기본 동작**
+  - **확정**: 옵션 A — 명시적 opt-in `connectWebMCP(bridge, options?)` 함수로 제공.
+  - **근거**: 라이브러리 import만으로 전역 `navigator.modelContext`를 암묵적으로 변경하는 부작용을 방지하고, 브라우저 표준 변화에 안전하게 격리한다.
+  - 검증: Phase 2, `M-2`
+
+- [x] **DC-5 — `confirm` 승인 훅 동작 범위**
+  - **확정**: 옵션 A — `bridge.callTool()`(AI 호출 경로)에서만 `confirm` 핸들러를 실행하고, 사람이 UI 버튼 `onClick`으로 직접 호출할 때는 즉시 실행.
+  - **근거**: 사람이 직접 누른 UI 조작에 이중 확인이 뜨는 불편을 없애고, AI의 자율 호출에 대해서만 승인 안전장치를 제공한다.
+  - 검증: Phase 1, Phase 2, `M-5`
+
+- [x] **DC-6 — `lithent/live` 생성 코드 규약 및 샌드박스 런타임 주입 방식**
+  - **확정**: 코드 규약 옵션 A(`import` 없이 주입된 `lithent`/`helper`/`ftags`/`tag`/`agent` 심볼을 사용하는 빌드 없는 JS 함수 본문) + 샌드박스 번들 로드 옵션 1(오프라인 인라인 주입용 `lithent/live/runtime`의 `sandboxRuntimeCode`를 `runtimeCode`로 전달, CDN/로컬 UMD는 `runtimeUrl`로 오버라이드).
+  - **근거**: 호스트 컨트롤러(`lithent/live`)를 3KB 이내로 유지하면서도 오프라인·단일 HTML·엄격한 CSP 환경에서 외부 요청 없이 동작하며, LLM이 import 경로 실수 없이 높은 원샷 정확도로 코드를 생성할 수 있다.
+  - 검증: Phase 4, Phase 5, `M-3`
+
+- [x] **DC-7 — `lithent/live` 샌드박스 CSP 및 네트워크 정책**
+  - **확정**: 옵션 A — `iframe`에 `sandbox="allow-scripts"` 강제(`allow-same-origin` 금지) + 기본 CSP 메타 태그로 외부 `fetch`/`img`/`script` 차단(`allowNetwork: true`로 명시적 해제 가능).
+  - **근거**: 비신뢰 LLM 생성 코드로부터 호스트 DOM·저장소 탈취와 무단 네트워크 유출을 기본값으로 차단한다.
+  - 검증: Phase 4, Phase 7, Phase 8, `M-4`
+
+- [x] **DC-8 — `lithent/live` iframe 크기 조절 및 테마 전달**
+  - **확정**: 옵션 A — `ResizeObserver` 기반 자동 높이 동기화 기본 활성화(`autoResize: true`) + 호스트 CSS 변수/테마 토큰 전달 옵션(`theme?: Record<string, string>`).
+  - **근거**: 채팅/사이드바 내 임베드 위젯의 이중 스크롤바 문제를 없애고 호스트 다크모드·브랜드 색상과 자연스럽게 어우러지게 한다.
+  - 검증: Phase 5, `M-3`, `M-6`
+
+- [x] **DC-9 — 번들 크기 예산**
+  - **확정**: `lithent/agent` ≤ **2,000 B** brotli, `lithent/live` (호스트 컨트롤러) ≤ **3,000 B** brotli, `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
+  - **근거**: 호스트 앱에 추가되는 오버헤드와 샌드박스 자체 포함 런타임 예산을 분리해 `lithent`의 초경량 정체성을 CI 게이트로 강제한다.
+  - 검증: Phase 3, Phase 6 (`pnpm size`)
+
+- [x] **DC-10 — 릴리스 순서 (단계적 출하 여부)**
+  - **확정**: 옵션 A — Phase 1~3 완료 시 `lithent/agent` 단독 1차 minor 릴리스 → Phase 4~8 완료 시 `lithent/live` 및 양방향 데모를 2차 minor 릴리스.
+  - **근거**: `lithent/agent`를 먼저 시장에 내보내 빠른 피드백을 얻고, 보안 샌드박스가 포함된 `lithent/live`의 검증 리스크를 분리한다.
+  - 검증: Phase 3, Phase 8, `M-1`~`M-7`
+
+- [x] **DC-11 — `agentAction` 미선언 여분 파라미터 키 처리**
+  - **확정**: 선언되지 않은 여분 키는 무시(strip)하고 `params`에 선언된 키만 `run(args)`에 전달한다(JSON Schema에는 `additionalProperties: false`를 힌트로 유지).
+  - **근거**: LLM이 부가 메타 키를 실수로 포함해 보내더라도 불필요한 도구 호출 실패를 줄이고 `run()`에는 검증된 입력만 전달한다.
+  - 검증: Phase 1, Phase 7
+
+- [x] **DC-12 — `agentState` getter 예외 및 직렬화 불가 값 처리**
+  - **확정**: 해당 키의 값을 `{ __agentStateError: message }`로 격리해 반환하고 `console.warn`을 1회 출력한다(나머지 상태 키는 정상 반환; `BigInt`는 문자열화, 함수/`undefined`는 JSON 직렬화 규칙으로 안전 변환).
+  - **근거**: 한 컴포넌트의 상태 오류가 전체 화면 스냅샷 조회를 마비시키지 않으면서도 디버깅·AI가 오류 원인을 즉시 식별할 수 있다.
+  - 검증: Phase 1, Phase 7
+
+- [x] **DC-13 — `lithent/live` Sandbox 모드에서 `runtimeCode`·`runtimeUrl` 모두 생략 시 동작**
+  - **확정**: `runtimeCode`(`lithent/live/runtime`) 또는 `runtimeUrl` 중 하나를 필수로 요구하고, 둘 다 없으면 외부 CDN을 암묵적으로 호출하지 않고 명확한 설정 오류(`LiveError(phase: 'compile')`)를 반환한다.
+  - **근거**: 기업망·오프라인·엄격한 CSP 환경에서 예기치 않은 외부 CDN 요청이 발생하지 않도록 보장한다.
+  - 검증: Phase 4, Phase 7
+
+- [x] **DC-14 — `lithent/live` Sandbox 위젯의 `confirm` 승인 훅 실행 위치**
+  - **확정**: 호스트 측 프록시 `bridge`가 `requiresConfirm`을 확인해 호스트의 `confirmHandler`로 먼저 승인받은 뒤에만 iframe으로 `postMessage('call')`을 전달한다.
+  - **근거**: 호스트 앱이 일관된 자체 승인 모달/오버레이 UI를 띄울 수 있고, 거부된 호출은 샌드박스 내부에 아예 도달하지 않는다.
+  - 검증: Phase 4, Phase 7, `M-5`
