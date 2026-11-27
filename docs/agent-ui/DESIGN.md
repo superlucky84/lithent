@@ -2,10 +2,10 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15` TBD) — Phase 1 (`lithent/agent` 코어) 구현 완료, Phase 2 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15`·`DC-16` TBD) — Phase 1~2 (`lithent/agent` 코어·어댑터) 구현 완료, Phase 3 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
-> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부 (Phase 1)"로 표시한 문단은 실제 구현된 동작을 기록한 것이고, `DC-15`는 아직 결정되지 않은 항목이다.
+> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이고, `DC-15`·`DC-16`은 아직 결정되지 않은 항목이다.
 
 ---
 
@@ -17,7 +17,7 @@
 flowchart TB
   subgraph Host["Host App (Lithent / React / Vue / Plain HTML)"]
     AI["In-app AI SDK / Copilot / Test"]
-    WMCP["Browser WebMCP (navigator.modelContext)"]
+    WMCP["Browser WebMCP (document.modelContext)"]
     Bridge["AgentBridge (lithent/agent)"]
     LiveHost["mountLive / lithent-live (lithent/live)"]
   end
@@ -169,15 +169,22 @@ export type AgentBridge = {
   dispose: () => void;
 };
 
-export type WebMCPModelContext = {
-  registerTool: (tool: {
-    name: string;
-    description: string;
-    inputSchema: ToolDescriptor['inputSchema'];
-    execute: (args: Record<string, unknown>) => Promise<unknown>;
-  }) => void;
-  unregisterTool: (name: string) => void;
+// Phase 2 구현 계약 (§2.6 편차 기록 참고)
+export type WebMCPTool = {
+  name: string;
+  description: string;
+  inputSchema: ToolDescriptor['inputSchema'];
+  execute: (args: Record<string, unknown>) => Promise<ToolCallResult>;
 };
+
+export type WebMCPModelContext = {
+  // 현재 초안: 등록 시 넘긴 signal이 abort되면 도구가 제거된다.
+  registerTool: (tool: WebMCPTool, options?: { signal?: AbortSignal }) => unknown;
+  // 이전 초안·polyfill 호환 (있을 때만 호출)
+  unregisterTool?: (name: string) => void;
+};
+
+export type ConnectWebMCPOptions = { target?: WebMCPModelContext };
 
 export function createAgentBridge(options?: CreateAgentBridgeOptions): AgentBridge;
 export const defaultAgentBridge: AgentBridge;
@@ -204,11 +211,11 @@ export function agentState<T>(
 
 export function connectWebMCP(
   bridge?: AgentBridge,
-  options?: { target?: WebMCPModelContext }
+  options?: ConnectWebMCPOptions
 ): () => void;
 ```
 
-> **구현 상태 (Phase 1 완료 시점, 2026-11-27)**: `agent/src/`에 `createAgentBridge`, `defaultAgentBridge`, `agentAction`, `agentState`, `AgentScope`, `useAgentBridge`와 위 타입이 구현되었다. 승인 훅 관련 표면(`AgentBridge.setConfirmHandler`, `AgentActionOptions.confirm`, `ToolDescriptor.requiresConfirm`의 실제 동작)과 `connectWebMCP`/`WebMCPModelContext`는 계획대로 **Phase 2**에서 추가하므로, Phase 1의 `AgentBridge` 타입에는 `setConfirmHandler`가 아직 없다. 구현하면서 추가된 공개 타입: `ParamIssue`(`INVALID_PARAMS` 상세, §2.5), `ToolDescriptor.inputSchema.additionalProperties?: false`(`DC-11` 힌트).
+> **구현 상태 (Phase 2 완료 시점, 2026-11-27)**: 위 API 표면 전체가 `agent/src/`에 구현되었다. Phase 1: `createAgentBridge`, `defaultAgentBridge`, `agentAction`, `agentState`, `AgentScope`, `useAgentBridge`. Phase 2: `AgentBridge.setConfirmHandler`, `AgentActionOptions.confirm`, `ToolDescriptor.requiresConfirm`(confirm 선언 액션에만 `true`, 나머지는 키 없음), `connectWebMCP`. 구현하면서 추가된 공개 타입: `ParamIssue`(`INVALID_PARAMS` 상세, §2.5), `ToolDescriptor.inputSchema.additionalProperties?: false`(`DC-11` 힌트), `WebMCPTool`, `ConnectWebMCPOptions`. `WebMCPModelContext`는 원래 설계(`registerTool` + 필수 `unregisterTool`)에서 바뀌었다 (§2.6 편차 기록).
 
 ### 2.2 컴포넌트 내부 사용 예
 
@@ -263,6 +270,13 @@ const OrderList = lmount(() => {
 4. **사람 직접 호출 vs AI 호출 (`DC-5` 확정)**:
    - 사람이 UI에서 `applyFilter(args)`를 직접 호출할 때는 `confirm` 확인 훅을 거치지 않고 `run(args)`를 즉시 실행하며, `notifyStateChange`를 마이크로태스크로 1회 디바운스 발행한다.
    - AI가 `bridge.callTool(name, args)`로 호출할 때만 파라미터 검증과 `confirm` 승인 훅을 거친다.
+   - **`confirm` 구현 세부 (Phase 2에서 확정된 동작)**:
+     - 순서: `NOT_FOUND` → 파라미터 검증(`INVALID_PARAMS`, 승인을 묻지 않음) → 승인 → 실행.
+     - `confirm: true`는 해당 액션이 등록된 브릿지의 `setConfirmHandler` 핸들러를 쓰고, 함수를 주면 그 함수가 브릿지 핸들러 대신 결정한다.
+     - 핸들러는 `{ name(scopeId 접두사 포함 등록 이름), description, args(검증·strip된 인자) }`를 받고, 동기·비동기 모두 가능하다. 정확히 `true`일 때만 승인한다.
+     - **보안 기본값**: 핸들러가 없거나, `false`·`true` 외 값을 반환하거나, 예외·거부(reject)되면 모두 `REJECTED`이며 `run`은 실행되지 않는다. 핸들러 예외 메시지는 `REJECTED`의 `message`로 전달한다.
+     - 승인을 기다리는 동안 액션이 언마운트되거나 같은 이름이 다른 인스턴스로 바뀌면 실행하지 않고 `NOT_FOUND`를 반환한다.
+     - `setConfirmHandler(null)`로 핸들러를 해제한다. `useAgentBridge()`의 위임 브릿지로도 설정할 수 있으나, 다른 메서드처럼 마운트 이후에 호출해야 스코프 브릿지에 적용된다.
 5. `mount` 모드(`renew()` 수동 호출)와 `lmount` 모드(`lstate` 자동 갱신) 모두 `mountCallback`/`updateCallback`/`getComponentKey`를 동일하게 지원하므로 두 모드에서 동작 차이가 없다.
 6. **구현 세부 (Phase 1에서 확정된 동작)**:
    - 변경 감지는 브릿지 단위로 모은다. `agentState`의 `updateCallback`, 사람 직접 호출, `callTool` 완료가 모두 같은 마이크로태스크 검사 1회를 예약하고, 검사는 각 상태의 직렬화 문자열을 직전 통지값과 비교한다. 바뀐 상태가 있으면 `state-changed`를 **1회** 발행하며, 바뀐 상태가 하나면 `name`에 그 이름을, 여럿이면 `name: undefined`를 담는다. 따라서 액션이 상태를 바꾼 뒤 뒤따르는 재렌더가 같은 이벤트를 다시 보내지 않는다.
@@ -283,6 +297,7 @@ const OrderList = lmount(() => {
   - **구현 세부 (Phase 1)**: 브릿지는 각 컴포넌트가 마운트될 때 한 번 결정된다. 이후 `<AgentScope>`의 `bridge` prop을 바꿔도 이미 마운트된 컴포넌트의 등록은 옮겨지지 않는다. `useAgentBridge()`는 마운트 시점에 스코프를 결정하는 위임(delegating) 브릿지를 반환하며, 마운트 전에 호출된 메서드는 `defaultAgentBridge`로 간다 (`mountCallback`·이벤트 핸들러에서 사용 권장). 이 위임 브릿지는 `options.bridge`로 넘겨도 동작한다.
   - 등록은 `createAgentBridge()`로 만든 브릿지(모듈 전용 `Symbol` 레지스트리 보유)에만 가능하다. 직접 만든 객체를 `options.bridge`로 넘기면 경고 1회 후 등록하지 않는다 (액션 함수 자체는 계속 동작).
   - `dispose()`는 도구·상태를 비우고, 도구가 있었다면 `tools-changed`(`tools: []`)를 발행한 뒤 구독자를 모두 해제한다. 브릿지는 이후에도 재사용할 수 있다.
+- **`lithent/element` 경계 (Phase 2 확인)**: Custom Element는 내부 컴포넌트를 자체 render 루트(기본 Shadow Root)에 그리므로 WDom 부모 체인이 요소 밖으로 이어지지 않는다. 따라서 요소 바깥의 `<AgentScope>`는 요소 내부 선언에 적용되지 않고, 내부 선언은 기본적으로 `defaultAgentBridge`에 등록된다. 페이지 브릿지를 쓰려면 `Object` prop(예: `props: { bridge: Object }`, `el.bridge = bridge`)으로 넘기고 내부에서 `<AgentScope bridge={props.bridge}>` 또는 `options.bridge`로 사용한다. 여러 인스턴스는 속성 값을 `scopeId`로 써서 이름을 나눈다 (`widget-id="left"` → `left.read_label`). 요소 이동(DC-4 of `lithent/element`)은 인스턴스를 유지하므로 등록도 유지되고, 제거 시에는 요소의 언마운트 마이크로태스크 뒤에 해제된다.
 - **동일 브릿지 내 중복 이름 처리 (`DC-3` 확정)**:
   - `scopeId`가 있으면 등록 이름을 `${scopeId}.${name}`으로 자동 접두사화한다.
   - 같은 브릿지에 동일 최종 이름이 이미 등록돼 있으면:
@@ -307,6 +322,14 @@ const OrderList = lmount(() => {
 - 대상이 없으면 예외 없이 no-op 해제 함수 `() => {}`를 반환한다 (SSR 및 미지원 브라우저 안전).
 - 대상이 있으면 현재 `bridge.listTools()`를 `target.registerTool(...)`로 등록하고, `bridge.subscribe`의 `tools-changed` 이벤트를 구독해 추가된 도구는 등록, 사라진 도구는 `target.unregisterTool(name)`으로 해제한다.
 - 반환된 해제 함수를 호출하면 구독을 끊고 이 어댑터가 등록한 모든 도구를 `unregisterTool`로 정리한다.
+
+> **편차 기록 (Phase 2, 2026-11-27)**: 위 세 항목은 Phase 0 시점의 WebMCP 초안(`navigator.modelContext`, `registerTool`/`unregisterTool`)을 기준으로 했다. Phase 2 착수 시 Chrome 문서([Imperative API](https://developer.chrome.com/docs/ai/webmcp/imperative-api), [Agentic JavaScript Tools](https://developer.chrome.com/docs/modern-web-guidance/guides/webmcp/agentic-javascript-tools))를 확인한 결과, 현재 API는 `document.modelContext`를 쓰고(`navigator.modelContext`는 deprecated), `unregisterTool()` 없이 `registerTool(tool, { signal })`의 `AbortSignal`을 abort해 제거하며, `execute`는 예외를 던지기보다 구조화된 오류 값을 반환하도록 권장한다. `DC-4`(명시적 opt-in 함수)는 그대로 두고, 어댑터를 두 방식 모두에 맞게 다음처럼 구현했다 (원래 계약의 상위 호환):
+> - 대상 결정: `options.target` → `document.modelContext` → `navigator.modelContext` → 없으면 no-op 해제 함수.
+> - 등록: 도구마다 `AbortController`를 만들어 `registerTool({ name, description, inputSchema, execute }, { signal })`로 등록한다. `registerTool`이 Promise를 반환하면 거부(reject)를 잡아 경고한다. 동기 예외도 경고 후 나머지 도구 등록을 계속한다.
+> - 해제: 해당 `AbortController`를 abort하고, 대상에 `unregisterTool`이 있으면 함께 호출한다.
+> - 동기화: `tools-changed`마다 이름별 디스크립터를 비교한다. 사라진 이름은 해제, 새 이름은 등록, 같은 이름이 다른 디스크립터로 바뀐 경우(`DC-3` 최신 인스턴스 덮어쓰기)는 해제 후 재등록한다.
+> - `execute(args)`는 `bridge.callTool(name, args)`의 `ToolCallResult`를 그대로 반환한다. 브라우저는 인자를 검증하지 않으므로 검증은 `callTool`이 맡고, 실패도 예외가 아닌 값(`{ ok: false, error }`)으로 돌아가 에이전트가 자기 수정할 수 있다. `confirm` 승인도 `callTool` 경로이므로 WebMCP 호출에 그대로 적용된다.
+> - 미반영(후속 검토): WebMCP `annotations`(`readOnlyHint`, `consequentialHint` 등)와 `requiresConfirm` 매핑, `execute`의 두 번째 인자 `{ signal }`(진행 중인 액션은 취소하지 않음).
 
 ---
 
@@ -477,6 +500,7 @@ type LiveRpcMessage =
 - [x] **DC-4 — WebMCP 어댑터 범위 및 기본 동작**
   - **확정**: 옵션 A — 명시적 opt-in `connectWebMCP(bridge, options?)` 함수로 제공.
   - **근거**: 라이브러리 import만으로 전역 `navigator.modelContext`를 암묵적으로 변경하는 부작용을 방지하고, 브라우저 표준 변화에 안전하게 격리한다.
+  - **구현 메모 (Phase 2)**: 결정은 그대로이며, 감지 대상과 해제 방식만 현재 WebMCP에 맞게 넓혔다 (`document.modelContext` 우선, `AbortSignal` 해제 + `unregisterTool` 호환 — §2.6 편차 기록).
   - 검증: Phase 2, `M-2`
 
 - [x] **DC-5 — `confirm` 승인 훅 동작 범위**
@@ -502,6 +526,7 @@ type LiveRpcMessage =
 - [x] **DC-9 — 번들 크기 예산**
   - **확정**: `lithent/agent` ≤ **2,000 B** brotli, `lithent/live` (호스트 컨트롤러) ≤ **3,000 B** brotli, `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
   - **근거**: 호스트 앱에 추가되는 오버헤드와 샌드박스 자체 포함 런타임 예산을 분리해 `lithent`의 초경량 정체성을 CI 게이트로 강제한다.
+  - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (`lithent/agent` 예산 2,000 B를 340 B 초과). 대응은 `DC-16`(TBD)에서 결정한다.
   - 검증: Phase 3, Phase 6 (`pnpm size`)
 
 - [x] **DC-10 — 릴리스 순서 (단계적 출하 여부)**
@@ -534,3 +559,12 @@ type LiveRpcMessage =
   - **옵션**: A) `.` 유지, 소비자가 이름을 변환 / B) 구분자를 `_` 또는 `__`로 변경 / C) `createAgentBridge({ separator })` 옵션 제공.
   - **현재 구현**: `DC-3`대로 `.` (구분자는 `agent/src/hooks.tsx`의 `fullName` 한 곳에만 있어 변경 비용이 작다).
   - 검증: 결정 후 Phase 7 이름 규칙 테스트에 반영.
+
+- [ ] **DC-16 — `lithent/agent` UMD 크기 예산 초과 대응 (TBD — Phase 2 구현 후 발견, 사용자 결정 대기)**
+  - **문제**: Phase 2 종료 시 `agent/dist/lithentAgent.umd.js`가 brotli **2,340 B**로 `DC-9` 예산(2,000 B)을 340 B 초과한다. 증가분은 `confirm` 승인 훅 약 165 B, `connectWebMCP` 약 290 B (Phase 1 종료 1,884 B 기준). `connectWebMCP`를 빼고 측정하면 2,049 B로 그래도 49 B 초과다. 메시지 축약 같은 미세 조정으로는 340 B를 회수하기 어렵다.
+  - **옵션**:
+    - A) `lithent/agent` 예산을 **2,400 B**로 상향 (현재 구조 유지, 60 B 여유).
+    - B) `connectWebMCP`를 별도 서브패스(예: `lithent/agent/webmcp`)로 분리하고 코어 예산을 **2,100 B**로 소폭 상향 (WebMCP를 쓰지 않는 소비자는 UMD 기준 2,049 B).
+    - C) 기능·메시지를 줄여 2,000 B 유지 (오류 메시지·경고 품질 저하 위험).
+  - **영향**: Phase 3의 `scripts/size-report.js` 게이트 등재 전에 결정되어야 한다 (Phase 3 진입 조건).
+  - 검증: Phase 3 (`pnpm size`).

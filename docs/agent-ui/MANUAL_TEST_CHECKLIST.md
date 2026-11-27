@@ -38,9 +38,9 @@
 ### M-2. WebMCP 연동 및 미지원 브라우저 안전성 (`RQ-5`, `DC-4`)
 
 **절차**:
-1. `navigator.modelContext`를 지원하는 브라우저(또는 모의 polyfill 주입 환경)에서 `connectWebMCP(bridge)`를 호출한다.
+1. WebMCP를 지원하는 브라우저(현재 Chrome은 `document.modelContext`, 이전 초안은 `navigator.modelContext`) 또는 모의 polyfill 주입 환경에서 `connectWebMCP(bridge)`를 호출한다. (`DESIGN.md` §2.6 편차 기록)
 2. 컴포넌트를 마운트·언마운트하며 등록/해제된 도구 목록을 확인한다.
-3. `navigator.modelContext`가 없는 브라우저(Firefox/Safari 등)에서 동일한 코드를 실행한다.
+3. `document.modelContext`·`navigator.modelContext`가 모두 없는 브라우저(Firefox/Safari 등)에서 동일한 코드를 실행한다.
 
 **합격 기준**:
 - 지원 환경에서 마운트 시 도구가 등록되고 언마운트 시 해제되며, 도구 실행 시 화면이 갱신된다.

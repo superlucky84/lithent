@@ -51,10 +51,30 @@ export type ParamsOf<S extends ParamSpec> = {
     : K]?: FieldToType<S[K]>;
 };
 
+/** What an approval sees before an agent's call runs (DC-5). */
+export type ActionConfirmContext<P = Record<string, unknown>> = {
+  /** The registered name, `scopeId` prefix included. */
+  name: string;
+  description: string;
+  /** The checked arguments `run` would receive. */
+  args: P;
+};
+
+/** Approve (`true`) or reject an agent's call; may be async (DC-5). */
+export type ActionConfirmHandler = (
+  ctx: ActionConfirmContext
+) => boolean | Promise<boolean>;
+
 export type AgentActionOptions<S extends ParamSpec | undefined, R> = {
   name: string;
   description: string;
   params?: S;
+  /**
+   * Ask before an agent's `callTool` runs this action (DC-5): `true` uses the
+   * bridge's `setConfirmHandler`, a function decides itself. Calls of the
+   * returned function (people, UI handlers) never ask.
+   */
+  confirm?: boolean | ActionConfirmHandler;
   /** Register on this bridge instead of the nearest scope (§2.4). */
   bridge?: AgentBridge;
   /** Registers the action as `${scopeId}.${name}` (DC-3). */
@@ -124,6 +144,35 @@ export type AgentBridge = {
     args?: Record<string, unknown>
   ) => Promise<ToolCallResult>;
   subscribe: (listener: (event: AgentBridgeEvent) => void) => () => void;
+  /** The approval for actions declared with `confirm: true` (DC-5). */
+  setConfirmHandler: (handler: ActionConfirmHandler | null) => void;
   notifyStateChange: (name?: string) => void;
   dispose: () => void;
+};
+
+/** A tool as `connectWebMCP` registers it (§2.6). */
+export type WebMCPTool = {
+  name: string;
+  description: string;
+  inputSchema: ToolDescriptor['inputSchema'];
+  /** Resolves with the `ToolCallResult`; failures are returned, not thrown. */
+  execute: (args: Record<string, unknown>) => Promise<ToolCallResult>;
+};
+
+/**
+ * The part of a WebMCP model context the adapter uses (§2.6). Browsers that
+ * follow the current draft remove a tool when the `signal` passed at
+ * registration aborts; `unregisterTool` covers earlier drafts and polyfills.
+ */
+export type WebMCPModelContext = {
+  registerTool: (
+    tool: WebMCPTool,
+    options?: { signal?: AbortSignal }
+  ) => unknown;
+  unregisterTool?: (name: string) => void;
+};
+
+export type ConnectWebMCPOptions = {
+  /** Use this context instead of `document.modelContext` / `navigator.modelContext`. */
+  target?: WebMCPModelContext;
 };

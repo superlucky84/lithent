@@ -1,5 +1,6 @@
 import { toInputSchema, validateArgs } from '@/schema';
 import type {
+  ActionConfirmHandler,
   AgentBridge,
   AgentBridgeEvent,
   CreateAgentBridgeOptions,
@@ -18,6 +19,8 @@ export type ToolEntry = {
   d: ToolDescriptor;
   s?: ParamSpec;
   run: (args: Record<string, unknown>) => unknown;
+  /** Confirm policy (DC-5): `true` → the bridge's handler. */
+  c?: boolean | ActionConfirmHandler;
 };
 
 export type StateEntry = {
@@ -44,18 +47,23 @@ export const tool = (
   name: string,
   description: string,
   params: ParamSpec | undefined,
-  run: ToolEntry['run']
-): ToolEntry => ({
-  d: { name, description, inputSchema: toInputSchema(params) },
-  s: params,
-  run,
-});
+  run: ToolEntry['run'],
+  confirm?: boolean | ActionConfirmHandler
+): ToolEntry => {
+  const d: ToolDescriptor = {
+    name,
+    description,
+    inputSchema: toInputSchema(params),
+  };
+  if (confirm) d.requiresConfirm = true;
+  return { d, s: params, run, c: confirm };
+};
 
 const message = (error: unknown) =>
   String(error instanceof Error ? error.message : error);
 
 const fail = (
-  code: 'NOT_FOUND' | 'INVALID_PARAMS' | 'EXECUTION_ERROR',
+  code: 'NOT_FOUND' | 'INVALID_PARAMS' | 'REJECTED' | 'EXECUTION_ERROR',
   msg: string,
   details?: unknown
 ): ToolCallResult => ({ ok: false, error: { code, message: msg, details } });
@@ -87,6 +95,7 @@ export const createAgentBridge = ({
   const states = new Map<string, StateEntry>();
   const listeners = new Set<(event: AgentBridgeEvent) => void>();
   let queued = false;
+  let confirmHandler: ActionConfirmHandler | null = null;
 
   const emit = (event: AgentBridgeEvent) =>
     listeners.forEach(listener => {
@@ -183,6 +192,30 @@ export const createAgentBridge = ({
         );
       }
 
+      // DC-5: approval runs on this path only, after the arguments are
+      // checked. No handler, a refusal or a failing handler all reject: a
+      // confirm-marked action never runs unapproved.
+      if (e.c) {
+        const ask = typeof e.c == 'function' ? e.c : confirmHandler;
+        let reason = 'The call was not approved.';
+        let approved = false;
+        try {
+          if (ask) {
+            const ctx = { name, description: e.d.description, args: clean };
+            approved = (await ask(ctx)) === true;
+          } else {
+            reason = `"${name}" needs approval and no confirm handler is set.`;
+          }
+        } catch (error) {
+          reason = message(error);
+        }
+        if (!approved) return fail('REJECTED', reason);
+        // It may have unmounted while the approval was open.
+        if (tools.get(name) !== e) {
+          return fail('NOT_FOUND', `"${name}" was removed before it ran.`);
+        }
+      }
+
       try {
         return { ok: true, value: await e.run(clean) };
       } catch (error) {
@@ -196,6 +229,9 @@ export const createAgentBridge = ({
       return () => {
         listeners.delete(listener);
       };
+    },
+    setConfirmHandler: handler => {
+      confirmHandler = handler;
     },
     notifyStateChange: name => stateChanged(name, []),
     dispose: () => {

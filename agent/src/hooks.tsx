@@ -121,6 +121,7 @@ const METHODS = [
   'getState',
   'callTool',
   'subscribe',
+  'setConfirmHandler',
   'notifyStateChange',
   'dispose',
 ] as const;
@@ -139,7 +140,7 @@ export function agentAction<S extends ParamSpec, R>(
 export function agentAction(
   options: AgentActionOptions<ParamSpec | undefined, unknown>
 ) {
-  const { name, description, params, bridge, scopeId } = options;
+  const { name, description, params, bridge, scopeId, confirm } = options;
   const run = options.run as (args?: Record<string, unknown>) => unknown;
   const compKey = getComponentKey();
   let registry: Registry | undefined;
@@ -150,7 +151,10 @@ export function agentAction(
     mountCallback(() => {
       const key = fullName(name, scopeId);
       registry = registryOf(resolveBridge(compKey as CompKey, bridge));
-      return registry && registry.t(key, tool(key, description, params, run));
+      return (
+        registry &&
+        registry.t(key, tool(key, description, params, run, confirm))
+      );
     });
   }
 

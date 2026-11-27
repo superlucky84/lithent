@@ -8,7 +8,7 @@
 |---|---|---|
 | 0 | 문서 작성 (`REQUIREMENTS`, `DESIGN`, `IMPLEMENT`, `MANUAL_TEST_CHECKLIST`) | done |
 | 1 | `lithent/agent` 코어 패키지 (`agentAction`, `agentState`, `createAgentBridge`) | done |
-| 2 | `lithent/agent` 어댑터 (WebMCP, `confirm` 승인 훅, `lithent/element` 연동) | planned |
+| 2 | `lithent/agent` 어댑터 (WebMCP, `confirm` 승인 훅, `lithent/element` 연동) | done |
 | 3 | `lithent/agent` 배포 연결·스킬·문서 (선택적 1차 릴리스 게이트) | planned |
 | 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | planned |
 | 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | planned |
@@ -102,7 +102,7 @@ Files:
 
 ---
 
-## Phase 2 — `lithent/agent` 어댑터 (WebMCP·승인 훅·Custom Element 연동): planned
+## Phase 2 — `lithent/agent` 어댑터 (WebMCP·승인 훅·Custom Element 연동): done
 
 Refs: RQ-4, RQ-5, RQ-9, RQ-11, DC-4, DC-5, M-1, M-2, M-5
 
@@ -111,18 +111,44 @@ Refs: RQ-4, RQ-5, RQ-9, RQ-11, DC-4, DC-5, M-1, M-2, M-5
 - `DESIGN.md`의 `DC-4`(WebMCP 정책) 및 `DC-5`(`confirm` 정책) 확정.
 
 ### 구현 체크리스트
-- [ ] `setConfirmHandler` 및 액션별 `confirm` 승인 훅 구현 (거부 시 `REJECTED`, 비동기 승인 지원)
-- [ ] `connectWebMCP(bridge?, options?)` 구현 (`navigator.modelContext` 감지, 도구 등록/해제 동기화, 미지원 환경 no-op, 테스트용 커스텀 `target` 주입 지원)
-- [ ] `lithent/element` Custom Element 내부 컴포넌트에서 `agentAction`/`agentState` 사용 및 호스트 브릿지 연결 확인
+- [x] `setConfirmHandler` 및 액션별 `confirm` 승인 훅 구현 (거부 시 `REJECTED`, 비동기 승인 지원) — `agent/src/bridge.ts`, `agent/src/hooks.tsx`
+  - 핸들러가 없거나 예외를 던지거나 정확히 `true`를 반환하지 않으면 `REJECTED`(보안 기본값). 승인 대기 중 언마운트되면 `NOT_FOUND`. 세부 동작은 `DESIGN.md` §2.3 항목 4.
+- [x] `connectWebMCP(bridge?, options?)` 구현 (`navigator.modelContext` 감지, 도구 등록/해제 동기화, 미지원 환경 no-op, 테스트용 커스텀 `target` 주입 지원) — `agent/src/webmcp.ts`
+  - **설계 편차**: 현재 Chrome WebMCP에 맞춰 `document.modelContext`를 먼저 감지하고, `AbortSignal`로 해제하며, `unregisterTool`은 있을 때만 호출한다 (`DESIGN.md` §2.6 편차 기록, `DC-4` 구현 메모).
+- [x] `lithent/element` Custom Element 내부 컴포넌트에서 `agentAction`/`agentState` 사용 및 호스트 브릿지 연결 확인
+  - 코드 변경 없이 동작 확인. 요소 내부는 별도 render 루트이므로 바깥 `<AgentScope>`는 적용되지 않으며, 페이지 브릿지는 `Object` prop으로 넘긴다 (`DESIGN.md` §2.4 `lithent/element` 경계).
 
 ### 기준 테스트
-- [ ] `agent/src/tests/confirm.test.tsx`: 승인/거부/비동기 승인, 사람 직접 호출 vs `callTool` 경로 동작(`DC-5`)
-- [ ] `agent/src/tests/webmcp.test.tsx`: 모의 `navigator.modelContext` 등록/언마운트 해제/재등록/미지원 환경 no-op
-- [ ] `agent/src/tests/element-interop.test.tsx`: `defineElement`로 감싼 위젯 마운트/이동/제거 시 브릿지 도구 동기화
+- [x] `agent/src/tests/confirm.test.tsx`: 승인/거부/비동기 승인, 사람 직접 호출 vs `callTool` 경로 동작(`DC-5`) (15 tests — 핸들러 없음·예외·`true` 외 값·`null` 해제·검증 선행·승인 대기 중 언마운트·스코프별 핸들러·액션별 핸들러·`useAgentBridge` 포함)
+- [x] `agent/src/tests/webmcp.test.tsx`: 모의 `navigator.modelContext` 등록/언마운트 해제/재등록/미지원 환경 no-op (9 tests — `AbortSignal` 방식과 `unregisterTool` 방식 모의 대상, `document`→`navigator` 감지 순서, `execute` 결과, `DC-3` 재등록, 등록 실패 격리 포함)
+- [x] `agent/src/tests/element-interop.test.tsx`: `defineElement`로 감싼 위젯 마운트/이동/제거 시 브릿지 도구 동기화 (6 tests — 이동 시 등록 유지·이벤트 없음, 제거 후 해제·재추가 재등록, `Object` prop 페이지 브릿지 + 속성 기반 `scopeId`, 속성 변경 상태 통지, 바깥 스코프 비전파)
 
 ### 종료 조건
 - Phase 1~2 테스트가 base·concurrent 양쪽에서 모두 통과.
 - `lithent/element` 기존 테스트 무회귀.
+
+### 검증 기록 (2026-11-27, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] `pnpm --filter lithent-agent test` → 7 files, 86/86 통과 (Phase 1 56 + Phase 2 30)
+- [x] `LITHENT_CORE=concurrent pnpm --filter lithent-agent test` → 7 files, 86/86 통과
+- [x] `pnpm --filter lithent-element test` → 12 files, 86 passed + 3 skipped(기존 skip) / `LITHENT_CORE=concurrent` → 12 files, 89/89 통과 (무회귀, element 파일 변경 없음)
+- [x] `pnpm --filter lithent-agent build` → 성공 (타입 검사 + ESLint). Node에서 ESM/CJS/UMD 산출물의 `connectWebMCP`·`setConfirmHandler` 동작 확인, 외부 소비자 TSX가 `index.d.ts`·`index.d.cts`에 대해 `confirm`·`ActionConfirmHandler`·`WebMCPModelContext` 타입 검사 통과
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+- [ ] **크기**: `lithentAgent.umd.js` brotli **2,340 B > 2,000 B** (`DC-9` 초과, 340 B). Phase 2 종료 조건 항목은 아니지만 Phase 3 크기 게이트를 막으므로 `DESIGN.md` `DC-16`(TBD)으로 기록했다. `connectWebMCP` 제외 시 2,049 B.
+- 참고: Phase 2는 루트 설정 파일을 바꾸지 않았으므로 Phase 1의 전체 `pnpm build:sequence && pnpm test` 결과가 그대로 유효하다.
+
+Files:
+- `agent/src/types.ts` (modified)
+- `agent/src/bridge.ts` (modified)
+- `agent/src/hooks.tsx` (modified)
+- `agent/src/index.ts` (modified)
+- `agent/src/webmcp.ts` (added)
+- `agent/src/tests/confirm.test.tsx` (added)
+- `agent/src/tests/webmcp.test.tsx` (added)
+- `agent/src/tests/element-interop.test.tsx` (added)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
+- `docs/agent-ui/MANUAL_TEST_CHECKLIST.md` (modified)
 
 ---
 
@@ -132,6 +158,8 @@ Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-9, DC-10, M-1
 
 ### 진입 조건
 - Phase 2 종료 조건 충족.
+- `DESIGN.md` `DC-16`(크기 예산 초과 대응) 결정 — `scripts/size-report.js`에 등재할 예산과, 옵션 B 선택 시 `lithent/agent/webmcp` 서브패스 추가 여부가 이 결정에 달려 있다. (Phase 2 종료 시 추가)
+- 권장: `DESIGN.md` `DC-15`(`scopeId` 구분자) 결정 — 1차 릴리스 전에 정하면 공개 이름 규칙을 바꿀 필요가 없다.
 
 ### 구현 체크리스트
 - [ ] 루트 `package.json`: `exports["./agent"]`, `files`, `build:agent`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
@@ -257,7 +285,7 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
 ### 통합 검증 체크리스트
 - [ ] **Playwright E2E (`e2e/agent-ui.spec.ts`)**: 실제 Chromium에서 다음 시나리오 자동 검증
   1. 로컬 `lithent` 컴포넌트의 `agentAction`/`agentState` 양방향 조작 (`M-1`)
-  2. 모의 `navigator.modelContext` WebMCP 동기화 (`M-2`)
+  2. 모의 WebMCP 모델 컨텍스트(`document.modelContext`, 이전 초안의 `navigator.modelContext`) 동기화 (`M-2`)
   3. `mountLive` Sandbox 모드에서 LLM 스타일 `ftags`/`tag` 코드 실행 → 사용자 입력(슬라이더/버튼) → 호스트 `bridge.getState()` 조회 → `bridge.callTool()`로 기존 상태 유지하며 부분 갱신 (`M-3`)
   4. 악성 코드의 호스트 DOM/쿠키/외부 네트워크 차단 확인 (`M-4`)
   5. `confirm` 승인/거부 흐름 (`M-5`)
@@ -286,16 +314,21 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
 
 - **done**:
   - Phase 0 문서 4종 작성 및 `DC-1`~`DC-14` 확정 (커밋 `d290fc3`)
-  - **Phase 1 (`lithent/agent` 코어 패키지) 구현 완료** — `agent/` 워크스페이스 패키지, `createAgentBridge`/`defaultAgentBridge`, `DC-2` 스키마 변환·검증(`DC-11` strip), `agentAction`, `agentState`(`DC-12`), `AgentScope`/`useAgentBridge`, `DC-3` 충돌 정책
-  - 기준 테스트 4종 base·concurrent 각 56/56 통과, 빌드·타입·크기(1,884 B br) 통과, 코어 diff 0줄, 전체 `pnpm test` 통과 (Phase 1 "검증 기록" 참고)
-  - `DESIGN.md`에 Phase 1 구현 세부(§2.1 구현 상태, §2.3 항목 6, §2.4·§2.5 구현 세부)와 `DC-15`(TBD) 기록
+  - **Phase 1 (`lithent/agent` 코어 패키지) 구현 완료** — 브릿지, `DC-2` 스키마·검증, `agentAction`, `agentState`, `AgentScope`/`useAgentBridge`, `DC-3` 충돌 정책 (Phase 1 "검증 기록")
+  - **Phase 2 (어댑터) 구현 완료** — `setConfirmHandler`·액션별 `confirm`(`DC-5`, 보안 기본값 `REJECTED`), `connectWebMCP`(`DC-4`, 현재 WebMCP에 맞춘 편차 포함), `lithent/element` 연동 확인
+  - agent 테스트 7 files base·concurrent 각 86/86, element 무회귀, 빌드·타입 통과, 코어 diff 0줄 (Phase 2 "검증 기록")
+  - `DESIGN.md`: §2.1 구현 상태·`WebMCPModelContext` 계약 갱신, §2.3 `confirm` 세부, §2.4 `lithent/element` 경계, §2.6 편차 기록, `DC-4` 구현 메모, `DC-9` 측정 기록, `DC-16`(TBD) 추가. `REQUIREMENTS.md`·`MANUAL_TEST_CHECKLIST.md`(`M-2`)에 `document.modelContext` 반영
+  - Phase 1·2를 `feat/agent-ui`에 Phase별로 커밋 (Phase 1 `c7917de`, Phase 2는 그 다음 커밋 — Phase별 `Files:`와 일치)
 - **next**:
-  1. 사용자 결정: Phase 1 리뷰(`doc-driven-reviewer-v1`) 여부, 또는 Phase 2 착수
-  2. 사용자 결정: `DC-15` (`scopeId` 구분자) — Phase 2 전에 정하면 변경 비용이 가장 작다
-  3. Phase 2: `setConfirmHandler`·액션별 `confirm`, `connectWebMCP`, `lithent/element` 연동
-- **blockers**: 없음
+  1. 사용자 결정: `DC-16` (크기 예산 초과 대응: A 예산 2,400 B / B `lithent/agent/webmcp` 분리 + 코어 2,100 B / C 축소) — **Phase 3 진입 조건**
+  2. 사용자 결정: `DC-15` (`scopeId` 구분자) — 1차 릴리스 전 권장
+  3. 사용자 결정: Phase 2 리뷰(`doc-driven-reviewer-v1`) 여부
+  4. Phase 3: 루트 `exports["./agent"]`·빌드/테스트 스크립트·크기/릴리스 검증 스크립트 등재, README·스킬·문서 사이트
+- **blockers**:
+  - Phase 3 착수: `DC-16` 결정 필요 (현재 2,340 B로 `DC-9` 2,000 B 초과)
 - **risks / follow-ups**:
-  - 크기: `lithentAgent.umd.js` 1,884 / 2,000 B. Phase 2 추가분으로 예산 초과 가능성이 높아, 그 시점에 `DC-9` 예산 조정 또는 `connectWebMCP` 별도 엔트리 분리를 사용자와 정해야 한다.
   - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면, 아직 마운트된 이전 인스턴스는 다시 등록되지 않는다 (설계대로의 동작). Phase 7 경계 테스트에서 의도 확인 권장.
-  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. 새 워크스페이스 패키지 인식에는 `node_modules/.pnpm-workspace-state-v1.json` 삭제 후 `pnpm install --frozen-lockfile`이 필요했다.
-- **latest commit**: `d290fc3` (Phase 1 변경은 아직 커밋하지 않음 — not committed yet)
+  - WebMCP는 표준화 진행 중이다. `annotations`(`consequentialHint` 등)와 `requiresConfirm` 매핑, `execute`의 `{ signal }` 취소는 미반영 (`DESIGN.md` §2.6). 실제 Chrome 검증은 `M-2`(수동)와 Phase 8 E2E에서 한다.
+  - `useAgentBridge()` 위임 브릿지의 메서드(`setConfirmHandler` 포함)는 마운트 전에 호출하면 `defaultAgentBridge`로 간다.
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. agent의 element 연동 테스트는 `element/dist`(예: `pnpm build:element` 또는 `pnpm build:sequence`)가 필요하다.
+- **latest commit**: `feat/agent-ui`의 Phase 2 커밋 (`feat(agent): add confirm hook, connectWebMCP and element interop (agent-ui Phase 2)`, 직전 Phase 1 커밋 `c7917de`)

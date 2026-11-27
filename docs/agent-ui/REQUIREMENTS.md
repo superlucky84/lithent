@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15` TBD) — Phase 1 (`lithent/agent` 코어) 구현 완료, Phase 2 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15`·`DC-16` TBD) — Phase 1~2 (`lithent/agent` 코어·어댑터) 구현 완료, Phase 3 대기**
 - 문서 위치 및 코드 범위:
   - 정규 문서: `docs/agent-ui/` (`REQUIREMENTS.md` → `DESIGN.md` → `IMPLEMENT.md` → `MANUAL_TEST_CHECKLIST.md`)
   - 확정 코드 범위 (`DC-1`):
@@ -12,7 +12,7 @@
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.1, §3.1, §3.4 · [../element/REQUIREMENTS.md](../element/REQUIREMENTS.md)
 
-> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-14`는 **확정 설계**이며, `DC-15`는 Phase 1 구현 중 발견된 **미결 결정(TBD)**이다. **구현 상태**: Phase 1 완료 — `RQ-1`~`RQ-3`과 `RQ-4`의 브릿지·스코프 계약이 `agent/`에 구현되었다. `RQ-4`의 `lithent/element` 연동과 `RQ-5`는 Phase 2, `RQ-10`~`RQ-12`의 배포 게이트 등재는 Phase 3에서 진행한다.
+> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-14`는 **확정 설계**이며, `DC-15`·`DC-16`은 구현 중 발견된 **미결 결정(TBD)**이다. **구현 상태**: Phase 1~2 완료 — `RQ-1`~`RQ-5`가 `agent/`에 구현되었다 (`RQ-4`의 `lithent/element` 연동 포함). `RQ-10`은 현재 `lithent/agent` UMD 2,340 B로 예산 초과 상태이며(`DC-16`), `RQ-10`~`RQ-12`의 배포 게이트 등재는 Phase 3에서 진행한다.
 
 ---
 
@@ -93,6 +93,7 @@ AI 시대에 다른 UI 프레임워크가 구조적으로 따라오기 어려운
 
 - **RQ-5. WebMCP 연동 및 승인(Confirmation) 훅**:
   - 브라우저에 `navigator.modelContext`가 존재할 때 opt-in 어댑터(`connectWebMCP(bridge)`)로 활성 액션을 자동 등록·해제할 수 있어야 한다. 미지원 환경에서는 예외 없이 no-op 해제 함수를 반환한다. (`DESIGN.md` `DC-4`)
+    - Phase 2 확인: 현재 WebMCP는 `document.modelContext`와 `AbortSignal` 기반 해제를 쓴다. 요구의 의도(지원 브라우저의 모델 컨텍스트에 자동 등록·해제)는 그대로이며, 어댑터는 `document.modelContext`를 우선 감지하고 `navigator.modelContext`도 지원한다 (`DESIGN.md` §2.6 편차 기록).
   - 파괴적이거나 민감한 액션에 대해 실행 전 호스트/사용자 승인을 거칠 수 있는 확인 훅(`confirm` 정책 또는 미들웨어)을 지원해야 한다. (`DESIGN.md` `DC-5`)
 
 ### 3.2 `lithent/live` (Phase B — Generative UI 런타임)
@@ -137,6 +138,6 @@ AI 시대에 다른 UI 프레임워크가 구조적으로 따라오기 어려운
 ## 6. 가정과 제약
 
 - 대상 브라우저: ES2020+, Shadow DOM v1, Custom Elements v1, `postMessage`, `structuredClone`(또는 JSON 직렬화)을 지원하는 에버그린 브라우저.
-- WebMCP(`navigator.modelContext`)는 초기 표준화 단계이므로 브라우저 구현 변동에 대비해 어댑터 계층으로 격리한다.
+- WebMCP(`navigator.modelContext`)는 초기 표준화 단계이므로 브라우저 구현 변동에 대비해 어댑터 계층으로 격리한다. (Phase 2 시점 Chrome 문서 기준 진입점은 `document.modelContext`이며 `navigator.modelContext`는 deprecated — 어댑터가 양쪽을 감지한다.)
 - 로컬 환경 Node 버전 주의: 현재 저장소는 `devEngines.runtime: 24.22.1`을 명시하고 있으며, Node 22 환경에서 실행 시 `pnpm_config_runtime_on_fail=ignore` 등 기존 테스트 관례([../test-utils/IMPLEMENT.md](../test-utils/IMPLEMENT.md) Phase 4 참고)를 따른다.
 - 배포 방식 (`DC-1` 확정, `DC-10` 확정): `lithent` 패키지 내 서브패스 `./agent`, `./live`로 제공하며, Phase 1~3 완료 시 `lithent/agent`를 먼저 minor 릴리스하고 Phase 4~8 완료 시 `lithent/live`를 후속 minor로 릴리스한다.
