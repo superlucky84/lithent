@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정 — Phase 1 구현 대기)**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15` TBD) — Phase 1 (`lithent/agent` 코어) 구현 완료, Phase 2 대기**
 - 문서 위치 및 코드 범위:
   - 정규 문서: `docs/agent-ui/` (`REQUIREMENTS.md` → `DESIGN.md` → `IMPLEMENT.md` → `MANUAL_TEST_CHECKLIST.md`)
   - 확정 코드 범위 (`DC-1`):
@@ -12,7 +12,7 @@
 - 관련 문서: [DESIGN.md](./DESIGN.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 - 배경: [../ideas/IDEAS.md](../ideas/IDEAS.md) §2.1, §3.1, §3.4 · [../element/REQUIREMENTS.md](../element/REQUIREMENTS.md)
 
-> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-14`는 **확정 설계**이며, **구현 상태**는 아직 미착수(Phase 0 문서 완료, Phase 1 대기)이다.
+> **구분 표기**: 이 문서의 요구사항 및 `DESIGN.md`의 `DC-1`~`DC-14`는 **확정 설계**이며, `DC-15`는 Phase 1 구현 중 발견된 **미결 결정(TBD)**이다. **구현 상태**: Phase 1 완료 — `RQ-1`~`RQ-3`과 `RQ-4`의 브릿지·스코프 계약이 `agent/`에 구현되었다. `RQ-4`의 `lithent/element` 연동과 `RQ-5`는 Phase 2, `RQ-10`~`RQ-12`의 배포 게이트 등재는 Phase 3에서 진행한다.
 
 ---
 

@@ -2,10 +2,10 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정 — 코드 미구현, Phase 1 대기)**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-14` 확정, `DC-15` TBD) — Phase 1 (`lithent/agent` 코어) 구현 완료, Phase 2 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
-> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다.
+> **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부 (Phase 1)"로 표시한 문단은 실제 구현된 동작을 기록한 것이고, `DC-15`는 아직 결정되지 않은 항목이다.
 
 ---
 
@@ -208,6 +208,8 @@ export function connectWebMCP(
 ): () => void;
 ```
 
+> **구현 상태 (Phase 1 완료 시점, 2026-11-27)**: `agent/src/`에 `createAgentBridge`, `defaultAgentBridge`, `agentAction`, `agentState`, `AgentScope`, `useAgentBridge`와 위 타입이 구현되었다. 승인 훅 관련 표면(`AgentBridge.setConfirmHandler`, `AgentActionOptions.confirm`, `ToolDescriptor.requiresConfirm`의 실제 동작)과 `connectWebMCP`/`WebMCPModelContext`는 계획대로 **Phase 2**에서 추가하므로, Phase 1의 `AgentBridge` 타입에는 `setConfirmHandler`가 아직 없다. 구현하면서 추가된 공개 타입: `ParamIssue`(`INVALID_PARAMS` 상세, §2.5), `ToolDescriptor.inputSchema.additionalProperties?: false`(`DC-11` 힌트).
+
 ### 2.2 컴포넌트 내부 사용 예
 
 ```tsx
@@ -262,6 +264,11 @@ const OrderList = lmount(() => {
    - 사람이 UI에서 `applyFilter(args)`를 직접 호출할 때는 `confirm` 확인 훅을 거치지 않고 `run(args)`를 즉시 실행하며, `notifyStateChange`를 마이크로태스크로 1회 디바운스 발행한다.
    - AI가 `bridge.callTool(name, args)`로 호출할 때만 파라미터 검증과 `confirm` 승인 훅을 거친다.
 5. `mount` 모드(`renew()` 수동 호출)와 `lmount` 모드(`lstate` 자동 갱신) 모두 `mountCallback`/`updateCallback`/`getComponentKey`를 동일하게 지원하므로 두 모드에서 동작 차이가 없다.
+6. **구현 세부 (Phase 1에서 확정된 동작)**:
+   - 변경 감지는 브릿지 단위로 모은다. `agentState`의 `updateCallback`, 사람 직접 호출, `callTool` 완료가 모두 같은 마이크로태스크 검사 1회를 예약하고, 검사는 각 상태의 직렬화 문자열을 직전 통지값과 비교한다. 바뀐 상태가 있으면 `state-changed`를 **1회** 발행하며, 바뀐 상태가 하나면 `name`에 그 이름을, 여럿이면 `name: undefined`를 담는다. 따라서 액션이 상태를 바꾼 뒤 뒤따르는 재렌더가 같은 이벤트를 다시 보내지 않는다.
+   - 상태 등록·해제 시에는 해당 `name`으로 즉시 `state-changed`를 발행한다. `notifyStateChange(name?)`는 비교 없이 즉시 발행하고 직전 통지값을 갱신한다.
+   - 호출 위치 검사: 현재 컴포넌트 엔트리가 존재하고 아직 그려지지 않았을 때(`vd.value === null`)만 `mounter`로 본다. 이미 사라진 컴포넌트의 키가 남아 있는 경우(컴포넌트 밖 호출)도 엔트리가 없으므로 밖으로 판정한다. 경고는 이름별 1회다. 한계: 첫 렌더의 `updater`는 `vd.value`가 설정되기 전에 실행되므로 그 1회 호출은 등록되고, 두 번째 렌더부터 경고와 함께 무시된다 (중복 등록은 발생하지 않음).
+   - 구독자(listener)가 예외를 던져도 다른 구독자와 등록 흐름은 계속되며, 예외는 `console.error`로 보고한다.
 
 ### 2.4 스코프 주입 및 중복 이름 처리 (`RQ-3`, `RQ-4`, `DC-3` 확정)
 
@@ -273,6 +280,9 @@ const OrderList = lmount(() => {
   - `<AgentScope bridge={bridge}>`는 `mount`로 구현되며, 내부 `props`에 모듈 전용 `Symbol` 키로 `bridge`를 저장하고 `children`을 그대로 `Fragment`로 반환한다 (`helper/src/hook/context.tsx`의 `Provider` 패턴과 동일).
   - 하위 컴포넌트에서 `agentAction`·`agentState`·`useAgentBridge`는 `mounter` 시점에 `compKey = getComponentKey()`를 캡처한 뒤, `mountCallback` 시점(WDom 트리 연결 완료)에 `getComponentSubInfo(compKey, 'vd')?.value`에서 `getParent()` 체인을 따라 올라가며 해당 `Symbol` 키가 붙은 조상 WDom의 `bridge`를 찾는다.
   - 이 방식은 `lithent/helper` 의존성 없이 `mount`와 `lmount` 모두에서, base·concurrent 양쪽 코어에서 동일하게 동작한다.
+  - **구현 세부 (Phase 1)**: 브릿지는 각 컴포넌트가 마운트될 때 한 번 결정된다. 이후 `<AgentScope>`의 `bridge` prop을 바꿔도 이미 마운트된 컴포넌트의 등록은 옮겨지지 않는다. `useAgentBridge()`는 마운트 시점에 스코프를 결정하는 위임(delegating) 브릿지를 반환하며, 마운트 전에 호출된 메서드는 `defaultAgentBridge`로 간다 (`mountCallback`·이벤트 핸들러에서 사용 권장). 이 위임 브릿지는 `options.bridge`로 넘겨도 동작한다.
+  - 등록은 `createAgentBridge()`로 만든 브릿지(모듈 전용 `Symbol` 레지스트리 보유)에만 가능하다. 직접 만든 객체를 `options.bridge`로 넘기면 경고 1회 후 등록하지 않는다 (액션 함수 자체는 계속 동작).
+  - `dispose()`는 도구·상태를 비우고, 도구가 있었다면 `tools-changed`(`tools: []`)를 발행한 뒤 구독자를 모두 해제한다. 브릿지는 이후에도 재사용할 수 있다.
 - **동일 브릿지 내 중복 이름 처리 (`DC-3` 확정)**:
   - `scopeId`가 있으면 등록 이름을 `${scopeId}.${name}`으로 자동 접두사화한다.
   - 같은 브릿지에 동일 최종 이름이 이미 등록돼 있으면:
@@ -289,6 +299,7 @@ const OrderList = lmount(() => {
   - 필수값 누락 / 타입 불일치(`Number`는 `typeof v === 'number' && !Number.isNaN(v)`, `Array`는 `Array.isArray(v)`, `Object`는 `v !== null && typeof v === 'object' && !Array.isArray(v)`) / `enum` 위반 → `{ ok: false, error: { code: 'INVALID_PARAMS', ... } }`
   - `confirm` 거부 → `{ ok: false, error: { code: 'REJECTED', ... } }`
   - `run` 예외 → `{ ok: false, error: { code: 'EXECUTION_ERROR', ... } }` (호스트 앱 크래시 방지)
+- **`INVALID_PARAMS` 상세 형식 (Phase 1 구현)**: `details`는 문제를 한 번에 모두 담은 `ParamIssue[]`(`{ param, issue: 'required' | 'type' | 'enum', expected? }`)이며, `message`는 `Invalid arguments for "<name>": status (required), minPrice (type).` 형태로 LLM이 바로 자기 수정할 수 있게 한다. 인자 자체가 객체가 아니면(`null`, 배열, 문자열) `[{ param: '', issue: 'type', expected: 'object' }]`이다. 선택 파라미터에 `null`을 보내면 생략으로 보지 않고 타입 불일치로 처리한다.
 
 ### 2.6 WebMCP 어댑터 (`RQ-5`, `DC-4` 확정)
 
@@ -517,3 +528,9 @@ type LiveRpcMessage =
   - **확정**: 호스트 측 프록시 `bridge`가 `requiresConfirm`을 확인해 호스트의 `confirmHandler`로 먼저 승인받은 뒤에만 iframe으로 `postMessage('call')`을 전달한다.
   - **근거**: 호스트 앱이 일관된 자체 승인 모달/오버레이 UI를 띄울 수 있고, 거부된 호출은 샌드박스 내부에 아예 도달하지 않는다.
   - 검증: Phase 4, Phase 7, `M-5`
+
+- [ ] **DC-15 — `scopeId` 구분자와 LLM 도구 이름 규칙 호환성 (TBD — Phase 1 구현 중 발견, 사용자 결정 대기)**
+  - **문제**: `DC-3`의 `${scopeId}.${name}`은 MCP 도구 이름에는 허용되지만, OpenAI 함수 이름 규칙(`^[a-zA-Z0-9_-]{1,64}$`)처럼 `.`을 허용하지 않는 벤더 API에 `listTools()` 결과를 그대로 넘기면 거부된다. §2.5의 "OpenAI, Anthropic, Gemini, MCP, WebMCP 도구 규격과 즉시 호환" 서술과 충돌한다 (다른 벤더의 규칙도 결정 전 확인 필요).
+  - **옵션**: A) `.` 유지, 소비자가 이름을 변환 / B) 구분자를 `_` 또는 `__`로 변경 / C) `createAgentBridge({ separator })` 옵션 제공.
+  - **현재 구현**: `DC-3`대로 `.` (구분자는 `agent/src/hooks.tsx`의 `fullName` 한 곳에만 있어 변경 비용이 작다).
+  - 검증: 결정 후 Phase 7 이름 규칙 테스트에 반영.

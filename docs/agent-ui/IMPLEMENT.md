@@ -7,7 +7,7 @@
 | Phase | 내용 | 상태 |
 |---|---|---|
 | 0 | 문서 작성 (`REQUIREMENTS`, `DESIGN`, `IMPLEMENT`, `MANUAL_TEST_CHECKLIST`) | done |
-| 1 | `lithent/agent` 코어 패키지 (`agentAction`, `agentState`, `createAgentBridge`) | planned |
+| 1 | `lithent/agent` 코어 패키지 (`agentAction`, `agentState`, `createAgentBridge`) | done |
 | 2 | `lithent/agent` 어댑터 (WebMCP, `confirm` 승인 훅, `lithent/element` 연동) | planned |
 | 3 | `lithent/agent` 배포 연결·스킬·문서 (선택적 1차 릴리스 게이트) | planned |
 | 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | planned |
@@ -37,7 +37,7 @@ Files:
 
 ---
 
-## Phase 1 — `lithent/agent` 코어 패키지: planned
+## Phase 1 — `lithent/agent` 코어 패키지: done
 
 Refs: RQ-1, RQ-2, RQ-3, RQ-4, RQ-9, RQ-10, RQ-11, DC-1, DC-2, DC-3, DC-5, DC-9, DC-11, DC-12
 
@@ -45,25 +45,60 @@ Refs: RQ-1, RQ-2, RQ-3, RQ-4, RQ-9, RQ-10, RQ-11, DC-1, DC-2, DC-3, DC-5, DC-9, 
 - `DESIGN.md`의 `DC-1`, `DC-2`, `DC-3`, `DC-5`, `DC-9`, `DC-11`, `DC-12`가 사용자 확인을 거쳐 확정되어 있을 것 (충족 완료).
 
 ### 구현 체크리스트
-- [ ] `agent/` 워크스페이스 패키지 구성 (`package.json`, `tsconfig.json`, `vite.config.js`, `pnpm-workspace.yaml` 등록 — `element/`·`test/` 패턴 준용, `LITHENT_CORE=concurrent` alias 포함)
-- [ ] `createAgentBridge()` 및 `defaultAgentBridge` 구현 (`listTools`, `getState`, `callTool`, `subscribe`, `notifyStateChange`, `dispose`)
-- [ ] 파라미터 스펙(`DC-2`) → JSON Schema 변환기 및 런타임 인자 검증기 구현 (`INVALID_PARAMS`, `NOT_FOUND`, `EXECUTION_ERROR`, 미선언 여분 키 strip `DC-11`)
-- [ ] `agentAction()` 구현 (`mountCallback` 자동 등록/해제, 사람 직접 호출 vs `callTool` 경로, 동기/비동기 실행, `mount`/`lmount` 공용)
-- [ ] `agentState()` 구현 (JSON-safe 스냅샷 수집, 예외·순환참조 시 `{ __agentStateError }` 격리 `DC-12`, `updateCallback` 기반 일반 UI 입력 상태 변경 자동 감지 및 마이크로태스크 알림)
-- [ ] 스코프 격리 및 다중 인스턴스 이름 충돌 정책(`DC-3`) 구현 (`scopeId`, `<AgentScope bridge={...}>`/`useAgentBridge()` WDom 부모 체인 탐색)
-- [ ] ESM/CJS/UMD(`lithentAgent`) 및 `.d.ts`/`.d.cts` 타입 추론 빌드 검증
+- [x] `agent/` 워크스페이스 패키지 구성 (`package.json`, `tsconfig.json`, `vite.config.js`, `pnpm-workspace.yaml` 등록 — `element/`·`test/` 패턴 준용, `LITHENT_CORE=concurrent` alias 포함)
+  - `pnpm-lock.yaml`에는 `agent` importer 6줄만 추가했다 (`pnpm install --fix-lockfile`은 무관한 의존성까지 재해석하므로 사용하지 않음).
+  - 루트 `vite.config.js` vitest `exclude`의 `agent/**`는 Phase 3 항목이지만 Phase 1에서 선반영했다. 없으면 루트 `pnpm test:core`가 `agent/src/tests`를 루트 `@` alias로 수집해 기존 스위트가 깨진다 (RQ-11).
+- [x] `createAgentBridge()` 및 `defaultAgentBridge` 구현 (`listTools`, `getState`, `callTool`, `subscribe`, `notifyStateChange`, `dispose`) — `agent/src/bridge.ts`
+- [x] 파라미터 스펙(`DC-2`) → JSON Schema 변환기 및 런타임 인자 검증기 구현 (`INVALID_PARAMS`, `NOT_FOUND`, `EXECUTION_ERROR`, 미선언 여분 키 strip `DC-11`) — `agent/src/schema.ts`, 상세 형식은 `DESIGN.md` §2.5
+- [x] `agentAction()` 구현 (`mountCallback` 자동 등록/해제, 사람 직접 호출 vs `callTool` 경로, 동기/비동기 실행, `mount`/`lmount` 공용) — `agent/src/hooks.tsx`
+  - `DC-5`의 Phase 1 범위는 경로 분리(사람 직접 호출은 검증 없이 즉시 실행, `callTool`만 검증)까지다. `confirm` 승인 훅과 `setConfirmHandler`는 Phase 2 항목이다.
+- [x] `agentState()` 구현 (JSON-safe 스냅샷 수집, 예외·순환참조 시 `{ __agentStateError }` 격리 `DC-12`, `updateCallback` 기반 일반 UI 입력 상태 변경 자동 감지 및 마이크로태스크 알림) — 통지 병합 규칙은 `DESIGN.md` §2.3 항목 6
+- [x] 스코프 격리 및 다중 인스턴스 이름 충돌 정책(`DC-3`) 구현 (`scopeId`, `<AgentScope bridge={...}>`/`useAgentBridge()` WDom 부모 체인 탐색)
+  - 구현 중 `scopeId` 구분자 `.`이 OpenAI 등 일부 벤더 도구 이름 규칙과 맞지 않는 문제를 발견해 `DESIGN.md` `DC-15`(TBD)로 기록했다. 현재 구현은 `DC-3`대로 `.`이다.
+- [x] ESM/CJS/UMD(`lithentAgent`) 및 `.d.ts`/`.d.cts` 타입 추론 빌드 검증
+  - Node에서 `dist/lithentAgent.mjs`(import), `dist/lithentAgent.cjs`(require), `dist/lithentAgent.umd.js`(`vm` 컨텍스트 + `lithent.umd.js` 전역) 로드 후 `callTool` 동작 확인.
+  - 외부 소비자 TSX를 `index.d.ts`·`index.d.cts` 양쪽에 대해 `skipLibCheck: false`로 타입 검사 통과 (`ParamsOf` 추론, 필수 인자 누락 `@ts-expect-error` 포함).
 
 ### 기준 테스트
-- [ ] `agent/src/tests/action.test.tsx`: `mount`·`lmount` 양쪽에서 사람 클릭 호출, `callTool` 호출, 비동기 반환, 파라미터 타입/필수/enum 검증 실패, 예외 격리
-- [ ] `agent/src/tests/state.test.tsx`: 스냅샷 조회, 일반 UI 입력 및 액션으로 상태 변경 시 `subscribe` 자동 통지, 언마운트 시 상태 제거, getter 예외 격리
-- [ ] `agent/src/tests/lifecycle.test.tsx`: 마운트·언마운트 자동 등록/해제, 다중 인스턴스 충돌(`DC-3`, 덮어쓴 최신 엔트리 보호), `<AgentScope>` 독립 브릿지 스코프 격리
-- [ ] `agent/src/tests/ssr.test.ts`: Node/SSR 환경에서 import 및 브릿지 생성 무예외
-- [ ] base 및 `LITHENT_CORE=concurrent` 양쪽 코어에서 전체 테스트 통과
+- [x] `agent/src/tests/action.test.tsx`: `mount`·`lmount` 양쪽에서 사람 클릭 호출, `callTool` 호출, 비동기 반환, 파라미터 타입/필수/enum 검증 실패, 예외 격리 (24 tests, `ParamsOf` 타입 테스트 포함)
+- [x] `agent/src/tests/state.test.tsx`: 스냅샷 조회, 일반 UI 입력 및 액션으로 상태 변경 시 `subscribe` 자동 통지, 언마운트 시 상태 제거, getter 예외 격리 (12 tests)
+- [x] `agent/src/tests/lifecycle.test.tsx`: 마운트·언마운트 자동 등록/해제, 다중 인스턴스 충돌(`DC-3`, 덮어쓴 최신 엔트리 보호), `<AgentScope>` 독립 브릿지 스코프 격리 (17 tests)
+- [x] `agent/src/tests/ssr.test.ts`: Node/SSR 환경에서 import 및 브릿지 생성 무예외 (3 tests, `@vitest-environment node`)
+- [x] base 및 `LITHENT_CORE=concurrent` 양쪽 코어에서 전체 테스트 통과 (각 56/56)
 
 ### 종료 조건
 - `agent/` 단위 테스트가 base·concurrent 양쪽에서 100% 통과.
 - `src/`와 `lithentConcurrent/src/` diff 0줄 (`RQ-9`).
 - `agent/dist/lithentAgent.umd.js` brotli 크기가 `DC-9` 예산 이내.
+
+### 검증 기록 (2026-11-27, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] `pnpm --filter lithent-agent test` → 4 files, 56/56 통과
+- [x] `LITHENT_CORE=concurrent pnpm --filter lithent-agent test` → 4 files, 56/56 통과 (임시 프로브로 concurrent 번들 해석 확인 후 프로브 삭제)
+- [x] `pnpm --filter lithent-agent build` → 성공 (vite-plugin-checker 타입 검사 + ESLint 포함), `lithentAgent.umd.js` raw 4,393 B / **brotli 1,884 B ≤ 2,000 B** (`DC-9`)
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` 및 `git status --porcelain -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+- [x] `pnpm build:sequence && pnpm test` → 성공 (루트 core 81 files/516 tests, concurrent 77 files/394 tests 포함 전 스위트 통과). 빌드 전 첫 실행은 `lithent/devHelper`, `@lithent/lithent-template-vite` dist 미빌드로 2개 파일이 로드 실패했으며 Phase 1 변경과 무관함을 빌드 후 재실행으로 확인.
+- [x] 코어 `dist/lithent.umd.js` brotli 4,774 B (무변화)
+- 참고: Phase 2에서 `confirm`·`connectWebMCP`를 같은 번들에 추가하면 남은 여유 116 B로는 2,000 B 예산을 넘을 가능성이 높다 (Handoff `risks` 참고).
+
+Files:
+- `agent/package.json` (added)
+- `agent/tsconfig.json` (added)
+- `agent/vite.config.js` (added)
+- `agent/src/index.ts` (added)
+- `agent/src/types.ts` (added)
+- `agent/src/schema.ts` (added)
+- `agent/src/bridge.ts` (added)
+- `agent/src/hooks.tsx` (added)
+- `agent/src/tests/action.test.tsx` (added)
+- `agent/src/tests/state.test.tsx` (added)
+- `agent/src/tests/lifecycle.test.tsx` (added)
+- `agent/src/tests/ssr.test.ts` (added)
+- `pnpm-workspace.yaml` (modified)
+- `pnpm-lock.yaml` (modified)
+- `vite.config.js` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
 
 ---
 
@@ -100,7 +135,7 @@ Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-9, DC-10, M-1
 
 ### 구현 체크리스트
 - [ ] 루트 `package.json`: `exports["./agent"]`, `files`, `build:agent`, `build:sequence`, `build:parallel` 제외 목록, `test:satellites`·`test` 연결
-- [ ] 루트 `vite.config.js` vitest `exclude`에 `agent/**` 추가
+- [x] 루트 `vite.config.js` vitest `exclude`에 `agent/**` 추가 (Phase 1에서 선반영 — Phase 1 체크리스트 참고)
 - [ ] `scripts/size-report.js`, `scripts/verify-release.mjs`, `scripts/ci-build-artifacts.mjs`, `.github/release-policy.json`에 `agent` 등록
 - [ ] `agent/README.md`, `skills/lithent/reference/agent.md`, `skills/lithent/SKILL.md`, `lithent-agent-addon.md` 업데이트
 - [ ] `lithentDocs` 가이드 페이지(영어·한국어) 추가
@@ -250,11 +285,17 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
 ## Handoff
 
 - **done**:
-  - `feat/agent-ui` 브랜치 생성 (`ead8b2e` 기준)
-  - `docs/agent-ui/` 4개 설계 문서(`REQUIREMENTS.md`, `DESIGN.md`, `IMPLEMENT.md`, `MANUAL_TEST_CHECKLIST.md`) 작성 완료
-  - `DESIGN.md` 결정 체크리스트 `DC-1`~`DC-14` 전 항목 권장안으로 사용자 확정 완료 (2026-11-27)
-  - `docatlas check --strict` 통과 (`0 errors, 0 warnings`)
+  - Phase 0 문서 4종 작성 및 `DC-1`~`DC-14` 확정 (커밋 `d290fc3`)
+  - **Phase 1 (`lithent/agent` 코어 패키지) 구현 완료** — `agent/` 워크스페이스 패키지, `createAgentBridge`/`defaultAgentBridge`, `DC-2` 스키마 변환·검증(`DC-11` strip), `agentAction`, `agentState`(`DC-12`), `AgentScope`/`useAgentBridge`, `DC-3` 충돌 정책
+  - 기준 테스트 4종 base·concurrent 각 56/56 통과, 빌드·타입·크기(1,884 B br) 통과, 코어 diff 0줄, 전체 `pnpm test` 통과 (Phase 1 "검증 기록" 참고)
+  - `DESIGN.md`에 Phase 1 구현 세부(§2.1 구현 상태, §2.3 항목 6, §2.4·§2.5 구현 세부)와 `DC-15`(TBD) 기록
 - **next**:
-  - `doc-driven-implementer-v1`로 **Phase 1 (`lithent/agent` 코어 패키지)** 착수
+  1. 사용자 결정: Phase 1 리뷰(`doc-driven-reviewer-v1`) 여부, 또는 Phase 2 착수
+  2. 사용자 결정: `DC-15` (`scopeId` 구분자) — Phase 2 전에 정하면 변경 비용이 가장 작다
+  3. Phase 2: `setConfirmHandler`·액션별 `confirm`, `connectWebMCP`, `lithent/element` 연동
 - **blockers**: 없음
-- **latest commit**: `ead8b2e` (기준 커밋; Phase 0 문서 커밋 예정)
+- **risks / follow-ups**:
+  - 크기: `lithentAgent.umd.js` 1,884 / 2,000 B. Phase 2 추가분으로 예산 초과 가능성이 높아, 그 시점에 `DC-9` 예산 조정 또는 `connectWebMCP` 별도 엔트리 분리를 사용자와 정해야 한다.
+  - `DC-3` 결과: 같은 이름을 덮어쓴 최신 인스턴스가 먼저 언마운트되면, 아직 마운트된 이전 인스턴스는 다시 등록되지 않는다 (설계대로의 동작). Phase 7 경계 테스트에서 의도 확인 권장.
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore` 필요. 새 워크스페이스 패키지 인식에는 `node_modules/.pnpm-workspace-state-v1.json` 삭제 후 `pnpm install --frozen-lockfile`이 필요했다.
+- **latest commit**: `d290fc3` (Phase 1 변경은 아직 커밋하지 않음 — not committed yet)

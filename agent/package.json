@@ -1,0 +1,34 @@
+{
+  "type": "module",
+  "name": "lithent-agent",
+  "version": "0.1.0",
+  "description": "Expose lithent component actions and state to AI agents",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "main": "./dist/lithentAgent.cjs",
+  "module": "./dist/lithentAgent.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "test": "vitest run --reporter verbose",
+    "test:dev": "vitest",
+    "watch": "vite build --watch",
+    "build": "vite build"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https@github.com:superlucky84/lithent.git"
+  },
+  "homepage": "https://github.com/superlucky84/lithent",
+  "license": "MIT",
+  "keywords": [
+    "lithent",
+    "agent",
+    "ai",
+    "mcp",
+    "webmcp"
+  ],
+  "peerDependencies": {
+    "lithent": "workspace:*"
+  }
+}

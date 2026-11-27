@@ -99,6 +99,8 @@ export default defineConfig({
       '**/element/**',
       // lithent/test likewise (`pnpm --filter lithent-test test`).
       'test/**',
+      // lithent/agent likewise (`pnpm --filter lithent-agent test`).
+      'agent/**',
       // Browser contracts use Playwright's runner, not Vitest.
       '**/e2e/**',
       // Node's CI/artifact failure fixtures use their own mandatory runner.
