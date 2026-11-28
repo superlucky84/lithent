@@ -77,6 +77,18 @@ describe('hintFor (§3.4)', () => {
     for (const name of symbolNames) expect(hint).toContain(name);
   });
 
+  it('a start that times out also names the host page CSP (Phase 7)', () => {
+    const start = hintFor(
+      { phase: 'timeout', message: 'The widget did not start within 5000 ms.' },
+      ''
+    );
+    expect(start).toMatch(/endless loop/);
+    expect(start).toMatch(/Content-Security-Policy.*'unsafe-eval'/);
+    expect(
+      hintFor({ phase: 'timeout', message: '"add" did not answer' }, '')
+    ).not.toMatch(/Content-Security-Policy/);
+  });
+
   it('a timeout', () => {
     expect(hintFor({ phase: 'timeout', message: 'no answer' }, '')).toMatch(
       /endless loop/

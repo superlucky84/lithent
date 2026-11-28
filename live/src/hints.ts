@@ -30,7 +30,12 @@ export const hintFor = (error: LiveError, code: string): string | undefined => {
 
   if (error.phase != 'compile') {
     return error.phase == 'timeout'
-      ? 'The widget did not answer: look for an endless loop or a promise that never settles in the mounter, the render or an action.'
+      ? 'The widget did not answer: look for an endless loop or a promise that never settles in the mounter, the render or an action.' +
+          // A start that never answers may be the host page's CSP, which the
+          // sandbox document inherits (DESIGN §3.3).
+          (/did not start/.test(message)
+            ? " If the page has a Content-Security-Policy, it must allow inline scripts and 'unsafe-eval' for the sandbox."
+            : '')
       : undefined;
   }
 

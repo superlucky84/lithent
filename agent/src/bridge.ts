@@ -180,7 +180,15 @@ export const createAgentBridge = ({
       const e = tools.get(name);
       if (!e) return fail('NOT_FOUND', `No tool named "${name}".`);
 
-      const [clean, issues] = validateArgs(e.s, args);
+      // callTool never throws, even for arguments whose reading does (a
+      // getter or a Proxy that throws).
+      let checked;
+      try {
+        checked = validateArgs(e.s, args);
+      } catch (error) {
+        return fail('INVALID_PARAMS', message(error));
+      }
+      const [clean, issues] = checked;
       if (issues) {
         const list = issues
           .map(i => `${i.param || 'arguments'} (${i.issue})`)

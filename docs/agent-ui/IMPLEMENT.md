@@ -13,7 +13,7 @@
 | 4 | `lithent/live` 샌드박스 런타임 및 `postMessage` 양방향 RPC 브릿지 | done |
 | 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | done |
 | 6 | `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모 | done (수동 체크 `M-3`·`M-6`·`M-7`은 Phase 8) |
-| 7 | Test Hardening (보안·경계값·오류 격리·동시성·누수 강화) | planned |
+| 7 | Test Hardening (보안·경계값·오류 격리·동시성·누수 강화) | done |
 | 8 | Integration Test (이중 코어, 실제 브라우저 E2E, React 호스트, 릴리스 검증) | planned |
 
 ---
@@ -572,26 +572,76 @@ Files:
 
 ---
 
-## Phase 7 — Test Hardening (보안·경계값·오류·누수 강화): planned
+## Phase 7 — Test Hardening (보안·경계값·오류·누수 강화): done
 
-Refs: RQ-1, RQ-2, RQ-3, RQ-5, RQ-7, RQ-8, RQ-9, DC-3, DC-5, DC-7, DC-11, DC-12, DC-13, DC-14, M-4, M-5
+Refs: RQ-1, RQ-2, RQ-3, RQ-5, RQ-7, RQ-8, RQ-9, DC-3, DC-5, DC-7, DC-11, DC-12, DC-13, DC-14, DC-15, M-4, M-5
 
 ### 진입 조건
-- Phase 1~6 구현 및 기본 테스트 완료.
+- Phase 1~6 구현 및 기본 테스트 완료 — 충족 (Phase 6 `d8d37a0`, Phase 4~6 리뷰 반영 `0ad8d82`).
 
 ### 강화 체크리스트
-- [ ] **보안 음성 대조 테스트**: 샌드박스 내부에서 `window.parent.document`, `localStorage`, `document.cookie`, 임의 외부 `fetch`(기본 CSP 활성 시), 위조된 `postMessage`(다른 `channelId`·다른 `source`) 접근이 모두 차단됨을 검증
-- [ ] **재진입·경합·언마운트 경계 테스트**: `callTool` 실행 도중 컴포넌트 언마운트 / `reload()` / `destroy()` 발생 시 메모리 누수·미처리 Promise rejection 0건 검증
-- [ ] **상태 직렬화 경계 테스트**: `agentState`가 순환 참조, `BigInt`, 함수, 예외를 반환할 때 `{ __agentStateError }` 격리(`DC-12`) 및 `BigInt` 문자열화 검증
-- [ ] **여분 키·승인 경계 테스트**: `agentAction` 미선언 여분 키 strip(`DC-11`), Sandbox `confirm` 거부 시 iframe으로 `call` 메시지 미전송(`DC-14`), `runtimeCode`·`runtimeUrl` 모두 생략 시 외부 요청 0건(`DC-13`) 검증
-- [ ] **오류 복구 루프 테스트**: 잘못된 코드 로드(`LiveError` + `hint` 반환) → `reload(수정된 코드)` 호출 시 이전 iframe/리스너가 완전히 정리되고 새 위젯이 정상 동작함 검증
-- [ ] **대량 등록·해제 스트레스 테스트**: 100회 연속 마운트/언마운트 및 `reload` 반복 후 리스너 수·등록 엔트리 수 0으로 복귀 검증
+- [x] **보안 음성 대조 테스트**: 샌드박스 내부에서 `window.parent.document`, `localStorage`, `document.cookie`, 임의 외부 `fetch`(기본 CSP 활성 시), 위조된 `postMessage`(다른 `channelId`·다른 `source`) 접근이 모두 차단됨을 검증
+  - **편차**: opaque origin과 CSP는 브라우저가 집행하고 jsdom은 srcdoc을 실행하지 않는다(`sandbox` 속성도 집행하지 않음). 그래서 둘로 나눴다. jsdom 자동 테스트(`live/src/tests/hardening.test.ts`)는 라이브러리가 맡는 부분을 검사한다: 호스트가 다른 `source`(이 창·다른 iframe·`null`)와 다른 모양의 데이터를 무시, 샌드박스 런타임(`entry.start`)이 `parent`가 아닌 출처·다른 채널의 메시지에 답하지 않음, srcdoc이 `props`·`code`·`styles`·`theme`·`runtimeCode`에 넣은 `</script>`·`<!--` 공격에도 스크립트 2개·스타일 2개를 유지, 모든 옵션 조합에서 `sandbox="allow-scripts"`만, 기본 CSP가 `default-src 'none'`이고 네트워크 지시어 없음. 브라우저가 집행하는 부분은 실제 Chromium에서 확인해 아래 검증 기록에 남겼고, 저장소의 자동 브라우저 테스트는 Phase 8 `e2e/agent-ui.spec.ts`(시나리오 4, `M-4`)에서 만든다.
+- [x] **재진입·경합·언마운트 경계 테스트**: `callTool` 실행 도중 컴포넌트 언마운트 / `reload()` / `destroy()` 발생 시 메모리 누수·미처리 Promise rejection 0건 검증
+  - 두 하드닝 파일 모두 테스트마다 `unhandledRejection`을 모아 0건인지 확인하고, live는 창의 `message` 리스너 순증가 수를 센다.
+  - agent: 언마운트 뒤 거부되는 `run` → `EXECUTION_ERROR`·이벤트 없음, 액션 안에서 같은 브릿지의 다른 도구 호출, 변경마다 도구를 부르는 리스너가 무한 반복 없이 수렴, 전달 중 자기 구독 해제, 호출 중 `dispose`.
+  - live: 승인 중 `reload`(아래 결함 1), 승인 핸들러 안의 `destroy`, `destroy` 시 대기 중 호출·`updateProps`와 타이머 정리, `reload`의 `tools-changed`에서 리스너 예외, `destroy` 두 번, Direct 모드 청크 로드 중 `destroy`, 실행 중 액션이 있는 Direct 위젯 `destroy`.
+- [x] **상태 직렬화 경계 테스트**: `agentState`가 순환 참조, `BigInt`, 함수, 예외를 반환할 때 `{ __agentStateError }` 격리(`DC-12`) 및 `BigInt` 문자열화 검증
+  - 기존(Phase 1) 순환 참조·`Error` 예외·`BigInt`·함수 테스트에 더해: `Error`가 아닌 값(`'text'`, `null`) 던지기, `toJSON` 예외, 중첩 `BigInt`·`Symbol`·`Date`·`NaN`·`-Infinity`, 같은 방식으로 계속 실패하는 getter는 변경으로 보고하지 않음, 회복한 getter는 값이 다시 보이고 경고는 한 번. Direct 모드로 실제 런타임을 거쳐 호스트까지 격리·문자열화가 유지됨.
+- [x] **여분 키·승인 경계 테스트**: `agentAction` 미선언 여분 키 strip(`DC-11`), Sandbox `confirm` 거부 시 iframe으로 `call` 메시지 미전송(`DC-14`), `runtimeCode`·`runtimeUrl` 모두 생략 시 외부 요청 0건(`DC-13`) 검증
+  - `__proto__`·`constructor` 키 제거와 프로토타입 오염 없음, `NaN`·`±Infinity` 거절과 `-0`·1만 개 배열 허용, 읽으면 예외가 나는 인자(아래 결함 2). `DC-14`는 rpc 테스트와 승인 중 `reload`·`destroy`로, `DC-13`은 `fetch` 호출·`script`/`iframe`/`link` 생성·`message` 리스너 0건으로 검사.
+- [x] **오류 복구 루프 테스트**: 잘못된 코드 로드(`LiveError` + `hint` 반환) → `reload(수정된 코드)` 호출 시 이전 iframe/리스너가 완전히 정리되고 새 위젯이 정상 동작함 검증
+  - `mountLive` 실패(JSX 힌트) → iframe·리스너 0 → 고친 코드로 `mountLive` 성공. `reload`로 깨진 코드 → 고친 코드를 20회 반복해도 iframe 1개·리스너 1개, `destroy` 뒤 0.
+- [x] **대량 등록·해제 스트레스 테스트**: 100회 연속 마운트/언마운트 및 `reload` 반복 후 리스너 수·등록 엔트리 수 0으로 복귀 검증
+  - agent: 100회 마운트/언마운트, 스코프별 100개 인스턴스 동시 등록(도구 200개) 후 전부 해제, 구독·해제 100쌍, 한 task 안 100번 변경 → 이벤트 1번.
+  - live: 연속 `reload` 100회, 기다리지 않는 `reload` 100회(마지막만 시작, 99개 `phase: 'mount'` reject), 위젯 100개 시작·파괴, 동시 호출 100개 역순 응답, Direct 모드 `reload` 50회, `<lithent-live>` 한 task 안 `code` 변경 50번·이동 50번·제거.
+- [x] **이름 규칙 (`DC-15` 검증 항목)**: 규칙을 지키는 `scopeId`·`name`의 조합 이름은 `^[a-zA-Z0-9_-]+$`를 지킨다. 라이브러리는 이름을 검사하지 않는다는 계약(§2.5)도 테스트로 고정했다 (`cart.add`는 그대로 등록).
+
+### 하드닝에서 찾아 고친 결함
+1. **승인 중 `reload`하면 승인된 호출이 새 위젯에서 실행됨 (`lithent/live`)**: 승인 뒤 같은 이름의 도구가 있는지만 봤기 때문에, 승인 대화상자가 열린 사이 `reload`된 새 위젯이 같은 이름의 도구를 가지면 이전 위젯을 위해 승인한 호출이 새 위젯으로 갔다(재현 결과 `{ ok: true, value: 'ran on new' }`). `lithent/agent`는 엔트리 동일성으로 막는다(`NOT_FOUND`). 호출이 시작될 때의 세션을 기억해 승인 뒤 세션이 바뀌었으면 `NOT_FOUND`(`"…" was removed before it ran.`)를 돌려준다 (`live/src/mountLive.ts`).
+2. **읽으면 예외가 나는 인자에서 `callTool`이 reject (`lithent/agent`, `lithent/live` 호스트)**: getter나 `Proxy`가 예외를 내는 인자 객체에서 검사 중 예외가 그대로 나가 "`callTool`은 던지지 않는다"는 계약(`agent/README.md`, 스킬)을 어겼다. 검사를 감싸 `INVALID_PARAMS`(예외 메시지)로 돌려준다 (`agent/src/bridge.ts`, `live/src/mountLive.ts`). `lithent/agent` +13 B.
+3. **엄격한 호스트 CSP에서 시작 타임아웃 힌트가 원인을 짚지 못함 (`lithent/live`)**: Chromium에서 호스트 페이지 CSP가 `script-src 'self'`이면 샌드박스가 정책을 상속해 시작하지 못하고 `timeout`으로 끝나는데, 힌트는 무한 루프만 말했다. 시작 타임아웃 힌트에 "페이지 CSP가 인라인 스크립트와 `'unsafe-eval'`을 허용해야 한다"를 덧붙였다 (호출 타임아웃 힌트는 그대로, `live/src/hints.ts`).
+
+### 검토 후보 (Phase 6 Handoff) 판단
+- **이름 규칙 검사 없음**: 그대로 둔다. 검사를 넣으면 `lithent/agent` 여유(113 B)를 쓰고, 규칙은 제공자마다 다르다(길이 제한 등). 계약을 테스트로 고정했다.
+- **`DC-3` 덮어쓰기 후 이전 인스턴스 미재등록**: 그대로 둔다(최신 인스턴스 우선이라는 `DC-3` 결정대로). `lifecycle.test.tsx`가 고정한다.
+- **WebMCP `annotations`·`signal`, 보류한 리뷰 제안 2건**: 하드닝 범위가 아니다. 그대로 Phase 8 이후 후보로 남긴다.
 
 ### 기준 테스트
-- [ ] `agent/src/tests/hardening.test.tsx` 및 `live/src/tests/hardening.test.ts` 신규 작성 및 base·concurrent 양쪽 통과
+- [x] `agent/src/tests/hardening.test.tsx` 및 `live/src/tests/hardening.test.ts` 신규 작성 및 base·concurrent 양쪽 통과
 
 ### 종료 조건
 - 모든 음성 대조·경계값·누수 회귀 테스트 100% 통과.
+
+### 검증 기록 (2026-11-28, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] 결함 재현: 승인 중 `reload` 시나리오를 수정 전 코드로 돌리면 새 iframe에 `call`이 가고 `{ ok: true, value: 'ran on new' }`, 읽으면 예외가 나는 인자는 `callTool`이 `getter trap`으로 reject. 수정 후 각각 `NOT_FOUND`·`INVALID_PARAMS`
+- [x] `pnpm --filter lithent-agent test` / `LITHENT_CORE=concurrent` → 각 8 files, **110/110** (91 + 하드닝 19)
+- [x] `pnpm --filter lithent-live test` / `LITHENT_CORE=concurrent` → 각 8 files, **133/133** (110 + 하드닝 22 + 힌트 1)
+- [x] 하드닝 테스트마다 `unhandledRejection` 0건, live는 창 `message` 리스너 순증가를 확인 (위젯이 살아 있으면 1, 파괴 뒤 0)
+- [x] `pnpm build` → 성공 (타입 검사 + ESLint)
+- [x] `pnpm size` → `lithent/agent` **2,387 / 2,500 B** (+13 B), `lithent/live` 호스트 **5,145 / 5,500 B** (+63 B), 런타임 **8,478 / 11,000 B**, 코어 항목 변화 없음
+- [x] `pnpm test:dual` → 성공 (루트 코어 516/516·394/394, agent 110/110 ×2, live 133/133 ×2, 나머지 위성 패키지 기존과 같음)
+- [x] `pnpm verify:release` → `ALL PASS (8 prepared packages; nothing published)`, ESM·CJS 15개 경로
+- [x] `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs` → 50/50
+- [x] `pnpm build:docs` → 성공
+- [x] 실제 Chromium (Playwright, 빌드한 UMD + `runtimeUrl`, 요청 가로채기, 저장소에 임시 파일 없음) — 위젯 코드가 시도한 탈출:
+  - 기본 설정: `parent.document`·`top.location.href`·`localStorage`·`sessionStorage`·`document.cookie` 쓰기 `SecurityError`, `location.origin` `"null"`, `window.open` `null`, `fetch`·no-cors `fetch` `TypeError`, 이미지는 브라우저 안에서 `csp`로 실패(가로채기 핸들러에 도달하지 않음), `sendBeacon`은 `true`를 돌려주지만 요청 없음, 채널 없는 `postMessage` 무시, 호스트 쿠키 `secret=host-only` 그대로, 페이지 오류 0건
+  - `allowNetwork: true` 대조: `fetch`(200)·no-cors·`sendBeacon`·이미지 요청이 나감 → 기본 설정의 차단이 CSP 때문임을 확인. 저장소·부모 접근은 여전히 `SecurityError`
+  - 호스트 페이지 CSP `script-src 'self'`: 샌드박스가 정책을 상속해 시작하지 못하고 3초 뒤 `LiveError(phase: 'timeout')`, 외부 요청 0건, 페이지 오류 0건 → 결함 3의 힌트 보강
+  - 위젯이 알아낸 채널로 보낸 위조 메시지: "Phase 6 후속" 검증 기록(2026-11-28)과 같은 방식으로 확인됨
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+- [x] `docatlas check --strict` 통과
+
+Files:
+- `agent/src/tests/hardening.test.tsx` (added)
+- `agent/src/bridge.ts` (modified)
+- `live/src/tests/hardening.test.ts` (added)
+- `live/src/tests/error-hints.test.ts` (modified)
+- `live/src/mountLive.ts` (modified)
+- `live/src/hints.ts` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
 
 ---
 
@@ -640,16 +690,15 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - **Phase 6 (`lithent/live` 배포 연결·스킬·문서·플레이그라운드)** — 루트 `exports["./live"]`·`["./live/runtime"]`·`files`·빌드/테스트 스크립트, `size`·`verify:release`·CI 아티팩트·릴리스 정책 등재, `live/README.md`, 스킬 `reference/live.md`(LLM 코드 규약), `SKILL.md`·`lithent-agent-addon.md`·`README.md`·`CHANGELOG.md`·`IDEAS.md`, 문서 사이트 `/guide/live`(영·한)와 양방향 Generative UI 플레이그라운드
   - Phase 6 검증: `build`·`size`·`test:dual`·`verify:release`(15개 경로, 청크 패킹 확인)·`build:docs`·CI fixture 통과, Chromium 플레이그라운드 확인, 코어 diff 0줄 (Phase 6 "검증 기록", 커밋 `d8d37a0`)
   - **Phase 6 후속 (Phase 4~6 리뷰 반영)** — 시작 중 `reload`·`destroy` 정리, 샌드박스 메시지 모양 확인, 승인 전 호스트 인자 검사(`lithent/agent`와 같은 규칙), 샌드박스 설정 실패 처리, `<lithent-live>` 정의 전 프로퍼티, 스킬 `{{VERSION}}`. Warning 4(`updateProps` ack)는 전제가 맞지 않아 반영하지 않음 ("Phase 6 후속" 참고)
+  - **Phase 7 (Test Hardening)** — `agent/src/tests/hardening.test.tsx`(19개), `live/src/tests/hardening.test.ts`(22개), base·concurrent 통과. 결함 3건 수정: 승인 중 `reload` 뒤 새 위젯에서 실행, 읽으면 예외가 나는 인자에서 `callTool` reject, 엄격한 호스트 CSP의 시작 타임아웃 힌트. 브라우저 집행 격리는 Chromium 확인 기록 ("Phase 7" 검증 기록)
 - **next**:
   1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스)
-  2. Phase 7 (Test Hardening): `agent/src/tests/hardening.test.tsx`, `live/src/tests/hardening.test.ts` — 보안 음성 대조, 재진입·경합·언마운트, 상태 직렬화 경계, 여분 키·승인 경계, 오류 복구 루프, 대량 등록·해제
+  2. Phase 8 (Integration Test): `e2e/agent-ui.spec.ts` — 기존 Playwright 설정(`playwright.config.ts`, `e2e/*.spec.ts`, `pnpm test:e2e`)을 쓴다. 시나리오 1~7(`M-1`~`M-7`), 특히 4번은 Phase 7 Chromium 확인 항목(부모·저장소·쿠키 `SecurityError`, CSP의 `fetch`·이미지·`sendBeacon` 차단, `allowNetwork` 대조, 위젯이 알아낸 채널로 보낸 위조 메시지, 엄격한 호스트 CSP의 `timeout`)을 자동화한다. 전체 저장소 게이트와 수동 체크 기록.
 - **blockers**: 없음
 - **risks / follow-ups**:
-  - 크기 여유: `lithent/agent` 126 B (2,374 / 2,500 B), `lithent/live` 호스트 **418 B** (5,082 / 5,500 B — 리뷰 반영으로 +546 B), 런타임 2,515 B (8,485 / 11,000 B). Phase 7 하드닝이 이 안에서 끝나야 한다. 호스트에 코드를 더해야 하면 먼저 크기를 재고, 넘으면 `DC-17`을 다시 연다.
-  - Phase 7 보안 음성 대조에 넣을 것: 위젯 코드가 호스트 메시지에서 채널 id를 알아내 위조 메시지를 보내는 경우(2026-11-28 Chromium에서 확인한 시나리오, "Phase 6 후속" 검증 기록).
-  - srcdoc 문서는 호스트 페이지 CSP를 상속한다 — 엄격한 호스트 CSP에서의 동작은 Phase 7·8에서 확인 (`DESIGN.md` §3.3 구현 메모).
-  - `mountLive`는 시작 실패 시 reject하고 핸들을 주지 않는다 — Phase 7 "오류 복구 루프"는 `reload` 실패 → 성공과 `mountLive` 재호출로 검증.
-  - jsdom은 `iframe.sandbox`·Shadow Root 안 iframe의 `contentWindow`를 지원하지 않는다 — Phase 7 보안 음성 대조(`window.parent.document`·`localStorage`·`document.cookie`·`fetch` 차단)는 실제 브라우저가 필요할 수 있다. jsdom에서 안 되는 항목은 Phase 8 Playwright로 옮기고 그 사실을 기록한다.
-  - 이름 규칙 검사 없음(`DESIGN.md` §2.5), `DC-3` 덮어쓰기 후 이전 인스턴스 미재등록, WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건 — Phase 7 검토 후보.
-  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체, `npm pack`은 `devEngines` 때문에 실패하므로 패킹 확인은 `verify:release`가 만든 tarball로 한다. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
-- **latest commit**: `d8d37a0` (Phase 6). "Phase 6 후속" 변경은 이 기록과 함께 커밋한다.
+  - 크기 여유: `lithent/agent` 113 B (2,387 / 2,500 B), `lithent/live` 호스트 355 B (5,145 / 5,500 B), 런타임 2,522 B (8,478 / 11,000 B). 호스트에 코드를 더해야 하면 먼저 크기를 재고, 넘으면 `DC-16`·`DC-17`을 다시 연다.
+  - srcdoc 문서는 호스트 페이지 CSP를 상속한다: `script-src 'self'` 같은 엄격한 정책에서는 Sandbox 위젯이 시작하지 못한다(`timeout`, 힌트가 CSP 안내). 해결하려면 별도 origin에서 런타임 문서를 내려주는 방식이 필요하며 지금 설계 범위 밖이다 — 문서에 한계로 적혀 있다(`live/README.md` "Limits").
+  - `sendBeacon`은 기본 CSP에서 요청 없이 `true`를 돌려준다(브라우저 동작). 위젯 코드가 결과를 믿지 않도록 따로 할 일은 없다.
+  - WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건(`listTools()` 내부 디스크립터 반환, `agent/package.json` `repository.url`) — Phase 8 이후 후보.
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체, `npm pack`은 `devEngines` 때문에 실패하므로 패킹 확인은 `verify:release`가 만든 tarball로 한다. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다. Phase 8 `pnpm test:e2e`는 설치된 Chromium(`/opt/pw-browsers`)을 쓴다.
+- **latest commit**: `0ad8d82` (Phase 6 후속). Phase 7 변경은 이 기록과 함께 커밋한다.

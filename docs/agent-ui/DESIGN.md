@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-17` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4~6 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`·배포 연결·문서·플레이그라운드) 구현 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 7 대기**
+- 상태: **설계 확정 (2026-11-27, `DC-1`~`DC-17` 확정) — Phase 1~3 (`lithent/agent`) 및 Phase 4~6 (`lithent/live` 샌드박스·RPC·Direct·`<lithent-live>`·배포 연결·문서·플레이그라운드) 구현 완료, Phase 7 하드닝 완료, `lithent/agent` 1차 릴리스 전 수동 체크 `M-1`·`M-2`·`M-5` 대기, Phase 8 대기**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) → [IMPLEMENT.md](./IMPLEMENT.md) → [MANUAL_TEST_CHECKLIST.md](./MANUAL_TEST_CHECKLIST.md)
 
 > **구분 표기**: `§7 결정 체크리스트(DC-1~DC-14)`는 2026-11-27 사용자 승인으로 확정되었고, 구현 중 발견된 `DC-15`·`DC-16`·`DC-17`도 같은 날 사용자 결정으로 확정되었다. 본 문서의 계약은 **확정 설계**이며, 코드 구현은 Phase 1부터 순차 진행한다. "구현 상태"·"구현 세부"·"편차 기록"·"구현 메모"·"측정 기록"·"확인 기록"으로 표시한 문단은 실제 구현된 동작을 기록한 것이다.
@@ -315,7 +315,7 @@ const OrderList = lmount(() => {
   - 필수값 누락 / 타입 불일치(`Number`는 `Number.isFinite(v)` — `NaN`·`Infinity`처럼 JSON으로 표현할 수 없는 값 거절, Phase 3 리뷰 반영으로 원래의 `!Number.isNaN(v)`에서 강화, `Array`는 `Array.isArray(v)`, `Object`는 `v !== null && typeof v === 'object' && !Array.isArray(v)`) / `enum` 위반 → `{ ok: false, error: { code: 'INVALID_PARAMS', ... } }`
   - `confirm` 거부 → `{ ok: false, error: { code: 'REJECTED', ... } }`
   - `run` 예외 → `{ ok: false, error: { code: 'EXECUTION_ERROR', ... } }` (호스트 앱 크래시 방지)
-- **`INVALID_PARAMS` 상세 형식 (Phase 1 구현)**: `details`는 문제를 한 번에 모두 담은 `ParamIssue[]`(`{ param, issue: 'required' | 'type' | 'enum', expected? }`)이며, `message`는 `Invalid arguments for "<name>": status (required), minPrice (type).` 형태로 LLM이 바로 자기 수정할 수 있게 한다. 인자 자체가 객체가 아니면(`null`, 배열, 문자열) `[{ param: '', issue: 'type', expected: 'object' }]`이다. 선택 파라미터에 `null`을 보내면 생략으로 보지 않고 타입 불일치로 처리한다.
+- **`INVALID_PARAMS` 상세 형식 (Phase 1 구현)**: `details`는 문제를 한 번에 모두 담은 `ParamIssue[]`(`{ param, issue: 'required' | 'type' | 'enum', expected? }`)이며, `message`는 `Invalid arguments for "<name>": status (required), minPrice (type).` 형태로 LLM이 바로 자기 수정할 수 있게 한다. 인자 자체가 객체가 아니면(`null`, 배열, 문자열) `[{ param: '', issue: 'type', expected: 'object' }]`이다. 선택 파라미터에 `null`을 보내면 생략으로 보지 않고 타입 불일치로 처리한다. 읽으면 예외가 나는 인자(예외를 던지는 getter나 `Proxy`)는 `details` 없이 그 예외 메시지로 `INVALID_PARAMS`가 된다 — `callTool`은 어떤 인자에도 던지지 않는다 (Phase 7 하드닝에서 발견해 수정, `lithent/live` 호스트 검사도 같다).
 
 ### 2.6 WebMCP 어댑터 (`RQ-5`, `DC-4` 확정)
 
@@ -422,6 +422,7 @@ LLM이 생성하는 코드는 **빌드 없는 표준 JS**이며, 런타임이 �
 - **구현 메모 (Phase 4~6 리뷰 반영) — 샌드박스 메시지는 신뢰하지 않는다**: 위젯 코드는 런타임과 같은 창에서 돌기 때문에 채널 id를 알아낼 수 있다(호스트가 보내는 `call`·`props` 메시지를 직접 받아 볼 수 있다). 따라서 채널 id는 세션을 구분하고 관계없는 메시지를 거르는 용도이지 위젯에게 숨기는 비밀이 아니며, 호스트는 채널이 맞는 메시지도 모양을 확인한다: 도구 목록은 배열이고 `name`이 문자열인 항목만, 상태는 JSON 텍스트로 저장해(객체가 아니거나 직렬화할 수 없으면 `{}`) `getState()`가 항상 새 사본을 주고, `event`는 받은 객체를 넘기지 않고 확인한 캐시로 다시 만들며(알 수 없는 종류는 무시), `error`는 `LiveError` 모양(`phase`·`message` 문자열)으로 바꾸고, `resize`는 유한한 0 이상 숫자만 받는다. 그래서 위조 메시지로 호스트의 `listTools()`·`getState()`·구독자가 예외를 내지 않는다. srcdoc 시작 스크립트는 설정을 함수 스코프에 두어 `window`에 남기지 않는다(쉬운 경로만 막는 보조 조치).
 - **확인 기록 (Phase 4, Chromium)**: 생성 코드에서 `parent.document`, `top.location`, `localStorage`, `document.cookie` 접근은 모두 `SecurityError`, `location.origin`은 `"null"`이었다. 기본 CSP에서 `fetch`(no-cors 포함)·이미지 요청은 차단되고, `allowNetwork: true`에서만 요청이 나갔다. 자동화된 음성 대조 테스트는 Phase 7·8에서 만든다.
 - **구현 메모 (Phase 4)**: `allowNetwork: true`는 CSP 메타 태그를 넣지 않는다(sandbox 속성은 유지). srcdoc 문서는 호스트 페이지의 CSP도 함께 받으므로(정책 상속), 호스트 CSP가 `'unsafe-eval'`·인라인 스크립트를 막으면 샌드박스 런타임이 시작하지 못한다 — 엄격한 호스트 CSP에서의 동작은 Phase 7·8에서 확인한다.
+- **확인 기록 (Phase 7, Chromium, 빌드한 UMD + `runtimeUrl`)**: 위젯 코드가 시도한 결과 — `parent.document`·`top.location.href`·`localStorage`·`sessionStorage`·`document.cookie` 쓰기는 모두 `SecurityError`, `location.origin`은 `"null"`, `window.open`은 `null`(`allow-popups` 없음), 채널 없이 보낸 `postMessage`는 호스트가 무시, 호스트 쿠키는 그대로. 기본 CSP에서 `fetch`(no-cors 포함)는 `TypeError`, 이미지·`sendBeacon`은 브라우저 안에서 `csp`로 막혀 네트워크에 나가지 않았다(`sendBeacon`은 `true`를 돌려주지만 요청이 없다). `allowNetwork: true`에서는 `fetch`·`sendBeacon`·이미지 요청이 나갔고 저장소·부모 접근은 여전히 막혔다. 호스트 페이지 CSP가 `script-src 'self'`이면 샌드박스가 정책을 상속해 시작하지 못하고 `LiveError(phase: 'timeout')`으로 끝난다(시작 타임아웃 힌트가 CSP를 함께 안내). 저장소의 자동 브라우저 테스트는 Phase 8 E2E가 맡는다.
 
 ### 3.4 `postMessage` RPC 프로토콜 (`RQ-8`, `DC-8`, `DC-14`)
 
@@ -441,6 +442,7 @@ type LiveRpcMessage =
 
 - **호스트 측 `confirm` 승인 처리 (`DC-14` 확정)**: `handle.bridge.callTool(name, args)` 호출 시 호스트 프록시 브릿지가 캐시된 `ToolDescriptor.requiresConfirm`을 먼저 확인해 호스트에 등록된 `confirmHandler`를 실행한다. 거부되면 iframe으로 `call` 메시지를 보내지 않고 즉시 `{ ok: false, error: { code: 'REJECTED', ... } }`를 반환한다.
   - **구현 세부 (Phase 4~6 리뷰 반영)**: 승인 전에 호스트가 위젯이 보고한 `inputSchema`로 인자를 `lithent/agent`와 같은 규칙(§2.5, `DC-11`)으로 검사한다(`live/src/args.ts`). 틀리면 승인을 묻지도, iframe으로 보내지도 않고 `lithent/agent`와 같은 `INVALID_PARAMS`(같은 메시지·`details`)를 돌려준다. 통과하면 `confirmHandler`와 `call` 메시지 모두 선언된 키만 남긴 인자를 받는다. 따라서 `lithent/agent`와 순서가 같다: 검사 → 승인 → 실행. 샌드박스 브릿지가 다시 검사한다. 스키마도 샌드박스에서 오므로 모양이 틀려도 예외를 내지 않는다.
+  - **승인은 그 위젯에만 유효 (Phase 7 하드닝에서 발견해 수정)**: 호출이 시작될 때의 세션을 기억해, 승인을 기다리는 사이 `reload`·`destroy`로 세션이 바뀌었으면 새 위젯에 같은 이름의 도구가 있어도 보내지 않고 `NOT_FOUND`(`"…" was removed before it ran.`)를 돌려준다. `lithent/agent`가 엔트리 동일성으로 막는 것과 같은 결과다.
 - **자동 높이 조절**: `autoResize: true`(기본값)일 때 iframe 내부 `ResizeObserver`가 콘텐츠 높이를 `resize` 메시지로 전달해 호스트가 iframe 높이를 자연스럽게 맞춘다.
 - **오류 자기 수정(Self-Repair)**: 컴파일/마운트/렌더 오류 발생 시 `LiveError`에 `phase`, `message`, 그리고 `lithent` 흔한 실수(`mounter`가 JSX를 직접 반환함, `lstate`를 `mount`에서 사용함 등)에 대한 `hint`를 포함해 호스트 LLM 루프에 즉시 되돌릴 수 있게 한다 (`RQ-8`).
 - **구현 세부 (Phase 4에서 확정된 동작)**:
@@ -455,7 +457,7 @@ type LiveRpcMessage =
   - **`props` 메시지**: `updateProps`는 호스트에 새 props를 기억한 뒤(이후 `reload`에도 사용) `ack`를 기다린다. 응답이 없으면 `LiveError(phase: 'timeout')`로 reject한다.
   - **새 props로 다시 그리다 예외가 날 때 (Phase 4~6 리뷰 확인)**: lithent의 `renew()`는 다시 그리기를 마이크로태스크에 넣기만 하므로(`src/utils/redraw.ts`) `renew()`도 `nextTick()`도 예외를 내지 않고, `ack`는 바로 간다. 렌더 예외는 샌드박스 창의 `error` 리스너를 거쳐 `onError`(`phase: 'render'`)로 온다. 따라서 `updateProps`는 타임아웃까지 멈추지 않고 resolve한다.
 - **구현 세부 (Phase 5에서 확정된 동작)**:
-  - **자기 수정 힌트**: 호스트가 오류와 그 오류를 낸 코드로 `hint`를 붙인다(이미 `hint`가 있으면 유지). 엔진마다 문구가 달라 메시지를 느슨하게 맞추고 코드도 함께 본다. 대상: JSX(`'<'` 토큰 오류) → `fTags`/`lTag` 안내, `import` 문 → 이미 주입된 심볼 안내, `export` 문 → `return` 안내, 컴포넌트 미반환 → `return lmount(...)` 예시, React 습관(`useState`·`useEffect`·`React` 등 미정의) → `lstate`/`state`·`mountCallback` 안내, `render`·`createRoot` 직접 호출 → 반환만 하라는 안내, 그 밖의 미정의 이름 → 사용 가능한 심볼 목록, `timeout` → 무한 루프·끝나지 않는 Promise 점검. 처음 예시로 든 "`lstate`를 `mount`에서 사용"은 현재 lithent에서 오류가 나지 않으므로(`lstate`는 `useRenew()`라 두 모드에서 모두 동작) 힌트 대상에서 뺐다. "`mounter`가 JSX를 직접 반환"은 빌드 없는 코드에서 JSX 문법 오류로 나타나므로 JSX 힌트가 맡는다.
+  - **자기 수정 힌트**: 호스트가 오류와 그 오류를 낸 코드로 `hint`를 붙인다(이미 `hint`가 있으면 유지). 엔진마다 문구가 달라 메시지를 느슨하게 맞추고 코드도 함께 본다. 대상: JSX(`'<'` 토큰 오류) → `fTags`/`lTag` 안내, `import` 문 → 이미 주입된 심볼 안내, `export` 문 → `return` 안내, 컴포넌트 미반환 → `return lmount(...)` 예시, React 습관(`useState`·`useEffect`·`React` 등 미정의) → `lstate`/`state`·`mountCallback` 안내, `render`·`createRoot` 직접 호출 → 반환만 하라는 안내, 그 밖의 미정의 이름 → 사용 가능한 심볼 목록, `timeout` → 무한 루프·끝나지 않는 Promise 점검(시작 타임아웃이면 호스트 페이지 CSP가 인라인 스크립트와 `'unsafe-eval'`을 허용해야 한다는 안내 추가 — Phase 7). 처음 예시로 든 "`lstate`를 `mount`에서 사용"은 현재 lithent에서 오류가 나지 않으므로(`lstate`는 `useRenew()`라 두 모드에서 모두 동작) 힌트 대상에서 뺐다. "`mounter`가 JSX를 직접 반환"은 빌드 없는 코드에서 JSX 문법 오류로 나타나므로 JSX 힌트가 맡는다.
   - **자동 높이 (`DC-8`)**: Sandbox에서 `autoResize`가 `false`가 아니면 런타임이 `document.documentElement`를 `ResizeObserver`로 지켜보다가 높이(올림한 정수)가 바뀔 때만 `resize`를 보내고, 호스트가 iframe `style.height`를 맞춘다. 음수·숫자 아닌 값은 무시한다. `ResizeObserver`가 없는 환경에서는 아무것도 하지 않는다.
   - **테마 (`DC-8`)**: `theme`의 `--이름: 값` 쌍만 CSS 사용자 정의 속성으로 넣는다(Sandbox는 srcdoc의 `:root{...}`, Direct는 `:host{...}`). 이름은 `^--[\w-]+$`, 값에 `;`·`{`·`}`·`<`·`>`가 있으면 버린다. 마운트·`reload` 때 적용된다.
 
@@ -555,8 +557,8 @@ type LiveRpcMessage =
 - [x] **DC-9 — 번들 크기 예산**
   - **확정**: `lithent/agent` ≤ **2,500 B** brotli (원래 2,000 B → 2026-11-27 `DC-16` 결정으로 상향), `lithent/live` (호스트 컨트롤러) ≤ **5,500 B** brotli (원래 3,000 B → 2026-11-27 `DC-17` 결정으로 상향), `lithent/live/runtime` (`sandboxRuntime.umd.js`) ≤ **11,000 B** brotli (`scripts/size-report.js` 게이트 등재, 코어 4,800 B 무변화).
   - **근거**: 호스트 앱에 추가되는 오버헤드와 샌드박스 자체 포함 런타임 예산을 분리해 `lithent`의 초경량 정체성을 CI 게이트로 강제한다.
-  - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (원래 예산 2,000 B 초과 → `DC-16`으로 예산 2,500 B 확정, 여유 160 B) → Phase 3 리뷰 반영 후 **2,374 B** (여유 126 B).
-  - **측정 기록 (`lithent/live`)**: Phase 4 종료 호스트 2,084 B · 런타임 8,277 B → Phase 5 종료 호스트 **4,536 B**(원래 예산 3,000 B 초과 → `DC-17`으로 예산 5,500 B 확정, 여유 964 B) · 런타임 8,485 B → Phase 4~6 리뷰 반영 후 호스트 **5,082 B**(여유 418 B, 호스트 인자 검사·메시지 확인·시작 중단 처리 +546 B) · 런타임 8,485 B(변화 없음).
+  - **측정 기록**: Phase 1 종료 1,884 B → Phase 2 종료 **2,340 B** (원래 예산 2,000 B 초과 → `DC-16`으로 예산 2,500 B 확정, 여유 160 B) → Phase 3 리뷰 반영 후 **2,374 B** (여유 126 B) → Phase 7 하드닝 후 **2,387 B** (여유 113 B, 읽으면 예외가 나는 인자 처리 +13 B).
+  - **측정 기록 (`lithent/live`)**: Phase 4 종료 호스트 2,084 B · 런타임 8,277 B → Phase 5 종료 호스트 **4,536 B**(원래 예산 3,000 B 초과 → `DC-17`으로 예산 5,500 B 확정, 여유 964 B) · 런타임 8,485 B → Phase 4~6 리뷰 반영 후 호스트 **5,082 B**(여유 418 B, 호스트 인자 검사·메시지 확인·시작 중단 처리 +546 B) · 런타임 8,485 B(변화 없음) → Phase 7 하드닝 후 호스트 **5,145 B**(여유 355 B, 승인 세션 확인·인자 읽기 예외 처리·CSP 힌트 +63 B) · 런타임 8,478 B.
   - 검증: Phase 3, Phase 6 (`pnpm size`)
 
 - [x] **DC-10 — 릴리스 순서 (단계적 출하 여부)**

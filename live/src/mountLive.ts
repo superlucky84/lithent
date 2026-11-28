@@ -386,10 +386,19 @@ export const mountLive = async (
       const find = () => current && tools.find(t => t.name === name);
       const tool = find();
       if (!tool) return fail('NOT_FOUND', `No tool named "${name}".`);
+      // The widget the call is for: a reload during the approval replaces it.
+      const session = current as Session;
 
       // As in lithent/agent: check first, so the approval and the widget see
       // only valid, declared arguments (DC-5, DC-11).
-      const [clean, issues] = checkArgs(tool.inputSchema, args);
+      let checked;
+      try {
+        checked = checkArgs(tool.inputSchema, args);
+      } catch (error) {
+        // Arguments whose reading throws: callTool still never throws.
+        return fail('INVALID_PARAMS', messageOf(error));
+      }
+      const [clean, issues] = checked;
       if (issues) {
         const list = issues
           .map(i => `${i.param || 'arguments'} (${i.issue})`)
@@ -421,12 +430,11 @@ export const mountLive = async (
           reason = messageOf(error);
         }
         if (!approved) return fail('REJECTED', reason);
-        if (!find()) {
+        if (current !== session || !find()) {
           return fail('NOT_FOUND', `"${name}" was removed before it ran.`);
         }
       }
 
-      const session = current as Session;
       const reply = await request(session, {
         type: 'call',
         name,
