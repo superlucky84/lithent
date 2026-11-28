@@ -14,7 +14,16 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-const settle = () => new Promise(resolve => setTimeout(resolve, 5));
+/**
+ * Wait for the answer to request `id`. The runtime answers after a macrotask
+ * (§3.4 "응답 순서"); a fixed delay was too short under a loaded test run.
+ */
+const answered = (posted: LiveRpcMessage[], type: string, id: number) =>
+  vi.waitFor(() => {
+    if (!posted.some(m => m.type == type && 'id' in m && m.id == id)) {
+      throw new Error(`no ${type} for ${id} yet`);
+    }
+  });
 
 /** A fake host: records posts (cloned like postMessage) and can send. */
 const host = () => {
@@ -158,7 +167,7 @@ describe('answering the host', () => {
   it('runs a call and reports the state change before the result', async () => {
     const { send, posted, root } = start(COUNTER, { start: 1, label: 'n' });
     send({ type: 'call', id: 7, name: 'add', args: { by: 4 } });
-    await settle();
+    await answered(posted, 'result', 7);
 
     const after = posted.slice(1);
     expect(after.map(m => m.type)).toEqual(['event', 'result']);
@@ -181,7 +190,7 @@ describe('answering the host', () => {
   it('checks arguments inside the sandbox too', async () => {
     const { send, posted } = start(COUNTER);
     send({ type: 'call', id: 1, name: 'add', args: { by: 'x' } });
-    await settle();
+    await answered(posted, 'result', 1);
     expect(ofType(posted, 'result')[0]).toMatchObject({
       result: { ok: false, error: { code: 'INVALID_PARAMS' } },
     });
@@ -190,7 +199,7 @@ describe('answering the host', () => {
   it('runs a confirm action without asking again: the host approved it (DC-14)', async () => {
     const { send, posted } = start(COUNTER, { start: 3 });
     send({ type: 'call', id: 2, name: 'wipe' });
-    await settle();
+    await answered(posted, 'result', 2);
     expect(ofType(posted, 'result')[0]).toMatchObject({
       result: { ok: true, value: 0 },
     });
@@ -199,7 +208,7 @@ describe('answering the host', () => {
   it('answers with EXECUTION_ERROR when a result cannot be posted', async () => {
     const { send, posted } = start(COUNTER);
     send({ type: 'call', id: 3, name: 'leak' });
-    await settle();
+    await answered(posted, 'result', 3);
     expect(ofType(posted, 'result')[0]).toMatchObject({
       id: 3,
       result: {
@@ -215,11 +224,11 @@ describe('answering the host', () => {
   it('takes new props, keeps the closure state and acks after the state event', async () => {
     const { send, posted, root } = start(COUNTER, { start: 1, label: 'a' });
     send({ type: 'call', id: 1, name: 'add', args: { by: 1 } });
-    await settle();
+    await answered(posted, 'result', 1);
     posted.length = 0;
 
     send({ type: 'props', id: 9, props: { start: 1, label: 'b' } });
-    await settle();
+    await answered(posted, 'ack', 9);
 
     expect(root.textContent).toBe('b:2');
     expect(posted.map(m => m.type)).toEqual(['event', 'ack']);
@@ -236,7 +245,7 @@ describe('answering the host', () => {
       });`;
     const { send, posted } = start(code);
     send({ type: 'call', id: 1, name: 'toggle' });
-    await settle();
+    await answered(posted, 'result', 1);
     const toolEvents = posted.filter(
       m => m.type == 'event' && m.event.type == 'tools-changed'
     ) as Extract<LiveRpcMessage, { type: 'event' }>[];

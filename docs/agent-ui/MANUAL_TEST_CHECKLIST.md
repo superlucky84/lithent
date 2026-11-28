@@ -2,7 +2,7 @@
 
 - 브랜치: `feat/agent-ui` / 기준 커밋 `ead8b2e`
 - 작성일: 2026-11-27
-- 상태: **미실행 (Phase 3 / Phase 8 완료 시 수행)**
+- 상태: **자동 검증 완료 (Phase 8, 2026-11-28, Playwright Chromium, base·concurrent) — 사람이 직접 하는 확인과 Safari·Firefox는 미실행**
 - 관련 문서: [REQUIREMENTS.md](./REQUIREMENTS.md) · [DESIGN.md](./DESIGN.md) · [IMPLEMENT.md](./IMPLEMENT.md)
 
 ## 실행 규칙
@@ -13,6 +13,10 @@
 - `DC-10`(옵션 A, 단계적 출하 확정)에 따라 `lithent/agent` 1차 출하 시에는 `M-1`, `M-2`, `M-5`를 필수로 통과하고, `lithent/live` 2차 출하 시 `M-3`, `M-4`, `M-6`, `M-7`을 통과한다.
 
 ---
+
+## 자동 검증 (Phase 8)
+
+각 항목의 절차를 `e2e/agent-ui.spec.ts`가 그대로 자동화한다(`e2e/fixtures/agent-ui/`). 아래 표의 Chrome 열은 그 실행 결과(실행 규칙이 인정하는 "Playwright 실행 결과" 증거)이며, base·concurrent 두 프로젝트에서 각각 통과했다. 이 환경에는 Chromium만 설치되어 있어 Safari·Firefox 열은 비어 있다: `LITHENT_E2E_BROWSER=firefox|webkit pnpm test:e2e e2e/agent-ui.spec.ts`로 같은 검사를 돌릴 수 있다. 사람이 직접 하는 확인(DevTools 절차, 실제 Vite + React 앱)은 출하 전에 사용자가 한다.
 
 ## 항목
 
@@ -31,7 +35,7 @@
 
 | Chrome | Safari | Firefox | 커밋 | 증거 |
 |---|---|---|---|---|
-| | | | | |
+| PASS (자동, Chromium) — `M-1: … both change the same orders; unmounting removes its tools and state` | 미실행 | 미실행 | Phase 8 커밋 | Playwright `e2e/agent-ui.spec.ts`, base·concurrent |
 
 ---
 
@@ -48,7 +52,7 @@
 
 | Chrome | Safari | Firefox | 커밋 | 증거 |
 |---|---|---|---|---|
-| | | | | |
+| PASS (자동, Chromium, 모의 `document.modelContext`·`navigator.modelContext`, 컨텍스트 없음) | 미실행 | 미실행 | Phase 8 커밋 | Playwright `M-2: WebMCP` 3개 테스트, base·concurrent |
 
 ---
 
@@ -69,7 +73,7 @@
 
 | Chrome | Safari | Firefox | 커밋 | 증거 |
 |---|---|---|---|---|
-| | | | | |
+| PASS (자동, Chromium, Sandbox·Direct, 시작 10~22 ms) | 미실행 | 미실행 | Phase 8 커밋 | Playwright `M-3: two-way generative UI` 3개 테스트, base·concurrent |
 
 ---
 
@@ -90,7 +94,7 @@
 
 | Chrome | Safari | Firefox | 커밋 | 증거 |
 |---|---|---|---|---|
-| | | | | |
+| PASS (자동, Chromium, `allowNetwork` 대조·엄격한 호스트 CSP·위조 메시지 포함) | 미실행 | 미실행 | Phase 8 커밋 | Playwright `M-4` 4개 테스트, base·concurrent |
 
 ---
 
@@ -108,7 +112,7 @@
 
 | Chrome | Safari | Firefox | 커밋 | 증거 |
 |---|---|---|---|---|
-| | | | | |
+| PASS (자동, Chromium, `lithent/agent`·`lithent/live` 승인, 오류 → 수정) | 미실행 | 미실행 | Phase 8 커밋 | Playwright `M-5` 3개 테스트, base·concurrent |
 
 ---
 
@@ -125,7 +129,7 @@
 
 | Chrome | Safari | Firefox | 커밋 | 증거 |
 |---|---|---|---|---|
-| | | | | |
+| PASS (자동, Chromium, React 18 UMD 개발 빌드) | 미실행 | 미실행 | Phase 8 커밋 | Playwright `M-6`, base·concurrent. 실제 Vite + React 앱 확인은 미실행 |
 
 ---
 
@@ -140,13 +144,13 @@
 
 | Chrome | Safari | Firefox | 커밋 | 증거 |
 |---|---|---|---|---|
-| | | | | |
+| PASS (자동, Chromium, base·concurrent 코어 UMD) | 미실행 | 미실행 | Phase 8 커밋 | Playwright `M-7`, base·concurrent |
 
 ---
 
 ## 출하 판정
 
-- [ ] `RQ-9` 코어 무수정 (`src/`, `lithentConcurrent/src/` diff 0줄) 확인
-- [ ] `RQ-10` 번들 크기 예산(`pnpm size`) 통과
-- [ ] `RQ-11`, `RQ-12` 자동 게이트(`pnpm test:dual`, `pnpm verify:release`, `pnpm test:e2e`) 통과
-- [ ] 해당 릴리스 범위의 `M-1`~`M-7` 전 브라우저 `PASS`
+- [x] `RQ-9` 코어 무수정 (`src/`, `lithentConcurrent/src/` diff 0줄) 확인 — `origin/main`(`ead8b2e`) 대비 0줄 (Phase 8)
+- [x] `RQ-10` 번들 크기 예산(`pnpm size`) 통과 (Phase 8)
+- [x] `RQ-11`, `RQ-12` 자동 게이트(`pnpm test:dual`, `pnpm verify:release`, `pnpm test:e2e`) 통과 (Phase 8, Chromium)
+- [ ] 해당 릴리스 범위의 `M-1`~`M-7` 전 브라우저 `PASS` — Chrome은 자동 검증 PASS. 사람 확인과 Safari·Firefox가 남음 (사용자)

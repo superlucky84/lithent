@@ -43,7 +43,8 @@ again. `callTool` never throws: `{ ok: false, error: { code, message } }`.
 One tag instead, in any framework: `defineLiveElement()` registers
 `<lithent-live code="..." runtime-url="...">`; set `runtimeCode`, `props`,
 `theme` as properties; listen to `live-ready` (`detail.bridge`) and
-`live-error`; call `el.bridge`.
+`live-error`; call `el.bridge`. In React 18, set `props` in `useLayoutEffect`
+so the first start has them.
 
 ## The code the model writes
 

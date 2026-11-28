@@ -52,6 +52,19 @@ that the core and lithent/element render and update with no policy violation,
 and that the `innerHTML` prop is the path Trusted Types rejects. It backs the
 claims in [`SECURITY.md`](../SECURITY.md).
 
+`agent-ui.spec.ts` (also outside the count) runs the
+[`docs/agent-ui`](../docs/agent-ui/MANUAL_TEST_CHECKLIST.md) checklist M-1 to
+M-7 on the built `lithent/agent` and `lithent/live` packages
+(`e2e/fixtures/agent-ui/`): a local component driven by a person and through
+its bridge, WebMCP through a mock `document.modelContext` /
+`navigator.modelContext` and with none, a generated loan widget used in the
+sandbox and in direct mode, a malicious widget that must not reach the host
+(with an `allowNetwork` control and a host page under a strict CSP), forged
+messages, approval through the host's dialog, the error → fix loop, a React 18
+app around `<lithent-live>`, and a page that loads UMD scripts only. Tests in
+which the browser is expected to refuse something use the plain Playwright test
+and check what was refused. They need `pnpm build` first.
+
 Each project starts fixture, examples and docs Vite servers on fixed loopback
 ports 43130–43135. Existing servers are never reused. HMR edits an isolated copy
 under `.e2e-work`; application sources and built cores are not edited by tests.

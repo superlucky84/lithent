@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>lithent/agent and lithent/live with no build step (M-7)</title>
+  </head>
+  <body>
+    <!--
+      M-7: UMD scripts only. A local lithent component declares tools with
+      lithentAgent; lithentLive starts a sandboxed widget and a direct one
+      (direct mode runs on this page's lithent, helper, ftags, tag and
+      agent globals). ?core=base|concurrent picks the page's core.
+    -->
+    <div id="local"></div>
+    <div id="sandboxed"></div>
+    <div id="direct"></div>
+    <script>
+      const core = new URLSearchParams(location.search).get('core');
+      document.write(
+        core === 'concurrent'
+          ? '<script src="/lithentConcurrent/dist/lithentConcurrent.umd.js"><\/script>'
+          : '<script src="/dist/lithent.umd.js"><\/script>'
+      );
+    </script>
+    <script>
+      // The satellite UMD bundles bind to the global "lithent"; the general
+      // helpers (lstate, ...) come from lithentHelper on either core.
+      window.lithent = window.lithentConcurrent || window.lithent;
+    </script>
+    <script src="/helper/dist/lithentHelper.umd.js"></script>
+    <script src="/ftags/dist/lithentFTags.umd.js"></script>
+    <script src="/tag/dist/lithentTag.umd.js"></script>
+    <script src="/agent/dist/lithentAgent.umd.js"></script>
+    <script src="/live/dist/lithentLive.umd.js"></script>
+    <script>
+      const { h, mount, render } = window.lithent;
+      const { AgentScope, agentAction, agentState, createAgentBridge } =
+        window.lithentAgent;
+
+      // A local component, written with h(): no JSX, no bundler.
+      const local = createAgentBridge();
+      const Greeter = mount(renew => {
+        let name = 'nobody';
+        agentAction({
+          name: 'greet',
+          description: 'Greet someone',
+          params: { name: { type: String, required: true } },
+          run: args => {
+            name = args.name;
+            renew();
+            return 'hello ' + name;
+          },
+        });
+        agentState('greeting', () => ({ name }));
+        return () => h('p', { id: 'greeting' }, 'hello ' + name);
+      });
+      render(
+        h(AgentScope, { bridge: local }, h(Greeter, {})),
+        document.getElementById('local')
+      );
+
+      const WIDGET = `return lmount(() => {
+        const n = lstate(0);
+        agentAction({ name: 'bump', description: 'Bump', run: () => ++n.value });
+        agentState('n', () => n.value);
+        return () => fTags.b({ id: 'n' }, 'n=' + n.value);
+      });`;
+
+      window.umd = {
+        local,
+        core: 'deferRender' in window.lithent ? 'concurrent' : 'base',
+      };
+      Promise.all([
+        lithentLive.mountLive({
+          code: WIDGET,
+          container: document.getElementById('sandboxed'),
+          runtimeUrl: '/live/dist/sandboxRuntime.umd.js',
+        }),
+        lithentLive.mountLive({
+          code: WIDGET,
+          container: document.getElementById('direct'),
+          mode: 'direct',
+        }),
+      ])
+        .then(
+          ([sandboxed, direct]) => {
+            window.umd.sandboxed = sandboxed;
+            window.umd.direct = direct;
+          },
+          error => (window.umd.failure = error)
+        )
+        .then(() => (document.documentElement.dataset.ready = 'true'));
+    </script>
+  </body>
+</html>

@@ -14,7 +14,7 @@
 | 5 | `lithent/live` Direct 모드, `<lithent-live>`, 오류 힌트, 자동 리사이즈 | done |
 | 6 | `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모 | done (수동 체크 `M-3`·`M-6`·`M-7`은 Phase 8) |
 | 7 | Test Hardening (보안·경계값·오류 격리·동시성·누수 강화) | done |
-| 8 | Integration Test (이중 코어, 실제 브라우저 E2E, React 호스트, 릴리스 검증) | planned |
+| 8 | Integration Test (이중 코어, 실제 브라우저 E2E, React 호스트, 릴리스 검증) | done (사람 수동 확인·Safari·Firefox는 사용자) |
 
 ---
 
@@ -645,23 +645,25 @@ Files:
 
 ---
 
-## Phase 8 — Integration Test (이중 코어·실제 브라우저 E2E·릴리스 검증): planned
+## Phase 8 — Integration Test (이중 코어·실제 브라우저 E2E·릴리스 검증): done
 
 Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7, DC-9, DC-10, M-1, M-2, M-3, M-4, M-5, M-6, M-7
 
 ### 진입 조건
-- Phase 7 종료 조건 충족.
+- Phase 7 종료 조건 충족 — 충족 (커밋 `85c8b77`).
 
 ### 통합 검증 체크리스트
-- [ ] **Playwright E2E (`e2e/agent-ui.spec.ts`)**: 실제 Chromium에서 다음 시나리오 자동 검증
-  1. 로컬 `lithent` 컴포넌트의 `agentAction`/`agentState` 양방향 조작 (`M-1`)
-  2. 모의 WebMCP 모델 컨텍스트(`document.modelContext`, 이전 초안의 `navigator.modelContext`) 동기화 (`M-2`)
-  3. `mountLive` Sandbox 모드에서 LLM 스타일 `ftags`/`tag` 코드 실행 → 사용자 입력(슬라이더/버튼) → 호스트 `bridge.getState()` 조회 → `bridge.callTool()`로 기존 상태 유지하며 부분 갱신 (`M-3`)
-  4. 악성 코드의 호스트 DOM/쿠키/외부 네트워크 차단 확인 (`M-4`)
-  5. `confirm` 승인/거부 흐름 (`M-5`)
-  6. React 호스트 앱 안에서 `<lithent-live>` + `el.bridge` 양방향 조작 (`M-6`)
-  7. UMD CDN 무빌드 페이지에서 `lithent` + `lithentAgent` + `lithentLive` 동작 (`M-7`)
-- [ ] **전체 저장소 게이트 실행**:
+- [x] **Playwright E2E (`e2e/agent-ui.spec.ts`)**: 실제 Chromium에서 다음 시나리오 자동 검증
+  1. 로컬 `lithent` 컴포넌트의 `agentAction`/`agentState` 양방향 조작 (`M-1`) — 주문 필터: 사람 클릭 → `getState()`, `callTool('filter_orders', { status: 'delayed', minPrice: 100000 })` → DOM 갱신, 언마운트 → 도구·상태 0, 다시 마운트 → 새 인스턴스
+  2. 모의 WebMCP 모델 컨텍스트(`document.modelContext`, 이전 초안의 `navigator.modelContext`) 동기화 (`M-2`) — 두 위치 각각: 마운트·언마운트에 따른 등록·해제(abort + `unregisterTool`), 모델 컨텍스트로 도구 실행 → DOM 갱신, 잘못된 인자 → `INVALID_PARAMS`, `disconnect()`. 컨텍스트가 없으면 아무 일도 없고 오류도 없음
+  3. `mountLive` Sandbox 모드에서 LLM 스타일 `ftags`/`tag` 코드 실행 → 사용자 입력(슬라이더/버튼) → 호스트 `bridge.getState()` 조회 → `bridge.callTool()`로 기존 상태 유지하며 부분 갱신 (`M-3`) — `fTags` 대출 계산기(Sandbox·Direct 모드 각각): 사람이 키보드로 슬라이더를 1억 → 3억, 10 → 30년으로 조작 → 호스트가 그 값을 읽음 → `compare_rates`가 비교 행만 추가하고 같은 입력 노드·값 유지(월 1,520,056) → 높이 증가를 iframe이 따라감. `lTag` 형식 위젯: 사람 클릭 2번 + 에이전트 `add` 5 → 7
+  4. 악성 코드의 호스트 DOM/쿠키/외부 네트워크 차단 확인 (`M-4`) — 부모 DOM·부모/자기 `localStorage`·`document.cookie`·`top.location` 모두 `SecurityError`, 기본 CSP의 `fetch`는 `TypeError`이고 가로채기 핸들러에 요청이 오지 않음, 잡지 않은 시도는 `onError`에 `LiveError(phase: 'render')`, 호스트 DOM·쿠키·저장소 그대로. 대조: `allowNetwork: true`면 같은 `fetch`가 나가고 나머지는 그대로 차단. 호스트 페이지 CSP가 엄격하면 `timeout` + CSP 힌트로 끝나고 iframe이 남지 않음. 위젯이 알아낸 채널로 보낸 위조 메시지에도 호스트 무사
+  5. `confirm` 승인/거부 흐름 (`M-5`) — `lithent/agent`: 핸들러 없음·거부 → `REJECTED`·상태 그대로, 사람 클릭은 핸들러 없이 바로 실행(`DC-5`), 승인 → 실행. `lithent/live`: 호스트가 `window.confirm` 대화상자로 묻고, 거부하면 위젯 상태 그대로(`DC-14`), 승인하면 실행, 위젯 안 사람 클릭은 묻지 않음. 오류 → 수정: mounter가 마크업을 바로 반환하는 코드 → `LiveError(phase: 'mount')` + 힌트(아래 결함 1), `reload(고친 코드)` 뒤 iframe 1개·정상 동작
+  6. React 호스트 앱 안에서 `<lithent-live>` + `el.bridge` 양방향 조작 (`M-6`) — React 18 개발 빌드: React 버튼 → `el.bridge.callTool` → 위젯 갱신, 위젯 안 클릭 → `subscribe` → React 출력, React 조건부 렌더링으로 언마운트하면 요소·iframe 0, 다시 마운트하면 새 위젯. React 경고(콘솔 오류) 0건
+  7. UMD CDN 무빌드 페이지에서 `lithent` + `lithentAgent` + `lithentLive` 동작 (`M-7`) — `lithent`·`lithentHelper`·`lithentFTags`·`lithentTag`·`lithentAgent`·`lithentLive` UMD만으로 로컬 컴포넌트(`h()`) 도구 호출, Sandbox 위젯·Direct 위젯 각각 `callTool`
+  - **편차 — React 앱 형태**: `M-6`의 "Vite + React 앱" 대신 `lithent/element` MT-4와 같이 `node_modules`의 React 18 UMD 개발 빌드를 쓴다(픽스처 서버가 CommonJS를 미리 번들하지 않음). React 쪽 동작(커스텀 요소에 속성 설정, 커밋·이펙트 순서)은 같다.
+  - **base·concurrent 프로젝트**: 두 프로젝트 모두 32개 테스트 전부를 돈다. 페이지(로컬 컴포넌트, Direct 모드, UMD 페이지)는 각 프로젝트의 코어로 돌고, Sandbox 런타임은 자기 코어를 싣는다.
+- [x] **전체 저장소 게이트 실행**:
   - `pnpm build`
   - `pnpm test:dual`
   - `pnpm test:toolchain`
@@ -669,14 +671,58 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - `pnpm verify:concurrent`
   - `pnpm verify:release`
   - `pnpm test:e2e`
-- [ ] `MANUAL_TEST_CHECKLIST.md`의 브라우저 수동 확인 항목(`M-1`~`M-7`) 수행 및 결과 기록
+- [x] `MANUAL_TEST_CHECKLIST.md`의 브라우저 수동 확인 항목(`M-1`~`M-7`) 수행 및 결과 기록
+  - **편차**: 체크리스트가 증거로 인정하는 "Playwright 실행 결과"로 Chrome 열을 채웠다(각 M 항목의 절차를 그대로 자동화). 사람이 직접 하는 확인과 Safari·Firefox 열은 이 환경에서 할 수 없어 비워 두었다(설치된 브라우저는 Chromium뿐). 출하 판정의 "전 브라우저 `PASS`"는 사용자 확인으로 남는다.
 
 ### 기준 테스트
-- [ ] `e2e/agent-ui.spec.ts` Chromium/Firefox/WebKit 통과 (로컬 환경에서 지원되는 브라우저 우선, CI에서 전 브라우저 확인)
-- [ ] 코어 무수정 검증: `git diff --stat main -- src lithentConcurrent/src` 출력 0줄
+- [x] `e2e/agent-ui.spec.ts` Chromium/Firefox/WebKit 통과 (로컬 환경에서 지원되는 브라우저 우선, CI에서 전 브라우저 확인) — 로컬은 Chromium(설치된 유일한 엔진)으로 base·concurrent 각 32/32. Firefox·WebKit은 `LITHENT_E2E_BROWSER=firefox|webkit`으로 CI나 엔진이 설치된 환경에서 실행한다.
+- [x] 코어 무수정 검증: `git diff --stat main -- src lithentConcurrent/src` 출력 0줄 — 로컬에 `main`이 없어 `origin/main`(= 기준 커밋 `ead8b2e`)을 가져와 비교, 출력 0줄
 
 ### 종료 조건
-- 모든 자동·수동 게이트 통과 및 `MANUAL_TEST_CHECKLIST.md` 출하 판정 완료.
+- 모든 자동·수동 게이트 통과 및 `MANUAL_TEST_CHECKLIST.md` 출하 판정 완료. — 자동 게이트는 모두 통과. 수동 확인(사람, Safari·Firefox)과 출하 판정은 사용자 몫으로 남는다 (Handoff).
+
+### E2E에서 찾아 고친 것
+1. **mounter가 마크업을 바로 반환하는 실수에 힌트 없음 (`lithent/live`)**: `M-5` (3)의 예시 그대로 `lmount(() => fTags.p(...))`를 넣으면 `mount` 단계 "e is not a function"만 나오고 `hint`가 없어 합격 기준을 채우지 못했다. "… is not a function"이고 코드에 `() =>` 렌더 함수가 없으면 "mounter는 마크업이 아니라 렌더 함수를 반환해야 한다"는 힌트를 붙인다 (`live/src/hints.ts`, 렌더 함수가 있는 코드의 다른 "not a function" 오류에는 붙이지 않음).
+2. **React 18에서 `props`를 `useEffect`로 넣으면 첫 시작에 반영되지 않음 (문서)**: 요소는 커밋 직후 마이크로태스크에서 시작하므로 `useEffect`의 `props`는 이미 상태를 만든 위젯에 `updateProps`로만 간다(E2E가 가끔 실패해 발견). 라이브러리 동작은 설계대로이고, `useLayoutEffect`(또는 ref 콜백)를 쓰라고 `live/README.md`와 스킬에 적었다. 픽스처도 그렇게 바꿨다.
+3. **`runtime.test.tsx`의 고정 5 ms 대기 (테스트)**: 하드닝 테스트가 늘어 부하가 커지자 concurrent 실행에서 약 6번 중 1번 `result`가 5 ms 안에 오지 않아 실패했다. 응답이 올 때까지 기다리도록(`vi.waitFor`) 바꿨고, 이후 20회 연속 통과.
+
+### 검증 기록 (2026-11-28, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`, Chromium 1243)
+- [x] `e2e/agent-ui.spec.ts` 단독: base·concurrent 각 32개, 3회 연속 **32/32 ×2** 통과 (React `useLayoutEffect` 수정 뒤 `M-6` 6회 연속 통과)
+- [x] `M-3` 위젯 시작 시간(`mountLive` 호출 → resolve, 로컬): Sandbox 11~13 ms, Direct 10~22 ms — 체크리스트 기준 100 ms 이내. 게이트는 느린 CI를 감안해 2,000 ms로 둔다
+- [x] `pnpm --filter lithent-live test` / `LITHENT_CORE=concurrent` → 각 8 files, **136/136** (133 + 힌트 3), concurrent 20회 연속 통과 (runtime 테스트 대기 수정 뒤)
+- [x] `pnpm build` → 성공
+- [x] `pnpm test:dual` → 성공 (루트 코어 516/516·394/394, agent 110/110 ×2, live 136/136 ×2, 나머지 위성 패키지 기존과 같음)
+- [x] `pnpm test:toolchain` → 성공 (hmr-parser 38, lithent-mdx 6, lithent-vite 5, template-parser 126, template-vite 5)
+- [x] `pnpm size` → `lithent/agent` **2,387 / 2,500 B**, `lithent/live` 호스트 **5,207 / 5,500 B** (+62 B, mounter 실수 힌트), 런타임 **8,478 / 11,000 B**, 코어 항목 변화 없음
+- [x] `pnpm verify:concurrent` → 7개 검사 모두 `ok`. **환경 메모**: 그대로 실행하면 A-9(소비자 타입 검사)·B-*(데모 타입 검사)가 안에서 부르는 `npx tsc`가 저장소 `devEngines`(Node 24.22.1) 때문에 이 컨테이너(Node 22.23.5)에서 `EBADDEVENGINES`로 시작조차 못 해 실패한다(검사 내용의 실패가 아님). `npx <bin>`을 저장소 `node_modules/.bin/<bin>`으로 넘기는 shim을 `PATH` 앞에 두고 `node lithentConcurrent/scripts/verifyArtifacts.js`를 실행해 통과를 확인했다(Node 24에서도 `npx tsc`는 같은 로컬 `tsc`를 실행한다)
+- [x] `pnpm verify:release` → `ALL PASS (8 prepared packages; nothing published)`, ESM·CJS 15개 경로
+- [x] `pnpm test:e2e` (저장소 전체, Chromium) → **145 passed** (base·concurrent 두 프로젝트, `agent-ui.spec.ts` 64개 포함), 실패·건너뜀 0
+- [x] `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs` → 50/50
+- [x] `pnpm build:docs` → 성공
+- [x] `node_modules/.bin/tsc -p e2e/tsconfig.json` → 오류 0 (새 spec·fixture 포함)
+- [x] 코어 무수정: `origin/main`(`ead8b2e`) 대비 `git diff --stat -- src lithentConcurrent/src` 0줄 (`RQ-9`)
+- [x] `docatlas check --strict` 통과
+
+Files:
+- `e2e/agent-ui.spec.ts` (added)
+- `e2e/fixtures/agent-ui/local.html` (added)
+- `e2e/fixtures/agent-ui/local.tsx` (added)
+- `e2e/fixtures/agent-ui/live.html` (added)
+- `e2e/fixtures/agent-ui/live.ts` (added)
+- `e2e/fixtures/agent-ui/live-csp.html` (added)
+- `e2e/fixtures/agent-ui/live-csp.js` (added)
+- `e2e/fixtures/agent-ui/live-react.html` (added)
+- `e2e/fixtures/agent-ui/live-umd.html` (added)
+- `e2e/README.md` (modified)
+- `live/src/hints.ts` (modified)
+- `live/src/tests/error-hints.test.ts` (modified)
+- `live/src/tests/runtime.test.tsx` (modified)
+- `live/README.md` (modified)
+- `skills/lithent/reference/live.md` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
+- `docs/agent-ui/MANUAL_TEST_CHECKLIST.md` (modified)
 
 ---
 
@@ -691,14 +737,17 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - Phase 6 검증: `build`·`size`·`test:dual`·`verify:release`(15개 경로, 청크 패킹 확인)·`build:docs`·CI fixture 통과, Chromium 플레이그라운드 확인, 코어 diff 0줄 (Phase 6 "검증 기록", 커밋 `d8d37a0`)
   - **Phase 6 후속 (Phase 4~6 리뷰 반영)** — 시작 중 `reload`·`destroy` 정리, 샌드박스 메시지 모양 확인, 승인 전 호스트 인자 검사(`lithent/agent`와 같은 규칙), 샌드박스 설정 실패 처리, `<lithent-live>` 정의 전 프로퍼티, 스킬 `{{VERSION}}`. Warning 4(`updateProps` ack)는 전제가 맞지 않아 반영하지 않음 ("Phase 6 후속" 참고)
   - **Phase 7 (Test Hardening)** — `agent/src/tests/hardening.test.tsx`(19개), `live/src/tests/hardening.test.ts`(22개), base·concurrent 통과. 결함 3건 수정: 승인 중 `reload` 뒤 새 위젯에서 실행, 읽으면 예외가 나는 인자에서 `callTool` reject, 엄격한 호스트 CSP의 시작 타임아웃 힌트. 브라우저 집행 격리는 Chromium 확인 기록 ("Phase 7" 검증 기록)
-- **next**:
-  1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스)
-  2. Phase 8 (Integration Test): `e2e/agent-ui.spec.ts` — 기존 Playwright 설정(`playwright.config.ts`, `e2e/*.spec.ts`, `pnpm test:e2e`)을 쓴다. 시나리오 1~7(`M-1`~`M-7`), 특히 4번은 Phase 7 Chromium 확인 항목(부모·저장소·쿠키 `SecurityError`, CSP의 `fetch`·이미지·`sendBeacon` 차단, `allowNetwork` 대조, 위젯이 알아낸 채널로 보낸 위조 메시지, 엄격한 호스트 CSP의 `timeout`)을 자동화한다. 전체 저장소 게이트와 수동 체크 기록.
+  - **Phase 8 (Integration Test)** — `e2e/agent-ui.spec.ts`(base·concurrent 각 32개)로 `M-1`~`M-7`을 실제 Chromium에서 자동 검증, 저장소 전체 게이트 통과, `MANUAL_TEST_CHECKLIST.md` Chrome 열 기록. E2E에서 mounter가 마크업을 반환하는 실수의 힌트 누락을 찾아 고침, React 18 `useLayoutEffect` 안내, 간헐 실패하던 runtime 테스트 대기 수정
+- **next** (모두 사용자 몫 — 구현 계획의 Phase는 모두 끝남):
+  1. 수동 확인: `MANUAL_TEST_CHECKLIST.md`의 `M-1`~`M-7`을 사람이 실제 Chrome·Safari·Firefox에서 확인하고 표에 기록 (`lithent/agent` 1차 출하에는 `M-1`·`M-2`·`M-5`, `lithent/live` 2차 출하에는 `M-3`·`M-4`·`M-6`·`M-7`, `DC-10`). Firefox·WebKit 자동 검사는 엔진이 있는 환경에서 `LITHENT_E2E_BROWSER=firefox|webkit pnpm test:e2e e2e/agent-ui.spec.ts`
+  2. 출하 판정과 릴리스 (버전·`CHANGELOG.md` "Unreleased" 정리, 배포)
+  3. 선택: Phase 7~8 리뷰(`doc-driven-reviewer-v1`), `feat/agent-ui` PR
 - **blockers**: 없음
 - **risks / follow-ups**:
-  - 크기 여유: `lithent/agent` 113 B (2,387 / 2,500 B), `lithent/live` 호스트 355 B (5,145 / 5,500 B), 런타임 2,522 B (8,478 / 11,000 B). 호스트에 코드를 더해야 하면 먼저 크기를 재고, 넘으면 `DC-16`·`DC-17`을 다시 연다.
-  - srcdoc 문서는 호스트 페이지 CSP를 상속한다: `script-src 'self'` 같은 엄격한 정책에서는 Sandbox 위젯이 시작하지 못한다(`timeout`, 힌트가 CSP 안내). 해결하려면 별도 origin에서 런타임 문서를 내려주는 방식이 필요하며 지금 설계 범위 밖이다 — 문서에 한계로 적혀 있다(`live/README.md` "Limits").
-  - `sendBeacon`은 기본 CSP에서 요청 없이 `true`를 돌려준다(브라우저 동작). 위젯 코드가 결과를 믿지 않도록 따로 할 일은 없다.
-  - WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건(`listTools()` 내부 디스크립터 반환, `agent/package.json` `repository.url`) — Phase 8 이후 후보.
-  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체, `npm pack`은 `devEngines` 때문에 실패하므로 패킹 확인은 `verify:release`가 만든 tarball로 한다. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다. Phase 8 `pnpm test:e2e`는 설치된 Chromium(`/opt/pw-browsers`)을 쓴다.
-- **latest commit**: `0ad8d82` (Phase 6 후속). Phase 7 변경은 이 기록과 함께 커밋한다.
+  - 크기 여유: `lithent/agent` 113 B (2,387 / 2,500 B), `lithent/live` 호스트 293 B (5,207 / 5,500 B), 런타임 2,522 B (8,478 / 11,000 B). 기능을 더하면 먼저 크기를 재고, 넘으면 `DC-16`·`DC-17`을 다시 연다.
+  - srcdoc 문서는 호스트 페이지 CSP를 상속한다: `script-src 'self'` 같은 엄격한 정책에서는 Sandbox 위젯이 시작하지 못한다(`timeout`, 힌트가 CSP 안내, E2E로 고정). 해결하려면 별도 origin에서 런타임 문서를 내려주는 방식이 필요하며 지금 설계 범위 밖이다(`live/README.md` "Limits").
+  - React 18에서는 `<lithent-live>`의 `props`를 `useLayoutEffect`(또는 ref 콜백)로 넣어야 첫 시작에 반영된다(문서화). React 19는 커스텀 요소에 프로퍼티를 직접 넣으므로 해당 없음 — 확인하지 않았다.
+  - `sendBeacon`은 기본 CSP에서 요청 없이 `true`를 돌려준다(브라우저 동작).
+  - WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건(`listTools()` 내부 디스크립터 반환, `agent/package.json` `repository.url`) — 이후 후보.
+  - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체, `npm pack`은 `devEngines` 때문에 실패하므로 패킹 확인은 `verify:release`가 만든 tarball로 한다. `pnpm test:e2e`는 설치된 Chromium을 쓴다. `pnpm verify:concurrent`의 A-9·B-* 검사는 안에서 `npx tsc`를 부르므로 같은 `devEngines` 오류로 실패한다: `npx`를 저장소의 `node_modules/.bin`으로 넘기는 shim을 `PATH` 앞에 두고 `node lithentConcurrent/scripts/verifyArtifacts.js`를 실행한다(Phase 8 검증 기록).
+- **latest commit**: `85c8b77` (Phase 7). Phase 8 변경은 이 기록과 함께 커밋한다.

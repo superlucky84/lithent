@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>lithent/live in a React app (M-6)</title>
+  </head>
+  <body>
+    <!--
+      M-6: a React 18 app renders <lithent-live>, reaches el.bridge through a
+      ref, calls its tools from React buttons and shows the widget's state
+      from bridge.subscribe. Development builds, so React warnings surface
+      as console errors and fail the test. lithent/live needs no lithent
+      core for a sandboxed widget, so none is loaded here.
+    -->
+    <div id="react-root"></div>
+    <script src="/live/dist/lithentLive.umd.js"></script>
+    <script src="/node_modules/react/umd/react.development.js"></script>
+    <script src="/node_modules/react-dom/umd/react-dom.development.js"></script>
+    <script>
+      lithentLive.defineLiveElement();
+      const CODE = `return lmount(props => {
+        const count = lstate(props.start || 0);
+        agentAction({
+          name: 'add',
+          description: 'Add to the counter',
+          params: { by: { type: Number, required: true } },
+          run: ({ by }) => (count.value += by),
+        });
+        agentState('counter', () => ({ count: count.value }));
+        return () => fTags.button({ id: 'inner', onClick: () => count.value++ }, 'inner ' + count.value);
+      });`;
+
+      const e = React.createElement;
+      function Widget({ onCount }) {
+        const ref = React.useRef(null);
+        const bridge = React.useRef(null);
+        const [ready, setReady] = React.useState(false);
+
+        // A layout effect runs in the same task as the commit, before the
+        // element starts (it starts in a microtask), so the first start
+        // already has these props; a later useEffect would update a widget
+        // that has already set up its state.
+        React.useLayoutEffect(() => {
+          const el = ref.current;
+          // Objects go through the property (React 18 sets attributes).
+          el.props = { start: 5 };
+          let stop = () => {};
+          const onReady = event => {
+            bridge.current = event.detail.bridge;
+            stop();
+            stop = bridge.current.subscribe(change => {
+              if (change.type == 'state-changed')
+                onCount(change.state.counter.count);
+            });
+            onCount(bridge.current.getState().counter.count);
+            setReady(true);
+          };
+          el.addEventListener('live-ready', onReady);
+          return () => {
+            el.removeEventListener('live-ready', onReady);
+            stop();
+          };
+        }, []);
+
+        return e(
+          'div',
+          null,
+          e('lithent-live', {
+            ref,
+            code: CODE,
+            'runtime-url': '/live/dist/sandboxRuntime.umd.js',
+          }),
+          e(
+            'button',
+            {
+              id: 'react-add',
+              disabled: !ready,
+              onClick: () => bridge.current.callTool('add', { by: 10 }),
+            },
+            'add 10 from React'
+          )
+        );
+      }
+
+      function App() {
+        const [show, setShow] = React.useState(true);
+        const [count, setCount] = React.useState('none');
+        return e(
+          'main',
+          null,
+          e(
+            'button',
+            { id: 'react-toggle', onClick: () => setShow(!show) },
+            'toggle'
+          ),
+          e('output', { id: 'react-count' }, String(count)),
+          show ? e(Widget, { onCount: setCount }) : null
+        );
+      }
+      ReactDOM.createRoot(document.getElementById('react-root')).render(e(App));
+      document.documentElement.dataset.ready = 'true';
+    </script>
+  </body>
+</html>

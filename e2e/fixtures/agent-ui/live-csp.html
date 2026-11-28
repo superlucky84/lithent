@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!--
+      M-4 / DESIGN §3.3: a host page whose policy blocks inline scripts and
+      eval. The srcdoc sandbox inherits it, so the widget cannot start;
+      mountLive must end with a timeout whose hint names the policy.
+      connect-src is only for the fixture server's own socket.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' ws://127.0.0.1:*"
+    />
+    <title>lithent/live under a strict host page CSP</title>
+  </head>
+  <body>
+    <div id="widget"></div>
+    <script src="/live/dist/lithentLive.umd.js"></script>
+    <script src="/e2e/fixtures/agent-ui/live-csp.js"></script>
+  </body>
+</html>

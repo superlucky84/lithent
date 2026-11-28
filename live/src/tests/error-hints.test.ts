@@ -95,6 +95,15 @@ describe('hintFor (§3.4)', () => {
     );
   });
 
+  it('"is not a function" in code that has a render function: no mounter hint', () => {
+    expect(
+      hintFor(
+        { phase: 'mount', message: 'api.load is not a function' },
+        'return lmount(() => { api.load(); return () => fTags.p({}, "x"); })'
+      )
+    ).toBeUndefined();
+  });
+
   it('nothing specific: no hint', () => {
     expect(
       hintFor({ phase: 'mount', message: 'boom' }, 'return 1')
@@ -142,6 +151,18 @@ describe('hints on real failures (direct mode runs the code here)', () => {
       'const W = lmount(() => () => fTags.p({}, "x"));',
       'compile',
       /return the component/,
+    ],
+    [
+      'a mounter that returns the markup (Phase 8, M-5)',
+      'return lmount(() => fTags.div({}, "no render function"));',
+      'mount',
+      /render function, not the markup/,
+    ],
+    [
+      'a mount mounter with a block body that returns the markup',
+      'return mount(renew => { const n = 1; return fTags.p({}, n); });',
+      'mount',
+      /render function, not the markup/,
     ],
     [
       'React state',

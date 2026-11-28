@@ -28,6 +28,17 @@ export const hintFor = (error: LiveError, code: string): string | undefined => {
     return `"${name}" is not available. In scope: ${symbolNames.join(', ')}.`;
   }
 
+  // The mounter returned the markup instead of a render function: the
+  // core then calls it ("… is not a function"). Correct code always has a
+  // `() =>` render function after `=>` or `return`.
+  if (
+    error.phase == 'mount' &&
+    /is not a function/.test(message) &&
+    !/(=>|return)\s*\(\s*\)\s*=>/.test(code)
+  ) {
+    return 'The mounter must return a render function, not the markup: `lmount(props => () => fTags.p({}, props.label))`.';
+  }
+
   if (error.phase != 'compile') {
     return error.phase == 'timeout'
       ? 'The widget did not answer: look for an endless loop or a promise that never settles in the mounter, the render or an action.' +

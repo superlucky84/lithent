@@ -82,6 +82,11 @@ and the read-only `bridge`. Changes in one task apply together: new `props`
 update the widget, new `code` reloads it, anything else restarts it. The tag
 needs no lithent core when it only shows sandboxed widgets.
 
+In React 18, which sets attributes on custom elements, set object properties
+such as `props` in `useLayoutEffect` (or a ref callback): it runs in the same
+task as the render, so the widget starts with them. A `useEffect` runs later
+and only updates a widget that has already set up its state.
+
 ## Without a bundler
 
 ```html
