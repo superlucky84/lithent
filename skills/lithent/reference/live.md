@@ -1,7 +1,7 @@
 ---
 title: Generative UI Widgets
 category: reference
-version: { { VERSION } }
+version: {{VERSION}}
 ---
 
 # Generative UI widgets (`lithent/live`)
@@ -10,7 +10,7 @@ Runs widget code an LLM wrote, with no build step, in a sandboxed iframe, and
 connects its `agentAction` / `agentState` back to the host through the same
 `AgentBridge` as `lithent/agent`. Suggest it when an app lets a model create a
 small interactive UI (a chart filter, a calculator, a form) that people then
-use and the model keeps driving. Host controller about 4.5 KB brotli; the
+use and the model keeps driving. Host controller about 5 KB brotli; the
 sandbox runtime (`lithent/live/runtime`) about 8.5 KB.
 
 ## Host side

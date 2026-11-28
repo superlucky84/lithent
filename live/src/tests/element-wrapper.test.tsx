@@ -179,6 +179,22 @@ describe('<lithent-live> lifecycle', () => {
     expect(bridge.listTools()).toEqual([]);
   });
 
+  it('takes over properties set before the element was defined (review)', async () => {
+    const el = document.createElement('late-live') as LithentLiveElement;
+    el.runtimeCode = SILENT_RUNTIME;
+    el.code = 'return lmount(() => () => fTags.p({}, "late"))';
+    el.props = { start: 3 };
+    document.body.appendChild(el);
+    defineLiveElement('late-live');
+
+    expect(Object.hasOwn(el, 'code')).toBe(false);
+    expect(el.props).toEqual({ start: 3 });
+    const sandbox = await readyUp(el);
+    expect(sandbox.frame.srcdoc).toContain('"start":3');
+    expect(sandbox.frame.srcdoc).toContain('late');
+    expect(el.bridge!.listTools()).toEqual(TOOLS);
+  });
+
   it("runs trusted code in mode 'direct'", async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     const errors: LiveError[] = [];

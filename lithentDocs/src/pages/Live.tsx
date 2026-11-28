@@ -5,7 +5,7 @@ const copy = {
   en: {
     title: 'Generative UI (lithent/live)',
     intro:
-      'lithent/live runs widget code an LLM wrote, with no build step, in a sandboxed iframe, and connects the widget’s agentAction and agentState back to your page through the same bridge as lithent/agent. A model can create a small interactive UI, a person can use it, and on the next turn the model reads the state the person left and changes it, instead of generating the widget again. The host controller is about 4.5 KB (brotli) and the sandbox runtime about 8.5 KB.',
+      'lithent/live runs widget code an LLM wrote, with no build step, in a sandboxed iframe, and connects the widget’s agentAction and agentState back to your page through the same bridge as lithent/agent. A model can create a small interactive UI, a person can use it, and on the next turn the model reads the state the person left and changes it, instead of generating the widget again. The host controller is about 5 KB (brotli) and the sandbox runtime about 8.5 KB.',
     play: 'Try it',
     playText:
       'The code below is the kind of widget a model would write. Run it, drag the slider as a person, then call its tools as the agent would: both sides read and change the same state. clear_expenses is marked confirm: true, so the page asks before it runs. “Try a broken version” shows the error and hint a model gets back.',
@@ -40,7 +40,7 @@ const copy = {
   ko: {
     title: '생성형 UI (lithent/live)',
     intro:
-      'lithent/live는 LLM이 작성한 위젯 코드를 빌드 없이 샌드박스 iframe에서 실행하고, 위젯의 agentAction과 agentState를 lithent/agent와 같은 브릿지로 페이지에 연결합니다. 모델이 작은 인터랙티브 UI를 만들고, 사람이 그것을 조작한 뒤, 다음 대화에서 모델이 위젯을 다시 만들지 않고 사람이 남긴 상태를 읽어 바꿀 수 있습니다. 호스트 컨트롤러는 약 4.5 KB(brotli), 샌드박스 런타임은 약 8.5 KB입니다.',
+      'lithent/live는 LLM이 작성한 위젯 코드를 빌드 없이 샌드박스 iframe에서 실행하고, 위젯의 agentAction과 agentState를 lithent/agent와 같은 브릿지로 페이지에 연결합니다. 모델이 작은 인터랙티브 UI를 만들고, 사람이 그것을 조작한 뒤, 다음 대화에서 모델이 위젯을 다시 만들지 않고 사람이 남긴 상태를 읽어 바꿀 수 있습니다. 호스트 컨트롤러는 약 5 KB(brotli), 샌드박스 런타임은 약 8.5 KB입니다.',
     play: '직접 해 보기',
     playText:
       '아래 코드는 모델이 작성할 법한 위젯입니다. 실행한 뒤 사람으로서 슬라이더를 움직이고, 에이전트처럼 도구를 호출해 보세요. 양쪽이 같은 상태를 읽고 바꿉니다. clear_expenses는 confirm: true라서 실행 전에 페이지가 확인을 받습니다. "망가진 버전 넣어 보기"는 모델이 돌려받는 오류와 힌트를 보여 줍니다.',

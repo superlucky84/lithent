@@ -76,10 +76,11 @@ export const buildSrcdoc = ({
       ? `<script>${scriptText(runtimeCode)}</script>`
       : `<script src="${attribute(runtimeUrl as string)}"></script>`;
   // If the runtime did not load (bad URL, blocked), say so at once instead
-  // of letting the host wait for its timeout.
-  const start = `<script>var r=window.lithentLiveRuntime,c=${scriptJson(
+  // of letting the host wait for its timeout. A function scope, so the
+  // config is not left on window for the widget code to read.
+  const start = `<script>(function(r,c){r?r.start(c):parent.postMessage({ch:c.ch,type:"error",error:{phase:"compile",message:"The sandbox runtime did not load."}},c.origin&&c.origin!="null"?c.origin:"*")})(window.lithentLiveRuntime,${scriptJson(
     config
-  )};r?r.start(c):parent.postMessage({ch:c.ch,type:"error",error:{phase:"compile",message:"The sandbox runtime did not load."}},c.origin&&c.origin!="null"?c.origin:"*")</script>`;
+  )})</script>`;
 
   return `<!doctype html><html><head><meta charset="utf-8">${csp}${css}</head><body><div id="root"></div>${runtime}${start}</body></html>`;
 };

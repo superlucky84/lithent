@@ -438,7 +438,7 @@ Files:
 
 ## Phase 6 — `lithent/live` 배포 연결·스킬·문서·인터랙티브 데모: done
 
-Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-6, DC-9, DC-10, M-3, M-6, M-7
+Refs: RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-6, DC-9, DC-10, DC-17, M-3, M-6, M-7
 
 ### 진입 조건
 - Phase 5 종료 조건 충족.
@@ -495,6 +495,77 @@ Files:
 - `lithentDocs/src/pages/Live_ko.tsx` (added)
 - `lithentDocs/src/components/Layout.tsx` (modified)
 - `lithentDocs/src/components/Sidebar.tsx` (modified)
+- `docs/agent-ui/REQUIREMENTS.md` (modified)
+- `docs/agent-ui/DESIGN.md` (modified)
+- `docs/agent-ui/IMPLEMENT.md` (modified)
+
+---
+
+## Phase 6 후속 — Phase 4~6 리뷰 반영: done
+
+Refs: RQ-7, RQ-8, RQ-10, RQ-12, DC-5, DC-7, DC-11, DC-14, DC-17
+
+### 진입 조건
+- `doc-driven-reviewer-v1`의 Phase 4~6 리뷰(`c470fb5..d8d37a0`, Verdict `REQUEST_CHANGES`, Critical 2 / Warning 5 / Suggestion 4)를 받아, 사용자가 의미 있는 항목만 판단해 반영하도록 요청 (2026-11-28).
+
+### 반영한 항목
+- [x] **Critical 1 — 시작 중 `reload()`·`destroy()`가 그 세션을 닫지 못함**: `current`는 `ready` 뒤에만 정해지므로, 시작 중인 세션은 다음 `reload`·`destroy`의 `clear()`에 걸리지 않았고 늦게 온 `ready`가 파괴된 핸들에 iframe과 `message` 리스너를 남겼다. 진행 중인 시작을 끊는 함수(`abort`)를 두고 `clear()`가 먼저 부른다. 끊긴 시작은 iframe·리스너·타이머를 지우고 `LiveError(phase: 'mount')`로 reject한다. 호출한 쪽이 요청한 일이므로 `onError`는 부르지 않는다 (`live/src/mountLive.ts`). `<lithent-live>`는 작업을 순서대로 실행하므로 이 경합이 없었고, `LiveHandle`을 직접 쓰는 호출자에게 해당했다.
+- [x] **Critical 2 — 샌드박스 메시지를 검증 없이 캐시에 넣음**: 채널이 맞는 위조 메시지(`tools: null`, `state: undefined`, `event: null`, `BigInt`·배열 상태 등)로 호스트의 `listTools()`·`getState()`·리스너가 예외를 냈다. 도구 목록은 배열·문자열 `name` 항목만, 상태는 JSON 텍스트(객체가 아니면 `{}`)로 저장하고, 이벤트는 확인한 캐시로 다시 만들어 보내며, `error`는 `LiveError` 모양으로, `resize`는 유한한 숫자만 받는다. 시작 스크립트는 설정을 함수 스코프로 옮겨 `window.c`를 없앴다 (`live/src/srcdoc.ts`). 다만 위젯 코드는 호스트가 보내는 메시지를 받아 볼 수 있어 채널 id를 알아낼 수 있으므로, 이것은 보조 조치이고 실제 방어는 호스트 쪽 확인이다 (`DESIGN.md` §3.3 구현 메모).
+- [x] **Warning 1 — 샌드박스를 만들다 동기 예외(잘못된 `runtimeUrl`, 순환 참조 `props`)**: 날것의 `TypeError`로 reject되고 시작 타이머가 남아 나중에 `timeout` 오류가 따로 왔다. `openSandbox`를 감싸 `LiveError(phase: 'mount')` + `onError` 한 번으로 끝내고 타이머를 지운다.
+- [x] **Warning 2 — 승인 전 인자 검사가 없음**: `lithent/agent`는 검사 → 승인(정리된 인자) → 실행 순서인데, `lithent/live`는 원래 인자로 승인을 물은 뒤 샌드박스에서 `INVALID_PARAMS`가 날 수 있었다(사람이 틀린 호출을 승인하고, 선언되지 않은 키도 승인 창에 보임). 호스트가 위젯이 보고한 `inputSchema`로 `lithent/agent`와 같은 규칙의 검사를 먼저 하고(`live/src/args.ts`), 승인과 `call` 메시지 모두 정리된 인자를 받는다. `DC-14`(거부된 호출은 샌드박스에 닿지 않음)는 그대로다. 같은 선언을 로컬 브릿지와 위젯 디스크립터로 각각 호출해 결과가 같은지 확인하는 테스트를 넣어 두 구현이 어긋나지 않게 했다.
+- [x] **Warning 3 — `<lithent-live>` 정의 전 프로퍼티 유실**: `connectedCallback`에서 자기 프로퍼티를 꺼내 접근자로 다시 넣는다 (`lithent/element`와 같은 처리).
+- [x] **Warning 5 — `version: { { VERSION } }`**: Prettier가 YAML frontmatter의 `{{VERSION}}`을 `{ { VERSION } }`로 바꾼다. `reference/live.md`와, 같은 문제가 2026-10-26(`95d6faf`)부터 있던 `skills/lithent/SKILL.md`를 고쳤고, `scripts/build-skills.js`가 두 형태를 모두 치환하게 해 다시 포맷되어도 깨지지 않게 했다.
+- [x] **Suggestion 1 — 플레이그라운드 연속 실행·이탈 경합**: 실행 번호와 언마운트 표시를 두어, 늦게 끝난 이전 실행의 위젯은 바로 `destroy()`한다.
+- [x] **Suggestion 3 — `live/vite.config.js` 주석**: `DC-9 ≤ 3,000 B` → `DC-17 ≤ 5,500 B`.
+- [x] **Suggestion 4 — Phase 6 `Refs:`에 `DC-17`**: 추가.
+- [x] 크기 증가에 맞춰 문서의 호스트 크기 표기를 "약 4.5 KB" → "약 5 KB"로 갱신 (`live/README.md`, `reference/live.md`, `CHANGELOG.md`, 문서 사이트 `Live.tsx`).
+
+### 반영하지 않은 항목 (사유)
+- **Warning 4 — `updateProps` 다시 그리기 예외 시 `ack` 미송신**: 전제가 맞지 않았다. lithent의 `renew()`는 다시 그리기를 마이크로태스크에 넣기만 하므로(`src/utils/redraw.ts`) `renew()`도 `nextTick()`도 예외를 내지 않는다. `try/catch` + `ack`에 오류를 싣는 수정을 넣고 테스트해 보니 `ack`는 수정 전에도 바로 갔고(오류는 비어 있음), 렌더 예외는 따로 잡히지 않은 예외로 나왔다. 샌드박스에서는 이 예외가 창의 `error` 리스너를 거쳐 `onError`(`phase: 'render'`)로 온다. 효과 없는 코드라 되돌리고, 확인한 동작을 `DESIGN.md` §3.4에 기록했다.
+- **Suggestion 2 — `runtimeUrl` 스킴 검사**: `runtimeUrl`은 개발자가 주는 설정이지 모델 출력이 아니다. `javascript:` 같은 값은 `<script src>`로 실행되지 않고 런타임이 없다는 `compile` 오류로 바로 끝난다. 크기를 쓸 만큼의 이득이 없다.
+
+### 기준 테스트
+- [x] 회귀 테스트 추가 (`live/src/tests/rpc.test.ts` 11개, `bridge-compat.test.ts` 1개, `element-wrapper.test.tsx` 1개 — 97 → 110):
+  - 시작 중 `reload`가 앞 세션을 닫음 / 시작 중 `destroy`가 세션·타이머를 지우고 늦은 `ready`를 무시
+  - 모양이 틀린 `ready`·`event`·`error`·`resize`에도 호스트 캐시가 안전
+  - 승인 전 `INVALID_PARAMS`(승인·전송 없음), 선언된 인자만 전송, 모양이 틀린 `inputSchema`에도 예외 없음
+  - 잘못된 `runtimeUrl`·순환 참조 `props` → `LiveError(phase: 'mount')`, 늦은 `timeout` 없음
+  - `lithent/agent`와 인자 검사 결과 일치 (8가지 인자 조합)
+  - 정의 전에 넣은 `code`·`runtimeCode`·`props`로 마운트
+- [x] 기존 테스트 3개를 새 동작에 맞춤: 승인 창이 받는 인자(선언되지 않은 `why` 제거), 복제할 수 없는 인자 테스트를 `object` 매개변수로, srcdoc 시작 스크립트 형식
+
+### 검증 기록 (2026-11-28, Node 22.23.5 + `pnpm_config_runtime_on_fail=ignore`)
+- [x] 실패 재현: 수정 전 `mountLive.ts`로 새 테스트를 돌리면 12개 실패(시작 중단 2, 메시지 확인 4, 승인 전 검사 2·일치 1·기존 승인 인자 1, 설정 실패 2), 수정 전 `element.ts`로 정의 전 프로퍼티 테스트 실패. 수정 후 모두 통과
+- [x] `pnpm --filter lithent-live test` / `LITHENT_CORE=concurrent` → 각 7 files, **110/110** (97 + 신규 13)
+- [x] `pnpm build` → 성공 (live 타입 검사 + ESLint 포함), `node scripts/build-skills.js` → `dist/skills`의 `SKILL.md`·`reference/live.md` frontmatter `version: 1.26.1`
+- [x] `pnpm size` → `lithent/live` 호스트 **5,082 / 5,500 B** (여유 418 B, +546 B), 런타임 8,485 / 11,000 B (변화 없음), `lithent/agent` 2,374 / 2,500 B
+- [x] `pnpm test:dual` → 성공 (live base·concurrent 각 110/110, 나머지 Phase 6과 같음)
+- [x] `pnpm verify:release` → `ALL PASS (8 prepared packages; nothing published)`, ESM·CJS 15개 경로
+- [x] `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs` → 50/50
+- [x] `pnpm build:docs` → 성공
+- [x] 실제 Chromium (Playwright, 요청 가로채기, 저장소에 임시 파일 없음):
+  - 문서 사이트 플레이그라운드: Phase 6 시나리오 전부 그대로(자동 높이 145px, 슬라이더 → 상태, 에이전트 호출, 승인 대화상자, JSX 힌트, 한국어), "실행" 세 번 연타 후 iframe 1개, 샌드박스 안 `typeof c`·`typeof r`·`typeof window.c` 모두 `undefined`, 페이지 오류 0건
+  - 빌드한 UMD(`lithentLive.umd.js` + `runtimeUrl`)로 위조 시나리오: 위젯 코드가 호스트의 `call` 메시지에서 채널 id를 알아내 `event: null`, `tools: null`, `BigInt` 상태, `error: null`, `resize: Infinity`를 보냄 → 호스트 `listTools()` `[]`, `getState()` `{}`, 이벤트는 확인한 값으로만 전달, `onError`는 `{ phase: 'render', message: 'null' }`, iframe 높이 유지, 페이지 오류 0건. 승인 전 검사: `{ n: 'x', extra: 1 }` → `INVALID_PARAMS`(`n (type)`), `{ n: 2, extra: 1 }` → `{ ok: true, value: 2 }`. 시작 중 `destroy` → `reload`는 `phase: 'mount'`로 reject, 남은 iframe 0개
+- [x] `git diff --stat ead8b2e -- src lithentConcurrent/src` → 출력 없음 (`RQ-9`)
+- [x] `docatlas check --strict` 통과
+
+Files:
+- `live/src/args.ts` (added)
+- `live/src/mountLive.ts` (modified)
+- `live/src/srcdoc.ts` (modified)
+- `live/src/element.ts` (modified)
+- `live/vite.config.js` (modified)
+- `live/src/tests/rpc.test.ts` (modified)
+- `live/src/tests/bridge-compat.test.ts` (modified)
+- `live/src/tests/element-wrapper.test.tsx` (modified)
+- `live/src/tests/sandbox.test.ts` (modified)
+- `live/README.md` (modified)
+- `scripts/build-skills.js` (modified)
+- `skills/lithent/SKILL.md` (modified)
+- `skills/lithent/reference/live.md` (modified)
+- `lithentDocs/src/components/LivePlayground.tsx` (modified)
+- `lithentDocs/src/pages/Live.tsx` (modified)
+- `CHANGELOG.md` (modified)
 - `docs/agent-ui/REQUIREMENTS.md` (modified)
 - `docs/agent-ui/DESIGN.md` (modified)
 - `docs/agent-ui/IMPLEMENT.md` (modified)
@@ -567,17 +638,18 @@ Refs: RQ-4, RQ-5, RQ-6, RQ-7, RQ-8, RQ-9, RQ-10, RQ-11, RQ-12, DC-1, DC-4, DC-7,
   - **Phase 4 (`lithent/live` Sandbox 모드·RPC)** (커밋 `d3c6afe`)
   - **Phase 5 (`lithent/live` Direct 모드·`<lithent-live>`·힌트·리사이즈·테마)** (커밋 `97709b1`), **Phase 5 후속 (`DC-17`)** — 호스트 예산 5,500 B (커밋 `4a43aa2`)
   - **Phase 6 (`lithent/live` 배포 연결·스킬·문서·플레이그라운드)** — 루트 `exports["./live"]`·`["./live/runtime"]`·`files`·빌드/테스트 스크립트, `size`·`verify:release`·CI 아티팩트·릴리스 정책 등재, `live/README.md`, 스킬 `reference/live.md`(LLM 코드 규약), `SKILL.md`·`lithent-agent-addon.md`·`README.md`·`CHANGELOG.md`·`IDEAS.md`, 문서 사이트 `/guide/live`(영·한)와 양방향 Generative UI 플레이그라운드
-  - Phase 6 검증: `build`·`size`·`test:dual`·`verify:release`(15개 경로, 청크 패킹 확인)·`build:docs`·CI fixture 통과, Chromium 플레이그라운드 확인, 코어 diff 0줄 (Phase 6 "검증 기록")
+  - Phase 6 검증: `build`·`size`·`test:dual`·`verify:release`(15개 경로, 청크 패킹 확인)·`build:docs`·CI fixture 통과, Chromium 플레이그라운드 확인, 코어 diff 0줄 (Phase 6 "검증 기록", 커밋 `d8d37a0`)
+  - **Phase 6 후속 (Phase 4~6 리뷰 반영)** — 시작 중 `reload`·`destroy` 정리, 샌드박스 메시지 모양 확인, 승인 전 호스트 인자 검사(`lithent/agent`와 같은 규칙), 샌드박스 설정 실패 처리, `<lithent-live>` 정의 전 프로퍼티, 스킬 `{{VERSION}}`. Warning 4(`updateProps` ack)는 전제가 맞지 않아 반영하지 않음 ("Phase 6 후속" 참고)
 - **next**:
   1. 사용자 수동 체크: `MANUAL_TEST_CHECKLIST.md`의 `M-1`, `M-2`, `M-5` (`lithent/agent` 1차 릴리스)
-  2. 사용자 결정: Phase 4~6 리뷰(`doc-driven-reviewer-v1`) 여부
-  3. Phase 7 (Test Hardening): `agent/src/tests/hardening.test.tsx`, `live/src/tests/hardening.test.ts` — 보안 음성 대조, 재진입·경합·언마운트, 상태 직렬화 경계, 여분 키·승인 경계, 오류 복구 루프, 대량 등록·해제
+  2. Phase 7 (Test Hardening): `agent/src/tests/hardening.test.tsx`, `live/src/tests/hardening.test.ts` — 보안 음성 대조, 재진입·경합·언마운트, 상태 직렬화 경계, 여분 키·승인 경계, 오류 복구 루프, 대량 등록·해제
 - **blockers**: 없음
 - **risks / follow-ups**:
-  - 크기 여유: `lithent/agent` 126 B (2,374 / 2,500 B), `lithent/live` 호스트 964 B (4,536 / 5,500 B), 런타임 2,515 B (8,485 / 11,000 B). Phase 7 하드닝이 이 안에서 끝나야 한다.
+  - 크기 여유: `lithent/agent` 126 B (2,374 / 2,500 B), `lithent/live` 호스트 **418 B** (5,082 / 5,500 B — 리뷰 반영으로 +546 B), 런타임 2,515 B (8,485 / 11,000 B). Phase 7 하드닝이 이 안에서 끝나야 한다. 호스트에 코드를 더해야 하면 먼저 크기를 재고, 넘으면 `DC-17`을 다시 연다.
+  - Phase 7 보안 음성 대조에 넣을 것: 위젯 코드가 호스트 메시지에서 채널 id를 알아내 위조 메시지를 보내는 경우(2026-11-28 Chromium에서 확인한 시나리오, "Phase 6 후속" 검증 기록).
   - srcdoc 문서는 호스트 페이지 CSP를 상속한다 — 엄격한 호스트 CSP에서의 동작은 Phase 7·8에서 확인 (`DESIGN.md` §3.3 구현 메모).
   - `mountLive`는 시작 실패 시 reject하고 핸들을 주지 않는다 — Phase 7 "오류 복구 루프"는 `reload` 실패 → 성공과 `mountLive` 재호출로 검증.
   - jsdom은 `iframe.sandbox`·Shadow Root 안 iframe의 `contentWindow`를 지원하지 않는다 — Phase 7 보안 음성 대조(`window.parent.document`·`localStorage`·`document.cookie`·`fetch` 차단)는 실제 브라우저가 필요할 수 있다. jsdom에서 안 되는 항목은 Phase 8 Playwright로 옮기고 그 사실을 기록한다.
   - 이름 규칙 검사 없음(`DESIGN.md` §2.5), `DC-3` 덮어쓰기 후 이전 인스턴스 미재등록, WebMCP `annotations`·`signal` 미반영, 보류한 리뷰 제안 2건 — Phase 7 검토 후보.
   - 로컬 Node 22 환경: `pnpm` 명령에 `pnpm_config_runtime_on_fail=ignore`, `pnpm test:ci`는 `node --test --experimental-test-isolation=none scripts/tests/*.test.mjs`로 대체, `npm pack`은 `devEngines` 때문에 실패하므로 패킹 확인은 `verify:release`가 만든 tarball로 한다. live 빌드는 `lithent/agent`·`helper`·`ftags`·`tag` dist가 먼저 있어야 한다.
-- **latest commit**: `4a43aa2` (Phase 5 후속). Phase 6 변경은 이 기록과 함께 커밋한다.
+- **latest commit**: `d8d37a0` (Phase 6). "Phase 6 후속" 변경은 이 기록과 함께 커밋한다.

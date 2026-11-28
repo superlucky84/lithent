@@ -151,14 +151,23 @@ describe('callTool (RQ-8)', () => {
   });
 
   it('returns INVALID_PARAMS when the arguments cannot be posted', async () => {
-    const { handle, sandbox } = await ready();
+    const save = {
+      name: 'save',
+      description: 'Save a record',
+      inputSchema: {
+        type: 'object',
+        properties: { record: { type: 'object' } },
+        additionalProperties: false,
+      },
+    };
+    const { handle, sandbox } = await ready({}, [save]);
     vi.mocked(sandbox.frame.contentWindow!.postMessage).mockImplementation(
       () => {
         throw new DOMException('could not be cloned', 'DataCloneError');
       }
     );
     await expect(
-      handle.bridge.callTool('add', { by: (() => 1) as unknown as number })
+      handle.bridge.callTool('save', { record: { at: () => 1 } })
     ).resolves.toMatchObject({
       ok: false,
       error: {
@@ -189,10 +198,12 @@ describe('host-side approval (DC-14)', () => {
       ok: false,
       error: { code: 'REJECTED' },
     });
+    // `why` is not declared: the approval sees the arguments that would run
+    // (DC-11), as with a lithent/agent bridge.
     expect(handler).toHaveBeenCalledWith({
       name: 'reset',
       description: 'Reset the counter',
-      args: { why: 'x' },
+      args: {},
     });
     expect(sandbox.sent).toEqual([]);
   });
@@ -371,5 +382,171 @@ describe('reload and destroy (§3.2)', () => {
       phase: 'mount',
     });
     expect(events).toHaveLength(1);
+  });
+});
+
+/*
+ * Phase 4–6 review: a start cut short, untrusted sandbox messages, the
+ * argument check before approval, and a sandbox that cannot be set up.
+ */
+
+describe('a start cut short by reload or destroy', () => {
+  it('a reload while another is starting closes the first sandbox', async () => {
+    const { handle, container, errors } = await ready();
+    const first = handle.reload('return 1');
+    const a = sandboxOf(container.querySelector('iframe')!);
+    const second = handle.reload('return 2');
+
+    await expect(first).rejects.toMatchObject({ phase: 'mount' });
+    expect(a.frame.isConnected).toBe(false);
+    const b = sandboxOf(container.querySelector('iframe')!);
+    b.reply({ type: 'ready', tools: [TOOLS[0]], state: { from: 'b' } });
+    await second;
+
+    expect(container.querySelectorAll('iframe')).toHaveLength(1);
+    expect(handle.bridge.getState()).toEqual({ from: 'b' });
+    // The caller cut it short: not a widget failure.
+    expect(errors).toEqual([]);
+  });
+
+  it('destroy while a reload is starting removes it and leaves no timer', async () => {
+    const { handle, container, errors } = await ready({ timeoutMs: 30 });
+    const reloading = handle.reload('return 1');
+    const a = sandboxOf(container.querySelector('iframe')!);
+    const win = a.frame.contentWindow;
+    handle.destroy();
+
+    await expect(reloading).rejects.toMatchObject({ phase: 'mount' });
+    expect(container.querySelector('iframe')).toBeNull();
+    // Its late ready, and the timeout it had, change nothing.
+    a.reply({ type: 'ready', tools: TOOLS, state: { late: true } }, win);
+    await new Promise(resolve => setTimeout(resolve, 50));
+    expect(handle.bridge.listTools()).toEqual([]);
+    expect(handle.bridge.getState()).toEqual({});
+    expect(errors).toEqual([]);
+  });
+});
+
+describe('untrusted sandbox messages (§3.3)', () => {
+  it('keeps listTools and getState working when ready has the wrong shapes', async () => {
+    const { sandbox, pending } = begin();
+    sandbox!.reply({ type: 'ready', tools: null, state: undefined });
+    const handle = await pending;
+    expect(handle.bridge.listTools()).toEqual([]);
+    expect(handle.bridge.getState()).toEqual({});
+  });
+
+  it('ignores malformed events and keeps the caches plain', async () => {
+    const { handle, sandbox } = await ready();
+    const events: AgentBridgeEvent[] = [];
+    handle.bridge.subscribe(e => events.push(e));
+
+    sandbox.reply({ type: 'event', event: null });
+    sandbox.reply({ type: 'event', event: { type: 'other' } });
+    sandbox.reply({
+      type: 'event',
+      event: { type: 'tools-changed', tools: [null, { name: 7 }, TOOLS[0]] },
+    });
+    sandbox.reply({
+      type: 'event',
+      event: { type: 'state-changed', name: 5, state: [1, 2] },
+    });
+    sandbox.reply({
+      type: 'event',
+      event: { type: 'state-changed', state: { big: 1n } },
+    });
+
+    expect(events).toEqual([
+      { type: 'tools-changed', tools: [TOOLS[0]] },
+      { type: 'state-changed', state: {} },
+      { type: 'state-changed', state: {} },
+    ]);
+    expect(handle.bridge.listTools()).toEqual([TOOLS[0]]);
+    expect(handle.bridge.getState()).toEqual({});
+  });
+
+  it('turns a malformed error into a LiveError', async () => {
+    const { sandbox, errors } = await ready();
+    sandbox.reply({ type: 'error', error: null });
+    sandbox.reply({ type: 'error', error: 'boom' });
+    expect(errors).toEqual([
+      { phase: 'render', message: 'null' },
+      { phase: 'render', message: 'boom' },
+    ]);
+  });
+
+  it('ignores a height that is not a finite number', async () => {
+    const { sandbox } = await ready();
+    sandbox.reply({ type: 'resize', height: 80 });
+    sandbox.reply({ type: 'resize', height: Infinity });
+    sandbox.reply({ type: 'resize', height: '9000' });
+    expect(sandbox.frame.style.height).toBe('80px');
+  });
+});
+
+describe('arguments are checked before approval (DC-5, DC-11)', () => {
+  it('returns INVALID_PARAMS without asking or posting', async () => {
+    const { handle, sandbox } = await ready();
+    const handler = vi.fn(() => true);
+    handle.bridge.setConfirmHandler(handler);
+    await expect(handle.bridge.callTool('add', {})).resolves.toEqual({
+      ok: false,
+      error: {
+        code: 'INVALID_PARAMS',
+        message: 'Invalid arguments for "add": by (required).',
+        details: [{ param: 'by', issue: 'required' }],
+      },
+    });
+    await expect(
+      handle.bridge.callTool('add', [] as unknown as Record<string, unknown>)
+    ).resolves.toMatchObject({ error: { code: 'INVALID_PARAMS' } });
+    expect(handler).not.toHaveBeenCalled();
+    expect(sandbox.sent).toEqual([]);
+  });
+
+  it('posts only the declared arguments', async () => {
+    const { handle, sandbox } = await ready();
+    handle.bridge.callTool('add', { by: 2, extra: 'x' });
+    await flush();
+    expect(sandbox.sent[0]).toMatchObject({ type: 'call', args: { by: 2 } });
+    expect(sandbox.sent[0].args).toEqual({ by: 2 });
+  });
+
+  it('does not throw on a malformed input schema from the sandbox', async () => {
+    const odd = [
+      { name: 'a', inputSchema: null },
+      { name: 'b', inputSchema: { properties: { x: null }, required: 5 } },
+      { name: 'c', inputSchema: { properties: { x: { enum: 'yes' } } } },
+    ];
+    // Nobody answers the calls that pass: they end in TIMEOUT.
+    const { handle } = await ready({ timeoutMs: 20 }, odd);
+    for (const name of ['a', 'b', 'c']) {
+      const call = handle.bridge.callTool(name, { x: 1 });
+      await expect(call).resolves.toHaveProperty('ok');
+    }
+  });
+});
+
+describe('a sandbox that cannot be set up', () => {
+  it('rejects with a LiveError for a runtimeUrl that is not a URL, with no late timeout', async () => {
+    const { pending, errors, container } = begin({
+      runtimeCode: undefined,
+      runtimeUrl: 'http://[',
+      timeoutMs: 30,
+    });
+    await expect(pending).rejects.toMatchObject({
+      phase: 'mount',
+      message: expect.stringContaining('could not be set up'),
+    });
+    await new Promise(resolve => setTimeout(resolve, 50));
+    expect(errors.map(e => e.phase)).toEqual(['mount']);
+    expect(container.querySelector('iframe')).toBeNull();
+  });
+
+  it('rejects with a LiveError for props that are not JSON', async () => {
+    const props: Record<string, unknown> = {};
+    props.self = props;
+    const { pending } = begin({ props });
+    await expect(pending).rejects.toMatchObject({ phase: 'mount' });
   });
 });

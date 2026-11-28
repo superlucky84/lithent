@@ -1,3 +1,4 @@
+import { checkArgs } from '@/args';
 import { hintFor } from '@/hints';
 import { buildSrcdoc, styleText, themeCss } from '@/srcdoc';
 import type {
@@ -40,13 +41,45 @@ type Receive = (message: LiveRpcMessage | undefined) => void;
 
 type Code = 'NOT_FOUND' | 'REJECTED' | 'TIMEOUT' | 'INVALID_PARAMS';
 
-const fail = (code: Code, message: string): ToolCallResult => ({
-  ok: false,
-  error: { code, message },
-});
+const fail = (
+  code: Code,
+  message: string,
+  details?: unknown
+): ToolCallResult => ({ ok: false, error: { code, message, details } });
 
 const messageOf = (error: unknown) =>
   error instanceof Error ? error.message : String(error);
+
+/*
+ * Messages from the sandbox are untrusted (§3.3): the widget code runs next
+ * to the runtime and can post anything on the channel. Keep only the shapes
+ * the bridge hands out, so a forged message cannot make listTools(),
+ * getState() or a listener throw in the host.
+ */
+
+const toolList = (value: unknown): ToolDescriptor[] =>
+  Array.isArray(value)
+    ? value.filter(tool => tool && typeof tool.name == 'string')
+    : [];
+
+/** The state as JSON text: an object, or `{}`. */
+const stateJson = (value: unknown) => {
+  try {
+    const json = JSON.stringify(value);
+    return json && json[0] == '{' ? json : '{}';
+  } catch {
+    return '{}';
+  }
+};
+
+const toError = (value: unknown): LiveError => {
+  const error = (value && typeof value == 'object' ? value : {}) as LiveError;
+  return {
+    ...error,
+    phase: typeof error.phase == 'string' ? error.phase : 'render',
+    message: typeof error.message == 'string' ? error.message : String(value),
+  };
+};
 
 /** A random channel id; works on insecure origins (no randomUUID). */
 const channelId = () =>
@@ -151,8 +184,11 @@ export const mountLive = async (
   const { timeoutMs = 5000, onError } = options;
   let props = options.props || {};
   let tools: ToolDescriptor[] = [];
-  let state: Record<string, unknown> = {};
+  /** JSON text, so getState() always returns a fresh, plain copy. */
+  let state = '{}';
   let current: Session | undefined;
+  /** Stops the start in progress, if any (reload or destroy meanwhile). */
+  let abort: (() => void) | undefined;
   let destroyed = false;
   let confirmHandler: ActionConfirmHandler | null = null;
   const listeners = new Set<(event: AgentBridgeEvent) => void>();
@@ -231,6 +267,14 @@ export const mountLive = async (
         resize: mode == 'sandbox' && options.autoResize !== false,
       };
       let started = false;
+      // Opened, but neither started nor stopped yet.
+      const settle = () => {
+        if (started) return false;
+        started = true;
+        abort = undefined;
+        clearTimeout(timer);
+        return true;
+      };
       const timer = setTimeout(
         () =>
           finish({
@@ -240,9 +284,7 @@ export const mountLive = async (
         timeoutMs
       );
       const finish = (error?: LiveError) => {
-        if (started) return;
-        started = true;
-        clearTimeout(timer);
+        if (!settle()) return;
         if (error) {
           close(session);
           reject(report(error, code));
@@ -257,24 +299,35 @@ export const mountLive = async (
       const receive: Receive = message => {
         if (!message || message.ch !== ch) return;
         if (message.type == 'ready') {
-          tools = message.tools;
-          state = message.state;
+          tools = toolList(message.tools);
+          state = stateJson(message.state);
           finish();
         } else if (message.type == 'error') {
-          if (started) report(message.error, code);
-          else finish(message.error);
+          const error = toError(message.error);
+          if (started) report(error, code);
+          else finish(error);
         } else if (message.type == 'event' && started) {
-          const forwarded = message.event;
-          if (forwarded.type == 'tools-changed') tools = forwarded.tools;
-          else state = forwarded.state;
-          emit(forwarded);
+          // Re-made from the checked caches, not passed on as received.
+          const event = (message.event || {}) as Partial<AgentBridgeEvent>;
+          if (event.type == 'tools-changed') {
+            tools = toolList(event.tools);
+            emit({ type: event.type, tools: tools.slice() });
+          } else if (event.type == 'state-changed') {
+            state = stateJson(event.state);
+            emit({
+              type: event.type,
+              name: typeof event.name == 'string' ? event.name : undefined,
+              state: bridge.getState(),
+            });
+          }
         } else if (message.type == 'result' || message.type == 'ack') {
-          const settle = session.pending.get(message.id);
-          if (settle) settle(message);
+          const answer = session.pending.get(message.id);
+          if (answer) answer(message);
         } else if (
           message.type == 'resize' &&
           config.resize &&
           session.frame &&
+          Number.isFinite(message.height) &&
           message.height >= 0
         ) {
           // DC-8: fit the iframe to its content.
@@ -289,31 +342,64 @@ export const mountLive = async (
         send: () => {},
         stop: () => {},
       };
+      // A reload or destroy before `ready` closes this session; the caller
+      // asked for that, so onError is not told.
+      abort = () => {
+        if (!settle()) return;
+        close(session);
+        reject({
+          phase: 'mount',
+          message: 'The widget was reloaded or destroyed before it started.',
+        });
+      };
       if (mode == 'direct') {
         openDirect(session, config, receive, options).catch(error =>
           finish({ phase: 'mount', message: messageOf(error) })
         );
       } else {
-        openSandbox(session, config, receive, options);
+        try {
+          openSandbox(session, config, receive, options);
+        } catch (error) {
+          // A runtimeUrl that is not a URL, props that are not JSON, ...
+          finish({
+            phase: 'mount',
+            message: `The sandbox could not be set up: ${messageOf(error)}`,
+          });
+        }
       }
     });
 
   /** Clear the widget's tools and state, telling subscribers. */
   const clear = () => {
+    if (abort) abort();
     if (current) close(current);
     current = undefined;
     if (tools.length) emit({ type: 'tools-changed', tools: [] });
     tools = [];
-    state = {};
+    state = '{}';
   };
 
   const bridge: AgentBridge = {
     listTools: () => tools.slice(),
-    getState: () => JSON.parse(JSON.stringify(state)),
+    getState: () => JSON.parse(state),
     callTool: async (name, args = {}) => {
       const find = () => current && tools.find(t => t.name === name);
       const tool = find();
       if (!tool) return fail('NOT_FOUND', `No tool named "${name}".`);
+
+      // As in lithent/agent: check first, so the approval and the widget see
+      // only valid, declared arguments (DC-5, DC-11).
+      const [clean, issues] = checkArgs(tool.inputSchema, args);
+      if (issues) {
+        const list = issues
+          .map(i => `${i.param || 'arguments'} (${i.issue})`)
+          .join(', ');
+        return fail(
+          'INVALID_PARAMS',
+          `Invalid arguments for "${name}": ${list}.`,
+          issues
+        );
+      }
 
       // DC-14: approval happens here, on the host; a refused call never
       // reaches the widget. Same rules as lithent/agent (DC-5).
@@ -326,7 +412,7 @@ export const mountLive = async (
               (await confirmHandler({
                 name,
                 description: tool.description,
-                args,
+                args: clean,
               })) === true;
           } else {
             reason = `"${name}" needs approval and no confirm handler is set.`;
@@ -341,7 +427,11 @@ export const mountLive = async (
       }
 
       const session = current as Session;
-      const reply = await request(session, { type: 'call', name, args });
+      const reply = await request(session, {
+        type: 'call',
+        name,
+        args: clean,
+      });
       if (typeof reply != 'string') {
         const result = (reply as { result?: ToolCallResult }).result;
         return result && typeof result.ok == 'boolean'

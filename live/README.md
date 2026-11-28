@@ -5,7 +5,7 @@ people use it. The code runs in a sandboxed iframe; its `agentAction` and
 `agentState` reach the host through the same `AgentBridge` as
 [`lithent/agent`](../agent/README.md), so a model can read the live state a
 person left and change it, instead of generating the widget again. Ships inside
-the `lithent` package: the host controller is about 4.5 KB brotli, the sandbox
+the `lithent` package: the host controller is about 5 KB brotli, the sandbox
 runtime (`lithent/live/runtime`) about 8.5 KB.
 
 **Design and test records:** [docs/agent-ui](../docs/agent-ui/)

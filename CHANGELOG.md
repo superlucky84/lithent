@@ -20,7 +20,7 @@
   Errors come back with a `hint` for the model; `updateProps` keeps the
   widget's state; `autoResize` and `theme` fit it into the page;
   `mode: 'direct'` runs trusted code in a shadow root; `defineLiveElement()`
-  registers `<lithent-live>`. Host about 4.5 KB, runtime about 8.5 KB brotli.
+  registers `<lithent-live>`. Host about 5 KB, runtime about 8.5 KB brotli.
 - Docs: Agent-Native Components and Generative UI guides (English and Korean)
   with an interactive playground; the bundled skill (`dist/skills/lithent`)
   and `lithent-agent-addon.md` describe both, including the code convention

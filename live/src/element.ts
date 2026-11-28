@@ -137,6 +137,16 @@ export const defineLiveElement = (
     }
 
     connectedCallback() {
+      // A value assigned before defineLiveElement() is an own property that
+      // hides the accessor: take it over (as lithent/element does).
+      const own = this as unknown as Record<string, unknown>;
+      for (const key of PROPERTIES) {
+        if (Object.hasOwn(own, key)) {
+          const value = own[key];
+          delete own[key];
+          own[key] = value;
+        }
+      }
       // Still running: the reconnect half of a move.
       if (!stateOf(this).h) change(this, 'mount');
     }

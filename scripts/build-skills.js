@@ -27,7 +27,10 @@ if (!existsSync(distDir)) {
   mkdirSync(distDir, { recursive: true });
 }
 
-const replaceVersion = (content) => content.replace(/{{VERSION}}/g, version);
+// Prettier rewrites `{{VERSION}}` in YAML frontmatter as `{ { VERSION } }`:
+// take both forms.
+const replaceVersion = content =>
+  content.replace(/\{\s*\{\s*VERSION\s*\}\s*\}/g, version);
 
 const processFile = (srcPath, destPath) => {
   mkdirSync(dirname(destPath), { recursive: true });

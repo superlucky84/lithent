@@ -5,7 +5,7 @@ import dts from 'vite-plugin-dts';
 import { emitDeclarationFormats } from '../scripts/emit-declaration-formats.mjs';
 
 /**
- * Host controller build: `lithent/live` (docs/agent-ui DESIGN §3, DC-9 ≤ 3,000 B).
+ * Host controller build: `lithent/live` (docs/agent-ui DESIGN §3; DC-17: ≤ 5,500 B).
  * The sandbox runtime is a separate build: vite.runtime.config.js.
  *
  * RQ-11 — `LITHENT_CORE=concurrent` points the bare `lithent` specifier at

@@ -99,7 +99,9 @@ describe('theme and size (DC-8)', () => {
 
   it('asks the sandbox for its height unless autoResize is false', () => {
     const configOf = (frame: HTMLIFrameElement) =>
-      JSON.parse(/c=(\{.*?\});r\?/.exec(frame.srcdoc)![1]);
+      JSON.parse(
+        /lithentLiveRuntime,(\{.*\})\)<\/script>/.exec(frame.srcdoc)![1]
+      );
     expect(configOf(begin().sandbox!.frame).resize).toBe(true);
     expect(configOf(begin({ autoResize: false }).sandbox!.frame).resize).toBe(
       false
@@ -184,7 +186,9 @@ describe('starting (DC-13, §3.4)', () => {
       code: 'return lmount(() => () => null)',
       props: { label: 'a' },
     });
-    const json = /c=(\{.*?\});r\?/.exec(sandbox!.frame.srcdoc)![1];
+    const json = /lithentLiveRuntime,(\{.*\})\)<\/script>/.exec(
+      sandbox!.frame.srcdoc
+    )![1];
     expect(JSON.parse(json)).toEqual({
       ch: sandbox!.ch,
       code: 'return lmount(() => () => null)',

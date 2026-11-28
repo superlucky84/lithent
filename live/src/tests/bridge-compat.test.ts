@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
-import { createAgentBridge } from 'lithent/agent';
+import { h, mount, render } from 'lithent';
+import type { TagFunction } from 'lithent';
+import { AgentScope, agentAction, createAgentBridge } from 'lithent/agent';
 import type { AgentBridge, AgentBridgeEvent } from 'lithent/agent';
-import { ready, TOOLS } from '@/tests/harness';
+import { flush, ready, TOOLS } from '@/tests/harness';
 import type { LiveHandle } from '@/index';
 
 /**
@@ -79,5 +81,65 @@ describe('LiveHandle.bridge and AgentBridge (RQ-8)', () => {
     const { handle } = await ready();
     expect(describeTools(handle.bridge)).toEqual(['add', 'reset!']);
     expect(describeTools(createAgentBridge())).toEqual([]);
+  });
+});
+
+describe('argument check parity with lithent/agent (review)', () => {
+  it('rejects the same arguments and posts the same clean ones', async () => {
+    // One action, through a local bridge and through a widget's descriptor.
+    const local = createAgentBridge();
+    const seen: unknown[] = [];
+    const Widget = mount(() => {
+      agentAction({
+        name: 'book',
+        description: 'Book a trip',
+        params: {
+          city: { type: String, required: true, enum: ['Seoul', 'Busan'] },
+          nights: { type: Number, required: true },
+          late: Boolean,
+          tags: Array,
+          meta: Object,
+        },
+        run: args => {
+          seen.push(args);
+          return true;
+        },
+      });
+      return () => null;
+    });
+    render(
+      h(AgentScope as unknown as TagFunction, { bridge: local }, h(Widget, {})),
+      document.body.appendChild(document.createElement('div'))
+    );
+    const { handle, sandbox } = await ready({}, local.listTools());
+
+    const cases: unknown[] = [
+      {},
+      { city: 'Tokyo', nights: 2 },
+      { city: 'Seoul', nights: '2' },
+      { city: 'Seoul', nights: NaN },
+      { city: 'Seoul', nights: 1, late: 'yes', tags: {}, meta: [] },
+      null,
+      [],
+      { city: 'Busan', nights: 3, late: true, tags: [1], meta: {}, x: 1 },
+    ];
+    for (const args of cases) {
+      sandbox.sent.length = 0;
+      const want = await local.callTool(
+        'book',
+        args as Record<string, unknown>
+      );
+      const got = handle.bridge.callTool(
+        'book',
+        args as Record<string, unknown>
+      );
+      if (want.ok) {
+        await flush();
+        expect(sandbox.sent[0].args).toEqual(seen.at(-1));
+      } else {
+        await expect(got).resolves.toEqual(want);
+        expect(sandbox.sent).toEqual([]);
+      }
+    }
   });
 });

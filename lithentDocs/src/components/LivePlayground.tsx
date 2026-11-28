@@ -125,6 +125,9 @@ export const LivePlayground = mount<{ language: Language }>(
     let state = '{}';
     let failure: LiveError | undefined;
     let log: string[] = [];
+    // The latest run; an older one that finishes later is dropped.
+    let runs = 0;
+    let gone = false;
     const args: Record<string, string> = { ...DEFAULT_ARGS };
 
     const refresh = () => {
@@ -135,6 +138,7 @@ export const LivePlayground = mount<{ language: Language }>(
     };
 
     const run = async () => {
+      const id = ++runs;
       if (handle) handle.destroy();
       handle = undefined;
       tools = [];
@@ -143,7 +147,7 @@ export const LivePlayground = mount<{ language: Language }>(
       log = [];
       renew();
       try {
-        handle = await mountLive({
+        const started = await mountLive({
           code,
           container: box.value as HTMLElement,
           runtimeCode: sandboxRuntimeCode,
@@ -151,6 +155,12 @@ export const LivePlayground = mount<{ language: Language }>(
           styles: WIDGET_STYLES,
           theme: { '--brand': '#42b883' },
         });
+        // Run again or left the page while it started: do not keep it.
+        if (gone || id != runs) {
+          started.destroy();
+          return;
+        }
+        handle = started;
         handle.bridge.subscribe(refresh);
         handle.bridge.setConfirmHandler(({ name, args: called }) =>
           window.confirm(
@@ -159,6 +169,7 @@ export const LivePlayground = mount<{ language: Language }>(
         );
         refresh();
       } catch (error) {
+        if (gone || id != runs) return;
         failure = error as LiveError;
         renew();
       }
@@ -184,7 +195,10 @@ export const LivePlayground = mount<{ language: Language }>(
 
     mountCallback(() => {
       run();
-      return () => handle && handle.destroy();
+      return () => {
+        gone = true;
+        if (handle) handle.destroy();
+      };
     });
 
     const button =

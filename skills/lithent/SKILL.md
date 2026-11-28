@@ -1,7 +1,7 @@
 ---
 name: lithent
 title: Lithent Agent Skills
-version: { { VERSION } }
+version: {{VERSION}}
 description: AI agent skills for working with the Lithent library.
 additional_materials:
   - constraints/
